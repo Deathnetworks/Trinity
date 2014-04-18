@@ -311,8 +311,6 @@ namespace Trinity
                     break;
                 case GObjectType.JumpLinkPortal:
                     {
-                        const int ignoreTime = 15;
-
                         // Same world portal check
                         if (CacheData.SameWorldPortals.Any(p => p.WorldID == Trinity.Player.WorldID &&
                                 DateTime.UtcNow.Subtract(p.LastInteract).TotalSeconds < 15 && // this is the duration since last interacted 
@@ -329,6 +327,13 @@ namespace Trinity
                             AddToCache = false;
                             c_IgnoreSubStep = "RecentSameWorldPortal";
                         }
+
+                        if (!NavHelper.CanRayCast(Trinity.Player.Position, CurrentCacheObject.Position))
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "Raycast";
+                        }
+
                         break;
                     }
                 case GObjectType.Interactable:

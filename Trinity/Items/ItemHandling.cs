@@ -51,6 +51,61 @@ namespace Trinity
         /// <returns></returns>
         internal static bool PickupItemValidation(PickupItem item)
         {
+            // Calculate item types and base types etc.
+            GItemType itemType = DetermineItemType(item.InternalName, item.DBItemType, item.ItemFollowerType);
+            GItemBaseType baseType = DetermineBaseType(itemType);
+
+
+            // Pickup Legendary potions
+            if (itemType == GItemType.HealthPotion && item.Quality >= ItemQuality.Legendary)
+            {
+                return true;
+            }
+            
+            if (itemType == GItemType.InfernalKey && !Settings.Loot.Pickup.InfernalKeys)
+            {
+                return false;
+            }
+
+            // Rift Keystone Fragments == LootRunkey
+            if (itemType == GItemType.LootRunKey && Settings.Loot.Pickup.LootRunKey)
+            {
+                return true;
+            }
+
+            // Blood Shards == HoradricRelic
+            if (itemType == GItemType.HoradricRelic && Settings.Loot.Pickup.BloodShards)
+            {
+                return true;
+            }
+
+            if (itemType == GItemType.CraftingMaterial && (item.ACDItem.GetTrinityItemQuality() < Settings.Loot.Pickup.MiscItemQuality || !Settings.Loot.Pickup.CraftMaterials))
+            {
+                return false;
+            }
+
+            if (itemType == GItemType.CraftTome && !Settings.Loot.Pickup.CraftTomes)
+            {
+                return false;
+            }
+
+            // Plans
+            if (item.InternalName.ToLower().StartsWith("craftingplan_smith") && (item.ACDItem.GetTrinityItemQuality() < Settings.Loot.Pickup.MiscItemQuality || !Settings.Loot.Pickup.Plans))
+            {
+                return false;
+            }
+
+            // Designs
+            if (item.InternalName.ToLower().StartsWith("craftingplan_jeweler") && (item.ACDItem.GetTrinityItemQuality() < Settings.Loot.Pickup.MiscItemQuality || !Settings.Loot.Pickup.Designs))
+            {
+                return false;
+            }
+
+            // Always pickup Legendary plans
+            if (itemType == GItemType.CraftingPlan && item.Quality >= ItemQuality.Legendary && Settings.Loot.Pickup.LegendaryPlans)
+            {
+                return true;
+            }
             // If it's legendary, we always want it *IF* it's level is right
             if (item.Quality >= ItemQuality.Legendary)
             {
@@ -62,9 +117,6 @@ namespace Trinity
                 return true;
             }
 
-            // Calculate item types and base types etc.
-            GItemType itemType = DetermineItemType(item.InternalName, item.DBItemType, item.ItemFollowerType);
-            GItemBaseType baseType = DetermineBaseType(itemType);
 
             string itemSha1Hash = HashGenerator.GenerateItemHash(item.Position, item.ActorSNO, item.Name, CurrentWorldDynamicId, item.Quality, item.Level);
 
@@ -103,53 +155,8 @@ namespace Trinity
                     break;
                 case GItemBaseType.Misc:
 
-                    if (itemType == GItemType.CraftingMaterial && (item.ACDItem.GetTrinityItemQuality() < Settings.Loot.Pickup.MiscItemQuality || !Settings.Loot.Pickup.CraftMaterials))
-                    {
-                        return false;
-                    }
-
-                    if (itemType == GItemType.CraftTome && !Settings.Loot.Pickup.CraftTomes)
-                    {
-                        return false;
-                    }
-
-                    // Plans
-                    if (item.InternalName.ToLower().StartsWith("craftingplan_smith") && (item.ACDItem.GetTrinityItemQuality() < Settings.Loot.Pickup.MiscItemQuality || !Settings.Loot.Pickup.Plans))
-                    {
-                        return false;
-                    }
-
-                    // Designs
-                    if (item.InternalName.ToLower().StartsWith("craftingplan_jeweler") && (item.ACDItem.GetTrinityItemQuality() < Settings.Loot.Pickup.MiscItemQuality || !Settings.Loot.Pickup.Designs))
-                    {
-                        return false;
-                    }
-
-                    // Always pickup Legendary plans
-                    if (itemType == GItemType.CraftingPlan && item.Quality >= ItemQuality.Legendary && Settings.Loot.Pickup.LegendaryPlans)
-                    {
-                        return true;
-                    }
-
-                    if (itemType == GItemType.InfernalKey && !Settings.Loot.Pickup.InfernalKeys)
-                    {
-                        return false;
-                    }
-
-                    // Rift Keystone Fragments == LootRunkey
-                    if (itemType == GItemType.LootRunKey && Settings.Loot.Pickup.LootRunKey)
-                    {
-                        return true;
-                    }
-
-                    // Blood Shards == HoradricRelic
-                    if (itemType == GItemType.HoradricRelic && Settings.Loot.Pickup.BloodShards)
-                    {
-                        return true;
-                    }
-
                     // Potion filtering
-                    if (itemType == GItemType.HealthPotion)
+                    if (itemType == GItemType.HealthPotion && item.Quality < ItemQuality.Legendary)
                     {
                         int potionsInBackPack = ZetaDia.Me.Inventory.Backpack.Where(p => p.ItemType == ItemType.Potion).Sum(p => p.ItemStackQuantity);
 

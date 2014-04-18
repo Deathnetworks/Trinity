@@ -219,7 +219,6 @@ namespace Trinity
                             Player.ActiveBounty = new TrinityBountyInfo()
                             {
                                 Act = ab.Act,
-                                LevelArea = ab.LevelArea,
                                 Quest = ab.Quest,
                                 State = ab.State,
                                 Info = new TrinityQuestInfo()

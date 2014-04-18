@@ -714,7 +714,7 @@ namespace Trinity.XmlTags
             }
             if (ExploreTimeoutType == TimeoutType.Timer && TagTimer.Elapsed.TotalSeconds > TimeoutValue)
             {
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "TrinityExploreDungeon timer ended ({0}), tag finished!", TimeoutValue);
+                Logger.Log("TrinityExploreDungeon timer ended ({0}), tag finished!", TimeoutValue);
                 timeoutBreached = true;
                 return RunStatus.Success;
             }
@@ -742,7 +742,7 @@ namespace Trinity.XmlTags
             }
             else if (lastCoinage == Trinity.Player.Coinage && TagTimer.Elapsed.TotalSeconds > TimeoutValue)
             {
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "TrinityExploreDungeon gold inactivity timer tripped ({0}), tag finished!", TimeoutValue);
+                Logger.Log("TrinityExploreDungeon gold inactivity timer tripped ({0}), tag finished!", TimeoutValue);
                 timeoutBreached = true;
                 return RunStatus.Success;
             }
@@ -771,10 +771,10 @@ namespace Trinity.XmlTags
                 ),
                 new Decorator(ret => GetRouteUnvisitedNodeCount() == 0,
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Visited all nodes but objective not complete, forcing grid reset!")),
+                        new Action(ret => Logger.Log("Visited all nodes but objective not complete, forcing grid reset!")),
                         new DecoratorContinue(ret => timesForcedReset > 2 && GetCurrentRouteNodeCount() == 1,
                             new Sequence(
-                                new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Only 1 node found and 3 grid resets, falling back to failsafe!")),
+                                new Action(ret => Logger.Log("Only 1 node found and 3 grid resets, falling back to failsafe!")),
                                 new Action(ret => BoxSize = 25),
                                 new Action(ret => BoxTolerance = 0.01f),
                                 new Action(ret => IgnoreScenes.Clear())
@@ -812,76 +812,77 @@ namespace Trinity.XmlTags
             new PrioritySelector(
                 TimeoutCheck(),
 
-                new Decorator(ret => EndType == TrinityExploreEndType.PortalExitFound && 
+                new Decorator(ret => EndType == TrinityExploreEndType.PortalExitFound &&
                     PortalExitMarker() != null && PortalExitMarker().Position.Distance2D(myPos) <= MarkerDistance,
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Found portal exit! Tag Finished.")),
+                        new Action(ret => Logger.Log("Found portal exit! Tag Finished.")),
                         new Action(ret => isDone = true)
                     )
-                ), new Decorator(ret => EndType == TrinityExploreEndType.BountyComplete && GetIsBountyDone(),
+                ),
+                new Decorator(ret => EndType == TrinityExploreEndType.BountyComplete && GetIsBountyDone(),
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Bounty is done. Tag Finished.", IgnoreLastNodes)),
+                        new Action(ret => Logger.Log("Bounty is done. Tag Finished.")),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => EndType == TrinityExploreEndType.FullyExplored && IgnoreLastNodes > 0 && GetRouteUnvisitedNodeCount() <= IgnoreLastNodes && GetGridSegmentationVisistedNodeCount() >= MinVisistedNodes,
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Fully explored area! Ignoring {0} nodes. Tag Finished.", IgnoreLastNodes)),
+                        new Action(ret => Logger.Log("Fully explored area! Ignoring {0} nodes. Tag Finished.", IgnoreLastNodes)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => EndType == TrinityExploreEndType.FullyExplored && GetRouteUnvisitedNodeCount() == 0,
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Fully explored area! Tag Finished.", 0)),
+                        new Action(ret => Logger.Log("Fully explored area! Tag Finished.", 0)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => EndType == TrinityExploreEndType.ExitFound && ExitNameHash != 0 && IsExitNameHashVisible(),
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Found exitNameHash {0}!", ExitNameHash)),
+                        new Action(ret => Logger.Log("Found exitNameHash {0}!", ExitNameHash)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => (EndType == TrinityExploreEndType.ObjectFound || EndType == TrinityExploreEndType.SceneLeftOrActorFound) && ActorId != 0 && ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
                     .Any(a => a.ActorSNO == ActorId && a.Distance <= ObjectDistance),
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Found Object {0}!", ActorId)),
+                        new Action(ret => Logger.Log("Found Object {0}!", ActorId)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => (EndType == TrinityExploreEndType.ObjectFound || EndType == TrinityExploreEndType.SceneLeftOrActorFound) && AlternateActorsFound(),
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Found Alternate Object {0}!", GetAlternateActor().ActorSNO)),
+                        new Action(ret => Logger.Log("Found Alternate Object {0}!", GetAlternateActor().ActorSNO)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => EndType == TrinityExploreEndType.SceneFound && Trinity.Player.SceneId == SceneId,
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Found SceneId {0}!", SceneId)),
+                        new Action(ret => Logger.Log("Found SceneId {0}!", SceneId)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => EndType == TrinityExploreEndType.SceneFound && !string.IsNullOrWhiteSpace(SceneName) && ZetaDia.Me.CurrentScene.Name.ToLower().Contains(SceneName.ToLower()),
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Found SceneName {0}!", SceneName)),
+                        new Action(ret => Logger.Log("Found SceneName {0}!", SceneName)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => EndType == TrinityExploreEndType.SceneLeftOrActorFound && SceneId != 0 && SceneIdLeft(),
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Left SceneId {0}!", SceneId)),
+                        new Action(ret => Logger.Log("Left SceneId {0}!", SceneId)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => (EndType == TrinityExploreEndType.SceneFound || EndType == TrinityExploreEndType.SceneLeftOrActorFound) && !string.IsNullOrWhiteSpace(SceneName) && SceneNameLeft(),
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Left SceneName {0}!", SceneName)),
+                        new Action(ret => Logger.Log("Left SceneName {0}!", SceneName)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => Trinity.Player.IsInTown,
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Cannot use TrinityExploreDungeon in town - tag finished!", SceneName)),
+                        new Action(ret => Logger.Log("Cannot use TrinityExploreDungeon in town - tag finished!", SceneName)),
                         new Action(ret => isDone = true)
                     )
                 )
@@ -1546,7 +1547,7 @@ namespace Trinity.XmlTags
             {
                 return false;
             }
-            
+
             if (ZetaDia.CurrentAct == Act.OpenWorld && DataDictionary.RiftWorldIds.Contains(ZetaDia.CurrentWorldId))
             {
                 //X1_LR_DungeonFinder = 337492,
@@ -1571,15 +1572,17 @@ namespace Trinity.XmlTags
                     return false;
 
                 _LastCheckBountyDone = DateTime.UtcNow;
-                
+
                 // Only valid for Adventure mode
                 if (ZetaDia.CurrentAct != Act.OpenWorld)
+                {
                     return false;
-
+                }
                 // We're in a rift, not a bounty!
                 if (ZetaDia.CurrentAct == Act.OpenWorld && DataDictionary.RiftWorldIds.Contains(ZetaDia.CurrentWorldId))
+                {
                     return false;
-
+                }
                 if (ZetaDia.IsInTown)
                 {
                     Logger.Log("In Town, Assuming done.");
@@ -1596,43 +1599,25 @@ namespace Trinity.XmlTags
                     Logger.Log("Bounty Turn-In available, Assuming done.");
                     return true;
                 }
-
-
-                if (ZetaDia.ActInfo.Bounties.Any(bounty => (int)bounty.LevelArea == Trinity.Player.LevelAreaId && bounty.State == QuestState.Completed))
-                {
-                    return true;
-                }
-
-
+                                           
                 var b = ZetaDia.ActInfo.ActiveBounty;
                 if (b == null)
                 {
                     Logger.Log("Active bounty returned null, Assuming done.");
                     return true;
-                }                
+                }
                 if (b == null && ZetaDia.ActInfo.ActiveQuests.Any(q => q.Quest.ToString().ToLower().StartsWith("x1_AdventureMode_BountyTurnin") && q.State == QuestState.InProgress))
                 {
                     Logger.Log("Bounty Turn-in quest is In-Progress, Assuming done.");
                     return true;
                 }
-                if (b != null)
+                //If completed or on next step, we are good.
+                if (b != null && b.Info.State == QuestState.Completed)
                 {
-                    if (!b.Info.IsValid)
-                    {
-                        Logger.Log("Does this even work? Thinks the bounty is not valid.");
-                    }
-                    if (b.Info.QuestSNO > 500000 || b.Info.QuestSNO < 200000)
-                    {
-                        Logger.Log("Got some weird numbers going on with the QuestSNO of the active bounty. Assuming glitched and done.");
-                        return true;
-                    }
-                    //If completed or on next step, we are good.
-                    if (b.Info.State == QuestState.Completed)
-                    {
-                        Logger.Log("Seems completed!");
-                        return true;
-                    }
+                    Logger.Log("Seems completed!");
+                    return true;
                 }
+
 
             }
             catch (Exception ex)

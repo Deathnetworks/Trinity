@@ -241,8 +241,10 @@ namespace Trinity
                                             cacheObject.Weight = Math.Max((90f - cacheObject.RadiusDistance) / 90f * 2000d, 20d);
 
                                         // Bounty Objectives goooo
-                                        if (cacheObject.IsBountyObjective)
+                                        if (cacheObject.IsBountyObjective && !navBlocking)
+                                        {
                                             cacheObject.Weight += 50000d;
+                                        }
 
                                         // set a minimum 100 just to make sure it's not 0
                                         if ((isKillBounty || Player.InActiveEvent))
@@ -838,6 +840,12 @@ namespace Trinity
                                 break;
                             }
                         case GObjectType.JumpLinkPortal:
+                            {
+                                if (cacheObject.CentreDistance < 15)
+                                    cacheObject.Weight = 25;
+
+                                break;
+                            }
                         case GObjectType.Interactable:
                             {
                                 // Need to Prioritize, forget it!
