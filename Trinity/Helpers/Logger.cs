@@ -14,7 +14,7 @@ namespace Trinity.Technicals
     //[DebuggerStepThrough]
     internal class Logger
     {
-        private static readonly log4net.ILog DBLog = Zeta.Common.Logger.GetLoggerInstanceForType();
+        private static readonly log4net.ILog _Logger = Zeta.Common.Logger.GetLoggerInstanceForType();
         private static string prefix = "[Trinity]";
 
         public static string Prefix
@@ -22,6 +22,10 @@ namespace Trinity.Technicals
             get { return Logger.prefix; }
             set { Logger.prefix = value; }
         }
+
+
+        private static string _LastLogMessage = "";
+        private static object[] _LastLogArgs = { };
 
         /// <summary>Logs the specified level.</summary>
         /// <param name="level">The logging level.</param>
@@ -34,22 +38,26 @@ namespace Trinity.Technicals
             {
                 string msg = string.Format(prefix + "{0} {1}", category != LogCategory.UserInformation ? "[" + category.ToString() + "]" : string.Empty, formatMessage);
 
-                //LogToTrinityDebug(msg, args);
-
-                switch (level)
+                if (_LastLogMessage != msg && _LastLogArgs != args)
                 {
-                    case TrinityLogLevel.Error:
-                        DBLog.ErrorFormat(msg, args);
-                        break;
-                    case TrinityLogLevel.Info:
-                        DBLog.InfoFormat(msg, args);
-                        break;
-                    case TrinityLogLevel.Verbose:
-                        DBLog.DebugFormat(msg, args);
-                        break;
-                    case TrinityLogLevel.Debug:
-                        LogToTrinityDebug(msg, args);
-                        break;
+                    _LastLogMessage = msg;
+                    _LastLogArgs = args;
+
+                    switch (level)
+                    {
+                        case TrinityLogLevel.Error:
+                            _Logger.ErrorFormat(msg, args);
+                            break;
+                        case TrinityLogLevel.Info:
+                            _Logger.InfoFormat(msg, args);
+                            break;
+                        case TrinityLogLevel.Verbose:
+                            _Logger.DebugFormat(msg, args);
+                            break;
+                        case TrinityLogLevel.Debug:
+                            LogToTrinityDebug(msg, args);
+                            break;
+                    }
                 }
             }
         }
@@ -201,7 +209,7 @@ namespace Trinity.Technicals
                 {
                     lock (_loglock)
                     {
-                        DBLog.Info("Setting up Trinity Logging");
+                        _Logger.Info("Setting up Trinity Logging");
                         int myPid = Process.GetCurrentProcess().Id;
                         DateTime startTime = Process.GetCurrentProcess().StartTime;
 
@@ -240,7 +248,7 @@ namespace Trinity.Technicals
             }
             catch (Exception ex)
             {
-                DBLog.Error("Error setting up Trinity Logger:\n" + ex.ToString());
+                _Logger.Error("Error setting up Trinity Logger:\n" + ex.ToString());
             }
         }
 
@@ -264,7 +272,7 @@ namespace Trinity.Technicals
             }
             catch (Exception ex)
             {
-                DBLog.Error("Error in LogToTrinityDebug: " + ex.ToString());
+                _Logger.Error("Error in LogToTrinityDebug: " + ex.ToString());
             }
         }
     }

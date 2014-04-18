@@ -258,7 +258,13 @@ namespace Trinity
                         EventStartTime = DateTime.MinValue;
                     }
 
-                    if (CurrentTarget == null && Player.InActiveEvent && DateTime.UtcNow.Subtract(EventStartTime).TotalSeconds < 30)
+                    // Reset Event time while we have targts
+                    if (CurrentTarget != null)
+                    {
+                        EventStartTime = DateTime.UtcNow;
+                    }
+
+                    if (CurrentTarget == null && Player.InActiveEvent && DateTime.UtcNow.Subtract(EventStartTime).TotalSeconds < 90)
                     {
                         if (EventStartPosition == Vector3.Zero)
                         {

@@ -584,7 +584,12 @@ namespace Trinity
 
         public static HashSet<int> DemonHunterPetIds { get { return demonHunterPetIds; } }
         private static readonly HashSet<int> demonHunterPetIds = new HashSet<int> { 
-            178664, 173827, 133741, 159144, 181748, 159098 
+            178664, 
+            173827, 
+            133741, 
+            159144, 
+            181748, 
+            159098 
         };
 
         /// <summary>
@@ -593,7 +598,7 @@ namespace Trinity
         /// </summary>
         public static HashSet<int> ForceToItemOverrideIds { get { return forceToItemOverrideIds; } }
         private static readonly HashSet<int> forceToItemOverrideIds = new HashSet<int> {
-            166943, // infernal key
+            166943, // DemonTrebuchetKey, infernal key
         };
 
         /// <summary>
@@ -601,7 +606,11 @@ namespace Trinity
         /// </summary>
         public static HashSet<int> InteractWhiteListIds { get { return interactWhiteListIds; } }
         private static readonly HashSet<int> interactWhiteListIds = new HashSet<int> {
-            56686, 211999, 52685, 54882, 180575, 105478, 
+            56686, // a3dun_Keep_Bridge_Switch 
+            211999, // a3dun_Keep_Bridge_Switch_B 
+            52685, // a3dun_Keep_Bridge
+            54882, // a3dun_Keep_Door_Wooden_A
+            105478, // a1dun_Leor_Spike_Spawner_Switch
             102927, // A1 Cursed Hold Prisoners
             5747, // A1 Cathedral Switch
             365097, // Cursed Chest - Damp Cellar
