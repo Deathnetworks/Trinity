@@ -65,6 +65,9 @@ namespace Trinity.UIComponents
                                                 if (_Model.Loot.ItemFilterMode != _OriginalModel.Loot.ItemFilterMode)
                                                     Trinity.SetItemManagerProvider();
 
+                                                CacheData.FullClear();
+                                                UsedProfileManager.SetProfileInWindowTitle();
+
                                                 UILoader.CloseWindow();
                                             }
                                             catch (Exception ex)
