@@ -1597,12 +1597,19 @@ namespace Trinity.XmlTags
                     return true;
                 }
 
+
+                if (ZetaDia.ActInfo.Bounties.Any(bounty => (int)bounty.LevelArea == Trinity.Player.LevelAreaId && bounty.State == QuestState.Completed))
+                {
+                    return true;
+                }
+
+
                 var b = ZetaDia.ActInfo.ActiveBounty;
                 if (b == null)
                 {
                     Logger.Log("Active bounty returned null, Assuming done.");
                     return true;
-                }
+                }                
                 if (b == null && ZetaDia.ActInfo.ActiveQuests.Any(q => q.Quest.ToString().ToLower().StartsWith("x1_AdventureMode_BountyTurnin") && q.State == QuestState.InProgress))
                 {
                     Logger.Log("Bounty Turn-in quest is In-Progress, Assuming done.");

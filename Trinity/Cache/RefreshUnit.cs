@@ -131,6 +131,8 @@ namespace Trinity
                 {
                     c_ObjectType = GObjectType.Interactable;
                     CurrentCacheObject.Type = GObjectType.Interactable;
+                    c_Radius = c_diaObject.CollisionSphere.Radius;
+                    c_RadiusDistance = c_diaObject.Distance - c_Radius;
                     return true;
                 }
             }

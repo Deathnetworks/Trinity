@@ -109,7 +109,7 @@ namespace Trinity
                     // Just to make sure each one starts at 0 weight...
                     cacheObject.Weight = 0d;
 
-                    bool navBlocking = CacheData.NavigationObstacles.Any(ob => MathUtil.IntersectsPath(ob.Position, ob.Radius, Trinity.Player.Position, cacheObject.Position));
+                    bool navBlocking = LastTargetACDGuid != cacheObject.ACDGuid && CacheData.NavigationObstacles.Any(ob => MathUtil.IntersectsPath(ob.Position, ob.Radius, Trinity.Player.Position, cacheObject.Position));
 
                     // Now do different calculations based on the object type
                     switch (cacheObject.Type)

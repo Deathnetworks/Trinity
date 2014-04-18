@@ -23,9 +23,7 @@ namespace Trinity.Combat.Abilities
                 // Sprint OOC
                 if (IsNull(power) && CanUseSprintOOC)
                     power = PowerSprint;
-
                 // Threatening Shout OOC
-
             }
 
             // Ignore Pain when low on health
@@ -675,7 +673,7 @@ namespace Trinity.Combat.Abilities
 
         public static TrinityPower PowerAvalanche { get { return new TrinityPower(SNOPower.X1_Barbarian_Avalanche_v2, 15f, TargetUtil.GetBestClusterUnit(15f, 45f).Position); } }
         public static TrinityPower PowerIgnorePain { get { return new TrinityPower(SNOPower.Barbarian_IgnorePain); } }
-        public static TrinityPower PowerEarthquake { get { return new TrinityPower(SNOPower.Barbarian_Earthquake, 45f, TargetUtil.GetBestClusterUnit(20f, 65f, 1, true, true).Position); } }
+        public static TrinityPower PowerEarthquake { get { return new TrinityPower(SNOPower.Barbarian_Earthquake); } }
         public static TrinityPower PowerWrathOfTheBerserker { get { return new TrinityPower(SNOPower.Barbarian_WrathOfTheBerserker); } }
         public static TrinityPower PowerCallOfTheAncients { get { return new TrinityPower(SNOPower.Barbarian_CallOfTheAncients, V.I("Barbarian.CallOfTheAncients.TickDelay"), V.I("Barbarian.CallOfTheAncients.TickDelay")); } }
         public static TrinityPower PowerBattleRage { get { return new TrinityPower(SNOPower.Barbarian_BattleRage); } }

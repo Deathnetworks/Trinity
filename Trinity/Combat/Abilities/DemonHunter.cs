@@ -325,7 +325,7 @@ namespace Trinity
                     return new TrinityPower(SNOPower.DemonHunter_Grenades, 18f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
                 }
                 // Now return rapid fire, if not sending grenades instead
-                return new TrinityPower(SNOPower.DemonHunter_RapidFire, 50f, CurrentTarget.Position);
+                return new TrinityPower(SNOPower.DemonHunter_RapidFire, 40f, CurrentTarget.Position);
             }
 
             // Impale

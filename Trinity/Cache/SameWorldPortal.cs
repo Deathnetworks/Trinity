@@ -3,7 +3,7 @@ using Zeta.Common;
 
 namespace Trinity.Cache
 {
-    class SameWorldPortal
+    class SameWorldPortal : IEquatable<SameWorldPortal>
     {
         public int ActorSNO { get; set; }
         public int RActorGUID { get; set; }
@@ -16,6 +16,26 @@ namespace Trinity.Cache
             StartPosition = Trinity.Player.Position;
             WorldID = Trinity.Player.WorldID;
             LastInteract = DateTime.UtcNow;
+        }
+
+        public bool Equals(SameWorldPortal other)
+        {
+            return this.RActorGUID == other.RActorGUID;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.RActorGUID.GetHashCode();
+        }
+
+        public static bool operator ==(SameWorldPortal a, SameWorldPortal b)
+        {
+            return a.RActorGUID == b.RActorGUID;
+        }
+
+        public static bool operator !=(SameWorldPortal a, SameWorldPortal b)
+        {
+            return a.RActorGUID != b.RActorGUID;
         }
     }
 }

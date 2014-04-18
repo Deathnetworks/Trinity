@@ -487,7 +487,7 @@ namespace Trinity
             c_RadiusDistance = c_CentreDistance;
             CurrentCacheObject.RadiusDistance = Player.Position.Distance2D(CurrentCacheObject.Position);
         }
-             
+
 
         private static bool RefreshStepCachedObjectType(bool AddToCache)
         {
@@ -817,11 +817,11 @@ namespace Trinity
             try
             {
                 // Bounty Objectives should always be on the weight list
-                if (CurrentCacheObject.IsBountyObjective)
+                if (CurrentCacheObject.IsBountyObjective && !DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
                     return true;
 
                 // Always LoS Units during events
-                if (c_ObjectType == GObjectType.Unit && Player.InActiveEvent)
+                if (c_ObjectType == GObjectType.Unit && Player.InActiveEvent && !DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
                     return true;
 
                 // Everything except items and the current target
@@ -845,7 +845,8 @@ namespace Trinity
                                             if (c_CentreDistance >= 1f && c_CentreDistance <= 5f)
                                             {
                                                 c_HasBeenRaycastable = true;
-                                                CacheData.HasBeenRayCasted.Add(c_RActorGuid, c_HasBeenRaycastable);
+                                                if (!CacheData.HasBeenRayCasted.ContainsKey(c_RActorGuid))
+                                                    CacheData.HasBeenRayCasted.Add(c_RActorGuid, c_HasBeenRaycastable);
                                             }
                                             else if (Settings.Combat.Misc.UseNavMeshTargeting)
                                             {
@@ -864,7 +865,8 @@ namespace Trinity
                                                 else
                                                 {
                                                     c_HasBeenRaycastable = true;
-                                                    CacheData.HasBeenRayCasted.Add(c_RActorGuid, c_HasBeenRaycastable);
+                                                    if (!CacheData.HasBeenRayCasted.ContainsKey(c_RActorGuid))
+                                                        CacheData.HasBeenRayCasted.Add(c_RActorGuid, c_HasBeenRaycastable);
                                                 }
                                             }
                                             else
@@ -877,7 +879,8 @@ namespace Trinity
                                                 else
                                                 {
                                                     c_HasBeenRaycastable = true;
-                                                    CacheData.HasBeenRayCasted.Add(c_RActorGuid, c_HasBeenRaycastable);
+                                                    if (!CacheData.HasBeenRayCasted.ContainsKey(c_RActorGuid))
+                                                        CacheData.HasBeenRayCasted.Add(c_RActorGuid, c_HasBeenRaycastable);
                                                 }
 
                                             }
@@ -907,13 +910,15 @@ namespace Trinity
                                                 else
                                                 {
                                                     c_HasBeenInLoS = true;
-                                                    CacheData.HasBeenInLoS.Add(c_RActorGuid, c_HasBeenInLoS);
+                                                    if (!CacheData.HasBeenInLoS.ContainsKey(c_RActorGuid))
+                                                        CacheData.HasBeenInLoS.Add(c_RActorGuid, c_HasBeenInLoS);
                                                 }
                                             }
                                             else
                                             {
                                                 c_HasBeenInLoS = true;
-                                                CacheData.HasBeenInLoS.Add(c_RActorGuid, c_HasBeenInLoS);
+                                                if (!CacheData.HasBeenInLoS.ContainsKey(c_RActorGuid))
+                                                    CacheData.HasBeenInLoS.Add(c_RActorGuid, c_HasBeenInLoS);
                                             }
                                         }
                                     }

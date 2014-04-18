@@ -98,6 +98,17 @@ namespace Trinity.Technicals
         }
 
         /// <summary>
+        /// Logs a message as verbose with the specified category
+        /// </summary>
+        /// <param name="category"></param>
+        /// <param name="formatMessage"></param>
+        /// <param name="args"></param>
+        public static void LogVerbose(LogCategory category, string formatMessage, params object[] args)
+        {
+            Log(TrinityLogLevel.Verbose, category, formatMessage, args);
+        }
+
+        /// <summary>
         /// Logs a message with Normal/UserInformation
         /// </summary>
         /// <param name="formatMessage"></param>
@@ -194,7 +205,7 @@ namespace Trinity.Technicals
                         int myPid = Process.GetCurrentProcess().Id;
                         DateTime startTime = Process.GetCurrentProcess().StartTime;
 
-                        trinityLayout = new PatternLayout("%date{HH:mm:ss.fff} %-5level %m%n");
+                        trinityLayout = new PatternLayout("%date{HH:mm:ss.fff} %-5level %logger{1} %m%n");
                         trinityLayout.ActivateOptions();
 
                         trinityFilter = new log4net.Filter.LoggerMatchFilter();
@@ -213,7 +224,7 @@ namespace Trinity.Technicals
                             }
                         }
 
-                        //trinityAppender.Layout = trinityLayout;
+                        trinityAppender.Layout = trinityLayout;
                         //trinityAppender.AddFilter(trinityFilter);
                         trinityAppender.LockingModel = new FileAppender.ExclusiveLock();
                         //trinityAppender.LockingModel = new FileAppender.InterProcessLock();

@@ -385,13 +385,15 @@ namespace Trinity
 
                     using (new PerformanceLogger("HandleTarget.InRange"))
                     {
+                        bool isMoving = !(ZetaDia.Me.Movement.SpeedXY == 0 || PlayerMover.GetMovementSpeed() == 0);
+
                         bool stuckOnTarget =
                             ((CurrentTarget.Type == GObjectType.Barricade ||
                              CurrentTarget.Type == GObjectType.Interactable ||
                              CurrentTarget.Type == GObjectType.CursedChest ||
                              CurrentTarget.Type == GObjectType.CursedShrine ||
                              CurrentTarget.Type == GObjectType.Destructible) &&
-                             !ZetaDia.Me.Movement.IsMoving && DateTime.UtcNow.Subtract(PlayerMover.TimeLastUsedPlayerMover).TotalMilliseconds < 500);
+                             !isMoving && DateTime.UtcNow.Subtract(PlayerMover.TimeLastUsedPlayerMover).TotalMilliseconds < 500);
 
                         bool npcInRange = CurrentTarget.IsQuestGiver && CurrentTarget.RadiusDistance <= 3f;
 
@@ -517,27 +519,27 @@ namespace Trinity
                                 case GObjectType.CursedShrine:
                                     {
                                         ForceTargetUpdate = true;
-                                        if (CurrentTarget.RadiusDistance <= 5f && ZetaDia.Me.Movement.IsMoving)
+
+                                        if (CurrentTarget.RadiusDistance <= 5f && isMoving)
                                         {
-                                            Logger.Log(LogCategory.Behavior, "Trying to stop");
-                                            Navigator.MoveTo(Player.Position, "Player Position", false);
+                                            Logger.LogVerbose(LogCategory.Behavior, "Trying to stop, Speeds:{0:0.00}/{1:0.00}", ZetaDia.Me.Movement.SpeedXY, PlayerMover.GetMovementSpeed());
+                                            Navigator.PlayerMover.MoveStop();
                                         }
-                                        else if (!ZetaDia.Me.Movement.IsMoving || DateTime.UtcNow.Subtract(PlayerMover.TimeLastUsedPlayerMover).TotalSeconds > 5)
+                                        else if (!isMoving || DateTime.UtcNow.Subtract(PlayerMover.TimeLastUsedPlayerMover).TotalSeconds > 1)
                                         {
                                             if (SpellHistory.TimeSinceUse(SNOPower.Axe_Operate_Gizmo) < TimeSpan.FromMilliseconds(500))
                                             {
                                                 return GetTreeSharpRunStatus(HandlerRunStatus.TreeRunning);
                                             }
 
-                                            Logger.LogDebug(LogCategory.Behavior, "Using {0} on {1} Distance {2} Radius {3}",
-                                                SNOPower.Axe_Operate_Gizmo, CurrentTarget.InternalName, CurrentTarget.CentreDistance, CurrentTarget.Radius);
-
-                                            if (CurrentTarget.Type == GObjectType.JumpLinkPortal)
+                                            if (CurrentTarget.Type == GObjectType.JumpLinkPortal && !CacheData.SameWorldPortals.Any(p => p.RActorGUID == CurrentTarget.RActorGuid))
                                             {
-                                                Logger.LogDebug("Adding {0} {1} to SameWorldPortals", CurrentTarget.InternalName, CurrentTarget.ActorSNO);
+                                                Logger.LogVerbose(LogCategory.Behavior, "Adding {0} {1} to SameWorldPortals", CurrentTarget.InternalName, CurrentTarget.ActorSNO);
                                                 CacheData.SameWorldPortals.Add(new Cache.SameWorldPortal() { ActorSNO = CurrentTarget.ActorSNO, RActorGUID = CurrentTarget.RActorGuid });
-
                                             }
+
+                                            Logger.LogVerbose(LogCategory.Behavior, "Interacting with {1} Distance {2} Radius {3}",
+                                                     SNOPower.Axe_Operate_Gizmo, CurrentTarget.InternalName, CurrentTarget.CentreDistance, CurrentTarget.Radius);
 
                                             bool interactSuccessful = false;
                                             if (CurrentTarget.ActorType == ActorType.Monster)
@@ -553,9 +555,8 @@ namespace Trinity
                                                     TargetPosition = CurrentTarget.Position,
                                                 });
 
-                                            if (CurrentTarget.Type == GObjectType.JumpLinkPortal && interactSuccessful)
-                                                hashRGUIDBlacklist3.Add(CurrentTarget.RActorGuid);
-
+                                            //if (CurrentTarget.Type == GObjectType.JumpLinkPortal && interactSuccessful)
+                                            //    hashRGUIDBlacklist3.Add(CurrentTarget.RActorGuid);
 
                                             //else if (interactSuccessful)
                                             //{
@@ -576,15 +577,17 @@ namespace Trinity
                                             // If we've tried interacting too many times, blacklist this for a while
                                             if (CacheData.InteractAttempts[CurrentTarget.RActorGuid] > 15 && !(CurrentTarget.Type != GObjectType.HealthWell))
                                             {
-                                                Logger.Log("Blacklisting {0} ({1}) for 15 seconds after {2} interactions",
+                                                Logger.LogVerbose("Blacklisting {0} ({1}) for 15 seconds after {2} interactions",
                                                     CurrentTarget.InternalName, CurrentTarget.ActorSNO, iInteractAttempts);
                                                 hashRGUIDBlacklist15.Add(CurrentTarget.RActorGuid);
                                             }
                                         }
-                                        
-                                        Logger.Log(LogCategory.Behavior, "Waiting to stop moving before interaction");
+                                        else
+                                        {
+                                            Logger.LogVerbose(LogCategory.Behavior, "Waiting to stop moving before interaction");
 
-                                        runStatus = HandlerRunStatus.TreeRunning;
+                                            runStatus = HandlerRunStatus.TreeRunning;
+                                        }
 
                                         //check if we are returning to the tree
                                         if (runStatus != HandlerRunStatus.NotFinished)
@@ -985,7 +988,7 @@ namespace Trinity
                     int interactAttempts;
                     CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out interactAttempts);
 
-                    if ((CurrentTarget.Type == GObjectType.Door || CurrentTarget.Type == GObjectType.Interactable || CurrentTarget.Type == GObjectType.Container) &&
+                    if ((CurrentTarget.Type == GObjectType.Door || CurrentTarget.Type == GObjectType.Interactable || CurrentTarget.Type == GObjectType.Container || CurrentTarget.Type == GObjectType.JumpLinkPortal) &&
                         interactAttempts < 45 && DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalSeconds > 15)
                     {
                         addTargetToBlacklist = false;
