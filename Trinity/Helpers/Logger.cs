@@ -37,7 +37,8 @@ namespace Trinity.Technicals
             {
                 string msg = string.Format(prefix + "{0} {1}", category != LogCategory.UserInformation ? "[" + category.ToString() + "]" : string.Empty, formatMessage);
 
-                msg = string.Format(msg, args);
+                if (args.Length > 0)
+                    msg = string.Format(msg, args);
 
                 if (_LastLogMessage != msg)
                 {

@@ -357,8 +357,8 @@ namespace Trinity
         public static Dictionary<int, TimeSpan> AvoidanceSpawnerDuration { get { return avoidanceSpawnerDuration; } }
         private static readonly Dictionary<int, TimeSpan> avoidanceSpawnerDuration = new Dictionary<int, TimeSpan>
         {
-            {5482, TimeSpan.FromSeconds(10)},   // Poison Tree
-            {6578, TimeSpan.FromSeconds(10)},   // Poison Tree
+            {5482, TimeSpan.FromSeconds(15)},   // Poison Tree
+            {6578, TimeSpan.FromSeconds(15)},   // Poison Tree
             {316389, TimeSpan.FromSeconds(6)}, // PoisonEnchanted 
             {340319, TimeSpan.FromSeconds(6)}, // PoisonEnchanted 
             {4803, TimeSpan.FromSeconds(6)}, // Molten Core

@@ -1149,17 +1149,17 @@ namespace Trinity
                             // health calculations
                             double dThisMaxHealth;
                             // Get the max health of this unit, a cached version if available, if not cache it
-                            if (!CacheData.UnitMaxHealth.TryGetValue(c_RActorGuid, out dThisMaxHealth))
+                            if (!CacheData.UnitMaxHealth.TryGetValue(CurrentCacheObject.RActorGuid, out dThisMaxHealth))
                             {
                                 try
                                 {
 
                                     dThisMaxHealth = CurrentTarget.Unit.HitpointsMax;
-                                    CacheData.UnitMaxHealth.Add(c_RActorGuid, CurrentTarget.Unit.HitpointsMax);
+                                    CacheData.UnitMaxHealth.Add(CurrentCacheObject.RActorGuid, CurrentTarget.Unit.HitpointsMax);
                                 }
                                 catch
                                 {
-                                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Safely handled exception getting attribute max health #2 for unit {0} [{1}]", c_InternalName, c_ActorSNO);
+                                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Safely handled exception getting attribute max health #2 for unit {0} [{1}]", c_InternalName, CurrentCacheObject.ActorSNO);
                                     StaleCache = true;
                                 }
                             }

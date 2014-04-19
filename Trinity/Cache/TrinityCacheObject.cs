@@ -35,7 +35,7 @@ namespace Trinity
                 if (Object != null && Object.IsValid && Object is DiaUnit)
                     return Object as DiaUnit;
                 else
-                    return null;
+                    return default(DiaUnit);
             }
         }
         [NoCopy]
@@ -46,7 +46,31 @@ namespace Trinity
                 if (Object != null && Object.IsValid && Object is DiaGizmo)
                     return Object as DiaGizmo;
                 else
-                    return null;
+                    return default(DiaGizmo);
+            }
+        }
+
+        [NoCopy]
+        public DiaItem Item
+        {
+            get
+            {
+                if (Object != null && Object.IsValid && Object is DiaItem)
+                    return Object as DiaItem;
+                else
+                    return default(DiaItem);
+            }
+        }
+
+        [NoCopy]
+        public ACD CommonData
+        {
+            get
+            {
+                if (Object != null && Object.IsValid)
+                    return Object.CommonData;
+                else
+                    return default(ACD);
             }
         }
 

@@ -444,14 +444,14 @@ namespace Trinity
                                     CurrentCacheObject.GizmoType != GizmoType.None ? CurrentCacheObject.GizmoType.ToString() : "",
                                     c_ObjectType,
                                     c_InternalName,
-                                    c_ActorSNO,
+                                    CurrentCacheObject.ActorSNO,
                                     (c_unit_IsBoss ? " IsBoss" : ""),
                                     (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""),
                                     c_CentreDistance,
                                     c_RadiusDistance,
                                     c_ZDiff,
                                     c_Radius,
-                                    c_RActorGuid,
+                                    CurrentCacheObject.RActorGuid,
                                     extraData);
                         }
                     }
@@ -465,12 +465,7 @@ namespace Trinity
                         Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0} {4}",
                                 currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance, gizmoType);
                         Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "{0}", ex);
-
-                        if (c_ACDGUID != -1 && CacheData.ObjectType.ContainsKey(c_RActorGuid))
-                        {
-                            CacheData.ObjectType.Remove(c_RActorGuid);
-                        }
-
+                                                
                     }
                 }
 
@@ -638,27 +633,7 @@ namespace Trinity
 
         private static void ClearCachesOnGameChange(object sender, EventArgs e)
         {
-            CacheData.Position = new Dictionary<int, Vector3>();
-            CacheData.ObjectType = new Dictionary<int, GObjectType>();
-            CacheData.ActorSNO = new Dictionary<int, int>();
-            CacheData.AcdGuid = new Dictionary<int, int>();
-            CacheData.CurrentUnitHealth = new Dictionary<int, double>();
-            CacheData.LastCheckedUnitHealth = new Dictionary<int, int>();
-            CacheData.UnitMonsterAffix = new Dictionary<int, MonsterAffixes>();
-            CacheData.UnitMaxHealth = new Dictionary<int, double>();
-            CacheData.MonsterTypes = new Dictionary<int, MonsterType>();
-            CacheData.MonsterSizes = new Dictionary<int, MonsterSize>();
-            CacheData.UnitIsBurrowed = new Dictionary<int, bool>();
-            CacheData.SummonedByACDId = new Dictionary<int, int>();
-            CacheData.Name = new Dictionary<int, string>();
-            CacheData.GoldStack = new Dictionary<int, int>();
-            CacheData.GameBalanceID = new Dictionary<int, int>();
-            CacheData.DynamicID = new Dictionary<int, int>();
-            CacheData.ItemQuality = new Dictionary<int, ItemQuality>();
-            CacheData.PickupItem = new Dictionary<int, bool>();
-            CacheData.HasBeenRayCasted = new Dictionary<int, bool>();
-            CacheData.HasBeenNavigable = new Dictionary<int, bool>();
-            CacheData.HasBeenInLoS = new Dictionary<int, bool>();
+            CacheData.FullClear();
         }
 
         private static HashSet<string> ignoreNames = new HashSet<string>

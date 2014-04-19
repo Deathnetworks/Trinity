@@ -18,9 +18,6 @@ namespace Trinity
         private static TrinityCacheObject CurrentCacheObject = new TrinityCacheObject();
 
         private static GObjectType c_ObjectType = GObjectType.Unknown;
-        /// <summary>
-        /// Percent of total health remaining on unit
-        /// </summary>
         private static double c_HitPointsPct = 0d;
         private static double c_HitPoints = 0d;
         private static float c_CentreDistance = 0f;
@@ -32,11 +29,6 @@ namespace Trinity
         private static string c_InternalName = "";
         private static string c_IgnoreReason = "";
         private static string c_IgnoreSubStep = "";
-        private static int c_ACDGUID = 0;
-        private static int c_RActorGuid = 0;
-        private static int c_GameDynamicID = 0;
-        private static int c_BalanceID = 0;
-        private static int c_ActorSNO = 0;
         private static int c_SummonedByACDId = 0;
         private static bool c_IsSummonedByPlayer = false;
         private static int c_ItemLevel = 0;
@@ -53,7 +45,6 @@ namespace Trinity
         private static MonsterSize c_unit_MonsterSize = MonsterSize.Unknown;
         private static DiaObject c_diaObject = null;
         private static DiaUnit c_diaUnit = null;
-        private static ACD c_CommonData = null;
         private static SNOAnim c_CurrentAnimation = SNOAnim.Invalid;
         private static bool c_unit_IsElite = false;
         private static bool c_unit_IsRare = false;
@@ -96,13 +87,9 @@ namespace Trinity
                 c_diaUnit = freshObject as DiaUnit;
             }
 
-            /*
-             * Set Common Data
-             */
-            AddToCache = RefreshStepGetCommonData(freshObject);
 
             // Ractor GUID
-            c_RActorGuid = freshObject.RActorGuid;
+            CurrentCacheObject.RActorGuid = freshObject.RActorGuid;
             // Check to see if we've already looked at this GUID
             CurrentCacheObject.RActorGuid = freshObject.RActorGuid;
             CurrentCacheObject.ACDGuid = freshObject.ACDGuid;
@@ -111,54 +98,50 @@ namespace Trinity
             c_InternalName = nameNumberTrimRegex.Replace(freshObject.Name, "");
             CurrentCacheObject.InternalName = nameNumberTrimRegex.Replace(freshObject.Name, "");
 
-            // ActorSNO
-            AddToCache = RefreshStepCachedActorSNO(AddToCache);
-            if (!AddToCache) { c_IgnoreReason = "CachedActorSNO"; return AddToCache; }
             CurrentCacheObject.ActorSNO = freshObject.ActorSNO;
-
+            CurrentCacheObject.ActorSNO = CurrentCacheObject.ActorSNO;
             CurrentCacheObject.ActorType = freshObject.ActorType;
+            CurrentCacheObject.ACDGuid = freshObject.ACDGuid;
+
+
 
             // Have ActorSNO Check for SNO based navigation obstacle hashlist
-            c_IsObstacle = DataDictionary.NavigationObstacleIds.Contains(c_ActorSNO);
+            c_IsObstacle = DataDictionary.NavigationObstacleIds.Contains(CurrentCacheObject.ActorSNO);
 
             // Add Cell Weight for Obstacle
             if (c_IsObstacle)
             {
-                if (!DataDictionary.ObstacleCustomRadius.TryGetValue(c_ActorSNO, out c_Radius) &&
-                    !CacheData.CollisionSphere.TryGetValue(c_RActorGuid, out c_Radius))
+                if (!DataDictionary.ObstacleCustomRadius.TryGetValue(CurrentCacheObject.ActorSNO, out c_Radius) &&
+                    !CacheData.CollisionSphere.TryGetValue(CurrentCacheObject.RActorGuid, out c_Radius))
                 {
                     c_Radius = c_diaObject.CollisionSphere.Radius;
-                    //CacheData.CollisionSphere.Add(c_RActorGuid, c_Radius);
+                    //CacheData.CollisionSphere.Add(CurrentCacheObject.RActorGuid, c_Radius);
                 }
 
                 Vector3 pos;
-                if (!CacheData.Position.TryGetValue(c_RActorGuid, out pos))
+                if (!CacheData.Position.TryGetValue(CurrentCacheObject.RActorGuid, out pos))
                 {
                     CurrentCacheObject.Position = c_diaObject.Position;
-                    //CacheData.Position.Add(c_RActorGuid, CurrentCacheObject.Position);
+                    //CacheData.Position.Add(CurrentCacheObject.RActorGuid, CurrentCacheObject.Position);
                 }
                 if (pos != Vector3.Zero)
                     CurrentCacheObject.Position = pos;
 
                 CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                 {
-                    ActorSNO = c_ActorSNO,
+                    ActorSNO = CurrentCacheObject.ActorSNO,
                     Name = c_InternalName,
                     Position = CurrentCacheObject.Position,
                     Radius = c_Radius,
                     ObjectType = c_ObjectType,
                 });
 
-                ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
+                ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, c_Radius);
 
                 c_IgnoreReason = "NavigationObstacle";
                 AddToCache = false;
                 return AddToCache;
             }
-
-            // Get ACDGuid
-            AddToCache = RefreshStepCachedACDGuid(AddToCache);
-            if (!AddToCache) { c_IgnoreReason = "CachedACDGuid"; return AddToCache; }
 
             // Summons by the player 
             AddToCache = RefreshStepCachedSummons(AddToCache);
@@ -182,7 +165,7 @@ namespace Trinity
             CurrentCacheObject.Type = c_ObjectType;
             if (CurrentCacheObject.Type != GObjectType.Item)
             {
-                CurrentCacheObject.ObjectHash = HashGenerator.GenerateWorldObjectHash(c_ActorSNO, CurrentCacheObject.Position, c_ObjectType.ToString(), Trinity.CurrentWorldDynamicId);
+                CurrentCacheObject.ObjectHash = HashGenerator.GenerateWorldObjectHash(CurrentCacheObject.ActorSNO, CurrentCacheObject.Position, c_ObjectType.ToString(), Trinity.CurrentWorldDynamicId);
             }
 
             // Check Blacklists
@@ -203,9 +186,11 @@ namespace Trinity
             AddToCache = RefreshStepObjectTypeZDiff(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "ZDiff"; return AddToCache; }
 
-            // Get DynamicId and GameBalanceId
-            AddToCache = RefreshStepCachedDynamicIds(AddToCache);
-            if (!AddToCache) { c_IgnoreReason = "CachedDynamicIds"; return AddToCache; }
+            if (c_ObjectType == GObjectType.Item)
+            {
+                CurrentCacheObject.DynamicID = CurrentCacheObject.CommonData.DynamicId;
+                CurrentCacheObject.BalanceID = CurrentCacheObject.CommonData.GameBalanceId;
+            }
 
             using (new PerformanceLogger("RefreshDiaObject.MainObjectType"))
             {
@@ -246,11 +231,11 @@ namespace Trinity
                 CurrentCacheObject.RadiusDistance = c_RadiusDistance;
                 CurrentCacheObject.InternalName = c_InternalName;
                 CurrentCacheObject.Animation = c_CurrentAnimation;
-                CurrentCacheObject.ACDGuid = c_ACDGUID;
-                CurrentCacheObject.RActorGuid = c_RActorGuid;
-                CurrentCacheObject.DynamicID = c_GameDynamicID;
-                CurrentCacheObject.BalanceID = c_BalanceID;
-                CurrentCacheObject.ActorSNO = c_ActorSNO;
+                CurrentCacheObject.ACDGuid = CurrentCacheObject.ACDGuid;
+                CurrentCacheObject.RActorGuid = CurrentCacheObject.RActorGuid;
+                CurrentCacheObject.DynamicID = CurrentCacheObject.DynamicID;
+                CurrentCacheObject.BalanceID = CurrentCacheObject.BalanceID;
+                CurrentCacheObject.ActorSNO = CurrentCacheObject.ActorSNO;
                 CurrentCacheObject.ItemLevel = c_ItemLevel;
                 CurrentCacheObject.GoldAmount = c_GoldStackSize;
                 CurrentCacheObject.OneHanded = c_IsOneHandedItem;
@@ -305,7 +290,7 @@ namespace Trinity
                 case GObjectType.Shrine:
                     CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                     {
-                        ActorSNO = c_ActorSNO,
+                        ActorSNO = CurrentCacheObject.ActorSNO,
                         Radius = c_Radius,
                         Position = CurrentCacheObject.Position,
                         Name = c_InternalName,
@@ -325,7 +310,7 @@ namespace Trinity
                 // Add to the collision-list
                 CacheData.MonsterObstacles.Add(new CacheObstacleObject()
                 {
-                    ActorSNO = c_ActorSNO,
+                    ActorSNO = CurrentCacheObject.ActorSNO,
                     Name = c_InternalName,
                     Position = CurrentCacheObject.Position,
                     Radius = c_Radius,
@@ -352,11 +337,11 @@ namespace Trinity
             c_InternalName = "";
             c_IgnoreReason = "";
             c_IgnoreSubStep = "";
-            c_ACDGUID = -1;
-            c_RActorGuid = -1;
-            c_GameDynamicID = -1;
-            c_BalanceID = -1;
-            c_ActorSNO = -1;
+            CurrentCacheObject.ACDGuid = -1;
+            CurrentCacheObject.RActorGuid = -1;
+            CurrentCacheObject.DynamicID = -1;
+            CurrentCacheObject.BalanceID = -1;
+            CurrentCacheObject.ActorSNO = -1;
             c_IsSummonedByPlayer = false;
             c_SummonedByACDId = -1;
             c_ItemLevel = -1;
@@ -399,79 +384,17 @@ namespace Trinity
             c_IsSummoner = false;
             c_DirectionVector = Vector2.Zero;
         }
-        /// <summary>
-        /// Inserts the ActorSNO <see cref="actorSNOCache"/> and sets <see cref="c_ActorSNO"/>
-        /// </summary>
-        /// <param name="AddToCache"></param>
-        /// <param name="c_diaObject"></param>
-        /// <returns></returns>
-        private static bool RefreshStepCachedActorSNO(bool AddToCache)
-        {
-            // Get the Actor SNO, cached if possible
-            if (!CacheData.ActorSNO.TryGetValue(c_RActorGuid, out c_ActorSNO))
-            {
-                try
-                {
-                    c_ActorSNO = c_diaObject.ActorSNO;
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting ActorSNO for an object.");
-                    Logger.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
-                    AddToCache = false;
-                }
-                CacheData.ActorSNO.Add(c_RActorGuid, c_ActorSNO);
-            }
-            return AddToCache;
-        }
-
-        private static bool RefreshInternalName(bool AddToCache)
-        {
-            // This is "internalname" for items, and just a "generic" name for objects and units - cached if possible
-            if (!CacheData.Name.TryGetValue(c_RActorGuid, out c_InternalName))
-            {
-                try
-                {
-                    c_InternalName = nameNumberTrimRegex.Replace(c_diaObject.Name, "");
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting InternalName for an object [{0}]", c_ActorSNO);
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
-                    AddToCache = false;
-                }
-                CacheData.Name.Add(c_RActorGuid, c_InternalName);
-            }
-            return AddToCache;
-        }
-
-        private static bool RefreshStepGetCommonData(DiaObject thisobj)
-        {
-            c_CommonData = thisobj.CommonData;
-            if (c_CommonData == null)
-            {
-                c_IgnoreReason = "CommonData";
-                return false;
-            }
-            else if (!c_CommonData.IsValid)
-            {
-                c_IgnoreReason = "CommonData";
-                return false;
-            }
-
-            return true;
-        }
 
         private static bool RefreshStepIgnoreNullCommonData(bool AddToCache)
         {
             // Null Common Data makes a DiaUseless!
             if (c_ObjectType == GObjectType.Unit || c_ObjectType == GObjectType.Item || c_ObjectType == GObjectType.Gold)
             {
-                if (c_CommonData == null)
+                if (CurrentCacheObject.CommonData == null)
                 {
                     AddToCache = false;
                 }
-                if (c_CommonData != null && !c_CommonData.IsValid)
+                if (CurrentCacheObject.CommonData != null && !CurrentCacheObject.CommonData.IsValid)
                 {
                     AddToCache = false;
                 }
@@ -505,7 +428,8 @@ namespace Trinity
             }
 
             // Check if it's a unit with an animation we should avoid. We need to recheck this every time.
-            if (Settings.Combat.Misc.AvoidAOE && DataDictionary.AvoidanceAnimations.Contains(new DoubleInt(c_ActorSNO, (int)c_diaObject.CommonData.CurrentAnimation)))
+            if (CurrentCacheObject.Unit != null && CurrentCacheObject.CommonData != null &&
+                Settings.Combat.Misc.AvoidAOE && DataDictionary.AvoidanceAnimations.Contains(new DoubleInt(CurrentCacheObject.ActorSNO, (int)CurrentCacheObject.CommonData.CurrentAnimation)))
             {
                 // The ActorSNO and Animation match a known pair, avoid this!
                 // Example: "Grotesque" death animation
@@ -519,12 +443,13 @@ namespace Trinity
                 return true;
             }
 
-
-        // Either get the cached object type, or calculate it fresh
-            else if (!c_IsObstacle && !CacheData.ObjectType.TryGetValue(c_RActorGuid, out c_ObjectType))
+            // Either get the cached object type, or calculate it fresh
+            else if (!c_IsObstacle)
             {
                 // See if it's an avoidance first from the SNO
-                bool isAvoidanceSNO = (DataDictionary.Avoidances.Contains(c_ActorSNO) || DataDictionary.AvoidanceBuffs.Contains(c_ActorSNO) || DataDictionary.AvoidanceProjectiles.Contains(c_ActorSNO));
+                bool isAvoidanceSNO = (DataDictionary.Avoidances.Contains(CurrentCacheObject.ActorSNO) || 
+                    DataDictionary.AvoidanceBuffs.Contains(CurrentCacheObject.ActorSNO) || 
+                    DataDictionary.AvoidanceProjectiles.Contains(CurrentCacheObject.ActorSNO));
 
                 // We're avoiding AoE and this is an AoE
                 if (Settings.Combat.Misc.AvoidAOE && isAvoidanceSNO)
@@ -532,17 +457,16 @@ namespace Trinity
                     using (new PerformanceLogger("RefreshCachedType.0"))
                     {
                         // Checking for BuffVisualEffect - for Butcher, maybe useful other places?
-                        if (DataDictionary.AvoidanceBuffs.Contains(c_ActorSNO))
+                        if (DataDictionary.AvoidanceBuffs.Contains(CurrentCacheObject.ActorSNO))
                         {
                             bool hasBuff = false;
                             try
                             {
-                                hasBuff = c_CommonData.GetAttribute<int>(ActorAttributeType.BuffVisualEffect) > 0;
+                                hasBuff = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.BuffVisualEffect) > 0;
                             }
                             catch
                             {
-                                // Remove on exception, otherwise it may get stuck in the cache
-                                CacheData.ObjectType.Remove(c_RActorGuid);
+
                             }
                             if (hasBuff)
                             {
@@ -551,7 +475,6 @@ namespace Trinity
                             }
                             else
                             {
-                                CacheData.ObjectType.Remove(c_RActorGuid);
                                 AddToCache = false;
                                 c_IgnoreSubStep = "NoBuffVisualEffect";
                             }
@@ -577,12 +500,12 @@ namespace Trinity
                     {
                         using (new PerformanceLogger("RefreshCachedType.1"))
                         {
-                            if (c_CommonData == null)
+                            if (CurrentCacheObject.CommonData == null)
                             {
                                 c_IgnoreSubStep = "InvalidUnitCommonData";
                                 AddToCache = false;
                             }
-                            else if (c_diaObject.ACDGuid != c_CommonData.ACDGuid)
+                            else if (c_diaObject.ACDGuid != CurrentCacheObject.CommonData.ACDGuid)
                             {
                                 c_IgnoreSubStep = "InvalidUnitACDGuid";
                                 AddToCache = false;
@@ -597,17 +520,17 @@ namespace Trinity
                     {
                         c_ObjectType = GObjectType.Player;
                     }
-                    else if (DataDictionary.ForceToItemOverrideIds.Contains(c_ActorSNO) || (c_diaObject.ActorType == ActorType.Item))
+                    else if (DataDictionary.ForceToItemOverrideIds.Contains(CurrentCacheObject.ActorSNO) || (c_diaObject.ActorType == ActorType.Item))
                     {
                         using (new PerformanceLogger("RefreshCachedType.2"))
                         {
                             c_ObjectType = GObjectType.Item;
 
-                            if (c_CommonData == null)
+                            if (CurrentCacheObject.CommonData == null)
                             {
                                 AddToCache = false;
                             }
-                            if (c_CommonData != null && c_diaObject.ACDGuid != c_CommonData.ACDGuid)
+                            if (CurrentCacheObject.CommonData != null && c_diaObject.ACDGuid != CurrentCacheObject.CommonData.ACDGuid)
                             {
                                 AddToCache = false;
                             }
@@ -618,7 +541,7 @@ namespace Trinity
                             }
                         }
                     }
-                    else if (DataDictionary.InteractWhiteListIds.Contains(c_ActorSNO))
+                    else if (DataDictionary.InteractWhiteListIds.Contains(CurrentCacheObject.ActorSNO))
                         c_ObjectType = GObjectType.Interactable;
 
                     else if (c_diaObject is DiaGizmo && c_diaObject.ActorType == ActorType.Gizmo && c_CentreDistance <= 90)
@@ -685,7 +608,7 @@ namespace Trinity
                 }
                 if (c_ObjectType != GObjectType.Unknown)
                 {  // Now cache the object type if it's on the screen and we know what it is
-                    //CacheData.ObjectType.Add(c_RActorGuid, c_ObjectType);
+                    //CacheData.ObjectType.Add(CurrentCacheObject.RActorGuid, c_ObjectType);
                 }
             }
             return AddToCache;
@@ -827,7 +750,7 @@ namespace Trinity
                     return true;
 
                 // Everything except items and the current target
-                if (c_ObjectType != GObjectType.Item && c_RActorGuid != LastTargetRactorGUID && c_ObjectType != GObjectType.Unknown)
+                if (c_ObjectType != GObjectType.Item && CurrentCacheObject.RActorGuid != LastTargetRactorGUID && c_ObjectType != GObjectType.Unknown)
                 {
                     if (c_CentreDistance < 95)
                     {
@@ -842,13 +765,13 @@ namespace Trinity
                                     using (new PerformanceLogger("RefreshLoS.2"))
                                     {
                                         // Get whether or not this RActor has ever been in a path line with AllowWalk. If it hasn't, don't add to cache and keep rechecking
-                                        if (!CacheData.HasBeenRayCasted.TryGetValue(c_RActorGuid, out c_HasBeenRaycastable) || DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
+                                        if (!CacheData.HasBeenRayCasted.TryGetValue(CurrentCacheObject.RActorGuid, out c_HasBeenRaycastable) || DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
                                         {
                                             if (c_CentreDistance >= 1f && c_CentreDistance <= 5f)
                                             {
                                                 c_HasBeenRaycastable = true;
-                                                if (!CacheData.HasBeenRayCasted.ContainsKey(c_RActorGuid))
-                                                    CacheData.HasBeenRayCasted.Add(c_RActorGuid, c_HasBeenRaycastable);
+                                                if (!CacheData.HasBeenRayCasted.ContainsKey(CurrentCacheObject.RActorGuid))
+                                                    CacheData.HasBeenRayCasted.Add(CurrentCacheObject.RActorGuid, c_HasBeenRaycastable);
                                             }
                                             else if (Settings.Combat.Misc.UseNavMeshTargeting)
                                             {
@@ -867,8 +790,8 @@ namespace Trinity
                                                 else
                                                 {
                                                     c_HasBeenRaycastable = true;
-                                                    if (!CacheData.HasBeenRayCasted.ContainsKey(c_RActorGuid))
-                                                        CacheData.HasBeenRayCasted.Add(c_RActorGuid, c_HasBeenRaycastable);
+                                                    if (!CacheData.HasBeenRayCasted.ContainsKey(CurrentCacheObject.RActorGuid))
+                                                        CacheData.HasBeenRayCasted.Add(CurrentCacheObject.RActorGuid, c_HasBeenRaycastable);
                                                 }
                                             }
                                             else
@@ -881,8 +804,8 @@ namespace Trinity
                                                 else
                                                 {
                                                     c_HasBeenRaycastable = true;
-                                                    if (!CacheData.HasBeenRayCasted.ContainsKey(c_RActorGuid))
-                                                        CacheData.HasBeenRayCasted.Add(c_RActorGuid, c_HasBeenRaycastable);
+                                                    if (!CacheData.HasBeenRayCasted.ContainsKey(CurrentCacheObject.RActorGuid))
+                                                        CacheData.HasBeenRayCasted.Add(CurrentCacheObject.RActorGuid, c_HasBeenRaycastable);
                                                 }
 
                                             }
@@ -899,7 +822,7 @@ namespace Trinity
                                     using (new PerformanceLogger("RefreshLoS.3"))
                                     {
                                         // Get whether or not this RActor has ever been in "Line of Sight" (as determined by Demonbuddy). If it hasn't, don't add to cache and keep rechecking
-                                        if (!CacheData.HasBeenInLoS.TryGetValue(c_RActorGuid, out c_HasBeenInLoS) || DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
+                                        if (!CacheData.HasBeenInLoS.TryGetValue(CurrentCacheObject.RActorGuid, out c_HasBeenInLoS) || DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
                                         {
                                             if (Settings.Combat.Misc.UseNavMeshTargeting)
                                             {
@@ -912,15 +835,15 @@ namespace Trinity
                                                 else
                                                 {
                                                     c_HasBeenInLoS = true;
-                                                    if (!CacheData.HasBeenInLoS.ContainsKey(c_RActorGuid))
-                                                        CacheData.HasBeenInLoS.Add(c_RActorGuid, c_HasBeenInLoS);
+                                                    if (!CacheData.HasBeenInLoS.ContainsKey(CurrentCacheObject.RActorGuid))
+                                                        CacheData.HasBeenInLoS.Add(CurrentCacheObject.RActorGuid, c_HasBeenInLoS);
                                                 }
                                             }
                                             else
                                             {
                                                 c_HasBeenInLoS = true;
-                                                if (!CacheData.HasBeenInLoS.ContainsKey(c_RActorGuid))
-                                                    CacheData.HasBeenInLoS.Add(c_RActorGuid, c_HasBeenInLoS);
+                                                if (!CacheData.HasBeenInLoS.ContainsKey(CurrentCacheObject.RActorGuid))
+                                                    CacheData.HasBeenInLoS.Add(CurrentCacheObject.RActorGuid, c_HasBeenInLoS);
                                             }
                                         }
                                     }
@@ -942,7 +865,7 @@ namespace Trinity
                         c_IgnoreSubStep = "";
                     }
                     // always take the current target even if not in LoS
-                    if (c_RActorGuid == LastTargetRactorGUID)
+                    if (CurrentCacheObject.RActorGuid == LastTargetRactorGUID)
                     {
                         AddToCache = true;
                         c_IgnoreSubStep = "";
@@ -950,13 +873,13 @@ namespace Trinity
                 }
 
                 // Simple whitelist for LoS 
-                if (DataDictionary.LineOfSightWhitelist.Contains(c_ActorSNO))
+                if (DataDictionary.LineOfSightWhitelist.Contains(CurrentCacheObject.ActorSNO))
                 {
                     AddToCache = true;
                     c_IgnoreSubStep = "";
                 }
                 // Always pickup Infernal Keys whether or not in LoS
-                if (DataDictionary.ForceToItemOverrideIds.Contains(c_ActorSNO))
+                if (DataDictionary.ForceToItemOverrideIds.Contains(CurrentCacheObject.ActorSNO))
                 {
                     AddToCache = true;
                     c_IgnoreSubStep = "";
@@ -982,97 +905,18 @@ namespace Trinity
             return AddToCache;
         }
 
-        private static bool RefreshStepCachedACDGuid(bool AddToCache)
-        {
-            // Get the ACDGUID, cached if possible, only for non-avoidance stuff
-            if (!c_IsObstacle && c_ObjectType != GObjectType.Avoidance)
-            {
-                if (!CacheData.AcdGuid.TryGetValue(c_RActorGuid, out c_ACDGUID))
-                {
-                    try
-                    {
-                        c_ACDGUID = c_diaObject.ACDGuid;
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting ACDGUID for an object [{0}]", c_ActorSNO);
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
-                        AddToCache = false;
-                    }
-                    CacheData.AcdGuid.Add(c_RActorGuid, c_ACDGUID);
-                }
-                // No ACDGUID, so shouldn't be anything we want to deal with
-                if (c_ACDGUID == -1)
-                {
-                    AddToCache = false;
-                }
-            }
-            else
-            {
-                // Give AOE's -1 ACDGUID, since it's not needed for avoidance stuff
-                c_ACDGUID = -1;
-            }
-            return AddToCache;
-        }
-
-        private static bool RefreshStepCachedDynamicIds(bool AddToCache)
-        {
-            // Try and grab the dynamic id and game balance id, if necessary and if possible
-            if (c_ObjectType == GObjectType.Item)
-            {
-                // Get the Dynamic ID, cached if possible
-                if (!CacheData.DynamicID.TryGetValue(c_RActorGuid, out c_GameDynamicID))
-                {
-                    try
-                    {
-                        c_GameDynamicID = c_CommonData.DynamicId;
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting DynamicID for item {0} [{1}]", c_InternalName, c_ActorSNO);
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
-                        AddToCache = false;
-                        //return bWantThis;
-                    }
-                    CacheData.DynamicID.Add(c_RActorGuid, c_GameDynamicID);
-                }
-                // Get the Game Balance ID, cached if possible
-                if (!CacheData.GameBalanceID.TryGetValue(c_RActorGuid, out c_BalanceID))
-                {
-                    try
-                    {
-                        c_BalanceID = c_CommonData.GameBalanceId;
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting GameBalanceID for item {0} [{1}]", c_InternalName, c_ActorSNO);
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
-                        AddToCache = false;
-                        //return bWantThis;
-                    }
-                    CacheData.GameBalanceID.Add(c_RActorGuid, c_BalanceID);
-                }
-            }
-            else
-            {
-                c_GameDynamicID = -1;
-                c_BalanceID = -1;
-            }
-            return AddToCache;
-        }
-
         private static bool RefreshStepObjectTypeZDiff(bool AddToCache)
         {
             c_ZDiff = c_diaObject.ZDiff;
             // always take current target regardless if ZDiff changed
-            if (c_RActorGuid == LastTargetRactorGUID)
+            if (CurrentCacheObject.RActorGuid == LastTargetRactorGUID)
             {
                 AddToCache = true;
                 return AddToCache;
             }
 
             // Special whitelist for always getting stuff regardless of ZDiff or LoS
-            if (DataDictionary.LineOfSightWhitelist.Contains(c_ActorSNO))
+            if (DataDictionary.LineOfSightWhitelist.Contains(CurrentCacheObject.ActorSNO))
             {
                 AddToCache = true;
                 return AddToCache;
@@ -1142,52 +986,52 @@ namespace Trinity
 
         private static bool RefreshStepCheckBlacklists(bool AddToCache)
         {
-            if (!DataDictionary.Avoidances.Contains(c_ActorSNO) && !DataDictionary.AvoidanceBuffs.Contains(c_ActorSNO) && !CurrentCacheObject.IsBountyObjective && !CurrentCacheObject.IsQuestMonster)
+            if (!DataDictionary.Avoidances.Contains(CurrentCacheObject.ActorSNO) && !DataDictionary.AvoidanceBuffs.Contains(CurrentCacheObject.ActorSNO) && !CurrentCacheObject.IsBountyObjective && !CurrentCacheObject.IsQuestMonster)
             {
                 // See if it's something we should always ignore like ravens etc.
-                if (!c_IsObstacle && DataDictionary.BlackListIds.Contains(c_ActorSNO))
+                if (!c_IsObstacle && DataDictionary.BlackListIds.Contains(CurrentCacheObject.ActorSNO))
                 {
                     AddToCache = false;
                     c_IgnoreSubStep = "Blacklist";
                     return AddToCache;
                 }
                 // Temporary ractor GUID ignoring, to prevent 2 interactions in a very short time which can cause stucks
-                if (IgnoreTargetForLoops > 0 && IgnoreRactorGUID == c_RActorGuid)
+                if (IgnoreTargetForLoops > 0 && IgnoreRactorGUID == CurrentCacheObject.RActorGuid)
                 {
                     AddToCache = false;
                     c_IgnoreSubStep = "IgnoreRactorGUID";
                     return AddToCache;
                 }
                 // Check our extremely short-term destructible-blacklist
-                if (hashRGUIDDestructible3SecBlacklist.Contains(c_RActorGuid))
+                if (hashRGUIDDestructible3SecBlacklist.Contains(CurrentCacheObject.RActorGuid))
                 {
                     AddToCache = false;
                     c_IgnoreSubStep = "hashRGUIDDestructible3SecBlacklist";
                     return AddToCache;
                 }
                 // Check our extremely short-term destructible-blacklist
-                if (hashRGUIDBlacklist3.Contains(c_RActorGuid))
+                if (hashRGUIDBlacklist3.Contains(CurrentCacheObject.RActorGuid))
                 {
                     AddToCache = false;
                     c_IgnoreSubStep = "hashRGUIDBlacklist3";
                     return AddToCache;
                 }
                 // See if it's on our 90 second blacklist (from being stuck targeting it), as long as it's distance is not extremely close
-                if (hashRGUIDBlacklist90.Contains(c_RActorGuid))
+                if (hashRGUIDBlacklist90.Contains(CurrentCacheObject.RActorGuid))
                 {
                     AddToCache = false;
                     c_IgnoreSubStep = "hashRGUIDBlacklist90";
                     return AddToCache;
                 }
                 // 60 second blacklist
-                if (hashRGUIDBlacklist60.Contains(c_RActorGuid))
+                if (hashRGUIDBlacklist60.Contains(CurrentCacheObject.RActorGuid))
                 {
                     AddToCache = false;
                     c_IgnoreSubStep = "hashRGUIDBlacklist60";
                     return AddToCache;
                 }
                 // 15 second blacklist
-                if (hashRGUIDBlacklist15.Contains(c_RActorGuid))
+                if (hashRGUIDBlacklist15.Contains(CurrentCacheObject.RActorGuid))
                 {
                     AddToCache = false;
                     c_IgnoreSubStep = "hashRGUIDBlacklist15";
@@ -1218,13 +1062,13 @@ namespace Trinity
         {
             if (!bHasCachedHealth)
             {
-                CacheData.CurrentUnitHealth.Add(c_RActorGuid, dThisCurrentHealth);
-                CacheData.LastCheckedUnitHealth.Add(c_RActorGuid, iLastCheckedHealth);
+                CacheData.CurrentUnitHealth.Add(CurrentCacheObject.RActorGuid, dThisCurrentHealth);
+                CacheData.LastCheckedUnitHealth.Add(CurrentCacheObject.RActorGuid, iLastCheckedHealth);
             }
             else
             {
-                CacheData.CurrentUnitHealth[c_RActorGuid] = dThisCurrentHealth;
-                CacheData.LastCheckedUnitHealth[c_RActorGuid] = iLastCheckedHealth;
+                CacheData.CurrentUnitHealth[CurrentCacheObject.RActorGuid] = dThisCurrentHealth;
+                CacheData.LastCheckedUnitHealth[CurrentCacheObject.RActorGuid] = iLastCheckedHealth;
             }
         }
 

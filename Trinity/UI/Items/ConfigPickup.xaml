@@ -375,10 +375,10 @@
                     </Grid.ColumnDefinitions>
                     <Label FontWeight="Bold" Margin="5">Gems:</Label>
                     <ComboBox Grid.Column="1" SelectedValuePath="Tag" Margin="0" SelectedValue="{Binding Path=Pickup.GemLevel, Converter={StaticResource intToStringConverter}}" >
-                        <ComboBoxItem Content="Chipped+" Tag="14" />
-                        <ComboBoxItem Content="Flawless Square+" IsSelected="True" Tag="60" />
-                        <ComboBoxItem Content="Marquise+" IsSelected="True" Tag="67" />
-                        <ComboBoxItem Content="Imperial+" IsSelected="True" Tag="68" />
+                        <ComboBoxItem Content="Chipped+" Tag="0" />
+                        <ComboBoxItem Content="Flawless Square+" IsSelected="True" Tag="14" />
+                        <ComboBoxItem Content="Marquise+" IsSelected="True" Tag="15" />
+                        <ComboBoxItem Content="Imperial+" IsSelected="True" Tag="16" />
                     </ComboBox>
                     <CheckBox Grid.Row="0" Grid.Column="2" Content="Emerald" 
                               IsChecked="{Binding Path=Pickup.GemType,Converter={StaticResource flagsEnumValueConverter}, ConverterParameter='Emerald'}" 

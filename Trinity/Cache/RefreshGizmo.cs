@@ -7,6 +7,7 @@ using Zeta.Bot.Navigation;
 using Zeta.Common.Plugins;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
+using Zeta.Game.Internals.Actors.Gizmos;
 
 namespace Trinity
 {
@@ -14,13 +15,17 @@ namespace Trinity
     {
         private static bool RefreshGizmo(bool AddToCache)
         {
+            DiaGizmo diaGizmo;
+            if (c_diaObject is DiaGizmo)
+                diaGizmo = (DiaGizmo)CurrentCacheObject.Object;
+
             // start as true, then set as false as we go. If nothing matches below, it will return true.
             AddToCache = true;
 
             bool openResplendentChest = c_InternalName.ToLower().Contains("chest_rare");
 
             // Ignore it if it's not in range yet, except health wells and resplendent chests if we're opening chests
-            if ((c_RadiusDistance > CurrentBotLootRange || c_RadiusDistance > 50) && c_ObjectType != GObjectType.HealthWell && c_ObjectType != GObjectType.Shrine && c_RActorGuid != LastTargetRactorGUID)
+            if ((c_RadiusDistance > CurrentBotLootRange || c_RadiusDistance > 50) && c_ObjectType != GObjectType.HealthWell && c_ObjectType != GObjectType.Shrine && CurrentCacheObject.RActorGuid != LastTargetRactorGUID)
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "NotInRange";
@@ -35,7 +40,7 @@ namespace Trinity
 
             try
             {
-                CurrentCacheObject.IsBountyObjective = (c_CommonData.GetAttribute<int>(ActorAttributeType.BountyObjective) > 0);
+                CurrentCacheObject.IsBountyObjective = (CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.BountyObjective) > 0);
             }
             catch (Exception)
             {
@@ -79,7 +84,7 @@ namespace Trinity
             if (!DataDictionary.CustomObjectRadius.TryGetValue(CurrentCacheObject.ActorSNO, out c_Radius))
             {
                 // Retrieve collision sphere radius, cached if possible
-                if (!CacheData.CollisionSphere.TryGetValue(c_ActorSNO, out c_Radius))
+                if (!CacheData.CollisionSphere.TryGetValue(CurrentCacheObject.ActorSNO, out c_Radius))
                 {
                     try
                     {
@@ -90,11 +95,11 @@ namespace Trinity
                     }
                     catch
                     {
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for object {0} [{1}]", c_InternalName, c_ActorSNO);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for object {0} [{1}]", c_InternalName, CurrentCacheObject.ActorSNO);
                         c_IgnoreSubStep = "CollisionSphereException";
                         AddToCache = false;
                     }
-                    CacheData.CollisionSphere.Add(c_ActorSNO, c_Radius);
+                    CacheData.CollisionSphere.Add(CurrentCacheObject.ActorSNO, c_Radius);
                 }
             }
             CurrentCacheObject.Radius = c_Radius;
@@ -116,28 +121,28 @@ namespace Trinity
             {
                 CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                 {
-                    ActorSNO = c_ActorSNO,
+                    ActorSNO = CurrentCacheObject.ActorSNO,
                     Radius = c_Radius,
                     Position = CurrentCacheObject.Position,
-                    RActorGUID = c_RActorGuid,
+                    RActorGUID = CurrentCacheObject.RActorGuid,
                     ObjectType = c_ObjectType,
                 });
 
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
-                    "Safely handled exception getting Gizmo-Disabled-By-Script attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
+                    "Safely handled exception getting Gizmo-Disabled-By-Script attribute for object {0} [{1}]", c_InternalName, CurrentCacheObject.ActorSNO);
                 c_IgnoreSubStep = "isGizmoDisabledByScriptException";
                 AddToCache = false;
             }
             if (isGizmoDisabledByScript)
             {
-                ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
-                
+                ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, c_Radius);
+
                 CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                 {
-                    ActorSNO = c_ActorSNO,
+                    ActorSNO = CurrentCacheObject.ActorSNO,
                     Radius = c_Radius,
                     Position = CurrentCacheObject.Position,
-                    RActorGUID = c_RActorGuid,
+                    RActorGUID = CurrentCacheObject.RActorGuid,
                     ObjectType = c_ObjectType,
                 });
 
@@ -159,7 +164,7 @@ namespace Trinity
             }
             catch
             {
-               
+
             }
 
 
@@ -189,15 +194,15 @@ namespace Trinity
             {
                 CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                 {
-                    ActorSNO = c_ActorSNO,
+                    ActorSNO = CurrentCacheObject.ActorSNO,
                     Radius = c_Radius,
                     Position = CurrentCacheObject.Position,
-                    RActorGUID = c_RActorGuid,
+                    RActorGUID = CurrentCacheObject.RActorGuid,
                     ObjectType = c_ObjectType,
                 });
 
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
-                    "Safely handled exception getting NoDamage attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
+                    "Safely handled exception getting NoDamage attribute for object {0} [{1}]", c_InternalName, CurrentCacheObject.ActorSNO);
                 c_IgnoreSubStep = "NoDamage";
                 AddToCache = false;
             }
@@ -219,7 +224,7 @@ namespace Trinity
 
                         try
                         {
-                            string currentAnimation = c_CommonData.CurrentAnimation.ToString().ToLower();
+                            string currentAnimation = CurrentCacheObject.CommonData.CurrentAnimation.ToString().ToLower();
                             gizmoUsed = currentAnimation.EndsWith("open") || currentAnimation.EndsWith("opening");
 
                             // special hax for A3 Iron Gates
@@ -231,7 +236,7 @@ namespace Trinity
                         catch { }
                         if (gizmoUsed)
                         {
-                            hashRGUIDBlacklist3.Add(c_RActorGuid);
+                            hashRGUIDBlacklist3.Add(CurrentCacheObject.RActorGuid);
                             AddToCache = false;
                             c_IgnoreSubStep = "Door is Open or Opening";
                             return AddToCache;
@@ -239,7 +244,7 @@ namespace Trinity
 
                         try
                         {
-                            int gizmoState = c_CommonData.GetAttribute<int>(ActorAttributeType.GizmoState);
+                            int gizmoState = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.GizmoState);
                             if (gizmoState == 1)
                             {
                                 AddToCache = false;
@@ -256,13 +261,13 @@ namespace Trinity
 
                         if (Untargetable)
                         {
-                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
+                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, c_Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                             {
-                                ActorSNO = c_ActorSNO,
+                                ActorSNO = CurrentCacheObject.ActorSNO,
                                 Radius = c_Radius,
                                 Position = CurrentCacheObject.Position,
-                                RActorGUID = c_RActorGuid,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
                                 ObjectType = c_ObjectType,
                             });
 
@@ -285,14 +290,14 @@ namespace Trinity
                                     {
                                         CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                                         {
-                                            ActorSNO = c_ActorSNO,
+                                            ActorSNO = CurrentCacheObject.ActorSNO,
                                             Radius = c_Radius,
                                             Position = CurrentCacheObject.Position,
-                                            RActorGUID = c_RActorGuid,
+                                            RActorGUID = CurrentCacheObject.RActorGuid,
                                             ObjectType = c_ObjectType,
                                         });
 
-                                        hashRGUIDBlacklist3.Add(c_RActorGuid);
+                                        hashRGUIDBlacklist3.Add(CurrentCacheObject.RActorGuid);
                                         AddToCache = false;
                                         c_IgnoreSubStep = "DoorDisabledbyScript";
                                         return AddToCache;
@@ -340,14 +345,12 @@ namespace Trinity
                     {
                         AddToCache = true;
 
-                        
-
                         // SameWorldPortals can have GizmoState=1 (e.g. Gizmo "Used")
                         if (!DataDictionary.SameWorldPortals.Contains(CurrentCacheObject.ActorSNO))
                         {
                             try
                             {
-                                int gizmoState = c_CommonData.GetAttribute<int>(ActorAttributeType.GizmoState);
+                                int gizmoState = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.GizmoState);
                                 if (gizmoState == 1)
                                 {
                                     AddToCache = false;
@@ -365,13 +368,13 @@ namespace Trinity
 
                         if (Untargetable)
                         {
-                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
+                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, c_Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                             {
-                                ActorSNO = c_ActorSNO,
+                                ActorSNO = CurrentCacheObject.ActorSNO,
                                 Radius = c_Radius,
                                 Position = CurrentCacheObject.Position,
-                                RActorGUID = c_RActorGuid,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
                                 ObjectType = c_ObjectType,
                             });
 
@@ -392,6 +395,12 @@ namespace Trinity
                             }
                         }
 
+                        if (CurrentCacheObject.Gizmo != null && CurrentCacheObject.Gizmo is GizmoLootContainer && CurrentCacheObject.Gizmo.HasBeenOperated)
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "GizmoHasBeenOperated";
+                            return AddToCache;
+                        }
 
                         c_Radius = c_diaObject.CollisionSphere.Radius;
                     }
@@ -401,17 +410,17 @@ namespace Trinity
                         AddToCache = true;
                         try
                         {
-                            gizmoUsed = (c_CommonData.GetAttribute<int>(ActorAttributeType.GizmoCharges) <= 0 && c_CommonData.GetAttribute<int>(ActorAttributeType.GizmoCharges) > 0);
+                            gizmoUsed = (CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.GizmoCharges) <= 0 && CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.GizmoCharges) > 0);
                         }
                         catch
                         {
-                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", c_InternalName, CurrentCacheObject.ActorSNO);
                             AddToCache = true;
                             //return bWantThis;
                         }
                         try
                         {
-                            int gizmoState = c_CommonData.GetAttribute<int>(ActorAttributeType.GizmoState);
+                            int gizmoState = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.GizmoState);
                             if (gizmoState == 1)
                             {
                                 AddToCache = false;
@@ -433,13 +442,13 @@ namespace Trinity
                         }
                         if (Untargetable)
                         {
-                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
+                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, c_Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                             {
-                                ActorSNO = c_ActorSNO,
+                                ActorSNO = CurrentCacheObject.ActorSNO,
                                 Radius = c_Radius,
                                 Position = CurrentCacheObject.Position,
-                                RActorGUID = c_RActorGuid,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
                                 ObjectType = c_ObjectType,
                             });
 
@@ -465,7 +474,7 @@ namespace Trinity
 
                         try
                         {
-                            int gizmoState = c_CommonData.GetAttribute<int>(ActorAttributeType.GizmoState);
+                            int gizmoState = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.GizmoState);
                             if (gizmoState == 1)
                             {
                                 AddToCache = false;
@@ -481,13 +490,13 @@ namespace Trinity
                         }
                         if (Untargetable)
                         {
-                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
+                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, c_Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                             {
-                                ActorSNO = c_ActorSNO,
+                                ActorSNO = CurrentCacheObject.ActorSNO,
                                 Radius = c_Radius,
                                 Position = CurrentCacheObject.Position,
-                                RActorGUID = c_RActorGuid,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
                                 ObjectType = c_ObjectType,
                             });
 
@@ -498,12 +507,12 @@ namespace Trinity
 
 
                         // Determine what shrine type it is, and blacklist if the user has disabled it
-                        switch (c_ActorSNO)
+                        switch (CurrentCacheObject.ActorSNO)
                         {
                             case 176077:  //Frenzy Shrine
                                 if (!Settings.WorldObject.UseFrenzyShrine)
                                 {
-                                    hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                    hashRGUIDBlacklist60.Add(CurrentCacheObject.RActorGuid);
                                     c_IgnoreSubStep = "IgnoreShrineOption";
                                     AddToCache = false;
                                 }
@@ -575,13 +584,13 @@ namespace Trinity
 
                         if (noDamage)
                         {
-                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
+                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, c_Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                             {
-                                ActorSNO = c_ActorSNO,
+                                ActorSNO = CurrentCacheObject.ActorSNO,
                                 Radius = c_Radius,
                                 Position = CurrentCacheObject.Position,
-                                RActorGUID = c_RActorGuid,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
                                 ObjectType = c_ObjectType,
                             });
 
@@ -591,13 +600,13 @@ namespace Trinity
                         }
                         if (Untargetable)
                         {
-                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
+                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, c_Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                             {
-                                ActorSNO = c_ActorSNO,
+                                ActorSNO = CurrentCacheObject.ActorSNO,
                                 Radius = c_Radius,
                                 Position = CurrentCacheObject.Position,
-                                RActorGUID = c_RActorGuid,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
                                 ObjectType = c_ObjectType,
                             });
 
@@ -609,13 +618,13 @@ namespace Trinity
 
                         if (Invulnerable)
                         {
-                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
+                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, c_Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                             {
-                                ActorSNO = c_ActorSNO,
+                                ActorSNO = CurrentCacheObject.ActorSNO,
                                 Radius = c_Radius,
                                 Position = CurrentCacheObject.Position,
-                                RActorGUID = c_RActorGuid,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
                                 ObjectType = c_ObjectType,
                             });
 
@@ -625,8 +634,8 @@ namespace Trinity
                         }
 
                         float maxRadiusDistance = -1f;
-                                          
-                        if (DataDictionary.DestructableObjectRadius.TryGetValue(c_ActorSNO, out maxRadiusDistance))
+
+                        if (DataDictionary.DestructableObjectRadius.TryGetValue(CurrentCacheObject.ActorSNO, out maxRadiusDistance))
                         {
                             if (c_RadiusDistance < maxRadiusDistance)
                             {
@@ -663,13 +672,13 @@ namespace Trinity
 
                         if (noDamage)
                         {
-                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
+                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, c_Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                             {
-                                ActorSNO = c_ActorSNO,
+                                ActorSNO = CurrentCacheObject.ActorSNO,
                                 Radius = c_Radius,
                                 Position = CurrentCacheObject.Position,
-                                RActorGUID = c_RActorGuid,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
                                 ObjectType = c_ObjectType,
                             });
 
@@ -680,13 +689,13 @@ namespace Trinity
 
                         if (Invulnerable)
                         {
-                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
+                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, c_Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                             {
-                                ActorSNO = c_ActorSNO,
+                                ActorSNO = CurrentCacheObject.ActorSNO,
                                 Radius = c_Radius,
                                 Position = CurrentCacheObject.Position,
-                                RActorGUID = c_RActorGuid,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
                                 ObjectType = c_ObjectType,
                             });
 
@@ -696,13 +705,13 @@ namespace Trinity
                         }
                         if (Untargetable)
                         {
-                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
+                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, c_Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                             {
-                                ActorSNO = c_ActorSNO,
+                                ActorSNO = CurrentCacheObject.ActorSNO,
                                 Radius = c_Radius,
                                 Position = CurrentCacheObject.Position,
-                                RActorGUID = c_RActorGuid,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
                                 ObjectType = c_ObjectType,
                             });
 
@@ -733,7 +742,7 @@ namespace Trinity
                             break;
                         }
 
-                        if (!DataDictionary.ForceDestructibles.Contains(c_ActorSNO) && Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.ForceIgnore)
+                        if (!DataDictionary.ForceDestructibles.Contains(CurrentCacheObject.ActorSNO) && Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.ForceIgnore)
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "ForceIgnoreDestructibles";
@@ -762,7 +771,7 @@ namespace Trinity
 
                         float maxRadiusDistance = -1f;
 
-                        if (DataDictionary.DestructableObjectRadius.TryGetValue(c_ActorSNO, out maxRadiusDistance))
+                        if (DataDictionary.DestructableObjectRadius.TryGetValue(CurrentCacheObject.ActorSNO, out maxRadiusDistance))
                         {
                             if (c_RadiusDistance < maxRadiusDistance)
                             {
@@ -797,7 +806,7 @@ namespace Trinity
                             c_IgnoreSubStep = "";
                         }
 
-                        if (c_RActorGuid == LastTargetRactorGUID)
+                        if (CurrentCacheObject.RActorGuid == LastTargetRactorGUID)
                         {
                             AddToCache = true;
                             c_IgnoreSubStep = "";
@@ -809,10 +818,10 @@ namespace Trinity
                     {
                         AddToCache = false;
 
-                        bool isRareChest = c_InternalName.ToLower().Contains("chest_rare") || DataDictionary.ResplendentChestIds.Contains(c_ActorSNO);
+                        bool isRareChest = c_InternalName.ToLower().Contains("chest_rare") || DataDictionary.ResplendentChestIds.Contains(CurrentCacheObject.ActorSNO);
                         bool isChest = (!isRareChest && c_InternalName.ToLower().Contains("chest")) ||
                             c_InternalName.ToLower().Contains("rack") ||
-                            DataDictionary.ContainerWhiteListIds.Contains(c_ActorSNO); // We know it's a container but this is not a known rare chest
+                            DataDictionary.ContainerWhiteListIds.Contains(CurrentCacheObject.ActorSNO); // We know it's a container but this is not a known rare chest
                         bool isCorpse = c_InternalName.ToLower().Contains("corpse");
 
                         // We want to do some vendoring, so don't open anything new yet
@@ -826,11 +835,11 @@ namespace Trinity
                         bool chestOpen = false;
                         try
                         {
-                            chestOpen = (c_CommonData.GetAttribute<int>(ActorAttributeType.ChestOpen) > 0);
+                            chestOpen = (CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.ChestOpen) > 0);
                         }
                         catch
                         {
-                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting container-been-opened attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting container-been-opened attribute for object {0} [{1}]", c_InternalName, CurrentCacheObject.ActorSNO);
                             c_IgnoreSubStep = "ChestOpenException";
                             AddToCache = false;
                             return AddToCache;
@@ -847,13 +856,13 @@ namespace Trinity
 
                         if (Untargetable)
                         {
-                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
+                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, c_Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                             {
-                                ActorSNO = c_ActorSNO,
+                                ActorSNO = CurrentCacheObject.ActorSNO,
                                 Radius = c_Radius,
                                 Position = CurrentCacheObject.Position,
-                                RActorGUID = c_RActorGuid,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
                                 ObjectType = c_ObjectType,
                             });
 

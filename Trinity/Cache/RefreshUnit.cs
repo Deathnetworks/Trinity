@@ -25,14 +25,14 @@ namespace Trinity
             if (!c_diaUnit.CommonData.IsValid)
                 return false;
 
-            if (c_CommonData.ACDGuid == -1)
+            if (CurrentCacheObject.CommonData.ACDGuid == -1)
                 return false;
 
             // grab this first
             c_CurrentAnimation = c_diaUnit.CommonData.CurrentAnimation;
 
             // See if this is a boss
-            c_unit_IsBoss = DataDictionary.BossIds.Contains(c_ActorSNO);
+            c_unit_IsBoss = DataDictionary.BossIds.Contains(CurrentCacheObject.ActorSNO);
 
             // hax for Diablo_shadowClone
             c_unit_IsAttackable = c_InternalName.StartsWith("Diablo_shadowClone");
@@ -54,7 +54,7 @@ namespace Trinity
             /*
             *  TeamID  - check once for all units except bosses (which can potentially change teams - Belial, Cydea)
             */
-            string teamIdHash = HashGenerator.GetGenericHash("teamId.RActorGuid=" + c_RActorGuid + ".ActorSNO=" + c_ActorSNO + ".WorldId=" + Player.WorldID);
+            string teamIdHash = HashGenerator.GetGenericHash("teamId.RActorGuid=" + CurrentCacheObject.RActorGuid + ".ActorSNO=" + CurrentCacheObject.ActorSNO + ".WorldId=" + Player.WorldID);
 
             int teamId = 0;
             if (!c_unit_IsBoss && GenericCache.ContainsKey(teamIdHash))
@@ -63,7 +63,7 @@ namespace Trinity
             }
             else
             {
-                teamId = c_CommonData.GetAttribute<int>(ActorAttributeType.TeamID);
+                teamId = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.TeamID);
 
                 GenericCache.AddToCache(new GenericCacheObject()
                 {
@@ -75,7 +75,7 @@ namespace Trinity
 
             try
             {
-                CurrentCacheObject.IsBountyObjective = (c_CommonData.GetAttribute<int>(ActorAttributeType.BountyObjective) > 0);
+                CurrentCacheObject.IsBountyObjective = (CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.BountyObjective) > 0);
                 if (CurrentCacheObject.IsBountyObjective)
                     c_unit_IsBoss = true;
             }
@@ -86,7 +86,7 @@ namespace Trinity
 
             try
             {
-                CurrentCacheObject.IsNPC = (c_CommonData.GetAttribute<int>(ActorAttributeType.IsNPC) > 0);
+                CurrentCacheObject.IsNPC = (CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.IsNPC) > 0);
             }
             catch (Exception)
             {
@@ -95,7 +95,7 @@ namespace Trinity
 
             try
             {
-                CurrentCacheObject.NPCIsOperable = (c_CommonData.GetAttribute<int>(ActorAttributeType.NPCIsOperatable) > 0);
+                CurrentCacheObject.NPCIsOperable = (CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.NPCIsOperatable) > 0);
             }
             catch (Exception)
             {
@@ -151,7 +151,7 @@ namespace Trinity
             /* Always refresh monster type */
             if (c_ObjectType != GObjectType.Player && !c_unit_IsBoss)
             {
-                switch (c_CommonData.MonsterInfo.MonsterType)
+                switch (CurrentCacheObject.CommonData.MonsterInfo.MonsterType)
                 {
                     case MonsterType.Ally:
                     case MonsterType.Scenery:
@@ -170,7 +170,7 @@ namespace Trinity
                 // Only set treasure goblins to true *IF* they haven't disabled goblins! Then check the SNO in the goblin hash list!
                 c_unit_IsTreasureGoblin = false;
                 // Flag this as a treasure goblin *OR* ignore this object altogether if treasure goblins are set to ignore
-                if (DataDictionary.GoblinIds.Contains(c_ActorSNO))
+                if (DataDictionary.GoblinIds.Contains(CurrentCacheObject.ActorSNO))
                 {
                     if (Settings.Combat.Misc.GoblinPriority != 0)
                     {
@@ -198,7 +198,7 @@ namespace Trinity
 
             // Only if at full health, else don't bother checking each loop
             // See if we already have this monster's size stored, if not get it and cache it
-            if (!CacheData.MonsterSizes.TryGetValue(c_ActorSNO, out c_unit_MonsterSize))
+            if (!CacheData.MonsterSizes.TryGetValue(CurrentCacheObject.ActorSNO, out c_unit_MonsterSize))
             {
                 try
                 {
@@ -209,10 +209,10 @@ namespace Trinity
                     Logger.LogDebug("Error refreshing MonsterSize");
                 }
             }
-            if (!DataDictionary.CustomObjectRadius.TryGetValue(c_ActorSNO, out c_Radius))
+            if (!DataDictionary.CustomObjectRadius.TryGetValue(CurrentCacheObject.ActorSNO, out c_Radius))
             {
                 // Retrieve collision sphere radius, cached if possible
-                if (!CacheData.CollisionSphere.TryGetValue(c_ActorSNO, out c_Radius))
+                if (!CacheData.CollisionSphere.TryGetValue(CurrentCacheObject.ActorSNO, out c_Radius))
                 {
                     try
                     {
@@ -222,7 +222,7 @@ namespace Trinity
                     {
                         Logger.LogDebug("Error refreshing MonsterRadius");
                     }
-                    CacheData.CollisionSphere.Add(c_ActorSNO, c_Radius);
+                    CacheData.CollisionSphere.Add(CurrentCacheObject.ActorSNO, c_Radius);
                 }
             }
 
@@ -288,7 +288,7 @@ namespace Trinity
             if (monsterInfo != null)
             {
                 c_unit_MonsterSize = monsterInfo.MonsterSize;
-                CacheData.MonsterSizes.Add(c_ActorSNO, c_unit_MonsterSize);
+                CacheData.MonsterSizes.Add(CurrentCacheObject.ActorSNO, c_unit_MonsterSize);
             }
             else
             {
@@ -304,10 +304,10 @@ namespace Trinity
             // health calculations
             double maxHealth;
             // Get the max health of this unit, a cached version if available, if not cache it
-            if (!CacheData.UnitMaxHealth.TryGetValue(c_RActorGuid, out maxHealth))
+            if (!CacheData.UnitMaxHealth.TryGetValue(CurrentCacheObject.RActorGuid, out maxHealth))
             {
                 maxHealth = c_diaUnit.HitpointsMax;
-                CacheData.UnitMaxHealth.Add(c_RActorGuid, maxHealth);
+                CacheData.UnitMaxHealth.Add(CurrentCacheObject.RActorGuid, maxHealth);
             }
 
             // Health calculations            
@@ -321,7 +321,7 @@ namespace Trinity
         {
 
 
-            if (!DataDictionary.IgnoreUntargettableAttribute.Contains(c_ActorSNO) && unit.IsUntargetable)
+            if (!DataDictionary.IgnoreUntargettableAttribute.Contains(CurrentCacheObject.ActorSNO) && unit.IsUntargetable)
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "IsUntargetable";
@@ -337,13 +337,13 @@ namespace Trinity
             }
 
             bool isBurrowed = false;
-            if (!CacheData.UnitIsBurrowed.TryGetValue(c_RActorGuid, out isBurrowed))
+            if (!CacheData.UnitIsBurrowed.TryGetValue(CurrentCacheObject.RActorGuid, out isBurrowed))
             {
                 isBurrowed = unit.IsBurrowed;
                 // if the unit is NOT burrowed - we can attack them, add to cache (as IsAttackable)
                 if (!isBurrowed)
                 {
-                    CacheData.UnitIsBurrowed.Add(c_RActorGuid, isBurrowed);
+                    CacheData.UnitIsBurrowed.Add(CurrentCacheObject.RActorGuid, isBurrowed);
                 }
             }
 
@@ -364,10 +364,10 @@ namespace Trinity
                 (Player.ActorClass == ActorClass.Monk && HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_WayOfTheHundredFists && s.RuneIndex == 0)))
                 )
             {
-                ////bool hasdotDPS = c_CommonData.GetAttribute<int>(ActorAttributeType.DOTDPS) != 0;
-                //bool isBleeding = c_CommonData.GetAttribute<int>(ActorAttributeType.Bleeding) != 0;
+                ////bool hasdotDPS = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.DOTDPS) != 0;
+                //bool isBleeding = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.Bleeding) != 0;
                 //c_HasDotDPS = hasdotDPS && isBleeding;
-                bool hasdotDPS = c_CommonData.GetAttribute<int>(ActorAttributeType.DOTDPS) != 0;
+                bool hasdotDPS = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.DOTDPS) != 0;
                 c_HasDotDPS = hasdotDPS;
             }
             return AddToCache;
@@ -384,23 +384,23 @@ namespace Trinity
             // Bosses get extra radius
             if (c_unit_IsBoss)
             {
-                if (c_ActorSNO != 80509)
+                if (CurrentCacheObject.ActorSNO != 80509)
                     // Kulle Exception
                     killRange *= 1.5;
                 // And even more if they're already injured
                 if (c_HitPointsPct <= 0.98)
                     killRange *= 4;
                 // And make sure we have a MINIMUM range for bosses - incase they are at screen edge etc + Kulle exception
-                if (killRange <= 200 && c_ActorSNO != 80509)
+                if (killRange <= 200 && CurrentCacheObject.ActorSNO != 80509)
                     killRange = 200;
             }
             // Special short-range list to ignore weakling mobs
-            if (PlayerKiteDistance <= 0 && !GetHasBuff(SNOPower.Wizard_Archon) && DataDictionary.ShortRangeAttackMonsterIds.Contains(c_ActorSNO))
+            if (PlayerKiteDistance <= 0 && !GetHasBuff(SNOPower.Wizard_Archon) && DataDictionary.ShortRangeAttackMonsterIds.Contains(CurrentCacheObject.ActorSNO))
             {
                 killRange = 12;
             }
             // Prevent long-range mobs beign ignored while they may be pounding on us
-            if (killRange <= 30 && DataDictionary.RangedMonsterIds.Contains(c_ActorSNO))
+            if (killRange <= 30 && DataDictionary.RangedMonsterIds.Contains(CurrentCacheObject.ActorSNO))
                 killRange = 120f;
 
             // Injured treasure goblins get a huge extra radius - since they don't stay on the map long if injured, anyway!
@@ -440,17 +440,17 @@ namespace Trinity
             using (new PerformanceLogger("RefreshAffixes"))
             {
                 MonsterAffixes affixFlags;
-                if (!CacheData.UnitMonsterAffix.TryGetValue(c_RActorGuid, out affixFlags))
+                if (!CacheData.UnitMonsterAffix.TryGetValue(CurrentCacheObject.RActorGuid, out affixFlags))
                 {
                     try
                     {
-                        affixFlags = c_CommonData.MonsterAffixes;
-                        CacheData.UnitMonsterAffix.Add(c_RActorGuid, affixFlags);
+                        affixFlags = CurrentCacheObject.CommonData.MonsterAffixes;
+                        CacheData.UnitMonsterAffix.Add(CurrentCacheObject.RActorGuid, affixFlags);
                     }
                     catch (Exception ex)
                     {
                         affixFlags = MonsterAffixes.None;
-                        Logger.Log(LogCategory.CacheManagement, "Handled Exception getting affixes for Monster SNO={0} Name={1} RAGuid={2}", c_ActorSNO, c_InternalName, c_RActorGuid);
+                        Logger.Log(LogCategory.CacheManagement, "Handled Exception getting affixes for Monster SNO={0} Name={1} RAGuid={2}", CurrentCacheObject.ActorSNO, c_InternalName, CurrentCacheObject.RActorGuid);
                         Logger.Log(LogCategory.CacheManagement, ex.ToString());
                     }
                 }
@@ -468,12 +468,12 @@ namespace Trinity
         }
         private static MonsterType RefreshMonsterType(bool addToDictionary)
         {
-            SNORecordMonster monsterInfo = c_CommonData.MonsterInfo;
+            SNORecordMonster monsterInfo = CurrentCacheObject.CommonData.MonsterInfo;
             MonsterType monsterType;
             if (monsterInfo != null)
             {
                 // Force Jondar as an undead, since Diablo 3 sticks him as a permanent ally
-                if (c_ActorSNO == 86624)
+                if (CurrentCacheObject.ActorSNO == 86624)
                 {
                     monsterType = MonsterType.Undead;
                 }
@@ -483,9 +483,9 @@ namespace Trinity
                 }
                 // Is this going to be a new dictionary entry, or updating one already existing?
                 if (addToDictionary)
-                    CacheData.MonsterTypes.Add(c_ActorSNO, monsterType);
+                    CacheData.MonsterTypes.Add(CurrentCacheObject.ActorSNO, monsterType);
                 else
-                    CacheData.MonsterTypes[c_ActorSNO] = monsterType;
+                    CacheData.MonsterTypes[CurrentCacheObject.ActorSNO] = monsterType;
             }
             else
             {
@@ -498,7 +498,7 @@ namespace Trinity
             if (c_diaUnit != null && c_diaUnit.IsValid)
             {
 
-                if (!CacheData.SummonedByACDId.TryGetValue(c_ACDGUID, out c_SummonedByACDId))
+                if (!CacheData.SummonedByACDId.TryGetValue(CurrentCacheObject.ACDGuid, out c_SummonedByACDId))
                 {
                     try
                     {
@@ -509,7 +509,7 @@ namespace Trinity
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Exception reading SummonedByACDId {0}", ex.ToString());
                     }
                 }
-                if (!CacheData.IsSummoner.TryGetValue(c_ACDGUID, out c_IsSummoner))
+                if (!CacheData.IsSummoner.TryGetValue(CurrentCacheObject.ACDGuid, out c_IsSummoner))
                 {
                     try
                     {
@@ -530,7 +530,7 @@ namespace Trinity
                 // Count up Mystic Allys, gargantuans, and zombies - if the player has those skills
                 if (Player.ActorClass == ActorClass.Monk)
                 {
-                    if (DataDictionary.MysticAllyIds.Contains(c_ActorSNO))
+                    if (DataDictionary.MysticAllyIds.Contains(CurrentCacheObject.ActorSNO))
                     {
                         if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
                             iPlayerOwnedMysticAlly++;
@@ -540,7 +540,7 @@ namespace Trinity
                 // Count up Demon Hunter pets
                 if (Player.ActorClass == ActorClass.DemonHunter)
                 {
-                    if ( DataDictionary.DemonHunterPetIds.Contains(c_ActorSNO))
+                    if ( DataDictionary.DemonHunterPetIds.Contains(CurrentCacheObject.ActorSNO))
                     {
                         if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
                             iPlayerOwnedDHPets++;
@@ -550,13 +550,13 @@ namespace Trinity
                 // Count up zombie dogs and gargantuans next
                 if (Player.ActorClass == ActorClass.Witchdoctor)
                 {
-                    if (DataDictionary.GargantuanIds.Contains(c_ActorSNO))
+                    if (DataDictionary.GargantuanIds.Contains(CurrentCacheObject.ActorSNO))
                     {
                         if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
                             iPlayerOwnedGargantuan++;
                         AddToCache = false;
                     }
-                    if (DataDictionary.ZombieDogIds.Contains(c_ActorSNO))
+                    if (DataDictionary.ZombieDogIds.Contains(CurrentCacheObject.ActorSNO))
                     {
                         if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
                             PlayerOwnedZombieDog++;
