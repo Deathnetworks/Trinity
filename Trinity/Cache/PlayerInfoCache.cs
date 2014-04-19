@@ -221,6 +221,9 @@ namespace Trinity
                                 Act = ab.Act,
                                 Quest = ab.Quest,
                                 State = ab.State,
+                                // Uncomment these after a while
+                                //LevelAreas = ab.LevelAreas.ToList(),
+                                //StartingLevelArea = ab.StartingLevelArea,
                                 Info = new TrinityQuestInfo()
                                 {
                                     Quest = ab.Info.Quest,
@@ -229,7 +232,7 @@ namespace Trinity
                                     QuestSNO = ab.Info.QuestSNO,
                                     BonusCount = ab.Info.BonusCount,
                                     KillCount = ab.Info.KillCount,
-                                    LevelArea = ab.Info.LevelArea,
+                                    // LevelArea = ab.Info.LevelArea,
 
                                     QuestInfo = ab.Info,
                                 },

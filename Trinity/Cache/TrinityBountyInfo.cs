@@ -1,4 +1,5 @@
-﻿using Zeta.Game;
+﻿using System.Collections.Generic;
+using Zeta.Game;
 using Zeta.Game.Internals;
 
 namespace Trinity.Cache
@@ -7,7 +8,8 @@ namespace Trinity.Cache
     {
         public Act Act { get; set; }
         public TrinityQuestInfo Info { get; set; }
-        public SNOLevelArea LevelArea { get; set; }
+        public List<SNOLevelArea> LevelAreas { get; set; }
+        public SNOLevelArea StartingLevelArea { get; set; }
         public SNOQuest Quest { get; set; }
         public QuestState State { get; set; }
         public BountyInfo BountyInfo { get; set; }

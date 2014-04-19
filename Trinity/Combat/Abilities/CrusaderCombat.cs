@@ -128,15 +128,15 @@ namespace Trinity.Combat.Abilities
 
                 // Blessed Shield : Piercing Shield
                 bool hasPiercingShield = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_Crusader_BlessedShield && s.RuneIndex == 5);
-                if (CanCastBlessedShieldPiercingShield(hasPiercingShield))
+                if (CanCastBlessedShieldPiercingShield() && hasPiercingShield)
                 {
                     var bestPierceTarget = TargetUtil.GetBestPierceTarget(45f);
                     if (bestPierceTarget != null)
                         return new TrinityPower(SNOPower.X1_Crusader_BlessedShield, 14f, bestPierceTarget.ACDGuid);
                 }
 
-                // Blessed Shield
-                if (CanCastBlessedShield(hasPiercingShield))
+                // Blessed Shield WITHOUT Piercing Shield
+                if (CanCastBlessedShield() && !hasPiercingShield)
                 {
                     return new TrinityPower(SNOPower.X1_Crusader_BlessedShield, 14f, TargetUtil.GetBestClusterUnit(15f, 65f, 1).ACDGuid);
                 }
@@ -261,14 +261,14 @@ namespace Trinity.Combat.Abilities
                 (TargetUtil.ClusterExists(8f, 8f, 2) || TargetUtil.EliteOrTrashInRange(8f) || Player.PrimaryResourcePct > 0.5);
         }
 
-        private static bool CanCastBlessedShield(bool hasPiercingShield)
+        private static bool CanCastBlessedShield()
         {
-            return CombatBase.CanCast(SNOPower.X1_Crusader_BlessedShield) && !hasPiercingShield && (TargetUtil.ClusterExists(14f, 3) || TargetUtil.EliteOrTrashInRange(14f));
+            return CombatBase.CanCast(SNOPower.X1_Crusader_BlessedShield) && (TargetUtil.ClusterExists(14f, 3) || TargetUtil.EliteOrTrashInRange(14f));
         }
 
-        private static bool CanCastBlessedShieldPiercingShield(bool hasPiercingShield)
+        private static bool CanCastBlessedShieldPiercingShield()
         {
-            return CombatBase.CanCast(SNOPower.X1_Crusader_BlessedShield) && hasPiercingShield && (TargetUtil.ClusterExists(14f, 3) || TargetUtil.EliteOrTrashInRange(14f));
+            return CombatBase.CanCast(SNOPower.X1_Crusader_BlessedShield) && (TargetUtil.ClusterExists(14f, 3) || TargetUtil.EliteOrTrashInRange(14f));
         }
 
         private static bool CanCastPhalanx()

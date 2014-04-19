@@ -25,7 +25,6 @@ namespace Trinity.Technicals
 
 
         private static string _LastLogMessage = "";
-        private static object[] _LastLogArgs = { };
 
         /// <summary>Logs the specified level.</summary>
         /// <param name="level">The logging level.</param>
@@ -38,24 +37,25 @@ namespace Trinity.Technicals
             {
                 string msg = string.Format(prefix + "{0} {1}", category != LogCategory.UserInformation ? "[" + category.ToString() + "]" : string.Empty, formatMessage);
 
-                if (_LastLogMessage != msg && _LastLogArgs != args)
+                msg = string.Format(msg, args);
+
+                if (_LastLogMessage != msg)
                 {
                     _LastLogMessage = msg;
-                    _LastLogArgs = args;
 
                     switch (level)
                     {
                         case TrinityLogLevel.Error:
-                            _Logger.ErrorFormat(msg, args);
+                            _Logger.Error(msg);
                             break;
                         case TrinityLogLevel.Info:
-                            _Logger.InfoFormat(msg, args);
+                            _Logger.Info(msg);
                             break;
                         case TrinityLogLevel.Verbose:
-                            _Logger.DebugFormat(msg, args);
+                            _Logger.Debug(msg);
                             break;
                         case TrinityLogLevel.Debug:
-                            LogToTrinityDebug(msg, args);
+                            LogToTrinityDebug(msg);
                             break;
                     }
                 }

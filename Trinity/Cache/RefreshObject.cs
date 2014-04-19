@@ -450,10 +450,12 @@ namespace Trinity
             c_CommonData = thisobj.CommonData;
             if (c_CommonData == null)
             {
+                c_IgnoreReason = "CommonData";
                 return false;
             }
             else if (!c_CommonData.IsValid)
             {
+                c_IgnoreReason = "CommonData";
                 return false;
             }
 
