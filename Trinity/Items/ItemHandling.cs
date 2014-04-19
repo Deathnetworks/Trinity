@@ -61,22 +61,22 @@ namespace Trinity
             {
                 return true;
             }
-            
-            if (itemType == GItemType.InfernalKey && !Settings.Loot.Pickup.InfernalKeys)
+
+            if (itemType == GItemType.InfernalKey)
             {
-                return false;
+                return Settings.Loot.Pickup.InfernalKeys;
             }
 
             // Rift Keystone Fragments == LootRunkey
-            if (itemType == GItemType.LootRunKey && Settings.Loot.Pickup.LootRunKey)
+            if (itemType == GItemType.LootRunKey)
             {
-                return true;
+                return Settings.Loot.Pickup.LootRunKey;
             }
 
             // Blood Shards == HoradricRelic
-            if (itemType == GItemType.HoradricRelic && Settings.Loot.Pickup.BloodShards)
+            if (itemType == GItemType.HoradricRelic)
             {
-                return true;
+                return Settings.Loot.Pickup.BloodShards;
             }
 
             if (itemType == GItemType.CraftingMaterial && (item.ACDItem.GetTrinityItemQuality() < Settings.Loot.Pickup.MiscItemQuality || !Settings.Loot.Pickup.CraftMaterials))
@@ -84,9 +84,9 @@ namespace Trinity
                 return false;
             }
 
-            if (itemType == GItemType.CraftTome && !Settings.Loot.Pickup.CraftTomes)
+            if (itemType == GItemType.CraftTome)
             {
-                return false;
+                return Settings.Loot.Pickup.CraftTomes;
             }
 
             // Plans

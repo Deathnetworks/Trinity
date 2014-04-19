@@ -264,7 +264,17 @@ namespace Trinity
                         EventStartTime = DateTime.UtcNow;
                     }
 
-                    if (CurrentTarget == null && Player.InActiveEvent && DateTime.UtcNow.Subtract(EventStartTime).TotalSeconds < 90)
+                    var activeEvent = ZetaDia.ActInfo.ActiveQuests.FirstOrDefault(q => DataDictionary.EventQuests.Contains(q.QuestSNO));
+
+                    const int waitTimeoutSeconds = 90;
+                    if (DateTime.UtcNow.Subtract(EventStartTime).TotalSeconds > waitTimeoutSeconds && activeEvent != null)
+                    {
+                        CacheData.BlacklistedEvents.Add(activeEvent.QuestSNO);
+                    }
+
+                    if (CurrentTarget == null && Player.InActiveEvent &&
+                        DateTime.UtcNow.Subtract(EventStartTime).TotalSeconds < waitTimeoutSeconds &&
+                        activeEvent != null && !CacheData.BlacklistedEvents.Contains(activeEvent.QuestSNO))
                     {
                         if (EventStartPosition == Vector3.Zero)
                         {
@@ -281,9 +291,11 @@ namespace Trinity
                             RadiusDistance = 2f,
                             InternalName = "WaitForEvent"
                         };
-                        Logger.Log("Waiting for Event");
+                        Logger.Log("Waiting for Event {0} - Time Remaining: {1:0} seconds",
+                            ZetaDia.ActInfo.ActiveQuests.FirstOrDefault(q => DataDictionary.EventQuests.Contains(q.QuestSNO)).Quest,
+                            waitTimeoutSeconds - DateTime.UtcNow.Subtract(EventStartTime).TotalSeconds);
                     }
-                    
+
                     // Still no target, let's see if we should backtrack or wait for wrath to come off cooldown...
                     if (CurrentTarget == null)
                     {
@@ -465,7 +477,7 @@ namespace Trinity
                         Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0} {4}",
                                 currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance, gizmoType);
                         Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "{0}", ex);
-                                                
+
                     }
                 }
 
@@ -590,7 +602,7 @@ namespace Trinity
                 {
                     ForceCloseRangeTarget = false;
                 }
-                
+
                 //AnyElitesPresent = false;
                 AnyMobsInRange = false;
 
@@ -658,7 +670,7 @@ namespace Trinity
 
         private static void RefreshDoBackTrack()
         {
-            
+
             // See if we should wait for [playersetting] milliseconds for possible loot drops before continuing run
             if (CurrentTarget == null && (DateTime.UtcNow.Subtract(lastHadUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill ||
                 DateTime.UtcNow.Subtract(lastHadEliteUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill ||
@@ -676,7 +688,7 @@ namespace Trinity
                                     };
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Waiting for loot to drop, delay: {0}ms", Settings.Combat.Misc.DelayAfterKill);
             }
-           
+
             // End of backtracking check
             // Finally, a special check for waiting for wrath of the berserker cooldown before engaging Azmodan
             if (CurrentTarget == null && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && Settings.Combat.Barbarian.WaitWOTB && !SNOPowerUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) &&

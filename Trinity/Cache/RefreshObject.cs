@@ -99,11 +99,17 @@ namespace Trinity
             CurrentCacheObject.InternalName = nameNumberTrimRegex.Replace(freshObject.Name, "");
 
             CurrentCacheObject.ActorSNO = freshObject.ActorSNO;
-            CurrentCacheObject.ActorSNO = CurrentCacheObject.ActorSNO;
             CurrentCacheObject.ActorType = freshObject.ActorType;
             CurrentCacheObject.ACDGuid = freshObject.ACDGuid;
-
-
+            if (CurrentCacheObject.CommonData == null)
+            {
+                c_IgnoreReason = "ACDNull";
+                return false;
+            }
+            if (!CurrentCacheObject.CommonData.IsValid)
+            {
+                c_IgnoreReason = "ACDInvalid";
+            }
 
             // Have ActorSNO Check for SNO based navigation obstacle hashlist
             c_IsObstacle = DataDictionary.NavigationObstacleIds.Contains(CurrentCacheObject.ActorSNO);
@@ -447,8 +453,8 @@ namespace Trinity
             else if (!c_IsObstacle)
             {
                 // See if it's an avoidance first from the SNO
-                bool isAvoidanceSNO = (DataDictionary.Avoidances.Contains(CurrentCacheObject.ActorSNO) || 
-                    DataDictionary.AvoidanceBuffs.Contains(CurrentCacheObject.ActorSNO) || 
+                bool isAvoidanceSNO = (DataDictionary.Avoidances.Contains(CurrentCacheObject.ActorSNO) ||
+                    DataDictionary.AvoidanceBuffs.Contains(CurrentCacheObject.ActorSNO) ||
                     DataDictionary.AvoidanceProjectiles.Contains(CurrentCacheObject.ActorSNO));
 
                 // We're avoiding AoE and this is an AoE
@@ -741,115 +747,115 @@ namespace Trinity
         {
             try
             {
-                // Bounty Objectives should always be on the weight list
-                if (CurrentCacheObject.IsBountyObjective && !DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
-                    return true;
+                if (!DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
+                {
+                    // Bounty Objectives should always be on the weight list
+                    if (CurrentCacheObject.IsBountyObjective)
+                        return true;
 
-                // Always LoS Units during events
-                if (c_ObjectType == GObjectType.Unit && Player.InActiveEvent && !DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
-                    return true;
-
+                    // Always LoS Units during events
+                    if (c_ObjectType == GObjectType.Unit && Player.InActiveEvent)
+                        return true;
+                }
                 // Everything except items and the current target
                 if (c_ObjectType != GObjectType.Item && CurrentCacheObject.RActorGuid != LastTargetRactorGUID && c_ObjectType != GObjectType.Unknown)
                 {
                     if (c_CentreDistance < 95)
                     {
-                        switch (c_ObjectType)
+                        //switch (c_ObjectType)
+                        //{
+                        //    case GObjectType.Destructible:
+                        //    case GObjectType.HealthWell:
+                        //    case GObjectType.Unit:
+                        //    case GObjectType.Shrine:
+                        //    case GObjectType.Gold:
+                        //    case GObjectType.Container:
+                        //    case GObjectType.Interactable:
+                        //    case GObjectType.Item:
+                        //    case GObjectType.CursedChest:
+                        //    case GObjectType.CursedShrine:
+                        //    case GObjectType.JumpLinkPortal:
+                        //        {
+                        using (new PerformanceLogger("RefreshLoS.2"))
                         {
-                            case GObjectType.Destructible:
-                            case GObjectType.HealthWell:
-                            case GObjectType.Unit:
-                            case GObjectType.Shrine:
-                            case GObjectType.Gold:
+                            // Get whether or not this RActor has ever been in a path line with AllowWalk. If it hasn't, don't add to cache and keep rechecking
+                            if (!CacheData.HasBeenRayCasted.TryGetValue(CurrentCacheObject.RActorGuid, out c_HasBeenRaycastable) || DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
+                            {
+                                if (c_CentreDistance >= 1f && c_CentreDistance <= 5f)
                                 {
-                                    using (new PerformanceLogger("RefreshLoS.2"))
+                                    c_HasBeenRaycastable = true;
+                                    if (!CacheData.HasBeenRayCasted.ContainsKey(CurrentCacheObject.RActorGuid))
+                                        CacheData.HasBeenRayCasted.Add(CurrentCacheObject.RActorGuid, c_HasBeenRaycastable);
+                                }
+                                else if (Settings.Combat.Misc.UseNavMeshTargeting)
+                                {
+                                    Vector3 myPos = new Vector3(Player.Position.X, Player.Position.Y, Player.Position.Z + 8f);
+                                    Vector3 cPos = new Vector3(CurrentCacheObject.Position.X, CurrentCacheObject.Position.Y, CurrentCacheObject.Position.Z + 8f);
+                                    cPos = MathEx.CalculatePointFrom(cPos, myPos, c_Radius + 1f);
+
+                                    if (Single.IsNaN(cPos.X) || Single.IsNaN(cPos.Y) || Single.IsNaN(cPos.Z))
+                                        cPos = CurrentCacheObject.Position;
+
+                                    if (!NavHelper.CanRayCast(myPos, cPos))
                                     {
-                                        // Get whether or not this RActor has ever been in a path line with AllowWalk. If it hasn't, don't add to cache and keep rechecking
-                                        if (!CacheData.HasBeenRayCasted.TryGetValue(CurrentCacheObject.RActorGuid, out c_HasBeenRaycastable) || DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
-                                        {
-                                            if (c_CentreDistance >= 1f && c_CentreDistance <= 5f)
-                                            {
-                                                c_HasBeenRaycastable = true;
-                                                if (!CacheData.HasBeenRayCasted.ContainsKey(CurrentCacheObject.RActorGuid))
-                                                    CacheData.HasBeenRayCasted.Add(CurrentCacheObject.RActorGuid, c_HasBeenRaycastable);
-                                            }
-                                            else if (Settings.Combat.Misc.UseNavMeshTargeting)
-                                            {
-                                                Vector3 myPos = new Vector3(Player.Position.X, Player.Position.Y, Player.Position.Z + 8f);
-                                                Vector3 cPos = new Vector3(CurrentCacheObject.Position.X, CurrentCacheObject.Position.Y, CurrentCacheObject.Position.Z + 8f);
-                                                cPos = MathEx.CalculatePointFrom(cPos, myPos, c_Radius + 1f);
-
-                                                if (Single.IsNaN(cPos.X) || Single.IsNaN(cPos.Y) || Single.IsNaN(cPos.Z))
-                                                    cPos = CurrentCacheObject.Position;
-
-                                                if (!NavHelper.CanRayCast(myPos, cPos))
-                                                {
-                                                    AddToCache = false;
-                                                    c_IgnoreSubStep = "UnableToRayCast";
-                                                }
-                                                else
-                                                {
-                                                    c_HasBeenRaycastable = true;
-                                                    if (!CacheData.HasBeenRayCasted.ContainsKey(CurrentCacheObject.RActorGuid))
-                                                        CacheData.HasBeenRayCasted.Add(CurrentCacheObject.RActorGuid, c_HasBeenRaycastable);
-                                                }
-                                            }
-                                            else
-                                            {
-                                                if (c_ZDiff > 14f)
-                                                {
-                                                    AddToCache = false;
-                                                    c_IgnoreSubStep = "LoS.ZDiff";
-                                                }
-                                                else
-                                                {
-                                                    c_HasBeenRaycastable = true;
-                                                    if (!CacheData.HasBeenRayCasted.ContainsKey(CurrentCacheObject.RActorGuid))
-                                                        CacheData.HasBeenRayCasted.Add(CurrentCacheObject.RActorGuid, c_HasBeenRaycastable);
-                                                }
-
-                                            }
-                                        }
+                                        AddToCache = false;
+                                        c_IgnoreSubStep = "UnableToRayCast";
+                                    }
+                                    else
+                                    {
+                                        c_HasBeenRaycastable = true;
+                                        if (!CacheData.HasBeenRayCasted.ContainsKey(CurrentCacheObject.RActorGuid))
+                                            CacheData.HasBeenRayCasted.Add(CurrentCacheObject.RActorGuid, c_HasBeenRaycastable);
                                     }
                                 }
-                                break;
-
-                        }
-                        switch (c_ObjectType)
-                        {
-                            case GObjectType.Unit:
+                                else
                                 {
-                                    using (new PerformanceLogger("RefreshLoS.3"))
+                                    if (c_ZDiff > 14f)
                                     {
-                                        // Get whether or not this RActor has ever been in "Line of Sight" (as determined by Demonbuddy). If it hasn't, don't add to cache and keep rechecking
-                                        if (!CacheData.HasBeenInLoS.TryGetValue(CurrentCacheObject.RActorGuid, out c_HasBeenInLoS) || DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
-                                        {
-                                            if (Settings.Combat.Misc.UseNavMeshTargeting)
-                                            {
-                                                // Ignore units not in LoS except bosses, rares, champs
-                                                if (!(c_unit_IsBoss) && !c_diaObject.InLineOfSight)
-                                                {
-                                                    AddToCache = false;
-                                                    c_IgnoreSubStep = "NotInLoS";
-                                                }
-                                                else
-                                                {
-                                                    c_HasBeenInLoS = true;
-                                                    if (!CacheData.HasBeenInLoS.ContainsKey(CurrentCacheObject.RActorGuid))
-                                                        CacheData.HasBeenInLoS.Add(CurrentCacheObject.RActorGuid, c_HasBeenInLoS);
-                                                }
-                                            }
-                                            else
-                                            {
-                                                c_HasBeenInLoS = true;
-                                                if (!CacheData.HasBeenInLoS.ContainsKey(CurrentCacheObject.RActorGuid))
-                                                    CacheData.HasBeenInLoS.Add(CurrentCacheObject.RActorGuid, c_HasBeenInLoS);
-                                            }
-                                        }
+                                        AddToCache = false;
+                                        c_IgnoreSubStep = "LoS.ZDiff";
                                     }
-                                    break;
+                                    else
+                                    {
+                                        c_HasBeenRaycastable = true;
+                                        if (!CacheData.HasBeenRayCasted.ContainsKey(CurrentCacheObject.RActorGuid))
+                                            CacheData.HasBeenRayCasted.Add(CurrentCacheObject.RActorGuid, c_HasBeenRaycastable);
+                                    }
+
                                 }
+                            }
                         }
+                        //}
+                        //break;
+
+                        //}
+                        //switch (c_ObjectType)
+                        //{
+                        //case GObjectType.Unit:
+                        //{
+                        using (new PerformanceLogger("RefreshLoS.3"))
+                        {
+                            // Get whether or not this RActor has ever been in "Line of Sight" (as determined by Demonbuddy). If it hasn't, don't add to cache and keep rechecking
+                            if (!CacheData.HasBeenInLoS.TryGetValue(CurrentCacheObject.RActorGuid, out c_HasBeenInLoS) || DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
+                            {
+                                // Ignore units not in LoS except bosses, rares, champs
+                                if (!(c_unit_IsBoss) && !c_diaObject.InLineOfSight)
+                                {
+                                    AddToCache = false;
+                                    c_IgnoreSubStep = "NotInLoS";
+                                }
+                                else
+                                {
+                                    c_HasBeenInLoS = true;
+                                    if (!CacheData.HasBeenInLoS.ContainsKey(CurrentCacheObject.RActorGuid))
+                                        CacheData.HasBeenInLoS.Add(CurrentCacheObject.RActorGuid, c_HasBeenInLoS);
+                                }
+
+                            }
+                        }
+                        //    break;
+                        //}
+                        //}
                     }
                     else
                     {

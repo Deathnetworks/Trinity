@@ -62,16 +62,18 @@ namespace Trinity
 
         internal static void SetProfileInWindowTitle()
         {
-
-            string fileName = Path.GetFileName(ProfileManager.CurrentProfile.Path);
-
-            if (ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.Name != null)
+            if (ProfileManager.CurrentProfile != null)
             {
-                Trinity.SetWindowTitle(Trinity.CurrentProfileName + " " + fileName);
-            }
-            else if (ProfileManager.CurrentProfile != null && string.IsNullOrWhiteSpace(ProfileManager.CurrentProfile.Name))
-            {
-                Trinity.SetWindowTitle(fileName);
+                string fileName = Path.GetFileName(ProfileManager.CurrentProfile.Path);
+
+                if (ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.Name != null)
+                {
+                    Trinity.SetWindowTitle(Trinity.CurrentProfileName + " " + fileName);
+                }
+                else if (ProfileManager.CurrentProfile != null && string.IsNullOrWhiteSpace(ProfileManager.CurrentProfile.Name))
+                {
+                    Trinity.SetWindowTitle(fileName);
+                }
             }
         }
 

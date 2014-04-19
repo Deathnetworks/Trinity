@@ -70,7 +70,7 @@ namespace Trinity
 
             PlayerMover.TimeLastRecordedPosition = DateTime.UtcNow;
             PlayerMover.LastRestartedGame = DateTime.UtcNow;
-            GoldInactivity.ResetCheckGold();
+            GoldInactivity.Instance.ResetCheckGold();
 
             if (CharacterSettings.Instance.KillRadius < 20)
             {
@@ -253,7 +253,7 @@ namespace Trinity
                     CurrentProfile = "";
                     FirstProfile = "";
 
-                    GoldInactivity.ResetCheckGold();
+                    GoldInactivity.Instance.ResetCheckGold();
 
                     TrinityLoadOnce.UsedProfiles = new List<string>();
                     CombatBase.IsQuestingMode = false;

@@ -16,8 +16,8 @@ namespace Trinity
         private static bool RefreshGizmo(bool AddToCache)
         {
             DiaGizmo diaGizmo;
-            if (c_diaObject is DiaGizmo)
-                diaGizmo = (DiaGizmo)CurrentCacheObject.Object;
+            if (CurrentCacheObject.Gizmo != null)
+                diaGizmo = CurrentCacheObject.Gizmo;
 
             // start as true, then set as false as we go. If nothing matches below, it will return true.
             AddToCache = true;

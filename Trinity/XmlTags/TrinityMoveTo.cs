@@ -105,7 +105,7 @@ namespace Trinity.XmlTags
             else
             {
                 var positionName = this.getPosition() + " (" + this.Name + ")";
-                lastMoveResult = Navigator.MoveTo(NavTarget, positionName, true);
+                lastMoveResult = Navigator.MoveTo(NavTarget, positionName, false);
             }
 
             return RunStatus.Success;

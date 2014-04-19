@@ -841,7 +841,7 @@ namespace Trinity
                             }
                         case GObjectType.JumpLinkPortal:
                             {
-                                if (cacheObject.CentreDistance < 15)
+                                if (cacheObject.CentreDistance < 45)
                                     cacheObject.Weight = 25;
 
                                 break;

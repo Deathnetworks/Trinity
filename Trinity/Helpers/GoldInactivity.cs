@@ -10,36 +10,87 @@ using Zeta.Game;
 
 namespace Trinity
 {
-    public class GoldInactivity
+    public class GoldInactivity : IDisposable
     {
-        private static int lastKnowCoin = 0;
-        private static DateTime lastCheckBag = DateTime.MinValue;
-        private static DateTime lastRefreshCoin = DateTime.MinValue;
+        private int _LastKnowCoin = 0;
+        private DateTime _LastCheckBag = DateTime.MinValue;
+        private DateTime _LastRefreshCoin = DateTime.MinValue;
+
+        private static GoldInactivity _Instance;
+        public static GoldInactivity Instance { get { return _Instance ?? (_Instance = new GoldInactivity()); } }
+
+        private Thread _WatcherThread;
+
+        public GoldInactivity()
+        {
+            _WatcherThread = new Thread(GoldInactivityWorker)
+            {
+                Name = "GoldInactivityWorker",
+                IsBackground = true,
+                Priority = ThreadPriority.Lowest
+            };
+            _WatcherThread.Start();
+        }
+
+        public void Dispose()
+        {
+            try
+            {
+                if (_WatcherThread != null)
+                    _WatcherThread.Abort();
+                _WatcherThread = null;
+            }
+            catch { }
+        }
+
+        private void GoldInactivityWorker()
+        {
+            while (true)
+            {
+                try
+                {
+                    if (BotMain.IsPaused)
+                    {
+                        ResetCheckGold();
+                    }
+
+                }
+                catch (ThreadAbortException)
+                {
+                    // ssh
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError("Error in GoldInactivityWatcher: {0}", ex.Message);
+                }
+                Thread.Sleep(1000);
+            }
+        }
+
+        ~GoldInactivity()
+        {
+            Dispose();
+        }
 
         /// <summary>
         /// Resets the gold inactivity timer
         /// </summary>
-        internal static void ResetCheckGold()
+        internal void ResetCheckGold()
         {
-            lastCheckBag = DateTime.UtcNow;
-            lastRefreshCoin = DateTime.UtcNow;
-            lastKnowCoin = 0;
+            _LastCheckBag = DateTime.UtcNow;
+            _LastRefreshCoin = DateTime.UtcNow;
+            _LastKnowCoin = 0;
         }
 
         /// <summary>
         /// Determines whether or not to leave the game based on the gold inactivity timer
         /// </summary>
         /// <returns></returns>
-        internal static bool GoldInactive()
+        internal bool GoldInactive()
         {
             if (Trinity.Settings.Advanced.DisableAllMovement)
                 return false;
 
-            if (BotMain.IsPaused)
-            {
-                ResetCheckGold();
-                return false;
-            }
             if (!Trinity.Settings.Advanced.GoldInactivityEnabled)
             {
                 // timer isn't enabled so move along!
@@ -59,7 +110,7 @@ namespace Trinity
                     Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Loading world, gold inactivity reset", 0);
                     return false;
                 }
-                if ((DateTime.UtcNow.Subtract(lastCheckBag).TotalSeconds < 5))
+                if ((DateTime.UtcNow.Subtract(_LastCheckBag).TotalSeconds < 5))
                 {
                     return false;
                 }
@@ -95,20 +146,20 @@ namespace Trinity
 
 
 
-                lastCheckBag = DateTime.UtcNow;
+                _LastCheckBag = DateTime.UtcNow;
                 int currentcoin = Trinity.Player.Coinage;
 
-                if (currentcoin != lastKnowCoin && currentcoin != 0)
+                if (currentcoin != _LastKnowCoin && currentcoin != 0)
                 {
-                    lastRefreshCoin = DateTime.UtcNow;
-                    lastKnowCoin = currentcoin;
+                    _LastRefreshCoin = DateTime.UtcNow;
+                    _LastKnowCoin = currentcoin;
                 }
-                int notpickupgoldsec = Convert.ToInt32(DateTime.UtcNow.Subtract(lastRefreshCoin).TotalSeconds);
+                int notpickupgoldsec = Convert.ToInt32(DateTime.UtcNow.Subtract(_LastRefreshCoin).TotalSeconds);
                 if (notpickupgoldsec >= Trinity.Settings.Advanced.GoldInactivityTimer)
                 {
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Gold inactivity after {0}s. Sending abort.", notpickupgoldsec);
-                    lastRefreshCoin = DateTime.UtcNow;
-                    lastKnowCoin = currentcoin;
+                    _LastRefreshCoin = DateTime.UtcNow;
+                    _LastKnowCoin = currentcoin;
                     notpickupgoldsec = 0;
                     return true;
                 }
@@ -125,15 +176,15 @@ namespace Trinity
             return false;
         }
 
-        private static bool isLeavingGame = false;
-        private static bool leaveGameInitiated = false;
+        private bool isLeavingGame = false;
+        private bool leaveGameInitiated = false;
 
-        private static Stopwatch leaveGameTimer = new Stopwatch();
+        private Stopwatch leaveGameTimer = new Stopwatch();
 
         /// <summary>
         /// Leaves the game if gold inactivity timer is tripped
         /// </summary>
-        internal static bool GoldInactiveLeaveGame()
+        internal bool GoldInactiveLeaveGame()
         {
             if (leaveGameTimer.IsRunning && leaveGameTimer.ElapsedMilliseconds < 12000)
             {

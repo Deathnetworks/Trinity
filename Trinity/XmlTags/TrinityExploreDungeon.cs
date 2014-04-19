@@ -630,7 +630,8 @@ namespace Trinity.XmlTags
 
             var actors = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
                 .Where(a => (a.ActorSNO == ActorId ||
-                    Objectives.Any(o => o.ActorID != 0 && o.ActorID == a.ActorSNO)) &&
+                    Objectives.Any(o => o.ActorID != 0 && o.ActorID == a.ActorSNO) ||
+                    a.CommonData.GetAttribute<int>(ActorAttributeType.BountyObjective) > 0) &&
                     Trinity.SkipAheadAreaCache.Any(o => o.Position.Distance2D(a.Position) >= ObjectDistance &&
                     !foundObjects.Any(fo => fo != new Tuple<int, Vector3>(o.ActorSNO, o.Position))));
 
@@ -811,7 +812,12 @@ namespace Trinity.XmlTags
             return
             new PrioritySelector(
                 TimeoutCheck(),
-
+                new Decorator(ret => EndType == TrinityExploreEndType.RiftComplete && GetIsRiftDone(),
+                    new Sequence(
+                        new Action(ret => Logger.Log("Rift is done. Tag Finished.")),
+                        new Action(ret => isDone = true)
+                    )
+                ),
                 new Decorator(ret => EndType == TrinityExploreEndType.PortalExitFound &&
                     PortalExitMarker() != null && PortalExitMarker().Position.Distance2D(myPos) <= MarkerDistance,
                     new Sequence(
@@ -952,9 +958,16 @@ namespace Trinity.XmlTags
                     ),
                     new Decorator(ret => PrioritySceneTarget != Vector3.Zero,
                         new PrioritySelector(
+                            new Decorator(ret => PlayerMover.TotalAntiStuckAttempts > 3,
+                                new Sequence(
+                                     new Action(ret => Logger.Log("Too many stuck attempts, canceling Priority Scene {0} {1} center {2} Distance {3:0}",
+                                        CurrentPriorityScene.Name, CurrentPriorityScene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos))),
+                                   new Action(ret => PrioritySceneMoveToFinished())
+                                )
+                            ),
                             new Decorator(ret => PrioritySceneTarget.Distance2D(myPos) <= PriorityScenePathPrecision,
                                 new Sequence(
-                                    new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Successfully navigated to priority scene {0} {1} center {2} Distance {3:0}",
+                                    new Action(ret => Logger.Log("Successfully navigated to priority scene {0} {1} center {2} Distance {3:0}",
                                         CurrentPriorityScene.Name, CurrentPriorityScene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos))),
                                     new Action(ret => PrioritySceneMoveToFinished())
                                 )
@@ -1544,26 +1557,28 @@ namespace Trinity.XmlTags
             _LastCheckRiftDone = DateTime.UtcNow;
 
             if (ZetaDia.Me.IsInBossEncounter)
-            {
                 return false;
-            }
-
-            if (ZetaDia.CurrentAct == Act.OpenWorld && DataDictionary.RiftWorldIds.Contains(ZetaDia.CurrentWorldId))
+            // X1_LR_DungeonFinder
+            if (ZetaDia.CurrentAct == Act.OpenWorld && DataDictionary.RiftWorldIds.Contains(ZetaDia.CurrentWorldId) &&
+                ZetaDia.ActInfo.AllQuests.Any(q => q.QuestSNO == 337492 && q.QuestStep == 10))
             {
-                //X1_LR_DungeonFinder = 337492,
-                if (ZetaDia.ActInfo.AllQuests.Any(q => q.QuestSNO == 337492 && q.State == QuestState.InProgress))
-                    return false;
-
-                // Bounty Turn-in
-                if (ZetaDia.ActInfo.AllQuests.Any(q => DataDictionary.BountyTurnInQuests.Contains(q.QuestSNO) && q.State == QuestState.InProgress))
-                    return true;
-
+                Logger.Log("Rift Quest Complete!");
+                return true;
             }
+
+            if (ZetaDia.Minimap.Markers.CurrentWorldMarkers
+                .Any(m => m.IsPortalExit && m.Position.Distance2D(Trinity.Player.Position) <= MarkerDistance))
+            {
+                Logger.Log("Rift portal exit marker within range!");
+                return true;
+            }
+
             return false;
         }
 
-        private DateTime _LastCheckBountyDone = DateTime.MinValue;
 
+
+        private DateTime _LastCheckBountyDone = DateTime.MinValue;
         public bool GetIsBountyDone()
         {
             try
@@ -1575,23 +1590,21 @@ namespace Trinity.XmlTags
 
                 // Only valid for Adventure mode
                 if (ZetaDia.CurrentAct != Act.OpenWorld)
-                {
                     return false;
-                }
+
                 // We're in a rift, not a bounty!
                 if (ZetaDia.CurrentAct == Act.OpenWorld && DataDictionary.RiftWorldIds.Contains(ZetaDia.CurrentWorldId))
-                {
                     return false;
-                }
+
                 if (ZetaDia.IsInTown)
                 {
                     Logger.Log("In Town, Assuming done.");
                     return true;
                 }
+
                 if (ZetaDia.Me.IsInBossEncounter)
-                {
                     return false;
-                }
+
 
                 // Bounty Turn-in
                 if (ZetaDia.ActInfo.AllQuests.Any(q => DataDictionary.BountyTurnInQuests.Contains(q.QuestSNO) && q.State == QuestState.InProgress))
@@ -1599,7 +1612,7 @@ namespace Trinity.XmlTags
                     Logger.Log("Bounty Turn-In available, Assuming done.");
                     return true;
                 }
-                                           
+
                 var b = ZetaDia.ActInfo.ActiveBounty;
                 if (b == null)
                 {

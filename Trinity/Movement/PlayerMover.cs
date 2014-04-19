@@ -105,7 +105,7 @@ namespace Trinity.DbProvider
                 if (c != null && c.GetType() == typeof(WaitTimerTag))
                 {
                     LastPosition = Vector3.Zero;
-                    GoldInactivity.ResetCheckGold();
+                    GoldInactivity.Instance.ResetCheckGold();
                     UnStuckCheckerLastResult = false;
                     return UnStuckCheckerLastResult;
                 }
@@ -116,7 +116,7 @@ namespace Trinity.DbProvider
                 if (ZetaDia.Me.IsInConversation || ZetaDia.IsPlayingCutscene || ZetaDia.IsLoadingWorld || (vendorWindow.IsValid && vendorWindow.IsVisible))
                 {
                     LastPosition = Vector3.Zero;
-                    GoldInactivity.ResetCheckGold();
+                    GoldInactivity.Instance.ResetCheckGold();
                     UnStuckCheckerLastResult = false;
                     return UnStuckCheckerLastResult;
                 }
@@ -128,7 +128,7 @@ namespace Trinity.DbProvider
                     aState == AnimationState.Channeling)
                 {
                     LastPosition = Vector3.Zero;
-                    GoldInactivity.ResetCheckGold();
+                    GoldInactivity.Instance.ResetCheckGold();
                     UnStuckCheckerLastResult = false;
                     return UnStuckCheckerLastResult;
                 }
@@ -783,7 +783,7 @@ namespace Trinity.DbProvider
 
                 try
                 {
-                    result = Navigator.MoveTo(moveTarget, destinationName, true);
+                    result = Navigator.MoveTo(moveTarget, destinationName, false);
                     Logger.Log(LogCategory.Movement, "Navigator {0} dest={1} ({2})", result, NavHelper.PrettyPrintVector3(moveTarget), destinationName);
                 }
                 catch (Exception ex)

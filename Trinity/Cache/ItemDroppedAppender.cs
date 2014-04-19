@@ -19,6 +19,7 @@ namespace Trinity.Cache
 
             QueueThread = new Thread(QueueWorker)
             {
+                Name = "ItemDroppedWorker",
                 IsBackground = true,
                 Priority = ThreadPriority.Lowest
             };

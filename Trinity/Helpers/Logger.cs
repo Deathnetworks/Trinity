@@ -264,7 +264,7 @@ namespace Trinity.Technicals
 
                 if (message.Contains("{c:"))
                     data = message + " args: " + args;
-                else if (args != null)
+                else if (args != null && args.Length > 0)
                     data = string.Format(message, args);
                 else
                     data = message;

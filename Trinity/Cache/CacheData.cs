@@ -141,7 +141,12 @@ namespace Trinity
         /// <summary>
         /// Contains an RActorGUID and count of the number of times we've switched to this target
         /// </summary>
-        internal static Dictionary<string, int> PrimaryTargetCount = new Dictionary<string, int>(); 
+        internal static Dictionary<string, int> PrimaryTargetCount = new Dictionary<string, int>();
+
+        /// <summary>
+        /// Events that have expired without being completed
+        /// </summary>
+        internal static HashSet<int> BlacklistedEvents = new HashSet<int>();
 
         /// <summary>
         /// Called every cache-refresh
@@ -183,7 +188,8 @@ namespace Trinity
             CacheData.PickupItem.Clear();
             CacheData.PrimaryTargetCount.Clear();
             CacheData.SameWorldPortals.Clear();
-            CacheData.TimeBoundAvoidance.Clear();        
+            CacheData.TimeBoundAvoidance.Clear();
+            CacheData.BlacklistedEvents.Clear();
         }
 
     }

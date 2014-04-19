@@ -423,15 +423,22 @@ namespace Trinity
                     return new TrinityPower(SNOPower.Wizard_Archon_SlowTime, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
 
-                // Archon Teleport in combat
+                // Archon Teleport in combat for kiting
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Archon_Teleport, CombatBase.CanCastFlags.NoTimer) &&
+                    Settings.Combat.Wizard.KiteLimit > 0 &&
                     // Try and teleport-retreat from 1 elite or 3+ greys or a boss at 15 foot range
                     (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 3) || (CurrentTarget.IsBoss && CurrentTarget.RadiusDistance <= 15f)))
                 {
                     Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, -20f);
-                    return new TrinityPower(SNOPower.Wizard_Archon_Teleport, 35f, vNewTarget, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                    return new TrinityPower(SNOPower.Wizard_Archon_Teleport, 35f, vNewTarget);
                 }
 
+                // Archon teleport in combat for no-kite
+                if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Archon_Teleport, CombatBase.CanCastFlags.NoTimer) &&
+                    Settings.Combat.Wizard.KiteLimit == 0 && CurrentTarget.RadiusDistance >= 10f)
+                {
+                    return new TrinityPower(SNOPower.Wizard_Archon_Teleport, 35f, CurrentTarget.Position);
+                }
                 // Arcane Blast - 2 second cooldown, big AoE
                 if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Archon_ArcaneBlast, CombatBase.CanCastFlags.NoTimer) && TargetUtil.AnyMobsInRange(15, 1) && CurrentTarget.IsFacingPlayer)
                 {

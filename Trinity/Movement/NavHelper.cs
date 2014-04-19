@@ -88,7 +88,7 @@ namespace Trinity
         /// <param name="vDestination"></param>
         /// <param name="ZDiff"></param>
         /// <returns></returns>
-        internal static bool CanRayCast(Vector3 vStartLocation, Vector3 vDestination, float ZDiff = 2f)
+        internal static bool CanRayCast(Vector3 vStartLocation, Vector3 vDestination)
         {
             // Navigator.Raycast is REVERSE Of ZetaDia.Physics.Raycast
             // Navigator.Raycast returns True if it "hits" an edge
@@ -96,9 +96,20 @@ namespace Trinity
             // So ZetaDia.Physics.Raycast() == !Navigator.Raycast()
             // We're using Navigator.Raycast now because it's "faster" (per Nesox)
 
-            bool rc = Navigator.Raycast(new Vector3(vStartLocation.X, vStartLocation.Y, vStartLocation.Z + ZDiff), new Vector3(vDestination.X, vDestination.Y, vDestination.Z + ZDiff));
+            bool rayCastHit = Navigator.Raycast(vStartLocation, vDestination);
+            bool rayPointHit = false;
+            float distance = vStartLocation.Distance2D(vDestination);
+            for (float i = 1f; i < distance; i += 1f)
+            {
+                var testPoint = MathEx.CalculatePointFrom(vDestination, vStartLocation, i);
+                if (!MainGridProvider.CanStandAt(testPoint))
+                {
+                    rayPointHit = true;
+                    break;
+                }
+            }
 
-            if (rc)
+            if (rayCastHit || rayPointHit)
                 return false;
 
             return !CacheData.NavigationObstacles.Any(o => MathEx.IntersectsPath(o.Position, o.Radius, vStartLocation, vDestination));

@@ -72,7 +72,7 @@ namespace Trinity.UIComponents
                                             }
                                             catch (Exception ex)
                                             {
-                                                Logger.Log("Exception in UI SaveCommand", ex);
+                                                Logger.Log("Exception in UI SaveCommand {0}", ex);
                                             }
                                         });
                 DumpBackpackCommand = new RelayCommand(
@@ -788,7 +788,13 @@ namespace Trinity.UIComponents
                                             {
                                                 _Model.CopyTo(_OriginalModel);
                                                 _OriginalModel.Save();
-                                                BotMain.PauseWhile(Trinity.StashRule.reloadFromUI);
+                                                if (Trinity.StashRule == null)
+                                                    Trinity.StashRule = new ItemRules.Interpreter();
+
+                                                if (Trinity.StashRule != null)
+                                                {
+                                                    BotMain.PauseWhile(Trinity.StashRule.reloadFromUI);
+                                                }
                                             }
                                             catch (Exception ex)
                                             {

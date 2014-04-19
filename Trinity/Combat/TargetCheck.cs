@@ -46,12 +46,12 @@ namespace Trinity
 
                 if (ZetaDia.Me.IsDead)
                 {
-                    GoldInactivity.ResetCheckGold();
+                    GoldInactivity.Instance.ResetCheckGold();
                     return false;
                 }
-                else if (GoldInactivity.GoldInactive())
+                else if (GoldInactivity.Instance.GoldInactive())
                 {
-                    BotMain.PauseWhile(GoldInactivity.GoldInactiveLeaveGame);
+                    BotMain.PauseWhile(GoldInactivity.Instance.GoldInactiveLeaveGame);
                     return false;
                 }
 

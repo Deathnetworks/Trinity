@@ -489,7 +489,7 @@ namespace Trinity
         private static float TargetRangeRequired = 1f;
 
         /// <summary>
-        /// An adjusted distance from the current target, <seealso cref="Trinity.TargetDistanceReduction"/>
+        /// An adjusted distance from the current target />
         /// </summary>
         private static float TargetCurrentDistance;
 
@@ -497,11 +497,6 @@ namespace Trinity
         /// If our current target is in LoS for use in Behavior handling
         /// </summary>
         private static bool CurrentTargetIsInLoS;
-
-        /// <summary>
-        /// This value is subtracted from the distance to the target to get the modified <see cref="Trinity.TargetCurrentDistance"/>
-        /// </summary>
-        private static float TargetDistanceReduction = 0f;
 
         /// <summary>
         /// Special check to force re-buffing before castign archon

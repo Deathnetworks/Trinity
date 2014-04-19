@@ -27,6 +27,22 @@ namespace Trinity
             288806,
         };
 
+        /// <summary>
+        /// Contains all the Exit Name Hashes in Rifts
+        /// </summary>
+        public static HashSet<int> RiftPortalHashes { get { return DataDictionary.riftPortalHashes; } }
+        private static readonly HashSet<int> riftPortalHashes = new HashSet<int>()
+		{
+			1938876095,
+			1938876096,
+			1938876097,
+			1938876098,
+			1938876099,
+			1938876100,
+			1938876101,
+			1938876102,
+		};
+
         public static HashSet<int> BountyTurnInQuests { get { return DataDictionary.bountyTurnInQuests; } }
         private static readonly HashSet<int> bountyTurnInQuests = new HashSet<int>()
         {
@@ -692,6 +708,8 @@ namespace Trinity
             55325, // a3dun_Keep_Door_Destructable
 
             225252, // Shamanic Ward - Revenge of Gharbad bounty
+
+            331397, // x1_westm_Graveyard_Floor_Sarcophagus_Undead_Husband_Event
         };
 
         /// <summary>
@@ -794,6 +812,7 @@ namespace Trinity
             218951,245838,
             // rrrix act 1
             108882, 245919, 5944, 165475, 199998, 168875, 105323, 85690, 105321, 108266, 89578,
+            175181, // trDun_Crypt_Skeleton_King_Throne_Parts 
             // rrrix act 2
             213907, 92519, 61544, 105681, 113983, 114527, 114642, 139933, 144405, 156890, 164057, 164195, 180254, 180802, 180809, 181173, 181174, 181177, 181181,
             181182, 181185, 181290, 181292, 181306, 181309, 181313, 181326, 181563, 181857, 181858, 187265, 191433, 191462, 191641, 192880, 192881, 196413, 196435,

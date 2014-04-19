@@ -18,6 +18,14 @@ namespace Trinity.Cache
             LastInteract = DateTime.UtcNow;
         }
 
+        public override bool Equals(object other)
+        {
+            if (other is SameWorldPortal)
+                return Equals((SameWorldPortal)other);
+            else
+                return false;
+        }
+
         public bool Equals(SameWorldPortal other)
         {
             return this.RActorGUID == other.RActorGUID;
