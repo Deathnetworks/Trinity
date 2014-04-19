@@ -106,7 +106,7 @@ namespace Trinity
                 }
 
                 // no rune || invigoration || focused mind || Backup Plan || Battle Scars (need Disc)
-                if ((!hasPunishment) && CombatBase.CanCast(SNOPower.DemonHunter_Preparation) && Player.SecondaryResourceMissing >= 30)
+                if ((!hasPunishment) && CombatBase.CanCast(SNOPower.DemonHunter_Preparation) && Player.SecondaryResource <= 15 && TimeSinceUse(SNOPower.DemonHunter_Preparation) >= 1000)
                 {
                     return new TrinityPower(SNOPower.DemonHunter_Preparation);
                 }

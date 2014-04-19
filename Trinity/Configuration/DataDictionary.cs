@@ -776,6 +776,15 @@ namespace Trinity
             173325,     // Anvil of Fury
 
             301177, // A5 Timeless Prison Switch
+
+            // Kevin Spacey was here
+            193023, //LootType3_GraveGuard_C_Corpse_03
+			156682, //Adventurer_A_Corpse_01_WarrivEvent
+			5758, //trDun_Cath_FloorSpawner_01
+			5724, //trDun_Cath_BookcaseShelves_A
+			85790, //Cath_Lecturn_ LachdanansScroll
+			227305, //Lore_Inarius_Corrupt
+			137125, //FesteringWoods_WarriorsRest_Lore
         };
 
         /// <summary>
