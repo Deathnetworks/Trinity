@@ -452,7 +452,7 @@ namespace Trinity.XmlTags
         /// </summary>
         public override void OnStart()
         {
-            Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "TrinityExploreDungeon OnStart() called");
+            Logger.Log("TrinityExploreDungeon Started");
 
             if (SetNodesExploredAutomatically)
             {
@@ -1536,6 +1536,7 @@ namespace Trinity.XmlTags
         {
             isDone = false;
             InitDone = false;
+            base.ResetCachedDone();
         }
 
         public bool IsInAdventureMode()
@@ -1567,7 +1568,7 @@ namespace Trinity.XmlTags
             }
 
             if (ZetaDia.Minimap.Markers.CurrentWorldMarkers
-                .Any(m => m.IsPortalExit && m.Position.Distance2D(Trinity.Player.Position) <= MarkerDistance))
+                .Any(m => m.IsPortalExit && m.Position.Distance2D(Trinity.Player.Position) <= MarkerDistance && !MiniMapMarker.TownHubMarkers.Contains(m.NameHash)))
             {
                 Logger.Log("Rift portal exit marker within range!");
                 return true;

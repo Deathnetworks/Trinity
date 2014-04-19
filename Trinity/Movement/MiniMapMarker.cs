@@ -20,6 +20,11 @@ namespace Trinity
     {
         private const int WAYPOINT_MARKER = -1751517829;
 
+        internal static HashSet<int> TownHubMarkers = new HashSet<int>()
+        {
+            1877684886 // A5 Hub
+        };
+
         public int MarkerNameHash { get; set; }
         public Vector3 Position { get; set; }
         public bool Visited { get; set; }
@@ -121,7 +126,7 @@ namespace Trinity
                             AddMarkersToList(nameHash);
                         }
 
-                        foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsPortalExit || m.IsPointOfInterest))
+                        foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => (m.IsPortalExit || m.IsPointOfInterest) && !TownHubMarkers.Contains(m.NameHash)))
                         {
                             AddMarkersToList(marker.NameHash);
                         }
