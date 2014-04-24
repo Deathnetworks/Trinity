@@ -6,6 +6,7 @@ using Trinity.DbProvider;
 using Trinity.Technicals;
 using Trinity.XmlTags;
 using Zeta.Bot;
+using Zeta.Bot.Logic;
 using Zeta.Bot.Profile.Common;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -39,7 +40,7 @@ namespace Trinity
 
                 int TrashMobCount = ObjectCache.Count(u => u.IsUnit && u.IsTrashMob);
                 int EliteCount = CombatBase.IgnoringElites ? 0 : ObjectCache.Count(u => u.IsUnit && u.IsBossOrEliteRareUnique);
-                int AvoidanceCount = Settings.Combat.Misc.AvoidAOE ? 0 : ObjectCache.Count(o => o.Type == GObjectType.Avoidance && o.CentreDistance <= 50f);
+                int AvoidanceCount = Settings.Combat.Misc.AvoidAOE ? 0 : ObjectCache.Count(o => o.Type == GObjectType.Avoidance && o.Distance <= 50f);
 
                 bool profileTagCheck = false;
 
@@ -83,7 +84,7 @@ namespace Trinity
                 bool inQuestArea = DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId);
                 bool usingTownPortal = TownRun.IsTryingToTownPortal();
 
-                foreach (TrinityCacheObject cacheObject in ObjectCache.OrderBy(c => c.CentreDistance))
+                foreach (TrinityCacheObject cacheObject in ObjectCache.OrderBy(c => c.Distance))
                 {
                     bool elitesInRangeOfUnit = !CombatBase.IgnoringElites &&
                         ObjectCache.Any(u => u.ACDGuid != cacheObject.ACDGuid && u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= 25f);
@@ -312,11 +313,11 @@ namespace Trinity
                                         }
 
                                         // Special additional weight for corrupt growths in act 4 ONLY if they are at close range (not a standard priority thing)
-                                        if ((cacheObject.ActorSNO == 210120 || cacheObject.ActorSNO == 210268) && cacheObject.CentreDistance <= 25f)
+                                        if ((cacheObject.ActorSNO == 210120 || cacheObject.ActorSNO == 210268) && cacheObject.Distance <= 25f)
                                             cacheObject.Weight += 2000d;
 
                                         // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
-                                        if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.CentreDistance <= 25f)
+                                        if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.Distance <= 25f)
                                             cacheObject.Weight += 1000d;
 
                                         //if (ObjectCache.Any(u => MathEx.IntersectsPath(u.Position, u.Radius, Trinity.Player.Position,
@@ -372,7 +373,7 @@ namespace Trinity
                                             {
                                                 iTotalNumberGoblins++;
                                                 lastGoblinTime = DateTime.UtcNow;
-                                                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Goblin #{0} in sight. Distance={1:0}", iTotalNumberGoblins, cacheObject.CentreDistance);
+                                                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Goblin #{0} in sight. Distance={1:0}", iTotalNumberGoblins, cacheObject.Distance);
                                             }
                                             else
                                             {
@@ -419,14 +420,14 @@ namespace Trinity
                                     break;
 
                                 // If it's very close, ignore
-                                if (cacheObject.CentreDistance <= V.F("Cache.HotSpot.MinDistance"))
+                                if (cacheObject.Distance <= V.F("Cache.HotSpot.MinDistance"))
                                 {
                                     break;
                                 }
                                 else if (!CacheData.TimeBoundAvoidance.Any(aoe => aoe.Position.Distance2D(cacheObject.Position) <= aoe.Radius))
                                 {
                                     float maxDist = V.F("Cache.HotSpot.MaxDistance");
-                                    cacheObject.Weight = (maxDist - cacheObject.CentreDistance) / maxDist * 50000d;
+                                    cacheObject.Weight = (maxDist - cacheObject.Distance) / maxDist * 50000d;
                                 }
                                 break;
                             }
@@ -434,7 +435,7 @@ namespace Trinity
                         case GObjectType.Gold:
                             {
                                 // Don't pickup items if we're doing a TownRun
-                                if (ForceVendorRunASAP || IsReadyToTownRun)
+                                if (ForceVendorRunASAP || IsReadyToTownRun || BrainBehavior.IsVendoring)
                                 {
                                     objWeightInfo += "TownRun";
                                     cacheObject.Weight = 0;
@@ -515,13 +516,13 @@ namespace Trinity
                                 }
 
                                 if (cacheObject.GoldAmount > 0)
-                                    cacheObject.Weight = (300 - cacheObject.CentreDistance) / 300 * 500d;
+                                    cacheObject.Weight = (300 - cacheObject.Distance) / 300 * 500d;
                                 else
-                                    cacheObject.Weight = (300 - cacheObject.CentreDistance) / 300 * 500d;
+                                    cacheObject.Weight = (300 - cacheObject.Distance) / 300 * 500d;
 
 
                                 // Point-blank items get a weight increase 
-                                if (cacheObject.GoldAmount <= 0 && cacheObject.CentreDistance <= 9f)
+                                if (cacheObject.GoldAmount <= 0 && cacheObject.Distance <= 9f)
                                     cacheObject.Weight += 1000d;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
@@ -563,7 +564,7 @@ namespace Trinity
                                 }
 
                                 // Point-blank items get a weight increase 
-                                if (cacheObject.GoldAmount <= 0 && cacheObject.CentreDistance <= 12f)
+                                if (cacheObject.GoldAmount <= 0 && cacheObject.Distance <= 12f)
                                     cacheObject.Weight += 1000d;
 
                                 // If there's a monster in the path-line to the item, reduce the weight to 1
@@ -587,7 +588,7 @@ namespace Trinity
                             {
                                 // Calculate a spot reaching a little bit further out from the globe, to help globe-movements
                                 if (cacheObject.Weight > 0)
-                                    cacheObject.Position = MathEx.CalculatePointFrom(cacheObject.Position, Player.Position, cacheObject.CentreDistance + 3f);
+                                    cacheObject.Position = MathEx.CalculatePointFrom(cacheObject.Position, Player.Position, cacheObject.Distance + 3f);
 
                                 // Weight Health Globes
 
@@ -625,15 +626,15 @@ namespace Trinity
                                         cacheObject.Weight += 10000d; // 10k for WD's!
 
                                     // Point-blank items get a weight increase
-                                    if (cacheObject.CentreDistance <= 15f)
+                                    if (cacheObject.Distance <= 15f)
                                         cacheObject.Weight += 3000d;
 
                                     // Close items get a weight increase
-                                    if (cacheObject.CentreDistance <= 60f)
+                                    if (cacheObject.Distance <= 60f)
                                         cacheObject.Weight += 1500d;
 
                                     // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
-                                    if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.CentreDistance <= 25f)
+                                    if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.Distance <= 25f)
                                         cacheObject.Weight += 800;
                                 }
 
@@ -645,7 +646,7 @@ namespace Trinity
                                     cacheObject.Weight *= 0.85;
                                 }
 
-                                if (cacheObject.CentreDistance > 10f)
+                                if (cacheObject.Distance > 10f)
                                 {
                                     // See if there's any AOE avoidance in that spot, if so reduce the weight by 10%
                                     if (CacheData.TimeBoundAvoidance.Any(cp => MathUtil.IntersectsPath(cp.Position, cp.Radius, Player.Position, cacheObject.Position)))
@@ -712,13 +713,13 @@ namespace Trinity
                                 cacheObject.Weight = Math.Max(((75f - cacheObject.RadiusDistance) / 75f * 14500f), 100d);
 
                                 // Very close shrines get a weight increase
-                                if (cacheObject.CentreDistance <= 30f)
+                                if (cacheObject.Distance <= 30f)
                                     cacheObject.Weight += 10000d;
 
                                 if (cacheObject.Weight > 0)
                                 {
                                     // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
-                                    if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.CentreDistance <= 25f)
+                                    if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.Distance <= 25f)
                                         cacheObject.Weight += 400;
 
                                     // If there's a monster in the path-line to the item
@@ -758,7 +759,7 @@ namespace Trinity
                                 //}
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
-                                if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.CentreDistance <= 25f)
+                                if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.Distance <= 25f)
                                 {
                                     cacheObject.Weight += 1000;
                                     objWeightInfo += " RePick";
@@ -779,7 +780,7 @@ namespace Trinity
                                 cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 5000f;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
-                                if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.CentreDistance <= 25f)
+                                if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.Distance <= 25f)
                                     cacheObject.Weight += 1000;
 
                                 // We're standing on the damn thing... open it!!
@@ -811,7 +812,7 @@ namespace Trinity
                                 cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 1000f;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
-                                if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.CentreDistance <= 25f)
+                                if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.Distance <= 25f)
                                     cacheObject.Weight += 400;
 
                                 //// Close destructibles get a weight increase
@@ -828,7 +829,7 @@ namespace Trinity
 
                                 // Are we prioritizing close-range stuff atm? If so limit it at a value 3k lower than monster close-range priority
                                 if (prioritizeCloseRangeUnits)
-                                    cacheObject.Weight = (15f - cacheObject.CentreDistance) / 15f * 19200d;
+                                    cacheObject.Weight = (15f - cacheObject.Distance) / 15f * 19200d;
 
                                 //// We're standing on the damn thing... break it
                                 if (cacheObject.RadiusDistance <= 5f)
@@ -841,7 +842,7 @@ namespace Trinity
                             }
                         case GObjectType.JumpLinkPortal:
                             {
-                                if (cacheObject.CentreDistance < 45)
+                                if (cacheObject.Distance < 45)
                                     cacheObject.Weight = 25;
 
                                 break;
@@ -861,10 +862,10 @@ namespace Trinity
                                 }
 
                                 // Weight Interactable Specials
-                                cacheObject.Weight = (300d - cacheObject.CentreDistance) / 300d * 1000d;
+                                cacheObject.Weight = (300d - cacheObject.Distance) / 300d * 1000d;
 
                                 // Very close interactables get a weight increase
-                                if (cacheObject.CentreDistance <= 8f)
+                                if (cacheObject.Distance <= 8f)
                                     cacheObject.Weight += 1000d;
 
                                 if (cacheObject.IsQuestMonster)
@@ -873,7 +874,7 @@ namespace Trinity
                                 }
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
-                                if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.CentreDistance <= 25f)
+                                if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.Distance <= 25f)
                                     cacheObject.Weight += 400;
 
                                 // If there's a monster in the path-line to the item, if so reduce the weight to 1
@@ -911,14 +912,14 @@ namespace Trinity
                                 }
 
                                 // Weight Containers
-                                cacheObject.Weight = (maxRange - cacheObject.CentreDistance) / maxRange * 100d;
+                                cacheObject.Weight = (maxRange - cacheObject.Distance) / maxRange * 100d;
 
                                 // Very close containers get a weight increase
-                                if (cacheObject.CentreDistance <= 8f)
+                                if (cacheObject.Distance <= 8f)
                                     cacheObject.Weight += 600d;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
-                                if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.CentreDistance <= 25f)
+                                if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.Distance <= 25f)
                                     cacheObject.Weight += 400;
 
                                 // If there's a monster in the path-line to the item, reduce the weight by 50%

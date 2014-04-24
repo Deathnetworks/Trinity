@@ -214,7 +214,7 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Witchdoctor_MassConfusion, 0f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
             }
             // Big Bad Voodoo, elites and bosses only
-            if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Witchdoctor_BigBadVoodoo) && !Player.IsIncapacitated && (TargetUtil.EliteOrTrashInRange(25f) || (CurrentTarget.IsBoss && CurrentTarget.CentreDistance <= 30f)))
+            if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Witchdoctor_BigBadVoodoo) && !Player.IsIncapacitated && (TargetUtil.EliteOrTrashInRange(25f) || (CurrentTarget.IsBoss && CurrentTarget.Distance <= 30f)))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_BigBadVoodoo);
             }
@@ -362,7 +362,7 @@ namespace Trinity
             bool firebatsMaintain =
               ObjectCache.Any(u => u.IsUnit &&
                   u.IsPlayerFacing(70f) && u.Weight > 0 &&
-                  u.CentreDistance <= V.F("WitchDoctor.Firebats.MaintainRange") &&
+                  u.Distance <= V.F("WitchDoctor.Firebats.MaintainRange") &&
                   SpellHistory.TimeSinceUse(SNOPower.Witchdoctor_Firebats) <= TimeSpan.FromMilliseconds(250d));
 
             // Fire Bats:Cloud of bats 

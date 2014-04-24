@@ -32,6 +32,7 @@ namespace Trinity
                 var monsterList = from m in ObjectCache
                                   where m.IsUnit &&
                                   m.Weight > 0 &&
+                                  m.RadiusDistance > 0 &&
                                   m.RadiusDistance <= PlayerKiteDistance &&
                                   (m.IsBossOrEliteRareUnique ||
                                    ((m.HitPointsPct >= .15 || m.MonsterSize != MonsterSize.Swarm) && !m.IsBossOrEliteRareUnique)
@@ -44,7 +45,7 @@ namespace Trinity
                     vKitePointAvoid = Player.Position;
                 }
 
-                if (monsterList.Count() > 0 && (Player.ActorClass != ActorClass.Wizard || IsWizardShouldKite()))
+                if (PlayerKiteDistance > 0 && monsterList.Count() > 0 && (Player.ActorClass != ActorClass.Wizard || IsWizardShouldKite()))
                 {
                     TryToKite = true;
                     vKitePointAvoid = Player.Position;
@@ -120,23 +121,11 @@ namespace Trinity
                             Position = vAnySafePoint,
                             Type = GObjectType.Avoidance,
                             Weight = 90000,
-                            CentreDistance = Vector3.Distance(Player.Position, vAnySafePoint),
-                            RadiusDistance = Vector3.Distance(Player.Position, vAnySafePoint),
+                            Distance = Vector3.Distance(Player.Position, vAnySafePoint),
+                            Radius = 2f,
                             InternalName = "KitePoint"
                         };
-
-                        //timeCancelledKiteMove = DateTime.UtcNow;
-                        //cancelledKiteMoveForMilliseconds = 100;
-
-                        // Try forcing a target update with each kiting
-                        //bForceTargetUpdate = true;
                     }
-                    //else
-                    //{
-                    //    // Didn't find any kiting we could reach, so don't look for any more kite spots for at least 1.5 seconds
-                    //    timeCancelledKiteMove = DateTime.UtcNow;
-                    //    cancelledKiteMoveForMilliseconds = 500;
-                    //}
                 }
                 else if (!shouldEmergencyMove && NeedToKite)
                 {

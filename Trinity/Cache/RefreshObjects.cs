@@ -174,8 +174,8 @@ namespace Trinity
                                     Position = vAnySafePoint,
                                     Type = GObjectType.Avoidance,
                                     Weight = 20000,
-                                    CentreDistance = Vector3.Distance(Player.Position, vAnySafePoint),
-                                    RadiusDistance = Vector3.Distance(Player.Position, vAnySafePoint),
+                                    Distance = Vector3.Distance(Player.Position, vAnySafePoint),
+                                    Radius = 2f,
                                     InternalName = "SafePoint"
                                 }; ;
                         }
@@ -201,8 +201,8 @@ namespace Trinity
                                             Position = Player.Position,
                                             Type = GObjectType.Avoidance,
                                             Weight = 20000,
-                                            CentreDistance = 2f,
-                                            RadiusDistance = 2f,
+                                            Distance = 2f,
+                                            Radius = 2f,
                                             InternalName = "StayPutPoint"
                                         };
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Staying Put During Avoidance");
@@ -236,8 +236,8 @@ namespace Trinity
                             Position = TownRun.PreTownRunPosition,
                             Type = GObjectType.Avoidance,
                             Weight = 20000,
-                            CentreDistance = 2f,
-                            RadiusDistance = 2f,
+                            Distance = 2f,
+                            Radius = 2f,
                             InternalName = "PreTownRunPosition"
                         };
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Returning to Pre-TownRun Position");
@@ -259,9 +259,14 @@ namespace Trinity
                     }
 
                     // Reset Event time while we have targts
-                    if (CurrentTarget != null)
+                    if (CurrentTarget != null && Player.InActiveEvent)
                     {
                         EventStartTime = DateTime.UtcNow;
+                    }
+
+                    if (ObjectCache.Any(o => o.Type == GObjectType.CursedChest || o.Type == GObjectType.CursedShrine))
+                    {
+                        EventStartPosition = ObjectCache.FirstOrDefault(o => o.Type == GObjectType.CursedChest || o.Type == GObjectType.CursedShrine).Position;
                     }
 
                     var activeEvent = ZetaDia.ActInfo.ActiveQuests.FirstOrDefault(q => DataDictionary.EventQuests.Contains(q.QuestSNO));
@@ -272,23 +277,17 @@ namespace Trinity
                         CacheData.BlacklistedEvents.Add(activeEvent.QuestSNO);
                     }
 
-                    if (CurrentTarget == null && Player.InActiveEvent &&
+                    if (CurrentTarget == null && Player.InActiveEvent && EventStartPosition != Vector3.Zero &&
                         DateTime.UtcNow.Subtract(EventStartTime).TotalSeconds < waitTimeoutSeconds &&
                         activeEvent != null && !CacheData.BlacklistedEvents.Contains(activeEvent.QuestSNO))
                     {
-                        if (EventStartPosition == Vector3.Zero)
-                        {
-                            EventStartPosition = Player.Position;
-                            EventStartTime = DateTime.UtcNow;
-                        }
-
                         CurrentTarget = new TrinityCacheObject()
                         {
                             Position = EventStartPosition,
                             Type = GObjectType.Avoidance,
                             Weight = 20000,
-                            CentreDistance = 2f,
-                            RadiusDistance = 2f,
+                            Distance = 2f,
+                            Radius = 2f,
                             InternalName = "WaitForEvent"
                         };
                         Logger.Log("Waiting for Event {0} - Time Remaining: {1:0} seconds",
@@ -331,7 +330,7 @@ namespace Trinity
                             "Found New Target {0} dist={1:0} IsElite={2} Radius={3:0.0} Weight={4:0} ActorSNO={5} " +
                             "Anim={6} TargetedCount={7} Type={8} ",
                             CurrentTarget.InternalName,
-                            CurrentTarget.CentreDistance,
+                            CurrentTarget.Distance,
                             CurrentTarget.IsEliteRareUnique,
                             CurrentTarget.Radius,
                             CurrentTarget.Weight,
@@ -417,7 +416,7 @@ namespace Trinity
 
                             string extraData = "";
 
-                            switch (c_ObjectType)
+                            switch (CurrentCacheObject.Type)
                             {
                                 case GObjectType.Unit:
                                     {
@@ -454,15 +453,15 @@ namespace Trinity
                                     (!AddToCache ? ("By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
                                     CurrentCacheObject.ActorType,
                                     CurrentCacheObject.GizmoType != GizmoType.None ? CurrentCacheObject.GizmoType.ToString() : "",
-                                    c_ObjectType,
-                                    c_InternalName,
+                                    CurrentCacheObject.Type,
+                                    CurrentCacheObject.InternalName,
                                     CurrentCacheObject.ActorSNO,
-                                    (c_unit_IsBoss ? " IsBoss" : ""),
+                                    (CurrentCacheObject.IsBoss ? " IsBoss" : ""),
                                     (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""),
-                                    c_CentreDistance,
-                                    c_RadiusDistance,
+                                    CurrentCacheObject.Distance,
+                                    CurrentCacheObject.RadiusDistance,
                                     c_ZDiff,
-                                    c_Radius,
+                                    CurrentCacheObject.Radius,
                                     CurrentCacheObject.RActorGuid,
                                     extraData);
                         }
@@ -682,8 +681,8 @@ namespace Trinity
                                         Position = Player.Position,
                                         Type = GObjectType.Avoidance,
                                         Weight = 20000,
-                                        CentreDistance = 2f,
-                                        RadiusDistance = 2f,
+                                        Distance = 2f,
+                                        Radius = 2f,
                                         InternalName = "WaitForLootDrops"
                                     };
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Waiting for loot to drop, delay: {0}ms", Settings.Combat.Misc.DelayAfterKill);
@@ -703,8 +702,8 @@ namespace Trinity
                                         Position = Player.Position,
                                         Type = GObjectType.Avoidance,
                                         Weight = 20000,
-                                        CentreDistance = 2f,
-                                        RadiusDistance = 2f,
+                                        Distance = 2f,
+                                        Radius = 2f,
                                         InternalName = "WaitForWrath"
                                     };
             }
@@ -718,8 +717,8 @@ namespace Trinity
                                         Position = Player.Position,
                                         Type = GObjectType.Avoidance,
                                         Weight = 20000,
-                                        CentreDistance = 2f,
-                                        RadiusDistance = 2f,
+                                        Distance = 2f,
+                                        Radius = 2f,
                                         InternalName = "WaitForArchon"
                                     };
             }
@@ -733,8 +732,8 @@ namespace Trinity
                                         Position = Player.Position,
                                         Type = GObjectType.Avoidance,
                                         Weight = 20000,
-                                        CentreDistance = 2f,
-                                        RadiusDistance = 2f,
+                                        Distance = 2f,
+                                        Radius = 2f,
                                         InternalName = "WaitForVoodooo"
                                     };
             }

@@ -85,12 +85,12 @@ namespace Trinity
         public double Weight { get; set; }
         public Vector3 Position { get; set; }
         public AABB AABBBounds { get; set; }
-        public float CentreDistance { get; set; }
-        public float RadiusDistance { get; set; }
+        public float Distance { get; set; }
+        public float RadiusDistance { get { return Math.Max(Distance - Radius, 0f); } }
         public string InternalName { get; set; }
         public SNOAnim Animation { get; set; }
         public int DynamicID { get; set; }
-        public int BalanceID { get; set; }
+        public int GameBalanceID { get; set; }
         public int ItemLevel { get; set; }
         public string ItemLink { get; set; }
         public int GoldAmount { get; set; }
@@ -142,6 +142,7 @@ namespace Trinity
         public bool IsMe { get { return RActorGuid == Trinity.Player.RActorGuid; } }
         public bool IsSummonedByPlayer { get; set; }
         public bool IsSummoner { get; set; }
+        public int SummonedByACDId { get; set; }
         [NoCopy]
         public bool IsUnit { get { return this.Type == GObjectType.Unit; } }
         public bool IsNPC { get; set; }

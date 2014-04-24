@@ -12,26 +12,7 @@ namespace Trinity
         private static bool RefreshAvoidance(bool AddToCache)
         {
             AddToCache = true;
-
-            // Retrieve collision sphere radius, cached if possible
-            if (!CacheData.CollisionSphere.TryGetValue(CurrentCacheObject.ActorSNO, out c_Radius))
-            {
-                try
-                {
-                    c_Radius = c_diaObject.CollisionSphere.Radius;
-                    if (c_Radius <= 5f)
-                        c_Radius = 5f;
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for Avoidance {0} [{1}]", c_InternalName, CurrentCacheObject.ActorSNO);
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
-                    AddToCache = false;
-                    return AddToCache;
-                }
-                CacheData.CollisionSphere.Add(CurrentCacheObject.ActorSNO, c_Radius);
-            }
-
+            
             try
             {
                 CurrentCacheObject.Animation = CurrentCacheObject.Object.CommonData.CurrentAnimation;
@@ -69,11 +50,8 @@ namespace Trinity
                   CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
             }
 
-            // Check default radius if not in AoE settings
-            DataDictionary.DefaultAvoidanceCustomRadius.TryGetValue(CurrentCacheObject.ActorSNO, out c_Radius);
-
             double minAvoidanceHealth = GetAvoidanceHealth(CurrentCacheObject.ActorSNO);
-            double minAvoidanceRadius = GetAvoidanceRadius(CurrentCacheObject.ActorSNO, c_Radius);
+            double minAvoidanceRadius = GetAvoidanceRadius(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
 
             // cap avoidance to 30f maximum
             minAvoidanceRadius = Math.Min(30f, minAvoidanceRadius);
@@ -143,7 +121,7 @@ namespace Trinity
             {
                 AddToCache = false;
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Ignoring Avoidance! Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
-                       c_InternalName, CurrentCacheObject.ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
+                       CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO, minAvoidanceRadius, minAvoidanceHealth, CurrentCacheObject.Distance);
                 return AddToCache;
 
             }
@@ -151,12 +129,12 @@ namespace Trinity
             // Add it to the list of known avoidance objects, *IF* our health is lower than this avoidance health limit
             if (minAvoidanceHealth >= Player.CurrentHealthPct)
             {
-                float avoidanceRadius = (float)GetAvoidanceRadius(CurrentCacheObject.ActorSNO, c_Radius);
+                float avoidanceRadius = (float)GetAvoidanceRadius(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
 
                 TimeSpan aoeExpiration;
                 DataDictionary.AvoidanceSpawnerDuration.TryGetValue(CurrentCacheObject.ActorSNO, out aoeExpiration);
 
-                CacheData.TimeBoundAvoidance.Add(new CacheObstacleObject(CurrentCacheObject.Position, avoidanceRadius, CurrentCacheObject.ActorSNO, c_InternalName)
+                CacheData.TimeBoundAvoidance.Add(new CacheObstacleObject(CurrentCacheObject.Position, avoidanceRadius, CurrentCacheObject.ActorSNO, CurrentCacheObject.InternalName)
                 {
                     Expires = DateTime.UtcNow.Add(aoeExpiration),
                     ObjectType = GObjectType.Avoidance,
@@ -164,7 +142,7 @@ namespace Trinity
                 });
 
                 // Is this one under our feet? If so flag it up so we can find an avoidance spot
-                if (c_CentreDistance <= minAvoidanceRadius)
+                if (CurrentCacheObject.Distance <= minAvoidanceRadius)
                 {
                     StandingInAvoidance = true;
 
@@ -173,24 +151,24 @@ namespace Trinity
                     {
                         IsAvoidingProjectiles = true;
                         Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Is standing in avoidance for projectile Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
-                           c_InternalName, CurrentCacheObject.ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
+                           CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO, minAvoidanceRadius, minAvoidanceHealth, CurrentCacheObject.Distance);
                     }
                     else
                     {
                         Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Is standing in avoidance Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
-                            c_InternalName, CurrentCacheObject.ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
+                            CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO, minAvoidanceRadius, minAvoidanceHealth, CurrentCacheObject.Distance);
                     }
                 }
                 else
                 {
                     // Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "NOT standing in Avoidance Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
-                    //    c_InternalName, CurrentCacheObject.ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
+                    //    CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
                 }
             }
             else
             {
                 //Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Enough health for avoidance, ignoring Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
-                //c_InternalName, CurrentCacheObject.ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
+                //CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
             }
 
             return AddToCache;

@@ -357,15 +357,13 @@ namespace Trinity
                     using (new PerformanceLogger("HandleTarget.LoSCheck"))
                     {
                         TargetCurrentDistance = CurrentTarget.RadiusDistance;
-                        if (TargetCurrentDistance < 0f)
-                            TargetCurrentDistance = 0f;
 
                         // Always raycast these bad boys
                         if (CurrentTarget.Type == GObjectType.JumpLinkPortal)
                         {
                             CurrentTargetIsInLoS = NavHelper.CanRayCast(Player.Position, vCurrentDestination);
                         }
-                        else if (DataDictionary.AlwaysRaycastWorlds.Contains(Player.WorldID) && CurrentTarget.CentreDistance > CurrentTarget.Radius + 2f)
+                        else if (DataDictionary.AlwaysRaycastWorlds.Contains(Player.WorldID) && CurrentTarget.Distance > CurrentTarget.Radius + 2f)
                         {
                             CurrentTargetIsInLoS = NavHelper.CanRayCast(Player.Position, vCurrentDestination);
                         }
@@ -398,7 +396,7 @@ namespace Trinity
                         bool npcInRange = CurrentTarget.IsQuestGiver && CurrentTarget.RadiusDistance <= 3f;
 
                         // Interact/use power on target if already in range
-                        if (TargetRangeRequired <= 1f || (TargetCurrentDistance <= TargetRangeRequired && CurrentTargetIsInLoS) || stuckOnTarget || npcInRange)
+                        if ((TargetCurrentDistance <= TargetRangeRequired && CurrentTargetIsInLoS) || stuckOnTarget || npcInRange)
                         {
                             // If avoidance, instantly skip
                             if (CurrentTarget.Type == GObjectType.Avoidance)
@@ -538,8 +536,11 @@ namespace Trinity
                                                 CacheData.SameWorldPortals.Add(new Cache.SameWorldPortal() { ActorSNO = CurrentTarget.ActorSNO, RActorGUID = CurrentTarget.RActorGuid });
                                             }
 
-                                            Logger.LogVerbose(LogCategory.Behavior, "Interacting with {1} Distance {2} Radius {3}",
-                                                     SNOPower.Axe_Operate_Gizmo, CurrentTarget.InternalName, CurrentTarget.CentreDistance, CurrentTarget.Radius);
+                                            int attemptCount = 0;
+                                            CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out attemptCount);
+
+                                            Logger.LogVerbose(LogCategory.Behavior, "Interacting with {1} Distance {2:0} Radius {3:0.0} Attempt {4}",
+                                                     SNOPower.Axe_Operate_Gizmo, CurrentTarget.InternalName, CurrentTarget.Distance, CurrentTarget.Radius, attemptCount);
 
                                             bool interactSuccessful = false;
                                             if (CurrentTarget.ActorType == ActorType.Monster)
@@ -554,31 +555,22 @@ namespace Trinity
                                                     MinimumRange = TargetRangeRequired,
                                                     TargetPosition = CurrentTarget.Position,
                                                 });
-
-                                            //if (CurrentTarget.Type == GObjectType.JumpLinkPortal && interactSuccessful)
-                                            //    hashRGUIDBlacklist3.Add(CurrentTarget.RActorGuid);
-
-                                            //else if (interactSuccessful)
-                                            //{
-                                            //    IgnoreRactorGUID = CurrentTarget.RActorGuid;
-                                            //    IgnoreTargetForLoops = 5;
-                                            //}
-
+                                            
                                             // Count how many times we've tried interacting
-                                            if (!CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
+                                            if (!CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out attemptCount))
                                             {
                                                 CacheData.InteractAttempts.Add(CurrentTarget.RActorGuid, 1);
                                             }
                                             else
                                             {
-                                                CacheData.InteractAttempts[CurrentTarget.RActorGuid]++;
+                                                CacheData.InteractAttempts[CurrentTarget.RActorGuid] += 1;
                                             }
 
                                             // If we've tried interacting too many times, blacklist this for a while
-                                            if (CacheData.InteractAttempts[CurrentTarget.RActorGuid] > 15 && !(CurrentTarget.Type != GObjectType.HealthWell))
+                                            if (CacheData.InteractAttempts[CurrentTarget.RActorGuid] > 15 && !(CurrentTarget.Type == GObjectType.HealthWell))
                                             {
                                                 Logger.LogVerbose("Blacklisting {0} ({1}) for 15 seconds after {2} interactions",
-                                                    CurrentTarget.InternalName, CurrentTarget.ActorSNO, iInteractAttempts);
+                                                    CurrentTarget.InternalName, CurrentTarget.ActorSNO, attemptCount);
                                                 hashRGUIDBlacklist15.Add(CurrentTarget.RActorGuid);
                                             }
                                         }
@@ -606,7 +598,7 @@ namespace Trinity
                                                     "Barricade: Name={0}. SNO={1}, Range={2}. Needed range={3}. Radius={4}. Type={5}. Using power={6}",
                                                     CurrentTarget.InternalName,     // 0
                                                     CurrentTarget.ActorSNO,         // 1
-                                                    CurrentTarget.CentreDistance,   // 2
+                                                    CurrentTarget.Distance,   // 2
                                                     TargetRangeRequired,                 // 3
                                                     CurrentTarget.Radius,           // 4
                                                     CurrentTarget.Type,             // 5
@@ -619,7 +611,7 @@ namespace Trinity
                                                     "Destructible: Name={0}. SNO={1}, Range={2}. Needed range={3}. Radius={4}. Type={5}. Using power={6}",
                                                     CurrentTarget.InternalName,     // 0
                                                     CurrentTarget.ActorSNO,         // 1
-                                                    CurrentTarget.CentreDistance,   // 2
+                                                    CurrentTarget.Distance,   // 2
                                                     TargetRangeRequired,                 // 3 
                                                     CurrentTarget.Radius,           // 4
                                                     CurrentTarget.Type,             // 5
@@ -633,7 +625,7 @@ namespace Trinity
                                             {
                                                 // Location attack - attack the Vector3/map-area (equivalent of holding shift and left-clicking the object in-game to "force-attack")
                                                 Vector3 vAttackPoint;
-                                                if (CurrentTarget.CentreDistance >= 6f)
+                                                if (CurrentTarget.Distance >= 6f)
                                                     vAttackPoint = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, 6f);
                                                 else
                                                     vAttackPoint = CurrentTarget.Position;
@@ -794,7 +786,7 @@ namespace Trinity
                                 }
                                 // Tempest rush for a monk
                                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Monk_TempestRush) && Player.PrimaryResource >= Settings.Combat.Monk.TR_MinSpirit &&
-                                    ((CurrentTarget.Type == GObjectType.Item && CurrentTarget.CentreDistance > 20f) || CurrentTarget.Type != GObjectType.Item) &&
+                                    ((CurrentTarget.Type == GObjectType.Item && CurrentTarget.Distance > 20f) || CurrentTarget.Type != GObjectType.Item) &&
                                     Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly &&
                                     Monk_TempestRushReady())
                                 {
@@ -1009,7 +1001,7 @@ namespace Trinity
                                 "Blacklisting a monster because of possible stuck issues. Monster={0} [{1}] Range={2:0} health %={3:0} RActorGUID={4}",
                                 CurrentTarget.InternalName,         // 0
                                 CurrentTarget.ActorSNO,             // 1
-                                CurrentTarget.CentreDistance,       // 2
+                                CurrentTarget.Distance,       // 2
                                 CurrentTarget.HitPointsPct,            // 3
                                 CurrentTarget.RActorGuid            // 4
                                 );
@@ -1020,7 +1012,7 @@ namespace Trinity
                                 "Blacklisting an object because of possible stuck issues. Object={0} [{1}]. Range={2:0} RActorGUID={3}",
                                 CurrentTarget.InternalName,         // 0
                                 CurrentTarget.ActorSNO,             // 1 
-                                CurrentTarget.CentreDistance,       // 2
+                                CurrentTarget.Distance,       // 2
                                 CurrentTarget.RActorGuid            // 3
                                 );
                         }
@@ -1166,7 +1158,7 @@ namespace Trinity
                                 }
                                 catch
                                 {
-                                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Safely handled exception getting attribute max health #2 for unit {0} [{1}]", c_InternalName, CurrentCacheObject.ActorSNO);
+                                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Safely handled exception getting attribute max health #2 for unit {0} [{1}]", CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
                                     StaleCache = true;
                                 }
                             }
@@ -1356,7 +1348,7 @@ namespace Trinity
             statusText.Append(" Type=");
             statusText.Append(CurrentTarget.Type.ToString().PadRight(10));
             statusText.Append(" C-Dist=");
-            statusText.Append(CurrentTarget.CentreDistance.ToString("0.0").PadRight(5));
+            statusText.Append(CurrentTarget.Distance.ToString("0.0").PadRight(5));
             statusText.Append(" R-Dist=");
             statusText.Append(CurrentTarget.RadiusDistance.ToString("0.0").PadRight(5));
             statusText.Append(" RangeReq'd=");
@@ -1427,17 +1419,17 @@ namespace Trinity
 
                     lastSentMovePower = DateTime.UtcNow;
 
-                    bool inRange = TargetCurrentDistance <= TargetRangeRequired || CurrentTarget.CentreDistance < 10f;
+                    bool inRange = TargetCurrentDistance <= TargetRangeRequired || CurrentTarget.Distance < 10f;
                     if (lastMoveResult == MoveResult.ReachedDestination && !inRange && CurrentTarget.Type != GObjectType.Item)
                     {
                         bool pathFindresult = ((DefaultNavigationProvider)Navigator.NavigationProvider).CanPathWithinDistance(CurrentTarget.Position, CurrentTarget.Radius);
                         if (!pathFindresult)
                         {
                             hashRGUIDBlacklist60.Add(CurrentTarget.RActorGuid);
-                            Logger.Log("Unable to navigate to target! Blacklisting {0} SNO={1} RAGuid={2} dist={3:0} canFullyPath={4} " 
-                                + (CurrentTarget.IsElite ? " IsElite " : "") 
+                            Logger.Log("Unable to navigate to target! Blacklisting {0} SNO={1} RAGuid={2} dist={3:0} canFullyPath={4} "
+                                + (CurrentTarget.IsElite ? " IsElite " : "")
                                 + (CurrentTarget.ItemQuality >= ItemQuality.Legendary ? "IsLegendaryItem " : ""),
-                                CurrentTarget.InternalName, CurrentTarget.ActorSNO, CurrentTarget.RActorGuid, CurrentTarget.CentreDistance, pathFindresult);
+                                CurrentTarget.InternalName, CurrentTarget.ActorSNO, CurrentTarget.RActorGuid, CurrentTarget.Distance, pathFindresult);
                         }
                     }
 

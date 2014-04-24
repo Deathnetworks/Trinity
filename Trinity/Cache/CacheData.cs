@@ -56,11 +56,6 @@ namespace Trinity
         internal static Dictionary<int, bool> UnitIsBurrowed = new Dictionary<int, bool>();
 
         /// <summary>
-        /// Store Collision-sphere radius for each object (SNO based)
-        /// </summary>
-        internal static Dictionary<int, float> CollisionSphere = new Dictionary<int, float>();
-
-        /// <summary>
         /// Caches the position for each object (only used for non-units, as this data is static so can be cached) (RactorGUID based)
         /// </summary>
         internal static Dictionary<int, Vector3> Position = new Dictionary<int, Vector3>();
@@ -153,7 +148,6 @@ namespace Trinity
         /// </summary>
         internal static void Clear()
         {
-            CacheData.CollisionSphere.Clear();
             CacheData.CurrentUnitHealth.Clear();
             CacheData.LastCheckedUnitHealth.Clear();
             CacheData.MonsterObstacles.Clear();

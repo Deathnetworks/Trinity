@@ -222,7 +222,7 @@ namespace Trinity
                      u.NearbyUnitsWithinDistance(aoe_radius) >= count
                      orderby u.Type != GObjectType.HealthGlobe && u.Type != GObjectType.PowerGlobe
                      orderby u.NearbyUnitsWithinDistance(aoe_radius)
-                     orderby u.CentreDistance descending
+                     orderby u.Distance descending
                      select u).ToList();
 
                 if (clusterUnits.Any())
@@ -260,7 +260,7 @@ namespace Trinity
                      (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                      u.RadiusDistance <= maxRange
                      orderby u.NearbyUnitsWithinDistance(radius)
-                     orderby u.CentreDistance descending
+                     orderby u.Distance descending
                      select u.Position).ToList();
 
                 if (clusterUnits.Any())
@@ -297,7 +297,7 @@ namespace Trinity
                      (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                      u.RadiusDistance <= maxRange
                      orderby u.NearbyUnitsWithinDistance(radius)
-                     orderby u.CentreDistance descending
+                     orderby u.Distance descending
                      select u.Position).ToList();
 
                 if (clusterUnits.Any())
@@ -367,7 +367,7 @@ namespace Trinity
                      u.RadiusDistance <= maxRange
                      orderby !u.IsBossOrEliteRareUnique
                      orderby u.NearbyUnitsWithinDistance(radius) descending
-                     orderby u.CentreDistance
+                     orderby u.Distance
                      orderby u.HitPointsPct descending
                      select u).ToList();
 
@@ -422,7 +422,7 @@ namespace Trinity
                      orderby u.Type != GObjectType.HealthGlobe // if it's a globe this will be false and sorted at the top
                      orderby !u.IsBossOrEliteRareUnique
                      orderby u.NearbyUnitsWithinDistance(radius) descending
-                     orderby u.CentreDistance
+                     orderby u.Distance
                      orderby u.HitPointsPct descending
                      select u.Position).ToList();
 
@@ -612,20 +612,20 @@ namespace Trinity
                         {
                             zigZagTargetList =
                                 (from u in ObjectCache
-                                 where u.IsUnit && u.CentreDistance < maxDistance
+                                 where u.IsUnit && u.Distance < maxDistance
                                  select u).ToList();
                         }
                         else
                         {
                             zigZagTargetList =
                                 (from u in ObjectCache
-                                 where u.IsUnit && u.CentreDistance < maxDistance && !UnitOrPathInAoE(u)
+                                 where u.IsUnit && u.Distance < maxDistance && !UnitOrPathInAoE(u)
                                  select u).ToList();
                         }
 
                         if (zigZagTargetList.Count() >= minTargets)
                         {
-                            zigZagPoint = zigZagTargetList.OrderByDescending(u => u.CentreDistance).FirstOrDefault().Position;
+                            zigZagPoint = zigZagTargetList.OrderByDescending(u => u.Distance).FirstOrDefault().Position;
                             if (NavHelper.CanRayCast(zigZagPoint) && zigZagPoint.Distance2D(Player.Position) >= minDistance)
                             {
                                 Logger.Log(LogCategory.Movement, "Returning ZigZag: TargetBased {0} r-dist={1} t-dist={2}", zigZagPoint, ringDistance, zigZagPoint.Distance2D(Player.Position));

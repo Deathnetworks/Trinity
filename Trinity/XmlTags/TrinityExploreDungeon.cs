@@ -447,6 +447,8 @@ namespace Trinity.XmlTags
         /// </summary>
         private Vector3 GPUpdatePosition = Vector3.Zero;
 
+        private int startedNearMarkerHash = -1;
+
         /// <summary>
         /// Called when the profile behavior starts
         /// </summary>
@@ -488,6 +490,20 @@ namespace Trinity.XmlTags
 
             if (ObjectDistance == 0)
                 ObjectDistance = 25f;
+
+            var nearbyExitMarkers = (from m in ZetaDia.Minimap.Markers.CurrentWorldMarkers
+                                         where m.IsPortalExit &&
+                                         m.Position.Distance2D(myPos) <= 25f
+                                         orderby m.Position.Distance2D(myPos)
+                                         select m);
+
+            // If in Rifts, check if we started near the Portal Exit - this means we're on the last rift level
+            if (EndType == TrinityExploreEndType.RiftComplete && ZetaDia.CurrentAct == Act.OpenWorld && DataDictionary.RiftWorldIds.Contains(ZetaDia.CurrentWorldId) &&
+                ZetaDia.ActInfo.AllQuests.Any(q => q.QuestSNO == 337492 && q.QuestStep == 3) && nearbyExitMarkers.Any())
+            {
+                Logger.Log("Started near Portal Exit, ignoring marker {0}", nearbyExitMarkers.FirstOrDefault().NameHash);
+                startedNearMarkerHash = nearbyExitMarkers.FirstOrDefault().NameHash;
+            }
 
             PrintNodeCounts("PostInit");
         }
@@ -1559,6 +1575,7 @@ namespace Trinity.XmlTags
 
             if (ZetaDia.Me.IsInBossEncounter)
                 return false;
+
             // X1_LR_DungeonFinder
             if (ZetaDia.CurrentAct == Act.OpenWorld && DataDictionary.RiftWorldIds.Contains(ZetaDia.CurrentWorldId) &&
                 ZetaDia.ActInfo.AllQuests.Any(q => q.QuestSNO == 337492 && q.QuestStep == 10))
@@ -1568,7 +1585,8 @@ namespace Trinity.XmlTags
             }
 
             if (ZetaDia.Minimap.Markers.CurrentWorldMarkers
-                .Any(m => m.IsPortalExit && m.Position.Distance2D(Trinity.Player.Position) <= MarkerDistance && !MiniMapMarker.TownHubMarkers.Contains(m.NameHash)))
+                .Any(m => m.IsPortalExit && m.Position.Distance2D(Trinity.Player.Position) <= MarkerDistance && !MiniMapMarker.TownHubMarkers.Contains(m.NameHash) &&
+                m.NameHash != startedNearMarkerHash))
             {
                 Logger.Log("Rift portal exit marker within range!");
                 return true;

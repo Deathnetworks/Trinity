@@ -296,7 +296,7 @@ namespace Trinity
             }
 
             // Dashing Strike
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CurrentTarget.CentreDistance >= 16f &&
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CurrentTarget.Distance >= 16f &&
                 CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike, CombatBase.CanCastFlags.NoTimer))
             {
                 Monk_TickSweepingWindSpam();
@@ -365,7 +365,7 @@ namespace Trinity
                 cwInterval = 2500;
 
             // Fists of Thunder:Thunder Clap - Fly to Target
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Monk_FistsofThunder) && hasThunderClap && CurrentTarget.CentreDistance > 16f)
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Monk_FistsofThunder) && hasThunderClap && CurrentTarget.Distance > 16f)
             {
                 Monk_TickSweepingWindSpam();
                 return new TrinityPower(SNOPower.Monk_FistsofThunder, 30f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 3, WAIT_FOR_ANIM);

@@ -19,7 +19,7 @@ namespace Trinity
                 bool logNewItem = false;
                 bool AddToCache = false;
 
-                if (CurrentCacheObject.BalanceID == -1)
+                if (CurrentCacheObject.GameBalanceID == -1)
                 {
                     AddToCache = false;
                     c_IgnoreSubStep = "InvalidBalanceID";
@@ -47,6 +47,8 @@ namespace Trinity
                     c_ItemDisplayName = diaItem.CommonData.Name;
                     c_GameBalanceID = diaItem.CommonData.GameBalanceId;
 
+                    CurrentCacheObject.DynamicID = CurrentCacheObject.CommonData.DynamicId;
+                    CurrentCacheObject.GameBalanceID = CurrentCacheObject.CommonData.GameBalanceId;
 
                     c_ItemLevel = diaItem.CommonData.Level;
                     c_DBItemBaseType = diaItem.CommonData.ItemBaseType;
@@ -55,7 +57,7 @@ namespace Trinity
                     c_IsTwoHandedItem = diaItem.CommonData.IsTwoHand;
                     c_item_tFollowerType = diaItem.CommonData.FollowerSpecialType;
                     // Calculate item type
-                    c_item_GItemType = DetermineItemType(c_InternalName, c_DBItemType, c_item_tFollowerType);
+                    c_item_GItemType = DetermineItemType(CurrentCacheObject.InternalName, c_DBItemType, c_item_tFollowerType);
 
                     // And temporarily store the base type
                     itemBaseType = DetermineBaseType(c_item_GItemType);
@@ -98,7 +100,7 @@ namespace Trinity
                     if (iKeepLootRadiusExtendedFor > 0)
                         fExtraRange += 90f;
 
-                    if (c_CentreDistance > (CurrentBotLootRange + fExtraRange))
+                    if (CurrentCacheObject.Distance > (CurrentBotLootRange + fExtraRange))
                     {
                         c_IgnoreSubStep = "OutOfRange";
                         AddToCache = false;
@@ -121,10 +123,10 @@ namespace Trinity
                 var pickupItem = new PickupItem
                 {
                     Name = c_ItemDisplayName,
-                    InternalName = c_InternalName,
+                    InternalName = CurrentCacheObject.InternalName,
                     Level = c_ItemLevel,
                     Quality = c_ItemQuality,
-                    BalanceID = CurrentCacheObject.BalanceID,
+                    BalanceID = CurrentCacheObject.GameBalanceID,
                     DBBaseType = c_DBItemBaseType,
                     DBItemType = c_DBItemType,
                     TBaseType = itemBaseType,
@@ -147,7 +149,7 @@ namespace Trinity
                 // Treat all globes as a yes
                 if (c_item_GItemType == GItemType.HealthGlobe)
                 {
-                    c_ObjectType = GObjectType.HealthGlobe;
+                    CurrentCacheObject.Type = GObjectType.HealthGlobe;
                     AddToCache = true;
                     return AddToCache;
                 }
@@ -155,7 +157,7 @@ namespace Trinity
                 // Treat all globes as a yes
                 if (c_item_GItemType == GItemType.PowerGlobe)
                 {
-                    c_ObjectType = GObjectType.PowerGlobe;
+                    CurrentCacheObject.Type = GObjectType.PowerGlobe;
                     AddToCache = true;
                     return AddToCache;
                 }
@@ -232,7 +234,7 @@ namespace Trinity
                 }
                 catch
                 {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting gold pile amount for item {0} [{1}]", c_InternalName, CurrentCacheObject.ActorSNO);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting gold pile amount for item {0} [{1}]", CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
                     AddToCache = false;
                     c_IgnoreSubStep = "GetAttributeException";
                 }
@@ -246,7 +248,7 @@ namespace Trinity
                 return AddToCache;
             }
 
-            if (c_CentreDistance <= Player.GoldPickupRadius)
+            if (CurrentCacheObject.Distance <= Player.GoldPickupRadius)
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "WithinPickupRadius";
@@ -265,7 +267,7 @@ namespace Trinity
         {
             bool isNewLogItem = false;
 
-            c_ItemMd5Hash = HashGenerator.GenerateItemHash(CurrentCacheObject.Position, CurrentCacheObject.ActorSNO, c_InternalName, CurrentWorldDynamicId, c_ItemQuality, c_ItemLevel);
+            c_ItemMd5Hash = HashGenerator.GenerateItemHash(CurrentCacheObject.Position, CurrentCacheObject.ActorSNO, CurrentCacheObject.InternalName, CurrentWorldDynamicId, c_ItemQuality, c_ItemLevel);
 
             if (!GenericCache.ContainsKey(c_ItemMd5Hash))
             {
@@ -372,10 +374,10 @@ namespace Trinity
                 LogWriter.Write(FormatCSVField(CurrentCacheObject.RActorGuid));
                 LogWriter.Write(FormatCSVField(CurrentCacheObject.DynamicID));
                 LogWriter.Write(FormatCSVField(CurrentCacheObject.ACDGuid));
-                LogWriter.Write(FormatCSVField(c_InternalName));
+                LogWriter.Write(FormatCSVField(CurrentCacheObject.InternalName));
                 LogWriter.Write(FormatCSVField(c_GoldStackSize));
                 LogWriter.Write(FormatCSVField(c_IgnoreSubStep));
-                LogWriter.Write(FormatCSVField(c_CentreDistance));
+                LogWriter.Write(FormatCSVField(CurrentCacheObject.Distance));
                 LogWriter.Write("\n");
             }
         }

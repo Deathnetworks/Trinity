@@ -149,15 +149,15 @@ namespace Trinity
                 {
                     // For distant monsters, try to target a little bit in-front of them (as they run towards us), if it's not a treasure goblin
                     float fExtraDistance = 0f;
-                    if (CurrentTarget.CentreDistance > 17f && !CurrentTarget.IsTreasureGoblin)
+                    if (CurrentTarget.Distance > 17f && !CurrentTarget.IsTreasureGoblin)
                     {
-                        fExtraDistance = CurrentTarget.CentreDistance - 17f;
+                        fExtraDistance = CurrentTarget.Distance - 17f;
                         if (fExtraDistance > 5f)
                             fExtraDistance = 5f;
-                        if (CurrentTarget.CentreDistance - fExtraDistance < 15f)
+                        if (CurrentTarget.Distance - fExtraDistance < 15f)
                             fExtraDistance -= 2;
                     }
-                    Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.CentreDistance - fExtraDistance);
+                    Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.Distance - fExtraDistance);
                     return new TrinityPower(SNOPower.Wizard_Hydra, 30f, vNewTarget, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                 }
 

@@ -138,7 +138,7 @@ namespace Trinity
 
                 // Use Boar Taunt on 3 or more trash mobs in an area or on Unique/Elite/Champion
                 if (!UseOOCBuff && hasBoar && CombatBase.CanCast(SNOPower.X1_DemonHunter_Companion) && ((TargetUtil.ClusterExists(20f, 4) && TargetUtil.EliteOrTrashInRange(20f)) ||
-                    (CurrentTarget.IsEliteRareUnique && CurrentTarget.CentreDistance <= 20f)))
+                    (CurrentTarget.IsEliteRareUnique && CurrentTarget.Distance <= 20f)))
                 {
                     return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
                 }
@@ -257,15 +257,15 @@ namespace Trinity
             {
                 // For distant monsters, try to target a little bit in-front of them (as they run towards us), if it's not a treasure goblin
                 float fExtraDistance = 0f;
-                if (CurrentTarget.CentreDistance > 17f && !CurrentTarget.IsTreasureGoblin)
+                if (CurrentTarget.Distance > 17f && !CurrentTarget.IsTreasureGoblin)
                 {
-                    fExtraDistance = CurrentTarget.CentreDistance - 17f;
+                    fExtraDistance = CurrentTarget.Distance - 17f;
                     if (fExtraDistance > 5f)
                         fExtraDistance = 5f;
-                    if (CurrentTarget.CentreDistance - fExtraDistance < 15f)
+                    if (CurrentTarget.Distance - fExtraDistance < 15f)
                         fExtraDistance -= 2;
                 }
-                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.CentreDistance - fExtraDistance);
+                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.Distance - fExtraDistance);
                 return new TrinityPower(SNOPower.DemonHunter_SpikeTrap, 35f, vNewTarget, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
 

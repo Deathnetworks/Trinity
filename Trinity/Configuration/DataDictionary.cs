@@ -520,7 +520,6 @@ namespace Trinity
             4299, // goat ranged
             62736, 130794, // demon flyer
             5508, // succubus 
-            210120, // corrupt growths, act 4
             5388, 4286, 256015, 256000, 255996,
        };
         // A list of bosses in the game, just to make CERTAIN they are treated as elites
@@ -548,7 +547,6 @@ namespace Trinity
             // Jondar, Chancellor, Queen Araneae (act 1 dungeons), Skeleton King, Butcher
             86624, 156353, 51341, 5350, 3526,
             215103, // Istaku            
-            210120, // A4 Corrupt Growths                 
             4630, // Rakanoth
             256015, // Xah'Rith Keywarden
             115403, // A1 Cain Skeleton boss
@@ -558,7 +556,8 @@ namespace Trinity
             108444, // ZombieFemale_A_TristramQuest (Wretched Mothers)
             176889, // ZombieFemale_Unique_WretchedQueen
 
-            210268, // A4 Gardens of Hope Corrupt Growths
+            210120, // A4 Corrupt Growth
+            210268, // A4 Corrupt Growth
 
             164502, // sandMonster_A_Head_Guardian
 
