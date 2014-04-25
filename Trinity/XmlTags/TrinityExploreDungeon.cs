@@ -646,6 +646,7 @@ namespace Trinity.XmlTags
 
             var actors = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
                 .Where(a => (a.ActorSNO == ActorId ||
+                    AlternateActors.Any(o => o.ActorId != 0 && o.ActorId == a.ActorSNO) ||
                     Objectives.Any(o => o.ActorID != 0 && o.ActorID == a.ActorSNO) ||
                     a.CommonData.GetAttribute<int>(ActorAttributeType.BountyObjective) > 0) &&
                     Trinity.SkipAheadAreaCache.Any(o => o.Position.Distance2D(a.Position) >= ObjectDistance &&
@@ -695,14 +696,18 @@ namespace Trinity.XmlTags
                     new Sequence(
                         new DecoratorContinue(ret => TownPortalOnTimeout && !Trinity.Player.IsInTown,
                             new Sequence(
-                                new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation,
-                                    "TrinityExploreDungeon inactivity timer tripped ({0}), tag Using Town Portal!", TimeoutValue)),
+                                new Action(ret => Logger.Log(
+                                    "TrinityExploreDungeon timer tripped ({0}), tag finished, Using Town Portal!", TimeoutValue)),
                                 Zeta.Bot.CommonBehaviors.CreateUseTownPortal(),
                                 new Action(ret => isDone = true)
                             )
                         ),
                         new DecoratorContinue(ret => !TownPortalOnTimeout,
-                            new Action(ret => isDone = true)
+                            new Sequence(
+                                new Action(ret => Logger.Log(
+                                    "TrinityExploreDungeon timer tripped ({0}), tag finished!", TimeoutValue)),
+                                new Action(ret => isDone = true)
+                            )
                         )
                     )
                 ),
@@ -781,7 +786,7 @@ namespace Trinity.XmlTags
                 CheckIsObjectiveFinished(),
                 new Decorator(ret => GetRouteUnvisitedNodeCount() == 0 && timesForcedReset > timesForceResetMax,
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation,
+                        new Action(ret => Logger.Log(
                             "Visited all nodes but objective not complete, forced reset more than {0} times, finished!", timesForceResetMax)),
                         new Action(ret => isDone = true)
                     )
@@ -1550,8 +1555,11 @@ namespace Trinity.XmlTags
         /// </summary>
         public override void ResetCachedDone()
         {
+            Logger.LogDebug(LogCategory.ProfileTag, "TrinityExploreDungeon ResetCachedDone()");
             isDone = false;
             InitDone = false;
+            timeoutBreached = false;
+            TagTimer.Reset();
             base.ResetCachedDone();
         }
 

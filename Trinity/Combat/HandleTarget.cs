@@ -1517,12 +1517,13 @@ namespace Trinity
                         {
                             if (CurrentTarget.IsQuestGiver)
                             {
-                                vCurrentDestination = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.Radius);
+                                vCurrentDestination = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.Radius + 2f);
                                 TargetRangeRequired = CurrentTarget.Radius + 2f;
                             }
-
-                            TargetRangeRequired = CurrentTarget.Radius;
-
+                            else
+                            {
+                                TargetRangeRequired = CurrentTarget.Radius;
+                            }
                             // Check if it's in our interactable range dictionary or not
                             float range;
 

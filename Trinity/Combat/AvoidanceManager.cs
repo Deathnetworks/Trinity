@@ -125,17 +125,20 @@ namespace Trinity
 
         public static float GetAvoidanceRadiusBySNO(int snoId, float defaultValue)
         {
-            if (SNOAvoidanceType.ContainsKey(snoId))
+            using (new PerformanceLogger("GetAvoidanceRadiusBySNO"))
             {
-                float radius = GetAvoidanceRadius(SNOAvoidanceType[snoId], defaultValue);
-                //DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Found avoidance Radius of={0} for snoId={1} (default={2})", radius, snoId, defaultValue);
-                return radius;
+                if (SNOAvoidanceType.ContainsKey(snoId))
+                {
+                    float radius = GetAvoidanceRadius(SNOAvoidanceType[snoId], defaultValue);
+                    //DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Found avoidance Radius of={0} for snoId={1} (default={2})", radius, snoId, defaultValue);
+                    return radius;
+                }
+                else
+                {
+                    //Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Unkown Avoidance type for Radius! {0}", snoId);
+                }
+                return defaultValue;
             }
-            else
-            {
-                //Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Unkown Avoidance type for Radius! {0}", snoId);
-            }
-            return defaultValue;
         }
 
         public static float GetAvoidanceHealth(AvoidanceType type, float defaultValue)
@@ -250,17 +253,20 @@ namespace Trinity
 
         public static float GetAvoidanceHealthBySNO(int snoId, float defaultValue)
         {
-            if (SNOAvoidanceType.ContainsKey(snoId))
+            using (new PerformanceLogger("GetAvoidanceHealthbySNO"))
             {
-                float health = GetAvoidanceHealth(SNOAvoidanceType[snoId], defaultValue);
-                //DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Found avoidance Health of={0} for snoId={1} (default={2})", health, snoId, defaultValue);
-                return health;
+                if (SNOAvoidanceType.ContainsKey(snoId))
+                {
+                    float health = GetAvoidanceHealth(SNOAvoidanceType[snoId], defaultValue);
+                    //DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Found avoidance Health of={0} for snoId={1} (default={2})", health, snoId, defaultValue);
+                    return health;
+                }
+                else
+                {
+                    //Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Unkown Avoidance type for Health! {0}", snoId);
+                }
+                return defaultValue;
             }
-            else
-            {
-                //Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Unkown Avoidance type for Health! {0}", snoId);
-            }
-            return defaultValue;
         }
     }
 }

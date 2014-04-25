@@ -473,9 +473,8 @@ namespace Trinity
                         {
                             gizmoType = "GizmoType: " + ((DiaGizmo)currentObject).CommonData.ActorInfo.GizmoType.ToString();
                         }
-                        Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0} {4}",
-                                currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance, gizmoType);
-                        Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "{0}", ex);
+                        Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0} {4} {5}",
+                                currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance, gizmoType, ex.Message);
 
                     }
                 }

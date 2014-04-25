@@ -82,49 +82,52 @@ namespace Trinity.Technicals
         /// <returns></returns>
         private static IDictionary<K, T> Load<K, T>(string filename, string name, string keyName, string valueName)
         {
-            Logger.Log(TrinityLogLevel.Info, LogCategory.Configuration, "Loading Dictionary file={0} name={1} keys={2} values={3}", filename, name, keyName, valueName);
-            IDictionary<K, T> ret = new Dictionary<K, T>();
-            try
+            using (new PerformanceLogger("FileManager.Load"))
             {
-                if (File.Exists(filename))
+                Logger.Log(TrinityLogLevel.Info, LogCategory.Configuration, "Loading Dictionary file={0} name={1} keys={2} values={3}", filename, name, keyName, valueName);
+                IDictionary<K, T> ret = new Dictionary<K, T>();
+                try
                 {
-                    XElement xElem = XElement.Load(filename);
-                    xElem = xElem.Descendants("Dictionary").FirstOrDefault(elem => elem.Attribute("Name").Value == name);
-                    if (xElem != null)
+                    if (File.Exists(filename))
                     {
-                        List<KeyValuePair<K, T>> lst = (from e in xElem.Descendants("Entry")
-                                                        where e.Attribute(keyName) != null && e.Attribute(keyName).Value != null
-                                                        where e.Attribute(valueName) != null && e.Attribute(valueName).Value != null
-                                                        select new KeyValuePair<K, T>(
-                                                            typeof(K).IsEnum ? (K)Enum.Parse(typeof(K), e.Attribute(keyName).Value, true) : (K)Convert.ChangeType(e.Attribute(keyName).Value, typeof(K), CultureInfo.InvariantCulture),
-                                                            typeof(T).IsEnum ? (T)Enum.Parse(typeof(T), e.Attribute(valueName).Value, true) : (T)Convert.ChangeType(e.Attribute(valueName).Value, typeof(T), CultureInfo.InvariantCulture))
-                                                        ).ToList();
-
-                        foreach (KeyValuePair<K, T> item in lst)
+                        XElement xElem = XElement.Load(filename);
+                        xElem = xElem.Descendants("Dictionary").FirstOrDefault(elem => elem.Attribute("Name").Value == name);
+                        if (xElem != null)
                         {
-                            Logger.Log(TrinityLogLevel.Debug, LogCategory.Configuration, "Found dictionary item {0} = {1}", item.Key, item.Value);
-                            ret.Add(item);
+                            List<KeyValuePair<K, T>> lst = (from e in xElem.Descendants("Entry")
+                                                            where e.Attribute(keyName) != null && e.Attribute(keyName).Value != null
+                                                            where e.Attribute(valueName) != null && e.Attribute(valueName).Value != null
+                                                            select new KeyValuePair<K, T>(
+                                                                typeof(K).IsEnum ? (K)Enum.Parse(typeof(K), e.Attribute(keyName).Value, true) : (K)Convert.ChangeType(e.Attribute(keyName).Value, typeof(K), CultureInfo.InvariantCulture),
+                                                                typeof(T).IsEnum ? (T)Enum.Parse(typeof(T), e.Attribute(valueName).Value, true) : (T)Convert.ChangeType(e.Attribute(valueName).Value, typeof(T), CultureInfo.InvariantCulture))
+                                                            ).ToList();
+
+                            foreach (KeyValuePair<K, T> item in lst)
+                            {
+                                Logger.Log(TrinityLogLevel.Debug, LogCategory.Configuration, "Found dictionary item {0} = {1}", item.Key, item.Value);
+                                ret.Add(item);
+                            }
                         }
                     }
+                    else
+                    {
+                        throw new FileNotFoundException("Could not load {0}", filename);
+                    }
+                    if (ret.Count > 0)
+                    {
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.Configuration, "Loaded Dictionary name={0} key={1} value={2} with {3} values", name, keyName, valueName, ret.Count);
+                    }
+                    else
+                    {
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.Configuration, "Attempted to load Dictionary name={0} key={1} value={2} but 0 values found!", name, keyName, valueName, ret.Count);
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    throw new FileNotFoundException("Could not load {0}", filename);
+                    Logger.LogNormal("{0}", ex);
                 }
-                if (ret.Count > 0)
-                {
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.Configuration, "Loaded Dictionary name={0} key={1} value={2} with {3} values", name, keyName, valueName, ret.Count);
-                }
-                else
-                {
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.Configuration, "Attempted to load Dictionary name={0} key={1} value={2} but 0 values found!", name, keyName, valueName, ret.Count);
-                }
+                return ret;
             }
-            catch (Exception ex)
-            {
-                Logger.LogNormal("{0}", ex);
-            }
-            return ret;
         }
 
         /// <summary>

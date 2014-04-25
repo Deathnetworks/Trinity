@@ -200,7 +200,7 @@ namespace Trinity
             */
 
             const float gridSquareSize = 2.5f;
-            const int maxDistance = 150;
+            const int maxDistance = 65;
             const int maxWeight = 100;
             const int maxZDiff = 14;
 
@@ -272,14 +272,13 @@ namespace Trinity
                             continue;
                         }
                     }
+
                     //if (!DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) &&
-                    //    gridPoint.Distance > 45 && !Navigator.Raycast(origin, xyz))
-                    if (!DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) &&
-                        !CanRayCast(origin, xyz))
-                    {
-                        nodesGT45Raycast++;
-                        continue;
-                    }
+                    //    !CanRayCast(origin, xyz))
+                    //{
+                    //    nodesGT45Raycast++;
+                    //    continue;
+                    //}
 
                     if (isStuck && gridPoint.Distance > (PlayerMover.TotalAntiStuckAttempts + 2) * 5)
                     {
@@ -373,12 +372,12 @@ namespace Trinity
                     if (shouldKite)
                     {
                         // make sure we can raycast to our target
-                        if (!DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) &&
-                            !NavHelper.CanRayCast(gridPoint.Position, Trinity.LastPrimaryTargetPosition))
-                        {
-                            navRaycast++;
-                            continue;
-                        }
+                        //if (!DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) &&
+                        //    !NavHelper.CanRayCast(gridPoint.Position, Trinity.LastPrimaryTargetPosition))
+                        //{
+                        //    navRaycast++;
+                        //    continue;
+                        //}
 
                         /*
                         * We want to down-weight any grid points where monsters are closer to it than we are
