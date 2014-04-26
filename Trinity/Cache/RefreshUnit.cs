@@ -208,7 +208,7 @@ namespace Trinity
                     Logger.LogDebug("Error refreshing MonsterSize");
                 }
             }
-            
+
             RefreshMonsterHealth();
 
             // Unit is already dead
@@ -466,14 +466,14 @@ namespace Trinity
         {
             if (CurrentCacheObject.Unit != null && CurrentCacheObject.Unit.IsValid)
             {
-
                 try
                 {
                     CurrentCacheObject.SummonedByACDId = CurrentCacheObject.Unit.SummonedByACDId;
                 }
-                catch
+                catch (Exception ex)
                 {
                     // Only part of a ReadProcessMemory or WriteProcessMemory request was completed
+                    Logger.LogDebug("Error refreshing {0} {1} {2}", ex.Message);
                 }
                 try
                 {
@@ -484,7 +484,7 @@ namespace Trinity
                     // Only part of a ReadProcessMemory or WriteProcessMemory request was completed 
                 }
 
-                if (CurrentCacheObject.SummonedByACDId == Player.ACDGuid)
+                if (CurrentCacheObject.SummonedByACDId == Player.MyDynamicID)
                 {
                     CurrentCacheObject.IsSummonedByPlayer = true;
                 }
@@ -496,7 +496,10 @@ namespace Trinity
                     if (DataDictionary.MysticAllyIds.Contains(CurrentCacheObject.ActorSNO))
                     {
                         if (CurrentCacheObject.IsSummonedByPlayer)
+                        {
                             iPlayerOwnedMysticAlly++;
+                            c_IgnoreSubStep = "IsPlayerSummoned";
+                        }
                         AddToCache = false;
                     }
                 }
@@ -506,7 +509,10 @@ namespace Trinity
                     if (DataDictionary.DemonHunterPetIds.Contains(CurrentCacheObject.ActorSNO))
                     {
                         if (CurrentCacheObject.IsSummonedByPlayer)
+                        {
                             iPlayerOwnedDHPets++;
+                            c_IgnoreSubStep = "IsPlayerSummoned";
+                        }
                         AddToCache = false;
                     }
                 }
@@ -516,13 +522,19 @@ namespace Trinity
                     if (DataDictionary.GargantuanIds.Contains(CurrentCacheObject.ActorSNO))
                     {
                         if (CurrentCacheObject.IsSummonedByPlayer)
+                        {
                             iPlayerOwnedGargantuan++;
+                            c_IgnoreSubStep = "IsPlayerSummoned";
+                        }
                         AddToCache = false;
                     }
                     if (DataDictionary.ZombieDogIds.Contains(CurrentCacheObject.ActorSNO))
                     {
                         if (CurrentCacheObject.IsSummonedByPlayer)
+                        {
                             PlayerOwnedZombieDog++;
+                            c_IgnoreSubStep = "IsPlayerSummoned";
+                        }
                         AddToCache = false;
                     }
                 }
