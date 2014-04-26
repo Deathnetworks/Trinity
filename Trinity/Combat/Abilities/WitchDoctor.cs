@@ -275,7 +275,7 @@ namespace Trinity
             }
             // Fetish Army, elites only
             if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Witchdoctor_FetishArmy) && !Player.IsIncapacitated &&
-                (TargetUtil.EliteOrTrashInRange(30f) || (TargetUtil.IsEliteTargetInRange(30f))))
+                (TargetUtil.EliteOrTrashInRange(30f) || TargetUtil.IsEliteTargetInRange(30f) || Settings.Combat.WitchDoctor.UseFetishArmyOffCooldown))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_FetishArmy, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }

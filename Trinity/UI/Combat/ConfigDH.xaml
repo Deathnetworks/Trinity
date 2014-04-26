@@ -85,9 +85,9 @@
 
                 <TextBlock Text="Minimum RapidFire Hatred" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
                 <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                    Interval="500" Maximum="150" Minimum="12" 
+                    Interval="500" Maximum="150" Minimum="30" 
                     SmallChange="1" LargeChange="5" IsSnapToTickEnabled="True"
-                    TickPlacement="BottomRight" TickFrequency="12"
+                    TickPlacement="BottomRight" TickFrequency="10"
                     Value="{Binding Path=DH.RapidFireMinHatred}" 
                     HorizontalAlignment="Stretch" Margin="2"/>
             </Grid>

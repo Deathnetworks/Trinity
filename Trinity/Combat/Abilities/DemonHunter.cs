@@ -36,7 +36,8 @@ namespace Trinity
             }
 
             // Vengeance
-            if (!IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.X1_DemonHunter_Vengeance, CombatBase.CanCastFlags.NoTimer) && (TargetUtil.EliteOrTrashInRange(60) || TargetUtil.AnyMobsInRange(60, 6)))
+            if (!IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.X1_DemonHunter_Vengeance, CombatBase.CanCastFlags.NoTimer) && 
+                ((!Settings.Combat.DemonHunter.VengeanceElitesOnly && TargetUtil.AnyMobsInRange(60, 6)) || TargetUtil.IsEliteTargetInRange(60f) ))
             {
                 return new TrinityPower(SNOPower.X1_DemonHunter_Vengeance);
             }
@@ -317,7 +318,7 @@ namespace Trinity
 
             // Rapid Fire
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_RapidFire, CombatBase.CanCastFlags.NoTimer) && !Player.IsIncapacitated &&
-                Player.PrimaryResource >= 20)
+                (Player.PrimaryResource >= Settings.Combat.DemonHunter.RapidFireMinHatred || CombatBase.LastPowerUsed == SNOPower.DemonHunter_RapidFire))
             {
                 // Players with grenades *AND* rapid fire should spam grenades at close-range instead
                 if (Hotbar.Contains(SNOPower.DemonHunter_Grenades) && CurrentTarget.RadiusDistance <= 18f)

@@ -65,6 +65,7 @@
         <Grid Grid.Row="2" Margin="2">
             <UniformGrid Columns="2">
                 <CheckBox Margin="2" IsChecked="{Binding Path=WD.ZeroDogs}" ToolTip="Spam Sacrifice">Zero Dogs/Spam Sacrifice</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=WD.UseFetishArmyOffCooldown}" ToolTip="Spam Sacrifice">Use Fetish Army Off Cooldown</CheckBox>
             </UniformGrid>
         </Grid>
 

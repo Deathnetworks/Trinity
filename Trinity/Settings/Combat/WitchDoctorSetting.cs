@@ -11,6 +11,7 @@ namespace Trinity.Config.Combat
         private float _HealingJourneyHealth;
         private float _HonoredGuestMana;
         private float _FirebatsRange;
+        private bool _UseFetishArmyOffCooldown;
         private float _PotionLevel;
         private float _HealthGlobeLevel;
         private int _KiteLimit;
@@ -119,6 +120,19 @@ namespace Trinity.Config.Combat
             {
                 _FirebatsRange = value;
                 OnPropertyChanged("FirebatsRange");
+            }
+        }
+
+        
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool UseFetishArmyOffCooldown
+        {
+            get { return _UseFetishArmyOffCooldown; }
+            set
+            {
+                _UseFetishArmyOffCooldown = value;
+                OnPropertyChanged("UseFetishArmyOffCooldown");
             }
         }
 
