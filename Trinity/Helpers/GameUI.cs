@@ -1,4 +1,5 @@
 ﻿using System;
+using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Game;
 using Zeta.Game.Internals;
@@ -42,7 +43,7 @@ namespace Trinity
         {
             get
             {
-                return UIElement.FromHash(confirmTimedDungeonOKHash); 
+                return UIElement.FromHash(confirmTimedDungeonOKHash);
             }
         }
 
@@ -52,7 +53,7 @@ namespace Trinity
         {
             get
             {
-                return UIElement.FromHash(mercenaryOKHash); 
+                return UIElement.FromHash(mercenaryOKHash);
             }
         }
 
@@ -62,7 +63,7 @@ namespace Trinity
         {
             get
             {
-                return UIElement.FromHash(conversationSkipHash); 
+                return UIElement.FromHash(conversationSkipHash);
             }
         }
 
@@ -72,7 +73,7 @@ namespace Trinity
         {
             get
             {
-                return UIElement.FromHash(partyLeaderBossAcceptHash); 
+                return UIElement.FromHash(partyLeaderBossAcceptHash);
             }
         }
 
@@ -82,7 +83,7 @@ namespace Trinity
         {
             get
             {
-                return UIElement.FromHash(0xF495983BA9BE450F); 
+                return UIElement.FromHash(0xF495983BA9BE450F);
             }
         }
 
@@ -92,7 +93,7 @@ namespace Trinity
         {
             get
             {
-               return UIElement.FromHash(0x891D21408238D18E); 
+                return UIElement.FromHash(0x891D21408238D18E);
             }
         }
 
@@ -102,7 +103,7 @@ namespace Trinity
         {
             get
             {
-                return UIElement.FromHash(talkToInteractButton1Hash); 
+                return UIElement.FromHash(talkToInteractButton1Hash);
             }
         }
 
@@ -138,6 +139,9 @@ namespace Trinity
         private static DateTime lastCheckedUIButtons = DateTime.MinValue;
         public static void SafeClickUIButtons()
         {
+            if (ZetaDia.IsLoadingWorld)
+                return;
+
             SafeClickElement(BountyRewardDialog, "Bounty Reward Dialog");
             SafeClickElement(ConversationSkipButton, "Conversation Button");
             SafeClickElement(PartyLeaderBossAccept, "Party Leader Boss Accept", true);
@@ -149,7 +153,14 @@ namespace Trinity
 
             lastCheckedUIButtons = DateTime.UtcNow;
 
-            if (ZetaDia.Me.LoopingAnimationEndTime <= 0)
+            int loopingAnimationEndTime = 0;
+            try
+            {
+                loopingAnimationEndTime = ZetaDia.Me.LoopingAnimationEndTime;
+            }
+            catch (Exception ex) { Logger.LogDebug("Error in getting LoopingAnimationEndTime {0}", ex.Message); }
+
+            if (loopingAnimationEndTime <= 0)
             {
                 SafeClickElement(MercenaryOKButton, "Mercenary OK Button");
                 SafeClickElement(GenericOK, "GenericOK");

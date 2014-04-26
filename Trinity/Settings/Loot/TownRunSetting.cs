@@ -205,7 +205,7 @@ namespace Trinity.Config.Loot
 
         
         [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
+        [DefaultValue(true)]
         public bool OpenHoradricCaches
         {
             get
