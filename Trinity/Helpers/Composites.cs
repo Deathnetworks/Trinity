@@ -9,7 +9,7 @@ namespace Trinity.Helpers
 {
     public class Composites
     {
-        public static Composite CreateVendorRunBehavior(Composite child)
+        public static Composite CreateLootBehavior(Composite child)
         {
             return
             new PrioritySelector(
@@ -38,7 +38,7 @@ namespace Trinity.Helpers
             return
             new PrioritySelector(
                 new Decorator(ret => Trinity.Settings.Loot.TownRun.OpenHoradricCaches && !BrainBehavior.IsVendoring && !Trinity.ForceVendorRunASAP && !TownRun.IsTryingToTownPortal() &&
-                        Trinity.Player.IsInTown && DateTime.UtcNow.Subtract(lastCheckedForHoradricCache).TotalSeconds > 30,
+                        Trinity.Player.IsInTown && DateTime.UtcNow.Subtract(lastCheckedForHoradricCache).TotalSeconds > 1,
                     new Sequence(
                         new Action(ret => lastCheckedForHoradricCache = DateTime.UtcNow),
                         new Decorator(ret => HasHoradricCaches(),

@@ -14,25 +14,26 @@ namespace Trinity
         /// <summary>
         /// Contains a list of Rift WorldId's
         /// </summary>
-        public static HashSet<int> RiftWorldIds { get { return DataDictionary.riftWorldIds; } }
-        private static readonly HashSet<int> riftWorldIds = new HashSet<int>()
+        public static List<int> RiftWorldIds { get { return DataDictionary.riftWorldIds; } }
+        private static readonly List<int> riftWorldIds = new List<int>()
         {
-            288454,
-            288685,
-            288687,
-            288798,
-            288800,
-            288802,
-            288804,
-            288806,
+			288454,
+			288685,
+			288687,
+			288798,
+			288800,
+			288802,
+			288804,
+			288806,
         };
 
         /// <summary>
         /// Contains all the Exit Name Hashes in Rifts
         /// </summary>
-        public static HashSet<int> RiftPortalHashes { get { return DataDictionary.riftPortalHashes; } }
-        private static readonly HashSet<int> riftPortalHashes = new HashSet<int>()
+        public static List<int> RiftPortalHashes { get { return DataDictionary.riftPortalHashes; } }
+        private static readonly List<int> riftPortalHashes = new List<int>()
 		{
+			1938876094,
 			1938876095,
 			1938876096,
 			1938876097,

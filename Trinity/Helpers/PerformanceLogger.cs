@@ -30,12 +30,12 @@ namespace Trinity.Technicals
                 {
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance))
                     {
-                        Logging.DebugFormat("[Trinity][Performance] Execution of the block {0} took {1:00.00}ms.", _BlockName,
+                        Logging.DebugFormat("[Trinity][Performance] Execution of {0} took {1:00.00}ms.", _BlockName,
                                             _Stopwatch.Elapsed.TotalMilliseconds);
                     }
                     else if (_Stopwatch.Elapsed.TotalMilliseconds > 1000)
                     {
-                        Logging.ErrorFormat("[Trinity][Performance] Execution of the block {0} took {1:00.00}ms.", _BlockName,
+                        Logging.ErrorFormat("[Trinity][Performance] Execution of {0} took {1:00.00}ms.", _BlockName,
                                             _Stopwatch.Elapsed.TotalMilliseconds);
                     }
                 }

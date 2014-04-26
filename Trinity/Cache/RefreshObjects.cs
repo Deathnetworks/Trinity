@@ -252,47 +252,50 @@ namespace Trinity
                         bDontMoveMeIAmDoingShit = true;
                     }
 
-                    if (!Player.InActiveEvent)
+                    if (Settings.Combat.Misc.EnableBountyEvents)
                     {
-                        EventStartPosition = Vector3.Zero;
-                        EventStartTime = DateTime.MinValue;
-                    }
-
-                    // Reset Event time while we have targts
-                    if (CurrentTarget != null && Player.InActiveEvent)
-                    {
-                        EventStartTime = DateTime.UtcNow;
-                    }
-
-                    if (ObjectCache.Any(o => o.Type == GObjectType.CursedChest || o.Type == GObjectType.CursedShrine))
-                    {
-                        EventStartPosition = ObjectCache.FirstOrDefault(o => o.Type == GObjectType.CursedChest || o.Type == GObjectType.CursedShrine).Position;
-                    }
-
-                    var activeEvent = ZetaDia.ActInfo.ActiveQuests.FirstOrDefault(q => DataDictionary.EventQuests.Contains(q.QuestSNO));
-
-                    const int waitTimeoutSeconds = 90;
-                    if (DateTime.UtcNow.Subtract(EventStartTime).TotalSeconds > waitTimeoutSeconds && activeEvent != null)
-                    {
-                        CacheData.BlacklistedEvents.Add(activeEvent.QuestSNO);
-                    }
-
-                    if (CurrentTarget == null && Player.InActiveEvent && EventStartPosition != Vector3.Zero &&
-                        DateTime.UtcNow.Subtract(EventStartTime).TotalSeconds < waitTimeoutSeconds &&
-                        activeEvent != null && !CacheData.BlacklistedEvents.Contains(activeEvent.QuestSNO))
-                    {
-                        CurrentTarget = new TrinityCacheObject()
+                        if (!Player.InActiveEvent)
                         {
-                            Position = EventStartPosition,
-                            Type = GObjectType.Avoidance,
-                            Weight = 20000,
-                            Distance = 2f,
-                            Radius = 2f,
-                            InternalName = "WaitForEvent"
-                        };
-                        Logger.Log("Waiting for Event {0} - Time Remaining: {1:0} seconds",
-                            ZetaDia.ActInfo.ActiveQuests.FirstOrDefault(q => DataDictionary.EventQuests.Contains(q.QuestSNO)).Quest,
-                            waitTimeoutSeconds - DateTime.UtcNow.Subtract(EventStartTime).TotalSeconds);
+                            EventStartPosition = Vector3.Zero;
+                            EventStartTime = DateTime.MinValue;
+                        }
+
+                        // Reset Event time while we have targts
+                        if (CurrentTarget != null && Player.InActiveEvent)
+                        {
+                            EventStartTime = DateTime.UtcNow;
+                        }
+
+                        if (ObjectCache.Any(o => o.Type == GObjectType.CursedChest || o.Type == GObjectType.CursedShrine))
+                        {
+                            EventStartPosition = ObjectCache.FirstOrDefault(o => o.Type == GObjectType.CursedChest || o.Type == GObjectType.CursedShrine).Position;
+                        }
+
+                        var activeEvent = ZetaDia.ActInfo.ActiveQuests.FirstOrDefault(q => DataDictionary.EventQuests.Contains(q.QuestSNO));
+
+                        const int waitTimeoutSeconds = 90;
+                        if (DateTime.UtcNow.Subtract(EventStartTime).TotalSeconds > waitTimeoutSeconds && activeEvent != null)
+                        {
+                            CacheData.BlacklistedEvents.Add(activeEvent.QuestSNO);
+                        }
+
+                        if (CurrentTarget == null && Player.InActiveEvent && EventStartPosition != Vector3.Zero &&
+                            DateTime.UtcNow.Subtract(EventStartTime).TotalSeconds < waitTimeoutSeconds &&
+                            activeEvent != null && !CacheData.BlacklistedEvents.Contains(activeEvent.QuestSNO))
+                        {
+                            CurrentTarget = new TrinityCacheObject()
+                            {
+                                Position = EventStartPosition,
+                                Type = GObjectType.Avoidance,
+                                Weight = 20000,
+                                Distance = 2f,
+                                Radius = 2f,
+                                InternalName = "WaitForEvent"
+                            };
+                            Logger.Log("Waiting for Event {0} - Time Remaining: {1:0} seconds",
+                                ZetaDia.ActInfo.ActiveQuests.FirstOrDefault(q => DataDictionary.EventQuests.Contains(q.QuestSNO)).Quest,
+                                waitTimeoutSeconds - DateTime.UtcNow.Subtract(EventStartTime).TotalSeconds);
+                        }
                     }
 
                     // Still no target, let's see if we should backtrack or wait for wrath to come off cooldown...

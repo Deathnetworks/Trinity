@@ -19,7 +19,7 @@ namespace Trinity
         {
             get
             {
-                return new Version(1, 8, 26);
+                return new Version(1, 8, 27);
             }
         }
 
@@ -260,24 +260,17 @@ namespace Trinity
 
         private static DateTime _lastWindowTitleTick = DateTime.MinValue;
         private static Window mainWindow;
-        private static string mainWindowTitle;
         internal static void SetWindowTitle(string profileName = "")
         {
-            if (DateTime.UtcNow.Subtract(_lastWindowTitleTick).TotalMilliseconds < 5000)
+            if (DateTime.UtcNow.Subtract(_lastWindowTitleTick).TotalMilliseconds < 1000)
                 return;
 
             if (mainWindow == null)
             {
-                Application.Current.Dispatcher.Invoke(new Action(() => mainWindow = Application.Current.MainWindow));
+                Application.Current.Dispatcher.BeginInvoke(new Action(() => mainWindow = Application.Current.MainWindow));
             }
-            if (mainWindow != null)
+            if (mainWindow != null && ZetaDia.Service.IsValid && ZetaDia.Service.Platform.IsValid && ZetaDia.Service.Platform.IsConnected)
             {
-                Application.Current.Dispatcher.Invoke(new Action(() => mainWindowTitle = mainWindow.Title));
-            }
-
-            if (mainWindowTitle.Contains("Demonbuddy") && ZetaDia.Service.IsValid && ZetaDia.Service.Platform.IsValid && ZetaDia.Service.Platform.IsConnected)
-            {
-
                 string battleTagName = "";
                 if (Settings.Advanced.ShowBattleTag)
                 {
@@ -295,28 +288,31 @@ namespace Trinity
                     windowTitle += " - " + profileName;
                 }
 
-                Logger.LogDebug("Setting Window Title");
                 BeginInvoke(new Action(() =>
                 {
                     try
                     {
-                        if (mainWindow != null && windowTitle != null)
+                        if (mainWindow != null && !string.IsNullOrWhiteSpace(windowTitle))
                         {
                             mainWindow.Title = windowTitle;
-                            Logger.LogDebug("Window Title Set");
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        Logger.LogError("Unable to set MainWindow Title {0}", ex.ToString());
-                    }
+                    catch { }
                 }));
             }
         }
 
         internal static void BeginInvoke(Action action)
         {
-            Application.Current.Dispatcher.BeginInvoke(action);
+            new System.Threading.Thread(() =>
+            {
+                Application.Current.Dispatcher.BeginInvoke(action, System.Windows.Threading.DispatcherPriority.Background);
+            })
+            {
+                Name = "UIInvoke",
+                IsBackground = true,
+                Priority = System.Threading.ThreadPriority.Lowest
+            }.Start();
         }
 
     }

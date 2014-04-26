@@ -447,8 +447,6 @@ namespace Trinity.XmlTags
         /// </summary>
         private Vector3 GPUpdatePosition = Vector3.Zero;
 
-        private int startedNearMarkerHash = -1;
-
         /// <summary>
         /// Called when the profile behavior starts
         /// </summary>
@@ -492,18 +490,10 @@ namespace Trinity.XmlTags
                 ObjectDistance = 25f;
 
             var nearbyExitMarkers = (from m in ZetaDia.Minimap.Markers.CurrentWorldMarkers
-                                         where m.IsPortalExit &&
-                                         m.Position.Distance2D(myPos) <= 25f
-                                         orderby m.Position.Distance2D(myPos)
-                                         select m);
-
-            // If in Rifts, check if we started near the Portal Exit - this means we're on the last rift level
-            if (EndType == TrinityExploreEndType.RiftComplete && ZetaDia.CurrentAct == Act.OpenWorld && DataDictionary.RiftWorldIds.Contains(ZetaDia.CurrentWorldId) &&
-                ZetaDia.ActInfo.AllQuests.Any(q => q.QuestSNO == 337492 && q.QuestStep == 3) && nearbyExitMarkers.Any())
-            {
-                Logger.Log("Started near Portal Exit, ignoring marker {0}", nearbyExitMarkers.FirstOrDefault().NameHash);
-                startedNearMarkerHash = nearbyExitMarkers.FirstOrDefault().NameHash;
-            }
+                                     where m.IsPortalExit &&
+                                     m.Position.Distance2D(myPos) <= 25f
+                                     orderby m.Position.Distance2D(myPos)
+                                     select m);
 
             PrintNodeCounts("PostInit");
         }
@@ -635,7 +625,7 @@ namespace Trinity.XmlTags
                 var actor = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).FirstOrDefault(a => a.ActorSNO == ActorId);
 
                 if (actor != null && actor.IsValid && actor.Position.Distance2D(myPos) >= ObjectDistance)
-                    PlayerMover.NavigateTo(actor.Position);
+                    PlayerMover.NavigateTo(actor.Position, string.Format("InvestigateActor {0} {1} {2}", actor.ActorSNO, actor.Name, actor.ActorType));
             });
         }
 
@@ -1005,10 +995,11 @@ namespace Trinity.XmlTags
         /// </summary>
         private void MoveToPriorityScene()
         {
-            Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Moving to Priority Scene {0} - {1} Center {2} Distance {3:0}",
+            string info = string.Format("Moving to Priority Scene {0} - {1} Center {2} Distance {3:0}",
                 CurrentPriorityScene.Name, CurrentPriorityScene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
+            Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, info);
 
-            MoveResult moveResult = PlayerMover.NavigateTo(PrioritySceneTarget);
+            MoveResult moveResult = PlayerMover.NavigateTo(PrioritySceneTarget, info);
 
             if (moveResult == MoveResult.PathGenerationFailed || moveResult == MoveResult.ReachedDestination)
             {
@@ -1469,12 +1460,12 @@ namespace Trinity.XmlTags
                 return;
             }
 
-            string nodeName = String.Format("{0} Distance: {1:0} Direction: {2}",
-                NextNode.NavigableCenter, NextNode.NavigableCenter.Distance(Trinity.Player.Position), MathUtil.GetHeadingToPoint(NextNode.NavigableCenter));
+            string nodeName = String.Format("DungeonNode {0} Distance: {1:0} Direction: {2}",
+                NavHelper.PrettyPrintVector3(NextNode.NavigableCenter), NextNode.NavigableCenter.Distance(Trinity.Player.Position), MathUtil.GetHeadingToPoint(NextNode.NavigableCenter));
 
             RecordPosition();
 
-            LastMoveResult = PlayerMover.NavigateTo(CurrentNavTarget);
+            LastMoveResult = PlayerMover.NavigateTo(CurrentNavTarget, nodeName);
             //Navigator.MoveTo(CurrentNavTarget);
         }
 
@@ -1592,18 +1583,21 @@ namespace Trinity.XmlTags
                 return true;
             }
 
-            if (ZetaDia.Minimap.Markers.CurrentWorldMarkers
-                .Any(m => m.IsPortalExit && m.Position.Distance2D(Trinity.Player.Position) <= MarkerDistance && !MiniMapMarker.TownHubMarkers.Contains(m.NameHash) &&
-                m.NameHash != startedNearMarkerHash))
+            int riftWorldIndex = DataDictionary.RiftWorldIds.IndexOf(ZetaDia.CurrentWorldId);
+            if (riftWorldIndex != -1 &&
+                ZetaDia.Minimap.Markers.CurrentWorldMarkers
+                .Any(m => m.NameHash == DataDictionary.RiftPortalHashes[riftWorldIndex] &&
+                    m.Position.Distance2D(Trinity.Player.Position) <= MarkerDistance + 10f &&
+                    Math.Abs(m.Position.Z - Trinity.Player.Position.Z) <= 14f &&
+                    !MiniMapMarker.TownHubMarkers.Contains(m.NameHash)))
             {
-                Logger.Log("Rift portal exit marker within range!");
+                int marker = DataDictionary.RiftPortalHashes[riftWorldIndex];
+                Logger.Log("Rift exit marker {0} within range!", marker);
                 return true;
             }
 
             return false;
         }
-
-
 
         private DateTime _LastCheckBountyDone = DateTime.MinValue;
         public bool GetIsBountyDone()
@@ -1667,7 +1661,6 @@ namespace Trinity.XmlTags
 
             return false;
         }
-
     }
 }
 

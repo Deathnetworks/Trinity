@@ -178,6 +178,7 @@
                             <CheckBox IsChecked="{Binding Path=Misc.AllowOOCMovement}" ToolTip="leap, charge, teleport, sprint, spirit walk">Use movement spells Out of Combat</CheckBox>
                             <CheckBox IsChecked="{Binding Path=Misc.CollectHealthGlobe}">Attempt to collect health globes</CheckBox>
                             <CheckBox IsChecked="{Binding Path=Misc.UseNavMeshTargeting}" ToolTip="Recommended ON, May increase CPU/Memory usage">Use NavMesh to prevent stucks</CheckBox>
+                            <CheckBox IsChecked="{Binding Path=Misc.EnableBountyEvents}" ToolTip="Allow Bounty Events">Enable Bounty Events</CheckBox>
                         </UniformGrid>
                     </StackPanel>
                 </GroupBox>

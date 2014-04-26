@@ -8,7 +8,9 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <!-- Don't format this line otherwise Db can't open config window -->
-            <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="..\Template.xaml"/></ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="..\Template.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
 
             <ut:PercentConverter x:Key="percentConverter" />
             <ut:EnumBooleanConverter x:Key="enumBooleanConverter" />
@@ -17,100 +19,114 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <!--Emergency Health-->
-        <Grid Grid.Row="0" Margin="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="2*"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Text="Potion %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
-            <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+        <StackPanel>
+            <!--Emergency Health-->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Potion %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+                <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                     Interval="500" Maximum="99" Minimum="0" 
                     SmallChange="1" LargeChange="5"
                     TickPlacement="None" 
                     Value="{Binding Path=DH.PotionLevel, Converter={StaticResource percentConverter}}" 
                     HorizontalAlignment="Stretch" Margin="2"/>
-            <TextBlock Grid.Column="2" Text="Globe %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
-            <Slider Grid.Column="3" Template="{DynamicResource Slider}" 
+                <TextBlock Grid.Column="2" Text="Globe %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+                <Slider Grid.Column="3" Template="{DynamicResource Slider}" 
                     Interval="500" Maximum="100" Minimum="0" 
                     SmallChange="1" LargeChange="5"
                     TickPlacement="None" 
                     Value="{Binding Path=DH.HealthGlobeLevel, Converter={StaticResource percentConverter}}" 
                     HorizontalAlignment="Stretch" Margin="2"/>
-        </Grid>
-        <!--Kite-->
-        <Grid Grid.Row="1" Margin="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="3*"/>
-            </Grid.ColumnDefinitions>
+            </Grid>
+            <!--Kite-->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
 
-            <TextBlock Text="Min-Distance before Kite" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
-            <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                <TextBlock Text="Min-Distance before Kite" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+                <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                     Interval="500" Maximum="40" Minimum="0" 
                     SmallChange="1" LargeChange="5" 
                     TickPlacement="BottomRight" TickFrequency="1"
                     Value="{Binding Path=DH.KiteLimit}" 
                     HorizontalAlignment="Stretch" Margin="2"/>
-        </Grid>
-        <!--Strafe-->
-        <Grid Grid.Row="2" Margin="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="3*"/>
-            </Grid.ColumnDefinitions>
+            </Grid>
+            <!--Strafe-->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
 
-            <TextBlock Text="Minimum Strafe Hatred" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
-            <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                <TextBlock Text="Minimum Strafe Hatred" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+                <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                     Interval="500" Maximum="150" Minimum="12" 
                     SmallChange="1" LargeChange="5" IsSnapToTickEnabled="True"
                     TickPlacement="BottomRight" TickFrequency="12"
                     Value="{Binding Path=DH.StrafeMinHatred}" 
                     HorizontalAlignment="Stretch" Margin="2"/>
-        </Grid>
-        <!--Vault-->
-        <Grid Grid.Row="3" Margin="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="3*"/>
-            </Grid.ColumnDefinitions>
+            </Grid>
+            <!--RapidFire-->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
 
-            <TextBlock Text="Vault movement delay" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
-            <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                <TextBlock Text="Minimum RapidFire Hatred" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+                <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                    Interval="500" Maximum="150" Minimum="12" 
+                    SmallChange="1" LargeChange="5" IsSnapToTickEnabled="True"
+                    TickPlacement="BottomRight" TickFrequency="12"
+                    Value="{Binding Path=DH.RapidFireMinHatred}" 
+                    HorizontalAlignment="Stretch" Margin="2"/>
+            </Grid>
+            <!--Vault-->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Vault movement delay" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+                <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                     Interval="500" Maximum="4000" Minimum="400" 
                     SmallChange="10" LargeChange="5" 
                     TickPlacement="BottomRight" TickFrequency="1"
                     Value="{Binding Path=DH.VaultMovementDelay}" 
                     HorizontalAlignment="Stretch" Margin="2"
                     ToolTip="Vault for movement re-use delay"/>
-        </Grid>
-        <Grid Grid.Row="4" Margin="2">
-            <StackPanel>
-                <UniformGrid Columns="2">
-                    <CheckBox Margin="2" IsChecked="{Binding Path=DH.SpamSmokeScreen}" ToolTip="For use with Displacement rune">Spam Smoke Screen</CheckBox>
-                    <CheckBox Margin="2" IsChecked="{Binding Path=DH.SpamPreparation}">Preparation Out of Combat</CheckBox>
-                </UniformGrid>
-                <GroupBox>
-                    <GroupBox.Header>Vault</GroupBox.Header>
+            </Grid>
+            <Grid>
+                <StackPanel>
                     <UniformGrid Columns="2">
-                        <TextBlock Text="When to use Vault" />
-                        <RadioButton GroupName="VaultMode" Content="Anytime" IsChecked="{Binding Path=DH.VaultMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Always}"  />
-                        <RadioButton GroupName="VaultMode" Content="In Combat only" IsChecked="{Binding Path=DH.VaultMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=CombatOnly}" />
-                        <RadioButton GroupName="VaultMode" Content="Out of Combat Only" IsChecked="{Binding Path=DH.VaultMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=MovementOnly}" />
+                        <CheckBox Margin="2" IsChecked="{Binding Path=DH.SpamSmokeScreen}" ToolTip="For use with Displacement rune">Spam Smoke Screen</CheckBox>
+                        <CheckBox Margin="2" IsChecked="{Binding Path=DH.SpamPreparation}">Preparation Out of Combat</CheckBox>
+                        <CheckBox Margin="2" IsChecked="{Binding Path=DH.VengeanceElitesOnly}">Vengeance Elites Only</CheckBox>
                     </UniformGrid>
-                </GroupBox>
-            </StackPanel>
-        </Grid>
-        <Grid Grid.Row="5" Margin="2">
+                    <GroupBox>
+                        <GroupBox.Header>Vault</GroupBox.Header>
+                        <UniformGrid Columns="2">
+                            <TextBlock Text="When to use Vault" />
+                            <RadioButton GroupName="VaultMode" Content="Anytime" IsChecked="{Binding Path=DH.VaultMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Always}"  />
+                            <RadioButton GroupName="VaultMode" Content="In Combat only" IsChecked="{Binding Path=DH.VaultMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=CombatOnly}" />
+                            <RadioButton GroupName="VaultMode" Content="Out of Combat Only" IsChecked="{Binding Path=DH.VaultMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=MovementOnly}" />
+                        </UniformGrid>
+                    </GroupBox>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+        <Grid Grid.Row="1" Margin="2">
             <ScrollViewer Tag="Combat\Avoidance.xaml" DataContext="{Binding Path=DH}"/>
         </Grid>
         <!--Reset Button-->

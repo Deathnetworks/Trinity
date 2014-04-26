@@ -14,7 +14,11 @@ namespace Trinity.Config.Combat
         private bool _SpamSmokeScreen;
         private bool _SpamPreparation;
         private int _StrafeMinHatred;
+        private int _RapidFireMinHatred;
+        private bool _VengeanceElitesOnly;
         private DemonHunterVaultMode _VaultMode;
+
+
         private float _AvoidArcaneHealth;
         private float _AvoidAzmoBodiesHealth;
         private float _AvoidAzmoFireBallHealth;
@@ -172,6 +176,41 @@ namespace Trinity.Config.Combat
                 {
                     _StrafeMinHatred = value;
                     OnPropertyChanged("StrafeMinHatred");
+                }
+            }
+        }
+        
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool VengeanceElitesOnly
+        {
+            get
+            {
+                return _VengeanceElitesOnly;
+            }
+            set
+            {
+                if (_VengeanceElitesOnly != value)
+                {
+                    _VengeanceElitesOnly = value;
+                    OnPropertyChanged("VenganceElitesOnly");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(60)]
+        public int RapidFireMinHatred
+        {
+            get
+            {
+                return _RapidFireMinHatred;
+            }
+            set
+            {
+                if (_RapidFireMinHatred != value)
+                {
+                    _RapidFireMinHatred = value;
+                    OnPropertyChanged("RapidFireMinHatred");
                 }
             }
         }

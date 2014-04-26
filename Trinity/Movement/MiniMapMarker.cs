@@ -22,8 +22,9 @@ namespace Trinity
 
         internal static HashSet<int> TownHubMarkers = new HashSet<int>()
         {
-            1877684886 // A5 Hub
-        };
+            1877684886, // A5 Hub
+            1683860485, // A5 Hub
+       };
 
         public int MarkerNameHash { get; set; }
         public Vector3 Position { get; set; }

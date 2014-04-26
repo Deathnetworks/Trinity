@@ -170,7 +170,7 @@ namespace Trinity
 
         public static void Shutdown()
         {
-            if (Manager != null)
+            if (Manager != null && Manager.IsAlive)
             {
                 Manager.Abort();
             }

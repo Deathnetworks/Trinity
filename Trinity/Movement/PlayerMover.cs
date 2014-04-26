@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -772,27 +773,51 @@ namespace Trinity.DbProvider
 
         private static TrinityCacheObject CurrentTarget { get { return Trinity.CurrentTarget; } }
 
-        internal static MoveResult NavigateTo(Vector3 moveTarget, string destinationName = "")
+        internal static MoveResult NavigateTo(Vector3 destination, string destinationName = "")
         {
-            using (new PerformanceLogger("NavigateTo"))
+            Vector3 MyPos = Trinity.Player.Position;
+
+            PositionCache.AddPosition();
+            MoveResult result;
+
+            try
             {
-                Vector3 MyPos = Trinity.Player.Position;
+                Stopwatch t1 = new Stopwatch();
+                t1.Start();
 
-                PositionCache.AddPosition();
-                MoveResult result;
+                using (new PerformanceLogger("Navigator.MoveTo"))
+                {
+                    result = Navigator.MoveTo(destination, destinationName, false);
+                }
+                t1.Stop();
 
-                try
+                const float maxTime = 750;
+
+                // Shit was slow, make it slower but tell us why :)
+                string pathCheck = "";
+                if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Navigator) && t1.ElapsedMilliseconds > maxTime)
                 {
-                    result = Navigator.MoveTo(moveTarget, destinationName, false);
-                    Logger.Log(LogCategory.Movement, "Navigator {0} dest={1} ({2})", result, NavHelper.PrettyPrintVector3(moveTarget), destinationName);
+                    if (Navigator.GetNavigationProviderAs<DefaultNavigationProvider>().CanFullyClientPathTo(destination))
+                        pathCheck = "CanFullyPath";
+                    else
+                        pathCheck = "CannotFullyPath";
                 }
-                catch (Exception ex)
-                {
-                    Logger.Log("{0}", ex);
-                    return MoveResult.Failed;
-                }
-                return result;
+
+                LogCategory lc;
+                if (t1.ElapsedMilliseconds > maxTime)
+                    lc = LogCategory.UserInformation;
+                else
+                    lc = LogCategory.Navigator;
+
+                Logger.Log(lc, "Navigator {0} dest={1} ({2}) duration={3:0} distance={4:0} {5}",
+                    result, NavHelper.PrettyPrintVector3(destination), destinationName, t1.ElapsedMilliseconds, destination.Distance2D(Trinity.Player.Position), pathCheck);
             }
+            catch (Exception ex)
+            {
+                Logger.Log("{0}", ex);
+                return MoveResult.Failed;
+            }
+            return result;
         }
 
         private static DateTime lastRecordedSkipAheadCache = DateTime.MinValue;

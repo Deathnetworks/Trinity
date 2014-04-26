@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using Trinity.Combat.Abilities;
@@ -73,7 +74,7 @@ namespace Trinity
 
         internal static string PrettyPrintVector3(Vector3 pos)
         {
-            return string.Format("x=\"{0:0}\" y=\"{0:1}\" z=\"{0:2}\"", pos.X, pos.Y, pos.Z);
+            return string.Format("x=\"{0:0}\" y=\"{1:0}\" z=\"{2:0}\"", pos.X, pos.Y, pos.Z);
         }
 
         internal static bool CanRayCast(Vector3 destination)
@@ -96,23 +97,26 @@ namespace Trinity
             // So ZetaDia.Physics.Raycast() == !Navigator.Raycast()
             // We're using Navigator.Raycast now because it's "faster" (per Nesox)
 
-            bool rayCastHit = Navigator.Raycast(vStartLocation, vDestination);
-            bool rayPointHit = false;
-            float distance = vStartLocation.Distance2D(vDestination);
-            for (float i = 1f; i < distance; i += 1f)
+            using (new PerformanceLogger("CanRayCast"))
             {
-                var testPoint = MathEx.CalculatePointFrom(vDestination, vStartLocation, i);
-                if (!MainGridProvider.CanStandAt(testPoint))
-                {
-                    rayPointHit = true;
-                    break;
-                }
+                bool rayCastHit = Navigator.Raycast(vStartLocation, vDestination);
+                bool rayPointHit = false;
+                //float distance = vStartLocation.Distance2D(vDestination);
+                //for (float i = 1f; i < distance; i += 1f)
+                //{
+                //    var testPoint = MathEx.CalculatePointFrom(vDestination, vStartLocation, i);
+                //    if (!MainGridProvider.CanStandAt(testPoint))
+                //    {
+                //        rayPointHit = true;
+                //        break;
+                //    }
+                //}
+
+                if (rayCastHit || rayPointHit)
+                    return false;
+
+                return !CacheData.NavigationObstacles.Any(o => MathEx.IntersectsPath(o.Position, o.Radius, vStartLocation, vDestination));
             }
-
-            if (rayCastHit || rayPointHit)
-                return false;
-
-            return !CacheData.NavigationObstacles.Any(o => MathEx.IntersectsPath(o.Position, o.Radius, vStartLocation, vDestination));
         }
 
         /// <summary>
@@ -167,7 +171,8 @@ namespace Trinity
             if (monsterList == null)
                 monsterList = new List<TrinityCacheObject>();
 
-            Vector3 vBestLocation = FindSafeZone(dangerPoint, shouldKite, isStuck, monsterList, avoidDeath);
+            //Vector3 vBestLocation = FindSafeZone(dangerPoint, shouldKite, isStuck, monsterList, avoidDeath);            
+            Vector3 vBestLocation = MainFindSafeZone(dangerPoint, shouldKite, isStuck, monsterList, avoidDeath);
             highestWeight = 1;
 
             // Loop through distance-range steps
@@ -177,6 +182,309 @@ namespace Trinity
             lastFoundSafeSpot = DateTime.UtcNow;
             lastSafeZonePosition = vBestLocation;
             return vBestLocation;
+        }
+
+        // thanks to Main for the super fast can-stand-at code
+        internal static Vector3 MainFindSafeZone(Vector3 origin, bool shouldKite = false, bool isStuck = false, IEnumerable<TrinityCacheObject> monsterList = null, bool avoidDeath = false)
+        {
+            MainGridProvider.Update();
+            Navigator.Clear();
+
+            const float gridSquareSize = 10f;
+            const float maxDistance = 55;
+            const int maxWeight = 100;
+            const int maxZDiff = 14;
+
+            double gridSquareRadius = Math.Sqrt((Math.Pow(gridSquareSize / 2, 2) + Math.Pow(gridSquareSize / 2, 2)));
+
+            GridPoint bestPoint = new GridPoint(Vector3.Zero, 0, 0);
+
+            int nodesCantStand = 0;
+            int nodesZDiff = 0;
+            int nodesGT45Raycast = 0;
+            int nodesAvoidance = 0;
+            int nodesMonsters = 0;
+            int pathFailures = 0;
+            int navRaycast = 0;
+            int pointsFound = 0;
+
+            int worldId = Trinity.Player.WorldID;
+            Stopwatch[] timers = Enumerable.Range(0, 12).Select(i => new Stopwatch()).ToArray();
+
+            Vector2 minWorld;
+            minWorld.X = origin.X - maxDistance;
+            minWorld.Y = origin.Y - maxDistance;
+
+            Point minPoint = MainGridProvider.WorldToGrid(minWorld);
+            minPoint.X = Math.Max(minPoint.X, 0);
+            minPoint.Y = Math.Max(minPoint.Y, 0);
+
+            Vector2 maxWorld;
+            maxWorld.X = origin.X + maxDistance;
+            maxWorld.Y = origin.Y + maxDistance;
+
+            Point maxPoint = MainGridProvider.WorldToGrid(maxWorld);
+            maxPoint.X = Math.Min(maxPoint.X, MainGridProvider.Width - 1);
+            maxPoint.Y = Math.Min(maxPoint.Y, MainGridProvider.Height - 1);
+
+            Point originPos = MainGridProvider.WorldToGrid(origin.ToVector2());
+
+            using (new PerformanceLogger("MainFindSafeZoneLoop"))
+            {
+                for (int y = minPoint.Y; y <= maxPoint.Y; y++)
+                {
+                    int searchAreaBasis = y * MainGridProvider.Width;
+                    for (int x = minPoint.X; x <= maxPoint.X; x++)
+                    {
+                        timers[0].Start();
+
+                        int dx = originPos.X - x;
+                        int dy = originPos.Y - y;
+                        //if (dx * dx + dy * dy > radius * 2.5 * radius * 2.5)
+                        //    continue;
+
+                        // Ignore out of range
+                        if (dx * dx + dy * dy > (maxDistance / 2.5f) * (maxDistance / 2.5f))
+                            continue;
+
+                        // extremely efficient CanStandAt
+                        if (!MainGridProvider.SearchArea[searchAreaBasis + x])
+                            continue;
+
+
+                        Vector2 xy = MainGridProvider.GridToWorld(new Point(x, y));
+                        Vector3 xyz = Vector3.Zero;
+
+                        if (Trinity.Settings.Combat.Misc.UseNavMeshTargeting)
+                        {
+                            xyz = new Vector3(xy.X, xy.Y, MainGridProvider.GetHeight(xy));
+                        }
+                        else
+                        {
+                            xyz = new Vector3(xy.X, xy.Y, origin.Z + 4);
+                        }
+
+                        GridPoint gridPoint = new GridPoint(xyz, 0, origin.Distance(xyz));
+
+                        timers[0].Stop();
+
+
+                        if (isStuck && gridPoint.Distance > (PlayerMover.TotalAntiStuckAttempts + 2) * 5)
+                        {
+                            continue;
+                        }
+
+                        /*
+                         * Check if a square is occupied already
+                         */
+                        // Avoidance
+                        timers[2].Start();
+                        if (CacheData.TimeBoundAvoidance.Any(a => Vector3.Distance(xyz, a.Position) - a.Radius <= gridSquareRadius))
+                        {
+                            nodesAvoidance++;
+                            continue;
+                        }
+
+                        // Obstacles
+                        if (CacheData.NavigationObstacles.Any(a => Vector3.Distance(xyz, a.Position) - a.Radius <= gridSquareRadius))
+                        {
+                            nodesMonsters++;
+                            continue;
+                        }
+                        if (CacheData.NavigationObstacles.Any(a => MathUtil.IntersectsPath(a.Position, a.Radius, Trinity.Player.Position, gridPoint.Position)))
+                        {
+                            pathFailures++;
+                        }
+                        timers[2].Stop();
+
+                        // Monsters
+                        if (shouldKite)
+                        {
+                            timers[3].Start();
+                            double checkRadius = gridSquareRadius;
+
+                            if (Trinity.PlayerKiteDistance > 0)
+                            {
+                                checkRadius = gridSquareSize + Trinity.PlayerKiteDistance;
+                            }
+
+                            // Any monster standing in this GridPoint
+                            if (CacheData.MonsterObstacles.Any(a => Vector3.Distance(xyz, a.Position) + a.Radius <= checkRadius))
+                            {
+                                nodesMonsters++;
+                                continue;
+                            }
+
+                            if (!hasEmergencyTeleportUp)
+                            {
+                                // Any monsters blocking in a straight line between origin and this GridPoint
+                                foreach (CacheObstacleObject monster in CacheData.MonsterObstacles.Where(m =>
+                                    MathEx.IntersectsPath(new Vector3(m.Position.X, m.Position.Y, 0), m.Radius, new Vector3(origin.X, origin.Y, 0), new Vector3(gridPoint.Position.X, gridPoint.Position.Y, 0))
+                                    ))
+                                {
+
+                                    nodesMonsters++;
+                                    continue;
+                                }
+                            }
+                            timers[3].Stop();
+
+                        }
+
+                        timers[4].Start();
+                        if (isStuck && UsedStuckSpots.Any(p => Vector3.Distance(p.Position, gridPoint.Position) <= gridSquareRadius))
+                        {
+                            continue;
+                        }
+                        timers[4].Stop();
+
+                        // set base weight
+                        if (!isStuck && !avoidDeath)
+                        {
+                            // e.g. ((100 - 15) / 100) * 100) = 85
+                            // e.g. ((100 - 35) / 100) * 100) = 65
+                            // e.g. ((100 - 75) / 100) * 100) = 25
+                            gridPoint.Weight = ((maxDistance - gridPoint.Distance) / maxDistance) * maxWeight;
+
+                            // Low weight for close range grid points
+                            if (shouldKite && gridPoint.Distance < Trinity.PlayerKiteDistance)
+                            {
+                                gridPoint.Weight = (int)gridPoint.Distance;
+                            }
+
+                        }
+                        else
+                        {
+                            gridPoint.Weight = gridPoint.Distance;
+                        }
+
+                        // Boss Areas
+                        timers[5].Start();
+                        if (UnSafeZone.UnsafeKiteAreas.Any(a => a.WorldId == ZetaDia.CurrentWorldId && Vector3.Distance(a.Position, gridPoint.Position) <= a.Radius))
+                        {
+                            continue;
+                        }
+                        timers[5].Stop();
+
+                        if (shouldKite)
+                        {
+                            // make sure we can raycast to our target
+                            //if (!DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) &&
+                            //    !NavHelper.CanRayCast(gridPoint.Position, Trinity.LastPrimaryTargetPosition))
+                            //{
+                            //    navRaycast++;
+                            //    continue;
+                            //}
+
+                            /*
+                            * We want to down-weight any grid points where monsters are closer to it than we are
+                            */
+                            timers[7].Start();
+                            foreach (CacheObstacleObject monster in CacheData.MonsterObstacles)
+                            {
+                                float distFromMonster = gridPoint.Position.Distance2D(monster.Position);
+                                float distFromOrigin = gridPoint.Position.Distance2D(origin);
+                                float distFromOriginToAvoidance = origin.Distance2D(monster.Position);
+                                if (distFromOriginToAvoidance < distFromOrigin)
+                                    continue;
+
+                                if (distFromMonster < distFromOrigin)
+                                {
+                                    gridPoint.Weight -= distFromOrigin;
+                                }
+                                else if (distFromMonster > distFromOrigin)
+                                {
+                                    gridPoint.Weight += distFromMonster;
+                                }
+                            }
+                            timers[7].Stop();
+
+                            timers[8].Start();
+                            foreach (CacheObstacleObject avoidance in CacheData.TimeBoundAvoidance)
+                            {
+                                float distFromAvoidance = gridPoint.Position.Distance2D(avoidance.Position);
+                                float distFromOrigin = gridPoint.Position.Distance2D(origin);
+                                float distFromOriginToAvoidance = origin.Distance2D(avoidance.Position);
+
+                                float health = AvoidanceManager.GetAvoidanceHealthBySNO(avoidance.ActorSNO, 1f);
+                                float radius = AvoidanceManager.GetAvoidanceRadiusBySNO(avoidance.ActorSNO, 1f);
+
+                                // position is inside avoidance
+                                if (PlayerStatus.CurrentHealthPct < health && distFromAvoidance < radius)
+                                    continue;
+
+                                // closer to avoidance than it is to player
+                                if (distFromOriginToAvoidance < distFromOrigin)
+                                    continue;
+
+                                if (distFromAvoidance < distFromOrigin)
+                                {
+                                    gridPoint.Weight -= distFromOrigin;
+                                }
+                                else if (distFromAvoidance > distFromOrigin)
+                                {
+                                    gridPoint.Weight += distFromAvoidance;
+                                }
+                            }
+                            timers[8].Stop();
+                        }
+                        else if (isStuck)
+                        {
+                            // give weight to points nearer to our destination
+                            gridPoint.Weight *= (maxDistance - PlayerMover.LastMoveToTarget.Distance2D(gridPoint.Position)) / maxDistance * maxWeight;
+                        }
+                        else if (!shouldKite && !isStuck && !avoidDeath) // melee avoidance use only
+                        {
+                            timers[9].Start();
+                            var monsterCount = Trinity.ObjectCache.Count(u => u.IsUnit && u.Position.Distance2D(gridPoint.Position) <= 2.5f);
+                            if (monsterCount > 0)
+                                gridPoint.Weight *= monsterCount;
+                            timers[9].Stop();
+                        }
+
+                        pointsFound++;
+
+                        if (gridPoint.Weight > bestPoint.Weight && gridPoint.Distance > 1)
+                        {
+                            bestPoint = gridPoint;
+                        }
+
+
+                    }
+                }
+            }
+
+
+            if (isStuck)
+            {
+                UsedStuckSpots.Add(bestPoint);
+            }
+
+            string times = "";
+            for (int t = 0; t < timers.Length; t++)
+            {
+                if (timers[t].IsRunning) timers[t].Stop();
+                times += string.Format("{0}/{1:0.0} ", t, timers[t].ElapsedMilliseconds);
+            }
+
+            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Kiting grid found {0}, distance: {1:0}, weight: {2:0}", bestPoint.Position, bestPoint.Distance, bestPoint.Weight);
+            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Kiting grid stats CantStand {0} ZDiff {1} GT45Raycast {2} Avoidance {3} Monsters {4} pathFailures {5} navRaycast {6} "
+            + "pointsFound {7} shouldKite={8} isStuck={9} avoidDeath={10} monsters={11} timers={12}",
+                nodesCantStand,
+                nodesZDiff,
+                nodesGT45Raycast,
+                nodesAvoidance,
+                nodesMonsters,
+                pathFailures,
+                navRaycast,
+                pointsFound,
+                shouldKite,
+                isStuck,
+                avoidDeath,
+                monsterList == null ? 0 : monsterList.Count(),
+                times
+                );
+            return bestPoint.Position;
         }
 
         internal static Vector3 FindSafeZone(Vector3 origin, bool shouldKite = false, bool isStuck = false, IEnumerable<TrinityCacheObject> monsterList = null, bool avoidDeath = false)
@@ -199,8 +507,8 @@ namespace Trinity
             end result should be that only navigable squares where no avoidance, monsters, or obstacles are present
             */
 
-            const float gridSquareSize = 2.5f;
-            const int maxDistance = 65;
+            const float gridSquareSize = 10f;
+            const int maxDistance = 55;
             const int maxWeight = 100;
             const int maxZDiff = 14;
 
@@ -226,227 +534,248 @@ namespace Trinity
             int navRaycast = 0;
             int pointsFound = 0;
 
-            // Not sure if I need this...
-            MainGridProvider.Update();
-
             int worldId = Trinity.Player.WorldID;
 
-            for (int x = 0; x < gridTotalSize; x++)
+            Stopwatch[] timers = Enumerable.Range(0, 12).Select(i => new Stopwatch()).ToArray();
+
+            using (new PerformanceLogger("AvoidanceCheckLoop"))
             {
-                for (int y = 0; y < gridTotalSize; y++)
+                for (int x = 0; x < gridTotalSize; x++)
                 {
-                    Vector2 xy = new Vector2(topleft.X + (x * gridSquareSize), topleft.Y + (y * gridSquareSize));
-                    Vector3 xyz = Vector3.Zero;
-                    Point p_xy = Point.Empty;
-
-                    if (Trinity.Settings.Combat.Misc.UseNavMeshTargeting)
+                    for (int y = 0; y < gridTotalSize; y++)
                     {
-                        xyz = new Vector3(xy.X, xy.Y, MainGridProvider.GetHeight(xy));
-                    }
-                    else
-                    {
-                        xyz = new Vector3(xy.X, xy.Y, origin.Z + 4);
-                    }
+                        foreach (var timer in timers)
+                            timer.Stop();
 
-                    GridPoint gridPoint = new GridPoint(xyz, 0, origin.Distance(xyz));
 
-                    if (Trinity.Settings.Combat.Misc.UseNavMeshTargeting)
-                    {
-                        bool canStand = false;
+                        timers[0].Start();
+                        Vector2 xy = new Vector2(topleft.X + (x * gridSquareSize), topleft.Y + (y * gridSquareSize));
+                        Vector3 xyz = Vector3.Zero;
+                        Point p_xy = Point.Empty;
 
-                        p_xy = MainGridProvider.WorldToGrid(xy);
-                        canStand = MainGridProvider.CanStandAt(p_xy);
-
-                        if (!canStand)
+                        if (Trinity.Settings.Combat.Misc.UseNavMeshTargeting)
                         {
-                            nodesCantStand++;
+                            xyz = new Vector3(xy.X, xy.Y, MainGridProvider.GetHeight(xy));
+                        }
+                        else
+                        {
+                            xyz = new Vector3(xy.X, xy.Y, origin.Z + 4);
+                        }
+
+                        GridPoint gridPoint = new GridPoint(xyz, 0, origin.Distance(xyz));
+
+                        if (Trinity.Settings.Combat.Misc.UseNavMeshTargeting)
+                        {
+                            bool canStand = false;
+
+                            canStand = MainGridProvider.CanStandAt(xyz);
+
+                            if (!canStand)
+                            {
+                                nodesCantStand++;
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            // If ZDiff is way too different (up a cliff or wall)
+                            if (Math.Abs(gridPoint.Position.Z - origin.Z) > maxZDiff)
+                            {
+                                nodesZDiff++;
+                                continue;
+                            }
+                        }
+                        timers[0].Stop();
+
+                        //timers[1].Start();
+                        //if (!DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) &&
+                        //    !CanRayCast(origin, xyz))
+                        //{
+                        //    nodesGT45Raycast++;
+                        //    continue;
+                        //}
+                        //timers[1].Stop();
+
+                        if (isStuck && gridPoint.Distance > (PlayerMover.TotalAntiStuckAttempts + 2) * 5)
+                        {
                             continue;
                         }
-                    }
-                    else
-                    {
-                        // If ZDiff is way too different (up a cliff or wall)
-                        if (Math.Abs(gridPoint.Position.Z - origin.Z) > maxZDiff)
+
+                        /*
+                         * Check if a square is occupied already
+                         */
+                        // Avoidance
+                        timers[2].Start();
+                        if (CacheData.TimeBoundAvoidance.Any(a => Vector3.Distance(xyz, a.Position) - a.Radius <= gridSquareRadius))
                         {
-                            nodesZDiff++;
+                            nodesAvoidance++;
                             continue;
                         }
-                    }
 
-                    //if (!DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) &&
-                    //    !CanRayCast(origin, xyz))
-                    //{
-                    //    nodesGT45Raycast++;
-                    //    continue;
-                    //}
-
-                    if (isStuck && gridPoint.Distance > (PlayerMover.TotalAntiStuckAttempts + 2) * 5)
-                    {
-                        continue;
-                    }
-
-                    /*
-                     * Check if a square is occupied already
-                     */
-                    // Avoidance
-                    if (CacheData.TimeBoundAvoidance.Any(a => Vector3.Distance(xyz, a.Position) - a.Radius <= gridSquareRadius))
-                    {
-                        nodesAvoidance++;
-                        continue;
-                    }
-
-                    // Obstacles
-                    if (CacheData.NavigationObstacles.Any(a => Vector3.Distance(xyz, a.Position) - a.Radius <= gridSquareRadius))
-                    {
-                        nodesMonsters++;
-                        continue;
-                    }
-                    if (CacheData.NavigationObstacles.Any(a => MathUtil.IntersectsPath(a.Position, a.Radius, Trinity.Player.Position, gridPoint.Position)))
-                    {
-                        pathFailures++;
-                    }
-
-                    // Monsters
-                    if (shouldKite)
-                    {
-                        double checkRadius = gridSquareRadius;
-
-                        if (Trinity.PlayerKiteDistance > 0)
-                        {
-                            checkRadius = gridSquareSize + Trinity.PlayerKiteDistance;
-                        }
-
-                        // Any monster standing in this GridPoint
-                        if (CacheData.MonsterObstacles.Any(a => Vector3.Distance(xyz, a.Position) + a.Radius <= checkRadius))
+                        // Obstacles
+                        if (CacheData.NavigationObstacles.Any(a => Vector3.Distance(xyz, a.Position) - a.Radius <= gridSquareRadius))
                         {
                             nodesMonsters++;
                             continue;
                         }
-
-                        if (!hasEmergencyTeleportUp)
+                        if (CacheData.NavigationObstacles.Any(a => MathUtil.IntersectsPath(a.Position, a.Radius, Trinity.Player.Position, gridPoint.Position)))
                         {
-                            // Any monsters blocking in a straight line between origin and this GridPoint
-                            foreach (CacheObstacleObject monster in CacheData.MonsterObstacles.Where(m =>
-                                MathEx.IntersectsPath(new Vector3(m.Position.X, m.Position.Y, 0), m.Radius, new Vector3(origin.X, origin.Y, 0), new Vector3(gridPoint.Position.X, gridPoint.Position.Y, 0))
-                                ))
-                            {
+                            pathFailures++;
+                        }
+                        timers[2].Stop();
 
+                        // Monsters
+                        if (shouldKite)
+                        {
+                            timers[3].Start();
+                            double checkRadius = gridSquareRadius;
+
+                            if (Trinity.PlayerKiteDistance > 0)
+                            {
+                                checkRadius = gridSquareSize + Trinity.PlayerKiteDistance;
+                            }
+
+                            // Any monster standing in this GridPoint
+                            if (CacheData.MonsterObstacles.Any(a => Vector3.Distance(xyz, a.Position) + a.Radius <= checkRadius))
+                            {
                                 nodesMonsters++;
                                 continue;
                             }
+
+                            if (!hasEmergencyTeleportUp)
+                            {
+                                // Any monsters blocking in a straight line between origin and this GridPoint
+                                foreach (CacheObstacleObject monster in CacheData.MonsterObstacles.Where(m =>
+                                    MathEx.IntersectsPath(new Vector3(m.Position.X, m.Position.Y, 0), m.Radius, new Vector3(origin.X, origin.Y, 0), new Vector3(gridPoint.Position.X, gridPoint.Position.Y, 0))
+                                    ))
+                                {
+
+                                    nodesMonsters++;
+                                    continue;
+                                }
+                            }
+                            timers[3].Stop();
+
                         }
 
-                    }
-
-                    if (isStuck && UsedStuckSpots.Any(p => Vector3.Distance(p.Position, gridPoint.Position) <= gridSquareRadius))
-                    {
-                        continue;
-                    }
-
-                    // set base weight
-                    if (!isStuck && !avoidDeath)
-                    {
-                        // e.g. ((100 - 15) / 100) * 100) = 85
-                        // e.g. ((100 - 35) / 100) * 100) = 65
-                        // e.g. ((100 - 75) / 100) * 100) = 25
-                        gridPoint.Weight = ((maxDistance - gridPoint.Distance) / maxDistance) * maxWeight;
-
-                        // Low weight for close range grid points
-                        if (shouldKite && gridPoint.Distance < Trinity.PlayerKiteDistance)
+                        timers[4].Start();
+                        if (isStuck && UsedStuckSpots.Any(p => Vector3.Distance(p.Position, gridPoint.Position) <= gridSquareRadius))
                         {
-                            gridPoint.Weight = (int)gridPoint.Distance;
+                            continue;
                         }
+                        timers[4].Stop();
 
-                    }
-                    else
-                    {
-                        gridPoint.Weight = gridPoint.Distance;
-                    }
-
-                    // Boss Areas
-                    if (UnSafeZone.UnsafeKiteAreas.Any(a => a.WorldId == ZetaDia.CurrentWorldId && Vector3.Distance(a.Position, gridPoint.Position) <= a.Radius))
-                    {
-                        continue;
-                    }
-
-                    if (shouldKite)
-                    {
-                        // make sure we can raycast to our target
-                        //if (!DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) &&
-                        //    !NavHelper.CanRayCast(gridPoint.Position, Trinity.LastPrimaryTargetPosition))
-                        //{
-                        //    navRaycast++;
-                        //    continue;
-                        //}
-
-                        /*
-                        * We want to down-weight any grid points where monsters are closer to it than we are
-                        */
-                        foreach (CacheObstacleObject monster in CacheData.MonsterObstacles)
+                        // set base weight
+                        if (!isStuck && !avoidDeath)
                         {
-                            float distFromMonster = gridPoint.Position.Distance2D(monster.Position);
-                            float distFromOrigin = gridPoint.Position.Distance2D(origin);
-                            float distFromOriginToAvoidance = origin.Distance2D(monster.Position);
-                            if (distFromOriginToAvoidance < distFromOrigin)
-                                continue;
+                            // e.g. ((100 - 15) / 100) * 100) = 85
+                            // e.g. ((100 - 35) / 100) * 100) = 65
+                            // e.g. ((100 - 75) / 100) * 100) = 25
+                            gridPoint.Weight = ((maxDistance - gridPoint.Distance) / maxDistance) * maxWeight;
 
-                            if (distFromMonster < distFromOrigin)
+                            // Low weight for close range grid points
+                            if (shouldKite && gridPoint.Distance < Trinity.PlayerKiteDistance)
                             {
-                                gridPoint.Weight -= distFromOrigin;
+                                gridPoint.Weight = (int)gridPoint.Distance;
                             }
-                            else if (distFromMonster > distFromOrigin)
-                            {
-                                gridPoint.Weight += distFromMonster;
-                            }
+
                         }
-                        foreach (CacheObstacleObject avoidance in CacheData.TimeBoundAvoidance)
+                        else
                         {
-                            float distFromAvoidance = gridPoint.Position.Distance2D(avoidance.Position);
-                            float distFromOrigin = gridPoint.Position.Distance2D(origin);
-                            float distFromOriginToAvoidance = origin.Distance2D(avoidance.Position);
+                            gridPoint.Weight = gridPoint.Distance;
+                        }
 
-                            float health = AvoidanceManager.GetAvoidanceHealthBySNO(avoidance.ActorSNO, 1f);
-                            float radius = AvoidanceManager.GetAvoidanceRadiusBySNO(avoidance.ActorSNO, 1f);
+                        // Boss Areas
+                        timers[5].Start();
+                        if (UnSafeZone.UnsafeKiteAreas.Any(a => a.WorldId == ZetaDia.CurrentWorldId && Vector3.Distance(a.Position, gridPoint.Position) <= a.Radius))
+                        {
+                            continue;
+                        }
+                        timers[5].Stop();
 
-                            // position is inside avoidance
-                            if (PlayerStatus.CurrentHealthPct < health && distFromAvoidance < radius)
-                                continue;
+                        if (shouldKite)
+                        {
+                            // make sure we can raycast to our target
+                            //if (!DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) &&
+                            //    !NavHelper.CanRayCast(gridPoint.Position, Trinity.LastPrimaryTargetPosition))
+                            //{
+                            //    navRaycast++;
+                            //    continue;
+                            //}
 
-                            // closer to avoidance than it is to player
-                            if (distFromOriginToAvoidance < distFromOrigin)
-                                continue;
-
-                            if (distFromAvoidance < distFromOrigin)
+                            /*
+                            * We want to down-weight any grid points where monsters are closer to it than we are
+                            */
+                            timers[7].Start();
+                            foreach (CacheObstacleObject monster in CacheData.MonsterObstacles)
                             {
-                                gridPoint.Weight -= distFromOrigin;
+                                float distFromMonster = gridPoint.Position.Distance2D(monster.Position);
+                                float distFromOrigin = gridPoint.Position.Distance2D(origin);
+                                float distFromOriginToAvoidance = origin.Distance2D(monster.Position);
+                                if (distFromOriginToAvoidance < distFromOrigin)
+                                    continue;
+
+                                if (distFromMonster < distFromOrigin)
+                                {
+                                    gridPoint.Weight -= distFromOrigin;
+                                }
+                                else if (distFromMonster > distFromOrigin)
+                                {
+                                    gridPoint.Weight += distFromMonster;
+                                }
                             }
-                            else if (distFromAvoidance > distFromOrigin)
+                            timers[7].Stop();
+
+                            timers[8].Start();
+                            foreach (CacheObstacleObject avoidance in CacheData.TimeBoundAvoidance)
                             {
-                                gridPoint.Weight += distFromAvoidance;
+                                float distFromAvoidance = gridPoint.Position.Distance2D(avoidance.Position);
+                                float distFromOrigin = gridPoint.Position.Distance2D(origin);
+                                float distFromOriginToAvoidance = origin.Distance2D(avoidance.Position);
+
+                                float health = AvoidanceManager.GetAvoidanceHealthBySNO(avoidance.ActorSNO, 1f);
+                                float radius = AvoidanceManager.GetAvoidanceRadiusBySNO(avoidance.ActorSNO, 1f);
+
+                                // position is inside avoidance
+                                if (PlayerStatus.CurrentHealthPct < health && distFromAvoidance < radius)
+                                    continue;
+
+                                // closer to avoidance than it is to player
+                                if (distFromOriginToAvoidance < distFromOrigin)
+                                    continue;
+
+                                if (distFromAvoidance < distFromOrigin)
+                                {
+                                    gridPoint.Weight -= distFromOrigin;
+                                }
+                                else if (distFromAvoidance > distFromOrigin)
+                                {
+                                    gridPoint.Weight += distFromAvoidance;
+                                }
                             }
+                            timers[8].Stop();
+                        }
+                        else if (isStuck)
+                        {
+                            // give weight to points nearer to our destination
+                            gridPoint.Weight *= (maxDistance - PlayerMover.LastMoveToTarget.Distance2D(gridPoint.Position)) / maxDistance * maxWeight;
+                        }
+                        else if (!shouldKite && !isStuck && !avoidDeath) // melee avoidance use only
+                        {
+                            timers[9].Start();
+                            var monsterCount = Trinity.ObjectCache.Count(u => u.IsUnit && u.Position.Distance2D(gridPoint.Position) <= gridSquareRadius);
+                            if (monsterCount > 0)
+                                gridPoint.Weight *= monsterCount;
+                            timers[9].Stop();
+                        }
+
+                        pointsFound++;
+
+                        if (gridPoint.Weight > bestPoint.Weight && gridPoint.Distance > 1)
+                        {
+                            bestPoint = gridPoint;
                         }
                     }
-                    else if (isStuck)
-                    {
-                        // give weight to points nearer to our destination
-                        gridPoint.Weight *= (maxDistance - PlayerMover.LastMoveToTarget.Distance2D(gridPoint.Position)) / maxDistance * maxWeight;
-                    }
-                    else if (!shouldKite && !isStuck && !avoidDeath) // melee avoidance use only
-                    {
-                        var monsterCount = Trinity.ObjectCache.Count(u => u.IsUnit && u.Position.Distance2D(gridPoint.Position) <= gridSquareRadius);
-                        if (monsterCount > 0)
-                            gridPoint.Weight *= monsterCount;
-                    }
-
-                    pointsFound++;
-
-                    if (gridPoint.Weight > bestPoint.Weight && gridPoint.Distance > 1)
-                    {
-                        bestPoint = gridPoint;
-                    }
-
-                    //if (gridPoint.Weight > 0)
-                    //    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kiting grid point {0}, distance: {1:0}, weight: {2:0}", gridPoint.Position, gridPoint.Distance, gridPoint.Weight);
                 }
             }
 
@@ -455,9 +784,16 @@ namespace Trinity
                 UsedStuckSpots.Add(bestPoint);
             }
 
-            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting grid found {0}, distance: {1:0}, weight: {2:0}", bestPoint.Position, bestPoint.Distance, bestPoint.Weight);
-            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting grid stats CantStand {0} ZDiff {1} GT45Raycast {2} Avoidance {3} Monsters {4} pathFailures {5} navRaycast {6} "
-            + "pointsFound {7} shouldKite={8} isStuck={9} avoidDeath={10} monsters={11}",
+            string times = "";
+            for (int t = 0; t < timers.Length; t++)
+            {
+                if (timers[t].IsRunning) timers[t].Stop();
+                times += string.Format("{0}/{1:0.0} ", t, timers[t].ElapsedMilliseconds);
+            }
+
+            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Kiting grid found {0}, distance: {1:0}, weight: {2:0}", bestPoint.Position, bestPoint.Distance, bestPoint.Weight);
+            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Kiting grid stats CantStand {0} ZDiff {1} GT45Raycast {2} Avoidance {3} Monsters {4} pathFailures {5} navRaycast {6} "
+            + "pointsFound {7} shouldKite={8} isStuck={9} avoidDeath={10} monsters={11} timers={12}",
                 nodesCantStand,
                 nodesZDiff,
                 nodesGT45Raycast,
@@ -469,7 +805,8 @@ namespace Trinity
                 shouldKite,
                 isStuck,
                 avoidDeath,
-                monsterList == null ? 0 : monsterList.Count()
+                monsterList == null ? 0 : monsterList.Count(),
+                times
                 );
             return bestPoint.Position;
 

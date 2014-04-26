@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using log4net;
 using log4net.Appender;
@@ -23,8 +24,7 @@ namespace Trinity.Technicals
             set { Logger.prefix = value; }
         }
 
-
-        private static string _LastLogMessage = "";
+        private static Dictionary<LogCategory, string> _LastLogMessages = new Dictionary<LogCategory, string>();
 
         /// <summary>Logs the specified level.</summary>
         /// <param name="level">The logging level.</param>
@@ -40,9 +40,13 @@ namespace Trinity.Technicals
                 if (args.Length > 0)
                     msg = string.Format(msg, args);
 
-                if (_LastLogMessage != msg)
+                if (!_LastLogMessages.ContainsKey(category))
+                    _LastLogMessages.Add(category, "");
+                
+                string lastMessage;
+                if (_LastLogMessages.TryGetValue(category, out lastMessage) && lastMessage != msg)
                 {
-                    _LastLogMessage = msg;
+                    _LastLogMessages[category] = msg;
 
                     switch (level)
                     {

@@ -25,17 +25,17 @@ namespace Trinity
             // We still want the main VendorRun logic, we're just going to take control of *when* this logic kicks in
             PrioritySelector VendorRunPrioritySelector =
                 (TreeHooks.Instance.Hooks["VendorRun"][0] as Decorator).Children[0] as PrioritySelector;
-            
+
             TreeHooks.Instance.ReplaceHook("VendorRun",
-                Helpers.Composites.CreateVendorRunBehavior(
-                    new Decorator(ret => TownRun.TownRunCanRun(ret), 
-                        TownRun.TownRunWrapper(VendorRunPrioritySelector)
-                    )
+                new Decorator(ret => TownRun.TownRunCanRun(ret),
+                    TownRun.TownRunWrapper(VendorRunPrioritySelector)
                 )
             );
 
+            Composite lootComposite = TreeHooks.Instance.Hooks["Loot"][0];
             // Loot tree is now empty and never runs (Loot is handled through combat)
-            //TreeHooks.Instance.ReplaceHook("Loot", new Decorator(ret => false, new Action()));
+            // This is for special out of combat handling like Horadric Cache
+            TreeHooks.Instance.ReplaceHook("Loot", Helpers.Composites.CreateLootBehavior(lootComposite));
 
             // Death Handling
             //TreeHooks.Instance.ReplaceHook("Death",
