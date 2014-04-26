@@ -293,7 +293,13 @@ namespace Trinity
 
         // Variables used to actually hold powers the power-selector has picked to use, for buffing and main power use
         private static TrinityPower powerBuff;
-        internal static SNOPower LastPowerUsed = SNOPower.None;
+
+        private static SNOPower lastPowerUsed = SNOPower.None;
+        public static SNOPower LastPowerUsed
+        {
+            get { return Trinity.lastPowerUsed; }
+            set { Trinity.lastPowerUsed = value; }
+        }
 
         // Two variables to stop DB from attempting any navigator movement mid-combat/mid-backtrack
         public static bool bDontMoveMeIAmDoingShit = false;
@@ -354,8 +360,6 @@ namespace Trinity
         internal static Vector3 vPositionLastZigZagCheck = Vector3.Zero;
         public static int CurrentWorldDynamicId = -1;
         public static int CurrentWorldId = -1; // worldId from profiles, used in persistent stats
-        public static GameDifficulty CurrentGameDifficulty = GameDifficulty.Normal;
-
 
         /// <summary>
         /// Do not wait for animation after using, spam the power (false)

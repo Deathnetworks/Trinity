@@ -252,8 +252,10 @@ namespace Trinity
                         bDontMoveMeIAmDoingShit = true;
                     }
 
-                    if (Settings.Combat.Misc.EnableBountyEvents)
+                    if (Settings.WorldObject.EnableBountyEvents)
                     {
+                        bool eventObjectNear = ObjectCache.Any(o => o.Type == GObjectType.CursedChest || o.Type == GObjectType.CursedShrine);
+
                         if (!Player.InActiveEvent)
                         {
                             EventStartPosition = Vector3.Zero;
@@ -261,12 +263,12 @@ namespace Trinity
                         }
 
                         // Reset Event time while we have targts
-                        if (CurrentTarget != null && Player.InActiveEvent)
+                        if (CurrentTarget != null && Player.InActiveEvent && eventObjectNear)
                         {
                             EventStartTime = DateTime.UtcNow;
                         }
 
-                        if (ObjectCache.Any(o => o.Type == GObjectType.CursedChest || o.Type == GObjectType.CursedShrine))
+                        if (eventObjectNear)
                         {
                             EventStartPosition = ObjectCache.FirstOrDefault(o => o.Type == GObjectType.CursedChest || o.Type == GObjectType.CursedShrine).Position;
                         }

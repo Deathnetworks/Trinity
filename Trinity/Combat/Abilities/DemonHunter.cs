@@ -183,7 +183,7 @@ namespace Trinity
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_Vault) && !Player.IsRooted && !Player.IsIncapacitated &&
                 Settings.Combat.DemonHunter.VaultMode != Config.Combat.DemonHunterVaultMode.MovementOnly &&
                 // Only use vault to retreat if < level 60, or if in inferno difficulty for level 60's
-                (Player.Level < 60 || CurrentGameDifficulty > GameDifficulty.Master) &&
+                (Player.Level < 60 || Player.GameDifficulty > GameDifficulty.Master) &&
                 (CurrentTarget.RadiusDistance <= 10f || TargetUtil.AnyMobsInRange(10)) &&
                 // if we have ShadowPower and Disicpline is >= 16
                 // or if we don't have ShadoWpower and Discipline is >= 22
@@ -192,7 +192,8 @@ namespace Trinity
             {
                 //Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, -15f);
                 // Lets find a smarter Vault position instead of just "backwards"
-                Vector3 vNewTarget = NavHelper.FindSafeZone(Trinity.Player.Position, true, false, null, false);
+                //Vector3 vNewTarget = NavHelper.FindSafeZone(Trinity.Player.Position, true, false, null, false);
+                Vector3 vNewTarget = NavHelper.MainFindSafeZone(Trinity.Player.Position, true, false, null, false);
 
                 return new TrinityPower(SNOPower.DemonHunter_Vault, 20f, vNewTarget, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
             }

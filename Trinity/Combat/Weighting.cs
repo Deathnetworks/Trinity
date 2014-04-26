@@ -442,7 +442,7 @@ namespace Trinity
                                     break;
                                 }
 
-                                if (navBlocking)
+                                if (cacheObject.Type == GObjectType.Gold && navBlocking && cacheObject.ItemQuality < ItemQuality.Legendary)
                                 {
                                     objWeightInfo += " NavBlocking";
                                     cacheObject.Weight = 0;
@@ -707,10 +707,19 @@ namespace Trinity
                                 break;
                             }
                         case GObjectType.CursedShrine:
+                            {
+
+                                cacheObject.Weight += 5000d;
+
+                                break;
+                            }
                         case GObjectType.Shrine:
                             {
+                                float maxRange = Player.IsInRift ? 300f : 75f;
+                                double maxWeight = Player.IsInRift ? 15000d : 100d;
+
                                 // Weight Shrines
-                                cacheObject.Weight = Math.Max(((75f - cacheObject.RadiusDistance) / 75f * 14500f), 100d);
+                                cacheObject.Weight = Math.Max(((maxRange - cacheObject.RadiusDistance) / maxRange * 15000d), 100d);
 
                                 // Very close shrines get a weight increase
                                 if (cacheObject.Distance <= 30f)
@@ -723,7 +732,7 @@ namespace Trinity
                                         cacheObject.Weight += 400;
 
                                     // If there's a monster in the path-line to the item
-                                    if (CacheData.MonsterObstacles.Any(cp => MathUtil.IntersectsPath(cp.Position, cp.Radius, Player.Position, cacheObject.Position)))
+                                    if (CacheData.MonsterObstacles.Any(cp => MathUtil.IntersectsPath(cp.Position, cp.Radius, Player.Position, cacheObject.Position)) && !Player.IsInRift)
                                         cacheObject.Weight = 1;
 
                                     // See if there's any AOE avoidance in that spot, if so reduce the weight to 1
@@ -731,7 +740,7 @@ namespace Trinity
                                         cacheObject.Weight = 1;
 
                                     // if there's any monsters nearby
-                                    if (TargetUtil.AnyMobsInRange(15f))
+                                    if (TargetUtil.AnyMobsInRange(15f) && !Player.IsInRift)
                                         cacheObject.Weight = 1;
 
                                     if (prioritizeCloseRangeUnits)

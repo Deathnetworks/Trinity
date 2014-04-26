@@ -22,6 +22,7 @@ namespace Trinity
         public bool IsIncapacitated { get; set; }
         public bool IsRooted { get; set; }
         public bool IsInTown { get; set; }
+        public bool IsInRift { get; set; }
         public double CurrentHealthPct { get; set; }
         public double PrimaryResource { get; set; }
         public double PrimaryResourcePct { get; set; }
@@ -59,10 +60,12 @@ namespace Trinity
         public float Rotation { get; set; }
         public Vector2 DirectionVector { get; set; }
         public bool IsGhosted { get; set; }
+        public GameDifficulty GameDifficulty { get; set; }
 
         public TrinityBountyInfo ActiveBounty { get; set; }
 
         public bool InActiveEvent { get; set; }
+        public bool HasEventInspectionTask { get; set; }
 
         public PlayerInfoCache()
         {
@@ -144,6 +147,11 @@ namespace Trinity
                     Player.RActorGuid = me.RActorGuid;
                     Player.LastUpdated = DateTime.UtcNow;
                     Player.IsInTown = ZetaDia.IsInTown;
+                    Trinity.CurrentWorldDynamicId = ZetaDia.CurrentWorldDynamicId;
+                    Trinity.CurrentWorldId = ZetaDia.CurrentWorldId;
+                    Player.WorldDynamicID = ZetaDia.CurrentWorldDynamicId;
+                    Player.WorldID = ZetaDia.CurrentWorldId;
+                    Player.IsInRift = DataDictionary.RiftWorldIds.Contains(Player.WorldID);
                     Player.IsDead = me.IsDead;
                     Player.IsInGame = ZetaDia.IsInGame;
                     Player.IsLoadingWorld = ZetaDia.IsLoadingWorld;
@@ -187,6 +195,7 @@ namespace Trinity
                     Player.ParagonExperienceNextLevel = ZetaDia.Me.ParagonExperienceNextLevel;
 
                     Player.IsHidden = me.IsHidden;
+                    Player.GameDifficulty = ZetaDia.Service.Hero.CurrentDifficulty;
 
                     if (Player.CurrentHealthPct > 0)
                         Player.IsGhosted = ZetaDia.Me.CommonData.GetAttribute<int>(ActorAttributeType.Ghosted) > 0;
@@ -201,17 +210,16 @@ namespace Trinity
                         }
                     }
 
-                    // World ID safety caching incase it's ever unavailable
-                    Trinity.CurrentWorldDynamicId = ZetaDia.CurrentWorldDynamicId;
-                    Trinity.CurrentWorldId = ZetaDia.CurrentWorldId;
-                    Player.WorldDynamicID = ZetaDia.CurrentWorldDynamicId;
-                    Player.WorldID = ZetaDia.CurrentWorldId;
-                    // Game difficulty, used really for vault on DH's
-                    Trinity.CurrentGameDifficulty = ZetaDia.Service.Hero.CurrentDifficulty;
 
                     using (new PerformanceLogger("BountyInfo"))
                     {
-                        Player.InActiveEvent = ZetaDia.ActInfo.ActiveQuests.Any(q => DataDictionary.EventQuests.Contains(q.QuestSNO));
+
+                        // Step 13 is used when the player needs to go "Inspect the cursed shrine"
+                        // Step 1 is event in progress, kill stuff
+                        // Step 2 is event completed
+                        // Step -1 is not started
+                        Player.InActiveEvent = ZetaDia.ActInfo.ActiveQuests.Any(q => DataDictionary.EventQuests.Contains(q.QuestSNO) && q.QuestStep != 13 );
+                        Player.HasEventInspectionTask = ZetaDia.ActInfo.ActiveQuests.Any(q => DataDictionary.EventQuests.Contains(q.QuestSNO) && q.QuestStep == 13);
 
                         if (ZetaDia.ActInfo.ActiveBounty != null)
                         {

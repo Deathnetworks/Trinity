@@ -465,7 +465,7 @@ namespace Trinity.XmlTags
                 BrainBehavior.DungeonExplorer.SetNodesExploredAutomatically = false;
             }
 
-            if (!IgnoreGridReset)
+            if (!IgnoreGridReset && !Trinity.Player.IsDead && DateTime.UtcNow.Subtract(Trinity.LastDeathTime).TotalSeconds > 3)
             {
                 UpdateSearchGridProvider();
 
@@ -1327,20 +1327,7 @@ namespace Trinity.XmlTags
         {
             if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.ProfileTag))
             {
-                string nodeDistance = String.Empty;
-                if (GetRouteUnvisitedNodeCount() > 0)
-                {
-                    try
-                    {
-                        float distance = BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter.Distance(myPos);
-
-                        if (distance > 0)
-                            nodeDistance = String.Format("Dist:{0:0}", Math.Round(distance / 10f, 2) * 10f);
-                    }
-                    catch { }
-                }
-
-                var log = String.Format("Nodes [Unvisited: Route:{1} Grid:{3} | Grid-Visited: {2}] Box:{4}/{5} Step:{6} {7} Nav:{8} RayCast:{9} PP:{10:0} Dir: {11} ZDiff:{12:0}",
+                var log = String.Format("Nodes [Unvisited: Route:{1} Grid:{3} | Grid-Visited: {2}] Box:{4}/{5} Step:{6} PP:{7:0} Dir: {8} ",
                     GetRouteVisistedNodeCount(),                                 // 0
                     GetRouteUnvisitedNodeCount(),                                // 1
                     GetGridSegmentationVisistedNodeCount(),                      // 2
@@ -1348,12 +1335,8 @@ namespace Trinity.XmlTags
                     GridSegmentation.BoxSize,                                    // 4
                     GridSegmentation.BoxTolerance,                               // 5
                     step,                                                        // 6
-                    nodeDistance,                                                // 7
-                    MainGridProvider.CanStandAt(MainGridProvider.WorldToGrid(CurrentNavTarget.ToVector2())), // 8
-                    !Navigator.Raycast(myPos, CurrentNavTarget),
                     PathPrecision,
-                    MathUtil.GetHeadingToPoint(CurrentNavTarget),
-                    Math.Abs(myPos.Z - CurrentNavTarget.Z)
+                    MathUtil.GetHeadingToPoint(CurrentNavTarget)
                     );
 
                 Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, log);

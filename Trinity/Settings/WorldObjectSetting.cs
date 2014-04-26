@@ -22,7 +22,9 @@ namespace Trinity.Config
         private bool _OpenContainers;
         private bool _OpenRareChest;
         private int _HealthWellMinHealth;
+        private int _OpenContainerDelay;
         private DestructibleIgnoreOption _DestructibleOption;
+        private bool _EnableBountyEvents;
         #endregion Fields
 
         #region Events
@@ -276,6 +278,25 @@ namespace Trinity.Config
                 }
             }
         }
+        
+        [DataMember(IsRequired = false)]
+        [DefaultValue(500)]
+        [Description("Delay in milliseconds to wait after opening a container")]
+        public int OpenContainerDelay
+        {
+            get
+            {
+                return _OpenContainerDelay;
+            }
+            set
+            {
+                if (_OpenContainerDelay != value)
+                {
+                    _OpenContainerDelay = value;
+                    OnPropertyChanged("OpenContainerDelay");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(DestructibleIgnoreOption.OnlyIfStuck)]
@@ -294,6 +315,24 @@ namespace Trinity.Config
                 }
             }
         }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool EnableBountyEvents
+        {
+            get
+            {
+                return _EnableBountyEvents;
+            }
+            set
+            {
+                if (_EnableBountyEvents != value)
+                {
+                    _EnableBountyEvents = value;
+                    OnPropertyChanged("EnableBountyEvents");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -340,6 +379,8 @@ namespace Trinity.Config
             this.DestructibleOption = DestructibleIgnoreOption.OnlyIfStuck;
             this.OpenContainers = true;
             this.OpenRareChests = true;
+            this.OpenContainerDelay = 500;
+            this.EnableBountyEvents = true;
         }
         #endregion Methods
     }

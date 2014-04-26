@@ -27,6 +27,14 @@ namespace Trinity.Combat.Abilities
                 MyPosition = Trinity.Player.Position,
                 TargetPosition = power.TargetPosition
             });
+
+            CacheData.AbilityLastUsed[power.SNOPower] = DateTime.UtcNow;
+            Trinity.LastPowerUsed = power.SNOPower;
+        }
+
+        public static void RecordSpell(SNOPower power)
+        {
+            RecordSpell(new TrinityPower(power));
         }
 
         public static TrinityPower GetLastTrinityPower()

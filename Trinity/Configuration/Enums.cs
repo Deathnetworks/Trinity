@@ -34,6 +34,7 @@
         HealthPotion,
         Helm,
         HoradricRelic,
+        HoradricCache,
         InfernalKey,
         Legs,
         LootRunKey,

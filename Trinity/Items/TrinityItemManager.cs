@@ -138,6 +138,12 @@ namespace Trinity
                 tBaseType == GItemBaseType.WeaponRange ||
                 tBaseType == GItemBaseType.WeaponTwoHand);
 
+            if (cItem.TrinityItemType == GItemType.HoradricCache && Trinity.Settings.Loot.TownRun.OpenHoradricCaches)
+            {
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] = (ignoring Horadric Cache)", cItem.RealName, cItem.InternalName);
+                return false;
+            }
+
             // Stash all unidentified items - assume we want to keep them since we are using an identifier over-ride
             if (cItem.IsUnidentified)
             {

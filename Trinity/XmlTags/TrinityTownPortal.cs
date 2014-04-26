@@ -128,7 +128,7 @@ namespace Trinity.XmlTags
                                 new Action(ret =>
                                 {
                                     Technicals.Logger.LogNormal("Stuck casting town portal, moving a little");
-                                    Navigator.MoveTo(NavHelper.FindSafeZone(Trinity.Player.Position, false, true));
+                                    Navigator.MoveTo(NavHelper.SimpleUnstucker(),"Unstuck Position");
                                     PortalCastTimer.Reset();
                                 })
                             )

@@ -55,8 +55,6 @@ namespace Trinity.DbProvider
 
         internal static Vector3 LastTempestRushPosition = Vector3.Zero;
 
-        private static int WizardTeleportCount = 0;
-
         // Store player current position
         public static Vector3 vMyCurrentPosition = Vector3.Zero;
 
@@ -525,6 +523,7 @@ namespace Trinity.DbProvider
                     Trinity.Player.PrimaryResource >= V.F("Barbarian.Whirlwind.MinFury") && !Trinity.IsWaitingForSpecial && V.B("Barbarian.Whirlwind.UseForMovement"))
                 {
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vMoveToTarget, Trinity.CurrentWorldDynamicId, -1);
+                    SpellHistory.RecordSpell(SNOPower.Barbarian_Whirlwind);
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Whirlwind for OOC movement, distance={0}", DestinationDistance);
                     return;
@@ -540,7 +539,7 @@ namespace Trinity.DbProvider
                     if (DestinationDistance > 35f)
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Leap, vThisTarget, Trinity.CurrentWorldDynamicId, -1);
-                    CacheData.AbilityLastUsed[SNOPower.Barbarian_Leap] = DateTime.UtcNow;
+                    SpellHistory.RecordSpell(SNOPower.Barbarian_Leap);
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Leap for OOC movement, distance={0}", DestinationDistance);
                     return;
@@ -555,14 +554,18 @@ namespace Trinity.DbProvider
                     if (DestinationDistance > 35f)
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_FuriousCharge, vThisTarget, Trinity.CurrentWorldDynamicId, -1);
-                    CacheData.AbilityLastUsed[SNOPower.Barbarian_FuriousCharge] = DateTime.UtcNow;
+                    SpellHistory.RecordSpell(SNOPower.Barbarian_FuriousCharge);
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Furious Charge for OOC movement, distance={0}", DestinationDistance);
                     return;
                 }
-                // Vault for a DH - maximum set by user-defined setting
+
+                bool hasTacticalAdvantage = ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.DemonHunter_Passive_TacticalAdvantage);
+                int vaultDelay = hasTacticalAdvantage ? 2000 : Trinity.Settings.Combat.DemonHunter.VaultMovementDelay;
+
+                // DemonHunter Vault
                 if (Trinity.Hotbar.Contains(SNOPower.DemonHunter_Vault) && !bTooMuchZChange && Trinity.Settings.Combat.DemonHunter.VaultMode != DemonHunterVaultMode.CombatOnly &&
-                    DateTime.UtcNow.Subtract(CacheData.AbilityLastUsed[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
+                    CombatBase.TimeSincePowerUse(SNOPower.DemonHunter_Vault) > vaultDelay &&
                     DestinationDistance >= 18f &&
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault) && !ShrinesInArea(vMoveToTarget) &&
                     // Don't Vault into avoidance/monsters if we're kiting
@@ -577,7 +580,7 @@ namespace Trinity.DbProvider
                     if (DestinationDistance > 35f)
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
                     ZetaDia.Me.UsePower(SNOPower.DemonHunter_Vault, vThisTarget, Trinity.CurrentWorldDynamicId, -1);
-                    CacheData.AbilityLastUsed[SNOPower.DemonHunter_Vault] = DateTime.UtcNow;
+                    SpellHistory.RecordSpell(SNOPower.DemonHunter_Vault);
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Vault for OOC movement, distance={0}", DestinationDistance);
                     return;
@@ -615,8 +618,7 @@ namespace Trinity.DbProvider
                             LastTempestRushPosition = vTargetAimPoint;
 
                             ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vTargetAimPoint, Trinity.CurrentWorldDynamicId, -1);
-                            CacheData.AbilityLastUsed[SNOPower.Monk_TempestRush] = DateTime.UtcNow;
-                            Trinity.LastPowerUsed = SNOPower.Monk_TempestRush;
+                            SpellHistory.RecordSpell(SNOPower.Monk_TempestRush);
 
                             // simulate movement speed of 30
                             SpeedSensor lastSensor = SpeedSensors.OrderByDescending(s => s.Timestamp).FirstOrDefault();
@@ -661,7 +663,7 @@ namespace Trinity.DbProvider
                 if (CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike) && Trinity.Settings.Combat.Monk.UseDashingStrikeOOC && DestinationDistance > 15f)
                 {
                     ZetaDia.Me.UsePower(SNOPower.X1_Monk_DashingStrike, vMoveToTarget, Trinity.CurrentWorldDynamicId, -1);
-                    CacheData.AbilityLastUsed[SNOPower.X1_Monk_DashingStrike] = DateTime.UtcNow;
+                    SpellHistory.RecordSpell(SNOPower.X1_Monk_DashingStrike);
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Dashing Strike for OOC movement, distance={0}", DestinationDistance);
                 }
@@ -669,25 +671,18 @@ namespace Trinity.DbProvider
 
                 bool hasWormHole = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Teleport && s.RuneIndex == 4);
 
-                // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
+                // Teleport for a wizard 
                 if (CombatBase.CanCast(SNOPower.Wizard_Teleport, CombatBase.CanCastFlags.NoTimer) &&
-                    (hasWormHole && WizardTeleportCount < 3 && DateTime.UtcNow.Subtract(CacheData.AbilityLastUsed[SNOPower.Wizard_Teleport]).TotalMilliseconds >= 250) &&
+                    CombatBase.TimeSincePowerUse(SNOPower.Wizard_Teleport) > 250 &&
                     DestinationDistance >= 10f && !ShrinesInArea(vMoveToTarget))
                 {
-                    // Reset teleport count if we've already hit the max
-                    if (WizardTeleportCount >= 3)
-                        WizardTeleportCount = 0;
-
-                    // increment the teleport count for wormhole rune
-                    WizardTeleportCount++;
-
                     var maxTeleportRange = 75f;
 
                     Vector3 vThisTarget = vMoveToTarget;
                     if (DestinationDistance > maxTeleportRange)
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, maxTeleportRange);
                     ZetaDia.Me.UsePower(SNOPower.Wizard_Teleport, vThisTarget, Trinity.CurrentWorldDynamicId, -1);
-                    CacheData.AbilityLastUsed[SNOPower.Wizard_Teleport] = DateTime.UtcNow;
+                    SpellHistory.RecordSpell(SNOPower.Wizard_Teleport);
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Teleport for OOC movement, distance={0}", DestinationDistance);
                     return;
@@ -702,7 +697,7 @@ namespace Trinity.DbProvider
                     if (DestinationDistance > 35f)
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
                     ZetaDia.Me.UsePower(SNOPower.Wizard_Archon_Teleport, vThisTarget, Trinity.CurrentWorldDynamicId, -1);
-                    CacheData.AbilityLastUsed[SNOPower.Wizard_Archon_Teleport] = DateTime.UtcNow;
+                    SpellHistory.RecordSpell(SNOPower.Wizard_Archon_Teleport);
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Archon Teleport for OOC movement, distance={0}", DestinationDistance);
                     return;
@@ -811,6 +806,11 @@ namespace Trinity.DbProvider
 
                 Logger.Log(lc, "Navigator {0} dest={1} ({2}) duration={3:0} distance={4:0} {5}",
                     result, NavHelper.PrettyPrintVector3(destination), destinationName, t1.ElapsedMilliseconds, destination.Distance2D(Trinity.Player.Position), pathCheck);
+            }
+            catch (OutOfMemoryException)
+            {
+                Logger.LogDebug("Navigator ran out of memory!");
+                return MoveResult.Failed;
             }
             catch (Exception ex)
             {

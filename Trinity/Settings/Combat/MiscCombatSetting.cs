@@ -31,7 +31,6 @@ namespace Trinity.Config.Combat
         private int _ForceKillElitesHealth;
         private bool _ForceKillSummoners;
         private bool _ProfileTagOverride;
-        private bool _EnableBountyEvents;
         #endregion Fields
 
         #region Events
@@ -492,24 +491,6 @@ namespace Trinity.Config.Combat
                     _ForceKillSummoners = value;
                     OnPropertyChanged("ForceKillSummoners");
              }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool EnableBountyEvents
-        {
-            get
-            {
-                return _EnableBountyEvents;
-            }
-            set
-            {
-                if (_EnableBountyEvents != value)
-                {
-                    _EnableBountyEvents = value;
-                    OnPropertyChanged("EnableBountyEvents");
-                }
             }
         }
 

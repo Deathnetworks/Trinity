@@ -358,6 +358,7 @@ namespace Trinity
             if (name.StartsWith("handxbow_")) return GItemType.HandCrossbow;
             if (name.StartsWith("healthglobe")) return GItemType.HealthGlobe;
             if (name.StartsWith("healthpotion")) return GItemType.HealthPotion;
+            if (name.StartsWith("horadriccache")) return GItemType.HoradricCache;
             if (name.StartsWith("lore_book_")) return GItemType.CraftTome;
             if (name.StartsWith("lootrunkey")) return GItemType.LootRunKey;
             if (name.StartsWith("mace_")) return GItemType.Mace;
@@ -510,7 +511,7 @@ namespace Trinity
             }
             // Misc Items
             else if (itemType == GItemType.CraftingMaterial || itemType == GItemType.CraftTome || itemType == GItemType.LootRunKey || itemType == GItemType.HoradricRelic ||
-                itemType == GItemType.SpecialItem || itemType == GItemType.CraftingPlan || itemType == GItemType.HealthPotion ||
+                itemType == GItemType.SpecialItem || itemType == GItemType.CraftingPlan || itemType == GItemType.HealthPotion || itemType == GItemType.HoradricCache ||
                 itemType == GItemType.Dye || itemType == GItemType.StaffOfHerding || itemType == GItemType.InfernalKey)
             {
                 itemBaseType = GItemBaseType.Misc;

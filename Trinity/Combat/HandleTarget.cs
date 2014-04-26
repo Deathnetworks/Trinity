@@ -752,7 +752,7 @@ namespace Trinity
                             CurrentTarget.Type == GObjectType.Barricade ||
                             CurrentTarget.Type == GObjectType.Destructible) && (Monk_TempestRushReady()));
 
-                        bool Barbarian_SpecialMovement = ((CurrentTarget.Type == GObjectType.Avoidance &&
+                        bool Attackable_SpecialMovement = ((CurrentTarget.Type == GObjectType.Avoidance &&
                             ObjectCache.Any(u => (u.IsUnit || u.Type == GObjectType.Destructible || u.Type == GObjectType.Barricade) &&
                                 MathUtil.IntersectsPath(u.Position, u.Radius, Player.Position, CurrentTarget.Position))));
 
@@ -771,7 +771,7 @@ namespace Trinity
                             {
                                 // Whirlwind for a barb
 
-                                if (Barbarian_SpecialMovement && !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && !bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource >= 10)
+                                if (Attackable_SpecialMovement && !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && !bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource >= 10)
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vCurrentDestination, CurrentWorldDynamicId, -1);
                                     // Store the current destination for comparison incase of changes next loop
@@ -805,7 +805,7 @@ namespace Trinity
                                         return GetTreeSharpRunStatus(runStatus);
                                 }
                                 // Strafe for a Demon Hunter
-                                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Strafe) && Player.PrimaryResource >= 15)
+                                if (Attackable_SpecialMovement && !bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Strafe) && Player.PrimaryResource >= 15)
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.DemonHunter_Strafe, vCurrentDestination, CurrentWorldDynamicId, -1);
                                     // Store the current destination for comparison incase of changes next loop
