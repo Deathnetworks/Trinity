@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Trinity.Technicals;
 using Zeta.Game;
@@ -10,13 +11,6 @@ namespace Trinity
     public class HotbarSkills
     {
         private static HashSet<HotbarSkills> _assignedSkills = new HashSet<HotbarSkills>();
-        private static SNOPower[] _hotbarSlots = new SNOPower[6];
-
-        public static SNOPower[] HotbarSlots
-        {
-            get { return HotbarSkills._hotbarSlots; }
-            set { HotbarSkills._hotbarSlots = value; }
-        }
 
         /// <summary>
         /// The currently assigned hotbar skills with runes and slots
@@ -52,9 +46,26 @@ namespace Trinity
         /// </summary>
         internal static void Update(TrinityLogLevel logLevel = TrinityLogLevel.Debug, LogCategory logCategory = LogCategory.CacheManagement)
         {
-
-            UpdateHotbarSlotPowers();
+            Trinity.Hotbar = new List<SNOPower>();
             
+            for (int i = 0; i <= 5; i++)
+            {
+                SNOPower power = cPlayer.GetPowerForSlot((HotbarSlot)i);
+                Trinity.Hotbar.Add(power);
+
+                if (!DataDictionary.LastUseAbilityTimeDefaults.ContainsKey(power))
+                {
+                    DataDictionary.LastUseAbilityTimeDefaults.Add(power, DateTime.MinValue);
+                }
+                if (!CacheData.AbilityLastUsed.ContainsKey(power))
+                {
+                    CacheData.AbilityLastUsed.Add(power, DateTime.MinValue);
+                }
+            }
+            Trinity.HasMappedPlayerAbilities = true;
+            Trinity.ShouldRefreshHotbarAbilities = false;
+            Trinity.HotbarRefreshTimer.Restart();
+           
             HashSet<HotbarSkills> oldSkills = new HashSet<HotbarSkills>();
             foreach (var skill in _assignedSkills)
             {
@@ -92,17 +103,10 @@ namespace Trinity
         /// <returns></returns>
         private static HotbarSlot GetHotbarSlotFromPower(SNOPower power)
         {
-            if (Trinity.Hotbar.Contains(power))
-            {
-                for (int i = 0; i < 6; i++)
-                {
-                    //if (cPlayer.GetPowerForSlot((HotbarSlot)i) == power)
-                    if (_hotbarSlots[i] == power)
-                    {
-                        return (HotbarSlot)i;
-                    }
-                }
-            }
+            int powerIndex = Trinity.Hotbar.IndexOf(power);
+            if (powerIndex != -1)
+                return (HotbarSlot)powerIndex;
+
             return HotbarSlot.Invalid;
         }
 
@@ -124,20 +128,12 @@ namespace Trinity
             return runeIndex;
         }
 
-        private static void UpdateHotbarSlotPowers()
-        {
-            for (int i = 0; i < 6; i++)
-            {
-                _hotbarSlots[i] = cPlayer.GetPowerForSlot((HotbarSlot)i);
-            }
-        }
-
         public static SNOPower GetPowerForSlot(HotbarSlot slot)
         {
             if (slot == HotbarSlot.Invalid)
                 return SNOPower.None;
 
-            return _hotbarSlots[(int)slot];
+            return Trinity.Hotbar[(int)slot];
         }
 
         private static CPlayer cPlayer { get { return ZetaDia.CPlayer; } }

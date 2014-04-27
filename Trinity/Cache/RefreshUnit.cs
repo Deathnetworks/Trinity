@@ -364,7 +364,7 @@ namespace Trinity
                     killRange = 200;
             }
             // Special short-range list to ignore weakling mobs
-            if (PlayerKiteDistance <= 0 && !GetHasBuff(SNOPower.Wizard_Archon) && DataDictionary.ShortRangeAttackMonsterIds.Contains(CurrentCacheObject.ActorSNO))
+            if (!GetHasBuff(SNOPower.Wizard_Archon) && DataDictionary.ShortRangeAttackMonsterIds.Contains(CurrentCacheObject.ActorSNO))
             {
                 killRange = 12;
             }
@@ -470,10 +470,9 @@ namespace Trinity
                 {
                     CurrentCacheObject.SummonedByACDId = CurrentCacheObject.Unit.SummonedByACDId;
                 }
-                catch (Exception ex)
+                catch
                 {
                     // Only part of a ReadProcessMemory or WriteProcessMemory request was completed
-                    Logger.LogDebug("Error refreshing {0} {1} {2}", ex.Message);
                 }
                 try
                 {
@@ -484,6 +483,7 @@ namespace Trinity
                     // Only part of a ReadProcessMemory or WriteProcessMemory request was completed 
                 }
 
+                // SummonedByACDId is not ACDGuid, it's DynamicID
                 if (CurrentCacheObject.SummonedByACDId == Player.MyDynamicID)
                 {
                     CurrentCacheObject.IsSummonedByPlayer = true;
@@ -523,7 +523,7 @@ namespace Trinity
                     {
                         if (CurrentCacheObject.IsSummonedByPlayer)
                         {
-                            iPlayerOwnedGargantuan++;
+                            PlayerOwnedGargantuan++;
                             c_IgnoreSubStep = "IsPlayerSummoned";
                         }
                         AddToCache = false;

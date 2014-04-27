@@ -165,7 +165,7 @@ namespace Trinity
                             {
                                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting Avoidance: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}",
                                     vAnySafePoint, vAnySafePoint.Distance(Me.Position), MathUtil.GetHeading(MathUtil.FindDirectionDegree(Me.Position, vAnySafePoint)),
-                                    Player.CurrentHealthPct, PlayerKiteDistance);
+                                    Player.CurrentHealthPct, CombatBase.PlayerKiteDistance);
                             }
 
                             hasFoundSafePoint = true;
@@ -190,7 +190,7 @@ namespace Trinity
                 {
                     RefreshDiaGetWeights();
 
-                    RefreshSetKiting(ref KiteAvoidDestination, NeedToKite, ref TryToKite);
+                    RefreshSetKiting(ref KiteAvoidDestination, NeedToKite);
                 }
                 // Not heading straight for a safe-spot?
                 // No valid targets but we were told to stay put?
@@ -441,11 +441,7 @@ namespace Trinity
                                     } break;
                                 case GObjectType.Avoidance:
                                     {
-                                        extraData += " Ro:" + CurrentCacheObject.Rotation.ToString("0.00");
-                                        extraData += " AABB: [" +
-                                            CurrentCacheObject.AABBBounds.Min.ToString() +
-                                            CurrentCacheObject.AABBBounds.Max.ToString() +
-                                            "]";
+                                        extraData += StandingInAvoidance ? "InAoE " : "";
                                         break;
                                     }
                             }
@@ -631,7 +627,7 @@ namespace Trinity
 
                 // Reset the counters for player-owned things
                 iPlayerOwnedMysticAlly = 0;
-                iPlayerOwnedGargantuan = 0;
+                PlayerOwnedGargantuan = 0;
                 PlayerOwnedZombieDog = 0;
                 iPlayerOwnedDHPets = 0;
 

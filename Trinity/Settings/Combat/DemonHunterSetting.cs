@@ -16,6 +16,7 @@ namespace Trinity.Config.Combat
         private int _StrafeMinHatred;
         private int _RapidFireMinHatred;
         private bool _VengeanceElitesOnly;
+        private KiteMode _KiteMode;
         private DemonHunterVaultMode _VaultMode;
 
 
@@ -211,6 +212,24 @@ namespace Trinity.Config.Combat
                 {
                     _RapidFireMinHatred = value;
                     OnPropertyChanged("RapidFireMinHatred");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(KiteMode.Bosses)]
+        public KiteMode KiteMode
+        {
+            get
+            {
+                return _KiteMode;
+            }
+            set
+            {
+                if (_KiteMode != value)
+                {
+                    _KiteMode = value;
+                    OnPropertyChanged("KiteMode");
                 }
             }
         }

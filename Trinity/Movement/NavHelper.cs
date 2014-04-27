@@ -55,7 +55,7 @@ namespace Trinity
                 return Trinity.CurrentTarget;
             }
         }
-        private static HashSet<SNOPower> Hotbar
+        private static List<SNOPower> Hotbar
         {
             get
             {
@@ -193,7 +193,6 @@ namespace Trinity
             const float gridSquareSize = 10f;
             const float maxDistance = 55f;
             const int maxWeight = 100;
-            const int maxZDiff = 14;
 
             double gridSquareRadius = Math.Sqrt((Math.Pow(gridSquareSize / 2, 2) + Math.Pow(gridSquareSize / 2, 2)));
 
@@ -309,9 +308,9 @@ namespace Trinity
                             timers[3].Start();
                             double checkRadius = gridSquareRadius;
 
-                            if (Trinity.PlayerKiteDistance > 0)
+                            if (CombatBase.PlayerKiteDistance > 0)
                             {
-                                checkRadius = gridSquareSize + Trinity.PlayerKiteDistance;
+                                checkRadius = gridSquareSize + CombatBase.PlayerKiteDistance;
                             }
 
                             // Any monster standing in this GridPoint
@@ -353,7 +352,7 @@ namespace Trinity
                             gridPoint.Weight = ((maxDistance - gridPoint.Distance) / maxDistance) * maxWeight;
 
                             // Low weight for close range grid points
-                            if (shouldKite && gridPoint.Distance < Trinity.PlayerKiteDistance)
+                            if (shouldKite && gridPoint.Distance < CombatBase.PlayerKiteDistance)
                             {
                                 gridPoint.Weight = (int)gridPoint.Distance;
                             }
@@ -637,9 +636,9 @@ namespace Trinity
         //                    timers[3].Start();
         //                    double checkRadius = gridSquareRadius;
 
-        //                    if (Trinity.PlayerKiteDistance > 0)
+        //                    if (CombatBase.PlayerKiteDistance > 0)
         //                    {
-        //                        checkRadius = gridSquareSize + Trinity.PlayerKiteDistance;
+        //                        checkRadius = gridSquareSize + CombatBase.PlayerKiteDistance;
         //                    }
 
         //                    // Any monster standing in this GridPoint
@@ -681,7 +680,7 @@ namespace Trinity
         //                    gridPoint.Weight = ((maxDistance - gridPoint.Distance) / maxDistance) * maxWeight;
 
         //                    // Low weight for close range grid points
-        //                    if (shouldKite && gridPoint.Distance < Trinity.PlayerKiteDistance)
+        //                    if (shouldKite && gridPoint.Distance < CombatBase.PlayerKiteDistance)
         //                    {
         //                        gridPoint.Weight = (int)gridPoint.Distance;
         //                    }

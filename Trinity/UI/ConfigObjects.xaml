@@ -30,7 +30,7 @@
         <StackPanel>
             <GroupBox Header="Bounties">
                 <UniformGrid>
-                    <CheckBox IsChecked="{Binding Path=Misc.EnableBountyEvents}" ToolTip="Allow Bounty Events">Enable Wait for Bounty Events</CheckBox>
+                    <CheckBox IsChecked="{Binding Path=WorldObject.EnableBountyEvents}" ToolTip="Allow Bounty Events">Enable Wait for Bounty Events</CheckBox>
                 </UniformGrid>
             </GroupBox>
             <GroupBox Header="Containers">

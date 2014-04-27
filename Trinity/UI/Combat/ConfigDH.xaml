@@ -53,7 +53,7 @@
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Text="Min-Distance before Kite" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="Kite Trigger Range" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
                 <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                     Interval="500" Maximum="40" Minimum="0" 
                     SmallChange="1" LargeChange="5" 
@@ -61,6 +61,16 @@
                     Value="{Binding Path=DH.KiteLimit}" 
                     HorizontalAlignment="Stretch" Margin="2"/>
             </Grid>
+            <!--KiteMode-->
+            <GroupBox>
+                <GroupBox.Header>Kite Mode</GroupBox.Header>
+                <UniformGrid Columns="2">
+                    <TextBlock Text="When to Kite/Flee" />
+                    <RadioButton GroupName="KiteMode" Content="Always in Combat" IsChecked="{Binding Path=DH.KiteMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Always}"  />
+                    <RadioButton GroupName="KiteMode" Content="Bosses Only" IsChecked="{Binding Path=DH.KiteMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Bosses}" />
+                    <RadioButton GroupName="KiteMode" Content="Elites Only" IsChecked="{Binding Path=DH.KiteMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Elites}" />
+                </UniformGrid>
+            </GroupBox>
             <!--Strafe-->
             <Grid>
                 <Grid.ColumnDefinitions>

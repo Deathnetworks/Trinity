@@ -1243,12 +1243,12 @@ namespace Trinity.XmlTags
                         new Action(ret => UpdateRoute())
                     )
                 ),
-                new Decorator(ret => CacheData.NavigationObstacles.Any(o => o.Position.Distance2D(CurrentNavTarget) <= o.Radius * 2),
-                    new Sequence(
-                        new Action(ret => SetNodeVisited("Navigation obstacle detected at node point")),
-                        new Action(ret => UpdateRoute())
-                    )
-                ),
+                //new Decorator(ret => CacheData.NavigationObstacles.Any(o => o.Position.Distance2D(CurrentNavTarget) <= o.Radius * 2),
+                //    new Sequence(
+                //        new Action(ret => SetNodeVisited("Navigation obstacle detected at node point")),
+                //        new Action(ret => UpdateRoute())
+                //    )
+                //),
                 //new Decorator(ret => PlayerMover.MovementSpeed == 0 && myPos.Distance2D(CurrentNavTarget) <= 50f && !Navigator.Raycast(myPos, CurrentNavTarget),
                 //    new Sequence(
                 //        new Action(ret => SetNodeVisited("Stuck moving to node point, marking done (in LoS and nearby!)")),

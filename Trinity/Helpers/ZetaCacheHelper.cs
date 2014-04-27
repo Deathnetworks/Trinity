@@ -6,11 +6,13 @@ namespace Trinity.Helpers
     public class ZetaCacheHelper: IDisposable
     {
         private GreyMagic.ExternalReadCache externalReadCache;
+        private GreyMagic.FrameLock frame;
         public ZetaCacheHelper()
-        {            
-            ZetaDia.Actors.Update();
+        {
+            frame = ZetaDia.Memory.AcquireFrame();
             externalReadCache = ZetaDia.Memory.SaveCacheState();
             ZetaDia.Memory.TemporaryCacheState(false);
+            ZetaDia.Actors.Update();
         }
 
         ~ZetaCacheHelper()
@@ -21,6 +23,8 @@ namespace Trinity.Helpers
         {
             if (externalReadCache != null)
                 externalReadCache.Dispose();
+            if (frame != null)
+                frame.Dispose();
         }
     }
 }

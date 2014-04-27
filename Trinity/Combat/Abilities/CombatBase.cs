@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Trinity.Config;
+using Trinity.Config.Combat;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Common;
@@ -18,6 +19,9 @@ namespace Trinity.Combat.Abilities
         private static Vector3 lastZigZagLocation = Vector3.Zero;
         private static Vector3 zigZagPosition = Vector3.Zero;
         private static bool isCombatAllowed = true;
+        private static int playerKiteDistance = 0;
+        private static KiteMode playerKiteMode = KiteMode.Never;
+
 
         public enum AnimWait
         {
@@ -31,6 +35,23 @@ namespace Trinity.Combat.Abilities
             NoTimer = 4,
             NoPowerManager = 8
         }
+
+        /// <summary>
+        /// Distance to kite, read settings (class independant)
+        /// </summary>
+        public static int PlayerKiteDistance
+        {
+            get { return CombatBase.playerKiteDistance; }
+            set { CombatBase.playerKiteDistance = value; }
+        }
+
+        // When to Kite
+        public static KiteMode PlayerKiteMode
+        {
+            get { return CombatBase.playerKiteMode; }
+            set { CombatBase.playerKiteMode = value; }
+        }
+
 
         /// <summary>
         /// Allows for completely disabling combat. Settable through API only. 
@@ -268,7 +289,7 @@ namespace Trinity.Combat.Abilities
             set { currentPower = value; }
         }
 
-        public static HashSet<SNOPower> Hotbar
+        public static List<SNOPower> Hotbar
         {
             get
             {
@@ -307,7 +328,6 @@ namespace Trinity.Combat.Abilities
                         SNOPower = DefaultWeaponPower,
                         MinimumRange = DefaultWeaponDistance,
                         TargetACDGUID = CurrentTarget.ACDGuid,
-                        WaitForAnimationFinished = true
                     };
                 }
                 return new TrinityPower();
@@ -375,7 +395,7 @@ namespace Trinity.Combat.Abilities
         }
 
         /// <summary>
-        /// Performs basic checks to see if we have and can cast a power (hotbar, use timer, power manager)
+        /// Performs basic checks to see if we have and can cast a power (hotbar, power manager). Checks use timer for Wiz, DH, Monk
         /// </summary>
         /// <param name="power"></param>
         /// <returns></returns>

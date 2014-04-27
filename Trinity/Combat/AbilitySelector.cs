@@ -2,7 +2,6 @@
 using System.Linq;
 using Trinity.Combat.Abilities;
 using Trinity.Technicals;
-using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
@@ -56,47 +55,11 @@ namespace Trinity
                 return true;
             return false;
         }
-
-        /// <summary>
-        /// Quick and Dirty routine just to force a wait until the character is "free"
-        /// </summary>
-        /// <param name="maxLoops">The max safety loops.</param>
-        /// <param name="waitForAttacking">if set to <c>true</c> wait for attacking.</param>
-        public static void WaitWhileAnimating(int maxLoops = 10, bool waitForAttacking = false)
-        {
-            bool loop = true;
-            int loopCount = 0;
-            ACDAnimationInfo myAnimationState = ZetaDia.Me.CommonData.AnimationInfo;
-            while (loop)
-            {
-                loopCount++;
-                if (loopCount > maxLoops)
-                    loop = false;
-                bool isAnimating = false;
-                try
-                {
-                    myAnimationState = ZetaDia.Me.CommonData.AnimationInfo;
-                    if (myAnimationState == null || myAnimationState.State == AnimationState.Casting || myAnimationState.State == AnimationState.Channeling)
-                        isAnimating = true;
-                    if (waitForAttacking && (myAnimationState == null || myAnimationState.State == AnimationState.Attacking))
-                        isAnimating = true;
-                }
-                catch
-                {
-                    isAnimating = true;
-                }
-                if (!isAnimating)
-                    loop = false;
-                //DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Waiting for animation, maxLoops={0} waitForAttacking={1} anim={2}", maxSafetyLoops, waitForAttacking, myAnimationState.State);
-
-            }
-        }
-
-
+        
         /// <summary>
         /// A default power in case we can't use anything else
         /// </summary>
-        private static TrinityPower defaultPower = new TrinityPower(SNOPower.None, 10f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+        private static TrinityPower defaultPower = new TrinityPower();
 
         /// <summary>
         /// Returns an appropriately selected TrinityPower and related information
@@ -144,7 +107,7 @@ namespace Trinity
                             break;
                         // Witch Doctors
                         case ActorClass.Witchdoctor:
-                            power = GetWitchDoctorPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
+                            power = WitchDoctorCombat.GetPower();
                             break;
                         // Demon Hunters
                         case ActorClass.DemonHunter:

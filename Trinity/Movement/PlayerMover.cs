@@ -531,8 +531,6 @@ namespace Trinity.DbProvider
 
                 // Leap movement for a barb
                 if (Trinity.Settings.Combat.Barbarian.UseLeapOOC && Trinity.Hotbar.Contains(SNOPower.Barbarian_Leap) &&
-                    DateTime.UtcNow.Subtract(CacheData.AbilityLastUsed[SNOPower.Barbarian_Leap]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(SNOPower.Barbarian_Leap) &&
-                    DestinationDistance >= 20f &&
                     PowerManager.CanCast(SNOPower.Barbarian_Leap) && !ShrinesInArea(vMoveToTarget))
                 {
                     Vector3 vThisTarget = vMoveToTarget;
@@ -546,7 +544,6 @@ namespace Trinity.DbProvider
                 }
                 // Furious Charge movement for a barb
                 if (Trinity.Settings.Combat.Barbarian.UseChargeOOC && Trinity.Hotbar.Contains(SNOPower.Barbarian_FuriousCharge) && !bTooMuchZChange &&
-                    DateTime.UtcNow.Subtract(CacheData.AbilityLastUsed[SNOPower.Barbarian_FuriousCharge]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(SNOPower.Barbarian_FuriousCharge) &&
                     DestinationDistance >= 20f &&
                     PowerManager.CanCast(SNOPower.Barbarian_FuriousCharge) && !ShrinesInArea(vMoveToTarget))
                 {
@@ -569,10 +566,10 @@ namespace Trinity.DbProvider
                     DestinationDistance >= 18f &&
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault) && !ShrinesInArea(vMoveToTarget) &&
                     // Don't Vault into avoidance/monsters if we're kiting
-                    (Trinity.PlayerKiteDistance <= 0 || (Trinity.PlayerKiteDistance > 0 &&
-                     (!CacheData.TimeBoundAvoidance.Any(a => a.Position.Distance(vMoveToTarget) <= Trinity.PlayerKiteDistance) ||
+                    (CombatBase.PlayerKiteDistance <= 0 || (CombatBase.PlayerKiteDistance > 0 &&
+                     (!CacheData.TimeBoundAvoidance.Any(a => a.Position.Distance(vMoveToTarget) <= CombatBase.PlayerKiteDistance) ||
                      (!CacheData.TimeBoundAvoidance.Any(a => MathEx.IntersectsPath(a.Position, a.Radius, Trinity.Player.Position, vMoveToTarget))) ||
-                     !CacheData.MonsterObstacles.Any(a => a.Position.Distance(vMoveToTarget) <= Trinity.PlayerKiteDistance))))
+                     !CacheData.MonsterObstacles.Any(a => a.Position.Distance(vMoveToTarget) <= CombatBase.PlayerKiteDistance))))
                     )
                 {
 
@@ -670,9 +667,10 @@ namespace Trinity.DbProvider
 
 
                 bool hasWormHole = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Teleport && s.RuneIndex == 4);
+                bool hasCalamity = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Teleport && s.RuneIndex == 0);
 
                 // Teleport for a wizard 
-                if (CombatBase.CanCast(SNOPower.Wizard_Teleport, CombatBase.CanCastFlags.NoTimer) &&
+                if (!hasCalamity && CombatBase.CanCast(SNOPower.Wizard_Teleport, CombatBase.CanCastFlags.NoTimer) &&
                     CombatBase.TimeSincePowerUse(SNOPower.Wizard_Teleport) > 250 &&
                     DestinationDistance >= 10f && !ShrinesInArea(vMoveToTarget))
                 {

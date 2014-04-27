@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
 using Zeta.Common;
@@ -22,30 +24,56 @@ namespace Trinity
         }
         internal static KitePosition LastKitePosition = null;
 
-        private static void RefreshSetKiting(ref Vector3 vKitePointAvoid, bool NeedToKite, ref bool TryToKite)
+        private static void RefreshSetKiting(ref Vector3 vKitePointAvoid, bool NeedToKite)
         {
             using (new PerformanceLogger("RefreshDiaObjectCache.Kiting"))
             {
 
-                TryToKite = false;
+                bool TryToKite = false;
 
-                var monsterList = from m in ObjectCache
-                                  where m.IsUnit &&
-                                  m.Weight > 0 &&
-                                  m.RadiusDistance > 0 &&
-                                  m.RadiusDistance <= PlayerKiteDistance &&
-                                  (m.IsBossOrEliteRareUnique ||
-                                   ((m.HitPointsPct >= .15 || m.MonsterSize != MonsterSize.Swarm) && !m.IsBossOrEliteRareUnique)
-                                   )
-                                  select m;
+                List<TrinityCacheObject> kiteMonsterList = new List<TrinityCacheObject>();
 
-                if (CurrentTarget != null && CurrentTarget.IsUnit && PlayerKiteDistance > 0 && CurrentTarget.RadiusDistance <= PlayerKiteDistance)
+                if (CurrentTarget != null && CurrentTarget.IsUnit)
+                {
+                    switch (CombatBase.PlayerKiteMode)
+                    {
+                        case KiteMode.Never:
+                            break;
+                        case KiteMode.Elites:
+                            kiteMonsterList = (from m in ObjectCache
+                                               where m.IsUnit &&
+                                               m.RadiusDistance > 0 &&
+                                               m.RadiusDistance <= CombatBase.PlayerKiteDistance &&
+                                               m.IsBossOrEliteRareUnique
+                                               select m).ToList();
+                            break;
+                        case KiteMode.Bosses:
+                            kiteMonsterList = (from m in ObjectCache
+                                               where m.IsUnit &&
+                                               m.RadiusDistance > 0 &&
+                                               m.RadiusDistance <= CombatBase.PlayerKiteDistance &&
+                                               m.IsBoss
+                                               select m).ToList();
+                            break;
+                        case KiteMode.Always:
+                            kiteMonsterList = (from m in ObjectCache
+                                               where m.IsUnit &&
+                                               m.Weight > 0 &&
+                                               m.RadiusDistance > 0 &&
+                                               m.RadiusDistance <= CombatBase.PlayerKiteDistance &&
+                                               (m.IsBossOrEliteRareUnique ||
+                                                ((m.HitPointsPct >= .15 || m.MonsterSize != MonsterSize.Swarm) && !m.IsBossOrEliteRareUnique))
+                                               select m).ToList();
+                            break;
+                    }
+                }
+                if (kiteMonsterList.Any())
                 {
                     TryToKite = true;
                     vKitePointAvoid = Player.Position;
                 }
 
-                if (PlayerKiteDistance > 0 && monsterList.Count() > 0 && (Player.ActorClass != ActorClass.Wizard || IsWizardShouldKite()))
+                if (CombatBase.PlayerKiteDistance > 0 && kiteMonsterList.Count() > 0 && IsWizardShouldKite())
                 {
                     TryToKite = true;
                     vKitePointAvoid = Player.Position;
@@ -60,9 +88,9 @@ namespace Trinity
                     Logger.LogNormal("Attempting to avoid death!");
                     NeedToKite = true;
 
-                    monsterList = from m in ObjectCache
-                                  where m.IsUnit
-                                  select m;
+                    kiteMonsterList = (from m in ObjectCache
+                                       where m.IsUnit
+                                       select m).ToList();
                 }
 
                 // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
@@ -76,7 +104,7 @@ namespace Trinity
 
                 if (shouldKamikazeTreasureGoblins && (shouldEmergencyMove || shouldKite))
                 {
-                    Vector3 vAnySafePoint = NavHelper.FindSafeZone(false, 1, vKitePointAvoid, true, monsterList, shouldEmergencyMove);
+                    Vector3 vAnySafePoint = NavHelper.FindSafeZone(false, 1, vKitePointAvoid, true, kiteMonsterList, shouldEmergencyMove);
 
                     if (LastKitePosition == null)
                     {
@@ -113,7 +141,7 @@ namespace Trinity
                         {
                             Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}",
                                 vAnySafePoint, vAnySafePoint.Distance(Player.Position), MathUtil.GetHeading(MathUtil.FindDirectionDegree(Me.Position, vAnySafePoint)),
-                                Player.CurrentHealthPct, PlayerKiteDistance, monsterList.Count(),
+                                Player.CurrentHealthPct, CombatBase.PlayerKiteDistance, kiteMonsterList.Count(),
                                 NeedToKite, TryToKite);
                         }
                         CurrentTarget = new TrinityCacheObject()

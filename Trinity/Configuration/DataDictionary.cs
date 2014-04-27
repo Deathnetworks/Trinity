@@ -189,7 +189,7 @@ namespace Trinity
         public static HashSet<int> BossLevelAreaIDs { get { return bossLevelAreaIDs; } }
         private static readonly HashSet<int> bossLevelAreaIDs = new HashSet<int> { 
             109457, 185228, 60194, 130163, 60714, 19789, 62726, 90881, 195268, 58494, 81178, 60757, 111232, 112580, 
-            119656, 111516, 143648, 215396, 119882, 109563, 153669, 215235, 55313, 60193, 19789,
+            119656, 111516, 143648, 215396, 119882, 109563, 153669, 215235, 55313, 60193, 19789, 330576,
         };
 
         /// <summary>
@@ -580,6 +580,7 @@ namespace Trinity
 
             374751, // x1_PortalGuardian_A
             307339, // X1_Rockworm_Pand_Unique_HexMaze
+            297730, // x1_Malthael_Boss
         };
 
         // Three special lists used purely for checking for the existance of a player's summoned mystic ally, gargantuan, or zombie dog
@@ -665,6 +666,7 @@ namespace Trinity
             {368515, 5f}, // A5 Nephalem Switch -  Passage to Corvus
             {309432, 37f}, // x1_westm_Bridge
             {54850, 14f}, // a3dun_Keep_SiegeTowerDoor
+            {325136, 15f},
         };
 
         /// <summary>
@@ -881,6 +883,7 @@ namespace Trinity
 
             377253, // x1_Fortress_Crystal_Prison_Shield
             316221, // X1_WarpToPortal 
+            370187, // x1_Malthael_Boss_Orb_Collapse
 
         };
 

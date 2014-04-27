@@ -306,7 +306,7 @@ namespace Trinity
                 {
                     if (Trinity.HasHadArchonbuff)
                     {
-                        Trinity.Hotbar = new HashSet<SNOPower>(Trinity.hashCachedPowerHotbarAbilities);
+                        Trinity.Hotbar = new List<SNOPower>(Trinity.hashCachedPowerHotbarAbilities);
                     }
                     Trinity.HasHadArchonbuff = false;
                 }
@@ -337,28 +337,10 @@ namespace Trinity
                 // Update Hotbar Skills first
                 HotbarSkills.Update();
 
-                Trinity.Hotbar = new HashSet<SNOPower>();
-                for (int i = 0; i <= 5; i++)
-                {
-                    SNOPower power = HotbarSkills.GetPowerForSlot((HotbarSlot)i);
-                    Trinity.Hotbar.Add(power);
-                    if (!DataDictionary.LastUseAbilityTimeDefaults.ContainsKey(power))
-                    {
-                        DataDictionary.LastUseAbilityTimeDefaults.Add(power, DateTime.MinValue);
-                    }
-                    if (!CacheData.AbilityLastUsed.ContainsKey(power))
-                    {
-                        CacheData.AbilityLastUsed.Add(power, DateTime.MinValue);
-                    }
-                }
-                Trinity.HasMappedPlayerAbilities = true;
-                Trinity.ShouldRefreshHotbarAbilities = false;
-                Trinity.HotbarRefreshTimer.Restart();
-
                 SpellTracker.RefreshCachedSpells();
 
                 if (!Trinity.GetHasBuff(SNOPower.Wizard_Archon) && !Player.IsHidden)
-                    Trinity.hashCachedPowerHotbarAbilities = new HashSet<SNOPower>(Trinity.Hotbar);
+                    Trinity.hashCachedPowerHotbarAbilities = new List<SNOPower>(Trinity.Hotbar);
             }
 
             // Monk Seven Sided Strike: Sustained Attack

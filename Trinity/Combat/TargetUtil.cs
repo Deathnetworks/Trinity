@@ -47,7 +47,7 @@ namespace Trinity
                 return Trinity.CurrentTarget;
             }
         }
-        private static HashSet<SNOPower> Hotbar
+        private static List<SNOPower> Hotbar
         {
             get
             {
@@ -677,11 +677,11 @@ namespace Trinity
                                 targetCircle = 10f;
 
                             bool intersectsPath = MathUtil.IntersectsPath(CurrentTarget.Position, targetCircle, myPos, zigZagPoint);
-                            if (Trinity.PlayerKiteDistance <= 0 && !intersectsPath)
+                            if (CombatBase.PlayerKiteDistance <= 0 && !intersectsPath)
                                 continue;
 
                             // if we're kiting, lets not actualy run through monsters
-                            if (Trinity.PlayerKiteDistance > 0 && CacheData.MonsterObstacles.Any(m => m.Position.Distance(zigZagPoint) <= Trinity.PlayerKiteDistance))
+                            if (CombatBase.PlayerKiteDistance > 0 && CacheData.MonsterObstacles.Any(m => m.Position.Distance(zigZagPoint) <= CombatBase.PlayerKiteDistance))
                                 continue;
 
                             // Ignore point if any AoE in this point position

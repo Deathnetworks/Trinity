@@ -68,10 +68,8 @@ namespace Trinity.XmlTags
                     while (!ZetaDia.IsInTown)
                     {
                         iSafetyLoops++;
-                        Trinity.WaitWhileAnimating(5, true);
                         ZetaDia.Me.UsePower(SNOPower.UseStoneOfRecall, Trinity.Player.Position, ZetaDia.Me.WorldDynamicId, -1);
                         Thread.Sleep(1000);
-                        Trinity.WaitWhileAnimating(1000, true);
                         if (iSafetyLoops > 5)
                             break;
                     }

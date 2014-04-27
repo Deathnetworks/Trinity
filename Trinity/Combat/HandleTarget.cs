@@ -619,8 +619,6 @@ namespace Trinity
                                                     );
                                             }
 
-                                            WaitWhileAnimating(12, true);
-
                                             if (CurrentTarget.RActorGuid == IgnoreRactorGUID || DataDictionary.DestroyAtLocationIds.Contains(CurrentTarget.ActorSNO))
                                             {
                                                 // Location attack - attack the Vector3/map-area (equivalent of holding shift and left-clicking the object in-game to "force-attack")
@@ -655,8 +653,7 @@ namespace Trinity
                                             }
 
                                             CacheData.AbilityLastUsed[CombatBase.CurrentPower.SNOPower] = DateTime.UtcNow;
-                                            //CurrentPower.SNOPower = SNOPower.None;
-                                            WaitWhileAnimating(6, true);
+
                                             // Prevent this EXACT object being targetted again for a short while, just incase
                                             IgnoreRactorGUID = CurrentTarget.RActorGuid;
                                             IgnoreTargetForLoops = 3;
@@ -821,7 +818,6 @@ namespace Trinity
                             }
                             if (bFoundSpecialMovement)
                             {
-                                WaitWhileAnimating(6, true);
                                 // Store the current destination for comparison incase of changes next loop
                                 vLastMoveToTarget = vCurrentDestination;
                                 // Reset total body-block count, since we should have moved
@@ -1207,54 +1203,51 @@ namespace Trinity
                     TimeSinceUse(SNOPower.Barbarian_Leap) >= CombatBase.GetSNOPowerUseDelay(SNOPower.Barbarian_Leap) &&
                     PowerManager.CanCast(SNOPower.Barbarian_Leap))
                 {
-                    WaitWhileAnimating(3, true);
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Leap, vCurrentDestination, CurrentWorldDynamicId, -1);
-                    CacheData.AbilityLastUsed[SNOPower.Barbarian_Leap] = DateTime.UtcNow;
+                    SpellHistory.RecordSpell(SNOPower.Barbarian_Leap);
                     bFoundSpecialMovement = true;
                 }
+
                 // Furious Charge movement for a barb
                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_FuriousCharge) &&
                     TimeSinceUse(SNOPower.Barbarian_FuriousCharge) >= CombatBase.GetSNOPowerUseDelay(SNOPower.Barbarian_FuriousCharge) &&
                     PowerManager.CanCast(SNOPower.Barbarian_FuriousCharge))
                 {
-                    WaitWhileAnimating(3, true);
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_FuriousCharge, vCurrentDestination, CurrentWorldDynamicId, -1);
-                    CacheData.AbilityLastUsed[SNOPower.Barbarian_FuriousCharge] = DateTime.UtcNow;
+                    SpellHistory.RecordSpell(SNOPower.Barbarian_FuriousCharge);
                     bFoundSpecialMovement = true;
                 }
+
                 // Vault for a Demon Hunter
-                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Vault) && Settings.Combat.DemonHunter.VaultMode != DemonHunterVaultMode.MovementOnly &&
-                    DateTime.UtcNow.Subtract(CacheData.AbilityLastUsed[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
-                    PowerManager.CanCast(SNOPower.DemonHunter_Vault) &&
-                    (PlayerKiteDistance <= 0 || (!CacheData.MonsterObstacles.Any(a => a.Position.Distance(vCurrentDestination) <= PlayerKiteDistance) &&
-                    !CacheData.TimeBoundAvoidance.Any(a => a.Position.Distance(vCurrentDestination) <= PlayerKiteDistance))) &&
-                    (!CacheData.TimeBoundAvoidance.Any(a => MathEx.IntersectsPath(a.Position, a.Radius, Trinity.Player.Position, vCurrentDestination)))
-                    )
+                if (!bFoundSpecialMovement && CombatBase.CanCast(SNOPower.DemonHunter_Vault) && Settings.Combat.DemonHunter.VaultMode != DemonHunterVaultMode.MovementOnly &&
+                    CombatBase.TimeSincePowerUse(SNOPower.DemonHunter_Vault) >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
+                    (CombatBase.PlayerKiteDistance <= 0 || (!CacheData.MonsterObstacles.Any(a => a.Position.Distance(vCurrentDestination) <= CombatBase.PlayerKiteDistance) &&
+                    !CacheData.TimeBoundAvoidance.Any(a => a.Position.Distance(vCurrentDestination) <= CombatBase.PlayerKiteDistance))) &&
+                    (!CacheData.TimeBoundAvoidance.Any(a => MathEx.IntersectsPath(a.Position, a.Radius, Trinity.Player.Position, vCurrentDestination))))
                 {
-                    WaitWhileAnimating(3, true);
                     ZetaDia.Me.UsePower(SNOPower.DemonHunter_Vault, vCurrentDestination, CurrentWorldDynamicId, -1);
-                    CacheData.AbilityLastUsed[SNOPower.DemonHunter_Vault] = DateTime.UtcNow;
+                    SpellHistory.RecordSpell(SNOPower.DemonHunter_Vault);
                     bFoundSpecialMovement = true;
                 }
+
                 // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Wizard_Teleport) &&
                     TimeSinceUse(SNOPower.Wizard_Teleport) >= CombatBase.GetSNOPowerUseDelay(SNOPower.Wizard_Teleport) &&
                     Player.PrimaryResource >= 15 &&
                     PowerManager.CanCast(SNOPower.Wizard_Teleport))
                 {
-                    WaitWhileAnimating(3, true);
                     ZetaDia.Me.UsePower(SNOPower.Wizard_Teleport, vCurrentDestination, CurrentWorldDynamicId, -1);
-                    CacheData.AbilityLastUsed[SNOPower.Wizard_Teleport] = DateTime.UtcNow;
+                    SpellHistory.RecordSpell(SNOPower.Wizard_Teleport);
                     bFoundSpecialMovement = true;
                 }
+
                 // Archon Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Wizard_Archon_Teleport) &&
                     TimeSinceUse(SNOPower.Wizard_Archon_Teleport) >= CombatBase.GetSNOPowerUseDelay(SNOPower.Wizard_Archon_Teleport) &&
                     PowerManager.CanCast(SNOPower.Wizard_Archon_Teleport))
                 {
-                    WaitWhileAnimating(3, true);
                     ZetaDia.Me.UsePower(SNOPower.Wizard_Archon_Teleport, vCurrentDestination, CurrentWorldDynamicId, -1);
-                    CacheData.AbilityLastUsed[SNOPower.Wizard_Archon_Teleport] = DateTime.UtcNow;
+                    SpellHistory.RecordSpell(SNOPower.Wizard_Archon_Teleport);
                     bFoundSpecialMovement = true;
                 }
                 return bFoundSpecialMovement;
@@ -1458,41 +1451,35 @@ namespace Trinity
                     case GObjectType.Unit:
                         {
                             // Pick a range to try to reach
-                            TargetRangeRequired = CombatBase.CurrentPower.SNOPower == SNOPower.None ? 9f : CombatBase.CurrentPower.MinimumRange;
+                            TargetRangeRequired = CombatBase.CurrentPower.MinimumRange;
                             break;
                         }
                     // * Item - need to get within 6 feet and then interact with it
                     case GObjectType.Item:
                         {
-                            TargetRangeRequired = 6f;
+                            TargetRangeRequired = 2f;
 
                             break;
                         }
                     // * Gold - need to get within pickup radius only
                     case GObjectType.Gold:
                         {
-                            TargetRangeRequired = 1f; //Player.GoldPickupRadius - 2f;
+                            TargetRangeRequired = 1f; 
                             vCurrentDestination = MathEx.CalculatePointFrom(Player.Position, CurrentTarget.Position, -2f);
-                            //if (TargetRangeRequired < 2f)
-                            //    TargetRangeRequired = 2f;
                             break;
                         }
                     // * Globes - need to get within pickup radius only
                     case GObjectType.PowerGlobe:
                     case GObjectType.HealthGlobe:
                         {
-                            TargetRangeRequired = Player.GoldPickupRadius;
-                            if (TargetRangeRequired < 2f)
-                                TargetRangeRequired = 2f;
-                            if (TargetRangeRequired > 5f)
-                                TargetRangeRequired = 5f;
+                            TargetRangeRequired = 2f;
                             break;
                         }
                     // * Shrine & Container - need to get within 8 feet and interact
                     case GObjectType.HealthWell:
                         {
-                            TargetRangeRequired = CurrentTarget.Radius + 5f;
-                            //TargetRangeRequired = 5f;
+                            TargetRangeRequired = 2f;
+
                             float _range;
                             if (DataDictionary.CustomObjectRadius.TryGetValue(CurrentTarget.ActorSNO, out _range))
                             {
@@ -1503,9 +1490,8 @@ namespace Trinity
                     case GObjectType.Shrine:
                     case GObjectType.Container:
                         {
-                            TargetRangeRequired = 8f;
-                            if (ForceCloseRangeTarget)
-                                TargetRangeRequired -= 2f;
+                            TargetRangeRequired = 2f;
+
                             float range;
                             if (DataDictionary.CustomObjectRadius.TryGetValue(CurrentTarget.ActorSNO, out range))
                             {
@@ -1518,7 +1504,7 @@ namespace Trinity
                             if (CurrentTarget.IsQuestGiver)
                             {
                                 vCurrentDestination = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.Radius + 2f);
-                                TargetRangeRequired = CurrentTarget.Radius + 2f;
+                                TargetRangeRequired = CurrentTarget.Radius + 3f;
                             }
                             else
                             {
@@ -1580,10 +1566,6 @@ namespace Trinity
         {
             using (new PerformanceLogger("HandleTarget.HandleUnitInRange"))
             {
-                // Wait while animating before an attack
-                if (CombatBase.CurrentPower.WaitForAnimationFinished)
-                    WaitWhileAnimating(5, false);
-
                 // try WW every tick if we want - we should use other methods to avoid this garbage code... 
                 float dist = 0;
                 if (CombatBase.CurrentPower.TargetPosition != Vector3.Zero)
@@ -1607,10 +1589,7 @@ namespace Trinity
                     CacheData.AbilityLastUsed[CombatBase.CurrentPower.SNOPower] = DateTime.UtcNow;
                     lastGlobalCooldownUse = DateTime.UtcNow;
                     LastPowerUsed = CombatBase.CurrentPower.SNOPower;
-                    //CombatBase.CurrentPower.SNOPower = SNOPower.None;
-                    // Wait for animating AFTER the attack
-                    if (CombatBase.CurrentPower.WaitForAnimationFinished)
-                        WaitWhileAnimating(3, false);
+
                     // See if we should force a long wait AFTERWARDS, too
                     // Force waiting AFTER power use for certain abilities
                     IsWaitingAfterPower = false;
@@ -1656,7 +1635,6 @@ namespace Trinity
             {
                 int iInteractAttempts;
                 // Pick the item up the usepower way, and "blacklist" for a couple of loops
-                WaitWhileAnimating(12, true);
                 ZetaDia.Me.UsePower(SNOPower.Axe_Operate_Gizmo, Vector3.Zero, 0, CurrentTarget.ACDGuid);
                 IgnoreRactorGUID = CurrentTarget.RActorGuid;
                 IgnoreTargetForLoops = 3;
@@ -1728,7 +1706,7 @@ namespace Trinity
                         ItemsPickedStats.TotalInfernalKeys++;
                     }
                 }
-                WaitWhileAnimating(5, true);
+
                 // Count how many times we've tried interacting
                 if (!CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
                 {

@@ -146,7 +146,7 @@ namespace Trinity
 
         // A count for player mystic ally, gargantuans, and zombie dogs
         private static int iPlayerOwnedMysticAlly = 0;
-        public static int iPlayerOwnedGargantuan = 0;
+        public static int PlayerOwnedGargantuan = 0;
         public static int PlayerOwnedZombieDog = 0;
         private static int iPlayerOwnedDHPets = 0;
 
@@ -207,11 +207,6 @@ namespace Trinity
         // These values below are set on a per-class basis later on, so don't bother changing them here! These are the old default values
         public static double PlayerEmergencyHealthPotionLimit = 0.35;
         private static double PlayerEmergencyHealthGlobeLimit = 0.35;
-
-        /// <summary>
-        /// Distance to kite, read settings (class independant)
-        /// </summary>
-        internal static int PlayerKiteDistance = 0;
 
         /*
          *  Blacklists
@@ -341,10 +336,10 @@ namespace Trinity
         internal static bool HasMappedPlayerAbilities = false;
 
         // Contains our apparent *CURRENT* hotbar abilities, cached in a fast hash
-        public static HashSet<SNOPower> Hotbar = new HashSet<SNOPower>();
+        public static List<SNOPower> Hotbar = new List<SNOPower>();
 
         // Contains a hash of our LAST hotbar abilities before we transformed into archon (for quick and safe hotbar restoration)
-        internal static HashSet<SNOPower> hashCachedPowerHotbarAbilities = new HashSet<SNOPower>();
+        internal static List<SNOPower> hashCachedPowerHotbarAbilities = new List<SNOPower>();
 
         // A list and a dictionary for quick buff checking and buff references
         internal static List<Buff> listCachedBuffs = new List<Buff>();
@@ -435,8 +430,6 @@ namespace Trinity
         private static double w_HighestWeightFound;
 
         private static bool NeedToKite = false;
-        private static bool TryToKite = false;
-
 
         /// <summary>
         /// Used for trimming off numbers from object names in RefreshDiaObject

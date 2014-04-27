@@ -50,11 +50,14 @@ namespace Trinity
                   CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
             }
 
+            float customRadius;
+            if (DataDictionary.DefaultAvoidanceCustomRadius.TryGetValue(CurrentCacheObject.ActorSNO, out customRadius))
+            {
+                CurrentCacheObject.Radius = customRadius;
+            }
+
             double minAvoidanceHealth = GetAvoidanceHealth(CurrentCacheObject.ActorSNO);
             double minAvoidanceRadius = GetAvoidanceRadius(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
-
-            // cap avoidance to 30f maximum
-            minAvoidanceRadius = Math.Min(30f, minAvoidanceRadius);
 
             // Are we allowed to path around avoidance?
             if (Settings.Combat.Misc.AvoidanceNavigation)
@@ -159,16 +162,6 @@ namespace Trinity
                             CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO, minAvoidanceRadius, minAvoidanceHealth, CurrentCacheObject.Distance);
                     }
                 }
-                else
-                {
-                    // Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "NOT standing in Avoidance Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
-                    //    CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
-                }
-            }
-            else
-            {
-                //Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Enough health for avoidance, ignoring Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
-                //CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
             }
 
             return AddToCache;

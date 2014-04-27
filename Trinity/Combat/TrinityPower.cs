@@ -40,10 +40,7 @@ namespace Trinity
         /// The number of 1/10th second intervals we should wait after casting this power
         /// </summary>
         public float WaitTicksAfterUse { get; set; }
-        /// <summary>
-        /// Whether or not we should wait for the player animation to complete after casting this power
-        /// </summary>
-        public bool WaitForAnimationFinished { get; set; }
+
         /// <summary>
         /// The DateTime when the power was assigned
         /// </summary>
@@ -144,7 +141,6 @@ namespace Trinity
             TargetACDGUID = -1;
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
             WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
-            WaitForAnimationFinished = false;
         }
 
         /// <summary>
@@ -162,7 +158,6 @@ namespace Trinity
             TargetACDGUID = -1;
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
             WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
-            WaitForAnimationFinished = true;
             PowerAssignmentTime = DateTime.UtcNow;
         }
 
@@ -181,7 +176,6 @@ namespace Trinity
             TargetACDGUID = -1;
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
             WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
-            WaitForAnimationFinished = true;
             PowerAssignmentTime = DateTime.UtcNow;
         }
 
@@ -200,7 +194,6 @@ namespace Trinity
             TargetACDGUID = targetACDGuid;
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
             WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
-            WaitForAnimationFinished = true;
             PowerAssignmentTime = DateTime.UtcNow;
         }
 
@@ -219,7 +212,6 @@ namespace Trinity
             TargetACDGUID = -1;
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
             WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
-            WaitForAnimationFinished = true;
             PowerAssignmentTime = DateTime.UtcNow;
         }
 
@@ -238,7 +230,6 @@ namespace Trinity
             TargetACDGUID = -1;
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
             WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
-            WaitForAnimationFinished = true;
             PowerAssignmentTime = DateTime.UtcNow;
         }
 
@@ -261,35 +252,9 @@ namespace Trinity
             TargetACDGUID = targetACDGUID;
             WaitTicksBeforeUse = waitTicksBeforeUse;
             WaitTicksAfterUse = waitTicksAfterUse;
-            WaitForAnimationFinished = true;
             PowerAssignmentTime = DateTime.UtcNow;
         }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TrinityPower" /> class.
-        /// </summary>
-        /// <param name="snoPower">The SNOPower to be used</param>
-        /// <param name="minimumRange">The minimum range required from the Position or Target to be used</param>
-        /// <param name="position">The Position to use the power at</param>
-        /// <param name="targetDynamicWorldId">Usually the CurrentDynamicWorlID</param>
-        /// <param name="targetACDGUID">The Unit we are targetting</param>
-        /// <param name="waitTicksBeforeUse">The number of "ticks" to wait before using a power - logically 1/10th of a second</param>
-        /// <param name="waitTicksAfterUse">The number of "ticks" to wait after using a power - logically 1/10th of a second</param>
-        /// <param name="waitForAnimationFinished">Force the bot to wait for casting animation to complete after using</param>
-        public TrinityPower(SNOPower snoPower, float minimumRange, Vector3 position, int targetDynamicWorldId, int targetACDGUID, float waitTicksBeforeUse, float waitTicksAfterUse, bool waitForAnimationFinished)
-        {
-            SNOPower = snoPower;
-            MinimumRange = minimumRange;
-            TargetPosition = position;
-            TargetDynamicWorldId = targetDynamicWorldId;
-            TargetACDGUID = targetACDGUID;
-            WaitTicksBeforeUse = waitTicksBeforeUse;
-            WaitTicksAfterUse = waitTicksAfterUse;
-            WaitForAnimationFinished = waitForAnimationFinished;
-            PowerAssignmentTime = DateTime.UtcNow;
-        }
-
-
+      
         public bool Equals(TrinityPower other)
         {
             return this.SNOPower == other.SNOPower &&
@@ -303,13 +268,12 @@ namespace Trinity
         public override string ToString()
         {
             return
-            String.Format("power={0} pos={1} acdGuid={2} preWait={3} postWait={4} animWait={5} timeSinceAssigned={6} timeSinceUse={7} range={8}",
+            String.Format("power={0} pos={1} acdGuid={2} preWait={3} postWait={4} timeSinceAssigned={5} timeSinceUse={6} range={7}",
                     this.SNOPower,
                     this.TargetPosition,
                     this.TargetACDGUID,
                     this.WaitTicksBeforeUse,
                     this.WaitTicksAfterUse,
-                    this.WaitForAnimationFinished,
                     this.TimeSinceAssigned,
                     this.TimeSinceUse,
                     this.MinimumRange);

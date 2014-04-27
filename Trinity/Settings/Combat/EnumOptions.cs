@@ -59,6 +59,14 @@ namespace Trinity.Config.Combat
         MovementOnly
     }
 
+    public enum KiteMode
+    {
+        Never,
+        Always,
+        Bosses,
+        Elites,
+    }
+
     public enum TrinityItemQuality
     {
         Invalid = -1,

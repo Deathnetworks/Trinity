@@ -61,6 +61,9 @@ namespace Trinity
 
         private static bool CacheDiaObject(DiaObject freshObject)
         {
+            if (!freshObject.IsValid)
+                return false;
+
             /*
              *  Initialize Variables
              */

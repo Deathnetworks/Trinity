@@ -34,8 +34,8 @@ namespace Trinity
                 }
 
                 // We keep dying because we're spawning in AoE and next to 50 elites and we need to just leave the game
-                if (DateTime.UtcNow.Subtract(Trinity.LastDeathTime).TotalSeconds < 30 && 
-                    ZetaDia.Me.Inventory.Equipped.Any() && 
+                if (DateTime.UtcNow.Subtract(Trinity.LastDeathTime).TotalSeconds < 30 &&
+                    ZetaDia.Me.Inventory.Equipped.Any() &&
                     ZetaDia.Me.Inventory.Equipped.Average(i => i.DurabilityPercent) < 0.05 && !ZetaDia.IsInTown)
                 {
                     Logger.Log("Durability is zero, emergency leave game");
@@ -65,41 +65,41 @@ namespace Trinity
                     switch (Player.ActorClass)
                     {
                         case ActorClass.Barbarian:
-                            // What health % should we use a potion, or look for a globe
                             PlayerEmergencyHealthPotionLimit = Settings.Combat.Barbarian.PotionLevel;
                             PlayerEmergencyHealthGlobeLimit = Settings.Combat.Barbarian.HealthGlobeLevel;
-                            PlayerKiteDistance = Settings.Combat.Barbarian.KiteLimit;
+                            CombatBase.PlayerKiteDistance = Settings.Combat.Barbarian.KiteLimit;
+                            CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Never;
                             break;
                         case ActorClass.Crusader:
-                            // What health % should we use a potion, or look for a globe
                             PlayerEmergencyHealthPotionLimit = Settings.Combat.Crusader.PotionLevel;
                             PlayerEmergencyHealthGlobeLimit = Settings.Combat.Crusader.HealthGlobeLevel;
-                            PlayerKiteDistance = 0;
+                            CombatBase.PlayerKiteDistance = 0;
+                            CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Never;
                             break;
                         case ActorClass.Monk:
-                            // What health % should we use a potion, or look for a globe
                             PlayerEmergencyHealthPotionLimit = Settings.Combat.Monk.PotionLevel;
                             PlayerEmergencyHealthGlobeLimit = Settings.Combat.Monk.HealthGlobeLevel;
                             // Monks never kite :)
-                            PlayerKiteDistance = 0;
+                            CombatBase.PlayerKiteDistance = 0;
+                            CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Never;
                             break;
                         case ActorClass.Wizard:
-                            // What health % should we use a potion, or look for a globe
                             PlayerEmergencyHealthPotionLimit = Settings.Combat.Wizard.PotionLevel;
                             PlayerEmergencyHealthGlobeLimit = Settings.Combat.Wizard.HealthGlobeLevel;
-                            PlayerKiteDistance = Settings.Combat.Wizard.KiteLimit;
+                            CombatBase.PlayerKiteDistance = Settings.Combat.Wizard.KiteLimit;
+                            CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Always;
                             break;
                         case ActorClass.Witchdoctor:
-                            // What health % should we use a potion, or look for a globe
                             PlayerEmergencyHealthPotionLimit = Settings.Combat.WitchDoctor.PotionLevel;
                             PlayerEmergencyHealthGlobeLimit = Settings.Combat.WitchDoctor.HealthGlobeLevel;
-                            PlayerKiteDistance = Settings.Combat.WitchDoctor.KiteLimit;
+                            CombatBase.PlayerKiteDistance = Settings.Combat.WitchDoctor.KiteLimit;
+                            CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Always;
                             break;
                         case ActorClass.DemonHunter:
-                            // What health % should we use a potion, or look for a globe
                             PlayerEmergencyHealthPotionLimit = Settings.Combat.DemonHunter.PotionLevel;
                             PlayerEmergencyHealthGlobeLimit = Settings.Combat.DemonHunter.HealthGlobeLevel;
-                            PlayerKiteDistance = Settings.Combat.DemonHunter.KiteLimit;
+                            CombatBase.PlayerKiteDistance = Settings.Combat.DemonHunter.KiteLimit;
+                            CombatBase.PlayerKiteMode = Settings.Combat.DemonHunter.KiteMode;
                             break;
                     }
                 }
