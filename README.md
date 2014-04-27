@@ -1,6 +1,232 @@
 ﻿
 # Trinity
 
+### Changelog 1.8.27
+
+* DemonHunter: Added Min Hatred for RapidFire option
+
+* DemonHunter: Added Checkbox to use Vengeance on Elites only
+
+* WitchDoctor Fetish Armoy will now be used when elites are on screen
+
+* WitchDoctor Gargantuan runes now supported
+
+* Added Wizard Teleport Calamity rune support
+
+* Opening Horadric Caches should now work again
+
+* Refactored WitchDoctor combat logic into new Combat Class
+
+* Added Experimental Kite Mode Options for DemonHunter... still needs some work
+
+* Malthael boss fight should work better (less dying :))
+
+* Fixed player summons not being counted
+
+* Added safety check to SafeClickUIButtons (IsLoadingWorld and Exception catch for Readmemory error)
+
+* Set default value to of OpenHoradricCache to true
+
+* Added "Wait for loot delay" option for Containers
+
+* Refactored OOC Movement for Vault, Teleport
+
+* Squelched OutOfMemoryExceptions in Navigator.MoveTo
+
+* TrinityExploreDungeon profile tag logging is less noisy
+
+* Bounty Events will now only be waited for when there's a cursed chest or shrine nearby
+
+* Horadric Caches will no longer be stashed if we have the option to open them selected
+
+* WitchDoctor now has option to spam Fetish Army
+
+* Added option to disable Bounty Events
+
+* Window Title updating should work again
+
+* TrinityExploreDungeon now uses similar logic to the "RiftBot" plugin
+
+* Fixed not resetting timer in TrinityExploreDungeon ResetCachedDone
+
+
+### Changelog 1.8.26
+
+* Removed CollisionSphere cache
+
+* Removed bunch of static cache variables
+
+* Refactored & Simplified how Position, Distance and Radius are calculated and used for all objects
+
+* Fixed killing corrupt growths in A4
+
+* Fixed picking up gold
+
+* TrinityExploreDungeon should be better about completing the final rift level when using RiftComplete
+
+* Trinity will no longer try to pickup items in Town when Vendoring
+
+* Updated DemonHunter with KevinSpacey's Preparation
+
+* Updated container whitelists with KevinSpacey's corpses and things
+
+* Fixed TrinityExploreDungeon exit finder ending when MinimapMarker is 'exit' portal to town
+
+* Fixed TrinityExploreDungeon not reseting in a While tag
+
+### Changelog 1.8.25
+
+* Merged some "RiftBot" plugin functionality into TrinityExploreDungeon
+
+* Added Event Blacklisting - fixes re-enabling Event timer every time we engaged in combat
+
+* All targets except items are now raycasted
+
+* Wizard Archon Teleport will only teleport away from combat if kite limit is set
+
+* GoldInactivity timer should now be reset when the bot is paused
+
+* Fixed crash when Trinity options is opened/closed and no profile is loaded
+
+* TrinityExploreDungeon will now always prioritize/explore Rift dungeon exits
+
+* TrinityExploreDungeon will quit trying to move to a Priority Scene if it gets stuck too many times
+
+* Refactored caching a little more
+
+* Interactable Gizmo's which are LootContainers should no longer be interacted with once "open"
+
+* Fixed exception in new Logging antispam
+
+* Increased Poison Tree Avoidance time to 15 seconds
+
+* Fixed for .392 (left out LevelAreas from QuestInfo)
+
+* Logging will no longer spam messages if it's the same message
+
+* Fixed Diablo Health Wells
+
+* Event Timer is reset as long as we have a target
+
+* Event Timer increased to 90 seconds
+
+* Wizard will now use Archon Disintegrate if no other conditions match
+
+* Fixed for DB Beta .392
+
+* Added more checking for opening Horadric Caches during TownRun
+
+* BigBadVooDoo should now be cast on bosses *when in range*
+
+* Editing Trinity settings should now correctly take effect for current pickup items and will update the DB window title if needed
+
+* Interactions should work better
+
+* Refactored untargetable logic for Gizmos
+
+* Fixed exception in LoS check
+
+* Reduced range of DemonHunter rapid fire
+
+* HOPEFULLY fixed TrinityExploreDungeon not ending when using BountyComplete
+
+* Added ItemDroppedAppender for mucho faster faster ItemsDropped.csv logging
+
+* Added lots of PerformanceLogging for RefreshItem
+
+* Interacting with NPC's should work better
+
+* Fixed XP Stats in OutputReport
+
+* Trinity will no only interact with quest givers in Adventure mode and when NOT performing  a TownRun
+
+* WD BigBadVoodoo will now be used when current target is a boss
+
+* Removed cooldown check on Wizard Teleport for movement
+
+* Hopefully fixed interact radius with NPC's and other Interactables
+
+* DH Preparation now has a minimum 1 second cooldown (updated TVar's spell delay)
+
+* WD BigBadVoodoo should work better
+
+* Barbarian Earthquake should work better
+
+* Fixed not raycasting in "Always Raycast Worlds" (Pandemonium Fortress)
+
+### Changelog 1.8.24
+
+
+* Added EndType PortalExitMarker for TrinityExploreDungeon. This will find a Dungeon Exit without specifying the NameHash. e.g. until="PortalExitFound"
+
+* TrinityExploreDungeon will now investigate any MinimapMarkers that are "PointsofInterest" or "PortalExit" types
+
+* Trinity will attempt to stay at the event start position for Cursed Chests/Shrines (will add option to enable/disable this and timeout soon)
+
+* Fixed Trinity not picking up items when using TrinityTownPortal/UseTownPortal
+
+* Fixed not properly setting cell weights on navigation obstacles
+
+* Refactored object hashing a little
+
+* Fixed Trinity not counting Zombie Dogs when we don't have Summon Zombie Dogs spell
+
+* Fixed Earthquake not being cast when it should - it should also be cast at a proper location now too
+
+* DemonHunter Sentry's will be used after 6s/6s/6s/6s/12s delay (if available)
+
+* DemonHunter preperation w/ Punishment now has a 1 second cooldown
+
+* DemonHunter TVar for Cluster Arrow use range added
+
+* Fixed Exception when WitchDoctor Firebats
+
+* Fixed JumpLinkPortals not being cached
+
+* Refactored PrimaryTargetCount'ing - should be faster and more reliable
+
+* ToggleTargeting with Combat=False and Looting=False should work again
+
+### Changelog 1.8.23
+
+* Fixed TrinityTownPortal either using -1 or 2500 as waitTime and never using the defined wait time.
+
+* TrinityExploreDungeon now has EndType of "BountyComplete"... aka until="BountyComplete"
+
+* TrinityExploreDungeon now has EndType of "RiftComplete"... aka until="RiftComplete" (needs testing)
+
+* Added EndAnimation dictionary for interactables
+
+* Bounty Objectives (Bounty bosses and Rift bosses) are always added to cache and always given weight as long as the bot can "see" them
+
+* Added TrinityBountyInfo and TrinityQuestInfo cache classes
+
+* Trinity will now kill all monsters in Rifts, Kill type bounties and Clear type bounties when there is a kill counter available
+
+* Fixed typo in "Pickup Rift Keys" data binding
+
+* Added Gizmo's as possible Bounty Objectives
+
+* Pandemonium Fortress portals should work a little better
+
+* Trinity will now automatically interact with Quest Givers
+
+* Trinity will now try to wait and complete optional Event Quests (e.g. Cursed Chests, Cursed Shrines, etc)
+
+* Trinity will now try to move as close as possible range before destroying barricades and destructibles
+
+* Trinity will no longer try to pickup items when doing a TownRun
+
+* Fixed GoldInactivity timer running while bot is paused
+
+* Fixed performance issues related to heavy logging
+
+* Refactored HaveBounty a little
+
+* Trinity should be better about targetting in Pandemonium Fortress
+
+* Untargetable Gizmo's and Invulnerable Destructible objects should be appropriately ignored and pathing around them should work better
+
 ### Changelog 1.8.22
 
 * Removed WorldHeightCache and Raycast Cache to save memory
