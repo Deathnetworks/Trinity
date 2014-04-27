@@ -284,23 +284,29 @@ namespace Trinity
                          */
                         // Avoidance
                         timers[2].Start();
-                        if (CacheData.TimeBoundAvoidance.Any(a => Vector3.Distance(xyz, a.Position) - a.Radius <= gridSquareRadius))
+                        if (CacheData.TimeBoundAvoidance.Any(a => xyz.Distance2DSqr(a.Position) - (a.Radius * a.Radius) <= gridSquareRadius * gridSquareRadius))
                         {
                             nodesAvoidance++;
                             continue;
                         }
+                        timers[2].Stop();
 
+                        timers[9].Start();
                         // Obstacles
-                        if (CacheData.NavigationObstacles.Any(a => Vector3.Distance(xyz, a.Position) - a.Radius <= gridSquareRadius))
+                        if (CacheData.NavigationObstacles.Any(a => xyz.Distance2DSqr(a.Position) - (a.Radius * a.Radius) <= gridSquareRadius * gridSquareRadius))
                         {
                             nodesMonsters++;
                             continue;
                         }
-                        if (CacheData.NavigationObstacles.Any(a => MathUtil.IntersectsPath(a.Position, a.Radius, Trinity.Player.Position, gridPoint.Position)))
+                        timers[9].Stop();
+
+                        timers[10].Start();
+                        if (CacheData.NavigationObstacles.Any(a => a.Position.Distance2DSqr(Trinity.Player.Position) < maxDistance * maxDistance &&
+                            MathUtil.IntersectsPath(a.Position, a.Radius, Trinity.Player.Position, gridPoint.Position)))
                         {
                             pathFailures++;
                         }
-                        timers[2].Stop();
+                        timers[10].Stop();
 
                         // Monsters
                         if (shouldKite)
@@ -471,7 +477,7 @@ namespace Trinity
             }
 
             Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Kiting grid found {0}, distance: {1:0}, weight: {2:0}", bestPoint.Position, bestPoint.Distance, bestPoint.Weight);
-            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, 
+            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
             "Kiting grid stats Total={0} CantStand={1} ZDiff {2} GT45Raycast {3} Avoidance {4} Monsters {5} pathFailures {6} navRaycast {7} "
             + "pointsFound {8} shouldKite={9} isStuck={10} avoidDeath={11} monsters={12} timers={13}",
                 totalNodes,
@@ -500,7 +506,7 @@ namespace Trinity
 
         //    /*
         //    generate 50x50 grid of 5x5 squares within max 100 distance from origin to edge of grid
-            
+
         //    all squares start with 0 weight
 
         //    check if Center IsNavigable
@@ -509,7 +515,7 @@ namespace Trinity
         //    check if monsters are present
 
         //    final distance tile weight = (Max Dist - Dist)/Max Dist*Max Weight
-              
+
         //    end result should be that only navigable squares where no avoidance, monsters, or obstacles are present
         //    */
 

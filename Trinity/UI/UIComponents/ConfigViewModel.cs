@@ -92,6 +92,23 @@ namespace Trinity.UIComponents
                                                 Logger.Log(LogCategory.UserInformation, "Exception dumping Backpack: {0}", ex);
                                             }
                                         });
+                DumpMerchantItemsCommand = new RelayCommand(
+                                        (parameter) =>
+                                        {
+                                            try
+                                            {
+                                                Logger.Log(
+                                                    "\n############################################\n"
+                                                    + "\nDumping Merchant Items. This will hang your client. Please wait....\n"
+                                                    + "##########################");
+                                                UILoader.CloseWindow();
+                                                TrinityItemManager.DumpItems(TrinityItemManager.DumpItemLocation.Merchant);
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Logger.Log(LogCategory.UserInformation, "Exception dumping Backpack: {0}", ex);
+                                            }
+                                        });
                 DumpEquippedCommand = new RelayCommand(
                                         (parameter) =>
                                         {
@@ -317,6 +334,16 @@ namespace Trinity.UIComponents
         /// </summary>
         /// <value>The save command.</value>
         public ICommand DumpBackpackCommand
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the test score command.
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand DumpMerchantItemsCommand
         {
             get;
             private set;

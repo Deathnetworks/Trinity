@@ -410,7 +410,8 @@ namespace Trinity
             Equipped,
             Backpack,
             Ground,
-            Stash
+            Stash,
+            Merchant,
         }
 
 #pragma warning disable 1718
@@ -427,6 +428,9 @@ namespace Trinity
                 {
                     case DumpItemLocation.Backpack:
                         itemList = ZetaDia.Me.Inventory.Backpack.ToList();
+                        break;
+                    case DumpItemLocation.Merchant:
+                        itemList = ZetaDia.Me.Inventory.MerchantItems.ToList();
                         break;
                     case DumpItemLocation.Ground:
                         itemList = ZetaDia.Actors.GetActorsOfType<DiaItem>(true, false).Select(i => i.CommonData).ToList();

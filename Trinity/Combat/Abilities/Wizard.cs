@@ -45,6 +45,14 @@ namespace Trinity
                     return new TrinityPower(SNOPower.Wizard_Teleport, 55f, bestClusterPoint);
                 }
 
+                bool hasSafePassage = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Teleport && s.RuneIndex == 1);
+                // Defensive Teleport: SafePassage
+                if (CombatBase.CanCast(SNOPower.Wizard_Teleport) && hasSafePassage && 
+                    TimeSinceUse(SNOPower.Wizard_Teleport) >= 5000 && Player.CurrentHealthPct <= 0.75 && 
+                    (CurrentTarget.IsBossOrEliteRareUnique || TargetUtil.IsEliteTargetInRange(30f)))
+                {
+                    return new TrinityPower(SNOPower.Wizard_Teleport, 1f, Player.Position);
+                }
 
                 // Black Hole experiment
                 //spell steal
@@ -83,16 +91,20 @@ namespace Trinity
                 if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Wizard_DiamondSkin) && LastPowerUsed != SNOPower.Wizard_DiamondSkin && !GetHasBuff(SNOPower.Wizard_DiamondSkin) &&
                     (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 1) || Player.CurrentHealthPct <= 0.90 || Player.IsIncapacitated || Player.IsRooted || CurrentTarget.RadiusDistance <= 40f))
                 {
-                    return new TrinityPower(SNOPower.Wizard_DiamondSkin, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1);
+                    return new TrinityPower(SNOPower.Wizard_DiamondSkin);
                 }
                 
-                // Diamind Skin off CD
-
+                // Diamond Skin off CD
+                bool hasSleekShell = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_DiamondSkin && s.RuneIndex == 0);
+                if (hasSleekShell && CombatBase.CanCast(SNOPower.Wizard_DiamondSkin))
+                {
+                    return new TrinityPower(SNOPower.Wizard_DiamondSkin);
+                }
 
                 // Slow Time for in combat
                 if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_SlowTime, CombatBase.CanCastFlags.NoTimer) &&
                     (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 40f)) &&
-                    (SpellHistory.TimeSinceUse(SNOPower.Wizard_SlowTime) > TimeSpan.FromSeconds(15) || SpellHistory.DistanceFromLastUsePosition(SNOPower.Wizard_SlowTime) > 7.5))
+                    (SpellHistory.TimeSinceUse(SNOPower.Wizard_SlowTime) > TimeSpan.FromSeconds(15) || SpellHistory.DistanceFromLastUsePosition(SNOPower.Wizard_SlowTime) > 25f))
                 {
                     bool castOnSelf = false;
                     if (TargetUtil.AnyMobsInRange(20f))
@@ -266,11 +278,9 @@ namespace Trinity
                 }
 
                 // Explosive Blast
-                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_ExplosiveBlast, CombatBase.CanCastFlags.NoTimer) && Player.PrimaryResource >= 20 &&
-                    TargetUtil.ClusterExists(15f, 2))
+                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_ExplosiveBlast, CombatBase.CanCastFlags.NoTimer) && Player.PrimaryResource >= 20)
                 {
-                    float blastRange = 11f;
-                    return new TrinityPower(SNOPower.Wizard_ExplosiveBlast, blastRange, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 2);
+                    return new TrinityPower(SNOPower.Wizard_ExplosiveBlast, 12f, CurrentTarget.Position);
                 }
 
                 // Check to see if we have a signature spell on our hotbar, for energy twister check

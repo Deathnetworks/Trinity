@@ -117,6 +117,11 @@ namespace Trinity
             ResetEverythingNewGame();
         }
 
+        void GameEvents_OnWorldChanged(object sender, EventArgs e)
+        {
+            CacheData.FullClear();
+        }
+
         // When the bot stops, output a final item-stats report so it is as up-to-date as can be
         private void TrinityBotStop(IBot bot)
         {

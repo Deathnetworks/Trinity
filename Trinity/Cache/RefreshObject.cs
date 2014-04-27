@@ -727,6 +727,10 @@ namespace Trinity
                     if (CurrentCacheObject.IsBountyObjective)
                         return true;
 
+                    // Quest Monsters should get LoS white-listed
+                    if (CurrentCacheObject.IsQuestMonster)
+                        return true;
+
                     // Always LoS Units during events
                     if (CurrentCacheObject.Type == GObjectType.Unit && Player.InActiveEvent)
                         return true;

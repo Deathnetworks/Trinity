@@ -141,6 +141,7 @@ namespace Trinity
                     GameEvents.OnItemIdentificationRequest += ItemEvents.TrinityOnOnItemIdentificationRequest;
 
                     GameEvents.OnGameChanged += GameEvents_OnGameChanged;
+                    GameEvents.OnWorldChanged += GameEvents_OnWorldChanged;
 
                     CombatTargeting.Instance.Provider = new BlankCombatProvider();
                     LootTargeting.Instance.Provider = new BlankLootProvider();

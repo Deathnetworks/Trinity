@@ -159,6 +159,7 @@ namespace Trinity
             CacheData.UnitIsBurrowed.Clear();
             CacheData.UnitMaxHealth.Clear();
             CacheData.UnitMonsterAffix.Clear();
+            CacheData.NavigationObstacles.RemoveWhere(o => o.Position.Distance2DSqr(Trinity.Player.Position) > 90f * 90f);
         }
 
         /// <summary>
@@ -176,7 +177,6 @@ namespace Trinity
             CacheData.HasBeenRayCasted.Clear();
             CacheData.InteractAttempts.Clear();
             CacheData.IsSummoner.Clear();
-            CacheData.ItemLinkQuality.Clear();
             CacheData.ItemLinkQuality.Clear();
             CacheData.NavigationObstacles.Clear();
             CacheData.PickupItem.Clear();
