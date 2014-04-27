@@ -152,6 +152,10 @@ namespace Trinity
         public bool IsBountyObjective { get; set; }
         public bool IsQuestGiver { get; set; }
 
+        public bool IsCursedChest { get { return Type == GObjectType.CursedChest; } }
+        public bool IsCursedShrine { get { return Type == GObjectType.CursedShrine; } }
+        public bool IsEventObject { get { return IsCursedChest || IsCursedShrine; } }
+
         [NoCopy]
         public bool IsFacing(Vector3 targetPosition, float arcDegrees = 70f)
         {

@@ -11,6 +11,8 @@ namespace Trinity
     {
         public const int WALLER_SNO = 226808; //monsterAffix_waller_model (226808)
 
+        public const int PLAYER_HEADSTONE_SNO = 4860; // PlayerHeadstone
+
         /// <summary>
         /// Contains a list of Rift WorldId's
         /// </summary>
@@ -378,10 +380,10 @@ namespace Trinity
             {6578, TimeSpan.FromSeconds(15)},   // Poison Tree
             {316389, TimeSpan.FromSeconds(6)}, // PoisonEnchanted 
             {340319, TimeSpan.FromSeconds(6)}, // PoisonEnchanted 
-            {4803, TimeSpan.FromSeconds(6)}, // Molten Core
-            {4804, TimeSpan.FromSeconds(6)}, // Molten Core
-            {224225, TimeSpan.FromSeconds(6)}, // Molten Core
-            {247987, TimeSpan.FromSeconds(6)}, // Molten Core
+            {4803, TimeSpan.FromSeconds(10)}, // Molten Core
+            {4804, TimeSpan.FromSeconds(10)}, // Molten Core
+            {224225, TimeSpan.FromSeconds(10)}, // Molten Core
+            {247987, TimeSpan.FromSeconds(10)}, // Molten Core
         };
 
         public static Dictionary<int, float> DefaultAvoidanceCustomRadius { get { return defaultAvoidanceCustomRadius; } }
@@ -616,6 +618,9 @@ namespace Trinity
         public static HashSet<int> ForceToItemOverrideIds { get { return forceToItemOverrideIds; } }
         private static readonly HashSet<int> forceToItemOverrideIds = new HashSet<int> {
             166943, // DemonTrebuchetKey, infernal key
+            255880, // DemonKey_Destruction
+            255881, // DemonKey_Hate
+            255882, // DemonKey_Terror
         };
 
         /// <summary>
@@ -771,11 +776,31 @@ namespace Trinity
         /// </summary>
         public static HashSet<int> ContainerWhiteListIds { get { return containerWhiteListIds; } }
         private static readonly HashSet<int> containerWhiteListIds = new HashSet<int> {
-            62859, 62865, 62872, 78790, 79016, 94708, 96522, 130170, 108122, 111870, 111947, 213447, 213446, 51300, 179865, 109264, 212491, 210422, 211861, 
-			196945, 70534,            
-            103919,     // Demonic Vessels         
-            78030,      // GizmoType: Chest Name: trOut_Wilderness_Scarecrow_A-3924 ActorSNO: 78030 
-            173325,     // Anvil of Fury
+            62859,  // TrOut_Fields_Chest
+            62865,  // TrOut_Highlands_Chest
+            62872,  // CaOut_Oasis_Chest
+            78790,  // trOut_wilderness_chest
+            79016,  // trOut_Tristram_chest
+            94708,  // a1dun_Leor_Chest
+            96522,  // a1dun_Cath_chest
+            130170, // a3dun_Crater_Chest
+            108122, // caOut_StingingWinds_Chest
+            111870, // A3_Battlefield_Chest_Snowy
+            111947, // A3_Battlefield_Chest_Frosty
+            213447, // Lore_AzmodanChest3
+            213446, // Lore_AzmodanChest2
+            51300,  // a3dun_Keep_Chest_A
+            179865, // a3dun_Crater_ST_Chest
+            109264, // a3dun_Keep_Chest_Rare
+            212491, // a1dun_Random_Cloud
+            210422, // a1dun_random_pot_of_gold_A
+            211861, // Pinata
+			196945, // a2dun_Spider_EggSack__Chest
+            70534,  // a2dun_Spider_Chest
+       
+            103919, // Demonic Vessels         
+            78030,  // GizmoType: Chest Name: trOut_Wilderness_Scarecrow_A-3924 ActorSNO: 78030 
+            173325, // Anvil of Fury
 
             301177, // A5 Timeless Prison Switch
 
@@ -787,6 +812,7 @@ namespace Trinity
 			85790, //Cath_Lecturn_ LachdanansScroll
 			227305, //Lore_Inarius_Corrupt
 			137125, //FesteringWoods_WarriorsRest_Lore
+            289794, // X1_PandExt_ArmorRack
         };
 
         /// <summary>

@@ -25,6 +25,7 @@ namespace Trinity.Config
         private int _OpenContainerDelay;
         private DestructibleIgnoreOption _DestructibleOption;
         private bool _EnableBountyEvents;
+        private bool _AllowPlayerResurection;
         #endregion Fields
 
         #region Events
@@ -332,7 +333,24 @@ namespace Trinity.Config
                 }
             }
         }
-
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool AllowPlayerResurection
+        {
+            get
+            {
+                return _AllowPlayerResurection;
+            }
+            set
+            {
+                if (_AllowPlayerResurection != value)
+                {
+                    _AllowPlayerResurection = value;
+                    OnPropertyChanged("AllowPlayerResurection");
+                }
+            }
+        }
+        
         #endregion Properties
 
         #region Methods

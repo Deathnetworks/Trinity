@@ -19,6 +19,12 @@ namespace Trinity
             if (CurrentCacheObject.Gizmo != null)
                 diaGizmo = CurrentCacheObject.Gizmo;
 
+            if (!Settings.WorldObject.AllowPlayerResurection && CurrentCacheObject.ActorSNO == DataDictionary.PLAYER_HEADSTONE_SNO)
+            {
+                c_IgnoreSubStep = "IgnoreHeadstones";
+                AddToCache = false;
+                return AddToCache;
+            }
             // start as true, then set as false as we go. If nothing matches below, it will return true.
             AddToCache = true;
 

@@ -100,14 +100,14 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Spirit Walk < 65% Health: Healing Journey
-                if (CombatBase.CanCast(SNOPower.Witchdoctor_SpiritWalk) && Player.PrimaryResource >= 49 && hasHealingJourney &&
+                if (CombatBase.CanCast(SNOPower.Witchdoctor_SpiritWalk) && hasHealingJourney &&
                     Player.CurrentHealthPct <= V.F("WitchDoctor.SpiritWalk.HealingJourneyHealth"))
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
                 }
 
                 // Spirit Walk < 50% Mana: Honored Guest
-                if (CombatBase.CanCast(SNOPower.Witchdoctor_SpiritWalk) && Player.PrimaryResource >= 49 && hasHonoredGuest &&
+                if (CombatBase.CanCast(SNOPower.Witchdoctor_SpiritWalk) && hasHonoredGuest &&
                     Player.PrimaryResourcePct <= V.F("WitchDoctor.SpiritWalk.HonoredGuestMana"))
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
@@ -157,15 +157,15 @@ namespace Trinity.Combat.Abilities
                 bool hasSwallowYourSoul = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SoulHarvest && s.RuneIndex == 3);
 
                 // Soul Harvest Any Elites or to increase buff stacks
-                if (CombatBase.CanCast(SNOPower.Witchdoctor_SoulHarvest) && Player.PrimaryResource >= 59 &&
+                if (CombatBase.CanCast(SNOPower.Witchdoctor_SoulHarvest) &&
                     (TargetUtil.AnyMobsInRange(16f, GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) + 1, false) || (hasSwallowYourSoul && Player.PrimaryResourcePct <= 0.50) || TargetUtil.IsEliteTargetInRange(16f)))
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest);
                 }
 
                 // Soul Harvest with VengefulSpirit
-                if (CombatBase.CanCast(SNOPower.Witchdoctor_SoulHarvest) && hasVengefulSpirit && Player.PrimaryResource >= 59
-                    && TargetUtil.AnyMobsInRange(16, 3) && GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) <= 4)
+                if (CombatBase.CanCast(SNOPower.Witchdoctor_SoulHarvest) && hasVengefulSpirit &&
+                    TargetUtil.AnyMobsInRange(16, 3))
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest);
                 }
@@ -239,7 +239,7 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.Witchdoctor_Hex);
                 }
                 // Mass Confuse, elites only or big mobs or to escape on low health
-                if (CombatBase.CanCast(SNOPower.Witchdoctor_MassConfusion) && Player.PrimaryResource >= 74 &&
+                if (CombatBase.CanCast(SNOPower.Witchdoctor_MassConfusion) &&
                     (TargetUtil.AnyElitesInRange(12, 1) || TargetUtil.AnyMobsInRange(12, 6) || Player.CurrentHealthPct <= 0.25 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 12f)) &&
                     !CurrentTarget.IsTreasureGoblin)
                 {
@@ -357,8 +357,8 @@ namespace Trinity.Combat.Abilities
 
                 // Wall of Zombies
                 if (CombatBase.CanCast(SNOPower.Witchdoctor_WallOfZombies) && 
-                    (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 4) || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 25f)) &&
-                    Player.PrimaryResource >= 103)
+                    (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 4) || 
+                    ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 25f)))
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_WallOfZombies, 25f, CurrentTarget.Position);
                 }
@@ -384,7 +384,8 @@ namespace Trinity.Combat.Abilities
                 bool hasHungryBats = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 1);
                 bool hasCloudOfBats = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 4);
 
-                int fireBatsMana = CombatBase.TimeSincePowerUse(SNOPower.Witchdoctor_Firebats) < 125 ? 75 : 225;
+                int fireBatsChannelCost = hasVampireBats ? 0 : 75;
+                int fireBatsMana = CombatBase.TimeSincePowerUse(SNOPower.Witchdoctor_Firebats) < 125 ? fireBatsChannelCost : 225;
 
                 bool firebatsMaintain =
                   Trinity.ObjectCache.Any(u => u.IsUnit &&
@@ -435,7 +436,7 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Zombie Charger backup
-                if (CombatBase.CanCast(SNOPower.Witchdoctor_ZombieCharger) && Player.PrimaryResource >= 140)
+                if (CombatBase.CanCast(SNOPower.Witchdoctor_ZombieCharger) && Player.PrimaryResource >= 150)
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_ZombieCharger, zombieChargerRange, CurrentTarget.Position);
                 }
@@ -477,8 +478,7 @@ namespace Trinity.Combat.Abilities
             if (UseOOCBuff)
             {
                 // Spirit Walk OOC 
-                if (CombatBase.CanCast(SNOPower.Witchdoctor_SpiritWalk) && Player.PrimaryResource >= 49 &&
-                   Settings.Combat.Misc.AllowOOCMovement)
+                if (CombatBase.CanCast(SNOPower.Witchdoctor_SpiritWalk) && Settings.Combat.Misc.AllowOOCMovement)
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
                 }
@@ -531,13 +531,13 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.Witchdoctor_Firebomb, 12f, CurrentTarget.Position);
                 if (Hotbar.Contains(SNOPower.Witchdoctor_PoisonDart))
                     return new TrinityPower(SNOPower.Witchdoctor_PoisonDart, 15f, CurrentTarget.Position);
-                if (Hotbar.Contains(SNOPower.Witchdoctor_ZombieCharger) && Player.PrimaryResource >= 140)
+                if (Hotbar.Contains(SNOPower.Witchdoctor_ZombieCharger) && Player.PrimaryResource >= 150)
                     return new TrinityPower(SNOPower.Witchdoctor_ZombieCharger, 12f, CurrentTarget.Position);
                 if (Hotbar.Contains(SNOPower.Witchdoctor_CorpseSpider))
                     return new TrinityPower(SNOPower.Witchdoctor_CorpseSpider, 12f, CurrentTarget.Position);
                 if (Hotbar.Contains(SNOPower.Witchdoctor_PlagueOfToads))
                     return new TrinityPower(SNOPower.Witchdoctor_PlagueOfToads, 12f, CurrentTarget.Position);
-                if (Hotbar.Contains(SNOPower.Witchdoctor_AcidCloud) && Player.PrimaryResource >= 172)
+                if (Hotbar.Contains(SNOPower.Witchdoctor_AcidCloud) && Player.PrimaryResource >= 175)
                     return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, 12f, CurrentTarget.Position);
 
                 if (Hotbar.Contains(SNOPower.Witchdoctor_Sacrifice) && Hotbar.Contains(SNOPower.Witchdoctor_SummonZombieDog) &&

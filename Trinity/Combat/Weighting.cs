@@ -194,6 +194,18 @@ namespace Trinity
                                     }
                                 }
 
+                                if (Player.InActiveEvent && ObjectCache.Any(o => o.IsEventObject))
+                                {
+                                    Vector3 eventObjectPosition = ObjectCache.FirstOrDefault(o => o.IsEventObject).Position;
+
+                                    if (!cacheObject.IsQuestMonster && cacheObject.Position.Distance2DSqr(eventObjectPosition) > 75 * 75)
+                                    {
+                                        objWeightInfo += "TooFarFromEvent ";
+                                        cacheObject.Weight = 0;
+                                        break;
+                                    }
+                                }
+
                                 if (cacheObject.HitPoints <= 0)
                                 {
                                     break;
