@@ -407,6 +407,7 @@ namespace Trinity
 
         public enum DumpItemLocation
         {
+            All,
             Equipped,
             Backpack,
             Ground,
@@ -426,6 +427,9 @@ namespace Trinity
 
                 switch (location)
                 {
+                    case DumpItemLocation.All:
+                        itemList = ZetaDia.Actors.GetActorsOfType<ACDItem>(true).ToList();
+                        break;
                     case DumpItemLocation.Backpack:
                         itemList = ZetaDia.Me.Inventory.Backpack.ToList();
                         break;
@@ -452,10 +456,16 @@ namespace Trinity
 
                 foreach (var item in itemList)
                 {
+                    string itemName = string.Format("\n\nName={0} InternalName={1} ActorSNO={2} DynamicID={3}",
+                        item.Name, item.InternalName, item.ActorSNO, item.DynamicId);
+                }
+
+                foreach (var item in itemList)
+                {
                     try
                     {
-                        string itemName = string.Format("\n\nName={0} InternalName={1} GameBalanceID={2}",
-                            item.Name, item.InternalName, item.GameBalanceId) + " ItemLink: " + item.ItemLink.Replace("{", "{{").Replace("}", "}}");
+                        string itemName = string.Format("\n\nName={0} InternalName={1} ActorSNO={2}",
+                            item.Name, item.InternalName, item.ActorSNO) + " ItemLink: " + item.ItemLink.Replace("{", "{{").Replace("}", "}}");
 
                         Logger.Log(itemName);
                     }

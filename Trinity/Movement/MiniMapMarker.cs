@@ -99,23 +99,6 @@ namespace Trinity
             }
         }
 
-        internal static void AddMarkersToList(int includeMarker = 0)
-        {
-            foreach (Zeta.Game.Internals.MinimapMarker marker in GetMarkerList(includeMarker))
-            {
-                MiniMapMarker mmm = new MiniMapMarker()
-                {
-                    MarkerNameHash = marker.NameHash,
-                    Position = marker.Position,
-                    Visited = false
-                };
-
-                Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Adding MiniMapMarker {0} at {1} to KnownMarkers", mmm.MarkerNameHash, mmm.Position);
-
-                KnownMarkers.Add(mmm);
-            }
-        }
-
         private static Composite CreateAddRiftMarkers()
         {
             return
@@ -135,6 +118,31 @@ namespace Trinity
             );
         }
 
+        private static IEnumerable<Zeta.Game.Internals.MinimapMarker> GetMarkerList(int includeMarker)
+        {
+            return ZetaDia.Minimap.Markers.CurrentWorldMarkers
+                .Where(m => (m.NameHash == 0 || m.NameHash == includeMarker || m.IsPointOfInterest || m.IsPortalExit) && 
+                    !KnownMarkers.Any(ml => ml.Position == m.Position && ml.MarkerNameHash == m.NameHash))
+                    .OrderBy(m => m.NameHash != 0);
+        }
+
+        internal static void AddMarkersToList(int includeMarker = 0)
+        {
+            foreach (Zeta.Game.Internals.MinimapMarker marker in GetMarkerList(includeMarker))
+            {
+                MiniMapMarker mmm = new MiniMapMarker()
+                {
+                    MarkerNameHash = marker.NameHash,
+                    Position = marker.Position,
+                    Visited = false
+                };
+
+                Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Adding MiniMapMarker {0} at {1} to KnownMarkers", mmm.MarkerNameHash, mmm.Position);
+
+                KnownMarkers.Add(mmm);
+            }
+        }
+
         internal static void AddMarkersToList(List<TrinityExploreDungeon.Objective> objectives)
         {
             if (objectives == null)
@@ -149,12 +157,18 @@ namespace Trinity
             }
         }
 
-        private static IEnumerable<Zeta.Game.Internals.MinimapMarker> GetMarkerList(int includeMarker)
+        internal static void AddMarkersToList(List<TrinityExploreDungeon.AlternateMarker> markers)
         {
-            return ZetaDia.Minimap.Markers.CurrentWorldMarkers
-                .Where(m => (m.NameHash == 0 || m.NameHash == includeMarker || m.IsPointOfInterest || m.IsPortalExit) && 
-                    !KnownMarkers.Any(ml => ml.Position == m.Position && ml.MarkerNameHash == m.NameHash))
-                    .OrderBy(m => m.NameHash != 0);
+            if (markers == null)
+                return;
+
+            foreach (var marker in markers.Where(o => o.MarkerNameHash != 0))
+            {
+                if (ZetaDia.Minimap.Markers.CurrentWorldMarkers.Any(m => m.NameHash == marker.MarkerNameHash))
+                {
+                    AddMarkersToList(marker.MarkerNameHash);
+                }
+            }
         }
 
         internal static Composite DetectMiniMapMarkers(int includeMarker = 0)
@@ -176,6 +190,14 @@ namespace Trinity
             return
             new Sequence(
                 new Action(ret => MiniMapMarker.AddMarkersToList(objectives))
+            );
+        }
+
+        internal static Composite DetectMiniMapMarkers(List<TrinityExploreDungeon.AlternateMarker> markers)
+        {
+            return
+            new Sequence(
+                new Action(ret => MiniMapMarker.AddMarkersToList(markers))
             );
         }
 

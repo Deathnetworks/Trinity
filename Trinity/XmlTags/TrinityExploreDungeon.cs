@@ -281,6 +281,26 @@ namespace Trinity.XmlTags
             }
         }
 
+        [XmlElement("AlternateMarkers")]
+        public List<AlternateMarker> AlternateMarkers { get; set; }
+
+        [XmlElement("AlternateMarker")]
+        public class AlternateMarker
+        {
+            [XmlAttribute("markerNameHash")]
+            public int MarkerNameHash { get; set; }
+
+            [XmlAttribute("markerDistance")]
+            public float markerDistance { get; set; }
+
+            public AlternateMarker()
+            {
+                MarkerNameHash = 0;
+                markerDistance = 45f;
+            }
+        }
+
+
         [XmlElement("Objectives")]
         public List<Objective> Objectives { get; set; }
 
@@ -535,7 +555,8 @@ namespace Trinity.XmlTags
                     new Sequence(
                         MiniMapMarker.DetectMiniMapMarkers(0),
                         MiniMapMarker.DetectMiniMapMarkers(ExitNameHash),
-                        MiniMapMarker.DetectMiniMapMarkers(Objectives)
+                        MiniMapMarker.DetectMiniMapMarkers(Objectives),
+                        MiniMapMarker.DetectMiniMapMarkers(AlternateMarkers)
                     )
                 ),
                 UpdateSearchGridProvider(),

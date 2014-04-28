@@ -469,12 +469,21 @@ namespace Trinity
                     }
                     catch (Exception ex)
                     {
+                        TrinityLogLevel ll = TrinityLogLevel.Debug;
+                        LogCategory lc = LogCategory.CacheManagement;
+
+                        if (ex is NullReferenceException)
+                        {
+                            ll = TrinityLogLevel.Error;
+                            lc = LogCategory.UserInformation;
+                        }
+
                         string gizmoType = "";
                         if (currentObject is DiaGizmo)
                         {
                             gizmoType = "GizmoType: " + ((DiaGizmo)currentObject).CommonData.ActorInfo.GizmoType.ToString();
                         }
-                        Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0} {4} {5}",
+                        Logger.Log(ll, lc, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0} {4} {5}",
                                 currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance, gizmoType, ex.Message);
 
                     }

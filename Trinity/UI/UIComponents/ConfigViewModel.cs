@@ -92,6 +92,23 @@ namespace Trinity.UIComponents
                                                 Logger.Log(LogCategory.UserInformation, "Exception dumping Backpack: {0}", ex);
                                             }
                                         });
+                DumpAllItemsCommand = new RelayCommand(
+                                        (parameter) =>
+                                        {
+                                            try
+                                            {
+                                                Logger.Log(
+                                                    "\n############################################\n"
+                                                    + "\nDumping ALL Items. This will hang your client. Please wait....\n"
+                                                    + "##########################");
+                                                UILoader.CloseWindow();
+                                                TrinityItemManager.DumpItems(TrinityItemManager.DumpItemLocation.All);
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Logger.Log(LogCategory.UserInformation, "Exception dumping Backpack: {0}", ex);
+                                            }
+                                        });
                 DumpMerchantItemsCommand = new RelayCommand(
                                         (parameter) =>
                                         {
@@ -334,6 +351,16 @@ namespace Trinity.UIComponents
         /// </summary>
         /// <value>The save command.</value>
         public ICommand DumpBackpackCommand
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the test score command.
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand DumpAllItemsCommand
         {
             get;
             private set;
