@@ -20,6 +20,7 @@ namespace Trinity
                 try
                 {
                     RecordTrinityLoadOnceProfile();
+                    SetProfileInWindowTitle();
 
                     string currentProfile = ProfileManager.CurrentProfile.Path;
 
@@ -44,8 +45,6 @@ namespace Trinity
                         Trinity.CurrentProfile = currentProfile;
                         Trinity.CurrentProfileName = ProfileManager.CurrentProfile.Name;
 
-                        SetProfileInWindowTitle();
-
                         if (Trinity.FirstProfile == "")
                             Trinity.FirstProfile = currentProfile;
 
@@ -60,8 +59,14 @@ namespace Trinity
             }
         }
 
+        private static DateTime _lastProfileCheck = DateTime.MinValue;
         internal static void SetProfileInWindowTitle()
         {
+            if (DateTime.UtcNow.Subtract(_lastProfileCheck).TotalMilliseconds < 1000)
+                return;
+
+            _lastProfileCheck = DateTime.UtcNow;
+            
             if (ProfileManager.CurrentProfile != null)
             {
                 string fileName = Path.GetFileName(ProfileManager.CurrentProfile.Path);

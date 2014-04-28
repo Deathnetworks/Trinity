@@ -65,6 +65,7 @@ namespace Trinity
             }
 
             BeginInvoke(new Action(() => UsedProfileManager.RefreshProfileBlacklists()));
+            UsedProfileManager.SetProfileInWindowTitle();
 
             ReplaceTreeHooks();
 
@@ -115,6 +116,7 @@ namespace Trinity
             ProfileManager.Load(currentProfilePath);
             Navigator.SearchGridProvider.Update();
             ResetEverythingNewGame();
+            UsedProfileManager.SetProfileInWindowTitle();
         }
 
         void GameEvents_OnWorldChanged(object sender, EventArgs e)

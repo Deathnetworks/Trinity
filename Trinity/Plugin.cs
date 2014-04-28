@@ -19,7 +19,7 @@ namespace Trinity
         {
             get
             {
-                return new Version(1, 8, 28);
+                return new Version(1, 8, 29);
             }
         }
 
@@ -72,8 +72,6 @@ namespace Trinity
                             BotMain.PauseWhile(MouseLeft);
                         }
                     }
-
-                    UsedProfileManager.SetProfileInWindowTitle();
 
                     // See if we should update the stats file
                     if (DateTime.UtcNow.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)
@@ -266,6 +264,8 @@ namespace Trinity
             if (DateTime.UtcNow.Subtract(_lastWindowTitleTick).TotalMilliseconds < 1000)
                 return;
 
+            _lastWindowTitleTick = DateTime.UtcNow;
+
             if (mainWindow == null)
             {
                 Application.Current.Dispatcher.BeginInvoke(new Action(() => mainWindow = Application.Current.MainWindow));
@@ -305,15 +305,7 @@ namespace Trinity
 
         internal static void BeginInvoke(Action action)
         {
-            new System.Threading.Thread(() =>
-            {
-                Application.Current.Dispatcher.BeginInvoke(action, System.Windows.Threading.DispatcherPriority.Background);
-            })
-            {
-                Name = "UIInvoke",
-                IsBackground = true,
-                Priority = System.Threading.ThreadPriority.Lowest
-            }.Start();
+            Application.Current.Dispatcher.BeginInvoke(action);
         }
 
     }
