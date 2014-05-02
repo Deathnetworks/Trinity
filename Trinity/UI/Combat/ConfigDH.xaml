@@ -121,6 +121,7 @@
                 <StackPanel>
                     <UniformGrid Columns="2">
                         <CheckBox Margin="2" IsChecked="{Binding Path=DH.SpamSmokeScreen}" ToolTip="For use with Displacement rune">Spam Smoke Screen</CheckBox>
+                        <CheckBox Margin="2" IsChecked="{Binding Path=DH.SpamShadowPower}" ToolTip="For use with Shadow Glide rune for Out of Combat Sprint">Spam Shadow Power</CheckBox>
                         <CheckBox Margin="2" IsChecked="{Binding Path=DH.SpamPreparation}">Preparation Out of Combat</CheckBox>
                         <CheckBox Margin="2" IsChecked="{Binding Path=DH.VengeanceElitesOnly}">Vengeance Elites Only</CheckBox>
                     </UniformGrid>
