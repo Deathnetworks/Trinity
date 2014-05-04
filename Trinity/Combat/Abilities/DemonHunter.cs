@@ -27,10 +27,11 @@ namespace Trinity
             bool hasPreparation = Hotbar.Contains(SNOPower.DemonHunter_Preparation);
 
             // Shadow Power
-            if (!UseOOCBuff && CombatBase.CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
+            if((!UseOOCBuff || Settings.Combat.DemonHunter.SpamShadowPower) && CombatBase.CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
                 (!GetHasBuff(SNOPower.DemonHunter_ShadowPower) || Trinity.Player.CurrentHealthPct <= 0.5) && // if we don't have the buff or our health is low
                 ((!hasPreparation && Player.SecondaryResource >= 14) || (hasPreparation && Player.SecondaryResource >= 39)) && // Save some Discipline for Preparation
-                (Player.CurrentHealthPct <= 0.99 || Player.IsRooted || TargetUtil.AnyMobsInRange(15)))
+                ((Settings.Combat.DemonHunter.SpamShadowPower && Player.SecondaryResource >= 28) || !Settings.Combat.DemonHunter.SpamShadowPower) && // When spamming Shadow Power, save some Discipline for emergencies
+                (Player.CurrentHealthPct <= 0.99 || Player.IsRooted || TargetUtil.AnyMobsInRange(15) || Settings.Combat.DemonHunter.SpamShadowPower))
             {
                 return new TrinityPower(SNOPower.DemonHunter_ShadowPower, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1);
             }

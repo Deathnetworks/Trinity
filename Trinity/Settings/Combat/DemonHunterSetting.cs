@@ -12,6 +12,7 @@ namespace Trinity.Config.Combat
         private int _KiteLimit;
         private int _VaultMovementDelay;
         private bool _SpamSmokeScreen;
+        private bool _SpamShadowPower;
         private bool _SpamPreparation;
         private int _StrafeMinHatred;
         private int _RapidFireMinHatred;
@@ -141,6 +142,24 @@ namespace Trinity.Config.Combat
                 {
                     _SpamSmokeScreen = value;
                     OnPropertyChanged("SpamSmokeScreen");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool SpamShadowPower
+        {
+            get
+            {
+                return _SpamShadowPower;
+            }
+            set
+            {
+                if (_SpamShadowPower != value)
+                {
+                    _SpamShadowPower = value;
+                    OnPropertyChanged("SpamShadowPower");
                 }
             }
         }
