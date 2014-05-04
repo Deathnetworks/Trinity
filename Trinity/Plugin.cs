@@ -13,13 +13,13 @@ namespace Trinity
     /// <summary>
     /// Trinity DemonBuddy Plugin 
     /// </summary>
-    public partial class Trinity : IPlugin
+    public partial class Trinity
     {
         public Version Version
         {
             get
             {
-                return new Version(1, 8, 29);
+                return new Version(1, 9, 0);
             }
         }
 
@@ -39,7 +39,7 @@ namespace Trinity
             }
         }
 
-        private bool MouseLeft()
+        private static bool MouseLeft()
         {
             return (System.Windows.Forms.Control.MouseButtons & System.Windows.Forms.MouseButtons.Left) == System.Windows.Forms.MouseButtons.Left;
         }
@@ -85,7 +85,7 @@ namespace Trinity
 
                     Monk_MaintainTempestRush();
                 }
-                catch (System.AccessViolationException)
+                catch (AccessViolationException)
                 {
                     // woof! 
                 }
@@ -145,7 +145,7 @@ namespace Trinity
                     LootTargeting.Instance.Provider = new BlankLootProvider();
                     ObstacleTargeting.Instance.Provider = new BlankObstacleProvider();
 
-                    if (Settings.Loot.ItemFilterMode != global::Trinity.Config.Loot.ItemFilterMode.DemonBuddy)
+                    if (Settings.Loot.ItemFilterMode != Config.Loot.ItemFilterMode.DemonBuddy)
                     {
                         ItemManager.Current = new TrinityItemManager();
                     }
@@ -158,24 +158,24 @@ namespace Trinity
                             TrinityOnJoinGame(null, null);
                     }
 
-                    BeginInvoke(new Action(() => SetBotTPS()));
+                    BeginInvoke(SetBotTPS);
 
                     UI.UILoader.PreLoadWindowContent();
 
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ENABLED: {0} now in action!", Description); ;
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ENABLED: {0} now in action!", Description);
                 }
 
                 if (StashRule != null)
                 {
                     // reseting stash rules
-                    BeginInvoke(new Action(() => StashRule.reset()));
+                    BeginInvoke(() => StashRule.reset());
                 }
 
                 Logger.LogDebug("OnEnable took {0}ms", DateTime.UtcNow.Subtract(dateOnEnabledStart).TotalMilliseconds);
             }
             catch (Exception ex)
             {
-                Logger.LogError("Error in OnEnable: " + ex.ToString());
+                Logger.LogError("Error in OnEnable: " + ex);
             }
         }
 
@@ -190,7 +190,7 @@ namespace Trinity
             CombatTargeting.Instance.Provider = new DefaultCombatTargetingProvider();
             LootTargeting.Instance.Provider = new DefaultLootTargetingProvider();
             ObstacleTargeting.Instance.Provider = new DefaultObstacleTargetingProvider();
-            Navigator.SearchGridProvider = new Zeta.Bot.Navigation.MainGridProvider();
+            Navigator.SearchGridProvider = new MainGridProvider();
 
             GameEvents.OnPlayerDied -= TrinityOnDeath;
             BotMain.OnStop -= TrinityBotStop;
@@ -221,7 +221,7 @@ namespace Trinity
         public void OnInitialize()
         {
             Helpers.PluginCheck.CheckAndInstallTrinityRoutine();
-            Logger.Log("Initialized v{0}", this.Version);
+            Logger.Log("Initialized v{0}", Version);
         }
 
         public string Name
@@ -258,7 +258,7 @@ namespace Trinity
 
 
         private static DateTime _lastWindowTitleTick = DateTime.MinValue;
-        private static Window mainWindow;
+        private static Window _mainWindow;
         internal static void SetWindowTitle(string profileName = "")
         {
             if (DateTime.UtcNow.Subtract(_lastWindowTitleTick).TotalMilliseconds < 1000)
@@ -266,41 +266,45 @@ namespace Trinity
 
             _lastWindowTitleTick = DateTime.UtcNow;
 
-            if (mainWindow == null)
+            if (_mainWindow == null)
             {
-                Application.Current.Dispatcher.BeginInvoke(new Action(() => mainWindow = Application.Current.MainWindow));
+                Application.Current.Dispatcher.BeginInvoke(new Action(() => _mainWindow = Application.Current.MainWindow));
             }
-            if (mainWindow != null && ZetaDia.Service.IsValid && ZetaDia.Service.Platform.IsValid && ZetaDia.Service.Platform.IsConnected)
+
+            if (_mainWindow == null || !ZetaDia.Service.IsValid || !ZetaDia.Service.Platform.IsValid || !ZetaDia.Service.Platform.IsConnected)
+                return;
+
+            string battleTagName = "";
+            if (Settings.Advanced.ShowBattleTag)
             {
-                string battleTagName = "";
-                if (Settings.Advanced.ShowBattleTag)
+                try
                 {
-                    try
-                    {
-                        battleTagName = "- " + FileManager.BattleTagName + " ";
-                    }
-                    catch { }
+                    battleTagName = "- " + FileManager.BattleTagName + " ";
                 }
-
-                string windowTitle = "DB " + battleTagName + "- PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
-
-                if (profileName.Trim() != String.Empty)
-                {
-                    windowTitle += " - " + profileName;
-                }
-
-                BeginInvoke(new Action(() =>
-                {
-                    try
-                    {
-                        if (mainWindow != null && !string.IsNullOrWhiteSpace(windowTitle))
-                        {
-                            mainWindow.Title = windowTitle;
-                        }
-                    }
-                    catch { }
-                }));
+                catch
+                { }
             }
+
+            string windowTitle = "DB " + battleTagName + "- PID:" + System.Diagnostics.Process.GetCurrentProcess().Id;
+
+            if (profileName.Trim() != String.Empty)
+            {
+                windowTitle += " - " + profileName;
+            }
+
+            BeginInvoke(() =>
+            {
+                try
+                {
+                    if (_mainWindow != null && !string.IsNullOrWhiteSpace(windowTitle))
+                    {
+                        _mainWindow.Title = windowTitle;
+                    }
+                }
+                catch
+                {
+                }
+            });
         }
 
         internal static void BeginInvoke(Action action)

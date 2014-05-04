@@ -51,13 +51,13 @@ namespace Trinity
         /// </summary>
         public static DateTime LastRefreshedCache = DateTime.MinValue;
 
-		//intell
-		public static DateTime TimeToRunFromPoison = DateTime.MinValue;
-		public static DateTime LogTest = DateTime.MinValue;
-		public static bool RunFromPoison = false;
-		public static bool GotFrenzyShrine = false;
-		public static bool GotBlessedShrine = false;
-		public static bool prioritizeCloseRangeUnits = false;
+        //intell
+        public static DateTime TimeToRunFromPoison = DateTime.MinValue;
+        public static DateTime LogTest = DateTime.MinValue;
+        public static bool RunFromPoison = false;
+        public static bool GotFrenzyShrine = false;
+        public static bool GotBlessedShrine = false;
+        public static bool prioritizeCloseRangeUnits = false;
 
         /// <summary>
         /// This object is used for the main handling - the "current target" etc. as selected by the target-selecter, whether it be a unit, an item, a shrine, anything. 
@@ -516,6 +516,8 @@ namespace Trinity
         /// </summary>
         public static DateTime lastGlobalCooldownUse = DateTime.MinValue;
 
+        // track bounties completed
+        public static int TotalBountyCachesOpened = 0;
 
         // Xp Counter
         private static long TotalXP = 0;

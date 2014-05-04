@@ -73,6 +73,7 @@ namespace Trinity.Helpers
                 var item = ZetaDia.Me.Inventory.Backpack.First(i => i.InternalName.StartsWith(Items.ItemIds.HORADRIC_CACHE));
                 ZetaDia.Me.Inventory.UseItem(item.DynamicId);
                 LastFoundHoradricCache = DateTime.UtcNow;
+                Trinity.TotalBountyCachesOpened++;
                 return RunStatus.Running;
             }
 

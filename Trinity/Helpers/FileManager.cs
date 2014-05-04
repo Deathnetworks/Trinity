@@ -200,7 +200,7 @@ namespace Trinity.Technicals
         {
             get
             {
-                return "Trinity.cs";
+                return "TrinityRoutine.cs";
             }
         }
 
@@ -347,7 +347,7 @@ namespace Trinity.Technicals
             {
                 Path.Combine(DemonBuddyPath, "Routines", "GilesPlugin"),
                 Path.Combine(DemonBuddyPath, "Routines", "GilesBlankCombatRoutine"),
-                Path.Combine(DemonBuddyPath, "Routines", "TrinityRoutine")                
+                Path.Combine(DemonBuddyPath, "Routines", "Trinity")                
             };
 
             foreach (string routinePath in oldRoutines)
@@ -359,7 +359,7 @@ namespace Trinity.Technicals
                 }
             }
 
-            string oldTrinityRoutine = Path.Combine(DemonBuddyPath, "Routines", "Trinity", "TrinityRoutine.cs");
+            string oldTrinityRoutine = Path.Combine(DemonBuddyPath, "Routines", "Trinity", "Trinity.cs");
 
             if (File.Exists(oldTrinityRoutine))
             {

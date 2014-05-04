@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using Trinity.Combat.Abilities;
 using Trinity.Technicals;
-using Trinity.XmlTags;
 using Zeta.Bot;
 using Zeta.Bot.Profile;
 
@@ -19,7 +18,6 @@ namespace Trinity
             {
                 try
                 {
-                    RecordTrinityLoadOnceProfile();
                     SetProfileInWindowTitle();
 
                     string currentProfile = ProfileManager.CurrentProfile.Path;
@@ -47,9 +45,6 @@ namespace Trinity
 
                         if (Trinity.FirstProfile == "")
                             Trinity.FirstProfile = currentProfile;
-
-                        // Clear Trinity Combat Ignore Tag
-                        TrinityCombatIgnore.IgnoreList.Clear();
                     }
                 }
                 catch (Exception ex)
@@ -81,16 +76,7 @@ namespace Trinity
                 }
             }
         }
-
-        private static void RecordTrinityLoadOnceProfile()
-        {
-            string currentProfileFileName = Path.GetFileName(ProfileManager.CurrentProfile.Path);
-            if (!TrinityLoadOnce.UsedProfiles.Contains(currentProfileFileName))
-            {
-                TrinityLoadOnce.UsedProfiles.Add(currentProfileFileName);
-            }
-        }
-
+        
         /// <summary>
         /// Adds profile blacklist entries to the Trinity Blacklist
         /// </summary>

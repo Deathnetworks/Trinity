@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading;
+using System.Windows.Forms.VisualStyles;
 using Trinity.DbProvider;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -8,37 +9,37 @@ using Zeta.Bot.Profile;
 using Zeta.Bot.Profile.Common;
 using Zeta.Game;
 
-namespace Trinity
+namespace Trinity.Helpers
 {
     public class GoldInactivity : IDisposable
     {
-        private int _LastKnowCoin = 0;
-        private DateTime _LastCheckBag = DateTime.MinValue;
-        private DateTime _LastRefreshCoin = DateTime.MinValue;
+        private int _lastKnowCoin;
+        private DateTime _lastCheckBag = DateTime.MinValue;
+        private DateTime _lastRefreshCoin = DateTime.MinValue;
 
-        private static GoldInactivity _Instance;
-        public static GoldInactivity Instance { get { return _Instance ?? (_Instance = new GoldInactivity()); } }
+        private static GoldInactivity _instance;
+        public static GoldInactivity Instance { get { return _instance ?? (_instance = new GoldInactivity()); } }
 
-        private Thread _WatcherThread;
+        private Thread _watcherThread;
 
         public GoldInactivity()
         {
-            _WatcherThread = new Thread(GoldInactivityWorker)
+            _watcherThread = new Thread(GoldInactivityWorker)
             {
                 Name = "GoldInactivityWorker",
                 IsBackground = true,
                 Priority = ThreadPriority.Lowest
             };
-            _WatcherThread.Start();
+            _watcherThread.Start();
         }
 
         public void Dispose()
         {
             try
             {
-                if (_WatcherThread != null)
-                    _WatcherThread.Abort();
-                _WatcherThread = null;
+                if (_watcherThread != null)
+                    _watcherThread.Abort();
+                _watcherThread = null;
             }
             catch { }
         }
@@ -51,9 +52,9 @@ namespace Trinity
                 {
                     if (BotMain.IsPaused)
                     {
-                        ResetCheckGold();
+                        long pauseTicks = DateTime.UtcNow.Subtract(_lastRefreshCoin).Ticks;
+                        _lastRefreshCoin = _lastRefreshCoin.AddTicks(pauseTicks);
                     }
-
                 }
                 catch (ThreadAbortException)
                 {
@@ -77,9 +78,9 @@ namespace Trinity
         /// </summary>
         internal void ResetCheckGold()
         {
-            _LastCheckBag = DateTime.UtcNow;
-            _LastRefreshCoin = DateTime.UtcNow;
-            _LastKnowCoin = 0;
+            _lastCheckBag = DateTime.UtcNow;
+            _lastRefreshCoin = DateTime.UtcNow;
+            _lastKnowCoin = 0;
         }
 
         /// <summary>
@@ -110,7 +111,7 @@ namespace Trinity
                     Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Loading world, gold inactivity reset", 0);
                     return false;
                 }
-                if ((DateTime.UtcNow.Subtract(_LastCheckBag).TotalSeconds < 5))
+                if ((DateTime.UtcNow.Subtract(_lastCheckBag).TotalSeconds < 5))
                 {
                     return false;
                 }
@@ -146,24 +147,23 @@ namespace Trinity
 
 
 
-                _LastCheckBag = DateTime.UtcNow;
+                _lastCheckBag = DateTime.UtcNow;
                 int currentcoin = Trinity.Player.Coinage;
 
-                if (currentcoin != _LastKnowCoin && currentcoin != 0)
+                if (currentcoin != _lastKnowCoin && currentcoin != 0)
                 {
-                    _LastRefreshCoin = DateTime.UtcNow;
-                    _LastKnowCoin = currentcoin;
+                    _lastRefreshCoin = DateTime.UtcNow;
+                    _lastKnowCoin = currentcoin;
                 }
-                int notpickupgoldsec = Convert.ToInt32(DateTime.UtcNow.Subtract(_LastRefreshCoin).TotalSeconds);
+                int notpickupgoldsec = Convert.ToInt32(DateTime.UtcNow.Subtract(_lastRefreshCoin).TotalSeconds);
                 if (notpickupgoldsec >= Trinity.Settings.Advanced.GoldInactivityTimer)
                 {
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Gold inactivity after {0}s. Sending abort.", notpickupgoldsec);
-                    _LastRefreshCoin = DateTime.UtcNow;
-                    _LastKnowCoin = currentcoin;
-                    notpickupgoldsec = 0;
+                    _lastRefreshCoin = DateTime.UtcNow;
+                    _lastKnowCoin = currentcoin;
                     return true;
                 }
-                else if (notpickupgoldsec > 0)
+                if (notpickupgoldsec > 0)
                 {
                     Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Gold unchanged for {0}s", notpickupgoldsec);
                 }
@@ -176,17 +176,17 @@ namespace Trinity
             return false;
         }
 
-        private bool isLeavingGame = false;
-        private bool leaveGameInitiated = false;
+        private bool _isLeavingGame;
+        private bool _leaveGameInitiated;
 
-        private Stopwatch leaveGameTimer = new Stopwatch();
+        private readonly Stopwatch _leaveGameTimer = new Stopwatch();
 
         /// <summary>
         /// Leaves the game if gold inactivity timer is tripped
         /// </summary>
         internal bool GoldInactiveLeaveGame()
         {
-            if (leaveGameTimer.IsRunning && leaveGameTimer.ElapsedMilliseconds < 12000)
+            if (_leaveGameTimer.IsRunning && _leaveGameTimer.ElapsedMilliseconds < 12000)
             {
                 return true;
             }
@@ -196,8 +196,8 @@ namespace Trinity
 
             if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
             {
-                isLeavingGame = false;
-                leaveGameInitiated = false;
+                _isLeavingGame = false;
+                _leaveGameInitiated = false;
                 Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "GoldInactiveLeaveGame called but not in game!");
                 return false;
             }
@@ -207,21 +207,21 @@ namespace Trinity
                 return false;
             }
 
-            if (!isLeavingGame && !leaveGameInitiated)
+            if (!_isLeavingGame && !_leaveGameInitiated)
             {
                 // Exit the game and reload the profile
                 PlayerMover.LastRestartedGame = DateTime.UtcNow;
                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Gold Inactivity timer tripped - Anti-stuck measures exiting current game.");
                 // Reload this profile
-                ProfileManager.Load(Zeta.Bot.ProfileManager.CurrentProfile.Path);
+                ProfileManager.Load(ProfileManager.CurrentProfile.Path);
                 Trinity.ResetEverythingNewGame();
-                isLeavingGame = true;
+                _isLeavingGame = true;
                 return true;
             }
 
-            if (!leaveGameInitiated && isLeavingGame)
+            if (!_leaveGameInitiated && _isLeavingGame)
             {
-                leaveGameTimer.Start();
+                _leaveGameTimer.Start();
                 ZetaDia.Service.Party.LeaveGame(true);
                 Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "GoldInactiveLeaveGame initiated LeaveGame");
                 return true;
@@ -233,8 +233,8 @@ namespace Trinity
                 return true;
             }
 
-            isLeavingGame = false;
-            leaveGameInitiated = false;
+            _isLeavingGame = false;
+            _leaveGameInitiated = false;
             Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "GoldInactiveLeaveGame finished");
 
             return false;

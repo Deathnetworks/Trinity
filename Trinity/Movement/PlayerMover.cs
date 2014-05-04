@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
+using Trinity.Helpers;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Dungeons;
@@ -198,9 +199,6 @@ namespace Trinity.DbProvider
                     "stepId=\"" + ZetaDia.CurrentQuest.StepId + "\"",
                     "worldId=\"" + ZetaDia.CurrentWorldId + "\""
                 );
-
-                // check failed minimap markers
-                MiniMapMarker.UpdateFailedMarkers();
 
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "(destination=" + vOriginalDestination.ToString() + ", which is " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away)");
 

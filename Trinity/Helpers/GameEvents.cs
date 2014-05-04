@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using Trinity.Combat.Abilities;
 using Trinity.DbProvider;
+using Trinity.Helpers;
 using Trinity.ItemRules;
 using Trinity.Technicals;
-using Trinity.XmlTags;
 using Zeta.Bot;
 using Zeta.Bot.Navigation;
 using Zeta.Bot.Settings;
@@ -137,8 +137,6 @@ namespace Trinity
             PlayerMover.TimesReachedStuckPoint = 0;
             PlayerMover.TimeLastRecordedPosition = DateTime.MinValue;
             PlayerMover.LastGeneratedStuckPosition = DateTime.MinValue;
-            TrinityUseOnce.UseOnceIDs = new HashSet<int>();
-            TrinityUseOnce.UseOnceCounter = new Dictionary<int, int>();
             dictRandomID = new Dictionary<int, int>();
             iMaxDeathsAllowed = 0;
             iDeathsThisRun = 0;
@@ -227,8 +225,6 @@ namespace Trinity
                     CacheData.AbilityLastUsed.Clear();
                     SpellHistory.HistoryQueue.Clear();
 
-                    TrinityUseOnce.UseOnceIDs = new HashSet<int>();
-                    TrinityUseOnce.UseOnceCounter = new Dictionary<int, int>();
                     iMaxDeathsAllowed = 0;
                     iDeathsThisRun = 0;
                     LastDeathTime = DateTime.UtcNow;
@@ -262,7 +258,6 @@ namespace Trinity
 
                     GoldInactivity.Instance.ResetCheckGold();
 
-                    TrinityLoadOnce.UsedProfiles = new List<string>();
                     CombatBase.IsQuestingMode = false;
 
                     GenericCache.ClearCache();

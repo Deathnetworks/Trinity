@@ -293,9 +293,6 @@ namespace Trinity
             if (TownRunCheckTimer.IsRunning)
                 result = true;
 
-            if (XmlTags.TrinityTownPortal.ForceClearArea)
-                result = true;
-
             ProfileBehavior CurrentProfileBehavior = null;
 
             try
@@ -311,7 +308,11 @@ namespace Trinity
             if (ProfileManager.CurrentProfileBehavior != null)
             {
                 Type profileBehaviortype = CurrentProfileBehavior.GetType();
-                if (profileBehaviortype != null && (profileBehaviortype == typeof(UseTownPortalTag) || profileBehaviortype == typeof(WaitTimerTag) || profileBehaviortype == typeof(XmlTags.TrinityTownRun) || profileBehaviortype == typeof(XmlTags.TrinityTownPortal)))
+                string behaviorName = profileBehaviortype.Name;
+                if (profileBehaviortype != null && (profileBehaviortype == typeof(UseTownPortalTag) ||
+                    profileBehaviortype == typeof(WaitTimerTag) ||
+                        behaviorName.ToLower().Contains("townrun") ||
+                        behaviorName.ToLower().Contains("townportal")))
                 {
                     result = true;
                 }

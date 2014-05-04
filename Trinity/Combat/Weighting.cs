@@ -4,7 +4,6 @@ using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.DbProvider;
 using Trinity.Technicals;
-using Trinity.XmlTags;
 using Zeta.Bot;
 using Zeta.Bot.Logic;
 using Zeta.Bot.Profile.Common;
@@ -52,8 +51,8 @@ namespace Trinity
                     if (!Settings.Combat.Misc.ProfileTagOverride && CombatBase.IsQuestingMode ||
                         behaviorType == typeof(WaitTimerTag) ||
                         behaviorType == typeof(UseTownPortalTag) ||
-                        behaviorType == typeof(XmlTags.TrinityTownRun) ||
-                        behaviorType == typeof(XmlTags.TrinityTownPortal))
+                        behaviorName.ToLower().Contains("townrun") ||
+                        behaviorName.ToLower().Contains("townportal"))
                     {
                         profileTagCheck = true;
                     }
@@ -69,17 +68,13 @@ namespace Trinity
                      !DataDictionary.RiftWorldIds.Contains(Player.WorldID) &&
                      !DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId) &&
                      !profileTagCheck &&
-                     !XmlTags.TrinityTownPortal.ForceClearArea &&
                      !TownRun.IsTryingToTownPortal() &&
                      CombatBase.IgnoringElites;
 
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight,
-                    "Starting weights: packSize={0} packRadius={1} MovementSpeed={2:0.0} Elites={3} AoEs={4} disableIgnoreTag={5} ({6}) closeRangePriority={7} townRun={8} forceClear={9} questingArea={10} level={11} isQuestingMode={12}",
+                    "Starting weights: packSize={0} packRadius={1} MovementSpeed={2:0.0} Elites={3} AoEs={4} disableIgnoreTag={5} ({6}) closeRangePriority={7} townRun={8} questingArea={9} level={10} isQuestingMode={11}",
                     Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck, behaviorName,
-                    prioritizeCloseRangeUnits, TownRun.IsTryingToTownPortal(), TrinityTownPortal.ForceClearArea, DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId), Player.Level, CombatBase.IsQuestingMode);
-
-                if (TrinityCombatIgnore.IgnoreList.Any())
-                    Logger.LogDebug(LogCategory.Weight, " CombatIgnoreList={0}", Logger.ListToString(TrinityCombatIgnore.IgnoreList.ToList<object>()));
+                    prioritizeCloseRangeUnits, TownRun.IsTryingToTownPortal(), DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId), Player.Level, CombatBase.IsQuestingMode);
 
                 bool inQuestArea = DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId);
                 bool usingTownPortal = TownRun.IsTryingToTownPortal();
@@ -94,7 +89,6 @@ namespace Trinity
                         !CombatBase.IsQuestingMode &&
                         !inQuestArea &&
                         !DataDictionary.RiftWorldIds.Contains(Player.WorldID) &&
-                        !XmlTags.TrinityTownPortal.ForceClearArea &&
                         !usingTownPortal &&
                         !profileTagCheck &&
                         MovementSpeed > 1 &&
@@ -176,12 +170,6 @@ namespace Trinity
 
                                     if (ignoring)
                                         break;
-                                }
-
-                                // Monster on Combat Ignore list
-                                if (!usingTownPortal && !profileTagCheck && TrinityCombatIgnore.IgnoreList.Any(u => u.ActorSNO == cacheObject.ActorSNO && !u.ShouldAttack(cacheObject)))
-                                {
-                                    objWeightInfo += " CombatIgnore";
                                 }
 
                                 // Monster is in cache but not within kill range

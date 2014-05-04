@@ -60,6 +60,21 @@
                 <TextBox Margin="2" Text="{Binding Path=Notification.PushoverKey}" IsEnabled="{Binding Path=Notification.PushoverEnabled}" HorizontalAlignment="Stretch" Width="215"/>
             </StackPanel>
         </Grid>
+
+		<!--Pushbullet-->
+        <Grid Grid.Row="2" Margin="2">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Pushbullet Notifications :" FontWeight="Bold" TextAlignment="Center" Margin="5"/>
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Stretch">
+                <CheckBox Margin="25,5" IsChecked="{Binding Path=Notification.PushbulletEnabled}">Enabled</CheckBox>
+                <TextBlock Text="API Key :" TextAlignment="Center" Margin="5"/>
+                <TextBox Margin="2" Text="{Binding Path=Notification.PushbulletKey}" IsEnabled="{Binding Path=Notification.PushbulletEnabled}" HorizontalAlignment="Stretch" Width="215"/>
+            </StackPanel>
+        </Grid>
+
         <!-- Email -->
         <Grid Grid.Row="3" Margin="5">
             <Grid.RowDefinitions>

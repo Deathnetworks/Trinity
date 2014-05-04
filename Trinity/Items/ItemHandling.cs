@@ -756,6 +756,7 @@ namespace Trinity
                                 "m " + TotalRunningTime.Seconds.ToString() + "s");
                             LogWriter.WriteLine("Total deaths: " + iTotalDeaths.ToString() + " [" + Math.Round(iTotalDeaths / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
                             LogWriter.WriteLine("Total games (approx): " + TotalLeaveGames.ToString() + " [" + Math.Round(TotalLeaveGames / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
+                            LogWriter.WriteLine("Total Caches Opened:" + Trinity.TotalBountyCachesOpened); 
                             if (TotalLeaveGames == 0 && TotalGamesJoined > 0)
                             {
                                 if (TotalGamesJoined == 1 && TotalProfileRecycles > 1)

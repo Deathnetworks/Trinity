@@ -226,11 +226,10 @@ namespace Trinity
                     }
 
                 }
-                // Wave of force
-                if (!UseOOCBuff && !Player.IsIncapacitated && Player.PrimaryResource >= 25 && CombatBase.CanCast(SNOPower.Wizard_WaveOfForce) &&
-                    (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 4) || Player.CurrentHealthPct <= 0.7 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 23f)))
+                // Explosive Blast
+                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_ExplosiveBlast, CombatBase.CanCastFlags.NoTimer) && Player.PrimaryResource >= 20)
                 {
-                    return new TrinityPower(SNOPower.Wizard_WaveOfForce, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 2);
+                    return new TrinityPower(SNOPower.Wizard_ExplosiveBlast, 12f, CurrentTarget.Position);
                 }
 
                 //SkillDict.Add("Blizzard", SNOPower.Wizard_Blizzard);
@@ -277,12 +276,6 @@ namespace Trinity
                     return new TrinityPower(SNOPower.Wizard_FrostNova, 20f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 2);
                 }
 
-                // Explosive Blast
-                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_ExplosiveBlast, CombatBase.CanCastFlags.NoTimer) && Player.PrimaryResource >= 20)
-                {
-                    return new TrinityPower(SNOPower.Wizard_ExplosiveBlast, 12f, CurrentTarget.Position);
-                }
-
                 // Check to see if we have a signature spell on our hotbar, for energy twister check
                 bool bHasSignatureSpell = (Hotbar.Contains(SNOPower.Wizard_MagicMissile) || Hotbar.Contains(SNOPower.Wizard_ShockPulse) ||
                     Hotbar.Contains(SNOPower.Wizard_SpectralBlade) || Hotbar.Contains(SNOPower.Wizard_Electrocute));
@@ -309,10 +302,16 @@ namespace Trinity
 
                     Vector3 bestClusterPoint = TargetUtil.GetBestClusterPoint(10f, 15f);
 
-                    float twisterRange = 28f;
+                    const float twisterRange = 28f;
                     return new TrinityPower(SNOPower.Wizard_EnergyTwister, twisterRange, bestClusterPoint, CurrentWorldDynamicId, -1, 0, 0);
                 }
 
+                // Wave of force
+                if (!UseOOCBuff && !Player.IsIncapacitated && Player.PrimaryResource >= 25 && CombatBase.CanCast(SNOPower.Wizard_WaveOfForce, CombatBase.CanCastFlags.NoTimer))
+                {
+                    return new TrinityPower(SNOPower.Wizard_WaveOfForce, 5f, CurrentTarget.Position, CurrentWorldDynamicId, -1, 1, 2);
+                }
+                
                 bool hasEntropy = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Disintegrate && s.RuneIndex == 2);
 
                 float disintegrateRange = hasEntropy ? 10f : 35f;

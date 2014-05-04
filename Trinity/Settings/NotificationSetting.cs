@@ -13,6 +13,8 @@ namespace Trinity.Config
         private string _AndroidKey;
 		private bool _PushoverEnabled;
         private string _PushoverKey;
+		private bool _PushbulletEnabled;
+        private string _PushbulletKey;
         private bool _MailEnabled;
         private string _EmailAddress;
         private string _EmailPassword;
@@ -145,6 +147,42 @@ namespace Trinity.Config
                 {
                     _PushoverKey = value.Trim();
                     OnPropertyChanged("PushoverKey");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]		
+		 public bool PushbulletEnabled
+        {
+            get
+            {
+                return _PushbulletEnabled;
+            }
+            set
+            {
+                if (_PushbulletEnabled != value)
+                {
+                    _PushbulletEnabled = value;
+                    OnPropertyChanged("PushbulletEnabled");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue("")]
+        public string PushbulletKey
+        {
+            get
+            {
+                return _PushbulletKey;
+            }
+            set
+            {
+                if (_PushbulletKey != value)
+                {
+                    _PushbulletKey = value.Trim();
+                    OnPropertyChanged("PushbulletKey");
                 }
             }
         }

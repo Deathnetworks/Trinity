@@ -97,7 +97,7 @@
     <Compile Include="Combat\Abilities\DemonHunter.cs" />
     <Compile Include="Combat\AvoidanceManager.cs" />
     <Compile Include="Combat\AvoidanceType.cs" />
-    <Compile Include="Combat\Routine\Trinity.cs" />
+    <Compile Include="Combat\Routine\TrinityRoutine.cs" />
     <Compile Include="Combat\SpellTracker.cs" />
     <Compile Include="Configuration\TVar.cs" />
     <Compile Include="Configuration\TVars.cs" />
@@ -136,7 +136,6 @@
     <Compile Include="Combat\HotbarSkills.cs" />
     <Compile Include="Helpers\MathUtil.cs" />
     <Compile Include="Movement\Kite.cs" />
-    <Compile Include="Movement\MiniMapMarker.cs" />
     <Compile Include="Movement\NavHelper.cs" />
     <Compile Include="Movement\PositionCache.cs" />
     <Compile Include="Movement\SpeedSensor.cs" />
@@ -217,37 +216,6 @@
     <Compile Include="Movement\PlayerMover.cs" />
     <Compile Include="Cache\RefreshObject.cs" />
     <Compile Include="Cache\RefreshObjects.cs" />
-    <Compile Include="XmlTags\ActBountiesComplete.cs" />
-    <Compile Include="XmlTags\BaseComplexNodeTag.cs" />
-    <Compile Include="XmlTags\HasQuestAndStep.cs" />
-    <Compile Include="XmlTags\HaveBounty.cs" />
-    <Compile Include="XmlTags\TrinitySetQuesting.cs" />
-    <Compile Include="XmlTags\TrinityCombatIgnore.cs" />
-    <Compile Include="XmlTags\TrinityMoveToScene.cs" />
-    <Compile Include="XmlTags\TrinityCastSweepingWinds.cs" />
-    <Compile Include="XmlTags\TrinityExploreDungeon.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="XmlTags\TrinityIfRandom.cs" />
-    <Compile Include="XmlTags\TrinityIfSNOInRange.cs" />
-    <Compile Include="XmlTags\TrinityIf.cs" />
-    <Compile Include="XmlTags\TrinityInteract.cs" />
-    <Compile Include="XmlTags\TrinityLoadOnce.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="XmlTags\TrinityLoadProfile.cs" />
-    <Compile Include="XmlTags\TrinityLog.cs" />
-    <Compile Include="XmlTags\TrinityMaxDeaths.cs" />
-    <Compile Include="XmlTags\TrinityMoveToSNO.cs" />
-    <Compile Include="XmlTags\TrinityMoveTo.cs" />
-    <Compile Include="XmlTags\TrinityOffsetMove.cs" />
-    <Compile Include="XmlTags\TrinityRandomRoll.cs" />
-    <Compile Include="XmlTags\TrinityRandomWait.cs" />
-    <Compile Include="XmlTags\TrinityTownPortal.cs" />
-    <Compile Include="XmlTags\TrinityTownRun.cs" />
-    <Compile Include="XmlTags\TrinityUseOnce.cs" />
-    <Compile Include="XmlTags\TrinityUseReset.cs" />
-    <Compile Include="XmlTags\TrinityUseStop.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="UI\Combat\ConfigMisc.xaml">

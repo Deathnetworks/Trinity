@@ -5,8 +5,8 @@ using System.Text;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.DbProvider;
+using Trinity.Helpers;
 using Trinity.Technicals;
-using Trinity.XmlTags;
 using Zeta.Bot;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
@@ -321,17 +321,7 @@ namespace Trinity
                             {
                                 SkipAheadAreaCache.Add(new CacheObstacleObject(Player.Position, 20f, 0));
                                 LastRecordedPosition = Player.Position;
-
-                                // Mark Dungeon Explorer nodes as Visited if combat pulls us into it
-                                if (ProfileManager.CurrentProfileBehavior != null)
-                                {
-                                    Type profileBehaviorType = ProfileManager.CurrentProfileBehavior.GetType();
-                                    if (profileBehaviorType == typeof(TrinityExploreDungeon))
-                                    {
-                                        TrinityExploreDungeon trinityExploreDungeonTag = (TrinityExploreDungeon)ProfileManager.CurrentProfileBehavior;
-                                        trinityExploreDungeonTag.MarkNearbyNodesVisited();
-                                    }
-                                }
+                                
                             }
                         }
                         // Maintain a backtrack list only while fighting monsters
