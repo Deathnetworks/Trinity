@@ -7,20 +7,20 @@ namespace Trinity.Combat.Abilities
 {
     public static class SpellHistory
     {
-        private const int m_SpellHistorySize = 1000;
-        private static Queue<SpellHistoryItem> historyQueue = new Queue<SpellHistoryItem>(m_SpellHistorySize * 2);
+        private const int SpellHistorySize = 1000;
+        private static Queue<SpellHistoryItem> _historyQueue = new Queue<SpellHistoryItem>(SpellHistorySize * 2);
 
         internal static Queue<SpellHistoryItem> HistoryQueue
         {
-            get { return historyQueue; }
-            set { historyQueue = value; }
+            get { return _historyQueue; }
+            set { _historyQueue = value; }
         }
 
         public static void RecordSpell(TrinityPower power)
         {
-            if (historyQueue.Count >= m_SpellHistorySize)
-                historyQueue.Dequeue();
-            historyQueue.Enqueue(new SpellHistoryItem()
+            if (_historyQueue.Count >= SpellHistorySize)
+                _historyQueue.Dequeue();
+            _historyQueue.Enqueue(new SpellHistoryItem
             {
                 Power = power,
                 UseTime = DateTime.UtcNow,
@@ -40,24 +40,22 @@ namespace Trinity.Combat.Abilities
         public static TrinityPower GetLastTrinityPower()
         {
             if (HistoryQueue.Any())
-                return historyQueue.OrderByDescending(i => i.UseTime).FirstOrDefault().Power;
-            else
-                return new TrinityPower();
+                return _historyQueue.OrderByDescending(i => i.UseTime).FirstOrDefault().Power;
+            return new TrinityPower();
         }
 
         public static SNOPower GetLastSNOPower()
         {
             if (HistoryQueue.Any())
-                return historyQueue.OrderByDescending(i => i.UseTime).FirstOrDefault().Power.SNOPower;
-            else
-                return SNOPower.None;
+                return _historyQueue.OrderByDescending(i => i.UseTime).FirstOrDefault().Power.SNOPower;
+            return SNOPower.None;
         }
 
         public static DateTime GetSpellLastused(SNOPower power)
         {
             DateTime lastUsed = DateTime.MinValue;
-            if (historyQueue.Any(i => i.Power.SNOPower == power))
-                lastUsed = historyQueue.Where(i => i.Power.SNOPower == power).OrderByDescending(i => i.UseTime).FirstOrDefault().UseTime;
+            if (_historyQueue.Any(i => i.Power.SNOPower == power))
+                lastUsed = _historyQueue.Where(i => i.Power.SNOPower == power).OrderByDescending(i => DateTime.UtcNow.Subtract(i.UseTime)).FirstOrDefault().UseTime;
             return lastUsed;
         }
 
@@ -69,10 +67,10 @@ namespace Trinity.Combat.Abilities
 
         public static int SpellUseCountInTime(SNOPower power, TimeSpan time)
         {
-            if (historyQueue.Any(i => i.Power.SNOPower == power))
+            if (_historyQueue.Any(i => i.Power.SNOPower == power))
             {
                 DateTime lookBack = DateTime.UtcNow.Subtract(time);
-                var spellCount = historyQueue.Count(i => i.Power.SNOPower == power && i.UseTime >= lookBack);
+                var spellCount = _historyQueue.Count(i => i.Power.SNOPower == power && i.UseTime >= lookBack);
                 return spellCount;
             }
             return 0;
@@ -80,7 +78,7 @@ namespace Trinity.Combat.Abilities
 
         public static bool HasUsedSpell(SNOPower power)
         {
-            if (historyQueue.Any() && historyQueue.Any(i => i.Power.SNOPower == power))
+            if (_historyQueue.Any() && _historyQueue.Any(i => i.Power.SNOPower == power))
                 return true;
             return false;
         }
@@ -88,16 +86,16 @@ namespace Trinity.Combat.Abilities
         public static Vector3 GetSpellLastTargetPosition(SNOPower power)
         {
             Vector3 lastUsed = Vector3.Zero;
-            if (historyQueue.Any(i => i.Power.SNOPower == power))
-                lastUsed = historyQueue.Where(i => i.Power.SNOPower == power).OrderByDescending(i => i.UseTime).FirstOrDefault().TargetPosition;
+            if (_historyQueue.Any(i => i.Power.SNOPower == power))
+                lastUsed = _historyQueue.Where(i => i.Power.SNOPower == power).OrderByDescending(i => i.UseTime).FirstOrDefault().TargetPosition;
             return lastUsed;
         }
 
         public static Vector3 GetSpellLastMyPosition(SNOPower power)
         {
             Vector3 lastUsed = Vector3.Zero;
-            if (historyQueue.Any(i => i.Power.SNOPower == power))
-                lastUsed = historyQueue.Where(i => i.Power.SNOPower == power).OrderByDescending(i => i.UseTime).FirstOrDefault().MyPosition;
+            if (_historyQueue.Any(i => i.Power.SNOPower == power))
+                lastUsed = _historyQueue.Where(i => i.Power.SNOPower == power).OrderByDescending(i => i.UseTime).FirstOrDefault().MyPosition;
             return lastUsed;
         }
 

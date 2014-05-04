@@ -77,7 +77,7 @@ namespace Trinity.Combat.Abilities
                     Trinity.ShouldRefreshHotbarAbilities = true;
                     return new TrinityPower(SNOPower.Witchdoctor_Hex_Explode);
                 }
-                if (hasAngryChicken)
+                else if (hasAngryChicken)
                 {
                     Trinity.ShouldRefreshHotbarAbilities = true;
                 }

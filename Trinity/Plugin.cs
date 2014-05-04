@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using Trinity.DbProvider;
 using Trinity.Technicals;
@@ -53,6 +54,23 @@ namespace Trinity
             {
                 try
                 {
+                    // At Login screen, derp!
+                    var loginSubmitButton = Zeta.Game.Internals.UIElement.FromName("Root.NormalLayer.BattleNetLogin_main.LayoutRoot.LoginContainer.SubmitButton");
+                    if (loginSubmitButton != null && loginSubmitButton.IsValid && loginSubmitButton.IsVisible && BotMain.IsRunning)
+                    {
+                        new Thread(() => {
+                            BotMain.Stop();
+                            Thread.Sleep(1000);
+                            BotMain.Start();
+                        })
+                        {
+                            IsBackground = true,
+                            Name = "LoginScreenBouncer",
+                        }.Start();
+
+                        return;
+                    }
+
                     if (ZetaDia.Me == null)
                         return;
 

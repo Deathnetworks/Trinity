@@ -5,37 +5,48 @@ using Trinity.Config.Combat;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Common;
-using Zeta.Common.Plugins;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
-
-    public partial class Trinity : IPlugin
+    public partial class Trinity
     {
-        private static TrinityPower GetWizardPower(bool IsCurrentlyAvoiding, bool UseOOCBuff, bool UseDestructiblePower)
+        private static TrinityPower GetWizardPower(bool isCurrentlyAvoiding, bool useOocBuff, bool useDestructiblePower)
         {
             // Pick the best destructible power available
-            if (UseDestructiblePower)
+            if (useDestructiblePower)
             {
                 if (!GetHasBuff(SNOPower.Wizard_Archon))
                 {
                     return GetWizardDestructablePower();
                 }
-                else
-                {
-                    if (CurrentTarget.RadiusDistance <= 10f)
-                        return new TrinityPower(SNOPower.Wizard_Archon_ArcaneStrike, 20f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0);
-                    return new TrinityPower(SNOPower.Wizard_Archon_DisintegrationWave, 19f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0);
-                }
+                if (CurrentTarget.RadiusDistance <= 10f)
+                    return new TrinityPower(SNOPower.Wizard_Archon_ArcaneStrike, 20f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0);
+                return new TrinityPower(SNOPower.Wizard_Archon_DisintegrationWave, 19f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0);
             }
             // Wizards want to save up to a reserve of 65+ energy
             MinEnergyReserve = 45;
 
             if (!GetHasBuff(SNOPower.Wizard_Archon))
             {
+                bool hasIllusionist = ZetaDia.CPlayer.PassiveSkills.Any(p => p == SNOPower.Wizard_Passive_Illusionist);
+
+                // Illusionist speed boost
+                if (hasIllusionist && useOocBuff)
+                {
+                    // Slow Time on self for speed boost
+                    if (CombatBase.CanCast(SNOPower.Wizard_SlowTime))
+                        return new TrinityPower(SNOPower.Wizard_SlowTime);
+
+                    // Mirror Image for speed boost
+                    if (CombatBase.CanCast(SNOPower.Wizard_MirrorImage))
+                        return new TrinityPower(SNOPower.Wizard_MirrorImage);
+
+                    // Teleport already called from PlayerMover, not here (since it's a "movement" spell, not a buff)
+                }
+
 
                 bool hasCalamity = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Teleport && s.RuneIndex == 0);
                 // Offensive Teleport: Calamity
@@ -47,8 +58,8 @@ namespace Trinity
 
                 bool hasSafePassage = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Teleport && s.RuneIndex == 1);
                 // Defensive Teleport: SafePassage
-                if (CombatBase.CanCast(SNOPower.Wizard_Teleport) && hasSafePassage && 
-                    TimeSinceUse(SNOPower.Wizard_Teleport) >= 5000 && Player.CurrentHealthPct <= 0.75 && 
+                if (CombatBase.CanCast(SNOPower.Wizard_Teleport) && hasSafePassage &&
+                    TimeSinceUse(SNOPower.Wizard_Teleport) >= 5000 && Player.CurrentHealthPct <= 0.75 &&
                     (CurrentTarget.IsBossOrEliteRareUnique || TargetUtil.IsEliteTargetInRange(30f)))
                 {
                     return new TrinityPower(SNOPower.Wizard_Teleport, 1f, Player.Position);
@@ -68,32 +79,32 @@ namespace Trinity
                 //no rune
                 //[Trinity] Hotbar Skills (Skill/RuneIndex/Slot): Weapon_Ranged_Wand/-1/HotbarMouseLeft X1_Wizard_Wormhole/-1/HotbarSlot1 None/-1/HotbarSlot2
 
-          bool hasSupermassive = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_Wizard_Wormhole && s.RuneIndex == 0);
+                bool hasSupermassive = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_Wizard_Wormhole && s.RuneIndex == 0);
                 float blackholeRadius = hasSupermassive ? 20f : 15f;
-                if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.X1_Wizard_Wormhole, CombatBase.CanCastFlags.NoTimer) &&
-                    TargetUtil.ClusterExists(blackholeRadius, 45f, 4, true))
+                if (!useOocBuff && !isCurrentlyAvoiding && CombatBase.CanCast(SNOPower.X1_Wizard_Wormhole, CombatBase.CanCastFlags.NoTimer) &&
+                    TargetUtil.ClusterExists(blackholeRadius, 45f, 4))
                 {
-                    return new TrinityPower(SNOPower.X1_Wizard_Wormhole, 45f, TargetUtil.GetBestClusterUnit(blackholeRadius, 45f, 1, false, true).Position);
+                    return new TrinityPower(SNOPower.X1_Wizard_Wormhole, 45f, TargetUtil.GetBestClusterUnit(blackholeRadius, 45f, 1, false).Position);
                 }
 
                 bool arcaneDynamoPassiveReady =
                  (ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Wizard_Passive_ArcaneDynamo) && GetBuffStacks(SNOPower.Wizard_Passive_ArcaneDynamo) == 5);
 
-                var bestMeteorClusterUnit = TargetUtil.GetBestClusterUnit(15f, 65f, 1, true, true);
+                var bestMeteorClusterUnit = TargetUtil.GetBestClusterUnit();
                 // Meteor: Arcane Dynamo
-                if (!UseOOCBuff && !Player.IsIncapacitated && !arcaneDynamoPassiveReady && CombatBase.CanCast(SNOPower.Wizard_Meteor, CombatBase.CanCastFlags.NoTimer) &&
-                    (TargetUtil.EliteOrTrashInRange(65) || TargetUtil.ClusterExists(15f, 65, 2, true)))
+                if (!useOocBuff && !Player.IsIncapacitated && !arcaneDynamoPassiveReady && CombatBase.CanCast(SNOPower.Wizard_Meteor, CombatBase.CanCastFlags.NoTimer) &&
+                    (TargetUtil.EliteOrTrashInRange(65) || TargetUtil.ClusterExists(15f, 65, 2)))
                 {
                     return new TrinityPower(SNOPower.Wizard_Meteor, 65f, bestMeteorClusterUnit.Position);
                 }
-                
+
                 // Diamond Skin SPAM
-                if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Wizard_DiamondSkin) && LastPowerUsed != SNOPower.Wizard_DiamondSkin && !GetHasBuff(SNOPower.Wizard_DiamondSkin) &&
+                if (!useOocBuff && CombatBase.CanCast(SNOPower.Wizard_DiamondSkin) && LastPowerUsed != SNOPower.Wizard_DiamondSkin && !GetHasBuff(SNOPower.Wizard_DiamondSkin) &&
                     (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 1) || Player.CurrentHealthPct <= 0.90 || Player.IsIncapacitated || Player.IsRooted || CurrentTarget.RadiusDistance <= 40f))
                 {
                     return new TrinityPower(SNOPower.Wizard_DiamondSkin);
                 }
-                
+
                 // Diamond Skin off CD
                 bool hasSleekShell = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_DiamondSkin && s.RuneIndex == 0);
                 if (hasSleekShell && CombatBase.CanCast(SNOPower.Wizard_DiamondSkin))
@@ -102,25 +113,19 @@ namespace Trinity
                 }
 
                 // Slow Time for in combat
-                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_SlowTime, CombatBase.CanCastFlags.NoTimer) &&
+                if (!useOocBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_SlowTime, CombatBase.CanCastFlags.NoTimer) &&
                     (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 40f)) &&
-                    (SpellHistory.TimeSinceUse(SNOPower.Wizard_SlowTime) > TimeSpan.FromSeconds(15) || SpellHistory.DistanceFromLastUsePosition(SNOPower.Wizard_SlowTime) > 25f))
+                    (SpellHistory.TimeSinceUse(SNOPower.Wizard_SlowTime) > TimeSpan.FromSeconds(15) || SpellHistory.DistanceFromLastTarget(SNOPower.Wizard_SlowTime) > 30f))
                 {
-                    bool castOnSelf = false;
                     if (TargetUtil.AnyMobsInRange(20f))
-                        castOnSelf = true;
-
-                    if (castOnSelf)
-                        return new TrinityPower(SNOPower.Wizard_SlowTime);
-                    else
-                        return new TrinityPower(SNOPower.Wizard_SlowTime, 55f, TargetUtil.GetBestClusterUnit(20f, 65f, 1, true, true).Position);
+                        return new TrinityPower(SNOPower.Wizard_SlowTime); // cast of Self
+                    return new TrinityPower(SNOPower.Wizard_SlowTime, 55f, TargetUtil.GetBestClusterUnit(20f).Position);
                 }
 
                 // Mirror Image  @ half health or 5+ monsters or rooted/incapacitated or last elite left @25% health
-                if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_MirrorImage) &&
-                    (Player.CurrentHealthPct <= 0.50 || TargetUtil.AnyMobsInRange(30, 4) || Player.IsIncapacitated || Player.IsRooted ||
-                    TargetUtil.AnyElitesInRange(30) || CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss)
-                    && PowerManager.CanCast(SNOPower.Wizard_MirrorImage))
+                if (!useOocBuff && CombatBase.CanCast(SNOPower.Wizard_MirrorImage, CombatBase.CanCastFlags.NoTimer) &&
+                    (Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit || TargetUtil.AnyMobsInRange(30, 4) || Player.IsIncapacitated || Player.IsRooted ||
+                    TargetUtil.AnyElitesInRange(30) || CurrentTarget.IsBossOrEliteRareUnique))
                 {
                     return new TrinityPower(SNOPower.Wizard_MirrorImage, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1);
                 }
@@ -166,7 +171,7 @@ namespace Trinity
                 }
 
                 // Hydra
-                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Hydra, CombatBase.CanCastFlags.NoTimer) &&
+                if (!useOocBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Hydra, CombatBase.CanCastFlags.NoTimer) &&
                     LastPowerUsed != SNOPower.Wizard_Hydra &&
                     (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 4) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f)) &&
                     Player.PrimaryResource >= 15)
@@ -186,7 +191,7 @@ namespace Trinity
                 }
 
                 // Archon
-                if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Wizard_Archon, CombatBase.CanCastFlags.NoTimer) && Wizard_ShouldStartArchon())
+                if (!useOocBuff && !isCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Wizard_Archon, CombatBase.CanCastFlags.NoTimer) && Wizard_ShouldStartArchon())
                 {
                     //CanCastArchon = false;
                     //return new TrinityPower(SNOPower.Wizard_Archon, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 4, 5);
@@ -220,14 +225,10 @@ namespace Trinity
                         CanCastArchon = false;
                         return new TrinityPower(SNOPower.Wizard_Archon, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 4, 5);
                     }
-                    else
-                    {
-                        Player.WaitingForReserveEnergy = true;
-                    }
-
+                    Player.WaitingForReserveEnergy = true;
                 }
                 // Explosive Blast
-                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_ExplosiveBlast, CombatBase.CanCastFlags.NoTimer) && Player.PrimaryResource >= 20)
+                if (!useOocBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_ExplosiveBlast, CombatBase.CanCastFlags.NoTimer) && Player.PrimaryResource >= 20)
                 {
                     return new TrinityPower(SNOPower.Wizard_ExplosiveBlast, 12f, CurrentTarget.Position);
                 }
@@ -242,7 +243,7 @@ namespace Trinity
                 bool hasSnowBoundRune = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Blizzard && s.RuneIndex == 3);
 
                 // Blizzard
-                if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Blizzard) &&
+                if (!useOocBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Blizzard) &&
                     (TargetUtil.ClusterExists(18f, 90f, 2, false) || TargetUtil.AnyElitesInRange(40f) || TargetUtil.IsEliteTargetInRange(45f)) &&
                     (Player.PrimaryResource >= 40 || (hasSnowBoundRune && Player.PrimaryResource >= 20)) && SNOPowerUseTimer(SNOPower.Wizard_Blizzard))
                 {
@@ -253,8 +254,8 @@ namespace Trinity
                 bool hasArcaneDynamo = ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Wizard_Passive_ArcaneDynamo);
 
                 // Meteor - no arcane dynamo
-                if (!UseOOCBuff && !Player.IsIncapacitated && !hasArcaneDynamo && CombatBase.CanCast(SNOPower.Wizard_Meteor, CombatBase.CanCastFlags.NoTimer) &&
-                    (TargetUtil.EliteOrTrashInRange(65) || TargetUtil.ClusterExists(15f, 65, 2, true)))
+                if (!useOocBuff && !Player.IsIncapacitated && !hasArcaneDynamo && CombatBase.CanCast(SNOPower.Wizard_Meteor, CombatBase.CanCastFlags.NoTimer) &&
+                    (TargetUtil.EliteOrTrashInRange(65) || TargetUtil.ClusterExists(15f, 65, 2)))
                 {
                     return new TrinityPower(SNOPower.Wizard_Meteor, 65f, bestMeteorClusterUnit.Position);
                 }
@@ -269,7 +270,7 @@ namespace Trinity
                 bool hasDeepFreeze = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_FrostNova && s.RuneIndex == 4);
 
                 // Frost Nova
-                if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Wizard_FrostNova) && !Player.IsIncapacitated &&
+                if (!useOocBuff && CombatBase.CanCast(SNOPower.Wizard_FrostNova) && !Player.IsIncapacitated &&
                     ((hasDeepFreeze && TargetUtil.AnyMobsInRange(25, 5)) || (!hasDeepFreeze && (TargetUtil.AnyMobsInRange(25, 1) || Player.CurrentHealthPct <= 0.7)) &&
                     CurrentTarget.RadiusDistance <= 25f))
                 {
@@ -290,7 +291,7 @@ namespace Trinity
                 bool hasWickedWindRune = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_EnergyTwister && s.RuneIndex == 4);
 
                 // Energy Twister SPAMS whenever 35 or more ap to generate Arcane Power
-                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_EnergyTwister) &&
+                if (!useOocBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_EnergyTwister) &&
                     Player.PrimaryResource >= 35 &&
                     // If using storm chaser, then force a signature spell every 1 stack of the buff, if we have a signature spell
                     (!bHasSignatureSpell || GetBuffStacks(SNOPower.Wizard_EnergyTwister) < 1) &&
@@ -298,8 +299,6 @@ namespace Trinity
                     (hasWickedWindRune && CurrentTarget.RadiusDistance <= 60f)) &&
                     (!Hotbar.Contains(SNOPower.Wizard_Electrocute) || !DataDictionary.FastMovingMonsterIds.Contains(CurrentTarget.ActorSNO)))
                 {
-                    Vector3 targetDirection = MathEx.CalculatePointFrom(Player.Position, CurrentTarget.Position, 3f);
-
                     Vector3 bestClusterPoint = TargetUtil.GetBestClusterPoint(10f, 15f);
 
                     const float twisterRange = 28f;
@@ -307,28 +306,28 @@ namespace Trinity
                 }
 
                 // Wave of force
-                if (!UseOOCBuff && !Player.IsIncapacitated && Player.PrimaryResource >= 25 && CombatBase.CanCast(SNOPower.Wizard_WaveOfForce, CombatBase.CanCastFlags.NoTimer))
+                if (!useOocBuff && !Player.IsIncapacitated && Player.PrimaryResource >= 25 && CombatBase.CanCast(SNOPower.Wizard_WaveOfForce, CombatBase.CanCastFlags.NoTimer))
                 {
                     return new TrinityPower(SNOPower.Wizard_WaveOfForce, 5f, CurrentTarget.Position, CurrentWorldDynamicId, -1, 1, 2);
                 }
-                
+
                 bool hasEntropy = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Disintegrate && s.RuneIndex == 2);
 
                 float disintegrateRange = hasEntropy ? 10f : 35f;
                 // Disintegrate
-                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Disintegrate) &&
+                if (!useOocBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Disintegrate) &&
                     ((Player.PrimaryResource >= 20 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
                 {
                     return new TrinityPower(SNOPower.Wizard_Disintegrate, disintegrateRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0);
                 }
                 // Arcane Orb
-                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_ArcaneOrb) &&
+                if (!useOocBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_ArcaneOrb) &&
                     ((Player.PrimaryResource >= 30 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
                 {
                     return new TrinityPower(SNOPower.Wizard_ArcaneOrb, 35f, CurrentTarget.ACDGuid);
                 }
                 // Arcane Torrent
-                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_ArcaneTorrent) &&
+                if (!useOocBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_ArcaneTorrent) &&
                     ((Player.PrimaryResource >= 16 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
                 {
                     return new TrinityPower(SNOPower.Wizard_ArcaneTorrent, 40f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0);
@@ -344,7 +343,7 @@ namespace Trinity
                 bool hasSleetStorm = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_RayOfFrost && s.RuneIndex == 1);
 
                 // Ray of Frost
-                if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_RayOfFrost) &&
+                if (!useOocBuff && !isCurrentlyAvoiding && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_RayOfFrost) &&
                     Player.PrimaryResource >= 12 && !Player.WaitingForReserveEnergy)
                 {
                     float range = 50f;
@@ -357,10 +356,10 @@ namespace Trinity
                 bool hasConflagrate = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_MagicMissile && s.RuneIndex == 2);
 
                 // Magic Missile
-                if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_MagicMissile))
+                if (!useOocBuff && !isCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_MagicMissile))
                 {
-                    var bestPierceTarget = TargetUtil.GetBestPierceTarget(45f, 0);
-                    int targetId = 0;
+                    var bestPierceTarget = TargetUtil.GetBestPierceTarget(45f);
+                    int targetId;
 
                     if (bestPierceTarget != null)
                         targetId = hasConflagrate ?
@@ -372,17 +371,17 @@ namespace Trinity
                     return new TrinityPower(SNOPower.Wizard_MagicMissile, 45f, targetId);
                 }
                 // Shock Pulse
-                if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_ShockPulse))
+                if (!useOocBuff && !isCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_ShockPulse))
                 {
                     return new TrinityPower(SNOPower.Wizard_ShockPulse, 15f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1);
                 }
                 // Spectral Blade
-                if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_SpectralBlade))
+                if (!useOocBuff && !isCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_SpectralBlade))
                 {
                     return new TrinityPower(SNOPower.Wizard_SpectralBlade, 14f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1);
                 }
                 // Electrocute
-                if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_Electrocute))
+                if (!useOocBuff && !isCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_Electrocute))
                 {
                     return new TrinityPower(SNOPower.Wizard_Electrocute, 40f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0);
                 }
@@ -433,7 +432,7 @@ namespace Trinity
 
                 // Archon form
                 // Archon Slow Time for in combat
-                if (!UseOOCBuff && !Player.IsIncapacitated &&
+                if (!useOocBuff && !Player.IsIncapacitated &&
                     (TargetUtil.AnyElitesInRange(25, 1) ||
                     TargetUtil.EliteOrTrashInRange(25f) ||
                     (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 35f)) &&
@@ -444,7 +443,7 @@ namespace Trinity
                 }
 
                 // Archon Teleport in combat for kiting
-                if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Archon_Teleport, CombatBase.CanCastFlags.NoTimer) &&
+                if (!useOocBuff && !isCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Archon_Teleport, CombatBase.CanCastFlags.NoTimer) &&
                     Settings.Combat.Wizard.KiteLimit > 0 &&
                     // Try and teleport-retreat from 1 elite or 3+ greys or a boss at 15 foot range
                     (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 3) || (CurrentTarget.IsBoss && CurrentTarget.RadiusDistance <= 15f)))
@@ -454,31 +453,31 @@ namespace Trinity
                 }
 
                 // Archon teleport in combat for no-kite
-                if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Archon_Teleport, CombatBase.CanCastFlags.NoTimer) &&
+                if (!useOocBuff && !isCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Archon_Teleport, CombatBase.CanCastFlags.NoTimer) &&
                     Settings.Combat.Wizard.KiteLimit == 0 && CurrentTarget.RadiusDistance >= 10f)
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_Teleport, 35f, CurrentTarget.Position);
                 }
                 // Arcane Blast - 2 second cooldown, big AoE
-                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Archon_ArcaneBlast, CombatBase.CanCastFlags.NoTimer) && TargetUtil.AnyMobsInRange(15, 1) && CurrentTarget.IsFacingPlayer)
+                if (!useOocBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Archon_ArcaneBlast, CombatBase.CanCastFlags.NoTimer) && TargetUtil.AnyMobsInRange(15, 1) && CurrentTarget.IsFacingPlayer)
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_ArcaneBlast, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1);
                 }
 
                 // Disintegrate
-                if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && (CurrentTarget.CountUnitsBehind(25f) > 2 || Settings.Combat.Wizard.NoArcaneStrike || Settings.Combat.Wizard.KiteLimit > 0))
+                if (!useOocBuff && !isCurrentlyAvoiding && !Player.IsIncapacitated && (CurrentTarget.CountUnitsBehind(25f) > 2 || Settings.Combat.Wizard.NoArcaneStrike || Settings.Combat.Wizard.KiteLimit > 0))
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_DisintegrationWave, 49f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0);
                 }
 
                 // Arcane Strike Rapid Spam at close-range only
-                if (!UseOOCBuff && !Player.IsIncapacitated && !Settings.Combat.Wizard.NoArcaneStrike)
+                if (!useOocBuff && !Player.IsIncapacitated && !Settings.Combat.Wizard.NoArcaneStrike)
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_ArcaneStrike, 7f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1);
                 }
 
                 // Disintegrate as final option just in case
-                if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated)
+                if (!useOocBuff && !isCurrentlyAvoiding && !Player.IsIncapacitated)
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_DisintegrationWave, 49f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0);
                 }
@@ -502,7 +501,7 @@ namespace Trinity
 
         private static bool Wizard_HasFamiliar()
         {
-            double timeSinceDeath = DateTime.UtcNow.Subtract(Trinity.LastDeathTime).TotalMilliseconds;
+            double timeSinceDeath = DateTime.UtcNow.Subtract(LastDeathTime).TotalMilliseconds;
 
             // We've died, no longer have familiar
             if (timeSinceDeath < CombatBase.TimeSincePowerUse(SNOPower.Wizard_Familiar))
