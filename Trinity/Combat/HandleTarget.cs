@@ -10,7 +10,6 @@ using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
-using Zeta.Common.Plugins;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
@@ -21,7 +20,7 @@ using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
-    public partial class Trinity : IPlugin
+    public partial class Trinity
     {
 
         /// <summary>
@@ -40,15 +39,15 @@ namespace Trinity
         {
             return new PrioritySelector(
                 new Decorator(ret => ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && !bMainBotPaused,
-                    new Action(ctx => HandleTarget(ctx))
+                    new Action(ctx => HandleTarget())
                 ),
                 new Decorator(ret => ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && bMainBotPaused,
-                    new Action(ret => PausedAction(ret))
+                    new Action(ret => PausedAction())
                 )
             );
         }
 
-        private static RunStatus PausedAction(object ret)
+        private static RunStatus PausedAction()
         {
             return bMainBotPaused ? RunStatus.Running : RunStatus.Success;
         }
@@ -64,7 +63,7 @@ namespace Trinity
             TreeFailure
         }
 
-        private static bool StaleCache = false;
+        private static bool _staleCache;
 
         /// <summary>
         /// Returns a RunStatus, if appropriate. Throws an exception if not.
@@ -85,7 +84,6 @@ namespace Trinity
                     treeRunStatus = RunStatus.Running; break;
                 case HandlerRunStatus.TreeSuccess:
                     treeRunStatus = RunStatus.Success; break;
-                case HandlerRunStatus.NotFinished:
                 default:
                     throw new ApplicationException("Unable to return Non-TreeSharp RunStatus");
             }
@@ -111,7 +109,7 @@ namespace Trinity
             if (CombatBase.CurrentPower != null && CombatBase.CurrentPower.ShouldWaitAfterUse)
                 extras += " CPowerShouldWaitAfter=" + (CombatBase.CurrentPower.WaitAfterUseDelay - CombatBase.CurrentPower.TimeSinceUse);
             if (CombatBase.CurrentPower != null && (CombatBase.CurrentPower.ShouldWaitBeforeUse || CombatBase.CurrentPower.ShouldWaitAfterUse))
-                extras += " " + CombatBase.CurrentPower.ToString();
+                extras += " " + CombatBase.CurrentPower;
 
             Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Handle Target returning {0} to tree" + extras, treeRunStatus);
             return treeRunStatus;
@@ -121,9 +119,8 @@ namespace Trinity
         /// <summary>
         /// Handles all aspects of moving to and attacking the current target
         /// </summary>
-        /// <param name="ret"></param>
         /// <returns></returns>
-        private static RunStatus HandleTarget(object ret)
+        private static RunStatus HandleTarget()
         {
             HandlerRunStatus runStatus = HandlerRunStatus.NotFinished;
             using (new PerformanceLogger("HandleTarget"))
@@ -142,7 +139,7 @@ namespace Trinity
                         runStatus = HandlerRunStatus.TreeFailure;
                         return GetTreeSharpRunStatus(runStatus);
                     }
-                    else if (GoldInactivity.Instance.GoldInactive())
+                    if (GoldInactivity.Instance.GoldInactive())
                     {
                         BotMain.PauseWhile(GoldInactivity.Instance.GoldInactiveLeaveGame);
                         Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Gold Inactivity Tripped", true);
@@ -157,7 +154,7 @@ namespace Trinity
 
                     // Whether we should refresh the target list or not
                     // See if we should update hotbar abilities
-                    if (ShouldRefreshHotbarAbilities || Trinity.HotbarRefreshTimer.ElapsedMilliseconds > 5000)
+                    if (ShouldRefreshHotbarAbilities || HotbarRefreshTimer.ElapsedMilliseconds > 5000)
                     {
                         PlayerInfoCache.RefreshHotbar();
                     }
@@ -207,7 +204,7 @@ namespace Trinity
                         if (!IsWholeNewTarget && !IsWaitingForPower && !IsWaitingForPotion)
                         {
                             // If we *DO* want a new target list, do this... 
-                            if (StaleCache)
+                            if (_staleCache)
                             {
                                 // Now call the function that refreshes targets
                                 RefreshDiaObjectCache();
@@ -321,7 +318,7 @@ namespace Trinity
                             {
                                 SkipAheadAreaCache.Add(new CacheObstacleObject(Player.Position, 20f, 0));
                                 LastRecordedPosition = Player.Position;
-                                
+
                             }
                         }
                         // Maintain a backtrack list only while fighting monsters
@@ -385,8 +382,26 @@ namespace Trinity
 
                         bool npcInRange = CurrentTarget.IsQuestGiver && CurrentTarget.RadiusDistance <= 3f;
 
+                        // power can be cast without any target
+                        bool groundTargetInRange = false;
+                        // We have a power assigned
+                        if (CombatBase.CurrentPower.SNOPower != SNOPower.None)
+                        {
+                            // Get the given Position for the use of the power
+                            Vector3 groundTargetPosition = CombatBase.CurrentPower.TargetPosition;
+
+                            // if the target position is Vector3.Zero and it does not have a target unit (but it may have a range?)
+                            if (groundTargetPosition == Vector3.Zero && CombatBase.CurrentPower.TargetACDGUID == -1)
+                            {
+                                // Use our position 
+                                groundTargetPosition = Player.Position;
+                            }
+
+                            groundTargetInRange = Player.Position.Distance2DSqr(groundTargetPosition) < Math.Max(1.0f, CombatBase.CurrentPower.MinimumRange);
+                        }
+
                         // Interact/use power on target if already in range
-                        if ((TargetCurrentDistance <= TargetRangeRequired && CurrentTargetIsInLoS) || stuckOnTarget || npcInRange)
+                        if ((TargetCurrentDistance <= TargetRangeRequired && CurrentTargetIsInLoS) || stuckOnTarget || npcInRange || groundTargetInRange)
                         {
                             // If avoidance, instantly skip
                             if (CurrentTarget.Type == GObjectType.Avoidance)
@@ -545,7 +560,7 @@ namespace Trinity
                                                     MinimumRange = TargetRangeRequired,
                                                     TargetPosition = CurrentTarget.Position,
                                                 });
-                                            
+
                                             // Count how many times we've tried interacting
                                             if (!CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out attemptCount))
                                             {
@@ -1120,14 +1135,14 @@ namespace Trinity
                     // Update targets at least once every 80 milliseconds
                     if (ForceTargetUpdate || IsAvoidingProjectiles || DateTime.UtcNow.Subtract(LastRefreshedCache).TotalMilliseconds > Settings.Advanced.CacheRefreshRate)
                     {
-                        StaleCache = true;
+                        _staleCache = true;
                     }
                     // If we AREN'T getting new targets - find out if we SHOULD because the current unit has died etc.
-                    if (!StaleCache && CurrentTarget != null && CurrentTarget.IsUnit)
+                    if (!_staleCache && CurrentTarget != null && CurrentTarget.IsUnit)
                     {
                         if (CurrentTarget.Unit == null || CurrentTarget.Unit.BaseAddress == IntPtr.Zero)
                         {
-                            StaleCache = true;
+                            _staleCache = true;
                         }
                         else
                         {
@@ -1145,18 +1160,18 @@ namespace Trinity
                                 catch
                                 {
                                     Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Safely handled exception getting attribute max health #2 for unit {0} [{1}]", CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
-                                    StaleCache = true;
+                                    _staleCache = true;
                                 }
                             }
                             // Ok check we didn't fail getting the maximum health, now try to get live current health...
-                            if (!StaleCache)
+                            if (!_staleCache)
                             {
                                 try
                                 {
                                     double dTempHitpoints = CurrentTarget.Unit.HitpointsCurrent / dThisMaxHealth;
                                     if (dTempHitpoints <= 0d)
                                     {
-                                        StaleCache = true;
+                                        _staleCache = true;
                                     }
                                     else
                                     {
@@ -1166,7 +1181,7 @@ namespace Trinity
                                 }
                                 catch
                                 {
-                                    StaleCache = true;
+                                    _staleCache = true;
                                 }
                             }
 
@@ -1434,7 +1449,7 @@ namespace Trinity
                 CurrentTargetIsInLoS = false;
                 // Set current destination to our current target's destination
                 vCurrentDestination = CurrentTarget.Position;
-                float DistanceToDestination = Player.Position.Distance(vCurrentDestination);
+                
                 switch (CurrentTarget.Type)
                 {
                     // * Unit, we need to pick an ability to use and get within range
@@ -1454,7 +1469,7 @@ namespace Trinity
                     // * Gold - need to get within pickup radius only
                     case GObjectType.Gold:
                         {
-                            TargetRangeRequired = 1f; 
+                            TargetRangeRequired = 1f;
                             vCurrentDestination = MathEx.CalculatePointFrom(Player.Position, CurrentTarget.Position, -2f);
                             break;
                         }
