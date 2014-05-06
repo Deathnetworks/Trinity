@@ -120,7 +120,7 @@ namespace Trinity
                 using (new PerformanceLogger("TargetCheck.RefreshCache"))
                 {
                     // Refresh Cache if needed
-                    bool CacheWasRefreshed = RefreshDiaObjectCache();
+                    RefreshDiaObjectCache();
                 }
 
                 // We have a target, start the target handler!
