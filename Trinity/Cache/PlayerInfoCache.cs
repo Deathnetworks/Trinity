@@ -270,7 +270,7 @@ namespace Trinity
             using (new PerformanceLogger("RefreshBuffs"))
             {
 
-                Trinity.dictCachedBuffs = new Dictionary<int, int>();
+                Trinity.PlayerBuffs = new Dictionary<int, int>();
                 Trinity.listCachedBuffs = ZetaDia.Me.GetAllBuffs().ToList();
                 // Special flag for detecting the activation and de-activation of archon
                 bool archonBuff = false;
@@ -284,8 +284,8 @@ namespace Trinity
                     buffList += " " + buff.InternalName + " (SNO: " + buff.SNOId + " stack: " + buff.StackCount.ToString() + ")";
 
                     // Store the stack count of this buff
-                    if (!Trinity.dictCachedBuffs.TryGetValue(buff.SNOId, out stackCount))
-                        Trinity.dictCachedBuffs.Add(buff.SNOId, buff.StackCount);
+                    if (!Trinity.PlayerBuffs.TryGetValue(buff.SNOId, out stackCount))
+                        Trinity.PlayerBuffs.Add(buff.SNOId, buff.StackCount);
                     // Check for archon stuff
                     if (buff.SNOId == (int)SNOPower.Wizard_Archon)
                         archonBuff = true;

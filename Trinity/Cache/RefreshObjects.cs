@@ -82,7 +82,7 @@ namespace Trinity
                                 if (Trinity.Player.Position.Distance2D(fireChainSpot) <= fireChainSize)
                                 {
                                     Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Avoiding Fire Chains!");
-                                    StandingInAvoidance = true;
+                                    _standingInAvoidance = true;
                                 }
                                 CacheData.TimeBoundAvoidance.Add(new CacheObstacleObject(fireChainSpot, fireChainSize, -2, "FireChains"));
                             }
@@ -119,7 +119,7 @@ namespace Trinity
                             if (Trinity.Player.Position.Distance2D(pathSpot) <= beastChargePathWidth)
                             {
                                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Avoiding Beast Charger!");
-                                StandingInAvoidance = true;
+                                _standingInAvoidance = true;
                             }
                             CacheData.TimeBoundAvoidance.Add(new CacheObstacleObject(pathSpot, beastChargePathWidth, beastChargerSNO,
                                 "BeastCharge"));
@@ -141,8 +141,8 @@ namespace Trinity
 
 
                 // Reduce ignore-for-loops counter
-                if (IgnoreTargetForLoops > 0)
-                    IgnoreTargetForLoops--;
+                if (_ignoreTargetForLoops > 0)
+                    _ignoreTargetForLoops--;
                 // If we have an avoidance under our feet, then create a new object which contains a safety point to move to
                 // But only if we aren't force-cancelling avoidance for XX time
                 bool hasFoundSafePoint = false;
@@ -150,10 +150,10 @@ namespace Trinity
                 using (new PerformanceLogger("RefreshDiaObjectCache.AvoidanceCheck"))
                 {
                     if (Player.IsGhosted)
-                        StandingInAvoidance = true;
+                        _standingInAvoidance = true;
 
                     // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
-                    if (StandingInAvoidance && (!AnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
+                    if (_standingInAvoidance && (!AnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
                         DateTime.UtcNow.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= cancelledEmergencyMoveForMilliseconds)
                     {
                         Vector3 vAnySafePoint = NavHelper.FindSafeZone(false, 1, Player.Position, true, null, true);
@@ -194,7 +194,7 @@ namespace Trinity
                 }
                 // Not heading straight for a safe-spot?
                 // No valid targets but we were told to stay put?
-                if (CurrentTarget == null && ShouldStayPutDuringAvoidance && !StandingInAvoidance)
+                if (CurrentTarget == null && _shouldStayPutDuringAvoidance && !_standingInAvoidance)
                 {
                     CurrentTarget = new TrinityCacheObject()
                                         {
@@ -249,7 +249,7 @@ namespace Trinity
                     // force to stay put if we want to town run and there's no target
                     if (CurrentTarget == null && ForceVendorRunASAP)
                     {
-                        bDontMoveMeIAmDoingShit = true;
+                        DontMoveMeIAmDoingShit = true;
                     }
 
                     if (Settings.WorldObject.EnableBountyEvents)
@@ -345,8 +345,8 @@ namespace Trinity
                             CurrentTarget.Type
                             );
 
-                        dateSincePickedTarget = DateTime.UtcNow;
-                        iTargetLastHealth = 0f;
+                        _lastPickedTargetTime = DateTime.UtcNow;
+                        _targetLastHealth = 0f;
                     }
                     else
                     {
@@ -354,14 +354,14 @@ namespace Trinity
                         if (CurrentTarget.IsUnit)
                         {
                             // Check if the health has changed, if so update the target-pick time before we blacklist them again
-                            if (CurrentTarget.HitPointsPct != iTargetLastHealth)
+                            if (CurrentTarget.HitPointsPct != _targetLastHealth)
                             {
                                 Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Keeping Target {0} - CurrentTarget.HitPoints: {1:0.00} TargetLastHealth: {2:0.00} ",
-                                                CurrentTarget.RActorGuid, CurrentTarget.HitPointsPct, iTargetLastHealth);
-                                dateSincePickedTarget = DateTime.UtcNow;
+                                                CurrentTarget.RActorGuid, CurrentTarget.HitPointsPct, _targetLastHealth);
+                                _lastPickedTargetTime = DateTime.UtcNow;
                             }
                             // Now store the target's last-known health
-                            iTargetLastHealth = CurrentTarget.HitPointsPct;
+                            _targetLastHealth = CurrentTarget.HitPointsPct;
                         }
                     }
                 }
@@ -441,7 +441,7 @@ namespace Trinity
                                     } break;
                                 case GObjectType.Avoidance:
                                     {
-                                        extraData += StandingInAvoidance ? "InAoE " : "";
+                                        extraData += _standingInAvoidance ? "InAoE " : "";
                                         break;
                                     }
                             }
@@ -568,7 +568,7 @@ namespace Trinity
                     CurrentBotKillRange = 300f;
 
                 CurrentBotLootRange = Zeta.Bot.Settings.CharacterSettings.Instance.LootRadius;
-                ShouldStayPutDuringAvoidance = false;
+                _shouldStayPutDuringAvoidance = false;
 
                 // Always have a minimum kill radius, so we're never getting whacked without retaliating
                 if (CurrentBotKillRange < 10)
@@ -588,63 +588,58 @@ namespace Trinity
 
                 if (Player.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
                 { //!sp - keep looking for kills while WOTB is up
-                    iKeepKillRadiusExtendedFor = Math.Max(3, iKeepKillRadiusExtendedFor);
-                    timeKeepKillRadiusExtendedUntil = DateTime.UtcNow.AddSeconds(iKeepKillRadiusExtendedFor);
+                    _keepKillRadiusExtendedForSeconds = Math.Max(3, _keepKillRadiusExtendedForSeconds);
+                    _timeKeepKillRadiusExtendedUntil = DateTime.UtcNow.AddSeconds(_keepKillRadiusExtendedForSeconds);
                 }
                 // Counter for how many cycles we extend or reduce our attack/kill radius, and our loot radius, after a last kill
-                if (iKeepKillRadiusExtendedFor > 0)
+                if (_keepKillRadiusExtendedForSeconds > 0)
                 {
-                    TimeSpan diffResult = DateTime.UtcNow.Subtract(timeKeepKillRadiusExtendedUntil);
-                    iKeepKillRadiusExtendedFor = (int)diffResult.Seconds;
+                    TimeSpan diffResult = DateTime.UtcNow.Subtract(_timeKeepKillRadiusExtendedUntil);
+                    _keepKillRadiusExtendedForSeconds = (int)diffResult.Seconds;
                     //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kill Radius remaining " + diffResult.Seconds + "s");
-                    if (timeKeepKillRadiusExtendedUntil <= DateTime.UtcNow)
+                    if (_timeKeepKillRadiusExtendedUntil <= DateTime.UtcNow)
                     {
-                        iKeepKillRadiusExtendedFor = 0;
+                        _keepKillRadiusExtendedForSeconds = 0;
                     }
                 }
-                if (iKeepLootRadiusExtendedFor > 0)
-                    iKeepLootRadiusExtendedFor--;
+                if (_keepLootRadiusExtendedForSeconds > 0)
+                    _keepLootRadiusExtendedForSeconds--;
 
                 // Clear forcing close-range priority on mobs after XX period of time
-                if (ForceCloseRangeTarget && DateTime.UtcNow.Subtract(lastForcedKeepCloseRange).TotalMilliseconds > ForceCloseRangeForMilliseconds)
+                if (_forceCloseRangeTarget && DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds > ForceCloseRangeForMilliseconds)
                 {
-                    ForceCloseRangeTarget = false;
+                    _forceCloseRangeTarget = false;
                 }
 
                 //AnyElitesPresent = false;
                 AnyMobsInRange = false;
 
-                IsAvoidingProjectiles = false;
-                // Every 15 seconds, clear the "blackspots" where avoidance failed, so we can re-check them
-                if (DateTime.UtcNow.Subtract(lastClearedAvoidanceBlackspots).TotalSeconds > 15)
-                {
-                    lastClearedAvoidanceBlackspots = DateTime.UtcNow;
-                    hashAvoidanceBlackspot = new HashSet<CacheObstacleObject>();
-                }
+                _isAvoidingProjectiles = false;
+
                 // Clear our very short-term destructible blacklist within 3 seconds of last attacking a destructible
-                if (bNeedClearDestructibles && DateTime.UtcNow.Subtract(lastDestroyedDestructible).TotalMilliseconds > 2500)
+                if (_needClearDestructibles && DateTime.UtcNow.Subtract(_lastDestroyedDestructible).TotalMilliseconds > 2500)
                 {
-                    bNeedClearDestructibles = false;
-                    hashRGUIDDestructible3SecBlacklist = new HashSet<int>();
+                    _needClearDestructibles = false;
+                    _destructible3SecBlacklist = new HashSet<int>();
                 }
                 // Clear our very short-term ignore-monster blacklist (from not being able to raycast on them or already dead units)
-                if (NeedToClearBlacklist3 && DateTime.UtcNow.Subtract(dateSinceBlacklist3Clear).TotalMilliseconds > 3000)
+                if (NeedToClearBlacklist3 && DateTime.UtcNow.Subtract(Blacklist3LastClear).TotalMilliseconds > 3000)
                 {
                     NeedToClearBlacklist3 = false;
-                    hashRGUIDBlacklist3 = new HashSet<int>();
+                    Blacklist3Seconds = new HashSet<int>();
                 }
 
                 // Reset the counters for player-owned things
-                iPlayerOwnedMysticAlly = 0;
-                PlayerOwnedGargantuan = 0;
-                PlayerOwnedZombieDog = 0;
-                iPlayerOwnedDHPets = 0;
+                PlayerOwnedMysticAllyCount = 0;
+                PlayerOwnedGargantuanCount = 0;
+                PlayerOwnedZombieDogCount = 0;
+                PlayerOwnedDHPetsCount = 0;
 
                 // Flag for if we should search for an avoidance spot or not
-                StandingInAvoidance = false;
+                _standingInAvoidance = false;
 
                 // Highest weight found as we progress through, so we can pick the best target at the end (the one with the highest weight)
-                w_HighestWeightFound = 0;
+                HighestWeightFound = 0;
 
                 // Here's the list we'll use to store each object
                 ObjectCache = new List<TrinityCacheObject>();

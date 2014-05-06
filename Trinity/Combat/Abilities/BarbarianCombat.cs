@@ -25,10 +25,12 @@ namespace Trinity.Combat.Abilities
                 // Threatening Shout OOC
             }
 
-            // Refresh Frenzy
-            if (IsNull(power) && CanCast(SNOPower.Barbarian_Frenzy) && TimeSincePowerUse(SNOPower.Barbarian_Frenzy) > 3000 && TimeSincePowerUse(SNOPower.Barbarian_Frenzy) < 4000)
-                power = PowerFrenzy;
-
+            if (!UseOOCBuff)
+            {
+                // Refresh Frenzy
+                if (IsNull(power) && CanCast(SNOPower.Barbarian_Frenzy) && TimeSincePowerUse(SNOPower.Barbarian_Frenzy) > 3000 && TimeSincePowerUse(SNOPower.Barbarian_Frenzy) < 4000)
+                    power = PowerFrenzy;
+            }
             // Ignore Pain when low on health
             if (IsNull(power) && CanCastIgnorePain)
                 power = PowerIgnorePain;
@@ -327,6 +329,7 @@ namespace Trinity.Combat.Abilities
                     !IsCurrentlyAvoiding &&
                     !Player.IsIncapacitated &&
                     CanCast(SNOPower.Barbarian_Earthquake) &&
+                    Player.PrimaryResource >= 50 &&
                     TargetUtil.IsEliteTargetInRange(45f);
             }
         }

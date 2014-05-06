@@ -418,7 +418,7 @@ namespace Trinity.Combat.Abilities
         public static int GetBuffStacks(SNOPower power)
         {
             int stacks;
-            if (Trinity.dictCachedBuffs.TryGetValue((int)power, out stacks))
+            if (Trinity.PlayerBuffs.TryGetValue((int)power, out stacks))
             {
                 return stacks;
             }

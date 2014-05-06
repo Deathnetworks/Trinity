@@ -38,10 +38,10 @@ namespace Trinity
         private static Composite HandleTargetAction()
         {
             return new PrioritySelector(
-                new Decorator(ret => ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && !bMainBotPaused,
+                new Decorator(ret => ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && !MainBotPaused,
                     new Action(ctx => HandleTarget())
                 ),
-                new Decorator(ret => ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && bMainBotPaused,
+                new Decorator(ret => ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && MainBotPaused,
                     new Action(ret => PausedAction())
                 )
             );
@@ -49,7 +49,7 @@ namespace Trinity
 
         private static RunStatus PausedAction()
         {
-            return bMainBotPaused ? RunStatus.Running : RunStatus.Success;
+            return MainBotPaused ? RunStatus.Running : RunStatus.Success;
         }
 
         /// <summary>
@@ -88,11 +88,11 @@ namespace Trinity
                     throw new ApplicationException("Unable to return Non-TreeSharp RunStatus");
             }
             string extras = "";
-            if (IsWaitingForPower)
+            if (_isWaitingForPower)
                 extras += " IsWaitingForPower";
-            if (IsWaitingAfterPower)
+            if (_isWaitingAfterPower)
                 extras += " IsWaitingAfterPower";
-            if (IsWaitingForPotion)
+            if (_isWaitingForPotion)
                 extras += " IsWaitingForPotion";
             if (TownRun.IsTryingToTownPortal())
                 extras += " IsTryingToTownPortal";
@@ -100,7 +100,7 @@ namespace Trinity
                 extras += " TownRunTimerRunning";
             if (TownRun.TownRunTimerFinished())
                 extras += " TownRunTimerFinished";
-            if (ForceTargetUpdate)
+            if (_forceTargetUpdate)
                 extras += " ForceTargetUpdate";
             if (CurrentTarget == null)
                 extras += " CurrentTargetIsNull";
@@ -158,17 +158,17 @@ namespace Trinity
                     {
                         PlayerInfoCache.RefreshHotbar();
                     }
-                    if (!IsWaitingForPower && CombatBase.CurrentPower == null && CurrentTarget != null)
+                    if (!_isWaitingForPower && CombatBase.CurrentPower == null && CurrentTarget != null)
                         CombatBase.CurrentPower = AbilitySelector();
 
                     // Time based wait delay for certain powers with animations
-                    if (IsWaitingAfterPower && CombatBase.CurrentPower.ShouldWaitAfterUse)
+                    if (_isWaitingAfterPower && CombatBase.CurrentPower.ShouldWaitAfterUse)
                     {
                         runStatus = HandlerRunStatus.TreeRunning;
                     }
                     else
                     {
-                        IsWaitingAfterPower = false;
+                        _isWaitingAfterPower = false;
                     }
 
                     if (CurrentTarget != null && CurrentTarget.Type == GObjectType.JumpLinkPortal &&
@@ -186,7 +186,7 @@ namespace Trinity
                     if (Player.IsRooted && !wasRootedLastTick)
                     {
                         wasRootedLastTick = true;
-                        ForceTargetUpdate = true;
+                        _forceTargetUpdate = true;
                     }
                     if (!Player.IsRooted)
                         wasRootedLastTick = false;
@@ -201,7 +201,7 @@ namespace Trinity
                     using (new PerformanceLogger("HandleTarget.CheckForNewTarget"))
                     {
                         // So, after all that, do we actually want a new target list?
-                        if (!IsWholeNewTarget && !IsWaitingForPower && !IsWaitingForPotion)
+                        if (!_isWholeNewTarget && !_isWaitingForPower && !_isWaitingForPotion)
                         {
                             // If we *DO* want a new target list, do this... 
                             if (_staleCache)
@@ -219,7 +219,7 @@ namespace Trinity
                                     // Make sure we start trying to move again should we need to!
                                     IsAlreadyMoving = false;
                                     lastMovementCommand = DateTime.MinValue;
-                                    ShouldPickNewAbilities = true;
+                                    _shouldPickNewAbilities = true;
                                 }
                             }
 
@@ -269,7 +269,7 @@ namespace Trinity
                         return GetTreeSharpRunStatus(runStatus);
 
                     // This variable just prevents an instant 2-target update after coming here from the main decorator function above
-                    IsWholeNewTarget = false;
+                    _isWholeNewTarget = false;
                     if (CurrentTarget != null)
                         AssignMonsterTargetPower();
 
@@ -311,9 +311,9 @@ namespace Trinity
                         PositionCache.AddPosition();
 
                         // Maintain an area list of all zones we pass through/near while moving, for our custom navigation handler
-                        if (DateTime.UtcNow.Subtract(lastAddedLocationCache).TotalMilliseconds >= 100)
+                        if (DateTime.UtcNow.Subtract(LastAddedLocationCache).TotalMilliseconds >= 100)
                         {
-                            lastAddedLocationCache = DateTime.UtcNow;
+                            LastAddedLocationCache = DateTime.UtcNow;
                             if (Vector3.Distance(Player.Position, LastRecordedPosition) >= 5f)
                             {
                                 SkipAheadAreaCache.Add(new CacheObstacleObject(Player.Position, 20f, 0));
@@ -323,19 +323,19 @@ namespace Trinity
                         }
                         // Maintain a backtrack list only while fighting monsters
                         if (CurrentTarget.IsUnit && Settings.Combat.Misc.AllowBacktracking &&
-                            (iTotalBacktracks == 0 || Vector3.Distance(Player.Position, vBacktrackList[iTotalBacktracks]) >= 10f))
+                            (TotalBacktracks == 0 || Vector3.Distance(Player.Position, BacktrackList[TotalBacktracks]) >= 10f))
                         {
                             bool bAddThisBacktrack = true;
                             // Check we aren't within 12 feet of 2 backtracks again (eg darting back & forth)
-                            if (iTotalBacktracks >= 2)
+                            if (TotalBacktracks >= 2)
                             {
-                                if (Vector3.Distance(Player.Position, vBacktrackList[iTotalBacktracks - 1]) < 12f)
+                                if (Vector3.Distance(Player.Position, BacktrackList[TotalBacktracks - 1]) < 12f)
                                     bAddThisBacktrack = false;
                             }
                             if (bAddThisBacktrack)
                             {
-                                iTotalBacktracks++;
-                                vBacktrackList.Add(iTotalBacktracks, Player.Position);
+                                TotalBacktracks++;
+                                BacktrackList.Add(TotalBacktracks, Player.Position);
                             }
                         }
                     }
@@ -348,11 +348,11 @@ namespace Trinity
                         // Always raycast these bad boys
                         if (CurrentTarget.Type == GObjectType.JumpLinkPortal)
                         {
-                            CurrentTargetIsInLoS = NavHelper.CanRayCast(Player.Position, vCurrentDestination);
+                            CurrentTargetIsInLoS = NavHelper.CanRayCast(Player.Position, CurrentDestination);
                         }
                         else if (DataDictionary.AlwaysRaycastWorlds.Contains(Player.WorldID) && CurrentTarget.Distance > CurrentTarget.Radius + 2f)
                         {
-                            CurrentTargetIsInLoS = NavHelper.CanRayCast(Player.Position, vCurrentDestination);
+                            CurrentTargetIsInLoS = NavHelper.CanRayCast(Player.Position, CurrentDestination);
                         }
                         else if (TargetCurrentDistance <= 20f)
                         {
@@ -360,7 +360,7 @@ namespace Trinity
                         }
                         else if (Settings.Combat.Misc.UseNavMeshTargeting && CurrentTarget.Type != GObjectType.Barricade && CurrentTarget.Type != GObjectType.Destructible)
                         {
-                            CurrentTargetIsInLoS = (NavHelper.CanRayCast(Player.Position, vCurrentDestination) || DataDictionary.LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
+                            CurrentTargetIsInLoS = (NavHelper.CanRayCast(Player.Position, CurrentDestination) || DataDictionary.LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
                         }
                         else
                         {
@@ -407,7 +407,7 @@ namespace Trinity
                             if (CurrentTarget.Type == GObjectType.Avoidance)
                             {
                                 //vlastSafeSpot = Vector3.Zero;
-                                ForceTargetUpdate = true;
+                                _forceTargetUpdate = true;
                                 //bAvoidDirectionBlacklisting = false;
                                 runStatus = HandlerRunStatus.TreeRunning;
                             }
@@ -432,18 +432,18 @@ namespace Trinity
                                     {
                                         if (CombatBase.CurrentPower.SNOPower != SNOPower.None)
                                         {
-                                            if (IsWaitingForPower && CombatBase.CurrentPower.ShouldWaitBeforeUse)
+                                            if (_isWaitingForPower && CombatBase.CurrentPower.ShouldWaitBeforeUse)
                                             {
                                                 runStatus = HandlerRunStatus.TreeRunning;
                                             }
-                                            else if (IsWaitingForPower && !CombatBase.CurrentPower.ShouldWaitBeforeUse)
+                                            else if (_isWaitingForPower && !CombatBase.CurrentPower.ShouldWaitBeforeUse)
                                             {
                                                 runStatus = HandlerRunStatus.TreeRunning;
-                                                IsWaitingForPower = false;
+                                                _isWaitingForPower = false;
                                             }
                                             else
                                             {
-                                                IsWaitingForPower = false;
+                                                _isWaitingForPower = false;
                                                 HandleUnitInRange();
                                                 runStatus = HandlerRunStatus.TreeRunning;
                                             }
@@ -495,15 +495,15 @@ namespace Trinity
                                         // If we've tried interacting too many times, blacklist this for a while
                                         if (iInteractAttempts > 3)
                                         {
-                                            hashRGUIDBlacklist90.Add(CurrentTarget.RActorGuid);
+                                            Blacklist90Seconds.Add(CurrentTarget.RActorGuid);
                                             //dateSinceBlacklist90Clear = DateTime.UtcNow;
-                                            hashRGUIDBlacklist60.Add(CurrentTarget.RActorGuid);
+                                            Blacklist60Seconds.Add(CurrentTarget.RActorGuid);
                                         }
-                                        IgnoreRactorGUID = CurrentTarget.RActorGuid;
-                                        IgnoreTargetForLoops = 3;
+                                        _ignoreRactorGuid = CurrentTarget.RActorGuid;
+                                        _ignoreTargetForLoops = 3;
 
                                         // Now tell Trinity to get a new target!
-                                        ForceTargetUpdate = true;
+                                        _forceTargetUpdate = true;
                                         runStatus = HandlerRunStatus.TreeRunning;
 
                                         //check if we are returning to the tree
@@ -521,7 +521,7 @@ namespace Trinity
                                 case GObjectType.CursedChest:
                                 case GObjectType.CursedShrine:
                                     {
-                                        ForceTargetUpdate = true;
+                                        _forceTargetUpdate = true;
 
                                         if (isMoving)
                                         {
@@ -576,7 +576,7 @@ namespace Trinity
                                             {
                                                 Logger.LogVerbose("Blacklisting {0} ({1}) for 15 seconds after {2} interactions",
                                                     CurrentTarget.InternalName, CurrentTarget.ActorSNO, attemptCount);
-                                                hashRGUIDBlacklist15.Add(CurrentTarget.RActorGuid);
+                                                Blacklist15Seconds.Add(CurrentTarget.RActorGuid);
                                             }
                                         }
                                         else
@@ -624,7 +624,7 @@ namespace Trinity
                                                     );
                                             }
 
-                                            if (CurrentTarget.RActorGuid == IgnoreRactorGUID || DataDictionary.DestroyAtLocationIds.Contains(CurrentTarget.ActorSNO))
+                                            if (CurrentTarget.RActorGuid == _ignoreRactorGuid || DataDictionary.DestroyAtLocationIds.Contains(CurrentTarget.ActorSNO))
                                             {
                                                 // Location attack - attack the Vector3/map-area (equivalent of holding shift and left-clicking the object in-game to "force-attack")
                                                 Vector3 vAttackPoint;
@@ -660,16 +660,16 @@ namespace Trinity
                                             CacheData.AbilityLastUsed[CombatBase.CurrentPower.SNOPower] = DateTime.UtcNow;
 
                                             // Prevent this EXACT object being targetted again for a short while, just incase
-                                            IgnoreRactorGUID = CurrentTarget.RActorGuid;
-                                            IgnoreTargetForLoops = 3;
+                                            _ignoreRactorGuid = CurrentTarget.RActorGuid;
+                                            _ignoreTargetForLoops = 3;
                                             // Add this destructible/barricade to our very short-term ignore list
-                                            //hashRGUIDDestructible3SecBlacklist.Add(CurrentTarget.RActorGuid);
+                                            //Destructible3SecBlacklist.Add(CurrentTarget.RActorGuid);
                                             Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Blacklisting {0} {1} {2} for 3 seconds for Destrucable attack", CurrentTarget.Type, CurrentTarget.InternalName, CurrentTarget.ActorSNO);
-                                            lastDestroyedDestructible = DateTime.UtcNow;
-                                            bNeedClearDestructibles = true;
+                                            _lastDestroyedDestructible = DateTime.UtcNow;
+                                            _needClearDestructibles = true;
                                         }
                                         // Now tell Trinity to get a new target!
-                                        ForceTargetUpdate = true;
+                                        _forceTargetUpdate = true;
                                     }
                                     runStatus = HandlerRunStatus.TreeRunning;
                                     //check if we are returning to the tree
@@ -679,15 +679,15 @@ namespace Trinity
                                 // * Backtrack - clear this waypoint
                                 case GObjectType.Backtrack:
                                     // Remove the current backtrack location now we reached it
-                                    vBacktrackList.Remove(iTotalBacktracks);
-                                    iTotalBacktracks--;
+                                    BacktrackList.Remove(TotalBacktracks);
+                                    TotalBacktracks--;
                                     // Never bother with the very first backtrack location
-                                    if (iTotalBacktracks <= 1)
+                                    if (TotalBacktracks <= 1)
                                     {
-                                        iTotalBacktracks = 0;
-                                        vBacktrackList = new SortedList<int, Vector3>();
+                                        TotalBacktracks = 0;
+                                        BacktrackList = new SortedList<int, Vector3>();
                                     }
-                                    ForceTargetUpdate = true;
+                                    _forceTargetUpdate = true;
                                     runStatus = HandlerRunStatus.TreeRunning;
                                     //check if we are returning to the tree
                                     if (runStatus != HandlerRunStatus.NotFinished)
@@ -730,16 +730,16 @@ namespace Trinity
 
 
                     // Update the last distance stored
-                    fLastDistanceFromTarget = TargetCurrentDistance;
+                    LastDistanceFromTarget = TargetCurrentDistance;
 
                     if (TimeSinceUse(SNOPower.Monk_TempestRush) < 250)
                     {
-                        bForceNewMovement = true;
+                        ForceNewMovement = true;
                     }
 
                     // Only position-shift when not avoiding
                     // See if we want to ACTUALLY move, or are just waiting for the last move command...
-                    if (!bForceNewMovement && IsAlreadyMoving && vCurrentDestination == vLastMoveToTarget && DateTime.UtcNow.Subtract(lastMovementCommand).TotalMilliseconds <= 100)
+                    if (!ForceNewMovement && IsAlreadyMoving && CurrentDestination == LastMoveToTarget && DateTime.UtcNow.Subtract(lastMovementCommand).TotalMilliseconds <= 100)
                     {
                         runStatus = HandlerRunStatus.TreeRunning;
                         //check if we are returning to the tree
@@ -764,7 +764,7 @@ namespace Trinity
                             CurrentTarget.Type == GObjectType.PowerGlobe ||
                             Monk_SpecialMovement ||
                             (CurrentTarget.Type == GObjectType.Backtrack && Settings.Combat.Misc.AllowOOCMovement))
-                            && NavHelper.CanRayCast(Player.Position, vCurrentDestination)
+                            && NavHelper.CanRayCast(Player.Position, CurrentDestination)
                             )
                         {
                             bool bFoundSpecialMovement = UsedSpecialMovement();
@@ -775,12 +775,12 @@ namespace Trinity
 
                                 if (Attackable_SpecialMovement && !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && !bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource >= 10)
                                 {
-                                    ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vCurrentDestination, CurrentWorldDynamicId, -1);
+                                    ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, CurrentDestination, CurrentWorldDynamicId, -1);
                                     // Store the current destination for comparison incase of changes next loop
-                                    vLastMoveToTarget = vCurrentDestination;
+                                    LastMoveToTarget = CurrentDestination;
                                     // Reset total body-block count, since we should have moved
-                                    if (DateTime.UtcNow.Subtract(lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
-                                        TimesBlockedMoving = 0;
+                                    if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
+                                        _timesBlockedMoving = 0;
                                     runStatus = HandlerRunStatus.TreeRunning;
                                     //check if we are returning to the tree
                                     if (runStatus != HandlerRunStatus.NotFinished)
@@ -792,15 +792,15 @@ namespace Trinity
                                     Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly &&
                                     Monk_TempestRushReady())
                                 {
-                                    ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vCurrentDestination, CurrentWorldDynamicId, -1);
+                                    ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, CurrentDestination, CurrentWorldDynamicId, -1);
                                     CacheData.AbilityLastUsed[SNOPower.Monk_TempestRush] = DateTime.UtcNow;
                                     LastPowerUsed = SNOPower.Monk_TempestRush;
-                                    LastTempestRushLocation = vCurrentDestination;
+                                    LastTempestRushLocation = CurrentDestination;
                                     // Store the current destination for comparison incase of changes next loop
-                                    vLastMoveToTarget = vCurrentDestination;
+                                    LastMoveToTarget = CurrentDestination;
                                     // Reset total body-block count, since we should have moved
-                                    if (DateTime.UtcNow.Subtract(lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
-                                        TimesBlockedMoving = 0;
+                                    if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
+                                        _timesBlockedMoving = 0;
                                     runStatus = HandlerRunStatus.TreeRunning;
                                     //check if we are returning to the tree
                                     if (runStatus != HandlerRunStatus.NotFinished)
@@ -809,12 +809,12 @@ namespace Trinity
                                 // Strafe for a Demon Hunter
                                 if (Attackable_SpecialMovement && !bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Strafe) && Player.PrimaryResource >= 15)
                                 {
-                                    ZetaDia.Me.UsePower(SNOPower.DemonHunter_Strafe, vCurrentDestination, CurrentWorldDynamicId, -1);
+                                    ZetaDia.Me.UsePower(SNOPower.DemonHunter_Strafe, CurrentDestination, CurrentWorldDynamicId, -1);
                                     // Store the current destination for comparison incase of changes next loop
-                                    vLastMoveToTarget = vCurrentDestination;
+                                    LastMoveToTarget = CurrentDestination;
                                     // Reset total body-block count, since we should have moved
-                                    if (DateTime.UtcNow.Subtract(lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
-                                        TimesBlockedMoving = 0;
+                                    if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
+                                        _timesBlockedMoving = 0;
                                     runStatus = HandlerRunStatus.TreeRunning;
                                     //check if we are returning to the tree
                                     if (runStatus != HandlerRunStatus.NotFinished)
@@ -824,10 +824,10 @@ namespace Trinity
                             if (bFoundSpecialMovement)
                             {
                                 // Store the current destination for comparison incase of changes next loop
-                                vLastMoveToTarget = vCurrentDestination;
+                                LastMoveToTarget = CurrentDestination;
                                 // Reset total body-block count, since we should have moved
-                                if (DateTime.UtcNow.Subtract(lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
-                                    TimesBlockedMoving = 0;
+                                if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
+                                    _timesBlockedMoving = 0;
                                 runStatus = HandlerRunStatus.TreeRunning;
                                 //check if we are returning to the tree
                                 if (runStatus != HandlerRunStatus.NotFinished)
@@ -844,7 +844,7 @@ namespace Trinity
                         (CurrentTarget.Type != GObjectType.Item && CurrentTarget.Type != GObjectType.Gold && TargetCurrentDistance >= 6f) &&
                         (CurrentTarget.Type != GObjectType.Unit ||
                         (CurrentTarget.IsUnit && !CurrentTarget.IsTreasureGoblin &&
-                        (!Settings.Combat.Barbarian.SelectiveWhirlwind || (Settings.Combat.Barbarian.SelectiveWhirlwind && bAnyNonWWIgnoreMobsInRange && !DataDictionary.WhirlwindIgnoreSNOIds.Contains(CurrentTarget.ActorSNO))))))
+                        (!Settings.Combat.Barbarian.SelectiveWhirlwind || (Settings.Combat.Barbarian.SelectiveWhirlwind && _anyNonWwIgnoreMobsInRange && !DataDictionary.WhirlwindIgnoreSNOIds.Contains(CurrentTarget.ActorSNO))))))
                     {
                         // Special code to prevent whirlwind double-spam, this helps save fury
                         bool bUseThisLoop = SNOPower.Barbarian_Whirlwind != LastPowerUsed;
@@ -856,16 +856,16 @@ namespace Trinity
                         }
                         if (bUseThisLoop)
                         {
-                            ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vCurrentDestination, CurrentWorldDynamicId, -1);
+                            ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, CurrentDestination, CurrentWorldDynamicId, -1);
                             LastPowerUsed = SNOPower.Barbarian_Whirlwind;
                             CacheData.AbilityLastUsed[SNOPower.Barbarian_Whirlwind] = DateTime.UtcNow;
                         }
                         // Store the current destination for comparison incase of changes next loop
-                        vLastMoveToTarget = vCurrentDestination;
+                        LastMoveToTarget = CurrentDestination;
                         // Reset total body-block count
-                        if ((!ForceCloseRangeTarget || DateTime.UtcNow.Subtract(lastForcedKeepCloseRange).TotalMilliseconds > ForceCloseRangeForMilliseconds) &&
-                            DateTime.UtcNow.Subtract(lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
-                            TimesBlockedMoving = 0;
+                        if ((!_forceCloseRangeTarget || DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds > ForceCloseRangeForMilliseconds) &&
+                            DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
+                            _timesBlockedMoving = 0;
                         runStatus = HandlerRunStatus.TreeRunning;
                         //check if we are returning to the tree
                         if (runStatus != HandlerRunStatus.NotFinished)
@@ -879,7 +879,7 @@ namespace Trinity
                     return GetTreeSharpRunStatus(runStatus);
                 }
 
-                HandleTargetBasicMovement(bForceNewMovement);
+                HandleTargetBasicMovement(ForceNewMovement);
 
                 runStatus = HandlerRunStatus.TreeRunning;
                 return GetTreeSharpRunStatus(runStatus);
@@ -891,28 +891,28 @@ namespace Trinity
             using (new PerformanceLogger("HandleTarget.DistanceEqualCheck"))
             {
                 // Count how long we have failed to move - body block stuff etc.
-                if (Math.Abs(TargetCurrentDistance - fLastDistanceFromTarget) < 5f && PlayerMover.GetMovementSpeed() < 1)
+                if (Math.Abs(TargetCurrentDistance - LastDistanceFromTarget) < 5f && PlayerMover.GetMovementSpeed() < 1)
                 {
-                    bForceNewMovement = true;
-                    if (DateTime.UtcNow.Subtract(lastMovedDuringCombat).TotalMilliseconds >= 500)
+                    ForceNewMovement = true;
+                    if (DateTime.UtcNow.Subtract(_lastMovedDuringCombat).TotalMilliseconds >= 500)
                     {
-                        lastMovedDuringCombat = DateTime.UtcNow;
+                        _lastMovedDuringCombat = DateTime.UtcNow;
                         // We've been stuck at least 250 ms, let's go and pick new targets etc.
-                        TimesBlockedMoving++;
-                        ForceCloseRangeTarget = true;
-                        lastForcedKeepCloseRange = DateTime.UtcNow;
+                        _timesBlockedMoving++;
+                        _forceCloseRangeTarget = true;
+                        _lastForcedKeepCloseRange = DateTime.UtcNow;
                         // And tell Trinity to get a new target
-                        ForceTargetUpdate = true;
+                        _forceTargetUpdate = true;
 
                         // If we were backtracking and failed, remove the current backtrack and try and move to the next
-                        if (CurrentTarget.Type == GObjectType.Backtrack && TimesBlockedMoving >= 2)
+                        if (CurrentTarget.Type == GObjectType.Backtrack && _timesBlockedMoving >= 2)
                         {
-                            vBacktrackList.Remove(iTotalBacktracks);
-                            iTotalBacktracks--;
-                            if (iTotalBacktracks <= 1)
+                            BacktrackList.Remove(TotalBacktracks);
+                            TotalBacktracks--;
+                            if (TotalBacktracks <= 1)
                             {
-                                iTotalBacktracks = 0;
-                                vBacktrackList = new SortedList<int, Vector3>();
+                                TotalBacktracks = 0;
+                                BacktrackList = new SortedList<int, Vector3>();
                             }
                         }
                         // Reset the emergency loop counter and return success
@@ -923,7 +923,7 @@ namespace Trinity
                 else
                 {
                     // Movement has been made, so count the time last moved!
-                    lastMovedDuringCombat = DateTime.UtcNow;
+                    _lastMovedDuringCombat = DateTime.UtcNow;
                 }
             }
             return runStatus;
@@ -975,7 +975,7 @@ namespace Trinity
                     // So it won't blacklist a monster "on the edge of the screen" who isn't even being targetted
                     // Don't blacklist monsters on <= 50% health though, as they can't be in a stuck location... can they!? Maybe give them some extra time!
 
-                    bool isNavigable = NavHelper.CanRayCast(Player.Position, vCurrentDestination);
+                    bool isNavigable = NavHelper.CanRayCast(Player.Position, CurrentDestination);
 
                     bool addTargetToBlacklist = true;
 
@@ -1020,8 +1020,8 @@ namespace Trinity
 
                         if (CurrentTarget.IsBoss)
                         {
-                            hashRGUIDBlacklist15.Add(CurrentTarget.RActorGuid);
-                            dateSinceBlacklist15Clear = DateTime.UtcNow;
+                            Blacklist15Seconds.Add(CurrentTarget.RActorGuid);
+                            Blacklist15LastClear = DateTime.UtcNow;
                             CurrentTarget = null;
                             runStatus = HandlerRunStatus.TreeSuccess;
                         }
@@ -1032,8 +1032,8 @@ namespace Trinity
                         }
                         else
                         {
-                            hashRGUIDBlacklist90.Add(CurrentTarget.RActorGuid);
-                            dateSinceBlacklist90Clear = DateTime.UtcNow;
+                            Blacklist90Seconds.Add(CurrentTarget.RActorGuid);
+                            Blacklist90LastClear = DateTime.UtcNow;
                             CurrentTarget = null;
                             runStatus = HandlerRunStatus.TreeSuccess;
                         }
@@ -1051,9 +1051,9 @@ namespace Trinity
             using (new PerformanceLogger("HandleTarget.AssignMonsterTargetPower"))
             {
                 // Find a valid ability if the target is a monster
-                if (ShouldPickNewAbilities && !IsWaitingForPower && !IsWaitingForPotion)
+                if (_shouldPickNewAbilities && !_isWaitingForPower && !_isWaitingForPotion)
                 {
-                    ShouldPickNewAbilities = false;
+                    _shouldPickNewAbilities = false;
                     if (CurrentTarget.IsUnit)
                     {
                         // Pick a suitable ability
@@ -1061,8 +1061,8 @@ namespace Trinity
                             CombatBase.CurrentPower = AbilitySelector(false, false, false);
                         if (CombatBase.CurrentPower.SNOPower == SNOPower.None && !Player.IsIncapacitated)
                         {
-                            iNoAbilitiesAvailableInARow++;
-                            if (DateTime.UtcNow.Subtract(lastRemindedAboutAbilities).TotalSeconds > 60 && iNoAbilitiesAvailableInARow >= 4)
+                            NoAbilitiesAvailableInARow++;
+                            if (DateTime.UtcNow.Subtract(lastRemindedAboutAbilities).TotalSeconds > 60 && NoAbilitiesAvailableInARow >= 4)
                             {
                                 lastRemindedAboutAbilities = DateTime.UtcNow;
                                 Logger.Log(TrinityLogLevel.Error, LogCategory.Behavior, "Fatal Error: Couldn't find a valid attack ability. Not enough resource for any abilities or all on cooldown");
@@ -1072,7 +1072,7 @@ namespace Trinity
                         }
                         else
                         {
-                            iNoAbilitiesAvailableInARow = 0;
+                            NoAbilitiesAvailableInARow = 0;
                         }
                     }
                     // Select an ability for destroying a destructible with in advance
@@ -1083,7 +1083,7 @@ namespace Trinity
         }
 
         /// <summary>
-        /// Will check <see cref=" IsWaitingForPotion"/> and Use a Potion if needed
+        /// Will check <see cref=" _isWaitingForPotion"/> and Use a Potion if needed
         /// </summary>
         private static void UsePotionIfNeeded()
         {
@@ -1130,10 +1130,10 @@ namespace Trinity
             using (new PerformanceLogger("HandleTarget.CheckStaleCache"))
             {
                 // Let's calculate whether or not we want a new target list...
-                if (!IsWholeNewTarget && !IsWaitingForPower && !IsWaitingForPotion)
+                if (!_isWholeNewTarget && !_isWaitingForPower && !_isWaitingForPotion)
                 {
                     // Update targets at least once every 80 milliseconds
-                    if (ForceTargetUpdate || IsAvoidingProjectiles || DateTime.UtcNow.Subtract(LastRefreshedCache).TotalMilliseconds > Settings.Advanced.CacheRefreshRate)
+                    if (_forceTargetUpdate || _isAvoidingProjectiles || DateTime.UtcNow.Subtract(LastRefreshedCache).TotalMilliseconds > Settings.Advanced.CacheRefreshRate)
                     {
                         _staleCache = true;
                     }
@@ -1208,7 +1208,7 @@ namespace Trinity
                     TimeSinceUse(SNOPower.Barbarian_Leap) >= CombatBase.GetSNOPowerUseDelay(SNOPower.Barbarian_Leap) &&
                     PowerManager.CanCast(SNOPower.Barbarian_Leap))
                 {
-                    ZetaDia.Me.UsePower(SNOPower.Barbarian_Leap, vCurrentDestination, CurrentWorldDynamicId, -1);
+                    ZetaDia.Me.UsePower(SNOPower.Barbarian_Leap, CurrentDestination, CurrentWorldDynamicId, -1);
                     SpellHistory.RecordSpell(SNOPower.Barbarian_Leap);
                     bFoundSpecialMovement = true;
                 }
@@ -1218,7 +1218,7 @@ namespace Trinity
                     TimeSinceUse(SNOPower.Barbarian_FuriousCharge) >= CombatBase.GetSNOPowerUseDelay(SNOPower.Barbarian_FuriousCharge) &&
                     PowerManager.CanCast(SNOPower.Barbarian_FuriousCharge))
                 {
-                    ZetaDia.Me.UsePower(SNOPower.Barbarian_FuriousCharge, vCurrentDestination, CurrentWorldDynamicId, -1);
+                    ZetaDia.Me.UsePower(SNOPower.Barbarian_FuriousCharge, CurrentDestination, CurrentWorldDynamicId, -1);
                     SpellHistory.RecordSpell(SNOPower.Barbarian_FuriousCharge);
                     bFoundSpecialMovement = true;
                 }
@@ -1226,11 +1226,11 @@ namespace Trinity
                 // Vault for a Demon Hunter
                 if (!bFoundSpecialMovement && CombatBase.CanCast(SNOPower.DemonHunter_Vault) && Settings.Combat.DemonHunter.VaultMode != DemonHunterVaultMode.MovementOnly &&
                     CombatBase.TimeSincePowerUse(SNOPower.DemonHunter_Vault) >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
-                    (CombatBase.PlayerKiteDistance <= 0 || (!CacheData.MonsterObstacles.Any(a => a.Position.Distance(vCurrentDestination) <= CombatBase.PlayerKiteDistance) &&
-                    !CacheData.TimeBoundAvoidance.Any(a => a.Position.Distance(vCurrentDestination) <= CombatBase.PlayerKiteDistance))) &&
-                    (!CacheData.TimeBoundAvoidance.Any(a => MathEx.IntersectsPath(a.Position, a.Radius, Trinity.Player.Position, vCurrentDestination))))
+                    (CombatBase.PlayerKiteDistance <= 0 || (!CacheData.MonsterObstacles.Any(a => a.Position.Distance(CurrentDestination) <= CombatBase.PlayerKiteDistance) &&
+                    !CacheData.TimeBoundAvoidance.Any(a => a.Position.Distance(CurrentDestination) <= CombatBase.PlayerKiteDistance))) &&
+                    (!CacheData.TimeBoundAvoidance.Any(a => MathEx.IntersectsPath(a.Position, a.Radius, Trinity.Player.Position, CurrentDestination))))
                 {
-                    ZetaDia.Me.UsePower(SNOPower.DemonHunter_Vault, vCurrentDestination, CurrentWorldDynamicId, -1);
+                    ZetaDia.Me.UsePower(SNOPower.DemonHunter_Vault, CurrentDestination, CurrentWorldDynamicId, -1);
                     SpellHistory.RecordSpell(SNOPower.DemonHunter_Vault);
                     bFoundSpecialMovement = true;
                 }
@@ -1241,7 +1241,7 @@ namespace Trinity
                     Player.PrimaryResource >= 15 &&
                     PowerManager.CanCast(SNOPower.Wizard_Teleport))
                 {
-                    ZetaDia.Me.UsePower(SNOPower.Wizard_Teleport, vCurrentDestination, CurrentWorldDynamicId, -1);
+                    ZetaDia.Me.UsePower(SNOPower.Wizard_Teleport, CurrentDestination, CurrentWorldDynamicId, -1);
                     SpellHistory.RecordSpell(SNOPower.Wizard_Teleport);
                     bFoundSpecialMovement = true;
                 }
@@ -1251,7 +1251,7 @@ namespace Trinity
                     TimeSinceUse(SNOPower.Wizard_Archon_Teleport) >= CombatBase.GetSNOPowerUseDelay(SNOPower.Wizard_Archon_Teleport) &&
                     PowerManager.CanCast(SNOPower.Wizard_Archon_Teleport))
                 {
-                    ZetaDia.Me.UsePower(SNOPower.Wizard_Archon_Teleport, vCurrentDestination, CurrentWorldDynamicId, -1);
+                    ZetaDia.Me.UsePower(SNOPower.Wizard_Archon_Teleport, CurrentDestination, CurrentWorldDynamicId, -1);
                     SpellHistory.RecordSpell(SNOPower.Wizard_Archon_Teleport);
                     bFoundSpecialMovement = true;
                 }
@@ -1280,7 +1280,7 @@ namespace Trinity
         /// <returns></returns>
         private static double GetSecondsSinceTargetUpdate()
         {
-            return DateTime.UtcNow.Subtract(dateSincePickedTarget).TotalSeconds;
+            return DateTime.UtcNow.Subtract(_lastPickedTargetTime).TotalSeconds;
         }
 
         private static string lastStatusText = "";
@@ -1362,19 +1362,19 @@ namespace Trinity
             statusText.Append(" InLoS=");
             statusText.Append(CurrentTargetIsInLoS.ToString().PadRight(5));
 
-            statusText.Append(String.Format(" Duration={0:0}", DateTime.UtcNow.Subtract(dateSincePickedTarget).TotalSeconds));
+            statusText.Append(String.Format(" Duration={0:0}", DateTime.UtcNow.Subtract(_lastPickedTargetTime).TotalSeconds));
 
             if (Settings.Advanced.DebugInStatusBar)
             {
-                sStatusText = statusText.ToString();
-                BotMain.StatusText = sStatusText;
+                _statusText = statusText.ToString();
+                BotMain.StatusText = _statusText;
             }
             if (lastStatusText != statusText.ToString())
             {
                 // prevent spam
                 lastStatusText = statusText.ToString();
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "{0}", statusText.ToString());
-                bResetStatusText = true;
+                _resetStatusText = true;
             }
         }
 
@@ -1390,7 +1390,7 @@ namespace Trinity
                 IsAlreadyMoving = true;
                 lastMovementCommand = DateTime.UtcNow;
 
-                if (DateTime.UtcNow.Subtract(lastSentMovePower).TotalMilliseconds >= 250 || Vector3.Distance(vLastMoveToTarget, vCurrentDestination) >= 2f || bForceNewMovement)
+                if (DateTime.UtcNow.Subtract(lastSentMovePower).TotalMilliseconds >= 250 || Vector3.Distance(LastMoveToTarget, CurrentDestination) >= 2f || bForceNewMovement)
                 {
                     bool straightLinePathing = DataDictionary.StraightLinePathingLevelAreaIds.Contains(Player.LevelAreaId);
 
@@ -1407,12 +1407,12 @@ namespace Trinity
                     {
                         lastMoveResult = MoveResult.Moved;
                         // just "Click" 
-                        Navigator.PlayerMover.MoveTowards(vCurrentDestination);
+                        Navigator.PlayerMover.MoveTowards(CurrentDestination);
                         Logger.Log(TrinityLogLevel.Info, LogCategory.Movement, "Straight line pathing to {0}", destname);
                     }
                     else
                     {
-                        lastMoveResult = PlayerMover.NavigateTo(vCurrentDestination, destname);
+                        lastMoveResult = PlayerMover.NavigateTo(CurrentDestination, destname);
                     }
 
                     lastSentMovePower = DateTime.UtcNow;
@@ -1423,7 +1423,7 @@ namespace Trinity
                         bool pathFindresult = ((DefaultNavigationProvider)Navigator.NavigationProvider).CanPathWithinDistance(CurrentTarget.Position, CurrentTarget.Radius);
                         if (!pathFindresult)
                         {
-                            hashRGUIDBlacklist60.Add(CurrentTarget.RActorGuid);
+                            Blacklist60Seconds.Add(CurrentTarget.RActorGuid);
                             Logger.Log("Unable to navigate to target! Blacklisting {0} SNO={1} RAGuid={2} dist={3:0} "
                                 + (CurrentTarget.IsElite ? " IsElite " : "")
                                 + (CurrentTarget.ItemQuality >= ItemQuality.Legendary ? "IsLegendaryItem " : ""),
@@ -1432,10 +1432,10 @@ namespace Trinity
                     }
 
                     // Store the current destination for comparison incase of changes next loop
-                    vLastMoveToTarget = vCurrentDestination;
+                    LastMoveToTarget = CurrentDestination;
                     // Reset total body-block count, since we should have moved
-                    if (DateTime.UtcNow.Subtract(lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
-                        TimesBlockedMoving = 0;
+                    if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
+                        _timesBlockedMoving = 0;
                 }
             }
         }
@@ -1448,7 +1448,7 @@ namespace Trinity
                 TargetCurrentDistance = 0;
                 CurrentTargetIsInLoS = false;
                 // Set current destination to our current target's destination
-                vCurrentDestination = CurrentTarget.Position;
+                CurrentDestination = CurrentTarget.Position;
                 
                 switch (CurrentTarget.Type)
                 {
@@ -1470,7 +1470,7 @@ namespace Trinity
                     case GObjectType.Gold:
                         {
                             TargetRangeRequired = 1f;
-                            vCurrentDestination = MathEx.CalculatePointFrom(Player.Position, CurrentTarget.Position, -2f);
+                            CurrentDestination = MathEx.CalculatePointFrom(Player.Position, CurrentTarget.Position, -2f);
                             break;
                         }
                     // * Globes - need to get within pickup radius only
@@ -1508,7 +1508,7 @@ namespace Trinity
                         {
                             if (CurrentTarget.IsQuestGiver)
                             {
-                                vCurrentDestination = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.Radius + 2f);
+                                CurrentDestination = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.Radius + 2f);
                                 TargetRangeRequired = CurrentTarget.Radius + 3f;
                             }
                             else
@@ -1553,7 +1553,7 @@ namespace Trinity
                     case GObjectType.Backtrack:
                         {
                             TargetRangeRequired = 5f;
-                            if (ForceCloseRangeTarget)
+                            if (_forceCloseRangeTarget)
                                 TargetRangeRequired -= 2f;
                             break;
                         }
@@ -1595,10 +1595,10 @@ namespace Trinity
 
                     // See if we should force a long wait AFTERWARDS, too
                     // Force waiting AFTER power use for certain abilities
-                    IsWaitingAfterPower = false;
+                    _isWaitingAfterPower = false;
                     if (CombatBase.CurrentPower.ShouldWaitAfterUse)
                     {
-                        IsWaitingAfterPower = true;
+                        _isWaitingAfterPower = true;
                     }
                 }
                 //else
@@ -1608,24 +1608,24 @@ namespace Trinity
                 //    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "UsePower FAILED {0} ({1}) at {2} on {3} dist={4}", CombatBase.CurrentPower.SNOPower, failFlags, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetACDGUID, dist);
                 //}
 
-                ShouldPickNewAbilities = true;
+                _shouldPickNewAbilities = true;
 
                 // Keep looking for monsters at "normal kill range" a few moments after we successfully attack a monster incase we can pull them into range
-                iKeepKillRadiusExtendedFor = 8;
-                timeKeepKillRadiusExtendedUntil = DateTime.UtcNow.AddSeconds(iKeepKillRadiusExtendedFor);
-                iKeepLootRadiusExtendedFor = 8;
+                _keepKillRadiusExtendedForSeconds = 8;
+                _timeKeepKillRadiusExtendedUntil = DateTime.UtcNow.AddSeconds(_keepKillRadiusExtendedForSeconds);
+                _keepLootRadiusExtendedForSeconds = 8;
                 // if at full or nearly full health, see if we can raycast to it, if not, ignore it for 2000 ms
                 if (CurrentTarget.HitPointsPct >= 0.9d &&
                     !NavHelper.CanRayCast(Player.Position, CurrentTarget.Position) &&
                     !CurrentTarget.IsBoss &&
                     !(DataDictionary.StraightLinePathingLevelAreaIds.Contains(Player.LevelAreaId) || DataDictionary.LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO)))
                 {
-                    IgnoreRactorGUID = CurrentTarget.RActorGuid;
-                    IgnoreTargetForLoops = 6;
+                    _ignoreRactorGuid = CurrentTarget.RActorGuid;
+                    _ignoreTargetForLoops = 6;
                     // Add this monster to our very short-term ignore list
-                    hashRGUIDBlacklist3.Add(CurrentTarget.RActorGuid);
+                    Blacklist3Seconds.Add(CurrentTarget.RActorGuid);
                     Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Blacklisting {0} {1} {2} for 3 seconds due to Raycast failure", CurrentTarget.Type, CurrentTarget.InternalName, CurrentTarget.ActorSNO);
-                    dateSinceBlacklist3Clear = DateTime.UtcNow;
+                    Blacklist3LastClear = DateTime.UtcNow;
                     NeedToClearBlacklist3 = true;
                 }
 
@@ -1639,8 +1639,8 @@ namespace Trinity
                 int iInteractAttempts;
                 // Pick the item up the usepower way, and "blacklist" for a couple of loops
                 ZetaDia.Me.UsePower(SNOPower.Axe_Operate_Gizmo, Vector3.Zero, 0, CurrentTarget.ACDGuid);
-                IgnoreRactorGUID = CurrentTarget.RActorGuid;
-                IgnoreTargetForLoops = 3;
+                _ignoreRactorGuid = CurrentTarget.RActorGuid;
+                _ignoreTargetForLoops = 3;
                 // Store item pickup stats
 
                 string itemSha1Hash = HashGenerator.GenerateItemHash(CurrentTarget.Position, CurrentTarget.ActorSNO, CurrentTarget.InternalName, CurrentWorldDynamicId, CurrentTarget.ItemQuality, CurrentTarget.ItemLevel);
@@ -1725,10 +1725,10 @@ namespace Trinity
                 // If we've tried interacting too many times, blacklist this for a while
                 if (iInteractAttempts > 20 && CurrentTarget.ItemQuality < ItemQuality.Legendary)
                 {
-                    hashRGUIDBlacklist90.Add(CurrentTarget.RActorGuid);
+                    Blacklist90Seconds.Add(CurrentTarget.RActorGuid);
                 }
                 // Now tell Trinity to get a new target!
-                ForceTargetUpdate = true;
+                _forceTargetUpdate = true;
                 return iInteractAttempts;
             }
         }

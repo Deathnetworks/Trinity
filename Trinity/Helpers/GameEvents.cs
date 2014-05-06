@@ -52,11 +52,11 @@ namespace Trinity
             }
 
             HasMappedPlayerAbilities = false;
-            if (!bMaintainStatTracking)
+            if (!MaintainStatTracking)
             {
                 ItemStatsWhenStartedBot = DateTime.UtcNow;
                 ItemStatsLastPostedReport = DateTime.UtcNow;
-                bMaintainStatTracking = true;
+                MaintainStatTracking = true;
             }
             else
             {
@@ -129,17 +129,15 @@ namespace Trinity
         {
             // Issue final reports
             OutputReport();
-            vBacktrackList = new SortedList<int, Vector3>();
-            iTotalBacktracks = 0;
+            BacktrackList = new SortedList<int, Vector3>();
+            TotalBacktracks = 0;
             PlayerMover.TotalAntiStuckAttempts = 1;
             PlayerMover.vSafeMovementLocation = Vector3.Zero;
             PlayerMover.LastPosition = Vector3.Zero;
             PlayerMover.TimesReachedStuckPoint = 0;
             PlayerMover.TimeLastRecordedPosition = DateTime.MinValue;
             PlayerMover.LastGeneratedStuckPosition = DateTime.MinValue;
-            dictRandomID = new Dictionary<int, int>();
-            iMaxDeathsAllowed = 0;
-            iDeathsThisRun = 0;
+            DeathsThisRun = 0;
             CacheData.FullClear();
         }
 
@@ -148,11 +146,11 @@ namespace Trinity
             if (DateTime.UtcNow.Subtract(LastDeathTime).TotalSeconds > 10)
             {
                 LastDeathTime = DateTime.UtcNow;
-                iTotalDeaths++;
-                iDeathsThisRun++;
+                TotalDeaths++;
+                DeathsThisRun++;
                 CacheData.AbilityLastUsed = new Dictionary<SNOPower, DateTime>(DataDictionary.LastUseAbilityTimeDefaults);
-                vBacktrackList = new SortedList<int, Vector3>();
-                iTotalBacktracks = 0;
+                BacktrackList = new SortedList<int, Vector3>();
+                TotalBacktracks = 0;
                 PlayerMover.TotalAntiStuckAttempts = 1;
                 PlayerMover.vSafeMovementLocation = Vector3.Zero;
 
@@ -160,31 +158,6 @@ namespace Trinity
                 TownRun.PreTownRunPosition = Vector3.Zero;
                 TownRun.PreTownRunWorldId = -1;
                 SpellHistory.HistoryQueue.Clear();
-
-                // Does Trinity need to handle deaths?
-                if (iMaxDeathsAllowed > 0)
-                {
-                    if (iDeathsThisRun >= iMaxDeathsAllowed)
-                    {
-                        Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation,
-                            "You have died too many times. Now restarting the game.");
-                        string sUseProfile = FirstProfile;
-                        ProfileManager.Load(!string.IsNullOrEmpty(sUseProfile)
-                            ? sUseProfile
-                            : GlobalSettings.Instance.LastProfile);
-                        Thread.Sleep(1000);
-                        ResetEverythingNewGame();
-                        ZetaDia.Service.Party.LeaveGame(true);
-                        Thread.Sleep(10000);
-                    }
-                    else
-                    {
-                        Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation,
-                            "I'm sorry, but I seem to have let you die :( Now restarting the current profile.");
-                        ProfileManager.Load(ProfileManager.CurrentProfile.Path);
-                        Thread.Sleep(2000);
-                    }
-                }
             }
         }
 
@@ -225,18 +198,17 @@ namespace Trinity
                     CacheData.AbilityLastUsed.Clear();
                     SpellHistory.HistoryQueue.Clear();
 
-                    iMaxDeathsAllowed = 0;
-                    iDeathsThisRun = 0;
+                    DeathsThisRun = 0;
                     LastDeathTime = DateTime.UtcNow;
                     _hashsetItemStatsLookedAt = new HashSet<string>();
                     _hashsetItemPicksLookedAt = new HashSet<string>();
                     _hashsetItemFollowersIgnored = new HashSet<string>();
 
-                    hashRGUIDBlacklist60 = new HashSet<int>();
-                    hashRGUIDBlacklist90 = new HashSet<int>();
-                    hashRGUIDBlacklist15 = new HashSet<int>();
-                    vBacktrackList = new SortedList<int, Vector3>();
-                    iTotalBacktracks = 0;
+                    Blacklist60Seconds = new HashSet<int>();
+                    Blacklist90Seconds = new HashSet<int>();
+                    Blacklist15Seconds = new HashSet<int>();
+                    BacktrackList = new SortedList<int, Vector3>();
+                    TotalBacktracks = 0;
                     HasMappedPlayerAbilities = false;
                     PlayerMover.TotalAntiStuckAttempts = 1;
                     PlayerMover.vSafeMovementLocation = Vector3.Zero;

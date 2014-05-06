@@ -32,7 +32,7 @@ namespace Trinity
         public static int GetBuffStacks(SNOPower power)
         {
             int stacks;
-            if (dictCachedBuffs.TryGetValue((int)power, out stacks))
+            if (PlayerBuffs.TryGetValue((int)power, out stacks))
             {
                 return stacks;
             }

@@ -34,7 +34,7 @@ namespace Trinity
 
                 bool avoidanceNearby = Settings.Combat.Misc.AvoidAOE && ObjectCache.Any(o => o.Type == GObjectType.Avoidance && o.Distance <= 15f);
 
-                bool prioritizeCloseRangeUnits = (avoidanceNearby || ForceCloseRangeTarget || Player.IsRooted || DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds < 1000 &&
+                bool prioritizeCloseRangeUnits = (avoidanceNearby || _forceCloseRangeTarget || Player.IsRooted || DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds < 1000 &&
                     ObjectCache.Count(u => u.IsUnit && u.RadiusDistance < 10f) >= 3);
 
                 bool profileTagCheck = false;
@@ -195,9 +195,9 @@ namespace Trinity
                                     break;
                                 }
 
-                                if (cacheObject.RadiusDistance <= 25f && !bAnyNonWWIgnoreMobsInRange && !DataDictionary.WhirlwindIgnoreSNOIds.Contains(cacheObject.ActorSNO))
+                                if (cacheObject.RadiusDistance <= 25f && !_anyNonWwIgnoreMobsInRange && !DataDictionary.WhirlwindIgnoreSNOIds.Contains(cacheObject.ActorSNO))
                                 {
-                                    bAnyNonWWIgnoreMobsInRange = true;
+                                    _anyNonWwIgnoreMobsInRange = true;
                                 }
 
                                 // Force a close range target because we seem to be stuck *OR* if not ranged and currently rooted
@@ -387,9 +387,9 @@ namespace Trinity
                                             // Logging goblin sightings
                                             if (lastGoblinTime == DateTime.MinValue)
                                             {
-                                                iTotalNumberGoblins++;
+                                                TotalNumberGoblins++;
                                                 lastGoblinTime = DateTime.UtcNow;
-                                                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Goblin #{0} in sight. Distance={1:0}", iTotalNumberGoblins, cacheObject.Distance);
+                                                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Goblin #{0} in sight. Distance={1:0}", TotalNumberGoblins, cacheObject.Distance);
                                             }
                                             else
                                             {
@@ -623,7 +623,7 @@ namespace Trinity
                                     cacheObject.Weight = 0;
                                 }
                                 // Give all globes super low weight if we don't urgently need them, but are not 100% health
-                                else if (!witchDoctorManaLow && (Player.CurrentHealthPct > PlayerEmergencyHealthGlobeLimit))
+                                else if (!witchDoctorManaLow && (Player.CurrentHealthPct > _playerEmergencyHealthGlobeLimit))
                                 {
                                     double myHealth = Player.CurrentHealthPct;
 
@@ -978,10 +978,10 @@ namespace Trinity
                     }
 
                     // Force the character to stay where it is if there is nothing available that is out of avoidance stuff and we aren't already in avoidance stuff
-                    if (cacheObject.Weight == 1 && !StandingInAvoidance && ObjectCache.Any(o => o.Type == GObjectType.Avoidance))
+                    if (cacheObject.Weight == 1 && !_standingInAvoidance && ObjectCache.Any(o => o.Type == GObjectType.Avoidance))
                     {
                         cacheObject.Weight = 0;
-                        ShouldStayPutDuringAvoidance = true;
+                        _shouldStayPutDuringAvoidance = true;
                         objWeightInfo += "StayPutAoE ";
                     }
 
@@ -1001,7 +1001,7 @@ namespace Trinity
                             cacheObject.RActorGuid, objWeightInfo);
 
                     // Is the weight of this one higher than the current-highest weight? Then make this the new primary target!
-                    if (cacheObject.Weight > w_HighestWeightFound && cacheObject.Weight > 0)
+                    if (cacheObject.Weight > HighestWeightFound && cacheObject.Weight > 0)
                     {
 
                         /*
@@ -1010,7 +1010,7 @@ namespace Trinity
 
                         // Clone the current CacheObject
                         CurrentTarget = cacheObject.Copy();
-                        w_HighestWeightFound = cacheObject.Weight;
+                        HighestWeightFound = cacheObject.Weight;
 
                         // See if we can try attempting kiting later
                         NeedToKite = false;

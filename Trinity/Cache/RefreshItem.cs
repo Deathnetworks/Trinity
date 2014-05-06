@@ -97,7 +97,7 @@ namespace Trinity
                     if (c_ItemQuality >= ItemQuality.Rare4)
                         fExtraRange = CurrentBotLootRange;
 
-                    if (iKeepLootRadiusExtendedFor > 0)
+                    if (_keepLootRadiusExtendedForSeconds > 0)
                         fExtraRange += 90f;
 
                     if (CurrentCacheObject.Distance > (CurrentBotLootRange + fExtraRange))

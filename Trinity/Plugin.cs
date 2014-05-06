@@ -20,7 +20,7 @@ namespace Trinity
         {
             get
             {
-                return new Version(1, 9, 1);
+                return new Version(1, 9, 2);
             }
         }
 
@@ -140,7 +140,7 @@ namespace Trinity
                     Helpers.PluginCheck.Start();
 
                     HasMappedPlayerAbilities = false;
-                    isPluginEnabled = true;
+                    _isPluginEnabled = true;
 
                     // Settings are available after this... 
                     LoadConfiguration();
@@ -202,7 +202,7 @@ namespace Trinity
         /// </summary>
         public void OnDisabled()
         {
-            isPluginEnabled = false;
+            _isPluginEnabled = false;
             Navigator.PlayerMover = new DefaultPlayerMover();
             Navigator.StuckHandler = new DefaultStuckHandler();
             CombatTargeting.Instance.Provider = new DefaultCombatTargetingProvider();

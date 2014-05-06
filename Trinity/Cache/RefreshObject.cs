@@ -955,45 +955,45 @@ namespace Trinity
                     return AddToCache;
                 }
                 // Temporary ractor GUID ignoring, to prevent 2 interactions in a very short time which can cause stucks
-                if (IgnoreTargetForLoops > 0 && IgnoreRactorGUID == CurrentCacheObject.RActorGuid)
+                if (_ignoreTargetForLoops > 0 && _ignoreRactorGuid == CurrentCacheObject.RActorGuid)
                 {
                     AddToCache = false;
                     c_IgnoreSubStep = "IgnoreRactorGUID";
                     return AddToCache;
                 }
                 // Check our extremely short-term destructible-blacklist
-                if (hashRGUIDDestructible3SecBlacklist.Contains(CurrentCacheObject.RActorGuid))
+                if (_destructible3SecBlacklist.Contains(CurrentCacheObject.RActorGuid))
                 {
                     AddToCache = false;
-                    c_IgnoreSubStep = "hashRGUIDDestructible3SecBlacklist";
+                    c_IgnoreSubStep = "Destructible3SecBlacklist";
                     return AddToCache;
                 }
                 // Check our extremely short-term destructible-blacklist
-                if (hashRGUIDBlacklist3.Contains(CurrentCacheObject.RActorGuid))
+                if (Blacklist3Seconds.Contains(CurrentCacheObject.RActorGuid))
                 {
                     AddToCache = false;
                     c_IgnoreSubStep = "hashRGUIDBlacklist3";
                     return AddToCache;
                 }
                 // See if it's on our 90 second blacklist (from being stuck targeting it), as long as it's distance is not extremely close
-                if (hashRGUIDBlacklist90.Contains(CurrentCacheObject.RActorGuid))
+                if (Blacklist90Seconds.Contains(CurrentCacheObject.RActorGuid))
                 {
                     AddToCache = false;
-                    c_IgnoreSubStep = "hashRGUIDBlacklist90";
+                    c_IgnoreSubStep = "Blacklist90Seconds";
                     return AddToCache;
                 }
                 // 60 second blacklist
-                if (hashRGUIDBlacklist60.Contains(CurrentCacheObject.RActorGuid))
+                if (Blacklist60Seconds.Contains(CurrentCacheObject.RActorGuid))
                 {
                     AddToCache = false;
-                    c_IgnoreSubStep = "hashRGUIDBlacklist60";
+                    c_IgnoreSubStep = "Blacklist60Seconds";
                     return AddToCache;
                 }
                 // 15 second blacklist
-                if (hashRGUIDBlacklist15.Contains(CurrentCacheObject.RActorGuid))
+                if (Blacklist15Seconds.Contains(CurrentCacheObject.RActorGuid))
                 {
                     AddToCache = false;
-                    c_IgnoreSubStep = "hashRGUIDBlacklist15";
+                    c_IgnoreSubStep = "Blacklist15Seconds";
                     return AddToCache;
                 }
             }

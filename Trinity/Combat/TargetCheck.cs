@@ -66,38 +66,38 @@ namespace Trinity
                     {
                         case ActorClass.Barbarian:
                             PlayerEmergencyHealthPotionLimit = Settings.Combat.Barbarian.PotionLevel;
-                            PlayerEmergencyHealthGlobeLimit = Settings.Combat.Barbarian.HealthGlobeLevel;
+                            _playerEmergencyHealthGlobeLimit = Settings.Combat.Barbarian.HealthGlobeLevel;
                             CombatBase.PlayerKiteDistance = Settings.Combat.Barbarian.KiteLimit;
                             CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Never;
                             break;
                         case ActorClass.Crusader:
                             PlayerEmergencyHealthPotionLimit = Settings.Combat.Crusader.PotionLevel;
-                            PlayerEmergencyHealthGlobeLimit = Settings.Combat.Crusader.HealthGlobeLevel;
+                            _playerEmergencyHealthGlobeLimit = Settings.Combat.Crusader.HealthGlobeLevel;
                             CombatBase.PlayerKiteDistance = 0;
                             CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Never;
                             break;
                         case ActorClass.Monk:
                             PlayerEmergencyHealthPotionLimit = Settings.Combat.Monk.PotionLevel;
-                            PlayerEmergencyHealthGlobeLimit = Settings.Combat.Monk.HealthGlobeLevel;
+                            _playerEmergencyHealthGlobeLimit = Settings.Combat.Monk.HealthGlobeLevel;
                             // Monks never kite :)
                             CombatBase.PlayerKiteDistance = 0;
                             CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Never;
                             break;
                         case ActorClass.Wizard:
                             PlayerEmergencyHealthPotionLimit = Settings.Combat.Wizard.PotionLevel;
-                            PlayerEmergencyHealthGlobeLimit = Settings.Combat.Wizard.HealthGlobeLevel;
+                            _playerEmergencyHealthGlobeLimit = Settings.Combat.Wizard.HealthGlobeLevel;
                             CombatBase.PlayerKiteDistance = Settings.Combat.Wizard.KiteLimit;
                             CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Always;
                             break;
                         case ActorClass.Witchdoctor:
                             PlayerEmergencyHealthPotionLimit = Settings.Combat.WitchDoctor.PotionLevel;
-                            PlayerEmergencyHealthGlobeLimit = Settings.Combat.WitchDoctor.HealthGlobeLevel;
+                            _playerEmergencyHealthGlobeLimit = Settings.Combat.WitchDoctor.HealthGlobeLevel;
                             CombatBase.PlayerKiteDistance = Settings.Combat.WitchDoctor.KiteLimit;
                             CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Always;
                             break;
                         case ActorClass.DemonHunter:
                             PlayerEmergencyHealthPotionLimit = Settings.Combat.DemonHunter.PotionLevel;
-                            PlayerEmergencyHealthGlobeLimit = Settings.Combat.DemonHunter.HealthGlobeLevel;
+                            _playerEmergencyHealthGlobeLimit = Settings.Combat.DemonHunter.HealthGlobeLevel;
                             CombatBase.PlayerKiteDistance = Settings.Combat.DemonHunter.KiteLimit;
                             CombatBase.PlayerKiteMode = Settings.Combat.DemonHunter.KiteMode;
                             break;
@@ -106,13 +106,13 @@ namespace Trinity
                 // Clear target current and reset key variables used during the target-handling function
 
                 //CurrentTarget = null;
-                bDontMoveMeIAmDoingShit = false;
-                TimesBlockedMoving = 0;
+                DontMoveMeIAmDoingShit = false;
+                _timesBlockedMoving = 0;
                 IsAlreadyMoving = false;
                 lastMovementCommand = DateTime.MinValue;
-                IsWaitingForPower = false;
-                IsWaitingAfterPower = false;
-                IsWaitingForPotion = false;
+                _isWaitingForPower = false;
+                _isWaitingAfterPower = false;
+                _isWaitingForPotion = false;
                 wasRootedLastTick = false;
 
                 ClearBlacklists();
@@ -126,9 +126,9 @@ namespace Trinity
                 // We have a target, start the target handler!
                 if (CurrentTarget != null)
                 {
-                    IsWholeNewTarget = true;
-                    bDontMoveMeIAmDoingShit = true;
-                    ShouldPickNewAbilities = true;
+                    _isWholeNewTarget = true;
+                    DontMoveMeIAmDoingShit = true;
+                    _shouldPickNewAbilities = true;
                     return true;
                 }
 
@@ -144,12 +144,12 @@ namespace Trinity
                         Trinity.UsePotionIfNeeded();
                     }
                 }
-                sStatusText = "[Trinity] No more targets - DemonBuddy/profile management is now in control";
+                _statusText = "[Trinity] No more targets - DemonBuddy/profile management is now in control";
 
-                if (Settings.Advanced.DebugInStatusBar && bResetStatusText)
+                if (Settings.Advanced.DebugInStatusBar && _resetStatusText)
                 {
-                    bResetStatusText = false;
-                    BotMain.StatusText = sStatusText;
+                    _resetStatusText = false;
+                    BotMain.StatusText = _statusText;
                 }
 
                 // Nothing to do... do we have some maintenance we can do instead, like out of combat buffing?
@@ -185,8 +185,8 @@ namespace Trinity
                         }
                         else if (isLoopingAnimation)
                         {
-                            iKeepKillRadiusExtendedFor = 20;
-                            timeKeepKillRadiusExtendedUntil = DateTime.UtcNow.AddSeconds(iKeepKillRadiusExtendedFor);
+                            _keepKillRadiusExtendedForSeconds = 20;
+                            _timeKeepKillRadiusExtendedUntil = DateTime.UtcNow.AddSeconds(_keepKillRadiusExtendedForSeconds);
                         }
                     }
                 }
@@ -209,32 +209,32 @@ namespace Trinity
         private static void ClearBlacklists()
         {
             // Clear the temporary blacklist every 90 seconds (default was 90)
-            if (DateTime.UtcNow.Subtract(dateSinceBlacklist90Clear).TotalSeconds > 90)
+            if (DateTime.UtcNow.Subtract(Blacklist90LastClear).TotalSeconds > 90)
             {
-                dateSinceBlacklist90Clear = DateTime.UtcNow;
-                hashRGUIDBlacklist90 = new HashSet<int>();
+                Blacklist90LastClear = DateTime.UtcNow;
+                Blacklist90Seconds = new HashSet<int>();
 
                 // Refresh profile blacklists now, just in case
                 UsedProfileManager.RefreshProfileBlacklists();
             }
             // Clear the full blacklist every 60 seconds (default was 60)
-            if (DateTime.UtcNow.Subtract(dateSinceBlacklist60Clear).TotalSeconds > 60)
+            if (DateTime.UtcNow.Subtract(Blacklist60LastClear).TotalSeconds > 60)
             {
-                dateSinceBlacklist60Clear = DateTime.UtcNow;
-                hashRGUIDBlacklist60 = new HashSet<int>();
+                Blacklist60LastClear = DateTime.UtcNow;
+                Blacklist60Seconds = new HashSet<int>();
             }
             // Clear the temporary blacklist every 15 seconds (default was 15)
-            if (DateTime.UtcNow.Subtract(dateSinceBlacklist15Clear).TotalSeconds > 15)
+            if (DateTime.UtcNow.Subtract(Blacklist15LastClear).TotalSeconds > 15)
             {
-                dateSinceBlacklist15Clear = DateTime.UtcNow;
-                hashRGUIDBlacklist15 = new HashSet<int>();
+                Blacklist15LastClear = DateTime.UtcNow;
+                Blacklist15Seconds = new HashSet<int>();
             }
             // Clear our very short-term ignore-monster blacklist (from not being able to raycast on them or already dead units)
-            if (DateTime.UtcNow.Subtract(dateSinceBlacklist3Clear).TotalMilliseconds > 3000)
+            if (DateTime.UtcNow.Subtract(Blacklist3LastClear).TotalMilliseconds > 3000)
             {
-                dateSinceBlacklist3Clear = DateTime.UtcNow;
+                Blacklist3LastClear = DateTime.UtcNow;
                 NeedToClearBlacklist3 = false;
-                hashRGUIDBlacklist3 = new HashSet<int>();
+                Blacklist3Seconds = new HashSet<int>();
             }
 
         }

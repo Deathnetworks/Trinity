@@ -147,12 +147,12 @@ namespace Trinity
                 // Is this one under our feet? If so flag it up so we can find an avoidance spot
                 if (CurrentCacheObject.Distance <= minAvoidanceRadius)
                 {
-                    StandingInAvoidance = true;
+                    _standingInAvoidance = true;
 
                     // Note if this is a travelling projectile or not so we can constantly update our safe points
                     if (DataDictionary.AvoidanceProjectiles.Contains(CurrentCacheObject.ActorSNO))
                     {
-                        IsAvoidingProjectiles = true;
+                        _isAvoidingProjectiles = true;
                         Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Is standing in avoidance for projectile Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
                            CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO, minAvoidanceRadius, minAvoidanceHealth, CurrentCacheObject.Distance);
                     }

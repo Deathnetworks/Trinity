@@ -126,28 +126,27 @@ namespace Trinity.Helpers
                     return false;
                 }
 
-                if (TownRun.IsTryingToTownPortal())
-                {
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Trying to town portal or WaitTimer tag, gold inactivity reset", 0);
-                    ResetCheckGold();
-                    return false;
-                }
+                //if (TownRun.IsTryingToTownPortal())
+                //{
+                //    Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Trying to town portal or WaitTimer tag, gold inactivity reset", 0);
+                //    ResetCheckGold();
+                //    return false;
+                //}
+
                 // Don't go inactive on WaitTimer tags
-                ProfileBehavior c = null;
-                try
-                {
-                    if (ProfileManager.CurrentProfileBehavior != null)
-                        c = ProfileManager.CurrentProfileBehavior;
-                }
-                catch { }
-                if (c != null && c.GetType() == typeof(WaitTimerTag))
-                {
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Wait timer tag, gold inactivity reset", 0);
-                    ResetCheckGold();
-                    return false;
-                }
-
-
+                //try
+                //{
+                //    if (ProfileManager.CurrentProfileBehavior != null)
+                //        ;
+                //}
+                //catch { }
+                
+                //if (c != null && c.GetType() == typeof(WaitTimerTag))
+                //{
+                //    Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Wait timer tag, gold inactivity reset", 0);
+                //    ResetCheckGold();
+                //    return false;
+                //}
 
                 _lastCheckBag = DateTime.UtcNow;
                 int currentcoin = Trinity.Player.Coinage;

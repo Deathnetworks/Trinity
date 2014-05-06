@@ -215,7 +215,7 @@ namespace Trinity
                         catch { }
                         if (gizmoUsed)
                         {
-                            hashRGUIDBlacklist3.Add(CurrentCacheObject.RActorGuid);
+                            Blacklist3Seconds.Add(CurrentCacheObject.RActorGuid);
                             AddToCache = false;
                             c_IgnoreSubStep = "Door is Open or Opening";
                             return AddToCache;
@@ -276,7 +276,7 @@ namespace Trinity
                                             ObjectType = CurrentCacheObject.Type,
                                         });
 
-                                        hashRGUIDBlacklist3.Add(CurrentCacheObject.RActorGuid);
+                                        Blacklist3Seconds.Add(CurrentCacheObject.RActorGuid);
                                         AddToCache = false;
                                         c_IgnoreSubStep = "DoorDisabledbyScript";
                                         return AddToCache;
@@ -492,7 +492,7 @@ namespace Trinity
                             case 176077:  //Frenzy Shrine
                                 if (!Settings.WorldObject.UseFrenzyShrine)
                                 {
-                                    hashRGUIDBlacklist60.Add(CurrentCacheObject.RActorGuid);
+                                    Blacklist60Seconds.Add(CurrentCacheObject.RActorGuid);
                                     c_IgnoreSubStep = "IgnoreShrineOption";
                                     AddToCache = false;
                                 }
@@ -633,7 +633,7 @@ namespace Trinity
 
                         // Set min distance to user-defined setting
                         minDistance = Settings.WorldObject.DestructibleRange + CurrentCacheObject.Radius;
-                        if (ForceCloseRangeTarget)
+                        if (_forceCloseRangeTarget)
                             minDistance += 6f;
 
                         // This object isn't yet in our destructible desire range
@@ -738,7 +738,7 @@ namespace Trinity
 
                         // Set min distance to user-defined setting
                         minDistance = Settings.WorldObject.DestructibleRange;
-                        if (ForceCloseRangeTarget)
+                        if (_forceCloseRangeTarget)
                             minDistance += 6f;
 
                         // Only break destructables if we're stuck and using IgnoreNonBlocking

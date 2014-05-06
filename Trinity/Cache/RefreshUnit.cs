@@ -235,7 +235,7 @@ namespace Trinity
                 return AddToCache;
 
             // Extended kill radius after last fighting, or when we want to force a town run
-            if ((Settings.Combat.Misc.ExtendedTrashKill && iKeepKillRadiusExtendedFor > 0) || ForceVendorRunASAP || TownRun.IsTryingToTownPortal())
+            if ((Settings.Combat.Misc.ExtendedTrashKill && _keepKillRadiusExtendedForSeconds > 0) || ForceVendorRunASAP || TownRun.IsTryingToTownPortal())
             {
                 if (CurrentCacheObject.RadiusDistance <= killRange && AddToCache)
                     AnyMobsInRange = true;
@@ -497,7 +497,7 @@ namespace Trinity
                     {
                         if (CurrentCacheObject.IsSummonedByPlayer)
                         {
-                            iPlayerOwnedMysticAlly++;
+                            PlayerOwnedMysticAllyCount++;
                             c_IgnoreSubStep = "IsPlayerSummoned";
                         }
                         AddToCache = false;
@@ -510,7 +510,7 @@ namespace Trinity
                     {
                         if (CurrentCacheObject.IsSummonedByPlayer)
                         {
-                            iPlayerOwnedDHPets++;
+                            PlayerOwnedDHPetsCount++;
                             c_IgnoreSubStep = "IsPlayerSummoned";
                         }
                         AddToCache = false;
@@ -523,7 +523,7 @@ namespace Trinity
                     {
                         if (CurrentCacheObject.IsSummonedByPlayer)
                         {
-                            PlayerOwnedGargantuan++;
+                            PlayerOwnedGargantuanCount++;
                             c_IgnoreSubStep = "IsPlayerSummoned";
                         }
                         AddToCache = false;
@@ -532,7 +532,7 @@ namespace Trinity
                     {
                         if (CurrentCacheObject.IsSummonedByPlayer)
                         {
-                            PlayerOwnedZombieDog++;
+                            PlayerOwnedZombieDogCount++;
                             c_IgnoreSubStep = "IsPlayerSummoned";
                         }
                         AddToCache = false;

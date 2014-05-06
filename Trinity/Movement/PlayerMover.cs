@@ -102,13 +102,13 @@ namespace Trinity.DbProvider
                 }
                 catch { }
 
-                if (c != null && c.GetType() == typeof(WaitTimerTag))
-                {
-                    LastPosition = Vector3.Zero;
-                    GoldInactivity.Instance.ResetCheckGold();
-                    UnStuckCheckerLastResult = false;
-                    return UnStuckCheckerLastResult;
-                }
+                //if (c != null && c.GetType() == typeof(WaitTimerTag))
+                //{
+                //    LastPosition = Vector3.Zero;
+                //    GoldInactivity.Instance.ResetCheckGold();
+                //    UnStuckCheckerLastResult = false;
+                //    return UnStuckCheckerLastResult;
+                //}
 
                 Zeta.Game.Internals.UIElement vendorWindow = Zeta.Game.Internals.UIElements.VendorWindow;
 
@@ -510,7 +510,7 @@ namespace Trinity.DbProvider
             bool cancelSpecialMovementAfterStuck = DateTime.UtcNow.Subtract(LastGeneratedStuckPosition).TotalMilliseconds > 10000;
 
             // See if we can use abilities like leap etc. for movement out of combat, but not in town
-            if (Trinity.Settings.Combat.Misc.AllowOOCMovement && !Trinity.Player.IsInTown && !Trinity.bDontMoveMeIAmDoingShit && cancelSpecialMovementAfterStuck)
+            if (Trinity.Settings.Combat.Misc.AllowOOCMovement && !Trinity.Player.IsInTown && !Trinity.DontMoveMeIAmDoingShit && cancelSpecialMovementAfterStuck)
             {
                 bool bTooMuchZChange = (Math.Abs(vMyCurrentPosition.Z - vMoveToTarget.Z) >= 4f);
 

@@ -174,7 +174,7 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Sacrifice
-                if (CanCast(SNOPower.Witchdoctor_Sacrifice) && Trinity.PlayerOwnedZombieDog > 0 &&
+                if (CanCast(SNOPower.Witchdoctor_Sacrifice) && Trinity.PlayerOwnedZombieDogCount > 0 &&
                     (TargetUtil.AnyElitesInRange(15, 1) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 9f)))
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_Sacrifice);
@@ -182,7 +182,7 @@ namespace Trinity.Combat.Abilities
 
                 // Sacrifice for Circle of Life
                 bool hasCircleofLife = ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Witchdoctor_Passive_CircleOfLife);
-                if (CanCast(SNOPower.Witchdoctor_Sacrifice) && Trinity.PlayerOwnedZombieDog > 0 && hasCircleofLife && TargetUtil.AnyMobsInRange(15f))
+                if (CanCast(SNOPower.Witchdoctor_Sacrifice) && Trinity.PlayerOwnedZombieDogCount > 0 && hasCircleofLife && TargetUtil.AnyMobsInRange(15f))
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_Sacrifice);
                 }
@@ -193,7 +193,7 @@ namespace Trinity.Combat.Abilities
                 if (CanCast(SNOPower.Witchdoctor_Gargantuan))
                 {
                     // Gargantuan, Recast on Elites or Bosses to trigger Restless Giant
-                    if (hasRestlessGiant && (TargetUtil.IsEliteTargetInRange(30f) || Trinity.PlayerOwnedGargantuan == 0))
+                    if (hasRestlessGiant && (TargetUtil.IsEliteTargetInRange(30f) || Trinity.PlayerOwnedGargantuanCount == 0))
                     {
                         return new TrinityPower(SNOPower.Witchdoctor_Gargantuan);
                     }
@@ -205,7 +205,7 @@ namespace Trinity.Combat.Abilities
                     }
 
                     // Gargantuan regular
-                    if (!hasRestlessGiant && !hasWrathfulProtector && Trinity.PlayerOwnedGargantuan == 0)
+                    if (!hasRestlessGiant && !hasWrathfulProtector && Trinity.PlayerOwnedGargantuanCount == 0)
                     {
                         return new TrinityPower(SNOPower.Witchdoctor_Gargantuan);
                     }
@@ -214,14 +214,14 @@ namespace Trinity.Combat.Abilities
                 bool hasSacrifice = Hotbar.Contains(SNOPower.Witchdoctor_Sacrifice);
 
                 // Zombie Dogs non-sacrifice build
-                if (!hasSacrifice && CanCast(SNOPower.Witchdoctor_SummonZombieDog) && Trinity.PlayerOwnedZombieDog <= 2)
+                if (!hasSacrifice && CanCast(SNOPower.Witchdoctor_SummonZombieDog) && Trinity.PlayerOwnedZombieDogCount <= 2)
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog);
                 }
 
                 // Zombie Dogs for Sacrifice
                 if (hasSacrifice && CanCast(SNOPower.Witchdoctor_SummonZombieDog) &&
-                    (LastPowerUsed == SNOPower.Witchdoctor_Sacrifice || Trinity.PlayerOwnedZombieDog <= 2) &&
+                    (LastPowerUsed == SNOPower.Witchdoctor_Sacrifice || Trinity.PlayerOwnedZombieDogCount <= 2) &&
                     CombatBase.LastPowerUsed != SNOPower.Witchdoctor_SummonZombieDog)
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog);
@@ -494,7 +494,7 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Zombie Dogs non-sacrifice build
-                if (CanCast(SNOPower.Witchdoctor_SummonZombieDog) && Trinity.PlayerOwnedZombieDog <= 2)
+                if (CanCast(SNOPower.Witchdoctor_SummonZombieDog) && Trinity.PlayerOwnedZombieDogCount <= 2)
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog);
                 }
@@ -503,7 +503,7 @@ namespace Trinity.Combat.Abilities
                 bool hasRestlessGiant = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Gargantuan && s.RuneIndex == 0);
                 bool hasWrathfulProtector = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Gargantuan && s.RuneIndex == 3);
 
-                if (CanCast(SNOPower.Witchdoctor_Gargantuan) && !hasRestlessGiant && !hasWrathfulProtector && Trinity.PlayerOwnedGargantuan == 0)
+                if (CanCast(SNOPower.Witchdoctor_Gargantuan) && !hasRestlessGiant && !hasWrathfulProtector && Trinity.PlayerOwnedGargantuanCount == 0)
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_Gargantuan);
                 }
@@ -559,7 +559,7 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, 12f, CurrentTarget.Position);
 
                 if (Hotbar.Contains(SNOPower.Witchdoctor_Sacrifice) && Hotbar.Contains(SNOPower.Witchdoctor_SummonZombieDog) &&
-                    Trinity.PlayerOwnedZombieDog > 0 && Settings.Combat.WitchDoctor.ZeroDogs)
+                    Trinity.PlayerOwnedZombieDogCount > 0 && Settings.Combat.WitchDoctor.ZeroDogs)
                     return new TrinityPower(SNOPower.Witchdoctor_Sacrifice, 12f, CurrentTarget.Position);
 
                 if (Hotbar.Contains(SNOPower.Witchdoctor_SpiritBarrage) && Player.PrimaryResource > 100)

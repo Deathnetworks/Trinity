@@ -231,7 +231,7 @@ namespace Trinity
             updated.IsReset = false;
             updated.WhenStartedSession = ItemStatsWhenStartedBot;
             updated.TotalRunningTime += TotalRunningTime - PersistentLastSaved.TotalRunningTime;
-            updated.TotalDeaths += iTotalDeaths - PersistentLastSaved.TotalDeaths;
+            updated.TotalDeaths += TotalDeaths - PersistentLastSaved.TotalDeaths;
             updated.TotalLeaveGames += TotalLeaveGames - PersistentLastSaved.TotalLeaveGames;
             updated.TotalJoinGames += TotalGamesJoined - PersistentLastSaved.TotalJoinGames;
             updated.TotalProfileRecycles += TotalProfileRecycles - PersistentLastSaved.TotalProfileRecycles;
@@ -239,11 +239,11 @@ namespace Trinity
             updated.LastXp += LastXP - PersistentLastSaved.LastXp;
             updated.NextLvXp += NextLevelXP - PersistentLastSaved.NextLvXp;
 
-            updated.TotalGold = iTotalGold;
-            updated.LastGold = iLastGold;
+            updated.TotalGold = TotalGold;
+            updated.LastGold = LastGold;
 
-            updated.Level = iLevel;
-            updated.ParagonLevel = iParagonLevel;
+            updated.Level = Level;
+            updated.ParagonLevel = ParagonLevel;
 
             // Adds difference between now and LastSaved, and set LastSaved to now
             updated.AddItemsDroppedStats(PersistentLastSaved.ItemsDropped, ItemsDroppedStats);
@@ -277,17 +277,17 @@ namespace Trinity
             // Sets LastSaved to now for the rest of the things
             TimeSpan TotalRunningTime = DateTime.UtcNow.Subtract(ItemStatsWhenStartedBot);
             PersistentLastSaved.TotalRunningTime = TotalRunningTime;
-            PersistentLastSaved.TotalDeaths = iTotalDeaths;
+            PersistentLastSaved.TotalDeaths = TotalDeaths;
             PersistentLastSaved.TotalLeaveGames = TotalLeaveGames;
             PersistentLastSaved.TotalJoinGames = TotalGamesJoined;
             PersistentLastSaved.TotalProfileRecycles = TotalProfileRecycles;
             PersistentLastSaved.TotalXp = TotalXP;
             PersistentLastSaved.LastXp = LastXP;
             PersistentLastSaved.NextLvXp = NextLevelXP;
-            PersistentLastSaved.TotalGold = iTotalGold;
-            PersistentLastSaved.LastGold = iLastGold;
-            PersistentLastSaved.Level = iLevel;
-            PersistentLastSaved.ParagonLevel = iParagonLevel;
+            PersistentLastSaved.TotalGold = TotalGold;
+            PersistentLastSaved.LastGold = LastGold;
+            PersistentLastSaved.Level = Level;
+            PersistentLastSaved.ParagonLevel = ParagonLevel;
 
             PersistentStats.UpdateItemsDroppedStats(PersistentLastSaved.ItemsDropped, ItemsDroppedStats);
             PersistentStats.UpdateItemsPickedStats(PersistentLastSaved.ItemsPicked, ItemsPickedStats);

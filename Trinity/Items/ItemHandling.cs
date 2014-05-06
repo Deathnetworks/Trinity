@@ -703,8 +703,8 @@ namespace Trinity
                  */
                 try
                 {
-                    iLevel = Player.Level;
-                    iParagonLevel = Trinity.Player.ParagonLevel;
+                    Level = Player.Level;
+                    ParagonLevel = Trinity.Player.ParagonLevel;
                     if (Player.Level < 60)
                     {
                         if (!(TotalXP == 0 && LastXP == 0 && NextLevelXP == 0))
@@ -754,7 +754,7 @@ namespace Trinity
                             LogWriter.WriteLine("===== Misc Statistics =====");
                             LogWriter.WriteLine("Total tracking time: " + ((int)TotalRunningTime.TotalHours).ToString() + "h " + TotalRunningTime.Minutes.ToString() +
                                 "m " + TotalRunningTime.Seconds.ToString() + "s");
-                            LogWriter.WriteLine("Total deaths: " + iTotalDeaths.ToString() + " [" + Math.Round(iTotalDeaths / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
+                            LogWriter.WriteLine("Total deaths: " + TotalDeaths.ToString() + " [" + Math.Round(TotalDeaths / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
                             LogWriter.WriteLine("Total games (approx): " + TotalLeaveGames.ToString() + " [" + Math.Round(TotalLeaveGames / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
                             LogWriter.WriteLine("Total Caches Opened:" + Trinity.TotalBountyCachesOpened); 
                             if (TotalLeaveGames == 0 && TotalGamesJoined > 0)
@@ -772,20 +772,20 @@ namespace Trinity
                             }
 
                             LogWriter.WriteLine("Total XP gained: " + Math.Round(TotalXP / (float)1000000, 2).ToString() + " million [" + Math.Round(TotalXP / TotalRunningTime.TotalHours / 1000000, 2).ToString() + " million per hour]");
-                            if (iLastGold == 0)
+                            if (LastGold == 0)
                             {
-                                iLastGold = Player.Coinage;
+                                LastGold = Player.Coinage;
                             }
-                            if (Player.Coinage - iLastGold >= 500000)
+                            if (Player.Coinage - LastGold >= 500000)
                             {
-                                iLastGold = Player.Coinage;
+                                LastGold = Player.Coinage;
                             }
                             else
                             {
-                                iTotalGold += Player.Coinage - iLastGold;
-                                iLastGold = Player.Coinage;
+                                TotalGold += Player.Coinage - LastGold;
+                                LastGold = Player.Coinage;
                             }
-                            LogWriter.WriteLine("Total Gold gained: " + Math.Round(iTotalGold / (float)1000, 2).ToString() + " Thousand [" + Math.Round(iTotalGold / TotalRunningTime.TotalHours / 1000, 2).ToString() + " Thousand per hour]");
+                            LogWriter.WriteLine("Total Gold gained: " + Math.Round(TotalGold / (float)1000, 2).ToString() + " Thousand [" + Math.Round(TotalGold / TotalRunningTime.TotalHours / 1000, 2).ToString() + " Thousand per hour]");
                             LogWriter.WriteLine("");
                             LogWriter.WriteLine("===== Item DROP Statistics =====");
 

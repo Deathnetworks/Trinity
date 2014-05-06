@@ -175,10 +175,10 @@ namespace Trinity
                 // Clear blacklists to triple check any potential targets
                 if (Trinity.IsReadyToTownRun)
                 {
-                    Trinity.hashRGUIDBlacklist3 = new HashSet<int>();
-                    Trinity.hashRGUIDBlacklist15 = new HashSet<int>();
-                    Trinity.hashRGUIDBlacklist60 = new HashSet<int>();
-                    Trinity.hashRGUIDBlacklist90 = new HashSet<int>();
+                    Trinity.Blacklist3Seconds = new HashSet<int>();
+                    Trinity.Blacklist15Seconds = new HashSet<int>();
+                    Trinity.Blacklist60Seconds = new HashSet<int>();
+                    Trinity.Blacklist90Seconds = new HashSet<int>();
                 }
 
                 // Fix for A1 new game with bags full
