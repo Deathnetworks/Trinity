@@ -16,7 +16,7 @@ using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
-    public partial class Trinity : IPlugin
+    public partial class Trinity
     {
         private static double GetLastHadUnitsInSights()
         {
@@ -27,19 +27,15 @@ namespace Trinity
         {
             using (new PerformanceLogger("RefreshDiaObjectCache.Weighting"))
             {
-                double MovementSpeed = PlayerMover.GetMovementSpeed();
+                double movementSpeed = PlayerMover.GetMovementSpeed();
 
-                bool noGoblinsPresent = (!AnyTreasureGoblinsPresent && Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize) || Settings.Combat.Misc.GoblinPriority < GoblinPriority.Prioritize;
+                int eliteCount = CombatBase.IgnoringElites ? 0 : ObjectCache.Count(u => u.IsUnit && u.IsBossOrEliteRareUnique);
+                int avoidanceCount = Settings.Combat.Misc.AvoidAOE ? 0 : ObjectCache.Count(o => o.Type == GObjectType.Avoidance && o.Distance <= 50f);
 
+                bool avoidanceNearby = Settings.Combat.Misc.AvoidAOE && ObjectCache.Any(o => o.Type == GObjectType.Avoidance && o.Distance <= 15f);
 
-                bool prioritizeCloseRangeUnits = (ForceCloseRangeTarget || Player.IsRooted || DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds < 1000 &&
+                bool prioritizeCloseRangeUnits = (avoidanceNearby || ForceCloseRangeTarget || Player.IsRooted || DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds < 1000 &&
                     ObjectCache.Count(u => u.IsUnit && u.RadiusDistance < 10f) >= 3);
-
-                bool hasWrathOfTheBerserker = Player.ActorClass == ActorClass.Barbarian && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
-
-                int TrashMobCount = ObjectCache.Count(u => u.IsUnit && u.IsTrashMob);
-                int EliteCount = CombatBase.IgnoringElites ? 0 : ObjectCache.Count(u => u.IsUnit && u.IsBossOrEliteRareUnique);
-                int AvoidanceCount = Settings.Combat.Misc.AvoidAOE ? 0 : ObjectCache.Count(o => o.Type == GObjectType.Avoidance && o.Distance <= 50f);
 
                 bool profileTagCheck = false;
 
@@ -62,7 +58,7 @@ namespace Trinity
                     Player.ActiveBounty != null &&
                     Player.ActiveBounty.Info.KillCount > 0;
 
-                bool ShouldIgnoreElites =
+                bool shouldIgnoreElites =
                      !(isKillBounty || Player.InActiveEvent) &&
                      !CombatBase.IsQuestingMode &&
                      !DataDictionary.RiftWorldIds.Contains(Player.WorldID) &&
@@ -73,7 +69,7 @@ namespace Trinity
 
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight,
                     "Starting weights: packSize={0} packRadius={1} MovementSpeed={2:0.0} Elites={3} AoEs={4} disableIgnoreTag={5} ({6}) closeRangePriority={7} townRun={8} questingArea={9} level={10} isQuestingMode={11}",
-                    Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck, behaviorName,
+                    Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius, movementSpeed, eliteCount, avoidanceCount, profileTagCheck, behaviorName,
                     prioritizeCloseRangeUnits, TownRun.IsTryingToTownPortal(), DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId), Player.Level, CombatBase.IsQuestingMode);
 
                 bool inQuestArea = DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId);
@@ -91,7 +87,7 @@ namespace Trinity
                         !DataDictionary.RiftWorldIds.Contains(Player.WorldID) &&
                         !usingTownPortal &&
                         !profileTagCheck &&
-                        MovementSpeed > 1 &&
+                        movementSpeed > 1 &&
                         Settings.Combat.Misc.TrashPackSize > 1 &&
                         !elitesInRangeOfUnit &&
                         Player.Level >= 15 &&
@@ -104,7 +100,7 @@ namespace Trinity
                     // Just to make sure each one starts at 0 weight...
                     cacheObject.Weight = 0d;
 
-                    bool navBlocking = LastTargetACDGuid != cacheObject.ACDGuid && CacheData.NavigationObstacles.Any(ob => MathUtil.IntersectsPath(ob.Position, ob.Radius, Trinity.Player.Position, cacheObject.Position));
+                    bool navBlocking = LastTargetACDGuid != cacheObject.ACDGuid && CacheData.NavigationObstacles.Any(ob => MathUtil.IntersectsPath(ob.Position, ob.Radius, Player.Position, cacheObject.Position));
 
                     // Now do different calculations based on the object type
                     switch (cacheObject.Type)
@@ -156,17 +152,17 @@ namespace Trinity
                                 if (cacheObject.IsEliteRareUnique)
                                 {
                                     // Ignore elite option, except if trying to town portal
-                                    if (!cacheObject.IsBoss && !cacheObject.IsBountyObjective && ShouldIgnoreElites && cacheObject.IsEliteRareUnique && !isInHotSpot &&
+                                    if (!cacheObject.IsBoss && !cacheObject.IsBountyObjective && shouldIgnoreElites && cacheObject.IsEliteRareUnique && !isInHotSpot &&
                                         !(cacheObject.HitPointsPct <= (Settings.Combat.Misc.ForceKillElitesHealth / 100)))
                                     {
                                         objWeightInfo = "Ignoring ";
                                         ignoring = true;
                                     }
-                                    else if (cacheObject.IsEliteRareUnique && !ShouldIgnoreElites)
+                                    else if (cacheObject.IsEliteRareUnique && !shouldIgnoreElites)
                                     {
                                         objWeightInfo = "Adding ";
                                     }
-                                    objWeightInfo += String.Format("shouldIgnore={0} hitPointsPct={1:0}", ShouldIgnoreElites, cacheObject.HitPointsPct * 100);
+                                    objWeightInfo += String.Format("shouldIgnore={0} hitPointsPct={1:0}", shouldIgnoreElites, cacheObject.HitPointsPct * 100);
 
                                     if (ignoring)
                                         break;
@@ -576,7 +572,7 @@ namespace Trinity
                                     cacheObject.Weight = 1;
 
                                 // See if there's any AOE avoidance in that spot or inbetween us, if so reduce the weight to 1
-                                if (CacheData.TimeBoundAvoidance.Any(aoe => cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius))
+                                if (CacheData.TimeBoundAvoidance.Any(a => MathUtil.IntersectsPath(a.Position, a.Radius + 5f, Player.Position, cacheObject.Position)))
                                     cacheObject.Weight = 1;
 
                                 break;
@@ -597,7 +593,7 @@ namespace Trinity
                                     cacheObject.Weight = 1;
 
                                 // See if there's any AOE avoidance in that spot or inbetween us, if so reduce the weight to 1
-                                if (CacheData.TimeBoundAvoidance.Any(aoe => cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius))
+                                if (CacheData.TimeBoundAvoidance.Any(a => MathUtil.IntersectsPath(a.Position, a.Radius + 5f, Player.Position, cacheObject.Position)))
                                     cacheObject.Weight = 1;
 
                                 if (navBlocking)

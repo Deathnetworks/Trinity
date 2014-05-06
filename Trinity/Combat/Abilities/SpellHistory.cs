@@ -54,8 +54,7 @@ namespace Trinity.Combat.Abilities
         public static DateTime GetSpellLastused(SNOPower power)
         {
             DateTime lastUsed = DateTime.MinValue;
-            if (_historyQueue.Any(i => i.Power.SNOPower == power))
-                lastUsed = _historyQueue.Where(i => i.Power.SNOPower == power).OrderByDescending(i => DateTime.UtcNow.Subtract(i.UseTime)).FirstOrDefault().UseTime;
+            CacheData.AbilityLastUsed.TryGetValue(power, out lastUsed);
             return lastUsed;
         }
 

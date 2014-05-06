@@ -241,7 +241,7 @@ namespace Trinity
                 CacheData.GoldStack.Add(CurrentCacheObject.RActorGuid, c_GoldStackSize);
             }
 
-            if (c_GoldStackSize < Settings.Loot.Pickup.MinimumGoldStack)
+            if (c_GoldStackSize < Settings.Loot.Pickup.MinimumGoldStack || Settings.Loot.Pickup.MinimumGoldStack == 0)
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "NotEnoughGold";

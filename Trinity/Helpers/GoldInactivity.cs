@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading;
-using System.Windows.Forms.VisualStyles;
 using Trinity.DbProvider;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -83,6 +82,8 @@ namespace Trinity.Helpers
             _lastKnowCoin = 0;
         }
 
+        private const int CheckGoldSeconds = 5;
+
         /// <summary>
         /// Determines whether or not to leave the game based on the gold inactivity timer
         /// </summary>
@@ -111,7 +112,8 @@ namespace Trinity.Helpers
                     Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Loading world, gold inactivity reset", 0);
                     return false;
                 }
-                if ((DateTime.UtcNow.Subtract(_lastCheckBag).TotalSeconds < 5))
+
+                if ((DateTime.UtcNow.Subtract(_lastCheckBag).TotalSeconds < CheckGoldSeconds))
                 {
                     return false;
                 }
@@ -172,7 +174,7 @@ namespace Trinity.Helpers
             {
                 Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, e.Message);
             }
-            Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Gold inactivity error - no result", 0);
+            //Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Gold inactivity error - no result", 0);
             return false;
         }
 

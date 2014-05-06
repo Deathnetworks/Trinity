@@ -419,7 +419,9 @@ namespace Trinity.ItemRules
                     logOut(e.Message
                         + SEP + "last use rule: " + str
                         + SEP + getParseErrors(parseErrors)
-                        + SEP + getFullItem(), InterpreterAction.NULL, LogType.ERROR);
+                        + SEP + getFullItem()
+                        + SEP + e.ToString()
+                        , InterpreterAction.NULL, LogType.ERROR);
                 }
             }
 
@@ -687,7 +689,7 @@ namespace Trinity.ItemRules
                 {
                     case "dual":
                         if (obj is float && (float)obj > 0)
-                            obj = (float)1;
+                            obj = 1f;
                         break;
                     case "max":
                         object itemType, twoHand;
@@ -748,7 +750,7 @@ namespace Trinity.ItemRules
             if (float.TryParse(Regex.Replace(item.Quality.ToString(), @"[^\d]", string.Empty), out roll))
                 itemDic.Add("[ROLL]", roll);
             else
-                itemDic.Add("[ROLL]", 0);
+                itemDic.Add("[ROLL]", 0f);
 
             // - NAME -------------------------------------------------------------//
             itemDic.Add("[NAME]", item.Name.ToString().Replace(" ", ""));
@@ -807,7 +809,7 @@ namespace Trinity.ItemRules
             if (float.TryParse(Regex.Replace(item.ItemQualityLevel.ToString(), @"[^\d]", string.Empty), out roll))
                 itemDic.Add("[ROLL]", roll);
             else
-                itemDic.Add("[ROLL]", 0);
+                itemDic.Add("[ROLL]", 0f);
 
             // - NAME -------------------------------------------------------------//
             itemDic.Add("[NAME]", item.Name.ToString().Replace(" ", ""));
@@ -987,7 +989,9 @@ namespace Trinity.ItemRules
                     logOut(e.Message
                         + SEP + "last use rule: " + expr
                         + SEP + getParseErrors(parseErrors)
-                        + SEP + getFullItem(), InterpreterAction.NULL, LogType.ERROR);
+                        + SEP + getFullItem()
+                        + SEP + e.ToString()
+                        , InterpreterAction.NULL, LogType.ERROR);
                 }
             }
 
