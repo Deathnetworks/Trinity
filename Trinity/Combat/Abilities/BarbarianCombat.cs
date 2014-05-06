@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Trinity.Config.Combat;
-using Zeta.Bot;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
 
@@ -9,7 +8,7 @@ namespace Trinity.Combat.Abilities
 {
     class BarbarianCombat : CombatBase
     {
-        private static bool allowSprintOOC = true;
+        private static bool _allowSprintOoc = true;
 
         public static TrinityPower GetPower()
         {
@@ -26,6 +25,10 @@ namespace Trinity.Combat.Abilities
                 // Threatening Shout OOC
             }
 
+            // Refresh Frenzy
+            if (IsNull(power) && CanCast(SNOPower.Barbarian_Frenzy) && TimeSincePowerUse(SNOPower.Barbarian_Frenzy) > 3000 && TimeSincePowerUse(SNOPower.Barbarian_Frenzy) < 4000)
+                power = PowerFrenzy;
+
             // Ignore Pain when low on health
             if (IsNull(power) && CanCastIgnorePain)
                 power = PowerIgnorePain;
@@ -35,6 +38,11 @@ namespace Trinity.Combat.Abilities
             // Check if we should conserve Fury for specials
             if (IsNull(power) && Player.PrimaryResource < MinEnergyReserve)
             {
+                if (ShouldWaitForCallOfTheAncients)
+                {
+                    //Logger.LogNormal("Waiting for Barbarian_CallOfTheAncients!");
+                    IsWaitingForSpecial = true;
+                }
                 if (ShouldWaitForWrathOfTheBerserker)
                 {
                     //Logger.LogNormal("Waiting for Barbarian_WrathOfTheBerserker 1!");
@@ -45,31 +53,23 @@ namespace Trinity.Combat.Abilities
                     //Logger.LogNormal("Waiting for Barbarian_Earthquake!");
                     IsWaitingForSpecial = true;
                 }
-                if (ShouldWaitForCallOfTheAncients)
-                {
-                    //Logger.LogNormal("Waiting for Barbarian_CallOfTheAncients!");
-                    IsWaitingForSpecial = true;
-                }
             }
 
-            // Avalanche
-            if (IsNull(power) && CanUseAvalanche)
-                power = PowerAvalanche;
+            // Call of the Ancients
+            if (IsNull(power) && CanCastCallOfTheAncients)
+                power = PowerCallOfTheAncients;
 
             // WOTB
             if (IsNull(power) && CanCastWrathOfTheBerserker)
-            {
-                //Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Barbarian_WrathOfTheBerserker being used! ({0})", CurrentTarget.InternalName);
                 power = PowerWrathOfTheBerserker;
-            }
 
             // Earthquake
             if (IsNull(power) && CanCastEarthquake)
                 power = PowerEarthquake;
 
-            // Call of the Ancients
-            if (IsNull(power) && CanCastCallOfTheAncients)
-                power = PowerCallOfTheAncients;
+            // Avalanche
+            if (IsNull(power) && CanUseAvalanche)
+                power = PowerAvalanche;
 
             // War Cry
             if (IsNull(power) && CanUseWarCry)
@@ -161,7 +161,7 @@ namespace Trinity.Combat.Abilities
 
             // Default Attacks
             if (IsNull(power))
-                power = CombatBase.DefaultPower;
+                power = DefaultPower;
 
             return power;
 
@@ -175,131 +175,6 @@ namespace Trinity.Combat.Abilities
                     !UseOOCBuff &&
                     CanCast(SNOPower.Barbarian_IgnorePain) &&
                     Player.CurrentHealthPct <= V.F("Barbarian.IgnorePain.MinHealth");
-            }
-        }
-        public static bool ShouldWaitForEarthquake
-        {
-            get
-            {
-                return
-                    Hotbar.Contains(SNOPower.Barbarian_Earthquake) &&
-                    !UseOOCBuff &&
-                    !IsCurrentlyAvoiding &&
-                    !CanCast(SNOPower.Barbarian_Earthquake) &&
-                    TargetUtil.EliteOrTrashInRange(45) &&
-                    Player.PrimaryResource <= 50;
-            }
-        }
-        public static bool CanCastEarthquake
-        {
-            get
-            {
-                return
-                    !UseOOCBuff &&
-                    !IsCurrentlyAvoiding &&
-                    !Player.IsIncapacitated &&
-                    CanCast(SNOPower.Barbarian_Earthquake) &&
-                    TargetUtil.IsEliteTargetInRange(45f);
-            }
-        }
-        public static bool ShouldWaitForWrathOfTheBerserker
-        {
-            get
-            {
-                if (UseOOCBuff || IsCurrentlyAvoiding)
-                    return false;
-
-                // WOTB with elites
-                bool wotbElites =
-                    (WOTBGoblins || WOTBElitesPresent);
-
-                return
-                    Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) &&
-                    !UseOOCBuff &&
-                    !IsCurrentlyAvoiding &&
-                    Player.PrimaryResource <= 50 &&
-                    !CanCast(SNOPower.Barbarian_WrathOfTheBerserker) &&
-                    !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) &&
-                    (WOTBIgnoreElites || wotbElites || (Settings.Combat.Barbarian.WOTBMode == BarbarianWOTBMode.WhenReady));
-            }
-        }
-
-        /// <summary>
-        /// If using WOTB on all elites, or if we should only use on "hard" affixes
-        /// </summary>
-        public static bool WOTBElitesPresent
-        {
-            get
-            {
-                //bool hardEliteOverride = Trinity.ObjectCache.Any(o => DataDictionary.ForceUseWOTBIds.Contains(o.ActorSNO)) ||
-                //        TargetUtil.AnyElitesInRange(V.F("Barbarian.WOTB.HardEliteRangeOverride"), V.I("Barbarian.WOTB.HardEliteCountOverride"));
-
-                //// WotB only used on Arcane, Frozen, Jailer, Molten, Electrified+Reflect Damage elites, or bosses and ubers, or when more than 4 elites are present
-                //bool wotbHardElitesPresent = HardElitesPresent || hardEliteOverride;
-
-                bool hardElitesOnly = Settings.Combat.Barbarian.WOTBMode == Config.Combat.BarbarianWOTBMode.HardElitesOnly;
-
-                bool elitesPresent = TargetUtil.AnyElitesInRange(V.F("Barbarian.WOTB.MinRange"), V.I("Barbarian.WOTB.MinCount"));
-
-                return ((!hardElitesOnly && elitesPresent) || (hardElitesOnly && HardElitesPresent));
-            }
-        }
-
-        /// <summary>
-        /// Make sure we are allowed to use wrath on goblins, else make sure this isn't a goblin
-        /// </summary>
-        public static bool WOTBGoblins
-        {
-            get
-            {
-                if (CurrentTarget == null)
-                    return false;
-                return CurrentTarget.IsTreasureGoblin && Settings.Combat.Barbarian.UseWOTBGoblin;
-            }
-        }
-
-        /// <summary>
-        /// If ignoring elites completely, trigger on 3 trash within 25 yards, or 10 trash in 50 yards
-        /// </summary>
-        public static bool WOTBIgnoreElites
-        {
-            get
-            {
-                return
-                    CombatBase.IgnoringElites &&
-                    (TargetUtil.AnyMobsInRange(V.F("Barbarian.WOTB.RangeNear"), V.I("Barbarian.WOTB.CountNear")) ||
-                    TargetUtil.AnyMobsInRange(V.F("Barbarian.WOTB.RangeFar"), V.I("Barbarian.WOTB.CountFar")) ||
-                    TargetUtil.AnyMobsInRange(Settings.Combat.Misc.TrashPackClusterRadius, Settings.Combat.Misc.TrashPackSize));
-            }
-        }
-
-        public static bool CanCastWrathOfTheBerserker
-        {
-            get
-            {
-                /* WOTB should be used when the following conditions are met:
-                 * If ignoring elites, when 3 monsters in 25 yards or 10 monsters in 50 yards are present, OR
-                 * If using on hard elites only, when an elite with the required affix is present, OR
-                 * If normal mode, when any elite is within 20 yards, OR
-                 * If we have low health (use potion health)
-                 * And not on the Heart of sin
-                 */
-
-                bool anyTime = (Settings.Combat.Barbarian.WOTBMode == Config.Combat.BarbarianWOTBMode.WhenReady && !Player.IsInTown);
-                bool hasBuff = GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
-                bool canCast = CanCast(SNOPower.Barbarian_WrathOfTheBerserker, CanCastFlags.NoTimer);
-
-                bool emergencyHealth = Player.CurrentHealthPct <= V.F("Barbarian.WOTB.EmergencyHealth");
-
-                bool result =
-                    (!UseOOCBuff || anyTime) &&
-                    //Player.PrimaryResource >= V.I("Barbarian.WOTB.MinFury") && // WOTB is "free" !
-                    // Don't still have the buff
-                    !hasBuff &&
-                    canCast &&
-                    (WOTBGoblins || WOTBIgnoreElites || WOTBElitesPresent || anyTime || emergencyHealth);
-
-                return result;
             }
         }
         public static bool ShouldWaitForCallOfTheAncients
@@ -329,6 +204,133 @@ namespace Trinity.Combat.Abilities
                     TargetUtil.AnyMobsInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange"), 3) || TargetUtil.AnyElitesInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange")));
             }
         }
+
+        public static bool ShouldWaitForWrathOfTheBerserker
+        {
+            get
+            {
+                if (UseOOCBuff || IsCurrentlyAvoiding)
+                    return false;
+
+                // WOTB with elites
+                bool wotbElites =
+                    (WOTBGoblins || WOTBElitesPresent);
+
+                return
+                    Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) &&
+                    !UseOOCBuff &&
+                    !IsCurrentlyAvoiding &&
+                    Player.PrimaryResource <= 50 &&
+                    !CanCast(SNOPower.Barbarian_WrathOfTheBerserker) &&
+                    !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) &&
+                    (WOTBIgnoreElites || wotbElites || (Settings.Combat.Barbarian.WOTBMode == BarbarianWOTBMode.WhenReady));
+            }
+        }
+        public static bool CanCastWrathOfTheBerserker
+        {
+            get
+            {
+                /* WOTB should be used when the following conditions are met:
+                 * If ignoring elites, when 3 monsters in 25 yards or 10 monsters in 50 yards are present, OR
+                 * If using on hard elites only, when an elite with the required affix is present, OR
+                 * If normal mode, when any elite is within 20 yards, OR
+                 * If we have low health (use potion health)
+                 * And not on the Heart of sin
+                 */
+
+                bool anyTime = (Settings.Combat.Barbarian.WOTBMode == BarbarianWOTBMode.WhenReady && !Player.IsInTown);
+                bool hasBuff = GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
+                bool canCast = CanCast(SNOPower.Barbarian_WrathOfTheBerserker, CanCastFlags.NoTimer);
+
+                bool emergencyHealth = Player.CurrentHealthPct <= V.F("Barbarian.WOTB.EmergencyHealth");
+
+                bool result =
+                    (!UseOOCBuff || anyTime) &&
+                    //Player.PrimaryResource >= V.I("Barbarian.WOTB.MinFury") && // WOTB is "free" !
+                    // Don't still have the buff
+                    !hasBuff &&
+                    canCast &&
+                    (WOTBGoblins || WOTBIgnoreElites || WOTBElitesPresent || anyTime || emergencyHealth);
+
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// If using WOTB on all elites, or if we should only use on "hard" affixes
+        /// </summary>
+        public static bool WOTBElitesPresent
+        {
+            get
+            {
+                //bool hardEliteOverride = Trinity.ObjectCache.Any(o => DataDictionary.ForceUseWOTBIds.Contains(o.ActorSNO)) ||
+                //        TargetUtil.AnyElitesInRange(V.F("Barbarian.WOTB.HardEliteRangeOverride"), V.I("Barbarian.WOTB.HardEliteCountOverride"));
+
+                //// WotB only used on Arcane, Frozen, Jailer, Molten, Electrified+Reflect Damage elites, or bosses and ubers, or when more than 4 elites are present
+                //bool wotbHardElitesPresent = HardElitesPresent || hardEliteOverride;
+
+                bool hardElitesOnly = Settings.Combat.Barbarian.WOTBMode == BarbarianWOTBMode.HardElitesOnly;
+
+                bool elitesPresent = TargetUtil.AnyElitesInRange(V.F("Barbarian.WOTB.MinRange"), V.I("Barbarian.WOTB.MinCount"));
+
+                return ((!hardElitesOnly && elitesPresent) || (hardElitesOnly && HardElitesPresent));
+            }
+        }
+
+        /// <summary>
+        /// Make sure we are allowed to use wrath on goblins, else make sure this isn't a goblin
+        /// </summary>
+        public static bool WOTBGoblins
+        {
+            get
+            {
+                if (CurrentTarget == null)
+                    return false;
+                return CurrentTarget.IsTreasureGoblin && Settings.Combat.Barbarian.UseWOTBGoblin;
+            }
+        }
+
+        /// <summary>
+        /// If ignoring elites completely, trigger on 3 trash within 25 yards, or 10 trash in 50 yards
+        /// </summary>
+        public static bool WOTBIgnoreElites
+        {
+            get
+            {
+                return
+                    IgnoringElites &&
+                    (TargetUtil.AnyMobsInRange(V.F("Barbarian.WOTB.RangeNear"), V.I("Barbarian.WOTB.CountNear")) ||
+                    TargetUtil.AnyMobsInRange(V.F("Barbarian.WOTB.RangeFar"), V.I("Barbarian.WOTB.CountFar")) ||
+                    TargetUtil.AnyMobsInRange(Settings.Combat.Misc.TrashPackClusterRadius, Settings.Combat.Misc.TrashPackSize));
+            }
+        }
+
+        public static bool ShouldWaitForEarthquake
+        {
+            get
+            {
+                return
+                    Hotbar.Contains(SNOPower.Barbarian_Earthquake) &&
+                    !UseOOCBuff &&
+                    !IsCurrentlyAvoiding &&
+                    !CanCast(SNOPower.Barbarian_Earthquake) &&
+                    TargetUtil.EliteOrTrashInRange(45) &&
+                    Player.PrimaryResource <= 50;
+            }
+        }
+        public static bool CanCastEarthquake
+        {
+            get
+            {
+                return
+                    !UseOOCBuff &&
+                    !IsCurrentlyAvoiding &&
+                    !Player.IsIncapacitated &&
+                    CanCast(SNOPower.Barbarian_Earthquake) &&
+                    TargetUtil.IsEliteTargetInRange(45f);
+            }
+        }
+
         public static bool CanCastBattleRage
         {
             get
@@ -643,7 +645,7 @@ namespace Trinity.Combat.Abilities
                 {
                     bool hotaElites = (CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.IsTreasureGoblin) && TargetUtil.EliteOrTrashInRange(10f);
 
-                    bool hotaTrash = CombatBase.IgnoringElites && CurrentTarget.IsTrashMob &&
+                    bool hotaTrash = IgnoringElites && CurrentTarget.IsTrashMob &&
                         (TargetUtil.EliteOrTrashInRange(6f) || CurrentTarget.MonsterSize == Zeta.Game.Internals.SNO.MonsterSize.Big);
 
                     return canUseHota && (hotaElites || hotaTrash);
@@ -651,21 +653,15 @@ namespace Trinity.Combat.Abilities
                 return false;
             }
         }
-        public static bool CanUseWeaponThrow
-        {
-            get
-            {
-                return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.X1_Barbarian_WeaponThrow);
-            }
-        }
-        public static bool CanUseFrenzy { get { return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Frenzy) && PowerManager.CanCast(SNOPower.Barbarian_Frenzy); } }
-        public static bool CanUseBash { get { return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Bash) && PowerManager.CanCast(SNOPower.Barbarian_Bash); } }
-        public static bool CanUseCleave { get { return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Cleave) && PowerManager.CanCast(SNOPower.Barbarian_Cleave); } }
+        public static bool CanUseWeaponThrow { get { return !UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.X1_Barbarian_WeaponThrow); } }
+        public static bool CanUseFrenzy { get { return !UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Barbarian_Frenzy); } }
+        public static bool CanUseBash { get { return !UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Barbarian_Bash); } }
+        public static bool CanUseCleave { get { return !UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Barbarian_Cleave); } }
         public static bool CanUseAvalanche
         {
             get
             {
-                return !UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.X1_Barbarian_Avalanche_v2, CanCastFlags.NoTimer) &&
+                return !UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.X1_Barbarian_Avalanche_v2, CanCastFlags.NoTimer) &&
                        (TargetUtil.AnyMobsInRange(3) || TargetUtil.IsEliteTargetInRange());
             }
         }
@@ -691,15 +687,14 @@ namespace Trinity.Combat.Abilities
 
                 if (bestTarget != null)
                     return new TrinityPower(SNOPower.Barbarian_FuriousCharge, V.F("Barbarian.FuriousCharge.UseRange"), bestTarget.Position);
-                else
-                    return new TrinityPower(SNOPower.Barbarian_FuriousCharge, V.F("Barbarian.FuriousCharge.UseRange"), CurrentTarget.Position);
+                return new TrinityPower(SNOPower.Barbarian_FuriousCharge, V.F("Barbarian.FuriousCharge.UseRange"), CurrentTarget.Position);
             }
         }
         public static TrinityPower PowerLeap
         {
             get
             {
-                Vector3 aoeTarget = TargetUtil.GetBestClusterPoint(15f, 35f, false, true);
+                Vector3 aoeTarget = TargetUtil.GetBestClusterPoint(15f, 35f, false);
 
                 return new TrinityPower(SNOPower.Barbarian_Leap, V.F("Barbarian.Leap.UseRange"), aoeTarget);
             }
@@ -746,35 +741,35 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                if (CombatBase.CanCast(SNOPower.Barbarian_Frenzy))
+                if (CanCast(SNOPower.Barbarian_Frenzy))
                     return new TrinityPower(SNOPower.Barbarian_Frenzy, 4f);
 
-                if (CombatBase.CanCast(SNOPower.Barbarian_Bash))
+                if (CanCast(SNOPower.Barbarian_Bash))
                     return new TrinityPower(SNOPower.Barbarian_Bash, 4f);
 
-                if (CombatBase.CanCast(SNOPower.Barbarian_Cleave))
+                if (CanCast(SNOPower.Barbarian_Cleave))
                     return new TrinityPower(SNOPower.Barbarian_Cleave, 4f);
 
-                if (CombatBase.CanCast(SNOPower.X1_Barbarian_WeaponThrow))
+                if (CanCast(SNOPower.X1_Barbarian_WeaponThrow))
                     return new TrinityPower(SNOPower.X1_Barbarian_WeaponThrow, 4f);
 
-                if (CombatBase.CanCast(SNOPower.Barbarian_Overpower))
+                if (CanCast(SNOPower.Barbarian_Overpower))
                     return new TrinityPower(SNOPower.Barbarian_Overpower, 9);
 
-                if (CombatBase.CanCast(SNOPower.Barbarian_Whirlwind))
+                if (CanCast(SNOPower.Barbarian_Whirlwind))
                     return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), LastZigZagLocation);
 
-                if (CombatBase.CanCast(SNOPower.Barbarian_Rend) && Player.PrimaryResourcePct >= 0.65)
+                if (CanCast(SNOPower.Barbarian_Rend) && Player.PrimaryResourcePct >= 0.65)
                     return new TrinityPower(SNOPower.Barbarian_Rend, V.F("Barbarian.Rend.UseRange"));
 
-                return CombatBase.DefaultPower;
+                return DefaultPower;
             }
         }
 
         public static bool AllowSprintOOC
         {
-            get { return allowSprintOOC; }
-            set { allowSprintOOC = value; }
+            get { return _allowSprintOoc; }
+            set { _allowSprintOoc = value; }
         }
 
         private static bool BarbHasNoPrimary

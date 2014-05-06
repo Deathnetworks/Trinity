@@ -13,7 +13,7 @@ namespace Trinity
         // 66 == 15 tps or 1/15th a second
         // 50 = 20 tps or 1/20th a second
         // 20 == 50 tps or 1/50th a second
-        private const int _tickTimeMs = 66;        
+        private const int TickTimeMs = 66;        
 
         public SNOPower SNOPower { get; set; }
         /// <summary>
@@ -52,10 +52,9 @@ namespace Trinity
         {
             get
             {
-                if (CacheData.AbilityLastUsed.ContainsKey(this.SNOPower))
-                    return CacheData.AbilityLastUsed[this.SNOPower];
-                else
-                    return DateTime.MinValue;
+                if (CacheData.AbilityLastUsed.ContainsKey(SNOPower))
+                    return CacheData.AbilityLastUsed[SNOPower];
+                return DateTime.MinValue;
             }
         }
 
@@ -66,7 +65,7 @@ namespace Trinity
         {
             get
             {
-                return WaitTicksBeforeUse * _tickTimeMs;
+                return WaitTicksBeforeUse * TickTimeMs;
             }
         }
 
@@ -77,7 +76,7 @@ namespace Trinity
         {
             get
             {
-                return WaitTicksAfterUse * _tickTimeMs;
+                return WaitTicksAfterUse * TickTimeMs;
             }
         }
 
@@ -101,7 +100,7 @@ namespace Trinity
         {
             get
             {
-                return Trinity.TimeSinceUse(this.SNOPower);
+                return Trinity.TimeSinceUse(SNOPower);
             }
         }
 
@@ -131,7 +130,7 @@ namespace Trinity
 
         public TrinityPower()
         {
-            this.PowerAssignmentTime = DateTime.UtcNow;
+            PowerAssignmentTime = DateTime.UtcNow;
 
             // default values
             SNOPower = SNOPower.None;
@@ -147,8 +146,6 @@ namespace Trinity
         /// Create a TrinityPower for self cast
         /// </summary>
         /// <param name="snoPower"></param>
-        /// <param name="minimumRange"></param>
-        /// <param name="targetRActorGUID"></param>
         public TrinityPower(SNOPower snoPower)
         {
             SNOPower = snoPower;
@@ -165,8 +162,8 @@ namespace Trinity
         /// Create a TrinityPower for self cast
         /// </summary>
         /// <param name="snoPower"></param>
-        /// <param name="minimumRange"></param>
-        /// <param name="targetRActorGUID"></param>
+        /// <param name="waitTicksBeforeuse"></param>
+        /// <param name="waitTicksAfterUse"></param>
         public TrinityPower(SNOPower snoPower, int waitTicksBeforeuse, int waitTicksAfterUse)
         {
             SNOPower = snoPower;
@@ -174,8 +171,8 @@ namespace Trinity
             TargetPosition = Vector3.Zero;
             TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
             TargetACDGUID = -1;
-            WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
-            WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
+            WaitTicksBeforeUse = waitTicksBeforeuse;
+            WaitTicksAfterUse = waitTicksAfterUse;
             PowerAssignmentTime = DateTime.UtcNow;
         }
 
@@ -184,14 +181,14 @@ namespace Trinity
         /// </summary>
         /// <param name="snoPower"></param>
         /// <param name="minimumRange"></param>
-        /// <param name="targetACDGuid"></param>
-        public TrinityPower(SNOPower snoPower, float minimumRange, int targetACDGuid)
+        /// <param name="targetAcdGuid"></param>
+        public TrinityPower(SNOPower snoPower, float minimumRange, int targetAcdGuid)
         {
             SNOPower = snoPower;
             MinimumRange = minimumRange;
             TargetPosition = Vector3.Zero;
             TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
-            TargetACDGUID = targetACDGuid;
+            TargetACDGUID = targetAcdGuid;
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
             WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
             PowerAssignmentTime = DateTime.UtcNow;
@@ -202,7 +199,6 @@ namespace Trinity
         /// </summary>
         /// <param name="snoPower"></param>
         /// <param name="minimumRange"></param>
-        /// <param name="targetRActorGUID"></param>
         public TrinityPower(SNOPower snoPower, float minimumRange)
         {
             SNOPower = snoPower;
@@ -220,7 +216,7 @@ namespace Trinity
         /// </summary>
         /// <param name="snoPower"></param>
         /// <param name="minimumRange"></param>
-        /// <param name="targetRActorGUID"></param>
+        /// <param name="position"></param>
         public TrinityPower(SNOPower snoPower, float minimumRange, Vector3 position)
         {
             SNOPower = snoPower;
@@ -257,34 +253,33 @@ namespace Trinity
       
         public bool Equals(TrinityPower other)
         {
-            return this.SNOPower == other.SNOPower &&
-                this.TargetPosition == other.TargetPosition &&
-                this.TargetACDGUID == other.TargetACDGUID &&
-                this.WaitAfterUseDelay == other.WaitAfterUseDelay &&
-                this.TargetDynamicWorldId == other.TargetDynamicWorldId &&
-                this.MinimumRange == other.MinimumRange;
+            return SNOPower == other.SNOPower &&
+                TargetPosition == other.TargetPosition &&
+                TargetACDGUID == other.TargetACDGUID &&
+                WaitAfterUseDelay == other.WaitAfterUseDelay &&
+                TargetDynamicWorldId == other.TargetDynamicWorldId &&
+                MinimumRange == other.MinimumRange;
         }
 
         public override string ToString()
         {
             return
             String.Format("power={0} pos={1} acdGuid={2} preWait={3} postWait={4} timeSinceAssigned={5} timeSinceUse={6} range={7}",
-                    this.SNOPower,
-                    this.TargetPosition,
-                    this.TargetACDGUID,
-                    this.WaitTicksBeforeUse,
-                    this.WaitTicksAfterUse,
-                    this.TimeSinceAssigned,
-                    this.TimeSinceUse,
-                    this.MinimumRange);
+                    SNOPower,
+                    NavHelper.PrettyPrintVector3(TargetPosition),
+                    TargetACDGUID,
+                    WaitTicksBeforeUse,
+                    WaitTicksAfterUse,
+                    TimeSinceAssigned,
+                    TimeSinceUse,
+                    MinimumRange);
         }
 
         public static int MillisecondsToTickDelay(int milliseconds)
         {
-            var timesPerSecond = 1000 / milliseconds;
-            var totalTPS = 1000 / _tickTimeMs;
+            const int totalTps = 1000 / TickTimeMs;
 
-            return totalTPS / (1000 / milliseconds);
+            return totalTps / (1000 / milliseconds);
         }
     }
 }

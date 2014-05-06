@@ -115,7 +115,7 @@ namespace Trinity
                 // Slow Time for in combat
                 if (!useOocBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_SlowTime, CombatBase.CanCastFlags.NoTimer) &&
                     (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 40f)) &&
-                    (SpellHistory.TimeSinceUse(SNOPower.Wizard_SlowTime) > TimeSpan.FromSeconds(15) || SpellHistory.DistanceFromLastTarget(SNOPower.Wizard_SlowTime) > 30f))
+                    (CombatBase.TimeSpanSincePowerUse(SNOPower.Wizard_SlowTime) > TimeSpan.FromSeconds(15) || SpellHistory.DistanceFromLastTarget(SNOPower.Wizard_SlowTime) > 30f))
                 {
                     if (TargetUtil.AnyMobsInRange(20f))
                         return new TrinityPower(SNOPower.Wizard_SlowTime); // cast of Self
@@ -172,7 +172,7 @@ namespace Trinity
 
                 // Hydra
                 if (!useOocBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Hydra, CombatBase.CanCastFlags.NoTimer) &&
-                    LastPowerUsed != SNOPower.Wizard_Hydra &&
+                    (CombatBase.TimeSpanSincePowerUse(SNOPower.Wizard_Hydra) > TimeSpan.FromSeconds(15) && SpellHistory.DistanceFromLastTarget(SNOPower.Wizard_Hydra) > 30f) && //LastPowerUsed != SNOPower.Wizard_Hydra &&
                     (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 4) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f)) &&
                     Player.PrimaryResource >= 15)
                 {
@@ -433,11 +433,9 @@ namespace Trinity
                 // Archon form
                 // Archon Slow Time for in combat
                 if (!useOocBuff && !Player.IsIncapacitated &&
-                    (TargetUtil.AnyElitesInRange(25, 1) ||
-                    TargetUtil.EliteOrTrashInRange(25f) ||
-                    (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 35f)) &&
+                    (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.EliteOrTrashInRange(25f) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 35f)) &&
                     CombatBase.CanCast(SNOPower.Wizard_Archon_SlowTime, CombatBase.CanCastFlags.NoTimer) &&
-                    (SpellHistory.TimeSinceUse(SNOPower.Wizard_Archon_SlowTime) > TimeSpan.FromSeconds(15) || SpellHistory.DistanceFromLastUsePosition(SNOPower.Wizard_Archon_SlowTime) > 7.5))
+                    (CombatBase.TimeSpanSincePowerUse(SNOPower.Wizard_Archon_SlowTime) > TimeSpan.FromSeconds(15)))
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_SlowTime, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1);
                 }

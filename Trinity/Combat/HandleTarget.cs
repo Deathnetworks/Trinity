@@ -1424,10 +1424,10 @@ namespace Trinity
                         if (!pathFindresult)
                         {
                             hashRGUIDBlacklist60.Add(CurrentTarget.RActorGuid);
-                            Logger.Log("Unable to navigate to target! Blacklisting {0} SNO={1} RAGuid={2} dist={3:0} canFullyPath={4} "
+                            Logger.Log("Unable to navigate to target! Blacklisting {0} SNO={1} RAGuid={2} dist={3:0} "
                                 + (CurrentTarget.IsElite ? " IsElite " : "")
                                 + (CurrentTarget.ItemQuality >= ItemQuality.Legendary ? "IsLegendaryItem " : ""),
-                                CurrentTarget.InternalName, CurrentTarget.ActorSNO, CurrentTarget.RActorGuid, CurrentTarget.Distance, pathFindresult);
+                                CurrentTarget.InternalName, CurrentTarget.ActorSNO, CurrentTarget.RActorGuid, CurrentTarget.Distance);
                         }
                     }
 
@@ -1485,17 +1485,17 @@ namespace Trinity
                         {
                             TargetRangeRequired = 2f;
 
-                            float _range;
-                            if (DataDictionary.CustomObjectRadius.TryGetValue(CurrentTarget.ActorSNO, out _range))
+                            float range;
+                            if (DataDictionary.CustomObjectRadius.TryGetValue(CurrentTarget.ActorSNO, out range))
                             {
-                                TargetRangeRequired = _range;
+                                TargetRangeRequired = range;
                             }
                             break;
                         }
                     case GObjectType.Shrine:
                     case GObjectType.Container:
                         {
-                            TargetRangeRequired = 2f;
+                            TargetRangeRequired = 4f;
 
                             float range;
                             if (DataDictionary.CustomObjectRadius.TryGetValue(CurrentTarget.ActorSNO, out range))
@@ -1571,13 +1571,11 @@ namespace Trinity
         {
             using (new PerformanceLogger("HandleTarget.HandleUnitInRange"))
             {
-                // try WW every tick if we want - we should use other methods to avoid this garbage code... 
                 float dist = 0;
                 if (CombatBase.CurrentPower.TargetPosition != Vector3.Zero)
                     dist = CombatBase.CurrentPower.TargetPosition.Distance2D(Player.Position);
                 else if (CurrentTarget != null)
                     dist = CurrentTarget.Position.Distance2D(Player.Position);
-
 
                 var usePowerResult = ZetaDia.Me.UsePower(CombatBase.CurrentPower.SNOPower, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetDynamicWorldId, CombatBase.CurrentPower.TargetACDGUID);
 
@@ -1603,12 +1601,12 @@ namespace Trinity
                         IsWaitingAfterPower = true;
                     }
                 }
-                else
-                {
-                    PowerManager.CanCastFlags failFlags;
-                    PowerManager.CanCast(CombatBase.CurrentPower.SNOPower, out failFlags);
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "UsePower FAILED {0} ({1}) at {2} on {3} dist={4}", CombatBase.CurrentPower.SNOPower, failFlags, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetACDGUID, dist);
-                }
+                //else
+                //{
+                //    PowerManager.CanCastFlags failFlags;
+                //    PowerManager.CanCast(CombatBase.CurrentPower.SNOPower, out failFlags);
+                //    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "UsePower FAILED {0} ({1}) at {2} on {3} dist={4}", CombatBase.CurrentPower.SNOPower, failFlags, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetACDGUID, dist);
+                //}
 
                 ShouldPickNewAbilities = true;
 

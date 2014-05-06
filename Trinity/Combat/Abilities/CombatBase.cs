@@ -14,20 +14,12 @@ namespace Trinity.Combat.Abilities
 {
     public class CombatBase
     {
-        private static bool isWaitingForSpecial = false;
-        private static TrinityPower currentPower = new TrinityPower();
-        private static Vector3 lastZigZagLocation = Vector3.Zero;
-        private static Vector3 zigZagPosition = Vector3.Zero;
-        private static bool isCombatAllowed = true;
-        private static int playerKiteDistance = 0;
-        private static KiteMode playerKiteMode = KiteMode.Never;
+        private static TrinityPower _currentPower = new TrinityPower();
+        private static Vector3 _lastZigZagLocation = Vector3.Zero;
+        private static Vector3 _zigZagPosition = Vector3.Zero;
+        private static bool _isCombatAllowed = true;
+        private static KiteMode _playerKiteMode = KiteMode.Never;
 
-
-        public enum AnimWait
-        {
-            NO_WAIT = 0,
-            WAIT = 1
-        }
 
         public enum CanCastFlags
         {
@@ -39,17 +31,13 @@ namespace Trinity.Combat.Abilities
         /// <summary>
         /// Distance to kite, read settings (class independant)
         /// </summary>
-        public static int PlayerKiteDistance
-        {
-            get { return CombatBase.playerKiteDistance; }
-            set { CombatBase.playerKiteDistance = value; }
-        }
+        public static int PlayerKiteDistance { get; set; }
 
         // When to Kite
         public static KiteMode PlayerKiteMode
         {
-            get { return CombatBase.playerKiteMode; }
-            set { CombatBase.playerKiteMode = value; }
+            get { return _playerKiteMode; }
+            set { _playerKiteMode = value; }
         }
 
 
@@ -64,11 +52,11 @@ namespace Trinity.Combat.Abilities
                 if (!CombatTargeting.Instance.AllowedToKillMonsters)
                     return false;
 
-                if (!isCombatAllowed)
+                if (!_isCombatAllowed)
                     return false;
                 return true;
             }
-            set { CombatBase.isCombatAllowed = value; }
+            set { _isCombatAllowed = value; }
         }
 
         public static bool IsQuestingMode { get; set; }
@@ -78,16 +66,13 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         public static Vector3 ZigZagPosition
         {
-            get { return CombatBase.zigZagPosition; }
-            internal set { CombatBase.zigZagPosition = value; }
+            get { return _zigZagPosition; }
+            internal set { _zigZagPosition = value; }
         }
 
         /// <summary>
         /// Returns an appropriately selected TrinityPower and related information
         /// </summary>
-        /// <param name="IsCurrentlyAvoiding">Are we currently avoiding?</param>
-        /// <param name="UseOOCBuff">Buff Out Of Combat</param>
-        /// <param name="UseDestructiblePower">Is this for breaking destructables?</param>
         /// <returns></returns>
         internal static TrinityPower AbilitySelector()
         {
@@ -99,7 +84,7 @@ namespace Trinity.Combat.Abilities
 
                 // Switch based on the cached character class
 
-                TrinityPower power = CombatBase.CurrentPower;
+                TrinityPower power = CurrentPower;
 
                 using (new PerformanceLogger("AbilitySelector.ClassAbility"))
                 {
@@ -131,18 +116,17 @@ namespace Trinity.Combat.Abilities
                     }
                 }
                 // use IEquatable to check if they're equal
-                if (CombatBase.CurrentPower == power)
+                if (CurrentPower == power)
                 {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Keeping {0}", CombatBase.CurrentPower.ToString());
-                    return CombatBase.CurrentPower;
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Keeping {0}", CurrentPower.ToString());
+                    return CurrentPower;
                 }
-                else if (power != null)
+                if (power != null)
                 {
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Selected new {0}", power.ToString());
                     return power;
                 }
-                else
-                    return DefaultPower;
+                return DefaultPower;
             }
         }
 
@@ -175,11 +159,7 @@ namespace Trinity.Combat.Abilities
         /// <summary>
         /// Gets/sets whether we are building up energy for a big spell
         /// </summary>
-        public static bool IsWaitingForSpecial
-        {
-            get { return CombatBase.isWaitingForSpecial; }
-            set { CombatBase.isWaitingForSpecial = value; }
-        }
+        public static bool IsWaitingForSpecial { get; set; }
 
         /// <summary>
         /// Minimum energy reserve for using "Big" spells/powers
@@ -225,7 +205,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return !CombatBase.IsQuestingMode && Settings.Combat.Misc.IgnoreElites;
+                return !IsQuestingMode && Settings.Combat.Misc.IgnoreElites;
             }
         }
 
@@ -240,8 +220,7 @@ namespace Trinity.Combat.Abilities
             {
                 if (CurrentTarget == null)
                     return true;
-                else
-                    return false;
+                return false;
             }
         }
 
@@ -254,8 +233,7 @@ namespace Trinity.Combat.Abilities
 
                 if (CurrentTarget.Type == GObjectType.Avoidance)
                     return true;
-                else
-                    return false;
+                return false;
             }
         }
 
@@ -279,14 +257,14 @@ namespace Trinity.Combat.Abilities
 
         public static Vector3 LastZigZagLocation
         {
-            get { return lastZigZagLocation; }
-            set { lastZigZagLocation = value; }
+            get { return _lastZigZagLocation; }
+            set { _lastZigZagLocation = value; }
         }
 
         public static TrinityPower CurrentPower
         {
-            get { return currentPower; }
-            set { currentPower = value; }
+            get { return _currentPower; }
+            set { _currentPower = value; }
         }
 
         public static List<SNOPower> Hotbar
@@ -323,7 +301,7 @@ namespace Trinity.Combat.Abilities
                         Trinity.Monk_TickSweepingWindSpam();
                     }
 
-                    return new TrinityPower()
+                    return new TrinityPower
                     {
                         SNOPower = DefaultWeaponPower,
                         MinimumRange = DefaultWeaponDistance,
@@ -342,7 +320,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                ACDItem lhItem = ZetaDia.Me.Inventory.Equipped.Where(i => i.InventorySlot == InventorySlot.LeftHand).FirstOrDefault();
+                ACDItem lhItem = ZetaDia.Me.Inventory.Equipped.FirstOrDefault(i => i.InventorySlot == InventorySlot.LeftHand);
                 if (lhItem == null)
                     return SNOPower.None;
 
@@ -386,8 +364,6 @@ namespace Trinity.Combat.Abilities
                         return 65f;
                     case SNOPower.Weapon_Ranged_Wand:
                         return 35f;
-                    case SNOPower.Weapon_Melee_Instant:
-                    case SNOPower.Weapon_Melee_Instant_BothHand:
                     default:
                         return 10f;
                 }
@@ -398,6 +374,7 @@ namespace Trinity.Combat.Abilities
         /// Performs basic checks to see if we have and can cast a power (hotbar, power manager). Checks use timer for Wiz, DH, Monk
         /// </summary>
         /// <param name="power"></param>
+        /// <param name="flags"></param>
         /// <returns></returns>
         public static bool CanCast(SNOPower power, CanCastFlags flags = CanCastFlags.All)
         {
@@ -505,8 +482,19 @@ namespace Trinity.Combat.Abilities
         {
             if (CacheData.AbilityLastUsed.ContainsKey(power))
                 return DateTime.UtcNow.Subtract(CacheData.AbilityLastUsed[power]).TotalMilliseconds;
-            else
-                return -1;
+            return -1;
+        }
+
+        /// <summary>
+        /// Gets the time in Millseconds since we've used the specified power
+        /// </summary>
+        /// <param name="power"></param>
+        /// <returns></returns>
+        internal static TimeSpan TimeSpanSincePowerUse(SNOPower power)
+        {
+            if (CacheData.AbilityLastUsed.ContainsKey(power))
+                return DateTime.UtcNow.Subtract(CacheData.AbilityLastUsed[power]);
+            return TimeSpan.MinValue;
         }
 
         /// <summary>

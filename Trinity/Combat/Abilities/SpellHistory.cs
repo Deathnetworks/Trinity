@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Trinity.Technicals;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
+using Logger = Trinity.Technicals.Logger;
+
 namespace Trinity.Combat.Abilities
 {
     public static class SpellHistory
     {
         private const int SpellHistorySize = 1000;
-        private static Queue<SpellHistoryItem> _historyQueue = new Queue<SpellHistoryItem>(SpellHistorySize * 2);
+        private static List<SpellHistoryItem> _historyQueue = new List<SpellHistoryItem>(SpellHistorySize * 2);
 
-        internal static Queue<SpellHistoryItem> HistoryQueue
+        internal static List<SpellHistoryItem> HistoryQueue
         {
             get { return _historyQueue; }
             set { _historyQueue = value; }
@@ -19,14 +22,15 @@ namespace Trinity.Combat.Abilities
         public static void RecordSpell(TrinityPower power)
         {
             if (_historyQueue.Count >= SpellHistorySize)
-                _historyQueue.Dequeue();
-            _historyQueue.Enqueue(new SpellHistoryItem
+                _historyQueue.RemoveAt(_historyQueue.Count() - 1);
+            _historyQueue.Add(new SpellHistoryItem
             {
                 Power = power,
                 UseTime = DateTime.UtcNow,
                 MyPosition = Trinity.Player.Position,
                 TargetPosition = power.TargetPosition
             });
+            Logger.LogDebug(LogCategory.Targetting, "Recorded {0}", power);
 
             CacheData.AbilityLastUsed[power.SNOPower] = DateTime.UtcNow;
             Trinity.LastPowerUsed = power.SNOPower;
@@ -86,7 +90,7 @@ namespace Trinity.Combat.Abilities
         {
             Vector3 lastUsed = Vector3.Zero;
             if (_historyQueue.Any(i => i.Power.SNOPower == power))
-                lastUsed = _historyQueue.Where(i => i.Power.SNOPower == power).OrderByDescending(i => i.UseTime).FirstOrDefault().TargetPosition;
+                lastUsed = _historyQueue.FirstOrDefault(i => i.Power.SNOPower == power).TargetPosition;
             return lastUsed;
         }
 
@@ -94,7 +98,7 @@ namespace Trinity.Combat.Abilities
         {
             Vector3 lastUsed = Vector3.Zero;
             if (_historyQueue.Any(i => i.Power.SNOPower == power))
-                lastUsed = _historyQueue.Where(i => i.Power.SNOPower == power).OrderByDescending(i => i.UseTime).FirstOrDefault().MyPosition;
+                lastUsed = _historyQueue.FirstOrDefault(i => i.Power.SNOPower == power).MyPosition;
             return lastUsed;
         }
 
