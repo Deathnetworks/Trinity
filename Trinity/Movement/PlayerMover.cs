@@ -766,8 +766,6 @@ namespace Trinity.DbProvider
 
         internal static MoveResult NavigateTo(Vector3 destination, string destinationName = "")
         {
-            Vector3 MyPos = Trinity.Player.Position;
-
             PositionCache.AddPosition();
             MoveResult result;
 

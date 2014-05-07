@@ -401,14 +401,12 @@ namespace Trinity
                         }
 
                         // Interact/use power on target if already in range
-                        if ((TargetCurrentDistance <= TargetRangeRequired && CurrentTargetIsInLoS) || stuckOnTarget || npcInRange || groundTargetInRange)
+                        if (TargetRangeRequired <= 1f || (TargetCurrentDistance <= TargetRangeRequired && CurrentTargetIsInLoS) || stuckOnTarget || npcInRange || groundTargetInRange)
                         {
                             // If avoidance, instantly skip
                             if (CurrentTarget.Type == GObjectType.Avoidance)
                             {
-                                //vlastSafeSpot = Vector3.Zero;
                                 _forceTargetUpdate = true;
-                                //bAvoidDirectionBlacklisting = false;
                                 runStatus = HandlerRunStatus.TreeRunning;
                             }
 

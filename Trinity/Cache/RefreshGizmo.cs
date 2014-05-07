@@ -295,28 +295,30 @@ namespace Trinity
                     break;
                 case GObjectType.JumpLinkPortal:
                     {
-                        // Same world portal check
-                        if (CacheData.SameWorldPortals.Any(p => p.WorldID == Trinity.Player.WorldID &&
-                                DateTime.UtcNow.Subtract(p.LastInteract).TotalSeconds < 15 && // this is the duration since last interacted 
-                                p.StartPosition.Distance2D(Trinity.Player.Position) > 25f) && // this is the distance we should have jumped
-                                CurrentCacheObject.Distance <= 45f) // this is the distance from the "new" portal
-                        {
-                            GenericBlacklist.AddToBlacklist(new GenericCacheObject()
-                            {
-                                Key = CurrentCacheObject.ObjectHash,
-                                Value = null,
-                                Expires = DateTime.UtcNow.AddSeconds(30)
-                            });
+                        return false;
 
-                            AddToCache = false;
-                            c_IgnoreSubStep = "RecentSameWorldPortal";
-                        }
+                //        // Same world portal check
+                //        if (CacheData.SameWorldPortals.Any(p => p.WorldID == Trinity.Player.WorldID &&
+                //                DateTime.UtcNow.Subtract(p.LastInteract).TotalSeconds < 15 && // this is the duration since last interacted 
+                //                p.StartPosition.Distance2D(Trinity.Player.Position) > 25f) && // this is the distance we should have jumped
+                //                CurrentCacheObject.Distance <= 45f) // this is the distance from the "new" portal
+                //        {
+                //            GenericBlacklist.AddToBlacklist(new GenericCacheObject()
+                //            {
+                //                Key = CurrentCacheObject.ObjectHash,
+                //                Value = null,
+                //                Expires = DateTime.UtcNow.AddSeconds(30)
+                //            });
 
-                        if (!NavHelper.CanRayCast(Trinity.Player.Position, CurrentCacheObject.Position))
-                        {
-                            AddToCache = false;
-                            c_IgnoreSubStep = "Raycast";
-                        }
+                //            AddToCache = false;
+                //            c_IgnoreSubStep = "RecentSameWorldPortal";
+                //        }
+
+                //        if (!NavHelper.CanRayCast(Trinity.Player.Position, CurrentCacheObject.Position))
+                //        {
+                //            AddToCache = false;
+                //            c_IgnoreSubStep = "Raycast";
+                //        }
 
                         break;
                     }

@@ -119,39 +119,41 @@ namespace Trinity
             return true;
         }
 
-        public static void SafeClickElement(UIElement element, string name = "", bool fireWorldTransfer = false)
+        public static bool SafeClickElement(UIElement element, string name = "", bool fireWorldTransfer = false)
         {
-            if (ZetaDia.Me.IsValid)
-            {
-                if (IsElementVisible(element))
-                {
-                    if (fireWorldTransfer)
-                        GameEvents.FireWorldTransferStart();
+            if (!ZetaDia.Me.IsValid)
+                return false;
+            if (!IsElementVisible(element))
+                return false;
+            if (fireWorldTransfer)
+                GameEvents.FireWorldTransferStart();
 
-                    //Thread.Sleep(250);
-                    Technicals.Logger.Log("Clicking UI element {0} ({1})", name, element.BaseAddress);
-                    element.Click();
-                    //Thread.Sleep(250);
-                }
-            }
+            Logger.Log("Clicking UI element {0} ({1})", name, element.BaseAddress);
+            element.Click();
+            return true;
         }
 
-        private static DateTime lastCheckedUIButtons = DateTime.MinValue;
+        private static DateTime _lastCheckedUiButtons = DateTime.MinValue;
         public static void SafeClickUIButtons()
         {
             if (ZetaDia.IsLoadingWorld)
                 return;
 
-            SafeClickElement(BountyRewardDialog, "Bounty Reward Dialog");
-            SafeClickElement(ConversationSkipButton, "Conversation Button");
-            SafeClickElement(PartyLeaderBossAccept, "Party Leader Boss Accept", true);
-            SafeClickElement(PartyFollowerBossAccept, "Party Follower Boss Accept", true);
-            SafeClickElement(TalktoInteractButton1, "Conversation Button", false);
-
-            if (DateTime.UtcNow.Subtract(lastCheckedUIButtons).TotalMilliseconds <= 500)
+            if (ZetaDia.IsInGame && SafeClickElement(BountyRewardDialog, "Bounty Reward Dialog"))
+                return;
+            if (ZetaDia.IsInGame && SafeClickElement(ConversationSkipButton, "Conversation Button"))
+                return;
+            if (ZetaDia.IsInGame && SafeClickElement(PartyLeaderBossAccept, "Party Leader Boss Accept", true))
+                return;
+            if (ZetaDia.IsInGame && SafeClickElement(PartyFollowerBossAccept, "Party Follower Boss Accept", true))
+                return;
+            if (ZetaDia.IsInGame && SafeClickElement(TalktoInteractButton1, "Conversation Button"))
                 return;
 
-            lastCheckedUIButtons = DateTime.UtcNow;
+            if (DateTime.UtcNow.Subtract(_lastCheckedUiButtons).TotalMilliseconds <= 500)
+                return;
+
+            _lastCheckedUiButtons = DateTime.UtcNow;
 
             int loopingAnimationEndTime = 0;
             try
@@ -160,13 +162,16 @@ namespace Trinity
             }
             catch (Exception ex) { Logger.LogDebug("Error in getting LoopingAnimationEndTime {0}", ex.Message); }
 
-            if (loopingAnimationEndTime <= 0)
-            {
-                SafeClickElement(MercenaryOKButton, "Mercenary OK Button");
-                SafeClickElement(GenericOK, "GenericOK");
-                SafeClickElement(UIElements.ConfirmationDialogOkButton, "ConfirmationDialogOKButton", true);
-                SafeClickElement(ConfirmTimedDungeonOK, "Confirm Timed Dungeon OK Button", true);
-            }
+            if (loopingAnimationEndTime > 0)
+                return;
+            if (ZetaDia.IsInGame && SafeClickElement(MercenaryOKButton, "Mercenary OK Button"))
+                return;
+            if (SafeClickElement(GenericOK, "GenericOK"))
+                return;
+            if (SafeClickElement(UIElements.ConfirmationDialogOkButton, "ConfirmationDialogOKButton", true))
+                return;
+            if (ZetaDia.IsInGame && SafeClickElement(ConfirmTimedDungeonOK, "Confirm Timed Dungeon OK Button", true))
+                return;
         }
 
         public static bool IsPartyDialogVisible
