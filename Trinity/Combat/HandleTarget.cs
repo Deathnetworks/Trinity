@@ -171,13 +171,6 @@ namespace Trinity
                         _isWaitingAfterPower = false;
                     }
 
-                    if (CurrentTarget != null && CurrentTarget.Type == GObjectType.JumpLinkPortal &&
-                        CacheData.SameWorldPortals.Any(p => DateTime.UtcNow.Subtract(p.LastInteract).TotalSeconds < 5) && !NavHelper.CanRayCast(CurrentTarget.Position))
-                    {
-                        CurrentTarget = null;
-                        runStatus = HandlerRunStatus.TreeRunning;
-                    }
-
                     //check if we are returning to the tree
                     if (runStatus != HandlerRunStatus.NotFinished)
                         return GetTreeSharpRunStatus(runStatus);
@@ -344,13 +337,7 @@ namespace Trinity
                     using (new PerformanceLogger("HandleTarget.LoSCheck"))
                     {
                         TargetCurrentDistance = CurrentTarget.RadiusDistance;
-
-                        // Always raycast these bad boys
-                        if (CurrentTarget.Type == GObjectType.JumpLinkPortal)
-                        {
-                            CurrentTargetIsInLoS = NavHelper.CanRayCast(Player.Position, CurrentDestination);
-                        }
-                        else if (DataDictionary.AlwaysRaycastWorlds.Contains(Player.WorldID) && CurrentTarget.Distance > CurrentTarget.Radius + 2f)
+                        if (DataDictionary.AlwaysRaycastWorlds.Contains(Player.WorldID) && CurrentTarget.Distance > CurrentTarget.Radius + 2f)
                         {
                             CurrentTargetIsInLoS = NavHelper.CanRayCast(Player.Position, CurrentDestination);
                         }
@@ -515,7 +502,6 @@ namespace Trinity
                                 case GObjectType.Shrine:
                                 case GObjectType.Container:
                                 case GObjectType.Interactable:
-                                case GObjectType.JumpLinkPortal:
                                 case GObjectType.CursedChest:
                                 case GObjectType.CursedShrine:
                                     {
@@ -532,13 +518,7 @@ namespace Trinity
                                             {
                                                 return GetTreeSharpRunStatus(HandlerRunStatus.TreeRunning);
                                             }
-
-                                            if (CurrentTarget.Type == GObjectType.JumpLinkPortal && !CacheData.SameWorldPortals.Any(p => p.RActorGUID == CurrentTarget.RActorGuid))
-                                            {
-                                                Logger.LogVerbose(LogCategory.Behavior, "Adding {0} {1} to SameWorldPortals", CurrentTarget.InternalName, CurrentTarget.ActorSNO);
-                                                CacheData.SameWorldPortals.Add(new Cache.SameWorldPortal() { ActorSNO = CurrentTarget.ActorSNO, RActorGUID = CurrentTarget.RActorGuid });
-                                            }
-
+                                            
                                             int attemptCount = 0;
                                             CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out attemptCount);
 
@@ -986,7 +966,7 @@ namespace Trinity
                     int interactAttempts;
                     CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out interactAttempts);
 
-                    if ((CurrentTarget.Type == GObjectType.Door || CurrentTarget.Type == GObjectType.Interactable || CurrentTarget.Type == GObjectType.Container || CurrentTarget.Type == GObjectType.JumpLinkPortal) &&
+                    if ((CurrentTarget.Type == GObjectType.Door || CurrentTarget.Type == GObjectType.Interactable || CurrentTarget.Type == GObjectType.Container) &&
                         interactAttempts < 45 && DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalSeconds > 15)
                     {
                         addTargetToBlacklist = false;
@@ -1447,7 +1427,7 @@ namespace Trinity
                 CurrentTargetIsInLoS = false;
                 // Set current destination to our current target's destination
                 CurrentDestination = CurrentTarget.Position;
-                
+
                 switch (CurrentTarget.Type)
                 {
                     // * Unit, we need to pick an ability to use and get within range

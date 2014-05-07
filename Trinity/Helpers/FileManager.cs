@@ -454,6 +454,9 @@ namespace Trinity.Technicals
         }
         public static bool IsFileReadLocked(FileInfo file)
         {
+            if (!File.Exists(file.FullName))
+                return false;
+
             //http://stackoverflow.com/questions/876473/is-there-a-way-to-check-if-a-file-is-in-use
             FileStream stream = null;
 

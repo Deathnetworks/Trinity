@@ -414,14 +414,8 @@ namespace Trinity
             }
             catch { }
 
-            if (DataDictionary.SameWorldPortals.Contains(CurrentCacheObject.ActorSNO))
-            {
-                CurrentCacheObject.Type = GObjectType.JumpLinkPortal;
-                return true;
-            }
-
             // Either get the cached object type, or calculate it fresh
-            else if (!c_IsObstacle)
+            if (!c_IsObstacle)
             {
                 // See if it's an avoidance first from the SNO
                 bool isAvoidanceSNO = (DataDictionary.Avoidances.Contains(CurrentCacheObject.ActorSNO) ||
@@ -689,7 +683,6 @@ namespace Trinity
                 case GObjectType.Shrine:
                 case GObjectType.Interactable:
                 case GObjectType.HealthWell:
-                case GObjectType.JumpLinkPortal:
                 case GObjectType.CursedChest:
                 case GObjectType.CursedShrine:
                     {

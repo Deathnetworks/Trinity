@@ -910,6 +910,7 @@ namespace Trinity
             377253, // x1_Fortress_Crystal_Prison_Shield
             316221, // X1_WarpToPortal 
             370187, // x1_Malthael_Boss_Orb_Collapse
+            328830, // x1_Fortress_Portal_Switch
 
         };
 
@@ -951,12 +952,6 @@ namespace Trinity
         private static readonly HashSet<int> ignoreUntargettableAttribute = new HashSet<int>()
         {
             5432, // A2 Snakem
-        };
-
-        public static HashSet<int> SameWorldPortals { get { return sameWorldPortals; } }
-        private static readonly HashSet<int> sameWorldPortals = new HashSet<int>()
-        {
-            328830, // x1_Fortress_Portal_Switch
         };
 
         public static HashSet<string> WhiteItemCraftingWhiteList { get { return whiteItemCraftingWhiteList; } }

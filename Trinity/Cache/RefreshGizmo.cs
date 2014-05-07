@@ -293,60 +293,10 @@ namespace Trinity
                         }
                     }
                     break;
-                case GObjectType.JumpLinkPortal:
-                    {
-                        return false;
-
-                //        // Same world portal check
-                //        if (CacheData.SameWorldPortals.Any(p => p.WorldID == Trinity.Player.WorldID &&
-                //                DateTime.UtcNow.Subtract(p.LastInteract).TotalSeconds < 15 && // this is the duration since last interacted 
-                //                p.StartPosition.Distance2D(Trinity.Player.Position) > 25f) && // this is the distance we should have jumped
-                //                CurrentCacheObject.Distance <= 45f) // this is the distance from the "new" portal
-                //        {
-                //            GenericBlacklist.AddToBlacklist(new GenericCacheObject()
-                //            {
-                //                Key = CurrentCacheObject.ObjectHash,
-                //                Value = null,
-                //                Expires = DateTime.UtcNow.AddSeconds(30)
-                //            });
-
-                //            AddToCache = false;
-                //            c_IgnoreSubStep = "RecentSameWorldPortal";
-                //        }
-
-                //        if (!NavHelper.CanRayCast(Trinity.Player.Position, CurrentCacheObject.Position))
-                //        {
-                //            AddToCache = false;
-                //            c_IgnoreSubStep = "Raycast";
-                //        }
-
-                        break;
-                    }
-                case GObjectType.Interactable:
+               case GObjectType.Interactable:
                     {
                         AddToCache = true;
-
-                        // SameWorldPortals can have GizmoState=1 (e.g. Gizmo "Used")
-                        if (!DataDictionary.SameWorldPortals.Contains(CurrentCacheObject.ActorSNO))
-                        {
-                            try
-                            {
-                                int gizmoState = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.GizmoState);
-                                if (gizmoState == 1)
-                                {
-                                    AddToCache = false;
-                                    c_IgnoreSubStep = "GizmoState=1";
-                                    return AddToCache;
-                                }
-                            }
-                            catch
-                            {
-                                AddToCache = false;
-                                c_IgnoreSubStep = "GizmoStateException";
-                                return AddToCache;
-                            }
-                        }
-
+                        
                         if (Untargetable)
                         {
                             ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);

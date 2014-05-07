@@ -883,13 +883,6 @@ namespace Trinity
                                     cacheObject.Weight = 100 + cacheObject.RadiusDistance;
                                 break;
                             }
-                        case GObjectType.JumpLinkPortal:
-                            {
-                                if (cacheObject.Distance < 45)
-                                    cacheObject.Weight = 25;
-
-                                break;
-                            }
                         case GObjectType.Interactable:
                             {
                                 // Need to Prioritize, forget it!

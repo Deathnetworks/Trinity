@@ -129,11 +129,6 @@ namespace Trinity
         internal static HashSet<CacheObstacleObject> TimeBoundAvoidance = new HashSet<CacheObstacleObject>();
 
         /// <summary>
-        /// Stores the last use of same world portals, like in Pandemonium fortress 
-        /// </summary>
-        internal static HashSet<SameWorldPortal> SameWorldPortals = new HashSet<SameWorldPortal>();
-
-        /// <summary>
         /// Contains an RActorGUID and count of the number of times we've switched to this target
         /// </summary>
         internal static Dictionary<string, int> PrimaryTargetCount = new Dictionary<string, int>();
@@ -148,18 +143,18 @@ namespace Trinity
         /// </summary>
         internal static void Clear()
         {
-            CacheData.CurrentUnitHealth.Clear();
-            CacheData.LastCheckedUnitHealth.Clear();
-            CacheData.MonsterObstacles.Clear();
-            CacheData.MonsterSizes.Clear();
-            CacheData.MonsterTypes.Clear();
-            CacheData.Position.Clear();
-            CacheData.SummonedByACDId.Clear();
-            CacheData.TimeBoundAvoidance.RemoveWhere(aoe => aoe.Expires < DateTime.UtcNow);
-            CacheData.UnitIsBurrowed.Clear();
-            CacheData.UnitMaxHealth.Clear();
-            CacheData.UnitMonsterAffix.Clear();
-            CacheData.NavigationObstacles.RemoveWhere(o => o.Position.Distance2DSqr(Trinity.Player.Position) > 90f * 90f);
+            CurrentUnitHealth.Clear();
+            LastCheckedUnitHealth.Clear();
+            MonsterObstacles.Clear();
+            MonsterSizes.Clear();
+            MonsterTypes.Clear();
+            Position.Clear();
+            SummonedByACDId.Clear();
+            TimeBoundAvoidance.RemoveWhere(aoe => aoe.Expires < DateTime.UtcNow);
+            UnitIsBurrowed.Clear();
+            UnitMaxHealth.Clear();
+            UnitMonsterAffix.Clear();
+            NavigationObstacles.RemoveWhere(o => o.Position.Distance2DSqr(Trinity.Player.Position) > 90f * 90f);
         }
 
         /// <summary>
@@ -169,21 +164,20 @@ namespace Trinity
         {
             Clear();
 
-            CacheData.AbilityLastUsed = new Dictionary<SNOPower, DateTime>(DataDictionary.LastUseAbilityTimeDefaults);
-            CacheData.AvoidanceObstacles.Clear();
-            CacheData.GoldStack.Clear();
-            CacheData.HasBeenInLoS.Clear();
-            CacheData.HasBeenNavigable.Clear();
-            CacheData.HasBeenRayCasted.Clear();
-            CacheData.InteractAttempts.Clear();
-            CacheData.IsSummoner.Clear();
-            CacheData.ItemLinkQuality.Clear();
-            CacheData.NavigationObstacles.Clear();
-            CacheData.PickupItem.Clear();
-            CacheData.PrimaryTargetCount.Clear();
-            CacheData.SameWorldPortals.Clear();
-            CacheData.TimeBoundAvoidance.Clear();
-            CacheData.BlacklistedEvents.Clear();
+            AbilityLastUsed = new Dictionary<SNOPower, DateTime>(DataDictionary.LastUseAbilityTimeDefaults);
+            AvoidanceObstacles.Clear();
+            GoldStack.Clear();
+            HasBeenInLoS.Clear();
+            HasBeenNavigable.Clear();
+            HasBeenRayCasted.Clear();
+            InteractAttempts.Clear();
+            IsSummoner.Clear();
+            ItemLinkQuality.Clear();
+            NavigationObstacles.Clear();
+            PickupItem.Clear();
+            PrimaryTargetCount.Clear();
+            TimeBoundAvoidance.Clear();
+            BlacklistedEvents.Clear();
         }
 
     }
