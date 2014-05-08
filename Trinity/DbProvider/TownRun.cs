@@ -148,10 +148,10 @@ namespace Trinity
                     var equippedItems = ZetaDia.Me.Inventory.Equipped.Where(i => i.DurabilityCurrent != i.DurabilityMax);
                     if (equippedItems.Any())
                     {
-                        double avg = equippedItems.Average(i => i.DurabilityPercent);
+                        double min = equippedItems.Min(i => i.DurabilityPercent);
 
-                        float threshold = Trinity.Player.IsInTown ? 0.50f : Zeta.Bot.Settings.CharacterSettings.Instance.RepairWhenDurabilityBelow;
-                        bool needsRepair = avg <= threshold;
+                        float threshold = Trinity.Player.IsInTown ? 0.50f : Math.Max(Zeta.Bot.Settings.CharacterSettings.Instance.RepairWhenDurabilityBelow, 0.25f);
+                        bool needsRepair = min <= threshold;
 
                         if (needsRepair)
                         {

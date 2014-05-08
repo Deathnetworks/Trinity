@@ -133,12 +133,12 @@ namespace Trinity
 
 
             // Anything that's Untargetable
-            bool Untargetable = false;
+            bool untargetable = false;
             try
             {
                 if (CurrentCacheObject.Object is DiaGizmo)
                 {
-                    Untargetable = CurrentCacheObject.Object.CommonData.GetAttribute<int>(ActorAttributeType.Untargetable) > 0;
+                    untargetable = CurrentCacheObject.Object.CommonData.GetAttribute<int>(ActorAttributeType.Untargetable) > 0;
                 }
             }
             catch
@@ -147,13 +147,13 @@ namespace Trinity
             }
 
 
-            // Anything that's Untargetable
-            bool Invulnerable = false;
+            // Anything that's Invulnerable
+            bool invulnerable = false;
             try
             {
                 if (CurrentCacheObject.Object is DiaGizmo)
                 {
-                    Untargetable = CurrentCacheObject.Object.CommonData.GetAttribute<int>(ActorAttributeType.Invulnerable) > 0;
+                    invulnerable = CurrentCacheObject.Object.CommonData.GetAttribute<int>(ActorAttributeType.Invulnerable) > 0;
                 }
             }
             catch
@@ -238,7 +238,7 @@ namespace Trinity
                             return AddToCache;
                         }
 
-                        if (Untargetable)
+                        if (untargetable)
                         {
                             ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
@@ -297,7 +297,7 @@ namespace Trinity
                     {
                         AddToCache = true;
                         
-                        if (Untargetable)
+                        if (untargetable)
                         {
                             ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
@@ -371,7 +371,7 @@ namespace Trinity
                             AddToCache = false;
                             return AddToCache;
                         }
-                        if (Untargetable)
+                        if (untargetable)
                         {
                             ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
@@ -420,7 +420,7 @@ namespace Trinity
                             c_IgnoreSubStep = "GizmoStateException";
                             return AddToCache;
                         }
-                        if (Untargetable)
+                        if (untargetable)
                         {
                             ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
@@ -530,7 +530,7 @@ namespace Trinity
                             c_IgnoreSubStep = "NoDamage";
                             return AddToCache;
                         }
-                        if (Untargetable)
+                        if (untargetable)
                         {
                             ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
@@ -548,7 +548,7 @@ namespace Trinity
                         }
 
 
-                        if (Invulnerable)
+                        if (invulnerable)
                         {
                             ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
@@ -619,7 +619,7 @@ namespace Trinity
                             return AddToCache;
                         }
 
-                        if (Invulnerable)
+                        if (invulnerable)
                         {
                             ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
@@ -635,7 +635,7 @@ namespace Trinity
                             c_IgnoreSubStep = "Invulnerable";
                             return AddToCache;
                         }
-                        if (Untargetable)
+                        if (untargetable)
                         {
                             ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
@@ -787,7 +787,7 @@ namespace Trinity
                             return AddToCache;
                         }
 
-                        if (Untargetable)
+                        if (untargetable)
                         {
                             ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
