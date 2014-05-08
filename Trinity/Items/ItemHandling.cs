@@ -995,24 +995,23 @@ namespace Trinity
                         int inventoryColumn = item.InventoryColumn;
 
                         // Mark this slot as not-free
-                        BackpackSlotBlocked[inventoryColumn, inventoryRow] = true;
-                        freeBagSlots--;
-
-                        // Try and reliably find out if this is a two slot item or not
-                        if (item.IsTwoSquareItem && inventoryRow < 5)
+                        if (!BackpackSlotBlocked[inventoryColumn, inventoryRow])
                         {
-                            BackpackSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
                             freeBagSlots--;
+                            BackpackSlotBlocked[inventoryColumn, inventoryRow] = true;
+
+                            // Try and reliably find out if this is a two slot item or not
+                            if (item.IsTwoSquareItem && inventoryRow < 5 && !BackpackSlotBlocked[inventoryColumn, inventoryRow + 1])
+                            {
+                                freeBagSlots--;
+                                BackpackSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
+                            }
                         }
                     }
 
                     // free bag slots is less than required
-                    if (freeBagSlots <= 1 || freeBagSlots <= Trinity.Settings.Loot.TownRun.FreeBagSlots || 
-                        (freeBagSlots <= Trinity.Settings.Loot.TownRun.FreeBagSlotsInTown && Trinity.Player.IsInTown))
+                    if (freeBagSlots <= 1 || freeBagSlots <= Trinity.Settings.Loot.TownRun.FreeBagSlots || (freeBagSlots <= Trinity.Settings.Loot.TownRun.FreeBagSlotsInTown && Trinity.Player.IsInTown))
                         return new Vector2(-1, -1);
-
-                    int x = -1;
-                    int y = -1;
 
                     // 6 rows
                     for (int row = 0; row <= 5; row++)
@@ -1022,31 +1021,16 @@ namespace Trinity
                         {
                             if (!BackpackSlotBlocked[col, row])
                             {
-                                bool notEnoughSpace = false;
-                                if (row < 5)
-                                {
-                                    notEnoughSpace = (IsOriginalTwoSlot && BackpackSlotBlocked[col, row + 1]);
-                                }
-                                else
-                                {
-                                    if (IsOriginalTwoSlot)
-                                        notEnoughSpace = true;
-                                }
-                                if (!notEnoughSpace)
-                                {
-                                    x = col;
-                                    y = row;
-                                    goto FoundPackLocation;
-                                }
+                                if ((row < 5 && (!IsOriginalTwoSlot || BackpackSlotBlocked[col, row + 1])) // free slot first 5 rows (with free space in slot below it if 2-slot item)
+                                    || (row == 5 && !IsOriginalTwoSlot)) // free slot in 6th row for 1-slot items
+                                    return new Vector2(col, row); // we have a free slot
+
                             }
                         }
                     }
-                FoundPackLocation:
-                    if ((x < 0) || (y < 0))
-                    {
-                        return new Vector2(-1, -1);
-                    }
-                    return new Vector2(x, y);
+
+                    // no free slot
+                    return new Vector2(-1, -1);
                 }
                 catch (Exception ex)
                 {
