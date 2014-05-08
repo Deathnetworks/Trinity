@@ -387,8 +387,18 @@ namespace Trinity
                             groundTargetInRange = Player.Position.Distance2DSqr(groundTargetPosition) < Math.Max(1.0f, CombatBase.CurrentPower.MinimumRange);
                         }
 
+                        bool noRangeRequired = TargetRangeRequired <= 1f;
+                        switch (CurrentTarget.Type)
+                        {
+                            // These always have TargetRangeRequired=1f, but, we need to run directly to their center until we stop moving, then destroy them
+                            case GObjectType.Barricade:
+                            case GObjectType.Destructible:
+                                noRangeRequired = false;
+                                break;
+                        }
+
                         // Interact/use power on target if already in range
-                        if (TargetRangeRequired <= 1f || (TargetCurrentDistance <= TargetRangeRequired && CurrentTargetIsInLoS) || stuckOnTarget || npcInRange || groundTargetInRange)
+                        if (noRangeRequired || (TargetCurrentDistance <= TargetRangeRequired && CurrentTargetIsInLoS) || stuckOnTarget || npcInRange || groundTargetInRange)
                         {
                             // If avoidance, instantly skip
                             if (CurrentTarget.Type == GObjectType.Avoidance)
@@ -518,7 +528,7 @@ namespace Trinity
                                             {
                                                 return GetTreeSharpRunStatus(HandlerRunStatus.TreeRunning);
                                             }
-                                            
+
                                             int attemptCount = 0;
                                             CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out attemptCount);
 

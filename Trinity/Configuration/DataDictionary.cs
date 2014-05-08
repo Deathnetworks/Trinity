@@ -209,7 +209,8 @@ namespace Trinity
         {
             202446, // A1 New Tristram "Attack Area"
             19947, // A1 New Tristram
-            // 91324, // A1 Old Tristram Road
+             109457, // A1 New Tristram Inn
+             // 91324, // A1 Old Tristram Road
             109457, // A1 The Slaughtered Calf Inn
             62968, // A1 The Hidden Cellar
             60714, // A1 Leoric's Passage
