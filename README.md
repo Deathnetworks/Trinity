@@ -1,6 +1,84 @@
 ﻿
 # Trinity
 
+### Changelog 1.9.2
+
+* Crusader will now use Blessed Shield when off CD
+
+* Removed all references to, and blacklisted Pandemonium Fortress portals (QuestTools handles these now)
+
+* Fixed exception for Trinity Settings file locking
+
+* Fixed exception for PushBulletKey Trim
+
+* SafeClickUIElements will now only click one UI element per tick
+
+* Re-added "TargetRangeRequired <= 1f || " to TargetHandler, may fix DH range complaints
+
+* GoldInactivity is no longer reset on TownPortal, or on WaitTimer tags
+
+* Fixed Error with Frenzy refresh
+
+* Removed more Hungarian Notation
+
+* Refactored Variables.cs
+
+* Removed unused variables
+
+### Changelog 1.9.1
+
+* Fixed Wizard Archon Slow Time getting stuck
+
+* Slightly increased interact range for containers and shrines
+
+* Reordered Barbarian spell priority; new priority: CotA, WOTB, Earthquake
+
+* Barbarian Frenzy will now be refreshed before it drops
+
+* Fixed GetSpellLastused
+
+* Merged Gorm's prioritizeCloseRangeUnits, ItemRules updates, Ignore Gold when pickup == 0
+
+### Changelog 1.9.0
+
+* Removed all XmlTags - migrated to QuestTools
+
+* Wizard Wave of Force is now used more liberally but with lower priority
+
+* Wizard Explosive Blast is now use off cooldown, and as a pull spell
+
+* Wizard now has Illusionist Passive support (spam Slow time, Mirror Image out of Combat)
+
+* Added Wizard Teleport: Safe Passage support
+
+* Added Wizard Diamond Skin: Sleek Shell support
+
+* Fixed WD not casting Gargantuan
+
+* Fixed WD not casting Zombie Dogs OOC
+
+* WitchDoctor spirit walk is now always when available
+
+* DemonHunter: Added Checkbox to spam Shadow Power out of combat - for use with Shadow Glide Rune (movement speed).
+
+* ury0005's ground targetting updates
+
+* Added PushBullet notifications, thanks BlAchPT
+
+* Fixed Gold Inactivity Timer being reset on BotMain.IsPaused
+
+* Changed Window Title setting logic to avoid crashes
+
+* Added "Dump All Items" command to Scoring/TownRun
+
+* Trinity will no longer log to Error level for memory read errors
+
+* Added Dump Merchant Items button
+
+* Quest Monsters are now LoS whitelisted (should help with bounty events)
+
+* Horadric Caches Opened Count now included in Trinity report.
+
 ### Changelog 1.8.27
 
 * DemonHunter: Added Min Hatred for RapidFire option
