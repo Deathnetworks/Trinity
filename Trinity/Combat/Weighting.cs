@@ -633,9 +633,12 @@ namespace Trinity
                             }
                         case GObjectType.HealthGlobe:
                             {
-                                // Calculate a spot reaching a little bit further out from the globe, to help globe-movements
-                                if (cacheObject.Weight > 0)
-                                    cacheObject.Position = MathEx.CalculatePointFrom(cacheObject.Position, Player.Position, cacheObject.Distance + 3f);
+                                if (navBlocking)
+                                {
+                                    objWeightInfo += " NavBlocking";
+                                    cacheObject.Weight = 0;
+                                    break;
+                                }
 
                                 // Weight Health Globes
 
@@ -658,11 +661,11 @@ namespace Trinity
                                         minPartyHealth = ObjectCache.Where(p => p.Type == GObjectType.Player && p.RActorGuid != Player.RActorGuid).Min(p => p.HitPointsPct);
 
                                     if (myHealth > 0d && myHealth < V.D("Weight.Globe.MinPlayerHealthPct"))
-                                        cacheObject.Weight = (1d - myHealth) * 1000d;
+                                        cacheObject.Weight = (1d - myHealth) * 5000d;
 
                                     // Added weight for lowest health of party member
                                     if (minPartyHealth > 0d && minPartyHealth < V.D("Weight.Globe.MinPartyHealthPct"))
-                                        cacheObject.Weight = (1d - minPartyHealth) * 2500d;
+                                        cacheObject.Weight = (1d - minPartyHealth) * 5000d;
                                 }
                                 else
                                 {
@@ -710,12 +713,9 @@ namespace Trinity
                                         cacheObject.Weight = 0;
                                 }
 
-                                if (navBlocking)
-                                {
-                                    objWeightInfo += " NavBlocking";
-                                    cacheObject.Weight = 0;
-                                    break;
-                                }
+                                // Calculate a spot reaching a little bit further out from the globe, to help globe-movements
+                                if (cacheObject.Weight > 0)
+                                    cacheObject.Position = MathEx.CalculatePointFrom(cacheObject.Position, Player.Position, cacheObject.Distance + 3f);
 
                                 break;
                             }
