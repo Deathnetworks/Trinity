@@ -459,7 +459,7 @@ namespace Trinity
                                             isTwoSlot = CurrentTarget.Item.CommonData.IsTwoSquareItem;
                                         }
 
-                                        Vector2 validLocation = FindValidBackpackLocation(isTwoSlot);
+                                        Vector2 validLocation = TrinityItemManager.FindValidBackpackLocation(isTwoSlot);
                                         if (validLocation.X < 0 || validLocation.Y < 0)
                                         {
                                             Logger.Log("No more space to pickup item, town-run requested at next free moment. (HandleTarget)");

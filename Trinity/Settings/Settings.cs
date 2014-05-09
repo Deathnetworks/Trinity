@@ -2,11 +2,10 @@
 using System.Windows;
 using Trinity.Technicals;
 using Trinity.UI;
-using Zeta.Common.Plugins;
 
 namespace Trinity
 {
-    public partial class Trinity : IPlugin
+    public partial class Trinity
     {
         // Save Configuration
         private void SaveConfiguration()

@@ -24,12 +24,12 @@ namespace Trinity
             //Kridershot InternalName=x1_bow_norm_unique_09-137 GameBalanceID=1999595351 ItemLink: {c:ffff8000}Kridershot{/c}
             bool hasKridershot = ZetaDia.Me.Inventory.Equipped.Any(i => i.GameBalanceId == 1999595351);
 
-            bool hasPreparation = Hotbar.Contains(SNOPower.DemonHunter_Preparation);
+            bool hasPunishment = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Preparation && s.RuneIndex == 0);
 
             // Spam Shadow Power
             if (Settings.Combat.DemonHunter.SpamShadowPower && CombatBase.CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
                 (!GetHasBuff(SNOPower.DemonHunter_ShadowPower) || Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit) && // if we don't have the buff or our health is low
-                ((!hasPreparation && Player.SecondaryResource >= 14) || (hasPreparation && Player.SecondaryResource >= 39)) && // Save some Discipline for Preparation
+                ((!hasPunishment && Player.SecondaryResource >= 14) || (hasPunishment && Player.SecondaryResource >= 39)) && // Save some Discipline for Preparation
                 (Settings.Combat.DemonHunter.SpamShadowPower && Player.SecondaryResource >= 28)) // When spamming Shadow Power, save some Discipline for emergencies
                 
             {
@@ -39,8 +39,8 @@ namespace Trinity
             // NotSpam Shadow Power
             if(!UseOOCBuff && !Settings.Combat.DemonHunter.SpamShadowPower && CombatBase.CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
                 (!GetHasBuff(SNOPower.DemonHunter_ShadowPower) || Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit) && // if we don't have the buff or our health is low
-                ((!hasPreparation && Player.SecondaryResource >= 14) || (hasPreparation && Player.SecondaryResource >= 39)) && // Save some Discipline for Preparation
-                (Player.CurrentHealthPct <= 0.99 || Player.IsRooted || TargetUtil.AnyMobsInRange(15)))
+                ((!hasPunishment && Player.SecondaryResource >= 14) || (hasPunishment && Player.SecondaryResource >= 39)) && // Save some Discipline for Preparation
+                (Player.CurrentHealthPct < 1f || Player.IsRooted || TargetUtil.AnyMobsInRange(15)))
             {
                 return new TrinityPower(SNOPower.DemonHunter_ShadowPower);
             }
@@ -92,7 +92,7 @@ namespace Trinity
             // Backup plan  = 4 : 30% chance Prep has no cooldown (remove cast timer)
 
             // Restore 75 hatred for 25 disc - NO COOLDOWN!
-            bool hasPunishment = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Preparation && s.RuneIndex == 0);
+            //bool hasPunishment = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Preparation && s.RuneIndex == 0);
             bool hasInvigoration = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Preparation && s.RuneIndex == 1);
             bool hasBattleScars = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Preparation && s.RuneIndex == 3);
             bool hasFocusedMind = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Preparation && s.RuneIndex == 2);
@@ -157,7 +157,7 @@ namespace Trinity
                 // Placeholder for Ferrets Logic - Unsure if utilities Exist to Determine Whether Gold and Health Globes are Within a Certain Range - Consider Interaction with Blood Vengeance for Optimized Results
 
                 // Use Wolf Howl on Unique/Elite/Champion - Would help for farming trash, but trash farming should not need this - Used on Elites to reduce Deaths per hour
-                if (hasWolf && CombatBase.CanCast(SNOPower.X1_DemonHunter_Companion) && CurrentTarget.IsEliteRareUnique)
+                if (hasWolf && CombatBase.CanCast(SNOPower.X1_DemonHunter_Companion) && (TargetUtil.AnyMobsInRange(20) || CurrentTarget.IsEliteRareUnique))
                 {
                     return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
                 }

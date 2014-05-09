@@ -195,7 +195,7 @@ namespace Trinity.UI.UIComponents
                                         {
                                             try
                                             {
-                                                global::Trinity.TownRun.SortStash();
+                                                //TownRun.SortStash();
                                                 UILoader.CloseWindow();
                                             }
                                             catch (Exception ex)

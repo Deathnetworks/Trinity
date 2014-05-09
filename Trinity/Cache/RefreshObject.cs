@@ -119,7 +119,7 @@ namespace Trinity
 
             // Radius Distance
             CurrentCacheObject.Radius = radius;
-            
+
             // Have ActorSNO Check for SNO based navigation obstacle hashlist
             c_IsObstacle = DataDictionary.NavigationObstacleIds.Contains(CurrentCacheObject.ActorSNO);
 
@@ -623,18 +623,14 @@ namespace Trinity
                             break;
                         }
 
-
-                        if (CurrentCacheObject.Type != GObjectType.HealthGlobe && CurrentCacheObject.Type != GObjectType.PowerGlobe && (ForceVendorRunASAP || TownRun.TownRunTimerRunning()))
+                        if (CurrentCacheObject.Type != GObjectType.HealthGlobe && 
+                            CurrentCacheObject.Type != GObjectType.PowerGlobe && 
+                            (ForceVendorRunASAP || TownRun.TownRunTimerRunning()))
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "IsTryingToTownPortal";
                         }
-                        else
-                        {
-                            AddToCache = RefreshItem();
-                            c_IgnoreReason = "RefreshItem";
-                        }
-
+                        AddToCache = RefreshItem();
                         break;
 
                     }
@@ -642,18 +638,14 @@ namespace Trinity
                 case GObjectType.Gold:
                     {
                         // Not allowed to loot due to profile settings
-                        if (!ProfileManager.CurrentProfile.PickupLoot || !LootTargeting.Instance.AllowedToLoot || LootTargeting.Instance.DisableLooting)
+                        if (!LootTargeting.Instance.AllowedToLoot || LootTargeting.Instance.DisableLooting)
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "LootingDisabled";
                             break;
                         }
-                        else
-                        {
-                            AddToCache = RefreshGold(AddToCache);
-                            c_IgnoreSubStep = "RefreshGold";
-                            break;
-                        }
+                        AddToCache = RefreshGold(AddToCache);
+                        break;
                     }
                 case GObjectType.PowerGlobe:
                 case GObjectType.HealthGlobe:

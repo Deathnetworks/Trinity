@@ -8,6 +8,7 @@ using System.Xml;
 using Trinity.Config.Combat;
 using Trinity.Config.Loot;
 using Trinity.Technicals;
+using Zeta.Bot.Settings;
 
 namespace Trinity.Config
 {
@@ -184,27 +185,26 @@ namespace Trinity.Config
         }
         public void Reset()
         {
-            TrinitySetting.Reset(this);
+            Reset(this);
         }
 
         public void CopyTo(TrinitySetting setting)
         {
-            TrinitySetting.CopyTo(this, setting);
+            CopyTo(this, setting);
         }
 
         public TrinitySetting Clone()
         {
-            return (TrinitySetting)TrinitySetting.Clone(this);
+            return Clone(this);
         }
 
         public void Load()
         {
-            TrinitySetting loadedSetting = null;
             bool loadSuccessful = false;
             bool migrateConfig = false;
 
             // Only load once every 500ms (prevents duplicate Load calls)
-            if (_LastLoadedSettings != null && DateTime.UtcNow.Subtract(_LastLoadedSettings).TotalMilliseconds <= 500)
+            if (DateTime.UtcNow.Subtract(_LastLoadedSettings).TotalMilliseconds <= 500)
                 return;
 
             _LastLoadedSettings = DateTime.UtcNow;
@@ -245,14 +245,14 @@ namespace Trinity.Config
 
                             XmlReader reader = XmlReader.Create(stream);
                             XmlReader migrator = new SettingsMigrator(reader);
-                            loadedSetting = (TrinitySetting)serializer.ReadObject(migrator);
+                            TrinitySetting loadedSetting = (TrinitySetting)serializer.ReadObject(migrator);
 
                             loadedSetting.CopyTo(this);
                             stream.Close();
                             Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Configuration file loaded");
 
                             // this tests to make sure we didn't load anything null, and our load was succesful
-                            if (this.Advanced != null && this.Combat != null && this.Combat.Misc != null)
+                            if (Advanced != null && Combat != null && Combat.Misc != null)
                             {
                                 loadSuccessful = true;
                             }
@@ -275,7 +275,7 @@ namespace Trinity.Config
                 if (migrateConfig && loadSuccessful)
                 {
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Migrating configuration to new Trinity.xml");
-                    this.Save();
+                    Save();
                     File.Delete(OldBattleTagSettingsFile);
                 }
 
@@ -286,7 +286,10 @@ namespace Trinity.Config
         {
             lock (this)
             {
-                string filename = "";
+                GlobalSettings.Instance.Save();
+                CharacterSettings.Instance.Save();
+
+                string filename;
 
                 if (File.Exists(GlobalSettingsFile) || useGlobal)
                     filename = GlobalSettingsFile;
@@ -394,22 +397,23 @@ namespace Trinity.Config
                         {
                             object destinationValue = prop.GetValue(destination, null);
                             object sourceValue = prop.GetValue(source, null);
-                            if (sourceValue != null && destinationValue != null)
+
+                            if (sourceValue == null || destinationValue == null)
+                                continue;
+
+                            MethodBase method = prop.PropertyType.GetMethod("CopyTo", new[] { prop.PropertyType });
+                            if (method != null)
                             {
-                                MethodBase method = prop.PropertyType.GetMethod("CopyTo", new[] { prop.PropertyType });
-                                if (method != null)
-                                {
-                                    method.Invoke(sourceValue, new[] { destinationValue });
-                                }
+                                method.Invoke(sourceValue, new[] { destinationValue });
                             }
-                            else if (sourceValue != null && destinationValue != null)
-                            {
-                                MethodBase method = prop.PropertyType.GetMethod("Clone", null);
-                                if (method != null)
-                                {
-                                    prop.SetValue(destination, method.Invoke(sourceValue, null), null);
-                                }
-                            }
+                            //else if (sourceValue != null && destinationValue != null)
+                            //{
+                            //    MethodBase method = prop.PropertyType.GetMethod("Clone", null);
+                            //    if (method != null)
+                            //    {
+                            //        prop.SetValue(destination, method.Invoke(sourceValue, null), null);
+                            //    }
+                            //}
                         }
                     }
                     catch (Exception ex)

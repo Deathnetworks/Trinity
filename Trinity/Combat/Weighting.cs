@@ -8,7 +8,6 @@ using Zeta.Bot;
 using Zeta.Bot.Logic;
 using Zeta.Bot.Profile.Common;
 using Zeta.Common;
-using Zeta.Common.Plugins;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;

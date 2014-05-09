@@ -16,14 +16,8 @@ namespace Trinity
         {
             using (new PerformanceLogger("RefreshItem"))
             {
-                bool logNewItem = false;
-                bool AddToCache = false;
-
-                if (CurrentCacheObject.GameBalanceID == -1)
-                {
-                    AddToCache = false;
-                    c_IgnoreSubStep = "InvalidBalanceID";
-                }
+                bool logNewItem;
+                bool AddToCache;
 
                 var diaItem = c_diaObject as DiaItem;
 

@@ -8,9 +8,11 @@ using Trinity.ItemRules;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Items;
+using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
@@ -556,7 +558,89 @@ namespace Trinity
             }
         }
 
-       
+        /// <summary>
+        /// Search backpack to see if we have room for a 2-slot item anywhere
+        /// </summary>
+        /// <param name="isOriginalTwoSlot"></param>
+        /// <returns></returns>
+        internal static Vector2 FindValidBackpackLocation(bool isOriginalTwoSlot)
+        {
+            using (new PerformanceLogger("FindValidBackpackLocation"))
+            {
+                try
+                {
+                    bool[,] BackpackSlotBlocked = new bool[10, 6];
+
+                    int freeBagSlots = 60;
+                    // Block off the entire of any "protected bag slots"
+                    foreach (InventorySquare square in Zeta.Bot.Settings.CharacterSettings.Instance.ProtectedBagSlots)
+                    {
+                        BackpackSlotBlocked[square.Column, square.Row] = true;
+                        freeBagSlots--;
+                    }
+
+                    // Map out all the items already in the backpack
+                    foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
+                    {
+                        if (!item.IsValid)
+                            continue;
+
+                        int inventoryRow = item.InventoryRow;
+                        int inventoryColumn = item.InventoryColumn;
+
+                        BackpackSlotBlocked[inventoryColumn, inventoryRow] = true;
+                        freeBagSlots--;
+
+                        if (!item.IsTwoSquareItem)
+                            continue;
+
+                        freeBagSlots--;
+                        BackpackSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
+                    }
+
+                    // free bag slots is less than required
+                    if (freeBagSlots <= 1 || freeBagSlots <= Trinity.Settings.Loot.TownRun.FreeBagSlots || (freeBagSlots <= Trinity.Settings.Loot.TownRun.FreeBagSlotsInTown && Trinity.Player.IsInTown))
+                    {
+                        Logger.LogDebug("Free Bag Slots is less than required. FreeSlots={0}, FreeBagSlots={1} FreeBagSlotsInTown={2} IsInTown={3}",
+                            freeBagSlots, Trinity.Settings.Loot.TownRun.FreeBagSlots, Trinity.Settings.Loot.TownRun.FreeBagSlotsInTown, Trinity.Player.IsInTown);
+                        return new Vector2(-1, -1);
+                    }
+                    // 10 columns
+                    for (int col = 0; col <= 9; col++)
+                    {
+                        // 6 rows
+                        for (int row = 0; row <= 5; row++)
+                        {
+                            // Slot is blocked, skip
+                            if (BackpackSlotBlocked[col, row])
+                                continue;
+                            
+                            // Not a two slotitem, slot not blocked, use it!
+                            if (!isOriginalTwoSlot)
+                                return new Vector2(col, row);
+
+                            // Is a Two Slot, Can't check for 2 slot items on last row
+                            if (row == 5)
+                                continue;
+
+                            // Is a Two Slot, check row below
+                            if (!BackpackSlotBlocked[col, row + 1])
+                                return new Vector2(col, row);
+                        }
+                    }
+
+                    // no free slot
+                    Logger.LogDebug("No Free slots!");
+                    return new Vector2(-1, -1);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(LogCategory.UserInformation, "Error in finding backpack slot");
+                    Logger.Log(LogCategory.UserInformation, "{0}", ex.ToString());
+                    return new Vector2(1, 1);
+                }
+            }
+        }
 
     }
 }

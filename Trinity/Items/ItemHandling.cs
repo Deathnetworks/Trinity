@@ -535,46 +535,45 @@ namespace Trinity
             return itemBaseType;
         }
 
-        internal static bool[,] BackpackSlotBlocked = new bool[10, 6];
         /// <summary>
         /// Search backpack to see if we have room for a 2-slot item anywhere
         /// </summary>
-        internal static Vector2 SortingFindLocationBackpack(bool isOriginalTwoSlot)
-        {
-            int x = -1;
-            int y = -1;
-            for (int row = 0; row <= 5; row++)
-            {
-                for (int col = 0; col <= 9; col++)
-                {
-                    if (!BackpackSlotBlocked[col, row])
-                    {
-                        bool notEnoughSpace = false;
-                        if (row < 5)
-                        {
-                            notEnoughSpace = (isOriginalTwoSlot && BackpackSlotBlocked[col, row + 1]);
-                        }
-                        else
-                        {
-                            if (isOriginalTwoSlot)
-                                notEnoughSpace = true;
-                        }
-                        if (!notEnoughSpace)
-                        {
-                            x = col;
-                            y = row;
-                            goto FoundPackLocation;
-                        }
-                    }
-                }
-            }
-        FoundPackLocation:
-            if ((x < 0) || (y < 0))
-            {
-                return new Vector2(-1, -1);
-            }
-            return new Vector2(x, y);
-        }
+        //internal static Vector2 SortingFindLocationBackpack(bool isOriginalTwoSlot)
+        //{
+        //    int x = -1;
+        //    int y = -1;
+        //    for (int row = 0; row <= 5; row++)
+        //    {
+        //        for (int col = 0; col <= 9; col++)
+        //        {
+        //            if (!BackpackSlotBlocked[col, row])
+        //            {
+        //                bool notEnoughSpace = false;
+        //                if (row < 5)
+        //                {
+        //                    notEnoughSpace = (isOriginalTwoSlot && BackpackSlotBlocked[col, row + 1]);
+        //                }
+        //                else
+        //                {
+        //                    if (isOriginalTwoSlot)
+        //                        notEnoughSpace = true;
+        //                }
+        //                if (!notEnoughSpace)
+        //                {
+        //                    x = col;
+        //                    y = row;
+        //                    goto FoundPackLocation;
+        //                }
+        //            }
+        //        }
+        //    }
+        //FoundPackLocation:
+        //    if ((x < 0) || (y < 0))
+        //    {
+        //        return new Vector2(-1, -1);
+        //    }
+        //    return new Vector2(x, y);
+        //}
 
         /// <summary>
         /// Output test scores for everything in the backpack
@@ -965,94 +964,6 @@ namespace Trinity
             return false;
         }
 
-        /// <summary>
-        /// Search backpack to see if we have room for a 2-slot item anywhere
-        /// </summary>
-        /// <param name="isOriginalTwoSlot"></param>
-        /// <returns></returns>
-        internal static Vector2 FindValidBackpackLocation(bool isOriginalTwoSlot)
-        {
-            using (new PerformanceLogger("FindValidBackpackLocation"))
-            {
-                try
-                {
-                    bool[,] BackpackSlotBlocked = new bool[10, 6];
-
-                    int freeBagSlots = 60;
-                    // Block off the entire of any "protected bag slots"
-                    foreach (InventorySquare square in Zeta.Bot.Settings.CharacterSettings.Instance.ProtectedBagSlots)
-                    {
-                        BackpackSlotBlocked[square.Column, square.Row] = true;
-                        freeBagSlots--;
-                    }
-
-                    // Map out all the items already in the backpack
-                    foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
-                    {
-                        if (!item.IsValid)
-                            continue;
-
-                        int inventoryRow = item.InventoryRow;
-                        int inventoryColumn = item.InventoryColumn;
-
-                        BackpackSlotBlocked[inventoryColumn, inventoryRow] = true;
-                        freeBagSlots--;
-
-                        if (!item.IsTwoSquareItem)
-                            continue;
-
-                        freeBagSlots--;
-                        BackpackSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
-
-                        // Mark this slot as not-free
-                        //if (!BackpackSlotBlocked[inventoryColumn, inventoryRow])
-                        //{
-                        //    freeBagSlots--;
-                        //    BackpackSlotBlocked[inventoryColumn, inventoryRow] = true;
-
-                        //    // Try and reliably find out if this is a two slot item or not
-                        //    if (item.IsTwoSquareItem && inventoryRow < 5 && !BackpackSlotBlocked[inventoryColumn, inventoryRow + 1])
-                        //    {
-                        //        freeBagSlots--;
-                        //        BackpackSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
-                        //    }
-                        //}
-                    }
-
-                    // free bag slots is less than required
-                    if (freeBagSlots <= 1 || freeBagSlots <= Settings.Loot.TownRun.FreeBagSlots || (freeBagSlots <= Settings.Loot.TownRun.FreeBagSlotsInTown && Player.IsInTown))
-                    {
-                        Logger.LogDebug("Free Bag Slots is less than required. FreeSlots={0}, FreeBagSlots={1} FreeBagSlotsInTown={2} IsInTown={3}",
-                            freeBagSlots, Settings.Loot.TownRun.FreeBagSlots, Settings.Loot.TownRun.FreeBagSlotsInTown, Player.IsInTown);
-                        return new Vector2(-1, -1);
-                    }
-                    // 6 rows
-                    for (int row = 0; row <= 5; row++)
-                    {
-                        // 10 columns
-                        for (int col = 0; col <= 9; col++)
-                        {
-                            if (!BackpackSlotBlocked[col, row])
-                            {
-                                if ((row < 5 && (!isOriginalTwoSlot || BackpackSlotBlocked[col, row + 1])) // free slot first 5 rows (with free space in slot below it if 2-slot item)
-                                    || (row == 5 && !isOriginalTwoSlot)) // free slot in 6th row for 1-slot items
-                                    return new Vector2(col, row); // we have a free slot
-
-                            }
-                        }
-                    }
-
-                    // no free slot
-                    Logger.LogDebug("No Free slots!");
-                    return new Vector2(-1, -1);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log(LogCategory.UserInformation, "Error in finding backpack slot");
-                    Logger.Log(LogCategory.UserInformation, "{0}", ex.ToString());
-                    return new Vector2(1, 1);
-                }
-            }
-        }
     }
+
 }
