@@ -215,6 +215,7 @@ namespace Trinity
                                         objWeightInfo += "Goblin ";
                                         cacheObject.Weight += 25000;
                                     }
+                                    objWeightInfo += "close range ";
                                 }
                                 else
                                 {
@@ -238,11 +239,17 @@ namespace Trinity
 
                                         // Starting weight of 500
                                         if (cacheObject.IsTrashMob)
+                                        {
                                             cacheObject.Weight = Math.Max((cacheObject.KillRange - cacheObject.RadiusDistance) / cacheObject.KillRange * 500d, 2d);
+                                            objWeightInfo += string.Format("trash{0:0} ", cacheObject.Weight);
+                                        }
 
                                         // Elite Weight based on kill range and max possible weight
                                         if (cacheObject.IsBossOrEliteRareUnique)
+                                        {
                                             cacheObject.Weight = Math.Max((cacheObject.KillRange - cacheObject.RadiusDistance) / cacheObject.KillRange * MaxWeight, 1000d);
+                                            objWeightInfo += "elite ";
+                                        }
 
                                         // Bounty Objectives goooo
                                         if (!cacheObject.IsBoss && cacheObject.IsBountyObjective && !navBlocking)
@@ -267,10 +274,16 @@ namespace Trinity
                                         // Monsters near players given higher weight
                                         if (cacheObject.Weight > 0)
                                         {
+                                            var group = 0.0;
                                             foreach (var player in ObjectCache.Where(p => p.Type == GObjectType.Player && p.ACDGuid != Player.ACDGuid))
                                             {
-                                                cacheObject.Weight += Math.Max(((55f - cacheObject.Position.Distance2D(player.Position)) / 55f * 500d), 2d);
+                                                group += Math.Max(((55f - cacheObject.Position.Distance2D(player.Position)) / 55f * 500d), 2d);
                                             }
+                                            if (group > 100.0)
+                                            {
+                                                objWeightInfo += string.Format("group{0:0} ", group);
+                                            }
+                                            cacheObject.Weight += group;
                                         }
 
                                         // Is standing in HotSpot - focus fire!
@@ -1010,6 +1023,7 @@ namespace Trinity
                         "Weight={0:0} name={1} sno={2} type={3} R-Dist={4:0} IsElite={5} RAGuid={6} {7}",
                             cacheObject.Weight, cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Type, cacheObject.RadiusDistance, cacheObject.IsEliteRareUnique,
                             cacheObject.RActorGuid, objWeightInfo);
+                    cacheObject.WeightInfo = objWeightInfo;
 
                     // Use the highest weight, and if at max weight, the closest
                     bool pickNewTarget = cacheObject.Weight > 0 &&
@@ -1061,7 +1075,21 @@ namespace Trinity
                 if (CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0 && CurrentTarget.RActorGuid != LastTargetRactorGUID)
                 {
                     RecordTargetHistory();
-
+                    var top5 = ObjectCache.OrderByDescending(w => w.Weight).Take(5);
+                    var index = 0;
+                    foreach (var target in top5)
+                    {
+                        Logger.Log(TrinityLogLevel.Verbose,
+                                        LogCategory.Weight,
+                                        "#{0},w={1:0},s={2},t={3},n={4},g={5},{6}",
+                                        index++,
+                                        target.Weight,
+                                        CurrentTarget.ActorSNO,
+                                        CurrentTarget.Type,
+                                        CurrentTarget.InternalName,
+                                        CurrentTarget.RActorGuid,
+                                        target.WeightInfo);
+                    }
                     Logger.Log(TrinityLogLevel.Verbose,
                                     LogCategory.Targetting,
                                     "Target changed to name={2} sno={0} type={1} raGuid={3}",
