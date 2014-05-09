@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Trinity.Cache;
@@ -756,7 +757,7 @@ namespace Trinity
                                 "m " + TotalRunningTime.Seconds.ToString() + "s");
                             LogWriter.WriteLine("Total deaths: " + TotalDeaths.ToString() + " [" + Math.Round(TotalDeaths / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
                             LogWriter.WriteLine("Total games (approx): " + TotalLeaveGames.ToString() + " [" + Math.Round(TotalLeaveGames / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
-                            LogWriter.WriteLine("Total Caches Opened:" + Trinity.TotalBountyCachesOpened); 
+                            LogWriter.WriteLine("Total Caches Opened:" + Trinity.TotalBountyCachesOpened);
                             if (TotalLeaveGames == 0 && TotalGamesJoined > 0)
                             {
                                 if (TotalGamesJoined == 1 && TotalProfileRecycles > 1)
@@ -967,9 +968,9 @@ namespace Trinity
         /// <summary>
         /// Search backpack to see if we have room for a 2-slot item anywhere
         /// </summary>
-        /// <param name="IsOriginalTwoSlot"></param>
+        /// <param name="isOriginalTwoSlot"></param>
         /// <returns></returns>
-        internal static Vector2 FindValidBackpackLocation(bool IsOriginalTwoSlot)
+        internal static Vector2 FindValidBackpackLocation(bool isOriginalTwoSlot)
         {
             using (new PerformanceLogger("FindValidBackpackLocation"))
             {
@@ -994,25 +995,37 @@ namespace Trinity
                         int inventoryRow = item.InventoryRow;
                         int inventoryColumn = item.InventoryColumn;
 
-                        // Mark this slot as not-free
-                        if (!BackpackSlotBlocked[inventoryColumn, inventoryRow])
-                        {
-                            freeBagSlots--;
-                            BackpackSlotBlocked[inventoryColumn, inventoryRow] = true;
+                        BackpackSlotBlocked[inventoryColumn, inventoryRow] = true;
+                        freeBagSlots--;
 
-                            // Try and reliably find out if this is a two slot item or not
-                            if (item.IsTwoSquareItem && inventoryRow < 5 && !BackpackSlotBlocked[inventoryColumn, inventoryRow + 1])
-                            {
-                                freeBagSlots--;
-                                BackpackSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
-                            }
-                        }
+                        if (!item.IsTwoSquareItem)
+                            continue;
+
+                        freeBagSlots--;
+                        BackpackSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
+
+                        // Mark this slot as not-free
+                        //if (!BackpackSlotBlocked[inventoryColumn, inventoryRow])
+                        //{
+                        //    freeBagSlots--;
+                        //    BackpackSlotBlocked[inventoryColumn, inventoryRow] = true;
+
+                        //    // Try and reliably find out if this is a two slot item or not
+                        //    if (item.IsTwoSquareItem && inventoryRow < 5 && !BackpackSlotBlocked[inventoryColumn, inventoryRow + 1])
+                        //    {
+                        //        freeBagSlots--;
+                        //        BackpackSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
+                        //    }
+                        //}
                     }
 
                     // free bag slots is less than required
-                    if (freeBagSlots <= 1 || freeBagSlots <= Trinity.Settings.Loot.TownRun.FreeBagSlots || (freeBagSlots <= Trinity.Settings.Loot.TownRun.FreeBagSlotsInTown && Trinity.Player.IsInTown))
+                    if (freeBagSlots <= 1 || freeBagSlots <= Settings.Loot.TownRun.FreeBagSlots || (freeBagSlots <= Settings.Loot.TownRun.FreeBagSlotsInTown && Player.IsInTown))
+                    {
+                        Logger.LogDebug("Free Bag Slots is less than required. FreeSlots={0}, FreeBagSlots={1} FreeBagSlotsInTown={2} IsInTown={3}",
+                            freeBagSlots, Settings.Loot.TownRun.FreeBagSlots, Settings.Loot.TownRun.FreeBagSlotsInTown, Player.IsInTown);
                         return new Vector2(-1, -1);
-
+                    }
                     // 6 rows
                     for (int row = 0; row <= 5; row++)
                     {
@@ -1021,8 +1034,8 @@ namespace Trinity
                         {
                             if (!BackpackSlotBlocked[col, row])
                             {
-                                if ((row < 5 && (!IsOriginalTwoSlot || BackpackSlotBlocked[col, row + 1])) // free slot first 5 rows (with free space in slot below it if 2-slot item)
-                                    || (row == 5 && !IsOriginalTwoSlot)) // free slot in 6th row for 1-slot items
+                                if ((row < 5 && (!isOriginalTwoSlot || BackpackSlotBlocked[col, row + 1])) // free slot first 5 rows (with free space in slot below it if 2-slot item)
+                                    || (row == 5 && !isOriginalTwoSlot)) // free slot in 6th row for 1-slot items
                                     return new Vector2(col, row); // we have a free slot
 
                             }
@@ -1030,6 +1043,7 @@ namespace Trinity
                     }
 
                     // no free slot
+                    Logger.LogDebug("No Free slots!");
                     return new Vector2(-1, -1);
                 }
                 catch (Exception ex)

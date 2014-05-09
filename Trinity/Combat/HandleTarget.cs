@@ -452,10 +452,17 @@ namespace Trinity
                                 case GObjectType.Item:
                                     {
                                         // Check if we actually have room for this item first
-                                        Vector2 ValidLocation = FindValidBackpackLocation(true);
-                                        if (ValidLocation.X < 0 || ValidLocation.Y < 0)
+
+                                        bool isTwoSlot = false;
+                                        if (CurrentTarget.Item != null)
                                         {
-                                            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "No more space to pickup a 2-slot item, town-run requested at next free moment.");
+                                            isTwoSlot = CurrentTarget.Item.CommonData.IsTwoSquareItem;
+                                        }
+
+                                        Vector2 validLocation = FindValidBackpackLocation(isTwoSlot);
+                                        if (validLocation.X < 0 || validLocation.Y < 0)
+                                        {
+                                            Logger.Log("No more space to pickup item, town-run requested at next free moment. (HandleTarget)");
                                             ForceVendorRunASAP = true;
 
                                             // Record the first position when we run out of bag space, so we can return later
@@ -465,7 +472,7 @@ namespace Trinity
                                         }
                                         else
                                         {
-                                            iInteractAttempts = HandleItemInRange();
+                                            HandleItemInRange();
                                             runStatus = HandlerRunStatus.TreeRunning;
                                         }
                                         //check if we are returning to the tree

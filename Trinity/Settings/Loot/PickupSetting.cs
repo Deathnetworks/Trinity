@@ -24,6 +24,7 @@ namespace Trinity.Config.Loot
         private int _GemLevel;
         private int _LegendaryLevel;
         private int _MinimumGoldStack;
+        private bool _PickupGold;
         private bool _CraftTomes;
         private bool _Plans;
         private bool _LegendaryPlans;
@@ -309,6 +310,24 @@ namespace Trinity.Config.Loot
                 {
                     _MinimumGoldStack = value;
                     OnPropertyChanged("MinimumGoldStack");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool PickupGold
+        {
+            get
+            {
+                return _PickupGold;
+            }
+            set
+            {
+                if (_PickupGold != value)
+                {
+                    _PickupGold = value;
+                    OnPropertyChanged("PickupGold");
                 }
             }
         }
@@ -676,24 +695,25 @@ namespace Trinity.Config.Loot
         /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
         /// </summary>
         /// <param name="context"></param>
-        [OnDeserializing()]
+        [OnDeserializing]
         internal void OnDeserializingMethod(StreamingContext context)
         {
-            this.CraftMaterials = true;
-            this.InfernalKeys = true;
-            this.Designs = true;
-            this.Plans = true;
-            this.LegendaryPlans = true;
-            this.PickupLowLevel = true;
-            this.IgnoreTwoHandedWeapons = false;
-            this.PickupGrayItems = true;
-            this.PickupWhiteItems = true;
-            this.PickupBlueFollowerItems = true;
-            this.PickupYellowFollowerItems = true;
-            this.PickupUpgrades = true;
-            this.MiscItemQuality = Combat.TrinityItemQuality.Common;
-            this.BloodShards = true;
-            this.LootRunKey = true;
+            CraftMaterials = true;
+            InfernalKeys = true;
+            Designs = true;
+            Plans = true;
+            LegendaryPlans = true;
+            PickupLowLevel = true;
+            IgnoreTwoHandedWeapons = false;
+            PickupGrayItems = true;
+            PickupWhiteItems = true;
+            PickupBlueFollowerItems = true;
+            PickupYellowFollowerItems = true;
+            PickupUpgrades = true;
+            MiscItemQuality = TrinityItemQuality.Common;
+            BloodShards = true;
+            LootRunKey = true;
+            PickupGold = true;
         }
         #endregion Methods
     }

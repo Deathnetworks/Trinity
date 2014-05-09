@@ -6,10 +6,10 @@ using Trinity.Config;
 using Trinity.Config.Combat;
 using Trinity.Config.Loot;
 using Trinity.Technicals;
-using Trinity.UI;
+using Trinity.UIComponents;
 using Zeta.Bot;
 
-namespace Trinity.UIComponents
+namespace Trinity.UI.UIComponents
 {
     /// <summary>
     /// ViewModel injected to Configuration Window 
@@ -895,11 +895,12 @@ namespace Trinity.UIComponents
                 _Model.Loot.Pickup.JewelryBlueLevel = 1;
                 _Model.Loot.Pickup.JewelryYellowLevel = 1;
                 _Model.Loot.Pickup.LegendaryLevel = 1;
-                _Model.Loot.Pickup.GemLevel = 60;
+                _Model.Loot.Pickup.GemLevel = 0;
                 _Model.Loot.Pickup.GemType = TrinityGemType.All;
-                _Model.Loot.Pickup.PickupBlueFollowerItems = true;
+                _Model.Loot.Pickup.PickupBlueFollowerItems = false;
                 _Model.Loot.Pickup.PickupYellowFollowerItems = true;
-                _Model.Loot.Pickup.MinimumGoldStack = 0;
+                _Model.Loot.Pickup.PickupGold = true;
+                _Model.Loot.Pickup.MinimumGoldStack = 100;
                 _Model.Loot.Pickup.MiscItemQuality = TrinityItemQuality.Common;
                 _Model.Loot.Pickup.PotionCount = 98;
                 _Model.Loot.Pickup.Plans = true;
@@ -917,7 +918,7 @@ namespace Trinity.UIComponents
         {
             try
             {
-                _Model.Loot.ItemFilterMode = ItemFilterMode.TrinityWithItemRules;
+                _Model.Loot.ItemFilterMode = ItemFilterMode.TrinityOnly;
                 _Model.Loot.ItemRules.ItemRuleType = ItemRuleType.Hard;
                 _Model.Loot.Pickup.ArmorBlueLevel = 0;
                 _Model.Loot.Pickup.ArmorYellowLevel = 0;
@@ -925,18 +926,21 @@ namespace Trinity.UIComponents
                 _Model.Loot.Pickup.WeaponYellowLevel = 0;
                 _Model.Loot.Pickup.JewelryBlueLevel = 0;
                 _Model.Loot.Pickup.JewelryYellowLevel = 0;
-                _Model.Loot.Pickup.LegendaryLevel = 62;
-                _Model.Loot.Pickup.GemLevel = 60;
+                _Model.Loot.Pickup.LegendaryLevel = 70;
+                _Model.Loot.Pickup.GemLevel = 15;
                 _Model.Loot.Pickup.GemType = TrinityGemType.All;
-                _Model.Loot.Pickup.PickupBlueFollowerItems = true;
-                _Model.Loot.Pickup.PickupYellowFollowerItems = true;
-                _Model.Loot.Pickup.MinimumGoldStack = 900;
-                _Model.Loot.Pickup.MiscItemQuality = TrinityItemQuality.Rare;
+                _Model.Loot.Pickup.PickupBlueFollowerItems = false;
+                _Model.Loot.Pickup.PickupYellowFollowerItems = false;
+                _Model.Loot.Pickup.PickupGold = true;
+                _Model.Loot.Pickup.MinimumGoldStack = 600;
+                _Model.Loot.Pickup.MiscItemQuality = TrinityItemQuality.Legendary;
                 _Model.Loot.Pickup.PotionCount = 98;
-                _Model.Loot.Pickup.Plans = false;
-                _Model.Loot.Pickup.CraftTomes = false;
-                _Model.Loot.Pickup.PickupLowLevel = false;
+                _Model.Loot.Pickup.Plans = true;
+                _Model.Loot.Pickup.CraftTomes = true;
+                _Model.Loot.Pickup.PickupLowLevel = true;
                 _Model.Loot.Pickup.LegendaryPlans = true;
+
+                _Model.Loot.TownRun.ForceSalvageRares = true;
             }
             catch (Exception ex)
             {

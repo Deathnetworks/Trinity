@@ -214,8 +214,14 @@ namespace Trinity
 
         private static bool RefreshGold(bool AddToCache)
         {
-            //int rangedMinimumStackSize = 0;
             AddToCache = true;
+
+            if (!Settings.Loot.Pickup.PickupGold)
+            {
+                c_IgnoreSubStep = "PickupDisabled";
+                AddToCache = false;
+                return AddToCache;
+            }
 
             if (Player.ActorClass == ActorClass.Barbarian && Settings.Combat.Barbarian.IgnoreGoldInWOTB && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) &&
                 GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
@@ -241,7 +247,7 @@ namespace Trinity
                 CacheData.GoldStack.Add(CurrentCacheObject.RActorGuid, c_GoldStackSize);
             }
 
-            if (c_GoldStackSize < Settings.Loot.Pickup.MinimumGoldStack || Settings.Loot.Pickup.MinimumGoldStack == 0)
+            if (c_GoldStackSize < Settings.Loot.Pickup.MinimumGoldStack)
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "NotEnoughGold";
@@ -254,13 +260,6 @@ namespace Trinity
                 c_IgnoreSubStep = "WithinPickupRadius";
                 return AddToCache;
             }
-
-            //if (!AddToCache)
-            //    LogSkippedGold();
-
-            //DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Gold Stack {0} has iPercentage {1} with rangeMinimumStackSize: {2} Distance: {3} MininumGoldStack: {4} PickupRadius: {5} AddToCache: {6}",
-            //    c_GoldStackSize, iPercentage, rangedMinimumStackSize, c_CentreDistance, Settings.Loot.Pickup.MinimumGoldStack, ZetaDia.Me.GoldPickUpRadius, AddToCache);
-
             return AddToCache;
         }
         private static bool RefreshItemStats(GItemBaseType tempbasetype)

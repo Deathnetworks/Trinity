@@ -514,29 +514,32 @@ namespace Trinity
 
         private static TrinityPower GetWizardDestructablePower()
         {
+            if (Hotbar.Contains(SNOPower.Wizard_WaveOfForce) && Player.PrimaryResource >= 25)
+                return new TrinityPower(SNOPower.Wizard_WaveOfForce, 9f);
+
             if (Hotbar.Contains(SNOPower.Wizard_EnergyTwister) && Player.PrimaryResource >= 35)
-                return new TrinityPower(SNOPower.Wizard_EnergyTwister, 9f, Vector3.Zero, -1, -1, 0, 0);
+                return new TrinityPower(SNOPower.Wizard_EnergyTwister, 9f);
 
             if (Hotbar.Contains(SNOPower.Wizard_ArcaneOrb))
-                return new TrinityPower(SNOPower.Wizard_ArcaneOrb, 35f, Vector3.Zero, -1, -1, 0, 0);
+                return new TrinityPower(SNOPower.Wizard_ArcaneOrb, 35f);
 
             if (Hotbar.Contains(SNOPower.Wizard_MagicMissile))
-                return new TrinityPower(SNOPower.Wizard_MagicMissile, 15f, Vector3.Zero, -1, -1, 0, 0);
+                return new TrinityPower(SNOPower.Wizard_MagicMissile, 15f);
 
             if (Hotbar.Contains(SNOPower.Wizard_ShockPulse))
-                return new TrinityPower(SNOPower.Wizard_ShockPulse, 10f, Vector3.Zero, -1, -1, 0, 0);
+                return new TrinityPower(SNOPower.Wizard_ShockPulse, 10f);
 
             if (Hotbar.Contains(SNOPower.Wizard_SpectralBlade))
-                return new TrinityPower(SNOPower.Wizard_SpectralBlade, 9f, Vector3.Zero, -1, -1, 0, 0);
+                return new TrinityPower(SNOPower.Wizard_SpectralBlade, 5f);
 
             if (Hotbar.Contains(SNOPower.Wizard_Electrocute))
-                return new TrinityPower(SNOPower.Wizard_Electrocute, 9f, Vector3.Zero, -1, -1, 0, 0);
+                return new TrinityPower(SNOPower.Wizard_Electrocute, 9f);
 
             if (Hotbar.Contains(SNOPower.Wizard_ArcaneTorrent))
-                return new TrinityPower(SNOPower.Wizard_ArcaneTorrent, 9f, Vector3.Zero, -1, -1, 0, 0);
+                return new TrinityPower(SNOPower.Wizard_ArcaneTorrent, 9f);
 
             if (Hotbar.Contains(SNOPower.Wizard_Blizzard))
-                return new TrinityPower(SNOPower.Wizard_Blizzard, 9f, Vector3.Zero, -1, -1, 0, 0);
+                return new TrinityPower(SNOPower.Wizard_Blizzard, 9f);
 
             return CombatBase.DefaultPower;
         }

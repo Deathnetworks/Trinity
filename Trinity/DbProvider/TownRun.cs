@@ -138,7 +138,7 @@ namespace Trinity
                         Vector2 validLocation = Trinity.FindValidBackpackLocation(true);
                         if (validLocation.X < 0 || validLocation.Y < 0)
                         {
-                            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "No more space to pickup a 2-slot item, now running town-run routine.");
+                            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "No more space to pickup a 2-slot item, now running town-run routine. (TownRun)");
                             if (!LastTownRunCheckResult)
                             {
                                 LastTownRunCheckResult = true;
@@ -147,7 +147,7 @@ namespace Trinity
 
                             Trinity.ForceVendorRunASAP = true;
                             // Record the first position when we run out of bag space, so we can return later
-                            TownRun.SetPreTownRunPosition();
+                            SetPreTownRunPosition();
                         }
 
                         if (ZetaDia.Me.IsValid)
@@ -157,7 +157,7 @@ namespace Trinity
                             {
                                 double min = equippedItems.Min(i => i.DurabilityPercent);
 
-                                float threshold = Trinity.Player.IsInTown ? 0.50f : Math.Max(Zeta.Bot.Settings.CharacterSettings.Instance.RepairWhenDurabilityBelow, 0.25f);
+                                float threshold = Trinity.Player.IsInTown ? 0.50f : Zeta.Bot.Settings.CharacterSettings.Instance.RepairWhenDurabilityBelow;
                                 bool needsRepair = min <= threshold;
 
                                 if (needsRepair)
