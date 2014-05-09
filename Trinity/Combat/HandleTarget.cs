@@ -154,7 +154,8 @@ namespace Trinity
 
                     // Whether we should refresh the target list or not
                     // See if we should update hotbar abilities
-                    if (ShouldRefreshHotbarAbilities || HotbarRefreshTimer.ElapsedMilliseconds > 5000)
+                    if (ShouldRefreshHotbarAbilities || HotbarRefreshTimer.ElapsedMilliseconds > 5000 ||
+                         (CombatBase.TimeSincePowerUse(SNOPower.Wizard_Archon) < 20000))
                     {
                         PlayerInfoCache.RefreshHotbar();
                     }

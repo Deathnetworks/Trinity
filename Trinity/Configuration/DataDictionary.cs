@@ -13,6 +13,13 @@ namespace Trinity
 
         public const int PLAYER_HEADSTONE_SNO = 4860; // PlayerHeadstone
 
+        public static HashSet<int> NoCheckKillRange { get { return _noCheckKillRange; } }
+        private static readonly HashSet<int> _noCheckKillRange = new HashSet<int>
+        {
+            210120, // A4 Corrupt Growth
+            210268, // A4 Corrupt Growth
+        };
+
         /// <summary>
         /// Contains a list of Rift WorldId's
         /// </summary>
@@ -560,9 +567,6 @@ namespace Trinity
             108444, // ZombieFemale_A_TristramQuest (Wretched Mothers)
             176889, // ZombieFemale_Unique_WretchedQueen
 
-            210120, // A4 Corrupt Growth
-            210268, // A4 Corrupt Growth
-
             164502, // sandMonster_A_Head_Guardian
 
             // A5
@@ -958,6 +962,7 @@ namespace Trinity
         };
 
         public static HashSet<string> WhiteItemCraftingWhiteList { get { return whiteItemCraftingWhiteList; } }
+
         private static HashSet<string> whiteItemCraftingWhiteList = new HashSet<string>()
         {
             "Ascended Pauldrons",

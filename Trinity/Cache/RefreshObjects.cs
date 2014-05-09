@@ -570,10 +570,6 @@ namespace Trinity
                 CurrentBotLootRange = Zeta.Bot.Settings.CharacterSettings.Instance.LootRadius;
                 _shouldStayPutDuringAvoidance = false;
 
-                // Always have a minimum kill radius, so we're never getting whacked without retaliating
-                if (CurrentBotKillRange < 10)
-                    CurrentBotKillRange = 10;
-
                 // Not allowed to kill monsters due to profile/routine/combat targeting settings - just set the kill range to a third
                 if (!ProfileManager.CurrentProfile.KillMonsters || !CombatTargeting.Instance.AllowedToKillMonsters)
                 {

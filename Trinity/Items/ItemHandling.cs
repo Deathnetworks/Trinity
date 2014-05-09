@@ -118,9 +118,6 @@ namespace Trinity
                 return true;
             }
 
-
-            string itemSha1Hash = HashGenerator.GenerateItemHash(item.Position, item.ActorSNO, item.Name, CurrentWorldDynamicId, item.Quality, item.Level);
-
             switch (baseType)
             {
                 case GItemBaseType.WeaponTwoHand:

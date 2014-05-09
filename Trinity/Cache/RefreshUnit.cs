@@ -188,12 +188,6 @@ namespace Trinity
                     c_unit_HasShieldAffix = true;
 
             }
-            double killRange;
-
-            killRange = RefreshKillRadius();
-
-            c_KillRange = killRange;
-
 
             // Only if at full health, else don't bother checking each loop
             // See if we already have this monster's size stored, if not get it and cache it
@@ -234,20 +228,12 @@ namespace Trinity
             if (!AddToCache)
                 return AddToCache;
 
-            // Extended kill radius after last fighting, or when we want to force a town run
-            if ((Settings.Combat.Misc.ExtendedTrashKill && _keepKillRadiusExtendedForSeconds > 0) || ForceVendorRunASAP || TownRun.IsTryingToTownPortal())
-            {
-                if (CurrentCacheObject.RadiusDistance <= killRange && AddToCache)
-                    AnyMobsInRange = true;
-            }
-            else
-            {
-                if (CurrentCacheObject.RadiusDistance <= Settings.Combat.Misc.NonEliteRange && AddToCache)
-                    AnyMobsInRange = true;
-            }
-            if (c_unit_IsTreasureGoblin)
-                AnyTreasureGoblinsPresent = true;
+            // Set Kill range
+            CurrentCacheObject.KillRange = SetKillRange();
 
+            if (CurrentCacheObject.RadiusDistance <= CurrentCacheObject.KillRange)
+                AnyMobsInRange = true;
+            
             return AddToCache;
         }
 
@@ -342,66 +328,36 @@ namespace Trinity
             return AddToCache;
 
         }
-        private static double RefreshKillRadius()
+        private static double SetKillRange()
         {
-            // Cancel altogether if it's not even in range, unless it's a boss or an injured treasure goblin
-            double killRange = CurrentBotKillRange;
+            // Always within kill range if in the NoCheckKillRange list!
+            if (DataDictionary.NoCheckKillRange.Contains(CurrentCacheObject.ActorSNO))
+                return CurrentCacheObject.RadiusDistance + 100f;
 
-            if (CombatBase.IsQuestingMode && killRange <= 45f)
-                killRange = 45f;
+            double killRange;
 
-            // Bosses get extra radius
+            // Bosses, always kill
             if (CurrentCacheObject.IsBoss)
             {
-                if (CurrentCacheObject.ActorSNO != 80509)
-                    // Kulle Exception
-                    killRange *= 1.5;
-                // And even more if they're already injured
-                if (c_HitPointsPct <= 0.98)
-                    killRange *= 4;
-                // And make sure we have a MINIMUM range for bosses - incase they are at screen edge etc + Kulle exception
-                if (killRange <= 200 && CurrentCacheObject.ActorSNO != 80509)
-                    killRange = 200;
+                return CurrentCacheObject.RadiusDistance + 100f;
             }
-            // Special short-range list to ignore weakling mobs
-            if (!GetHasBuff(SNOPower.Wizard_Archon) && DataDictionary.ShortRangeAttackMonsterIds.Contains(CurrentCacheObject.ActorSNO))
-            {
-                killRange = 12;
-            }
-            // Prevent long-range mobs beign ignored while they may be pounding on us
-            if (killRange <= 30 && DataDictionary.RangedMonsterIds.Contains(CurrentCacheObject.ActorSNO))
-                killRange = 120f;
 
-            // Injured treasure goblins get a huge extra radius - since they don't stay on the map long if injured, anyway!
-            if (c_unit_IsTreasureGoblin && (CurrentCacheObject.Distance <= 60 || c_HitPointsPct <= 0.99))
-            {
-                c_ForceLeapAgainst = true;
-                if (Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize)
-                    killRange *= 2.5;
-                else
-                    killRange *= 4;
-                // Minimum distance of 60
-                if (killRange <= 60) killRange = 60;
-            }
             // Elitey type mobs and things
-            else if ((c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique || c_unit_IsMinion))
+            if ((c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique))
             {
-                c_ForceLeapAgainst = true;
-
                 // using new GUI slider for elite kill range
                 killRange = Settings.Combat.Misc.EliteRange;
-
-                // if we've damaged an elite and its still on screen, keep it
-                if (c_HitPointsPct < 1 && killRange < 60)
-                {
-                    killRange = 60;
-                }
             }
-            // Safety for TownRun and UseTownPortalTag
-            if (TownRun.IsTryingToTownPortal())
+            else
             {
-                if (killRange <= V.F("Cache.TownPortal.KillRange")) killRange = V.F("Cache.TownPortal.KillRange");
+                killRange = CurrentBotKillRange;
             }
+
+            if (!TownRun.IsTryingToTownPortal())
+                return killRange;
+
+            // Safety for TownRuns
+            if (killRange <= V.F("Cache.TownPortal.KillRange")) killRange = V.F("Cache.TownPortal.KillRange");
             return killRange;
         }
         private static void RefreshAffixes()

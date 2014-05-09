@@ -24,6 +24,8 @@ namespace Trinity
 
         private static void RefreshDiaGetWeights()
         {
+            const double MaxWeight = 50000d;
+
             using (new PerformanceLogger("RefreshDiaObjectCache.Weighting"))
             {
                 double movementSpeed = PlayerMover.GetMovementSpeed();
@@ -168,7 +170,8 @@ namespace Trinity
                                 }
 
                                 // Monster is in cache but not within kill range
-                                if (!cacheObject.IsBoss && cacheObject.RadiusDistance > cacheObject.KillRange && !(isKillBounty || Player.InActiveEvent || cacheObject.IsQuestMonster || cacheObject.IsBountyObjective))
+                                if (!cacheObject.IsBoss && cacheObject.RadiusDistance > cacheObject.KillRange && 
+                                    !(isKillBounty || Player.InActiveEvent || cacheObject.IsQuestMonster || cacheObject.IsBountyObjective))
                                 {
                                     if (cacheObject.Weight <= 0)
                                     {
@@ -454,8 +457,17 @@ namespace Trinity
                         case GObjectType.Item:
                         case GObjectType.Gold:
                             {
+                                bool isTwoSquare = true;
+
+                                try
+                                {
+                                    isTwoSquare = cacheObject.Item.CommonData.IsTwoSquareItem;
+                                }
+                                catch { }
+
                                 // Don't pickup items if we're doing a TownRun
-                                if (ForceVendorRunASAP || IsReadyToTownRun || BrainBehavior.IsVendoring)
+                                if (cacheObject.Type == GObjectType.Item &&
+                                    TrinityItemManager.FindValidBackpackLocation(isTwoSquare) == new Vector2(-1, -1))
                                 {
                                     objWeightInfo += "TownRun";
                                     cacheObject.Weight = 0;
@@ -470,12 +482,6 @@ namespace Trinity
                                 }
 
                                 // Weight Items
-
-                                // We'll weight them based on distance, giving gold less weight and close objects more
-                                //if (cacheObject.GoldAmount > 0)
-                                //    cacheObject.Weight = 5000d - (Math.Floor(cacheObject.CentreDistance) * 2000d);
-                                //else
-                                //    cacheObject.Weight = 8000d - (Math.Floor(cacheObject.CentreDistance) * 1900d);
 
                                 // ignore non-legendaries and gold near elites if we're ignoring elites
                                 // not sure how we should safely determine this distance
@@ -536,9 +542,9 @@ namespace Trinity
                                 }
 
                                 if (cacheObject.GoldAmount > 0)
-                                    cacheObject.Weight = (300 - cacheObject.Distance) / 300 * 500d;
+                                    cacheObject.Weight = (300 - cacheObject.Distance) / 300 * MaxWeight;
                                 else
-                                    cacheObject.Weight = (300 - cacheObject.Distance) / 300 * 500d;
+                                    cacheObject.Weight = (300 - cacheObject.Distance) / 300 * MaxWeight;
 
 
                                 // Point-blank items get a weight increase 

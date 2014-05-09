@@ -11,72 +11,54 @@ namespace Trinity.Cache
     {
         public ItemDroppedAppender()
         {
-            logItemQueue = new ConcurrentQueue<string>();
+            _logItemQueue = new ConcurrentQueue<string>();
 
-            droppedItemLogPath = Path.Combine(FileManager.TrinityLogsPath, "ItemsDropped.csv");
+            _droppedItemLogPath = Path.Combine(FileManager.TrinityLogsPath, "ItemsDropped.csv");
 
             CheckHeader();
 
-            QueueThread = new Thread(QueueWorker)
+            _queueThread = new Thread(QueueWorker)
             {
                 Name = "ItemDroppedWorker",
                 IsBackground = true,
                 Priority = ThreadPriority.Lowest
             };
-            QueueThread.Start();
+            _queueThread.Start();
 
         }
 
         private void CheckHeader()
         {
-            bool writeHeader = !File.Exists(droppedItemLogPath);
+            bool writeHeader = !File.Exists(_droppedItemLogPath);
 
             if (writeHeader)
             {
-                logItemQueue.Enqueue("ActorSNO,GameBalanceID,Name,InternalName,DBBaseType,DBItemType,TBaseType,TItemType,Quality,Level,Pickup\n");
+                _logItemQueue.Enqueue("ActorSNO,GameBalanceID,Name,InternalName,DBBaseType,DBItemType,TBaseType,TItemType,Quality,Level,Pickup\n");
             }
         }
         public void Dispose()
         {
             try
             {
-                
-                if (_logWriter != null)
-                    _logWriter.Dispose();
-
-                if (_fileStream != null)
-                    _fileStream.Dispose(); 
-
+                if (_queueThread != null)
+                    _queueThread.Abort();
             }
             catch { }
-            _logWriter = null;
-
-            try
-            {
-                if (QueueThread != null)
-                    QueueThread.Abort();
-            }
-            catch { }
-            QueueThread = null;
+            _queueThread = null;
         }
 
-        ~ItemDroppedAppender()
-        {
-            Dispose();
-        }
+        private readonly Mutex _mutex = new Mutex(false, "ItemDroppedMutex");
 
-        private Mutex mutex = new Mutex(false, "ItemDroppedMutex");
-
-        private static ItemDroppedAppender _Instance;
-        public static ItemDroppedAppender Instance { get { return _Instance ?? (_Instance = new ItemDroppedAppender()); } }
+        private static ItemDroppedAppender _instance;
+        public static ItemDroppedAppender Instance { get { return _instance ?? (_instance = new ItemDroppedAppender()); } }
 
         private StreamWriter _logWriter;
         private FileStream _fileStream;
 
-        private ConcurrentQueue<string> logItemQueue;
+        private readonly ConcurrentQueue<string> _logItemQueue;
 
-        private Thread QueueThread;
-        private string droppedItemLogPath;
+        private Thread _queueThread;
+        private readonly string _droppedItemLogPath;
 
         internal void AppendDroppedItem(PickupItem item)
         {
@@ -98,7 +80,7 @@ namespace Trinity.Cache
             sb.Append(FormatCSVField(pickupItem));
             sb.Append("\n");
 
-            logItemQueue.Enqueue(sb.ToString());
+            _logItemQueue.Enqueue(sb.ToString());
 
         }
 
@@ -114,13 +96,13 @@ namespace Trinity.Cache
                     CheckHeader(); 
                     
                     if (_fileStream == null)
-                        _fileStream = File.Open(droppedItemLogPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
+                        _fileStream = File.Open(_droppedItemLogPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
 
                     if (_logWriter == null)
-                        _logWriter = new StreamWriter(_fileStream, System.Text.Encoding.UTF8, bufferSize);
+                        _logWriter = new StreamWriter(_fileStream, Encoding.UTF8, bufferSize);
 
-                    string queueItem = "";
-                    while (logItemQueue.TryDequeue(out queueItem))
+                    string queueItem;
+                    while (_logItemQueue.TryDequeue(out queueItem))
                     {
                         bool success = false;
                         int attempts = 0;
@@ -128,7 +110,7 @@ namespace Trinity.Cache
                         {
                             try
                             {
-                                mutex.WaitOne();
+                                _mutex.WaitOne();
 
                                 attempts++;
                                 _logWriter.Write(queueItem);
@@ -144,7 +126,7 @@ namespace Trinity.Cache
                             }
                             finally
                             {
-                                mutex.ReleaseMutex();
+                                _mutex.ReleaseMutex();
                             }
                         }
                     }

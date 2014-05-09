@@ -21,7 +21,6 @@ namespace Trinity
         private static double c_HitPoints = 0d;
         private static float c_ZDiff = 0f;
         private static string c_ItemDisplayName = "";
-        private static int c_GameBalanceID = 0;
         private static string c_IgnoreReason = "";
         private static string c_IgnoreSubStep = "";
         private static int c_ItemLevel = 0;
@@ -30,7 +29,6 @@ namespace Trinity
         private static bool c_IsOneHandedItem = false;
         private static bool c_IsTwoHandedItem = false;
         private static ItemQuality c_ItemQuality = ItemQuality.Invalid;
-        private static int c_ItemQualityLevelIdentified = -1;
         private static ItemType c_DBItemType = ItemType.Unknown;
         private static ItemBaseType c_DBItemBaseType = ItemBaseType.None;
         private static FollowerType c_item_tFollowerType = FollowerType.None;
@@ -46,14 +44,12 @@ namespace Trinity
         private static bool c_IsEliteRareUnique = false;
         private static bool c_unit_IsAttackable = false;
         private static bool c_unit_HasShieldAffix = false;
-        private static bool c_ForceLeapAgainst = false;
         private static bool c_IsObstacle = false;
         private static bool c_HasBeenNavigable = false;
         private static bool c_HasBeenRaycastable = false;
         private static bool c_HasBeenInLoS = false;
         private static string c_ItemMd5Hash = string.Empty;
         private static bool c_HasDotDPS = false;
-        private static double c_KillRange = 0f;
         private static MonsterAffixes c_MonsterAffixes = MonsterAffixes.None;
         private static bool c_IsFacingPlayer;
         private static float c_Rotation;
@@ -216,56 +212,50 @@ namespace Trinity
             }
 
             // If it's a unit, add it to the monster cache
-            AddUnitToMonsterObstacleCache(AddToCache);
+            AddUnitToMonsterObstacleCache();
 
-            if (AddToCache)
-            {
-                c_IgnoreReason = "None";
+            c_IgnoreReason = "None";
 
-                CurrentCacheObject.Type = CurrentCacheObject.Type;
-                CurrentCacheObject.Distance = CurrentCacheObject.Distance;
-                CurrentCacheObject.InternalName = CurrentCacheObject.InternalName;
-                CurrentCacheObject.Animation = c_CurrentAnimation;
-                CurrentCacheObject.ACDGuid = CurrentCacheObject.ACDGuid;
-                CurrentCacheObject.RActorGuid = CurrentCacheObject.RActorGuid;
-                CurrentCacheObject.DynamicID = CurrentCacheObject.DynamicID;
-                CurrentCacheObject.GameBalanceID = CurrentCacheObject.GameBalanceID;
-                CurrentCacheObject.ActorSNO = CurrentCacheObject.ActorSNO;
-                CurrentCacheObject.ItemLevel = c_ItemLevel;
-                CurrentCacheObject.GoldAmount = c_GoldStackSize;
-                CurrentCacheObject.OneHanded = c_IsOneHandedItem;
-                CurrentCacheObject.TwoHanded = c_IsTwoHandedItem;
-                CurrentCacheObject.ItemQuality = c_ItemQuality;
-                CurrentCacheObject.DBItemBaseType = c_DBItemBaseType;
-                CurrentCacheObject.DBItemType = c_DBItemType;
-                CurrentCacheObject.FollowerType = c_item_tFollowerType;
-                CurrentCacheObject.TrinityItemType = c_item_GItemType;
-                CurrentCacheObject.IsElite = c_unit_IsElite;
-                CurrentCacheObject.IsRare = c_unit_IsRare;
-                CurrentCacheObject.IsUnique = c_unit_IsUnique;
-                CurrentCacheObject.IsMinion = c_unit_IsMinion;
-                CurrentCacheObject.IsTreasureGoblin = c_unit_IsTreasureGoblin;
-                CurrentCacheObject.IsAttackable = c_unit_IsAttackable;
-                CurrentCacheObject.HitPoints = c_HitPoints;
-                CurrentCacheObject.HitPointsPct = c_HitPointsPct;
-                CurrentCacheObject.Radius = CurrentCacheObject.Radius;
-                CurrentCacheObject.MonsterSize = c_unit_MonsterSize;
-                CurrentCacheObject.IsEliteRareUnique = c_IsEliteRareUnique;
-                CurrentCacheObject.ForceLeapAgainst = c_ForceLeapAgainst;
-                CurrentCacheObject.HasDotDPS = c_HasDotDPS;
-                CurrentCacheObject.KillRange = c_KillRange;
-                CurrentCacheObject.HasAffixShielded = c_unit_HasShieldAffix;
-                CurrentCacheObject.MonsterAffixes = c_MonsterAffixes;
-                CurrentCacheObject.HasBeenInLoS = c_HasBeenInLoS;
-                CurrentCacheObject.HasBeenNavigable = c_HasBeenNavigable;
-                CurrentCacheObject.HasBeenRaycastable = c_HasBeenRaycastable;
-                CurrentCacheObject.ItemLink = c_ItemLink;
-                CurrentCacheObject.Rotation = c_Rotation;
-                CurrentCacheObject.DirectionVector = c_DirectionVector;
-                CurrentCacheObject.IsFacingPlayer = c_IsFacingPlayer;
-
-                ObjectCache.Add(CurrentCacheObject);
-            }
+            CurrentCacheObject.ACDGuid = CurrentCacheObject.ACDGuid;
+            CurrentCacheObject.ActorSNO = CurrentCacheObject.ActorSNO;
+            CurrentCacheObject.Animation = c_CurrentAnimation;
+            CurrentCacheObject.DBItemBaseType = c_DBItemBaseType;
+            CurrentCacheObject.DBItemType = c_DBItemType;
+            CurrentCacheObject.DirectionVector = c_DirectionVector;
+            CurrentCacheObject.Distance = CurrentCacheObject.Distance;
+            CurrentCacheObject.DynamicID = CurrentCacheObject.DynamicID;
+            CurrentCacheObject.FollowerType = c_item_tFollowerType;
+            CurrentCacheObject.GameBalanceID = CurrentCacheObject.GameBalanceID;
+            CurrentCacheObject.GoldAmount = c_GoldStackSize;
+            CurrentCacheObject.HasAffixShielded = c_unit_HasShieldAffix;
+            CurrentCacheObject.HasBeenInLoS = c_HasBeenInLoS;
+            CurrentCacheObject.HasBeenNavigable = c_HasBeenNavigable;
+            CurrentCacheObject.HasBeenRaycastable = c_HasBeenRaycastable;
+            CurrentCacheObject.HasDotDPS = c_HasDotDPS;
+            CurrentCacheObject.HitPoints = c_HitPoints;
+            CurrentCacheObject.HitPointsPct = c_HitPointsPct;
+            CurrentCacheObject.InternalName = CurrentCacheObject.InternalName;
+            CurrentCacheObject.IsAttackable = c_unit_IsAttackable;
+            CurrentCacheObject.IsElite = c_unit_IsElite;
+            CurrentCacheObject.IsEliteRareUnique = c_IsEliteRareUnique;
+            CurrentCacheObject.IsFacingPlayer = c_IsFacingPlayer;
+            CurrentCacheObject.IsMinion = c_unit_IsMinion;
+            CurrentCacheObject.IsRare = c_unit_IsRare;
+            CurrentCacheObject.IsTreasureGoblin = c_unit_IsTreasureGoblin;
+            CurrentCacheObject.IsUnique = c_unit_IsUnique;
+            CurrentCacheObject.ItemLevel = c_ItemLevel;
+            CurrentCacheObject.ItemLink = c_ItemLink;
+            CurrentCacheObject.ItemQuality = c_ItemQuality;
+            CurrentCacheObject.MonsterAffixes = c_MonsterAffixes;
+            CurrentCacheObject.MonsterSize = c_unit_MonsterSize;
+            CurrentCacheObject.OneHanded = c_IsOneHandedItem;
+            CurrentCacheObject.RActorGuid = CurrentCacheObject.RActorGuid;
+            CurrentCacheObject.Radius = CurrentCacheObject.Radius;
+            CurrentCacheObject.Rotation = c_Rotation;
+            CurrentCacheObject.TrinityItemType = c_item_GItemType;
+            CurrentCacheObject.TwoHanded = c_IsTwoHandedItem;
+            CurrentCacheObject.Type = CurrentCacheObject.Type;
+            ObjectCache.Add(CurrentCacheObject);
             return true;
         }
 
@@ -294,10 +284,9 @@ namespace Trinity
         /// <summary>
         /// Adds a unit to cache hashMonsterObstacleCache
         /// </summary>
-        /// <param name="AddToCache"></param>
-        private static void AddUnitToMonsterObstacleCache(bool AddToCache)
+        private static void AddUnitToMonsterObstacleCache()
         {
-            if (AddToCache && CurrentCacheObject.Type == GObjectType.Unit)
+            if (CurrentCacheObject.Type == GObjectType.Unit)
             {
                 // Add to the collision-list
                 CacheData.MonsterObstacles.Add(new CacheObstacleObject()
@@ -347,14 +336,12 @@ namespace Trinity
             c_unit_IsAttackable = false;
             c_unit_HasShieldAffix = false;
             c_IsEliteRareUnique = false;
-            c_ForceLeapAgainst = false;
             c_IsObstacle = false;
             c_HasBeenNavigable = false;
             c_HasBeenRaycastable = false;
             c_HasBeenInLoS = false;
             c_ItemMd5Hash = string.Empty;
             c_ItemQuality = ItemQuality.Invalid;
-            c_ItemQualityLevelIdentified = -1;
             c_DBItemBaseType = ItemBaseType.None;
             c_DBItemType = ItemType.Unknown;
             c_item_tFollowerType = FollowerType.None;
@@ -363,7 +350,6 @@ namespace Trinity
             c_diaObject = null;
             c_CurrentAnimation = SNOAnim.Invalid;
             c_HasDotDPS = false;
-            c_KillRange = 0f;
             c_MonsterAffixes = MonsterAffixes.None;
             c_IsFacingPlayer = false;
             c_Rotation = 0f;
@@ -623,12 +609,11 @@ namespace Trinity
                             break;
                         }
 
-                        if (CurrentCacheObject.Type != GObjectType.HealthGlobe && 
-                            CurrentCacheObject.Type != GObjectType.PowerGlobe && 
-                            (ForceVendorRunASAP || TownRun.TownRunTimerRunning()))
+                        if (TrinityItemManager.FindValidBackpackLocation(true) != new Vector2(-1, -1))
                         {
                             AddToCache = false;
-                            c_IgnoreSubStep = "IsTryingToTownPortal";
+                            c_IgnoreSubStep = "NoFreeSlots";
+                            break;
                         }
                         AddToCache = RefreshItem();
                         break;

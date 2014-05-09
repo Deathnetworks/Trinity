@@ -319,22 +319,21 @@ namespace Trinity
                 Logger.Log(LogCategory.UserInformation, "Exception while checking for TownPortal!");
                 Logger.Log(LogCategory.GlobalHandler, ex.ToString());
             }
-            if (ProfileManager.CurrentProfileBehavior != null)
+            if (CurrentProfileBehavior != null)
             {
                 Type profileBehaviortype = CurrentProfileBehavior.GetType();
                 string behaviorName = profileBehaviortype.Name;
-                if (profileBehaviortype != null && (profileBehaviortype == typeof(UseTownPortalTag) ||
-                    profileBehaviortype == typeof(WaitTimerTag) ||
-                        behaviorName.ToLower().Contains("townrun") ||
-                        behaviorName.ToLower().Contains("townportal")))
+                if ((profileBehaviortype == typeof(UseTownPortalTag) ||
+                     profileBehaviortype == typeof(WaitTimerTag) ||
+                     behaviorName.ToLower().Contains("townrun") ||
+                     behaviorName.ToLower().Contains("townportal")))
                 {
                     result = true;
                 }
             }
 
-            if (Zeta.Bot.Logic.BrainBehavior.IsVendoring)
+            if (BrainBehavior.IsVendoring)
                 result = true;
-
 
             lastTownPortalCheckTime = DateTime.UtcNow;
             lastTownPortalCheckResult = result;

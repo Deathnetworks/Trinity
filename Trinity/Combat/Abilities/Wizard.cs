@@ -223,6 +223,7 @@ namespace Trinity
                     {
                         Player.WaitingForReserveEnergy = false;
                         CanCastArchon = false;
+                        ShouldRefreshHotbarAbilities = true;
                         return new TrinityPower(SNOPower.Wizard_Archon, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 4, 5);
                     }
                     Player.WaitingForReserveEnergy = true;

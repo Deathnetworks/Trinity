@@ -22,33 +22,6 @@ namespace Trinity
                 Logger.LogDebug(LogCategory.CacheManagement, "Error reading CurrentAnimation for AoE sno:{0} raGuid:{1} name:{2} ex:{3}",
                   CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
             }
-            try
-            {
-                CurrentCacheObject.DirectionVector = CurrentCacheObject.Object.Movement.DirectionVector;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogDebug(LogCategory.CacheManagement, "Error reading DirectionVector for AoE sno:{0} raGuid:{1} name:{2} ex:{3}",
-                  CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
-            }
-            try
-            {
-                CurrentCacheObject.Rotation = CurrentCacheObject.Object.Movement.Rotation;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogDebug(LogCategory.CacheManagement, "Error reading Rotation for AoE sno:{0} raGuid:{1} name:{2} ex:{3}",
-                  CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
-            }
-            try
-            {
-                CurrentCacheObject.AABBBounds = CurrentCacheObject.Object.ActorInfo.AABBBounds;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogDebug(LogCategory.CacheManagement, "Error reading AABBBounds for AoE sno:{0} raGuid:{1} name:{2} ex:{3}",
-                  CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
-            }
 
             float customRadius;
             if (DataDictionary.DefaultAvoidanceCustomRadius.TryGetValue(CurrentCacheObject.ActorSNO, out customRadius))
