@@ -1406,7 +1406,10 @@ namespace Trinity
                     lastSentMovePower = DateTime.UtcNow;
 
                     bool inRange = TargetCurrentDistance <= TargetRangeRequired || CurrentTarget.Distance < 10f;
-                    if (lastMoveResult == MoveResult.ReachedDestination && !inRange && CurrentTarget.Type != GObjectType.Item)
+                    if (lastMoveResult == MoveResult.ReachedDestination && !inRange && 
+                        CurrentTarget.Type != GObjectType.Item && 
+                        CurrentTarget.Type != GObjectType.Destructible && 
+                        CurrentTarget.Type != GObjectType.Barricade)
                     {
                         bool pathFindresult = ((DefaultNavigationProvider)Navigator.NavigationProvider).CanPathWithinDistance(CurrentTarget.Position, CurrentTarget.Radius);
                         if (!pathFindresult)

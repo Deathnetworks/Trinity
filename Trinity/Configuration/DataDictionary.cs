@@ -770,6 +770,7 @@ namespace Trinity
 
             329390, // x1_Pand_BatteringRam_Hook_B_low
             368515, // A5 Nephalem Switch -  Passage to Corvus 
+            347276, // x1_Fortress_Soul_Grinder_A
         };
 
         /// <summary>

@@ -844,7 +844,7 @@ namespace Trinity
 
                                 // Not Stuck, skip!
                                 if (Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.OnlyIfStuck &&
-                                    DateTime.UtcNow.Subtract(PlayerMover.LastGeneratedStuckPosition).TotalSeconds > 3)
+                                    (DateTime.UtcNow.Subtract(PlayerMover.LastGeneratedStuckPosition).TotalSeconds > 3 || Player.MovementSpeed > 0))
                                 {
                                     objWeightInfo += "NotStuck";
                                     break;
