@@ -918,6 +918,7 @@ namespace Trinity
             316221, // X1_WarpToPortal 
             370187, // x1_Malthael_Boss_Orb_Collapse
             328830, // x1_Fortress_Portal_Switch
+            374174, // X1_WarpToPortal
 
         };
 

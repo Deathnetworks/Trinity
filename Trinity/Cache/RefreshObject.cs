@@ -609,7 +609,7 @@ namespace Trinity
                             break;
                         }
 
-                        if (TrinityItemManager.FindValidBackpackLocation(true) != new Vector2(-1, -1))
+                        if (TrinityItemManager.FindValidBackpackLocation(true) == new Vector2(-1, -1))
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "NoFreeSlots";

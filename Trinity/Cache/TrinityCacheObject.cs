@@ -22,7 +22,7 @@ namespace Trinity
             {
                 if (_object == null || (_object != null && !_object.IsValid))
                 {
-                    _object = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, true).Where(o => o.RActorGuid == this.RActorGuid).FirstOrDefault();
+                    _object = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, true).FirstOrDefault(o => o.RActorGuid == RActorGuid);
                 }
                 return _object;
             }
@@ -34,8 +34,7 @@ namespace Trinity
             {
                 if (Object != null && Object.IsValid && Object is DiaUnit)
                     return Object as DiaUnit;
-                else
-                    return default(DiaUnit);
+                return default(DiaUnit);
             }
         }
         [NoCopy]
@@ -45,8 +44,7 @@ namespace Trinity
             {
                 if (Object != null && Object.IsValid && Object is DiaGizmo)
                     return Object as DiaGizmo;
-                else
-                    return default(DiaGizmo);
+                return default(DiaGizmo);
             }
         }
 
@@ -57,8 +55,7 @@ namespace Trinity
             {
                 if (Object != null && Object.IsValid && Object is DiaItem)
                     return Object as DiaItem;
-                else
-                    return default(DiaItem);
+                return default(DiaItem);
             }
         }
 
@@ -69,8 +66,7 @@ namespace Trinity
             {
                 if (Object != null && Object.IsValid)
                     return Object.CommonData;
-                else
-                    return default(ACD);
+                return default(ACD);
             }
         }
 

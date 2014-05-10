@@ -469,8 +469,9 @@ namespace Trinity
                     return new TrinityPower(SNOPower.Wizard_Archon_DisintegrationWave, 49f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0);
                 }
 
-                // Arcane Strike Rapid Spam at close-range only
-                if (!useOocBuff && !Player.IsIncapacitated && !Settings.Combat.Wizard.NoArcaneStrike)
+                // Arcane Strike Rapid Spam at close-range only, and no AoE inbetween us and target
+                if (!useOocBuff && !Player.IsIncapacitated && !Settings.Combat.Wizard.NoArcaneStrike &&
+                    !CacheData.TimeBoundAvoidance.Any(aoe => MathUtil.IntersectsPath(aoe.Position, aoe.Radius, Player.Position, CurrentTarget.Position)))
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_ArcaneStrike, 7f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1);
                 }

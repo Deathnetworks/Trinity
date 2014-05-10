@@ -170,7 +170,7 @@ namespace Trinity
                                 }
 
                                 // Monster is in cache but not within kill range
-                                if (!cacheObject.IsBoss && cacheObject.RadiusDistance > cacheObject.KillRange && 
+                                if (!cacheObject.IsBoss && cacheObject.RadiusDistance > cacheObject.KillRange &&
                                     !(isKillBounty || Player.InActiveEvent || cacheObject.IsQuestMonster || cacheObject.IsBountyObjective))
                                 {
                                     if (cacheObject.Weight <= 0)
@@ -236,11 +236,11 @@ namespace Trinity
 
                                         // Starting weight of 500
                                         if (cacheObject.IsTrashMob)
-                                            cacheObject.Weight = Math.Max((CurrentBotKillRange - cacheObject.RadiusDistance) / CurrentBotKillRange * 500d, 2d);
+                                            cacheObject.Weight = Math.Max((cacheObject.KillRange - cacheObject.RadiusDistance) / cacheObject.KillRange * 500d, 2d);
 
-                                        // Starting weight of 1000 for elites
+                                        // Elite Weight based on kill range and max possible weight
                                         if (cacheObject.IsBossOrEliteRareUnique)
-                                            cacheObject.Weight = Math.Max((90f - cacheObject.RadiusDistance) / 90f * 2000d, 20d);
+                                            cacheObject.Weight = Math.Max((cacheObject.KillRange - cacheObject.RadiusDistance) / cacheObject.KillRange * MaxWeight, 1000d);
 
                                         // Bounty Objectives goooo
                                         if (!cacheObject.IsBoss && cacheObject.IsBountyObjective && !navBlocking)
@@ -427,8 +427,6 @@ namespace Trinity
                                             }
                                         }
                                     }
-
-
                                 }
                                 break;
                             }
@@ -481,7 +479,15 @@ namespace Trinity
                                     break;
                                 }
 
-                                // Weight Items
+                                // Default Weight
+                                cacheObject.Weight = Math.Max((300 - cacheObject.Distance) / 300 * MaxWeight, 100d);
+
+                                // Give legendaries max weight, always
+                                if (cacheObject.GoldAmount <= 0 && cacheObject.ItemQuality >= ItemQuality.Legendary)
+                                {
+                                    cacheObject.Weight = MaxWeight;
+                                }
+
 
                                 // ignore non-legendaries and gold near elites if we're ignoring elites
                                 // not sure how we should safely determine this distance
@@ -494,6 +500,7 @@ namespace Trinity
                                     break;
                                 }
 
+                                #region Ignore Settings
                                 // Ignore Legendaries in AoE
                                 if (Settings.Loot.Pickup.IgnoreLegendaryInAoE && cacheObject.Type == GObjectType.Item && cacheObject.ItemQuality >= ItemQuality.Legendary &&
                                     CacheData.TimeBoundAvoidance.Any(aoe => cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius))
@@ -540,12 +547,7 @@ namespace Trinity
                                     cacheObject.Weight = 0;
                                     break;
                                 }
-
-                                if (cacheObject.GoldAmount > 0)
-                                    cacheObject.Weight = (300 - cacheObject.Distance) / 300 * MaxWeight;
-                                else
-                                    cacheObject.Weight = (300 - cacheObject.Distance) / 300 * MaxWeight;
-
+                                #endregion
 
                                 // Point-blank items get a weight increase 
                                 if (cacheObject.GoldAmount <= 0 && cacheObject.Distance <= 9f)
@@ -559,17 +561,14 @@ namespace Trinity
                                 if (cacheObject.GoldAmount <= 0 && cacheObject.ItemQuality >= ItemQuality.Rare4)
                                     cacheObject.Weight += 100d;
 
-                                // Give legendaries more weight
-                                if (cacheObject.GoldAmount <= 0 && cacheObject.ItemQuality >= ItemQuality.Legendary)
-                                    cacheObject.Weight += 15000d;
-
                                 if (Player.ActorClass == ActorClass.Monk && TimeSinceUse(SNOPower.Monk_TempestRush) < 1000 && cacheObject.ItemQuality < ItemQuality.Legendary)
                                 {
                                     cacheObject.Weight = 500;
                                 }
 
                                 // If there's a monster in the path-line to the item, reduce the weight to 1, except legendaries
-                                if (CacheData.MonsterObstacles.Any(cp => MathUtil.IntersectsPath(cp.Position, cp.Radius * 1.2f, Player.Position, cacheObject.Position)))
+                                if (cacheObject.ItemQuality < ItemQuality.Legendary &&
+                                    CacheData.MonsterObstacles.Any(cp => MathUtil.IntersectsPath(cp.Position, cp.Radius * 1.2f, Player.Position, cacheObject.Position)))
                                     cacheObject.Weight = 1;
 
                                 // ignore any items/gold if there is mobs in kill radius and we aren't combat looting
@@ -577,7 +576,7 @@ namespace Trinity
                                     cacheObject.Weight = 1;
 
                                 // See if there's any AOE avoidance in that spot or inbetween us, if so reduce the weight to 1
-                                if (CacheData.TimeBoundAvoidance.Any(a => MathUtil.IntersectsPath(a.Position, a.Radius + 5f, Player.Position, cacheObject.Position)))
+                                if (cacheObject.ItemQuality < ItemQuality.Legendary && CacheData.TimeBoundAvoidance.Any(a => MathUtil.IntersectsPath(a.Position, a.Radius + 5f, Player.Position, cacheObject.Position)))
                                     cacheObject.Weight = 1;
 
                                 break;
@@ -741,7 +740,7 @@ namespace Trinity
                                 }
 
                                 // As a percentage of health with typical maximum weight
-                                cacheObject.Weight = 50000d * (1 - Trinity.Player.CurrentHealthPct);
+                                cacheObject.Weight = MaxWeight * (1 - Trinity.Player.CurrentHealthPct);
 
                                 break;
                             }
@@ -849,7 +848,10 @@ namespace Trinity
 
                                 // Not Stuck, skip!
                                 if (Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.OnlyIfStuck &&
-                                    (DateTime.UtcNow.Subtract(PlayerMover.LastGeneratedStuckPosition).TotalSeconds > 3 || Player.MovementSpeed > 0))
+                                    cacheObject.RadiusDistance > 0 &&
+                                    (DateTime.UtcNow.Subtract(PlayerMover.LastGeneratedStuckPosition).TotalSeconds > 3) &&
+                                    movementSpeed > 0 &&
+                                    Player.MovementSpeed > 0)
                                 {
                                     objWeightInfo += "NotStuck";
                                     break;
@@ -975,6 +977,8 @@ namespace Trinity
 
                     }
 
+                    cacheObject.Weight = Math.Min(cacheObject.Weight, MaxWeight);
+
                     // Force the character to stay where it is if there is nothing available that is out of avoidance stuff and we aren't already in avoidance stuff
                     if (cacheObject.Weight == 1 && !_standingInAvoidance && ObjectCache.Any(o => o.Type == GObjectType.Avoidance))
                     {
@@ -998,8 +1002,13 @@ namespace Trinity
                             cacheObject.Weight, cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Type, cacheObject.RadiusDistance, cacheObject.IsEliteRareUnique,
                             cacheObject.RActorGuid, objWeightInfo);
 
+                    // Use the highest weight, and if at max weight, the closest
+                    bool pickNewTarget = cacheObject.Weight > 0 &&
+                        (cacheObject.Weight > HighestWeightFound ||
+                        (cacheObject.Weight == HighestWeightFound && cacheObject.Distance < CurrentTarget.Distance));
+
                     // Is the weight of this one higher than the current-highest weight? Then make this the new primary target!
-                    if (cacheObject.Weight > HighestWeightFound && cacheObject.Weight > 0)
+                    if (pickNewTarget)
                     {
 
                         /*
