@@ -1070,21 +1070,6 @@ namespace Trinity
                 if (CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0 && CurrentTarget.RActorGuid != LastTargetRactorGUID)
                 {
                     RecordTargetHistory();
-                    var top5 = ObjectCache.OrderByDescending(w => w.Weight).Take(5);
-                    var index = 0;
-                    foreach (var target in top5)
-                    {
-                        Logger.Log(TrinityLogLevel.Verbose,
-                                        LogCategory.Weight,
-                                        "#{0},w={1:0},s={2},t={3},n={4},g={5},{6}",
-                                        index++,
-                                        target.Weight,
-                                        CurrentTarget.ActorSNO,
-                                        CurrentTarget.Type,
-                                        CurrentTarget.InternalName,
-                                        CurrentTarget.RActorGuid,
-                                        target.WeightInfo);
-                    }
                     Logger.Log(TrinityLogLevel.Verbose,
                                     LogCategory.Targetting,
                                     "Target changed to name={2} sno={0} type={1} raGuid={3}",
