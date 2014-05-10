@@ -1,6 +1,50 @@
 ﻿
 # Trinity
 
+### Changelog 1.9.3
+
+* Fixed unintentionally not picking up items near AoE
+
+* Added "Quick Dump" for items in Debug tab
+
+* Trinity should be better about un-hooking itself from Demonbuddy
+
+* Fixed broken combat looting in Weights
+
+* Halls of Agony switches are now blacklisted
+
+* Removed incorrect AoE ignore in Weights for Items
+
+* Target Weighting now has a maximum value of 50k
+
+* Legendaries are always weighted at the maximum value
+
+* Various Target weighting adjustments to use new maximum value logic
+
+* Wizard Archon Arcane strike will no longer be used when AoE is between player and target
+
+* Items should get picked up now, even if trying to townrun, except when we don't have free space
+
+* Fixed incorrect TownRun cancel logic in Weighting
+
+* Trinity settings saving will now also save Demonbuddy Global and Character Settings
+
+* Added option to disable picking up gold completely
+
+* Wizard can now use Wave of Force to destroy objects
+
+* Refactored Backpack slot counting
+
+* Fixed Gem Pickup level defaults for Questing/Hunting buttons
+
+* Added movement speed detection for destructibles in Weighting logic
+
+* Added Try/Catch to Townrun to see if we can find whatever that error is...
+
+* Destructibles and Barricades will no longer be blacklisted due to pathing failures
+
+* Fixed marking Invulnerable gizmo's as untargettable
+
 ### Changelog 1.9.2
 
 * Crusader will now use Blessed Shield when off CD
