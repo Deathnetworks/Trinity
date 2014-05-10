@@ -79,6 +79,7 @@ namespace Trinity
         public ActorType ActorType { get; set; }
         public GizmoType GizmoType { get; set; }
         public double Weight { get; set; }
+        public string WeightInfo { get; set; }
         public Vector3 Position { get; set; }
         public AABB AABBBounds { get; set; }
         public float Distance { get; set; }
