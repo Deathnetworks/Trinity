@@ -50,7 +50,7 @@ namespace Trinity
 
                 bool hasCalamity = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Teleport && s.RuneIndex == 0);
                 // Offensive Teleport: Calamity
-                if (CombatBase.CanCast(SNOPower.Wizard_Teleport) && hasCalamity && (TargetUtil.ClusterExists(15f, 4) || TargetUtil.IsEliteTargetInRange(55f)))
+                if (CombatBase.CanCast(SNOPower.Wizard_Teleport) && hasCalamity)
                 {
                     var bestClusterPoint = TargetUtil.GetBestClusterPoint();
                     return new TrinityPower(SNOPower.Wizard_Teleport, 55f, bestClusterPoint);
@@ -433,10 +433,9 @@ namespace Trinity
 
                 // Archon form
                 // Archon Slow Time for in combat
-                if (!useOocBuff && !Player.IsIncapacitated &&
-                    (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.EliteOrTrashInRange(25f) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 35f)) &&
+                if (!useOocBuff && !Player.IsIncapacitated && 
                     CombatBase.CanCast(SNOPower.Wizard_Archon_SlowTime, CombatBase.CanCastFlags.NoTimer) &&
-                    (CombatBase.TimeSpanSincePowerUse(SNOPower.Wizard_Archon_SlowTime) > TimeSpan.FromSeconds(15)))
+                    (CombatBase.TimeSpanSincePowerUse(SNOPower.Wizard_Archon_SlowTime) > TimeSpan.FromSeconds(30)))
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_SlowTime, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1);
                 }

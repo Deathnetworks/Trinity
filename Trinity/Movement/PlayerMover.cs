@@ -301,6 +301,13 @@ namespace Trinity.DbProvider
 
         public static double GetMovementSpeed()
         {
+            // Just changed worlds, Clean up the stack
+            if (SpeedSensors.Any(s => s.WorldID != Trinity.CurrentWorldDynamicId))
+            {
+                SpeedSensors.Clear();
+                return 1d;
+            }
+            
             // record speed once per second
             if (DateTime.UtcNow.Subtract(lastRecordedPosition).TotalMilliseconds >= 1000)
             {
@@ -340,6 +347,9 @@ namespace Trinity.DbProvider
             if (DateTime.UtcNow.Subtract(Trinity.lastHadEliteUnitInSights).TotalMilliseconds <= 1000)
                 return 1d;
 
+            if (DateTime.UtcNow.Subtract(Trinity.lastHadContainerInSights).TotalMilliseconds <= 1000)
+                return 1d;
+
             // Minimum of 2 records to calculate speed
             if (!SpeedSensors.Any() || SpeedSensors.Count <= 1)
                 return 0d;
@@ -353,12 +363,6 @@ namespace Trinity.DbProvider
             {
                 // first sensors
                 SpeedSensors.Remove(SpeedSensors.OrderBy(s => s.Timestamp).FirstOrDefault());
-            }
-            // Clean up the stack
-            if (SpeedSensors.Any(s => s.WorldID != Trinity.CurrentWorldDynamicId))
-            {
-                SpeedSensors.Clear();
-                return 1d;
             }
 
             double AverageRecordingTime = SpeedSensors.Average(s => s.TimeSinceLastMove.TotalHours); ;

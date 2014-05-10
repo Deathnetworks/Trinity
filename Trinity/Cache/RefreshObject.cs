@@ -603,12 +603,12 @@ namespace Trinity
                     {
                         // Not allowed to loot due to profile settings
                         // rrrix disabled this since noobs can't figure out their profile is broken... looting is always enabled now
-                        if (!LootTargeting.Instance.AllowedToLoot || LootTargeting.Instance.DisableLooting)
-                        {
-                            AddToCache = false;
-                            c_IgnoreSubStep = "LootingDisabled";
-                            break;
-                        }
+                        //if (!LootTargeting.Instance.AllowedToLoot || LootTargeting.Instance.DisableLooting)
+                        //{
+                        //    AddToCache = false;
+                        //    c_IgnoreSubStep = "LootingDisabled";
+                        //    break;
+                        //}
 
                         if (TrinityItemManager.FindValidBackpackLocation(true) == new Vector2(-1, -1))
                         {
@@ -624,12 +624,12 @@ namespace Trinity
                 case GObjectType.Gold:
                     {
                         // Not allowed to loot due to profile settings
-                        if (!LootTargeting.Instance.AllowedToLoot || LootTargeting.Instance.DisableLooting)
-                        {
-                            AddToCache = false;
-                            c_IgnoreSubStep = "LootingDisabled";
-                            break;
-                        }
+                        //if (!LootTargeting.Instance.AllowedToLoot || LootTargeting.Instance.DisableLooting)
+                        //{
+                        //    AddToCache = false;
+                        //    c_IgnoreSubStep = "LootingDisabled";
+                        //    break;
+                        //}
                         AddToCache = RefreshGold(AddToCache);
                         break;
                     }

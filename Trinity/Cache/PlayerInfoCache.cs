@@ -60,6 +60,7 @@ namespace Trinity
         public float Rotation { get; set; }
         public Vector2 DirectionVector { get; set; }
         public float MovementSpeed { get; set; }
+        public bool IsMoving { get; set; }
         public bool IsGhosted { get; set; }
         public GameDifficulty GameDifficulty { get; set; }
 
@@ -175,6 +176,7 @@ namespace Trinity
                     Player.Rotation = me.Movement.Rotation;
                     Player.DirectionVector = me.Movement.DirectionVector;
                     Player.MovementSpeed = me.Movement.SpeedXY;
+                    Player.IsMoving = me.Movement.IsMoving;
 
                     Player.GoldPickupRadius = me.GoldPickupRadius;
                     Player.Coinage = me.Inventory.Coinage;

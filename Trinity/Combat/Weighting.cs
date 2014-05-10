@@ -172,14 +172,10 @@ namespace Trinity
                                 }
 
                                 // Monster is in cache but not within kill range
-                                if (!cacheObject.IsBoss && cacheObject.RadiusDistance > cacheObject.KillRange &&
-                                    !(isKillBounty || Player.InActiveEvent || cacheObject.IsQuestMonster || cacheObject.IsBountyObjective))
+                                if (!cacheObject.IsBoss && cacheObject.RadiusDistance > cacheObject.KillRange && !cacheObject.IsQuestMonster && !cacheObject.IsBountyObjective && cacheObject.Weight <= 0)
                                 {
-                                    if (cacheObject.Weight <= 0)
-                                    {
-                                        objWeightInfo += "KillRange";
-                                        break;
-                                    }
+                                    objWeightInfo += "KillRange";
+                                    break;
                                 }
 
                                 if (Player.InActiveEvent && ObjectCache.Any(o => o.IsEventObject))
@@ -418,12 +414,12 @@ namespace Trinity
                                                 case GoblinPriority.Prioritize:
                                                     // Super-high priority option below... 
                                                     objWeightInfo += "GoblinPrioritize ";
-                                                    cacheObject.Weight += 5000;
+                                                    cacheObject.Weight = Math.Max((cacheObject.KillRange - cacheObject.RadiusDistance) / cacheObject.KillRange * MaxWeight, 1000d);
                                                     break;
                                                 case GoblinPriority.Kamikaze:
                                                     // KAMIKAZE SUICIDAL TREASURE GOBLIN RAPE AHOY!
                                                     objWeightInfo += "GoblinKamikaze ";
-                                                    cacheObject.Weight += 20000;
+                                                    cacheObject.Weight = MaxWeight;
                                                     break;
 
                                             }
@@ -582,7 +578,7 @@ namespace Trinity
                                     cacheObject.Weight = 1;
                                 }
                                 // See if there's any AOE avoidance in that spot or inbetween us, if so reduce the weight to 1
-                                if (cacheObject.ItemQuality < ItemQuality.Legendary && 
+                                if (cacheObject.ItemQuality < ItemQuality.Legendary &&
                                     CacheData.TimeBoundAvoidance.Any(a => MathUtil.IntersectsPath(a.Position, a.Radius + 5f, Player.Position, cacheObject.Position)))
                                 {
                                     objWeightInfo += " TimeBoundAvoidance";
@@ -854,13 +850,12 @@ namespace Trinity
                                     break;
                                 }
 
-
                                 // Not Stuck, skip!
                                 if (Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.OnlyIfStuck &&
                                     cacheObject.RadiusDistance > 0 &&
                                     (DateTime.UtcNow.Subtract(PlayerMover.LastGeneratedStuckPosition).TotalSeconds > 3) &&
-                                    movementSpeed > 0 &&
-                                    Player.MovementSpeed > 0)
+                                    Player.MovementSpeed > 0 && 
+                                    PlayerMover.GetMovementSpeed() > 0)
                                 {
                                     objWeightInfo += "NotStuck";
                                     break;

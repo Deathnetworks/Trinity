@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Trinity.Combat.Abilities;
@@ -358,15 +359,13 @@ namespace Trinity
 
                     using (new PerformanceLogger("HandleTarget.InRange"))
                     {
-                        bool isMoving = !(ZetaDia.Me.Movement.SpeedXY == 0 || PlayerMover.GetMovementSpeed() == 0);
-
                         bool stuckOnTarget =
                             ((CurrentTarget.Type == GObjectType.Barricade ||
                              CurrentTarget.Type == GObjectType.Interactable ||
                              CurrentTarget.Type == GObjectType.CursedChest ||
                              CurrentTarget.Type == GObjectType.CursedShrine ||
                              CurrentTarget.Type == GObjectType.Destructible) &&
-                             !isMoving && DateTime.UtcNow.Subtract(PlayerMover.TimeLastUsedPlayerMover).TotalMilliseconds < 500);
+                             !Player.IsMoving && CurrentTarget.RadiusDistance <= 2);
 
                         bool npcInRange = CurrentTarget.IsQuestGiver && CurrentTarget.RadiusDistance <= 3f;
 
@@ -383,9 +382,12 @@ namespace Trinity
                         // Interact/use power on target if already in range
                         if (noRangeRequired || (TargetCurrentDistance <= TargetRangeRequired && CurrentTargetIsInLoS) || stuckOnTarget || npcInRange)
                         {
+                            Logger.LogDebug(LogCategory.Behavior, "Object in Range: noRangeRequired={0} Target In Range={1} stuckOnTarget={2} npcInRange={3}",
+                                noRangeRequired, (TargetCurrentDistance <= TargetRangeRequired && CurrentTargetIsInLoS), stuckOnTarget, npcInRange);
+
                             UpdateStatusTextTarget(true);
 
-                            HandleObjectInRange(isMoving);
+                            HandleObjectInRange();
                             runStatus = HandlerRunStatus.TreeRunning;
                         }
                         //check if we are returning to the tree
@@ -573,7 +575,7 @@ namespace Trinity
             }
         }
 
-        private static void HandleObjectInRange(bool isMoving)
+        private static void HandleObjectInRange()
         {
             switch (CurrentTarget.Type)
             {
@@ -669,19 +671,20 @@ namespace Trinity
                     {
                         _forceTargetUpdate = true;
 
-                        if (isMoving)
+                        if (ZetaDia.Me.Movement.IsMoving)
                         {
                             Logger.LogVerbose(LogCategory.Behavior, "Trying to stop, Speeds:{0:0.00}/{1:0.00}", ZetaDia.Me.Movement.SpeedXY, PlayerMover.GetMovementSpeed());
                             Navigator.PlayerMover.MoveStop();
+                            
                         }
-                        else if (DateTime.UtcNow.Subtract(PlayerMover.TimeLastUsedPlayerMover).TotalSeconds > 1)
+                        else
                         {
-                            if (SpellHistory.TimeSinceUse(SNOPower.Axe_Operate_Gizmo) < TimeSpan.FromMilliseconds(500))
+                            if (SpellHistory.TimeSinceUse(SNOPower.Axe_Operate_Gizmo) < TimeSpan.FromMilliseconds(150))
                             {
                                 break;
                             }
 
-                            int attemptCount = 0;
+                            int attemptCount;
                             CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out attemptCount);
 
                             Logger.LogVerbose(LogCategory.Behavior, "Interacting with {1} Distance {2:0} Radius {3:0.0} Attempt {4}",
@@ -711,7 +714,7 @@ namespace Trinity
                             }
 
                             // If we've tried interacting too many times, blacklist this for a while
-                            if (CacheData.InteractAttempts[CurrentTarget.RActorGuid] > 15 && !(CurrentTarget.Type == GObjectType.HealthWell))
+                            if (CacheData.InteractAttempts[CurrentTarget.RActorGuid] > 15 && CurrentTarget.Type != GObjectType.HealthWell)
                             {
                                 Logger.LogVerbose("Blacklisting {0} ({1}) for 15 seconds after {2} interactions",
                                     CurrentTarget.InternalName, CurrentTarget.ActorSNO, attemptCount);
@@ -1265,39 +1268,39 @@ namespace Trinity
                         action = "Click ";
                         break;
                 }
-            statusText.Append(action.PadRight(10));
+            statusText.Append(action);
 
             statusText.Append("Target=");
-            statusText.Append(CurrentTarget.InternalName.PadRight(40));
+            statusText.Append(CurrentTarget.InternalName);
             if (CurrentTarget.IsUnit && CombatBase.CurrentPower.SNOPower != SNOPower.None)
             {
                 statusText.Append(" Power=");
-                statusText.Append(CombatBase.CurrentPower.SNOPower.ToString().PadRight(40));
+                statusText.Append(CombatBase.CurrentPower.SNOPower);
             }
             statusText.Append(" SNO=");
-            statusText.Append(CurrentTarget.ActorSNO.ToString().PadRight(6));
+            statusText.Append(CurrentTarget.ActorSNO.ToString(CultureInfo.InvariantCulture));
             statusText.Append(" Elite=");
-            statusText.Append(CurrentTarget.IsBossOrEliteRareUnique.ToString().PadRight(5));
+            statusText.Append(CurrentTarget.IsBossOrEliteRareUnique.ToString());
             statusText.Append(" Weight=");
-            statusText.Append(CurrentTarget.Weight.ToString("0").PadRight(6));
+            statusText.Append(CurrentTarget.Weight.ToString("0"));
             statusText.Append(" Type=");
-            statusText.Append(CurrentTarget.Type.ToString().PadRight(10));
+            statusText.Append(CurrentTarget.Type.ToString());
             statusText.Append(" C-Dist=");
-            statusText.Append(CurrentTarget.Distance.ToString("0.0").PadRight(5));
+            statusText.Append(CurrentTarget.Distance.ToString("0.0"));
             statusText.Append(" R-Dist=");
-            statusText.Append(CurrentTarget.RadiusDistance.ToString("0.0").PadRight(5));
+            statusText.Append(CurrentTarget.RadiusDistance.ToString("0.0"));
             statusText.Append(" RangeReq'd=");
-            statusText.Append(TargetRangeRequired.ToString("0.0").PadRight(3));
+            statusText.Append(TargetRangeRequired.ToString("0.0"));
             statusText.Append(" DistfromTrgt=");
-            statusText.Append(TargetCurrentDistance.ToString("0").PadRight(3));
+            statusText.Append(TargetCurrentDistance.ToString("0"));
             statusText.Append(" tHP=");
-            statusText.Append((CurrentTarget.HitPointsPct * 100).ToString("0").PadRight(3));
+            statusText.Append((CurrentTarget.HitPointsPct * 100).ToString("0"));
             statusText.Append(" MyHP=");
-            statusText.Append((Player.CurrentHealthPct * 100).ToString("0").PadRight(3));
+            statusText.Append((Player.CurrentHealthPct * 100).ToString("0"));
             statusText.Append(" MyMana=");
-            statusText.Append((Player.PrimaryResource).ToString("0").PadRight(3));
+            statusText.Append((Player.PrimaryResource).ToString("0"));
             statusText.Append(" InLoS=");
-            statusText.Append(CurrentTargetIsInLoS.ToString().PadRight(5));
+            statusText.Append(CurrentTargetIsInLoS.ToString());
 
             statusText.Append(String.Format(" Duration={0:0}", DateTime.UtcNow.Subtract(_lastPickedTargetTime).TotalSeconds));
 
@@ -1384,7 +1387,7 @@ namespace Trinity
         {
             using (new PerformanceLogger("HandleTarget.SetRequiredRange"))
             {
-                TargetRangeRequired = 1f;
+                TargetRangeRequired = 2f;
                 TargetCurrentDistance = CurrentTarget.RadiusDistance;
                 CurrentTargetIsInLoS = false;
                 // Set current destination to our current target's destination
@@ -1409,7 +1412,7 @@ namespace Trinity
                     // * Gold - need to get within pickup radius only
                     case GObjectType.Gold:
                         {
-                            TargetRangeRequired = 1f;
+                            TargetRangeRequired = 2f;
                             CurrentDestination = MathEx.CalculatePointFrom(Player.Position, CurrentTarget.Position, -2f);
                             break;
                         }
@@ -1423,7 +1426,7 @@ namespace Trinity
                     // * Shrine & Container - need to get within 8 feet and interact
                     case GObjectType.HealthWell:
                         {
-                            TargetRangeRequired = 2f;
+                            TargetRangeRequired = 4f;
 
                             float range;
                             if (DataDictionary.CustomObjectRadius.TryGetValue(CurrentTarget.ActorSNO, out range))
@@ -1435,7 +1438,7 @@ namespace Trinity
                     case GObjectType.Shrine:
                     case GObjectType.Container:
                         {
-                            TargetRangeRequired = 4f;
+                            TargetRangeRequired = 6f;
 
                             float range;
                             if (DataDictionary.CustomObjectRadius.TryGetValue(CurrentTarget.ActorSNO, out range))
@@ -1449,7 +1452,7 @@ namespace Trinity
                             if (CurrentTarget.IsQuestGiver)
                             {
                                 CurrentDestination = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.Radius + 2f);
-                                TargetRangeRequired = CurrentTarget.Radius + 3f;
+                                TargetRangeRequired = CurrentTarget.Radius + 5f;
                             }
                             else
                             {
@@ -1493,8 +1496,6 @@ namespace Trinity
                     case GObjectType.Backtrack:
                         {
                             TargetRangeRequired = 5f;
-                            if (_forceCloseRangeTarget)
-                                TargetRangeRequired -= 2f;
                             break;
                         }
                     case GObjectType.Door:

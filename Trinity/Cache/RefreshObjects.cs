@@ -655,11 +655,11 @@ namespace Trinity
         };
 
 
-        private static IOrderedEnumerable<DiaObject> ReadDebugActorsFromMemory()
+        private static List<DiaObject> ReadDebugActorsFromMemory()
         {
-            return from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
-                   orderby o.Distance
-                   select o;
+            return (from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
+                    orderby o.Distance
+                    select o).ToList();
         }
 
         private static IEnumerable<DiaObject> ReadActorsFromMemory()
@@ -672,10 +672,12 @@ namespace Trinity
         {
 
             // See if we should wait for [playersetting] milliseconds for possible loot drops before continuing run
-            if (CurrentTarget == null && (DateTime.UtcNow.Subtract(lastHadUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill ||
+            if (CurrentTarget == null && 
+                (DateTime.UtcNow.Subtract(lastHadUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill ||
                 DateTime.UtcNow.Subtract(lastHadEliteUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill ||
                 DateTime.UtcNow.Subtract(lastHadBossUnitInSights).TotalMilliseconds <= 3000 ||
-                DateTime.UtcNow.Subtract(Helpers.Composites.LastFoundHoradricCache).TotalMilliseconds <= 5000))
+                DateTime.UtcNow.Subtract(Helpers.Composites.LastFoundHoradricCache).TotalMilliseconds <= 5000) ||
+                DateTime.UtcNow.Subtract(lastHadContainerInSights).TotalMilliseconds <= Settings.WorldObject.OpenContainerDelay)
             {
                 CurrentTarget = new TrinityCacheObject()
                                     {

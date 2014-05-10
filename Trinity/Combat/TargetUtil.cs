@@ -192,12 +192,12 @@ namespace Trinity
         {
             Vector3 _bestMovementPosition = Vector3.Zero;
 
-            if (TargetUtil.HealthGlobeExists(25) && Player.CurrentHealthPct < Trinity.Settings.Combat.Barbarian.HealthGlobeLevel)
-                _bestMovementPosition = TargetUtil.GetBestHealthGlobeClusterPoint(7, 25);
-            else if (TargetUtil.PowerGlobeExists(25))
-                _bestMovementPosition = TargetUtil.GetBestPowerGlobeClusterPoint(7, 25);
-            else if (TargetUtil.GetFarthestClusterUnit(7, 25, 4) != null && !CurrentTarget.IsEliteRareUnique && !CurrentTarget.IsTreasureGoblin)
-                _bestMovementPosition = TargetUtil.GetFarthestClusterUnit(7, 25).Position;
+            if (HealthGlobeExists(25) && Player.CurrentHealthPct < Trinity.Settings.Combat.Barbarian.HealthGlobeLevel)
+                _bestMovementPosition = GetBestHealthGlobeClusterPoint(7, 25);
+            else if (PowerGlobeExists(25))
+                _bestMovementPosition = GetBestPowerGlobeClusterPoint(7, 25);
+            else if (GetFarthestClusterUnit(7, 25, 4) != null && !CurrentTarget.IsEliteRareUnique && !CurrentTarget.IsTreasureGoblin)
+                _bestMovementPosition = GetFarthestClusterUnit(7, 25).Position;
             else if (_bestMovementPosition == Vector3.Zero)
                 _bestMovementPosition = CurrentTarget.Position;
 
@@ -288,7 +288,7 @@ namespace Trinity
             if (maxRange > 30f)
                 maxRange = 30f;
 
-            using (new Technicals.PerformanceLogger("TargetUtil.GetBestGlobeClusterPoint"))
+            using (new PerformanceLogger("TargetUtil.GetBestGlobeClusterPoint"))
             {
                 Vector3 bestClusterPoint;
                 var clusterUnits =
@@ -376,7 +376,7 @@ namespace Trinity
                 else if (Trinity.CurrentTarget != null)
                     bestClusterUnit = Trinity.CurrentTarget;
                 else
-                    bestClusterUnit = default(TrinityCacheObject); ;
+                    bestClusterUnit = default(TrinityCacheObject);
 
                 return bestClusterUnit;
             }
@@ -405,12 +405,9 @@ namespace Trinity
                                           Trinity.Settings.Combat.Misc.CollectHealthGlobe &&
                                           ObjectCache.Any(g => g.Type == GObjectType.HealthGlobe && g.Weight > 0);
                     break;
-                default:
-                    includeHealthGlobes = false;
-                    break;
             }
 
-            using (new Technicals.PerformanceLogger("TargetUtil.GetBestClusterPoint"))
+            using (new PerformanceLogger("TargetUtil.GetBestClusterPoint"))
             {
                 Vector3 bestClusterPoint;
                 var clusterUnits =
@@ -443,7 +440,7 @@ namespace Trinity
         /// <returns></returns>
         internal static bool AnyMobsInRange(float range = 10f)
         {
-            return AnyMobsInRange(range, 1, true);
+            return AnyMobsInRange(range, 1);
         }
         /// <summary>
         /// Fast check to see if there are any attackable units within a certain distance
