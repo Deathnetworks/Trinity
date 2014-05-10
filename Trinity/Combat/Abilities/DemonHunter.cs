@@ -73,7 +73,7 @@ namespace Trinity
                 (SpellHistory.TimeSinceUse(SNOPower.DemonHunter_Sentry) > TimeSpan.FromSeconds(sentryCoolDown) || SpellHistory.DistanceFromLastUsePosition(SNOPower.DemonHunter_Sentry) > 7.5))
             {
 
-                return new TrinityPower(SNOPower.DemonHunter_Sentry, 0f, Player.Position);
+                return new TrinityPower(SNOPower.DemonHunter_Sentry, 65f, TargetUtil.GetBestClusterPoint());
             }
 
             // Caltrops
