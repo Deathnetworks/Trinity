@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using Trinity.Cache;
 using Trinity.Combat.Abilities;
 using Trinity.DbProvider;
 using Trinity.Helpers;
@@ -64,10 +65,10 @@ namespace Trinity
                     "Note: Maintaining item stats from previous run. To reset stats fully, please restart DB.");
             }
 
-            BeginInvoke(new Action(() => UsedProfileManager.RefreshProfileBlacklists()));
+            BeginInvoke(UsedProfileManager.RefreshProfileBlacklists);
             UsedProfileManager.SetProfileInWindowTitle();
 
-            ReplaceTreeHooks();
+            BotManager.ReplaceTreeHooks();
 
             PlayerMover.TimeLastRecordedPosition = DateTime.UtcNow;
             PlayerMover.LastRestartedGame = DateTime.UtcNow;
@@ -89,19 +90,15 @@ namespace Trinity
 
             if (Settings.Loot.ItemFilterMode == Config.Loot.ItemFilterMode.TrinityWithItemRules)
             {
-                BeginInvoke(new Action(() =>
-                    {
-                        try
-                        {
-                            if (StashRule == null)
-                                StashRule = new Interpreter();
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.LogError("Error configuring ItemRules Interpreter: " + ex.ToString());
-                        }
-                    }
-                ));
+                try
+                {
+                    if (StashRule == null)
+                        StashRule = new Interpreter();
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError("Error configuring ItemRules Interpreter: " + ex);
+                }
             }
 
             Logger.LogDebug("Trinity BotStart took {0:0}ms", DateTime.UtcNow.Subtract(timeBotStart).TotalMilliseconds);
@@ -184,7 +181,7 @@ namespace Trinity
             // Out of thread Async stuff
             BeginInvoke(new Action(() =>
                 {
-                    
+
                     Logger.Log("New Game - resetting everything");
 
                     Trinity.IsReadyToTownRun = false;

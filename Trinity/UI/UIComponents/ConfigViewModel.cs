@@ -5,6 +5,7 @@ using System.Windows.Input;
 using Trinity.Config;
 using Trinity.Config.Combat;
 using Trinity.Config.Loot;
+using Trinity.Helpers;
 using Trinity.Technicals;
 using Trinity.UIComponents;
 using Zeta.Bot;
@@ -57,13 +58,13 @@ namespace Trinity.UI.UIComponents
                                                 _OriginalModel.Save();
 
                                                 if (_Model.Advanced.TPSEnabled != _OriginalModel.Advanced.TPSEnabled)
-                                                    Trinity.SetBotTPS();
+                                                    BotManager.SetBotTicksPerSecond();
 
                                                 if (_Model.Advanced.UnstuckerEnabled != _OriginalModel.Advanced.UnstuckerEnabled)
-                                                    Trinity.SetUnstuckProvider();
+                                                    BotManager.SetUnstuckProvider();
 
                                                 if (_Model.Loot.ItemFilterMode != _OriginalModel.Loot.ItemFilterMode)
-                                                    Trinity.SetItemManagerProvider();
+                                                    BotManager.SetItemManagerProvider();
 
                                                 CacheData.FullClear();
                                                 UsedProfileManager.SetProfileInWindowTitle();
@@ -92,6 +93,23 @@ namespace Trinity.UI.UIComponents
                                                 Logger.Log(LogCategory.UserInformation, "Exception dumping Backpack: {0}", ex);
                                             }
                                         });
+                DumpQuickItemsCommand = new RelayCommand(
+                                        (parameter) =>
+                                        {
+                                            try
+                                            {
+                                                Logger.Log(
+                                                    "\n############################################\n"
+                                                    + "\nQuick Dumping Items. This will hang your client. Please wait....\n"
+                                                    + "##########################");
+                                                UILoader.CloseWindow();
+                                                TrinityItemManager.DumpQuickItems();
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Logger.Log(LogCategory.UserInformation, "Exception Quick Dumping: {0}", ex);
+                                            }
+                                        });
                 DumpAllItemsCommand = new RelayCommand(
                                         (parameter) =>
                                         {
@@ -106,7 +124,7 @@ namespace Trinity.UI.UIComponents
                                             }
                                             catch (Exception ex)
                                             {
-                                                Logger.Log(LogCategory.UserInformation, "Exception dumping Backpack: {0}", ex);
+                                                Logger.Log(LogCategory.UserInformation, "Exception Dumping ALL Items: {0}", ex);
                                             }
                                         });
                 DumpMerchantItemsCommand = new RelayCommand(
@@ -123,7 +141,7 @@ namespace Trinity.UI.UIComponents
                                             }
                                             catch (Exception ex)
                                             {
-                                                Logger.Log(LogCategory.UserInformation, "Exception dumping Backpack: {0}", ex);
+                                                Logger.Log(LogCategory.UserInformation, "Exception dumping Merchant: {0}", ex);
                                             }
                                         });
                 DumpEquippedCommand = new RelayCommand(
@@ -356,6 +374,15 @@ namespace Trinity.UI.UIComponents
             private set;
         }
 
+        /// <summary>
+        /// Gets the test score command.
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand DumpQuickItemsCommand
+        {
+            get;
+            private set;
+        }
         /// <summary>
         /// Gets the test score command.
         /// </summary>

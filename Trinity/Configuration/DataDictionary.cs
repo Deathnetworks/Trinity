@@ -872,6 +872,7 @@ namespace Trinity
             5869, // trDun_Gargoyle_01
             5738, // trDun_Cath_Breakable_pillar
 
+            105478, // a1dun_Leor_Spike_Spawner_Switch
             /*
              * A5
              */

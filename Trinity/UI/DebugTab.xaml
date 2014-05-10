@@ -21,6 +21,8 @@
         <DockPanel Grid.Row="0">
             <Button Content="Dump Skills" Width="Auto" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Left" 
                 Command="{Binding DumpSkillsCommand}" Padding="0" Margin="10" />
+            <Button Content="Dump Items" Width="Auto" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Left" 
+                Command="{Binding DumpQuickItemsCommand}" Padding="0" Margin="10" />
         </DockPanel>
     </Grid>
 </UserControl>

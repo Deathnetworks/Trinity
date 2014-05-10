@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Trinity.Cache;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.DbProvider;
@@ -7,6 +8,7 @@ using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Logic;
 using Zeta.Bot.Profile.Common;
+using Zeta.Bot.Settings;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
@@ -324,11 +326,11 @@ namespace Trinity
                                         }
 
                                         // Close range get higher weights the more of them there are, to prevent body-blocking
-                                        if (!cacheObject.IsBoss && cacheObject.RadiusDistance <= 10f)
-                                        {
-                                            objWeightInfo += "CloseRange10f ";
-                                            cacheObject.Weight += (3000d * cacheObject.Radius);
-                                        }
+                                        //if (!cacheObject.IsBoss && cacheObject.RadiusDistance <= 10f)
+                                        //{
+                                        //    objWeightInfo += "CloseRange10f ";
+                                        //    cacheObject.Weight += (3000d * cacheObject.Radius);
+                                        //}
 
                                         // Special additional weight for corrupt growths in act 4 ONLY if they are at close range (not a standard priority thing)
                                         if ((cacheObject.ActorSNO == 210120 || cacheObject.ActorSNO == 210268) && cacheObject.Distance <= 25f)
@@ -491,11 +493,11 @@ namespace Trinity
 
                                 // ignore non-legendaries and gold near elites if we're ignoring elites
                                 // not sure how we should safely determine this distance
-                                if (cacheObject.ItemQuality < ItemQuality.Legendary && ((CombatBase.IgnoringElites &&
+                                if (cacheObject.ItemQuality < ItemQuality.Legendary && CombatBase.IgnoringElites &&
                                     ObjectCache.Any(u => u.IsUnit && u.IsEliteRareUnique &&
-                                        u.Position.Distance2D(cacheObject.Position) <= V.F("Weight.Items.IgnoreNonLegendaryNearEliteDistance"))) ||
-                                    CacheData.TimeBoundAvoidance.Any(aoe => cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius)))
+                                        u.Position.Distance2D(cacheObject.Position) <= V.F("Weight.Items.IgnoreNonLegendaryNearEliteDistance")))
                                 {
+                                    objWeightInfo += " IgnoringElites";
                                     cacheObject.Weight = 0;
                                     break;
                                 }
@@ -569,16 +571,23 @@ namespace Trinity
                                 // If there's a monster in the path-line to the item, reduce the weight to 1, except legendaries
                                 if (cacheObject.ItemQuality < ItemQuality.Legendary &&
                                     CacheData.MonsterObstacles.Any(cp => MathUtil.IntersectsPath(cp.Position, cp.Radius * 1.2f, Player.Position, cacheObject.Position)))
+                                {
+                                    objWeightInfo += " MonsterObstacles";
                                     cacheObject.Weight = 1;
-
+                                }
                                 // ignore any items/gold if there is mobs in kill radius and we aren't combat looting
-                                if (CurrentTarget != null && AnyMobsInRange && cacheObject.ItemQuality < ItemQuality.Legendary)
+                                if (CharacterSettings.Instance.CombatLooting && CurrentTarget != null && AnyMobsInRange && cacheObject.ItemQuality < ItemQuality.Legendary)
+                                {
+                                    objWeightInfo += " NoCombatLooting";
                                     cacheObject.Weight = 1;
-
+                                }
                                 // See if there's any AOE avoidance in that spot or inbetween us, if so reduce the weight to 1
-                                if (cacheObject.ItemQuality < ItemQuality.Legendary && CacheData.TimeBoundAvoidance.Any(a => MathUtil.IntersectsPath(a.Position, a.Radius + 5f, Player.Position, cacheObject.Position)))
+                                if (cacheObject.ItemQuality < ItemQuality.Legendary && 
+                                    CacheData.TimeBoundAvoidance.Any(a => MathUtil.IntersectsPath(a.Position, a.Radius + 5f, Player.Position, cacheObject.Position)))
+                                {
+                                    objWeightInfo += " TimeBoundAvoidance";
                                     cacheObject.Weight = 1;
-
+                                }
                                 break;
                             }
                         case GObjectType.PowerGlobe:

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using Demonbuddy;
 using Trinity.Config.Loot;
 using Trinity.Helpers;
@@ -419,6 +420,18 @@ namespace Trinity
             Merchant,
         }
 
+        public static void DumpQuickItems()
+        {
+            List<ACDItem> itemList = ZetaDia.Actors.GetActorsOfType<ACDItem>(true).OrderBy(i => i.InventorySlot).ThenBy(i => i.Name).ToList();
+            StringBuilder sbTopList = new StringBuilder();
+            foreach (var item in itemList)
+            {
+                sbTopList.AppendFormat("\nName={0} InternalName={1} ActorSNO={2} DynamicID={3} InventorySlot={4}",
+                    item.Name, item.InternalName, item.ActorSNO, item.DynamicId, item.InventorySlot);
+            }
+            Logger.Log(sbTopList.ToString());
+        }
+
 #pragma warning disable 1718
         public static void DumpItems(DumpItemLocation location)
         {
@@ -432,7 +445,7 @@ namespace Trinity
                 switch (location)
                 {
                     case DumpItemLocation.All:
-                        itemList = ZetaDia.Actors.GetActorsOfType<ACDItem>(true).ToList();
+                        itemList = ZetaDia.Actors.GetActorsOfType<ACDItem>(true).OrderBy(i => i.InventorySlot).ThenBy(i => i.Name).ToList();
                         break;
                     case DumpItemLocation.Backpack:
                         itemList = ZetaDia.Me.Inventory.Backpack.ToList();
@@ -458,18 +471,13 @@ namespace Trinity
                         break;
                 }
 
-                foreach (var item in itemList)
-                {
-                    string itemName = string.Format("\n\nName={0} InternalName={1} ActorSNO={2} DynamicID={3}",
-                        item.Name, item.InternalName, item.ActorSNO, item.DynamicId);
-                }
 
-                foreach (var item in itemList)
+                foreach (var item in itemList.OrderBy(i => i.InventorySlot).ThenBy(i => i.Name))
                 {
                     try
                     {
-                        string itemName = string.Format("\n\nName={0} InternalName={1} ActorSNO={2}",
-                            item.Name, item.InternalName, item.ActorSNO) + " ItemLink: " + item.ItemLink.Replace("{", "{{").Replace("}", "}}");
+                        string itemName = string.Format("\nName={0} InternalName={1} ActorSNO={2} DynamicID={3} InventorySlot={4}",
+                        item.Name, item.InternalName, item.ActorSNO, item.DynamicId, item.InventorySlot);
 
                         Logger.Log(itemName);
                     }

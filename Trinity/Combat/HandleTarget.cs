@@ -35,7 +35,7 @@ namespace Trinity
         /// Decorator for main Action delegate, also handles bot pausing
         /// </summary>
         /// <returns></returns>
-        private static Composite HandleTargetAction()
+        internal static Composite HandleTargetAction()
         {
             return new PrioritySelector(
                 new Decorator(ret => ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && !MainBotPaused,

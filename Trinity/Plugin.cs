@@ -2,7 +2,9 @@
 using System.IO;
 using System.Threading;
 using System.Windows;
+using Trinity.Cache;
 using Trinity.DbProvider;
+using Trinity.Helpers;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Navigation;
@@ -137,7 +139,7 @@ namespace Trinity
                 }
                 else
                 {
-                    Helpers.PluginCheck.Start();
+                    PluginCheck.Start();
 
                     HasMappedPlayerAbilities = false;
                     _isPluginEnabled = true;
@@ -146,16 +148,14 @@ namespace Trinity
                     LoadConfiguration();
 
                     Navigator.PlayerMover = new PlayerMover();
-                    SetUnstuckProvider();
+                    BotManager.SetUnstuckProvider();
                     GameEvents.OnPlayerDied += TrinityOnDeath;
                     GameEvents.OnGameJoined += TrinityOnJoinGame;
                     GameEvents.OnGameLeft += TrinityOnLeaveGame;
-
                     GameEvents.OnItemSold += ItemEvents.TrinityOnItemSold;
                     GameEvents.OnItemSalvaged += ItemEvents.TrinityOnItemSalvaged;
                     GameEvents.OnItemStashed += ItemEvents.TrinityOnItemStashed;
                     GameEvents.OnItemIdentificationRequest += ItemEvents.TrinityOnOnItemIdentificationRequest;
-
                     GameEvents.OnGameChanged += GameEvents_OnGameChanged;
                     GameEvents.OnWorldChanged += GameEvents_OnWorldChanged;
 
@@ -176,7 +176,7 @@ namespace Trinity
                             TrinityOnJoinGame(null, null);
                     }
 
-                    BeginInvoke(SetBotTPS);
+                    BeginInvoke(BotManager.SetBotTicksPerSecond);
 
                     UI.UILoader.PreLoadWindowContent();
 
@@ -203,6 +203,9 @@ namespace Trinity
         public void OnDisabled()
         {
             _isPluginEnabled = false;
+
+            BotManager.ReplaceTreeHooks();
+
             Navigator.PlayerMover = new DefaultPlayerMover();
             Navigator.StuckHandler = new DefaultStuckHandler();
             CombatTargeting.Instance.Provider = new DefaultCombatTargetingProvider();
@@ -213,14 +216,24 @@ namespace Trinity
             GameEvents.OnPlayerDied -= TrinityOnDeath;
             BotMain.OnStop -= TrinityBotStop;
 
+            GameEvents.OnPlayerDied -= TrinityOnDeath;
             GameEvents.OnGameJoined -= TrinityOnJoinGame;
             GameEvents.OnGameLeft -= TrinityOnLeaveGame;
+            GameEvents.OnItemSold -= ItemEvents.TrinityOnItemSold;
+            GameEvents.OnItemSalvaged -= ItemEvents.TrinityOnItemSalvaged;
+            GameEvents.OnItemStashed -= ItemEvents.TrinityOnItemStashed;
+            GameEvents.OnItemIdentificationRequest -= ItemEvents.TrinityOnOnItemIdentificationRequest;
+            GameEvents.OnGameChanged -= GameEvents_OnGameChanged;
+            GameEvents.OnWorldChanged -= GameEvents_OnWorldChanged;
+
+            ItemManager.Current = new LootRuleItemManager();
 
             Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "");
             Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "DISABLED: Trinity is now shut down...");
             Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "");
             GenericCache.Shutdown();
             GenericBlacklist.Shutdown();
+
         }
 
         /// <summary>

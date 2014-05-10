@@ -1,69 +1,89 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Windows;
+using Trinity.Config;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
-using Zeta.Common.Plugins;
 using Zeta.Game;
 using Zeta.TreeSharp;
 using Logger = Trinity.Technicals.Logger;
 
-namespace Trinity
+namespace Trinity.Helpers
 {
-    public partial class Trinity : IPlugin
+    public class BotManager
     {
+        private static TrinitySetting Settings { get { return Trinity.Settings; } }
+
+        private static readonly Dictionary<string, Composite> OriginalHooks = new Dictionary<string, Composite>();
+
         /// <summary>
         /// This will replace the main BehaviorTree hooks for Combat, Vendoring, and Looting.
         /// </summary>
-        private static void ReplaceTreeHooks()
+        internal static void ReplaceTreeHooks()
         {
-            // This is the do-all-be-all god-head all encompasing piece of trinity
-            TreeHooks.Instance.ReplaceHook("Combat", new Decorator(ctx => TargetCheck(ctx), HandleTargetAction()));
+            if (Trinity.IsPluginEnabled)
+            {
+                // This is the do-all-be-all god-head all encompasing piece of trinity
+                StoreAndReplaceHook("Combat", new Decorator(Trinity.TargetCheck, Trinity.HandleTargetAction()));
 
-            // We still want the main VendorRun logic, we're just going to take control of *when* this logic kicks in
-            PrioritySelector VendorRunPrioritySelector =
-                (TreeHooks.Instance.Hooks["VendorRun"][0] as Decorator).Children[0] as PrioritySelector;
+                // We still want the main VendorRun logic, we're just going to take control of *when* this logic kicks in
+                var vendorDecorator = TreeHooks.Instance.Hooks["VendorRun"][0] as Decorator;
+                if (vendorDecorator != null)
+                    StoreAndReplaceHook("VendorRun", new Decorator(TownRun.TownRunCanRun, TownRun.TownRunWrapper(vendorDecorator.Children[0])));
 
-            TreeHooks.Instance.ReplaceHook("VendorRun",
-                new Decorator(ret => TownRun.TownRunCanRun(ret),
-                    TownRun.TownRunWrapper(VendorRunPrioritySelector)
-                )
-            );
+                // Loot tree is now empty and never runs (Loot is handled through combat)
+                // This is for special out of combat handling like Horadric Cache
+                Composite lootComposite = TreeHooks.Instance.Hooks["Loot"][0];
+                StoreAndReplaceHook("Loot", Composites.CreateLootBehavior(lootComposite));
 
-            Composite lootComposite = TreeHooks.Instance.Hooks["Loot"][0];
-            // Loot tree is now empty and never runs (Loot is handled through combat)
-            // This is for special out of combat handling like Horadric Cache
-            TreeHooks.Instance.ReplaceHook("Loot", Helpers.Composites.CreateLootBehavior(lootComposite));
+            }
+            else
+            {
+                ReplaceHookWithOriginal("Combat");
+                ReplaceHookWithOriginal("VendorRun");
+                ReplaceHookWithOriginal("Loot");
+            }
+        }
 
-            // Death Handling
-            //TreeHooks.Instance.ReplaceHook("Death",
-            //    DbProvider.DeathHandler.CreateDeathHandler(TreeHooks.Instance.Hooks["Death"][0]));
+        private static void StoreAndReplaceHook(string hookName, Composite behavior)
+        {
+            if (!OriginalHooks.ContainsKey(hookName))
+                OriginalHooks.Add(hookName, TreeHooks.Instance.Hooks[hookName][0]);
+
+            TreeHooks.Instance.ReplaceHook(hookName, behavior);
+        }
+
+        private static void ReplaceHookWithOriginal(string hook)
+        {
+            if (OriginalHooks.ContainsKey(hook))
+            {
+                TreeHooks.Instance.ReplaceHook(hook, OriginalHooks[hook]);
+            }
         }
 
 
-
-
-        internal static void SetBotTPS()
+        internal static void SetBotTicksPerSecond()
         {
             // Carguy's ticks-per-second feature
             if (Settings.Advanced.TPSEnabled)
             {
-                BotMain.TicksPerSecond = (int)Settings.Advanced.TPSLimit;
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Bot TPS set to {0}", (int)Settings.Advanced.TPSLimit);
+                BotMain.TicksPerSecond = Settings.Advanced.TPSLimit;
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Bot TPS set to {0}", Settings.Advanced.TPSLimit);
             }
             else
             {
                 BotMain.TicksPerSecond = 10;
                 //BotMain.TicksPerSecond = Int32.MaxValue;
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Reset bot TPS to default", (int)Settings.Advanced.TPSLimit);
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Reset bot TPS to default", Settings.Advanced.TPSLimit);
             }
         }
 
         internal static void SetItemManagerProvider()
         {
-            if (Settings.Loot.ItemFilterMode != global::Trinity.Config.Loot.ItemFilterMode.DemonBuddy)
+            if (Settings.Loot.ItemFilterMode != Config.Loot.ItemFilterMode.DemonBuddy)
             {
                 ItemManager.Current = new TrinityItemManager();
             }
@@ -82,15 +102,9 @@ namespace Trinity
             }
             else
             {
-                Navigator.StuckHandler = new Zeta.Bot.Navigation.DefaultStuckHandler();
+                Navigator.StuckHandler = new DefaultStuckHandler();
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Default Demonbuddy Unstucker", true);
             }
-        }
-
-        internal static void DOU_p(bool t)
-        {
-            if (!t)
-                Trinity.Exit();
         }
 
         internal static void Exit()
