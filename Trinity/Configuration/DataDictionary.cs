@@ -698,6 +698,7 @@ namespace Trinity
             332922, // x1_Bog_bloodSpring_medium
             332923, // x1_Bog_bloodSpring_large     
             321855, // x1_Pand_Ext_Ordnance_Mine
+            355898, // x1_Bog_Family_Guard_Tower_Stump
         };
 
         /// <summary>
@@ -710,6 +711,7 @@ namespace Trinity
             {104632, 15}, // trOut_FesteringWoods_Neph_Column_B_Broken_Base
             {105303, 15}, // trOut_FesteringWoods_Neph_Column_C_Broken_Base_Bottom
             {104827, 15}, // trOut_FesteringWoods_Neph_Column_C_Broken_Base 
+            {355898, 12}, // x1_Bog_Family_Guard_Tower_Stump
             
          };
 
@@ -889,12 +891,12 @@ namespace Trinity
             357306, // X1_Fortress_Rack_F
             //374199, // X1_Fortress_Rack_F_Stump
             365503, // X1_Fortress_FloatRubble_A
-            365739, // X1_Fortress_FloatRubble_F
+            365562, // X1_Fortress_FloatRubble_B
             365580, // X1_Fortress_FloatRubble_C
-            365611, // X1_Fortress_FloatRubble_E
             365602, // X1_Fortress_FloatRubble_D
+            365611, // X1_Fortress_FloatRubble_E
+            365739, // X1_Fortress_FloatRubble_F
 
-            284713, // x1_westmarch_rat_A
             355365, // x1_Abattoir_furnaceWall
 
             304313, // x1_abattoir_furnace_01 
@@ -921,6 +923,8 @@ namespace Trinity
             370187, // x1_Malthael_Boss_Orb_Collapse
             328830, // x1_Fortress_Portal_Switch
             374174, // X1_WarpToPortal
+
+            356639, // x1_Catacombs_Breakable_Window_Relief
 
         };
 

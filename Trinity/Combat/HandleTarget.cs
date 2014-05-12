@@ -365,7 +365,7 @@ namespace Trinity
                              CurrentTarget.Type == GObjectType.CursedChest ||
                              CurrentTarget.Type == GObjectType.CursedShrine ||
                              CurrentTarget.Type == GObjectType.Destructible) &&
-                             !Player.IsMoving && CurrentTarget.RadiusDistance <= 2);
+                             !ZetaDia.Me.Movement.IsMoving && DateTime.UtcNow.Subtract(PlayerMover.TimeLastUsedPlayerMover).TotalMilliseconds < 250);
 
                         bool npcInRange = CurrentTarget.IsQuestGiver && CurrentTarget.RadiusDistance <= 3f;
 
@@ -582,7 +582,7 @@ namespace Trinity
                 case GObjectType.Avoidance:
                     _forceTargetUpdate = true;
                     break;
-                case GObjectType.Player: 
+                case GObjectType.Player:
                     break;
 
                 // Unit, use our primary power to attack
@@ -675,7 +675,7 @@ namespace Trinity
                         {
                             Logger.LogVerbose(LogCategory.Behavior, "Trying to stop, Speeds:{0:0.00}/{1:0.00}", ZetaDia.Me.Movement.SpeedXY, PlayerMover.GetMovementSpeed());
                             Navigator.PlayerMover.MoveStop();
-                            
+
                         }
                         else
                         {
@@ -1277,6 +1277,8 @@ namespace Trinity
                 statusText.Append(" Power=");
                 statusText.Append(CombatBase.CurrentPower.SNOPower);
             }
+            statusText.Append(" Speed=");
+            statusText.Append(ZetaDia.Me.Movement.SpeedXY.ToString("0"));
             statusText.Append(" SNO=");
             statusText.Append(CurrentTarget.ActorSNO.ToString(CultureInfo.InvariantCulture));
             statusText.Append(" Elite=");
@@ -1452,11 +1454,11 @@ namespace Trinity
                             if (CurrentTarget.IsQuestGiver)
                             {
                                 CurrentDestination = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.Radius + 2f);
-                                TargetRangeRequired = CurrentTarget.Radius + 5f;
+                                TargetRangeRequired = 5f;
                             }
                             else
                             {
-                                TargetRangeRequired = CurrentTarget.Radius;
+                                TargetRangeRequired = 5f;
                             }
                             // Check if it's in our interactable range dictionary or not
                             float range;
@@ -1475,15 +1477,17 @@ namespace Trinity
                         {
                             // Pick a range to try to reach + (tmp_fThisRadius * 0.70);
                             //TargetRangeRequired = CombatBase.CurrentPower.SNOPower == SNOPower.None ? 9f : CombatBase.CurrentPower.MinimumRange;
-                            TargetRangeRequired = 2f;
+                            TargetRangeRequired = CombatBase.CurrentPower.MinimumRange;
                             CurrentTarget.Radius = 1f;
+                            TargetCurrentDistance = CurrentTarget.Distance;
                             break;
                         }
                     case GObjectType.Barricade:
                         {
                             // Pick a range to try to reach + (tmp_fThisRadius * 0.70);
-                            TargetRangeRequired = 2f;
+                            TargetRangeRequired = CombatBase.CurrentPower.MinimumRange;
                             CurrentTarget.Radius = 1f;
+                            TargetCurrentDistance = CurrentTarget.Distance;
                             break;
                         }
                     // * Avoidance - need to pick an avoid location and move there

@@ -372,20 +372,22 @@ namespace Trinity
                     return new TrinityPower(SNOPower.Wizard_MagicMissile, 45f, targetId);
                 }
                 // Shock Pulse
-                if (!useOocBuff && !isCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_ShockPulse))
+                if (!useOocBuff && !isCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Wizard_ShockPulse))
                 {
-                    return new TrinityPower(SNOPower.Wizard_ShockPulse, 15f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1);
+                    return new TrinityPower(SNOPower.Wizard_ShockPulse, 15f, CurrentTarget.ACDGuid);
                 }
                 // Spectral Blade
-                if (!useOocBuff && !isCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_SpectralBlade))
+                if (!useOocBuff && !isCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Wizard_SpectralBlade))
                 {
-                    return new TrinityPower(SNOPower.Wizard_SpectralBlade, 14f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1);
+                    return new TrinityPower(SNOPower.Wizard_SpectralBlade, 14f, CurrentTarget.ACDGuid);
                 }
                 // Electrocute
-                if (!useOocBuff && !isCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_Electrocute))
+                if (!useOocBuff && !isCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Wizard_Electrocute))
                 {
-                    return new TrinityPower(SNOPower.Wizard_Electrocute, 40f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0);
+                    return new TrinityPower(SNOPower.Wizard_Electrocute, 40f, CurrentTarget.ACDGuid);
                 }
+
+                
                 // Default attacks
                 return CombatBase.DefaultPower;
 

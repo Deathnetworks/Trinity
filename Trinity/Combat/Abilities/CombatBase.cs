@@ -293,6 +293,8 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
+                Trinity.ShouldRefreshHotbarAbilities = true;
+
                 // Default attacks
                 if (!UseOOCBuff && !IsCurrentlyAvoiding)
                 {

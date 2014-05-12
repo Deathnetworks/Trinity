@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Trinity.Combat.Abilities;
-using Trinity.Config.Combat;
 using Trinity.Technicals;
 using Zeta.Bot.Logic;
 using Zeta.Game;
@@ -12,12 +10,12 @@ namespace Trinity
 {
     public partial class Trinity
     {
-        private static bool RefreshUnit(bool AddToCache)
+        private static bool RefreshUnit()
         {
-            AddToCache = true;
+            bool addToCache = true;
 
             if (CurrentCacheObject.Unit == null)
-                return AddToCache;
+                return false;
 
             if (!CurrentCacheObject.Unit.IsValid)
                 return false;
@@ -28,11 +26,16 @@ namespace Trinity
             if (CurrentCacheObject.CommonData.ACDGuid == -1)
                 return false;
 
+            // Always set this, otherwise we divide by zero later
+            CurrentCacheObject.KillRange = CurrentBotKillRange;
+
             // grab this first
             c_CurrentAnimation = CurrentCacheObject.Unit.CommonData.CurrentAnimation;
 
             // See if this is a boss
             CurrentCacheObject.IsBoss = DataDictionary.BossIds.Contains(CurrentCacheObject.ActorSNO);
+            if (CurrentCacheObject.IsBoss)
+                CurrentCacheObject.KillRange = CurrentCacheObject.RadiusDistance + 10f;
 
             // hax for Diablo_shadowClone
             c_unit_IsAttackable = CurrentCacheObject.InternalName.StartsWith("Diablo_shadowClone");
@@ -56,7 +59,7 @@ namespace Trinity
             */
             string teamIdHash = HashGenerator.GetGenericHash("teamId.RActorGuid=" + CurrentCacheObject.RActorGuid + ".ActorSNO=" + CurrentCacheObject.ActorSNO + ".WorldId=" + Player.WorldID);
 
-            int teamId = 0;
+            int teamId;
             if (!CurrentCacheObject.IsBoss && GenericCache.ContainsKey(teamIdHash))
             {
                 teamId = (int)GenericCache.GetObject(teamIdHash).Value;
@@ -65,7 +68,7 @@ namespace Trinity
             {
                 teamId = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.TeamID);
 
-                GenericCache.AddToCache(new GenericCacheObject()
+                GenericCache.AddToCache(new GenericCacheObject
                 {
                     Key = teamIdHash,
                     Value = teamId,
@@ -75,9 +78,9 @@ namespace Trinity
 
             try
             {
-                CurrentCacheObject.IsBountyObjective = (CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.BountyObjective) > 0);
+                CurrentCacheObject.IsBountyObjective = (CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.BountyObjective) != 0);
                 if (CurrentCacheObject.IsBountyObjective)
-                    CurrentCacheObject.IsBoss = true;
+                    CurrentCacheObject.KillRange = CurrentCacheObject.RadiusDistance + 10f;
             }
             catch (Exception)
             {
@@ -115,6 +118,8 @@ namespace Trinity
             try
             {
                 CurrentCacheObject.IsQuestMonster = CurrentCacheObject.Unit.CommonData.GetAttribute<int>(ActorAttributeType.QuestMonster) > 1;
+                if (CurrentCacheObject.IsQuestMonster)
+                    CurrentCacheObject.KillRange = CurrentCacheObject.RadiusDistance + 10f;
             }
             catch (Exception ex)
             {
@@ -127,7 +132,7 @@ namespace Trinity
                 CurrentCacheObject.IsQuestGiver = CurrentCacheObject.Unit.IsQuestGiver;
 
                 // Interact with quest givers, except when doing town-runs
-                if (ZetaDia.CurrentAct == Act.OpenWorld && CurrentCacheObject.IsQuestGiver && !(Trinity.IsReadyToTownRun || Trinity.ForceVendorRunASAP || BrainBehavior.IsVendoring))
+                if (ZetaDia.CurrentAct == Act.OpenWorld && CurrentCacheObject.IsQuestGiver && !(IsReadyToTownRun || ForceVendorRunASAP || BrainBehavior.IsVendoring))
                 {
                     CurrentCacheObject.Type = GObjectType.Interactable;
                     CurrentCacheObject.Type = GObjectType.Interactable;
@@ -142,9 +147,9 @@ namespace Trinity
 
             if ((teamId == 1 || teamId == 2 || teamId == 17))
             {
-                AddToCache = false;
-                c_IgnoreSubStep += "IsTeam" + teamId.ToString();
-                return AddToCache;
+                addToCache = false;
+                c_IgnoreSubStep += "IsTeam" + teamId;
+                return addToCache;
             }
 
             /* Always refresh monster type */
@@ -157,37 +162,34 @@ namespace Trinity
                     case MonsterType.Helper:
                     case MonsterType.Team:
                         {
-                            AddToCache = false;
+                            addToCache = false;
                             c_IgnoreSubStep = "AllySceneryHelperTeam";
-                            return AddToCache;
+                            return addToCache;
                         }
                 }
             }
 
-            using (new PerformanceLogger("RefreshUnit.8"))
+            // Only set treasure goblins to true *IF* they haven't disabled goblins! Then check the SNO in the goblin hash list!
+            c_unit_IsTreasureGoblin = false;
+            // Flag this as a treasure goblin *OR* ignore this object altogether if treasure goblins are set to ignore
+            if (DataDictionary.GoblinIds.Contains(CurrentCacheObject.ActorSNO))
             {
-                // Only set treasure goblins to true *IF* they haven't disabled goblins! Then check the SNO in the goblin hash list!
-                c_unit_IsTreasureGoblin = false;
-                // Flag this as a treasure goblin *OR* ignore this object altogether if treasure goblins are set to ignore
-                if (DataDictionary.GoblinIds.Contains(CurrentCacheObject.ActorSNO))
+                if (Settings.Combat.Misc.GoblinPriority != 0)
                 {
-                    if (Settings.Combat.Misc.GoblinPriority != 0)
-                    {
-                        c_unit_IsTreasureGoblin = true;
-                    }
-                    else
-                    {
-                        AddToCache = false;
-                        c_IgnoreSubStep = "IgnoreTreasureGoblins";
-                        return AddToCache;
-                    }
+                    c_unit_IsTreasureGoblin = true;
                 }
-                // Pull up the Monster Affix cached data
-                RefreshAffixes();
-                if (c_MonsterAffixes.HasFlag(MonsterAffixes.Shielding))
-                    c_unit_HasShieldAffix = true;
-
+                else
+                {
+                    addToCache = false;
+                    c_IgnoreSubStep = "IgnoreTreasureGoblins";
+                    return addToCache;
+                }
             }
+
+            // Pull up the Monster Affix cached data
+            RefreshAffixes();
+            if (c_MonsterAffixes.HasFlag(MonsterAffixes.Shielding))
+                c_unit_HasShieldAffix = true;
 
             // Only if at full health, else don't bother checking each loop
             // See if we already have this monster's size stored, if not get it and cache it
@@ -208,33 +210,33 @@ namespace Trinity
             // Unit is already dead
             if (c_HitPoints <= 0d && !CurrentCacheObject.IsBoss)
             {
-                AddToCache = false;
+                addToCache = false;
                 c_IgnoreSubStep = "0HitPoints";
-                return AddToCache;
+                return addToCache;
             }
 
             if (CurrentCacheObject.Unit.IsDead)
             {
-                AddToCache = false;
+                addToCache = false;
                 c_IgnoreSubStep = "IsDead";
-                return AddToCache;
+                return addToCache;
             }
 
             if (CurrentCacheObject.IsQuestMonster || CurrentCacheObject.IsBountyObjective)
-                return AddToCache;
+                return true;
 
-            AddToCache = RefreshUnitAttributes(AddToCache, CurrentCacheObject.Unit);
+            addToCache = RefreshUnitAttributes(addToCache, CurrentCacheObject.Unit);
 
-            if (!AddToCache)
-                return AddToCache;
+            if (!addToCache)
+                return addToCache;
 
             // Set Kill range
             CurrentCacheObject.KillRange = SetKillRange();
 
             if (CurrentCacheObject.RadiusDistance <= CurrentCacheObject.KillRange)
                 AnyMobsInRange = true;
-            
-            return AddToCache;
+
+            return addToCache;
         }
 
         private static void RefreshMonsterSize()
@@ -362,34 +364,30 @@ namespace Trinity
         }
         private static void RefreshAffixes()
         {
-            using (new PerformanceLogger("RefreshAffixes"))
+            MonsterAffixes affixFlags;
+            if (!CacheData.UnitMonsterAffix.TryGetValue(CurrentCacheObject.RActorGuid, out affixFlags))
             {
-                MonsterAffixes affixFlags;
-                if (!CacheData.UnitMonsterAffix.TryGetValue(CurrentCacheObject.RActorGuid, out affixFlags))
+                try
                 {
-                    try
-                    {
-                        affixFlags = CurrentCacheObject.CommonData.MonsterAffixes;
-                        CacheData.UnitMonsterAffix.Add(CurrentCacheObject.RActorGuid, affixFlags);
-                    }
-                    catch (Exception ex)
-                    {
-                        affixFlags = MonsterAffixes.None;
-                        Logger.Log(LogCategory.CacheManagement, "Handled Exception getting affixes for Monster SNO={0} Name={1} RAGuid={2}", CurrentCacheObject.ActorSNO, CurrentCacheObject.InternalName, CurrentCacheObject.RActorGuid);
-                        Logger.Log(LogCategory.CacheManagement, ex.ToString());
-                    }
+                    affixFlags = CurrentCacheObject.CommonData.MonsterAffixes;
+                    CacheData.UnitMonsterAffix.Add(CurrentCacheObject.RActorGuid, affixFlags);
                 }
-
-                c_unit_IsElite = affixFlags.HasFlag(MonsterAffixes.Elite);
-                c_unit_IsRare = affixFlags.HasFlag(MonsterAffixes.Rare);
-                c_unit_IsUnique = affixFlags.HasFlag(MonsterAffixes.Unique);
-                c_unit_IsMinion = affixFlags.HasFlag(MonsterAffixes.Minion);
-                // All-in-one flag for quicker if checks throughout
-                c_IsEliteRareUnique = (c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique || c_unit_IsMinion);
-
-                c_MonsterAffixes = affixFlags;
-
+                catch (Exception ex)
+                {
+                    affixFlags = MonsterAffixes.None;
+                    Logger.Log(LogCategory.CacheManagement, "Handled Exception getting affixes for Monster SNO={0} Name={1} RAGuid={2}", CurrentCacheObject.ActorSNO, CurrentCacheObject.InternalName, CurrentCacheObject.RActorGuid);
+                    Logger.Log(LogCategory.CacheManagement, ex.ToString());
+                }
             }
+
+            c_unit_IsElite = affixFlags.HasFlag(MonsterAffixes.Elite);
+            c_unit_IsRare = affixFlags.HasFlag(MonsterAffixes.Rare);
+            c_unit_IsUnique = affixFlags.HasFlag(MonsterAffixes.Unique);
+            c_unit_IsMinion = affixFlags.HasFlag(MonsterAffixes.Minion);
+            // All-in-one flag for quicker if checks throughout
+            c_IsEliteRareUnique = (c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique || c_unit_IsMinion);
+
+            c_MonsterAffixes = affixFlags;
         }
         private static MonsterType RefreshMonsterType(bool addToDictionary)
         {

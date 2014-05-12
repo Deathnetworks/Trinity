@@ -579,7 +579,7 @@ namespace Trinity
             {
                 case GObjectType.Player:
                     {
-                        AddToCache = RefreshUnit(AddToCache);
+                        AddToCache = RefreshUnit();
                         break;
                     }
                 // Handle Unit-type Objects
@@ -592,10 +592,8 @@ namespace Trinity
                             c_IgnoreSubStep = "CombatDisabled";
                             break;
                         }
-                        else
-                        {
-                            AddToCache = RefreshUnit(AddToCache);
-                        }
+                        
+                        AddToCache = RefreshUnit();
                         break;
                     }
                 // Handle Item-type Objects

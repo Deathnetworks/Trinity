@@ -103,13 +103,13 @@ namespace Trinity.Helpers
             {
                 if (!ZetaDia.IsInGame)
                 {
+                    Logger.Log("Not in game, gold inactivity reset", 0);
                     ResetCheckGold(); //If not in game, reset the timer
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Not in game, gold inactivity reset", 0);
                     return false;
                 }
                 if (ZetaDia.IsLoadingWorld)
                 {
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Loading world, gold inactivity reset", 0);
+                    Logger.Log("Loading world, gold inactivity reset");
                     return false;
                 }
 
@@ -121,7 +121,7 @@ namespace Trinity.Helpers
                 // sometimes bosses take a LONG time
                 if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsBoss)
                 {
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Current target is boss, gold inactivity reset", 0);
+                    Logger.Log("Current target is boss, gold inactivity reset");
                     ResetCheckGold();
                     return false;
                 }

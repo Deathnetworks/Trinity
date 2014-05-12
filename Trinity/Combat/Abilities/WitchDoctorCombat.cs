@@ -433,7 +433,7 @@ namespace Trinity.Combat.Abilities
                     hasRushOfEssence && !hasManitou)
                 {
                     if (hasWellOfSouls)
-                        return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 2, 2);
+                        return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 21f, CurrentTarget.ACDGuid);  
 
                     return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 21f, CurrentTarget.ACDGuid);
                 }

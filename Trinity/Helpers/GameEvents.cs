@@ -72,6 +72,7 @@ namespace Trinity
 
             PlayerMover.TimeLastRecordedPosition = DateTime.UtcNow;
             PlayerMover.LastRestartedGame = DateTime.UtcNow;
+            Logger.Log("Bot Starting, Resetting Gold Inactivity Timer");
             GoldInactivity.Instance.ResetCheckGold();
 
             if (CharacterSettings.Instance.KillRadius < 20)
@@ -225,6 +226,7 @@ namespace Trinity
                     CurrentProfile = "";
                     FirstProfile = "";
 
+                    Logger.Log("New Game, resetting Gold Inactivity Timer");
                     GoldInactivity.Instance.ResetCheckGold();
 
                     CombatBase.IsQuestingMode = false;

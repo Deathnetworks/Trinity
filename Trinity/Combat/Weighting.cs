@@ -103,7 +103,8 @@ namespace Trinity
                     // Just to make sure each one starts at 0 weight...
                     cacheObject.Weight = 0d;
 
-                    bool navBlocking = LastTargetACDGuid != cacheObject.ACDGuid && CacheData.NavigationObstacles.Any(ob => MathUtil.IntersectsPath(ob.Position, ob.Radius, Player.Position, cacheObject.Position));
+                    bool navBlocking = LastTargetACDGuid != cacheObject.ACDGuid &&
+                        CacheData.NavigationObstacles.Any(ob => MathUtil.IntersectsPath(ob.Position, ob.Radius, Player.Position, cacheObject.Position));
 
                     // Now do different calculations based on the object type
                     switch (cacheObject.Type)
@@ -136,7 +137,9 @@ namespace Trinity
                                     // Ignore Solitary Trash mobs (no elites present)
                                     // Except if has been primary target or if already low on health (<= 20%)
                                     if (shouldIgnoreTrashMobs && !isInHotSpot &&
-                                        !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize) && ignoreSummoner && !cacheObject.IsQuestMonster && !cacheObject.IsMinimapActive && !cacheObject.IsBountyObjective)
+                                        !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize) &&
+                                        ignoreSummoner && !cacheObject.IsQuestMonster &&
+                                        !cacheObject.IsMinimapActive && !cacheObject.IsBountyObjective)
                                     {
                                         objWeightInfo = "Ignoring ";
                                         ignoring = true;
@@ -145,7 +148,7 @@ namespace Trinity
                                     {
                                         objWeightInfo = "Adding ";
                                     }
-                                    objWeightInfo += String.Format("nearbyCount={0} radiusDistance={1:0} hotspot={2} ShouldIgnore={3} elitesInRange={4} hitPointsPc={5:0.0} summoner={6} quest:{7} minimap={8}",
+                                    objWeightInfo += String.Format("nearbyCount={0} radiusDistance={1:0} hotspot={2} ShouldIgnore={3} elitesInRange={4} hitPointsPc={5:0.0} summoner={6} quest:{7} minimap={8} ",
                                         nearbyMonsterCount, cacheObject.RadiusDistance, isInHotSpot, shouldIgnoreTrashMobs, elitesInRangeOfUnit, cacheObject.HitPointsPct, ignoreSummoner, cacheObject.IsQuestMonster, cacheObject.IsMinimapActive);
 
                                     if (ignoring)
@@ -165,16 +168,19 @@ namespace Trinity
                                     {
                                         objWeightInfo = "Adding ";
                                     }
-                                    objWeightInfo += String.Format("shouldIgnore={0} hitPointsPct={1:0}", shouldIgnoreElites, cacheObject.HitPointsPct * 100);
+                                    objWeightInfo += String.Format("shouldIgnore={0} hitPointsPct={1:0} ", shouldIgnoreElites, cacheObject.HitPointsPct * 100);
 
                                     if (ignoring)
                                         break;
                                 }
 
                                 // Monster is in cache but not within kill range
-                                if (!cacheObject.IsBoss && cacheObject.RadiusDistance > cacheObject.KillRange && !cacheObject.IsQuestMonster && !cacheObject.IsBountyObjective && cacheObject.Weight <= 0)
+                                if (!cacheObject.IsBoss &&
+                                    cacheObject.RadiusDistance > cacheObject.KillRange &&
+                                    !cacheObject.IsQuestMonster &&
+                                    !cacheObject.IsBountyObjective)
                                 {
-                                    objWeightInfo += "KillRange";
+                                    objWeightInfo += "KillRange ";
                                     break;
                                 }
 
@@ -203,7 +209,8 @@ namespace Trinity
                                 // Force a close range target because we seem to be stuck *OR* if not ranged and currently rooted
                                 if (prioritizeCloseRangeUnits)
                                 {
-                                    cacheObject.Weight = Math.Max((50 - cacheObject.RadiusDistance) / 50 * 2000d, 2d);
+                                    double rangePercent = (50d - cacheObject.RadiusDistance) / 50d;
+                                    cacheObject.Weight = Math.Max(rangePercent * 2000d, 2d);
 
                                     // Goblin priority KAMIKAZEEEEEEEE
                                     if (cacheObject.IsTreasureGoblin && Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze)
@@ -211,7 +218,7 @@ namespace Trinity
                                         objWeightInfo += "Goblin ";
                                         cacheObject.Weight += 25000;
                                     }
-                                    objWeightInfo += "close range ";
+                                    objWeightInfo += "CloseRange ";
                                 }
                                 else
                                 {
@@ -236,22 +243,22 @@ namespace Trinity
                                         // Starting weight of 500
                                         if (cacheObject.IsTrashMob)
                                         {
-                                            cacheObject.Weight = Math.Max((cacheObject.KillRange - cacheObject.RadiusDistance) / cacheObject.KillRange * 500d, 2d);
-                                            objWeightInfo += string.Format("trash{0:0} ", cacheObject.Weight);
+                                            objWeightInfo += "IsTrash ";
+                                            cacheObject.Weight = Math.Max((cacheObject.KillRange - cacheObject.RadiusDistance) / cacheObject.KillRange * 100d, 2d);
                                         }
 
                                         // Elite Weight based on kill range and max possible weight
                                         if (cacheObject.IsBossOrEliteRareUnique)
                                         {
-                                            cacheObject.Weight = Math.Max((cacheObject.KillRange - cacheObject.RadiusDistance) / cacheObject.KillRange * MaxWeight, 1000d);
-                                            objWeightInfo += "elite ";
+                                            objWeightInfo += "IsBossOrEliteRareUnique ";
+                                            cacheObject.Weight = Math.Max((cacheObject.KillRange - cacheObject.RadiusDistance) / cacheObject.KillRange * MaxWeight, 2000d);
                                         }
 
                                         // Bounty Objectives goooo
-                                        if (!cacheObject.IsBoss && cacheObject.IsBountyObjective && !navBlocking)
+                                        if (cacheObject.IsBountyObjective && !navBlocking)
                                         {
                                             objWeightInfo += "BountyObjective ";
-                                            cacheObject.Weight += 5000d;
+                                            cacheObject.Weight += 15000d;
                                         }
 
                                         // set a minimum 100 just to make sure it's not 0
@@ -302,21 +309,21 @@ namespace Trinity
                                         if (cacheObject.IsTrashMob && cacheObject.HitPointsPct < 0.20)
                                         {
                                             objWeightInfo += "LowHPTrash ";
-                                            cacheObject.Weight += Math.Max((1 - cacheObject.HitPointsPct) / 100 * 1000d, 100);
+                                            cacheObject.Weight += Math.Max((1 - cacheObject.HitPointsPct) / 100 * 1000d, 100d);
                                         }
 
                                         // Elites on low health get extra priority - up to 2500ish
                                         if (cacheObject.IsEliteRareUnique && cacheObject.HitPointsPct < 25)
                                         {
                                             objWeightInfo += "LowHPElite ";
-                                            cacheObject.Weight += Math.Max((1 - cacheObject.HitPointsPct) / 100 * 2500d, 100);
+                                            cacheObject.Weight += Math.Max((1 - cacheObject.HitPointsPct) / 100 * 2500d, 100d);
                                         }
 
                                         // Goblins on low health get extra priority - up to 2000ish
                                         if (Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize && cacheObject.IsTreasureGoblin && cacheObject.HitPointsPct <= 0.98)
                                         {
                                             objWeightInfo += "LowHPGoblin ";
-                                            cacheObject.Weight += Math.Max((1 - cacheObject.HitPointsPct) / 100 * 2000d, 100);
+                                            cacheObject.Weight += Math.Max((1 - cacheObject.HitPointsPct) / 100 * 2000d, 100d);
                                         }
                                         // Bonuses to priority type monsters from the dictionary/hashlist set at the top of the code
                                         int extraPriority;
@@ -371,7 +378,7 @@ namespace Trinity
                                             aoe.AvoidanceType == AvoidanceType.PoisonTree) &&
                                             cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius))
                                         {
-                                            objWeightInfo += "SpecialAoE ";
+                                            objWeightInfo += "InSpecialAoE ";
                                             cacheObject.Weight = 1;
                                         }
 
@@ -381,7 +388,7 @@ namespace Trinity
                                             CacheData.TimeBoundAvoidance.Any(aoe => aoe.AvoidanceType != AvoidanceType.PlagueCloud &&
                                                 MathUtil.IntersectsPath(aoe.Position, aoe.Radius, Player.Position, cacheObject.Position)))
                                         {
-                                            objWeightInfo += "AoELine ";
+                                            objWeightInfo += "AoEPathLine ";
                                             cacheObject.Weight = 1;
                                         }
                                         // See if there's any AOE avoidance in that spot, if so reduce the weight to 1, for melee only
@@ -412,6 +419,7 @@ namespace Trinity
 
                                             if (CacheData.TimeBoundAvoidance.Any(aoe => cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius) && Settings.Combat.Misc.GoblinPriority != GoblinPriority.Kamikaze)
                                             {
+                                                objWeightInfo += "GoblinInAoE ";
                                                 cacheObject.Weight = 1;
                                                 break;
                                             }
@@ -866,9 +874,7 @@ namespace Trinity
                                 // Not Stuck, skip!
                                 if (Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.OnlyIfStuck &&
                                     cacheObject.RadiusDistance > 0 &&
-                                    (DateTime.UtcNow.Subtract(PlayerMover.LastGeneratedStuckPosition).TotalSeconds > 3) &&
-                                    Player.MovementSpeed > 0 && 
-                                    PlayerMover.GetMovementSpeed() > 0)
+                                    (DateTime.UtcNow.Subtract(PlayerMover.LastGeneratedStuckPosition).TotalSeconds > 3))
                                 {
                                     objWeightInfo += "NotStuck";
                                     break;
@@ -994,7 +1000,11 @@ namespace Trinity
 
                     }
 
-                    cacheObject.Weight = Math.Min(cacheObject.Weight, MaxWeight);
+                    if (cacheObject.Weight > MaxWeight && !Double.IsNaN(cacheObject.Weight))
+                    {
+                        objWeightInfo += "MaxWeight ";
+                        cacheObject.Weight = Math.Min(cacheObject.Weight, MaxWeight);
+                    }
 
                     // Force the character to stay where it is if there is nothing available that is out of avoidance stuff and we aren't already in avoidance stuff
                     if (cacheObject.Weight == 1 && !_standingInAvoidance && ObjectCache.Any(o => o.Type == GObjectType.Avoidance))
