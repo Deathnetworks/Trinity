@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Trinity.Combat;
 using Trinity.Technicals;
 using Zeta.Game.Internals.Actors;
 namespace Trinity

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Trinity.Combat;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
@@ -163,7 +164,7 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Monk_SweepingWind, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0);
             }
 
-            bool hasTranscendance = ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Monk_Passive_Transcendence);
+            bool hasTranscendance = HotbarSkills.PassiveSkills.Any(s => s == SNOPower.Monk_Passive_Transcendence);
             float minSweepingWindSpirit = Settings.Combat.Monk.HasInnaSet ? 5f : 75f;
 
             // Sweeping wind
@@ -340,7 +341,7 @@ namespace Trinity
              *  - or - 
              * Keep Foresight and Blazing Fists buffs up every 30/5 seconds
              */
-            bool hasCombinationStrike = ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Monk_Passive_CombinationStrike);
+            bool hasCombinationStrike = HotbarSkills.PassiveSkills.Any(s => s == SNOPower.Monk_Passive_CombinationStrike);
             bool isDualOrTriGen = HotbarSkills.AssignedSkills.Count(s =>
                 s.Power == SNOPower.Monk_DeadlyReach ||
                 s.Power == SNOPower.Monk_WayOfTheHundredFists ||

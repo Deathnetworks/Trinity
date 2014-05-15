@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Trinity.Cache;
+using Trinity.Combat;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.DbProvider;
@@ -649,7 +650,7 @@ namespace Trinity
                                 bool witchDoctorManaLow =
                                     Player.ActorClass == ActorClass.Witchdoctor &&
                                     Player.PrimaryResourcePct <= 0.15 &&
-                                    ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GruesomeFeast);
+                                    HotbarSkills.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GruesomeFeast);
 
                                 if ((Player.CurrentHealthPct >= 1 || !Settings.Combat.Misc.CollectHealthGlobe))
                                 {

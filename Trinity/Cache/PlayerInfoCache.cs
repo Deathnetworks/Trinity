@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Trinity.Cache;
+using Trinity.Combat;
 using Trinity.Combat.Abilities;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -225,35 +226,35 @@ namespace Trinity
                         Player.InActiveEvent = ZetaDia.ActInfo.ActiveQuests.Any(q => DataDictionary.EventQuests.Contains(q.QuestSNO) && q.QuestStep != 13 );
                         Player.HasEventInspectionTask = ZetaDia.ActInfo.ActiveQuests.Any(q => DataDictionary.EventQuests.Contains(q.QuestSNO) && q.QuestStep == 13);
 
-                        if (ZetaDia.ActInfo.ActiveBounty != null)
-                        {
-                            var ab = ZetaDia.ActInfo.ActiveBounty;
-                            Player.ActiveBounty = new TrinityBountyInfo()
-                            {
-                                Act = ab.Act,
-                                Quest = ab.Quest,
-                                State = ab.State,
-                                // Uncomment these after a while
-                                //LevelAreas = ab.LevelAreas.ToList(),
-                                //StartingLevelArea = ab.StartingLevelArea,
-                                Info = new TrinityQuestInfo()
-                                {
-                                    Quest = ab.Info.Quest,
-                                    State = ab.Info.State,
-                                    QuestType = ab.Info.QuestType,
-                                    QuestSNO = ab.Info.QuestSNO,
-                                    BonusCount = ab.Info.BonusCount,
-                                    KillCount = ab.Info.KillCount,
-                                    // LevelArea = ab.Info.LevelArea,
+                        //if (ZetaDia.ActInfo.ActiveBounty != null)
+                        //{
+                        //    var ab = ZetaDia.ActInfo.ActiveBounty;
+                        //    Player.ActiveBounty = new TrinityBountyInfo()
+                        //    {
+                        //        Act = ab.Act,
+                        //        Quest = ab.Quest,
+                        //        State = ab.State,
+                        //        // Uncomment these after a while
+                        //        //LevelAreas = ab.LevelAreas.ToList(),
+                        //        //StartingLevelArea = ab.StartingLevelArea,
+                        //        Info = new TrinityQuestInfo()
+                        //        {
+                        //            Quest = ab.Info.Quest,
+                        //            State = ab.Info.State,
+                        //            QuestType = ab.Info.QuestType,
+                        //            QuestSNO = ab.Info.QuestSNO,
+                        //            BonusCount = ab.Info.BonusCount,
+                        //            KillCount = ab.Info.KillCount,
+                        //            // LevelArea = ab.Info.LevelArea,
 
-                                    QuestInfo = ab.Info,
-                                },
-                                BountyInfo = ab
-                            };
+                        //            QuestInfo = ab.Info,
+                        //        },
+                        //        BountyInfo = ab
+                        //    };
 
-                        }
-                        else
-                            Player.ActiveBounty = null;
+                        //}
+                        //else
+                        //    Player.ActiveBounty = null;
                     }
 
                     // Refresh player buffs (to check for archon)
@@ -351,7 +352,7 @@ namespace Trinity
             if (Player.ActorClass == ActorClass.Monk && HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_SevenSidedStrike && s.RuneIndex == 3))
                 CombatBase.SetSNOPowerUseDelay(SNOPower.Monk_SevenSidedStrike, 17000);
 
-            if (Player.ActorClass == ActorClass.Witchdoctor && ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice))
+            if (Player.ActorClass == ActorClass.Witchdoctor && HotbarSkills.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice))
             {
                 CombatBase.SetSNOPowerUseDelay(SNOPower.Witchdoctor_SoulHarvest, 1000);
                 CombatBase.SetSNOPowerUseDelay(SNOPower.Witchdoctor_SpiritWalk, 1000);
@@ -367,7 +368,7 @@ namespace Trinity
                 CombatBase.SetSNOPowerUseDelay(SNOPower.Witchdoctor_FetishArmy, 20000);
                 CombatBase.SetSNOPowerUseDelay(SNOPower.Witchdoctor_BigBadVoodoo, 20000);
             }
-            if (Player.ActorClass == ActorClass.Barbarian && ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Barbarian_Passive_BoonOfBulKathos))
+            if (Player.ActorClass == ActorClass.Barbarian && HotbarSkills.PassiveSkills.Contains(SNOPower.Barbarian_Passive_BoonOfBulKathos))
             {
                 CombatBase.SetSNOPowerUseDelay(SNOPower.Barbarian_Earthquake, 90500);
                 CombatBase.SetSNOPowerUseDelay(SNOPower.Barbarian_CallOfTheAncients, 90500);
@@ -384,7 +385,7 @@ namespace Trinity
             {
                 HotbarSkills.Update(TrinityLogLevel.Info, LogCategory.UserInformation);
 
-                foreach (var skill in ZetaDia.CPlayer.PassiveSkills.ToList())
+                foreach (var skill in HotbarSkills.PassiveSkills.ToList())
                 {
                     Logger.Log("Passive: {0}", skill);
                 }

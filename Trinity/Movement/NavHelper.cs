@@ -159,7 +159,7 @@ namespace Trinity
                     DateTime.UtcNow.Subtract(CacheData.AbilityLastUsed[SNOPower.Wizard_WaveOfForce]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(SNOPower.Wizard_WaveOfForce) &&
                     !PlayerStatus.IsIncapacitated && CacheData.TimeBoundAvoidance.Count(u => u.ActorSNO == 5212 && u.Position.Distance(PlayerStatus.Position) <= 15f) >= 2 &&
                     (
-                    //ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) || 
+                    //HotbarSkills.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) || 
                     PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))
                 {
                     ZetaDia.Me.UsePower(SNOPower.Wizard_WaveOfForce, Vector3.Zero, PlayerStatus.WorldDynamicID, -1);

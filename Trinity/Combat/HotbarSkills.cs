@@ -6,11 +6,12 @@ using Zeta.Game;
 using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
 
-namespace Trinity
+namespace Trinity.Combat
 {
     public class HotbarSkills
     {
         private static HashSet<HotbarSkills> _assignedSkills = new HashSet<HotbarSkills>();
+        private static HashSet<SNOPower> _passiveSkills = new HashSet<SNOPower>();
 
         /// <summary>
         /// The currently assigned hotbar skills with runes and slots
@@ -29,6 +30,23 @@ namespace Trinity
             set
             {
                 _assignedSkills = value;
+            }
+        }
+
+        internal static HashSet<SNOPower> PassiveSkills
+        {
+            get
+            {
+                if (_passiveSkills == null)
+                {
+                    _passiveSkills = new HashSet<SNOPower>();
+                    Update();
+                }
+                return _passiveSkills;
+            }
+            set
+            {
+                _passiveSkills = value;
             }
         }
 
@@ -78,21 +96,23 @@ namespace Trinity
 
                 foreach (SNOPower p in Trinity.Hotbar)
                 {
-                    _assignedSkills.Add(new HotbarSkills()
+                    _assignedSkills.Add(new HotbarSkills
                     {
                         Power = p,
-                        Slot = HotbarSkills.GetHotbarSlotFromPower(p),
-                        RuneIndex = HotbarSkills.GetRuneIndexFromPower(p)
+                        Slot = GetHotbarSlotFromPower(p),
+                        RuneIndex = GetRuneIndexFromPower(p)
                     });
                 }
             }
 
             string skillList = "";
-            foreach (HotbarSkills skill in HotbarSkills.AssignedSkills)
+            foreach (HotbarSkills skill in AssignedSkills)
             {
-                skillList += " " + skill.Power.ToString() + "/" + skill.RuneIndex + "/" + skill.Slot;
+                skillList += " " + skill.Power + "/" + skill.RuneIndex + "/" + skill.Slot;
             }
             Logger.Log(logLevel, logCategory, " Hotbar Skills (Skill/RuneIndex/Slot): " + skillList);
+
+            PassiveSkills = new HashSet<SNOPower>(cPlayer.PassiveSkills);
         }
 
 

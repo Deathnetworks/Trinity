@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Trinity.Combat;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Helpers;
@@ -28,14 +29,19 @@ namespace Trinity.DbProvider
         // 138989 = health pool, 176074 = protection, 176076 = fortune, 176077 = frenzied, 176536 = portal in leorics, 260330 = cooldown shrine
         // Exp shrines = ???? Other shrines ????
 
+
         private static bool ShrinesInArea(Vector3 targetpos)
         {
             return Trinity.ObjectCache.Any(o => BasicMovementOnlyIDs.Contains(o.ActorSNO) && Vector3.Distance(o.Position, targetpos) <= 10f);
         }
 
+        private static DateTime _lastUsedMoveStop = DateTime.MinValue;
         public void MoveStop()
         {
-            ZetaDia.Me.UsePower(SNOPower.Walk, Trinity.Player.Position, Trinity.CurrentWorldDynamicId, -1);
+            if (DateTime.UtcNow.Subtract(_lastUsedMoveStop).TotalMilliseconds < 250)
+                return;
+
+            ZetaDia.Me.UsePower(SNOPower.Walk, ZetaDia.Me.Position, ZetaDia.CurrentWorldDynamicId   );
         }
 
         // Anti-stuck variables
@@ -519,7 +525,7 @@ namespace Trinity.DbProvider
                     return;
                 }
 
-                bool hasTacticalAdvantage = ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.DemonHunter_Passive_TacticalAdvantage);
+                bool hasTacticalAdvantage = HotbarSkills.PassiveSkills.Any(s => s == SNOPower.DemonHunter_Passive_TacticalAdvantage);
                 int vaultDelay = hasTacticalAdvantage ? 2000 : Trinity.Settings.Combat.DemonHunter.VaultMovementDelay;
 
                 // DemonHunter Vault

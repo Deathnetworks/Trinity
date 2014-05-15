@@ -58,13 +58,15 @@ namespace Trinity
             AddHotSpot(hotSpot);
         }
 
+        private const int hotSpotRefreshRate = 300;
+
         private static void HotSpotManager()
         {
             while (true)
             {
                 try
                 {
-                    System.Threading.Thread.Sleep(Trinity.Settings.Advanced.CacheRefreshRate);
+                    System.Threading.Thread.Sleep(hotSpotRefreshRate);
 
                     if (hotSpotList == null)
                         hotSpotList = new HashSet<HotSpot>();

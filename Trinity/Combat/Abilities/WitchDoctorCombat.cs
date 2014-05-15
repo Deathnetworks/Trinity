@@ -50,12 +50,12 @@ namespace Trinity.Combat.Abilities
             // Combat Spells with a Target
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CurrentTarget != null)
             {
-                bool hasGraveInjustice = ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice);
+                bool hasGraveInjustice = HotbarSkills.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice);
 
                 bool hasAngryChicken = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Hex && s.RuneIndex == 1);
                 bool isChicken = hasAngryChicken && Player.IsHidden;
 
-                bool hasVisionQuest = ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Witchdoctor_Passive_VisionQuest);
+                bool hasVisionQuest = HotbarSkills.PassiveSkills.Any(s => s == SNOPower.Witchdoctor_Passive_VisionQuest);
 
                 // Set max ranged attack range, based on Grave Injustice, and current target NOT standing in avoidance, and health > 25%
                 float rangedAttackMaxRange = 30f;
@@ -181,7 +181,7 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Sacrifice for Circle of Life
-                bool hasCircleofLife = ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Witchdoctor_Passive_CircleOfLife);
+                bool hasCircleofLife = HotbarSkills.PassiveSkills.Any(s => s == SNOPower.Witchdoctor_Passive_CircleOfLife);
                 if (CanCast(SNOPower.Witchdoctor_Sacrifice) && Trinity.PlayerOwnedZombieDogCount > 0 && hasCircleofLife && TargetUtil.AnyMobsInRange(15f))
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_Sacrifice);
@@ -426,7 +426,7 @@ namespace Trinity.Combat.Abilities
                 }
 
                 bool hasWellOfSouls = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritBarrage && s.RuneIndex == 1);
-                bool hasRushOfEssence = ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Witchdoctor_Passive_RushOfEssence);
+                bool hasRushOfEssence = HotbarSkills.PassiveSkills.Any(s => s == SNOPower.Witchdoctor_Passive_RushOfEssence);
 
                 // Spirit Barrage + Rush of Essence
                 if (CanCast(SNOPower.Witchdoctor_SpiritBarrage) && Player.PrimaryResource >= 100 &&

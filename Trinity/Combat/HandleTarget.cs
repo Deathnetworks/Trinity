@@ -671,7 +671,7 @@ namespace Trinity
                     {
                         _forceTargetUpdate = true;
 
-                        if (ZetaDia.Me.Movement.IsMoving)
+                        if (ZetaDia.Me.Movement.SpeedXY > 0.5)
                         {
                             Logger.LogVerbose(LogCategory.Behavior, "Trying to stop, Speeds:{0:0.00}/{1:0.00}", ZetaDia.Me.Movement.SpeedXY, PlayerMover.GetMovementSpeed());
                             Navigator.PlayerMover.MoveStop();
@@ -1345,7 +1345,7 @@ namespace Trinity
                         MathUtil.GetHeadingToPoint(CurrentTarget.Position));
 
                     MoveResult lastMoveResult;
-                    if (straightLinePathing)
+                    if (straightLinePathing || CurrentDestination.Distance2DSqr(Player.Position) <= 10f * 10f)
                     {
                         lastMoveResult = MoveResult.Moved;
                         // just "Click" 

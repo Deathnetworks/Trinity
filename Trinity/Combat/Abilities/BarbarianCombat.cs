@@ -665,7 +665,7 @@ namespace Trinity.Combat.Abilities
             get
             {
                 return !UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.X1_Barbarian_Avalanche_v2, CanCastFlags.NoTimer) &&
-                       (TargetUtil.AnyMobsInRange(3) || TargetUtil.IsEliteTargetInRange());
+                    Player.PrimaryResourcePct > 0.99 && (TargetUtil.AnyMobsInRange(3) || TargetUtil.IsEliteTargetInRange());
             }
         }
 

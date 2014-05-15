@@ -261,7 +261,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(60)]
+        [DefaultValue(15)]
         public int GemLevel
         {
             get
