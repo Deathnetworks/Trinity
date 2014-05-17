@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Trinity.Cache;
+using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Navigation;

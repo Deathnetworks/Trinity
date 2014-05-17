@@ -12,9 +12,9 @@ namespace Trinity.Helpers
 {
     public class GoldInactivity : IDisposable
     {
-        private int _lastKnowCoin;
+        private int _lastGoldAmount;
         private DateTime _lastCheckBag = DateTime.MinValue;
-        private DateTime _lastRefreshCoin = DateTime.MinValue;
+        private DateTime _lastFoundGold = DateTime.MinValue;
 
         private static GoldInactivity _instance;
         public static GoldInactivity Instance { get { return _instance ?? (_instance = new GoldInactivity()); } }
@@ -51,8 +51,7 @@ namespace Trinity.Helpers
                 {
                     if (BotMain.IsPaused)
                     {
-                        long pauseTicks = DateTime.UtcNow.Subtract(_lastRefreshCoin).Ticks;
-                        _lastRefreshCoin = _lastRefreshCoin.AddTicks(pauseTicks);
+                        PauseGoldTimer();
                     }
                 }
                 catch (ThreadAbortException)
@@ -67,6 +66,12 @@ namespace Trinity.Helpers
             }
         }
 
+        private void PauseGoldTimer()
+        {
+            long pauseTicks = DateTime.UtcNow.Subtract(_lastFoundGold).Ticks;
+            _lastFoundGold = _lastFoundGold.AddTicks(pauseTicks);
+        }
+
         ~GoldInactivity()
         {
             Dispose();
@@ -78,8 +83,8 @@ namespace Trinity.Helpers
         internal void ResetCheckGold()
         {
             _lastCheckBag = DateTime.UtcNow;
-            _lastRefreshCoin = DateTime.UtcNow;
-            _lastKnowCoin = 0;
+            _lastFoundGold = DateTime.UtcNow;
+            _lastGoldAmount = 0;
         }
 
         private const int CheckGoldSeconds = 5;
@@ -126,54 +131,34 @@ namespace Trinity.Helpers
                     return false;
                 }
 
-                //if (TownRun.IsTryingToTownPortal())
-                //{
-                //    Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Trying to town portal or WaitTimer tag, gold inactivity reset", 0);
-                //    ResetCheckGold();
-                //    return false;
-                //}
-
-                // Don't go inactive on WaitTimer tags
-                //try
-                //{
-                //    if (ProfileManager.CurrentProfileBehavior != null)
-                //        ;
-                //}
-                //catch { }
-                
-                //if (c != null && c.GetType() == typeof(WaitTimerTag))
-                //{
-                //    Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Wait timer tag, gold inactivity reset", 0);
-                //    ResetCheckGold();
-                //    return false;
-                //}
-
                 _lastCheckBag = DateTime.UtcNow;
-                int currentcoin = Trinity.Player.Coinage;
+                int currentGoldAmount = Trinity.Player.Coinage;
 
-                if (currentcoin != _lastKnowCoin && currentcoin != 0)
+                if (currentGoldAmount != _lastGoldAmount && currentGoldAmount != 0)
                 {
-                    _lastRefreshCoin = DateTime.UtcNow;
-                    _lastKnowCoin = currentcoin;
+                    Logger.LogDebug(LogCategory.GlobalHandler, "Gold Changed from {0} to {1}", _lastGoldAmount, currentGoldAmount);
+                    _lastFoundGold = DateTime.UtcNow;
+                    _lastGoldAmount = currentGoldAmount;
                 }
-                int notpickupgoldsec = Convert.ToInt32(DateTime.UtcNow.Subtract(_lastRefreshCoin).TotalSeconds);
-                if (notpickupgoldsec >= Trinity.Settings.Advanced.GoldInactivityTimer)
+
+                int goldUnchangedSeconds = Convert.ToInt32(DateTime.UtcNow.Subtract(_lastFoundGold).TotalSeconds);
+                if (goldUnchangedSeconds >= Trinity.Settings.Advanced.GoldInactivityTimer)
                 {
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Gold inactivity after {0}s. Sending abort.", notpickupgoldsec);
-                    _lastRefreshCoin = DateTime.UtcNow;
-                    _lastKnowCoin = currentcoin;
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Gold inactivity after {0}s. Sending abort.", goldUnchangedSeconds);
+                    _lastFoundGold = DateTime.UtcNow;
+                    _lastGoldAmount = currentGoldAmount;
                     return true;
                 }
-                if (notpickupgoldsec > 0)
+                if (goldUnchangedSeconds > 0)
                 {
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Gold unchanged for {0}s", notpickupgoldsec);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Gold unchanged for {0}s", goldUnchangedSeconds);
                 }
             }
             catch (Exception e)
             {
                 Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, e.Message);
             }
-            //Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Gold inactivity error - no result", 0);
+
             return false;
         }
 

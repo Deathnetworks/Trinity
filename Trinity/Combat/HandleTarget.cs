@@ -7,6 +7,7 @@ using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.DbProvider;
 using Trinity.Helpers;
+using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Navigation;

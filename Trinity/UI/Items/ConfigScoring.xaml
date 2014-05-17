@@ -3,7 +3,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ut="clr-namespace:Trinity.UIComponents"
-             mc:Ignorable="d"  Foreground="{DynamicResource TextBrush}"
+             mc:Ignorable="d"  Foreground="{DynamicResource TextBrush}" Background="#555"
              d:DesignHeight="569" d:DesignWidth="428">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -25,137 +25,114 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <!-- TownRun Settings -->
-            <Grid Grid.Row="0" Margin="5">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="3*" />
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Free Bag Slots for Town Run:" />
-                <Slider Grid.Row="0" Grid.Column="1" Template="{DynamicResource Slider}"
+
+
+            <GroupBox Grid.Row="0" Header="Misc Town Run Options">
+                <StackPanel HorizontalAlignment="Center">
+                    <UniformGrid Columns="2" HorizontalAlignment="Center">
+                        <CheckBox Content="Open Horadric Cache's" IsChecked="{Binding Path=TownRun.OpenHoradricCaches}" />
+                        <CheckBox ToolTip="Sell Extra Potions" IsChecked="{Binding Path=TownRun.SellExtraPotions}" HorizontalAlignment="Left" Content="Sell Extra Potions" />
+                        <CheckBox ToolTip="Stash White Items" IsChecked="{Binding Path=TownRun.StashWhites}"  HorizontalAlignment="Left" Content="Stash Whites" />
+                        <CheckBox ToolTip="Stash Blue Items" IsChecked="{Binding Path=TownRun.StashBlues}" HorizontalAlignment="Left" Content="Stash Blues" />
+                        <CheckBox ToolTip="Trash all Rares" IsChecked="{Binding Path=TownRun.ForceSalvageRares}" HorizontalAlignment="Left" Content="Sell/Salvage All Rares" />
+                        <CheckBox ToolTip="Keep Legendaries Unidentified" IsChecked="{Binding Path=TownRun.KeepLegendaryUnid}" HorizontalAlignment="Left" Content="Keep Legendaries Unidentified" />
+                    </UniformGrid>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Grid.Row="1" Header="Free Bag Slots for Town Run">
+                <!-- TownRun Settings -->
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="3*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="When not in Town:" />
+                    <Slider Grid.Row="0" Grid.Column="1" Template="{DynamicResource Slider}"
                         Interval="500" Maximum="59" Minimum="0" SmallChange="1" LargeChange="10"
                         TickFrequency="1" TickPlacement="BottomRight" IsSnapToTickEnabled="True"
                         Value="{Binding Path=TownRun.FreeBagSlots}" />
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Free Bag slots in Town:" />
-                <Slider Grid.Row="1" Grid.Column="1" Template="{DynamicResource Slider}"
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="When in Town:" />
+                    <Slider Grid.Row="1" Grid.Column="1" Template="{DynamicResource Slider}"
                         Interval="500" Maximum="59" Minimum="0" SmallChange="1" LargeChange="10"
                         TickFrequency="1" TickPlacement="BottomRight" IsSnapToTickEnabled="True"
                         Value="{Binding Path=TownRun.FreeBagSlotsInTown}" />
-                <UniformGrid Grid.Row="2" Grid.Column="0" >
-                    <CheckBox Content="Open Horadric Cache's" IsChecked="{Binding Path=TownRun.OpenHoradricCaches}" />
-                </UniformGrid>
-            </Grid>
+                </Grid>
+            </GroupBox>
+            <GroupBox Grid.Row="2" Header="Sell/Salvage Options when item is not stashed">
+                <StackPanel>
+                    <UniformGrid Columns="3">
+                        <TextBlock Margin="2" Text="White Items" VerticalAlignment="Center"/>
+                        <RadioButton GroupName="WhiteSalvage" Content="Sell" ToolTip="Sell all items"
+                             IsChecked="{Binding Path=TownRun.SalvageWhiteItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Sell}" VerticalAlignment="Center"/>
+                        <RadioButton GroupName="WhiteSalvage" Content="Salvage" ToolTip="Salvage all items, will not sell"
+                             IsChecked="{Binding Path=TownRun.SalvageWhiteItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Salvage}" VerticalAlignment="Center"/>
 
-            <!--Junk items Settings-->
-            <Grid Grid.Row="1" Margin="5">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <TextBlock Text="Salvage options:" FontWeight="Bold" TextAlignment="Center"/>
-                <UniformGrid Grid.Row="1" Columns="4" Margin="25,2">
-                    <TextBlock Margin="2" Text="Whites" FontWeight="Bold" VerticalAlignment="Center"/>
-                    <RadioButton GroupName="WhiteSalvage" Content="None" ToolTip="Sell all items"
-                             IsChecked="{Binding Path=TownRun.SalvageWhiteItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=None}" VerticalAlignment="Center"/>
-                    <RadioButton GroupName="SalvageWhiteItemOption" Content="Inferno" ToolTip="Salvage Only 59/60+ Items" IsEnabled="False"
-                             IsChecked="{Binding Path=TownRun.SalvageWhiteItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=InfernoOnly}" VerticalAlignment="Center"/>
-                    <RadioButton GroupName="WhiteSalvage" Content="All levels" ToolTip="Salvage all items, will not sell"
-                             IsChecked="{Binding Path=TownRun.SalvageWhiteItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=All}" VerticalAlignment="Center"/>
+                        <TextBlock Margin="2" Text="Magic Items" VerticalAlignment="Center"/>
+                        <RadioButton GroupName="BlueSalvage" Content="Sell" ToolTip="Sell all items"
+                             IsChecked="{Binding Path=TownRun.SalvageBlueItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Sell}" VerticalAlignment="Center"/>
+                        <RadioButton GroupName="BlueSalvage" Content="Salvage" ToolTip="Salvage all items, will not sell"
+                             IsChecked="{Binding Path=TownRun.SalvageBlueItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Salvage}" VerticalAlignment="Center"/>
 
-                    <TextBlock Margin="2" Text="Magics" FontWeight="Bold" VerticalAlignment="Center"/>
-                    <RadioButton GroupName="BlueSalvage" Content="None" ToolTip="Sell all items"
-                             IsChecked="{Binding Path=TownRun.SalvageBlueItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=None}" VerticalAlignment="Center"/>
-                    <RadioButton GroupName="BlueSalvage" Content="Inferno" ToolTip="Salvage Only 59/60+ Items"
-                             IsChecked="{Binding Path=TownRun.SalvageBlueItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=InfernoOnly}" VerticalAlignment="Center"/>
-                    <RadioButton GroupName="BlueSalvage" Content="All levels" ToolTip="Salvage all items, will not sell"
-                             IsChecked="{Binding Path=TownRun.SalvageBlueItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=All}" VerticalAlignment="Center"/>
+                        <TextBlock Margin="2" Text="Rare Items" VerticalAlignment="Center"/>
+                        <RadioButton GroupName="YellowSalvage" Content="Sell" ToolTip="Sell all items"
+                             IsChecked="{Binding Path=TownRun.SalvageYellowItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Sell}" VerticalAlignment="Center"/>
+                        <RadioButton GroupName="YellowSalvage" Content="Salvage" ToolTip="Salvage all items, will not sell"
+                             IsChecked="{Binding Path=TownRun.SalvageYellowItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Salvage}" VerticalAlignment="Center"/>
 
-                    <TextBlock Margin="2" Text="Rares" FontWeight="Bold" VerticalAlignment="Center"/>
-                    <RadioButton GroupName="YellowSalvage" Content="None" ToolTip="Sell all items"
-                             IsChecked="{Binding Path=TownRun.SalvageYellowItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=None}" VerticalAlignment="Center"/>
-                    <RadioButton GroupName="YellowSalvage" Content="Inferno" ToolTip="Salvage Only 59/60+ Items"
-                             IsChecked="{Binding Path=TownRun.SalvageYellowItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=InfernoOnly}" VerticalAlignment="Center"/>
-                    <RadioButton GroupName="YellowSalvage" Content="All levels" ToolTip="Salvage all items, will not sell"
-                             IsChecked="{Binding Path=TownRun.SalvageYellowItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=All}" VerticalAlignment="Center"/>
+                        <TextBlock Margin="2" Text="Legendary Items **" VerticalAlignment="Center"/>
+                        <RadioButton GroupName="LegendarySalvage" Content="Sell" ToolTip="Sell all items"
+                             IsChecked="{Binding Path=TownRun.SalvageLegendaryItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Sell}" VerticalAlignment="Center"/>
+                        <RadioButton GroupName="LegendarySalvage" Content="Salvage" ToolTip="Salvage all items, will not sell"
+                             IsChecked="{Binding Path=TownRun.SalvageLegendaryItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Salvage}" VerticalAlignment="Center"/>
 
-                    <TextBlock Margin="2" Text="Legendaries" FontWeight="Bold" VerticalAlignment="Center"/>
-                    <RadioButton GroupName="LegendarySalvage" Content="None" ToolTip="Sell all items"
-                             IsChecked="{Binding Path=TownRun.SalvageLegendaryItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=None}" VerticalAlignment="Center"/>
-                    <RadioButton GroupName="LegendarySalvage" Content="Inferno" ToolTip="Salvage Only 59/60+ Items"
-                             IsChecked="{Binding Path=TownRun.SalvageLegendaryItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=InfernoOnly}" VerticalAlignment="Center"/>
-                    <RadioButton GroupName="LegendarySalvage" Content="All levels" ToolTip="Salvage all items, will not sell"
-                             IsChecked="{Binding Path=TownRun.SalvageLegendaryItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=All}" VerticalAlignment="Center"/>
-                </UniformGrid>
-            </Grid>
-            <StackPanel Grid.Row="2" Margin="10" HorizontalAlignment="Center">
-                <UniformGrid Columns="2" HorizontalAlignment="Center">
-                    <TextBlock Text="Stash Whites" FontWeight="Bold" HorizontalAlignment="Right" />
-                    <CheckBox Margin="10,0" ToolTip="Stash White Items" IsChecked="{Binding Path=TownRun.StashWhites}"  HorizontalAlignment="Left"/>
+                    </UniformGrid>
+                    <TextBlock Text="** When using Custom Item Rules or otherwise not stashing Legendaries. Trinity Scoring will always keep Legendaries" TextWrapping="Wrap" />
+                </StackPanel>
+            </GroupBox>
 
-                    <TextBlock Text="Stash Blues" FontWeight="Bold" HorizontalAlignment="Right" />
-                    <CheckBox Margin="10,0" ToolTip="Stash Blue Items" IsChecked="{Binding Path=TownRun.StashBlues}" HorizontalAlignment="Left" />
 
-                    <TextBlock Text="Sell/Salvage all Rares" FontWeight="Bold" HorizontalAlignment="Right" />
-                    <CheckBox Margin="10,0" ToolTip="Trash all Rares" IsChecked="{Binding Path=TownRun.ForceSalvageRares}" HorizontalAlignment="Left" />
-
-                    <TextBlock Text="Keep Legendaries Unidentified" FontWeight="Bold" HorizontalAlignment="Right" />
-                    <CheckBox Margin="10,0" ToolTip="Keep Legendaries Unidentified" IsChecked="{Binding Path=TownRun.KeepLegendaryUnid}" HorizontalAlignment="Left" />
-                </UniformGrid>
-            </StackPanel>
-            <!--Junk items Settings-->
-            <Grid Grid.Row="3" Margin="5">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <TextBlock Text="Stash/Keep Score Requirements :" FontWeight="Bold" TextAlignment="Center"/>
-                <StackPanel Grid.Row="1" Margin="0,0,0,0"  HorizontalAlignment="Center" Orientation="Vertical" MinWidth="400">
-                    <TextBlock Text="Weapon Score : (70 000+ recommended)" Margin="5"/>
-                    <Slider Grid.Row="1" Template="{DynamicResource SliderLTB}" 
+            <GroupBox Grid.Row="3" Header="Stash/Keep Scoring">
+                <!--Junk items Settings-->
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="1" Margin="0,0,0,0"  HorizontalAlignment="Center" Orientation="Vertical" MinWidth="400">
+                        <TextBlock Text="Weapon Score : (70 000+ recommended)" Margin="5"/>
+                        <Slider Template="{DynamicResource SliderLTB}" 
                     Interval="500" SmallChange="1000" LargeChange="10000" 
                     Maximum="110000" Minimum="0" TickPlacement="BottomRight" 
                     Value="{Binding Path=TownRun.WeaponScore}" 
                     IsSnapToTickEnabled="True" TickFrequency="1000"
                     HorizontalAlignment="Stretch" Margin="2"/>
-                    <TextBlock Text="Armor Score : (16 000+ recommended)" Margin="5"/>
-                    <Slider Grid.Row="1" Template="{DynamicResource SliderLTB}" 
+                        <TextBlock Text="Armor Score : (16 000+ recommended)" Margin="5"/>
+                        <Slider Template="{DynamicResource SliderLTB}" 
                     Interval="500"  SmallChange="1000" LargeChange="5000" 
                     Maximum="60000" Minimum="0" TickFrequency="1000" TickPlacement="BottomRight" 
                     Value="{Binding Path=TownRun.ArmorScore}"  IsSnapToTickEnabled="True"
                     HorizontalAlignment="Stretch" Margin="2"/>
-                    <TextBlock Text="Jewelry Score : (15 000+ recommended)" Margin="5"/>
-                    <Slider Grid.Row="1" Template="{DynamicResource SliderLTB}" 
+                        <TextBlock Text="Jewelry Score : (15 000+ recommended)" Margin="5"/>
+                        <Slider Template="{DynamicResource SliderLTB}" 
                     Interval="500"  SmallChange="1000" LargeChange="5000" 
                     Maximum="60000" Minimum="0" TickFrequency="1000" TickPlacement="BottomRight" 
                     Value="{Binding Path=TownRun.JewelryScore}"  IsSnapToTickEnabled="True"
                     HorizontalAlignment="Stretch" Margin="2"/>
-                </StackPanel>
-            </Grid>
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
 
-            <StackPanel Grid.Row="4" Margin="5" HorizontalAlignment="Center">
-                <TextBlock Text="Dump Item Debug Info" FontWeight="Bold" TextAlignment="Center"/>
-                <UniformGrid Columns="2" HorizontalAlignment="Center">
-                    <Button Grid.Row="1" Margin="10" HorizontalAlignment="Center" Content="Dump Backpack Items" Command="{Binding Path=DumpBackpackCommand}"/>
-                    <Button Grid.Row="1" Margin="10" HorizontalAlignment="Center" Content="Dump Equipped Items" Command="{Binding Path=DumpEquippedCommand}"/>
-                    <Button Grid.Row="1" Margin="10" HorizontalAlignment="Center" Content="Dump Ground Items" Command="{Binding Path=DumpGroundItemsCommand}"/>
-                    <Button Grid.Row="1" Margin="10" HorizontalAlignment="Center" Content="Dump Stash items" Command="{Binding Path=DumpStashCommand}"/>
-                    <Button Grid.Row="1" Margin="10" HorizontalAlignment="Center" Content="Dump Merchant items" Command="{Binding Path=DumpMerchantItemsCommand}"/>
-                    <Button Grid.Row="1" Margin="10" HorizontalAlignment="Center" Content="Dump ALL items (SLOW!!)" Command="{Binding Path=DumpAllItemsCommand}"/>
-                </UniformGrid>
-            </StackPanel>
             <!--Test Score-->
             <!--<Grid Grid.Row="3" Margin="5">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="See sample Backpack Score :" FontWeight="Bold" TextAlignment="Center"/>
+            <TextBlock Text="See sample Backpack Score :" TextAlignment="Center"/>
             <Button Grid.Row="1" Margin="50,0,50,0" HorizontalAlignment="Center" Content="Test Backpack Scores" Command="{Binding Path=TestScoreCommand}"/>
         </Grid>-->
             <!--Test Score-->
@@ -164,7 +141,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Order stash by Score (Use carefully!):" FontWeight="Bold" TextAlignment="Center"/>
+            <TextBlock Text="Order stash by Score (Use carefully!):" TextAlignment="Center"/>
             <Button Grid.Row="1" Margin="50,0,50,0" HorizontalAlignment="Center" Content="Order Stash" Command="{Binding Path=OrderStashCommand}"/>
         </Grid> -->
             <!--Reset Button-->

@@ -145,6 +145,7 @@ namespace Trinity.Config
         }
 
         [DataMember(IsRequired = false)]
+        [IgnoreDataMember]
         internal string BattleTagSettingsFile
         {
             get
@@ -249,7 +250,7 @@ namespace Trinity.Config
 
                             loadedSetting.CopyTo(this);
                             stream.Close();
-                            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Configuration file loaded");
+                            Logger.Log("Configuration file loaded");
 
                             // this tests to make sure we didn't load anything null, and our load was succesful
                             if (Advanced != null && Combat != null && Combat.Misc != null)

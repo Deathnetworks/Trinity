@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using Trinity.Cache;
 using Trinity.Combat.Abilities;
 using Trinity.DbProvider;
 using Trinity.Helpers;
 using Trinity.ItemRules;
+using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Navigation;
 using Zeta.Bot.Settings;
 using Zeta.Common;
-using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using Logger = Trinity.Technicals.Logger;
 
@@ -65,6 +64,8 @@ namespace Trinity
                     "Note: Maintaining item stats from previous run. To reset stats fully, please restart DB.");
             }
 
+            TrinityItemManager.ResetBackPackCheck();
+
             BeginInvoke(UsedProfileManager.RefreshProfileBlacklists);
             UsedProfileManager.SetProfileInWindowTitle();
 
@@ -77,15 +78,13 @@ namespace Trinity
 
             if (CharacterSettings.Instance.KillRadius < 20)
             {
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation,
-                    "WARNING: Low Kill Radius detected, currently set to: {0} (you can change this through Demonbuddy bot settings)",
+                Logger.Log("WARNING: Low Kill Radius detected, currently set to: {0} (you can change this through Demonbuddy bot settings)",
                     CharacterSettings.Instance.KillRadius);
             }
 
             if (CharacterSettings.Instance.LootRadius < 50)
             {
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation,
-                    "WARNING: Low Gold Loot Radius detected, currently set to: {0} (you can change this through Demonbuddy bot settings)",
+                Logger.Log("WARNING: Low Gold Loot Radius detected, currently set to: {0} (you can change this through Demonbuddy bot settings)",
                     CharacterSettings.Instance.LootRadius);
             }
 
@@ -105,7 +104,7 @@ namespace Trinity
             Logger.LogDebug("Trinity BotStart took {0:0}ms", DateTime.UtcNow.Subtract(timeBotStart).TotalMilliseconds);
         }
 
-        private void GameEvents_OnGameChanged(object sender, EventArgs e)
+        private static void GameEvents_OnGameChanged(object sender, EventArgs e)
         {
             ClearCachesOnGameChange(sender, e);
 
@@ -117,13 +116,14 @@ namespace Trinity
             UsedProfileManager.SetProfileInWindowTitle();
         }
 
-        void GameEvents_OnWorldChanged(object sender, EventArgs e)
+        static void GameEvents_OnWorldChanged(object sender, EventArgs e)
         {
             CacheData.FullClear();
+            TrinityItemManager.ResetBackPackCheck();
         }
 
         // When the bot stops, output a final item-stats report so it is as up-to-date as can be
-        private void TrinityBotStop(IBot bot)
+        private static void TrinityBotStop(IBot bot)
         {
             // Issue final reports
             OutputReport();
@@ -139,7 +139,7 @@ namespace Trinity
             CacheData.FullClear();
         }
 
-        private void TrinityOnDeath(object src, EventArgs mea)
+        private static void TrinityOnDeath(object src, EventArgs mea)
         {
             if (DateTime.UtcNow.Subtract(LastDeathTime).TotalSeconds > 10)
             {
@@ -155,7 +155,9 @@ namespace Trinity
                 // Reset pre-townrun position if we die
                 TownRun.PreTownRunPosition = Vector3.Zero;
                 TownRun.PreTownRunWorldId = -1;
+                TownRun.LastCheckBackpackDurability = DateTime.MinValue;
                 SpellHistory.HistoryQueue.Clear();
+                TrinityItemManager.ResetBackPackCheck();
             }
         }
 
@@ -180,60 +182,61 @@ namespace Trinity
             V.ValidateLoad();
 
             // Out of thread Async stuff
-            BeginInvoke(new Action(() =>
-                {
+            BeginInvoke(() =>
+            {
 
-                    Logger.Log("New Game - resetting everything");
+                Logger.Log("New Game - resetting everything");
 
-                    Trinity.IsReadyToTownRun = false;
-                    Trinity.ForceVendorRunASAP = false;
-                    TownRun.TownRunCheckTimer.Reset();
-                    TownRun.SendEmailNotification();
-                    TownRun.PreTownRunPosition = Vector3.Zero;
-                    TownRun.PreTownRunWorldId = -1;
-                    TownRun.WasVendoring = false;
+                TrinityItemManager.ResetBackPackCheck();
+                IsReadyToTownRun = false;
+                ForceVendorRunASAP = false;
+                TownRun.TownRunCheckTimer.Reset();
+                TownRun.SendEmailNotification();
+                TownRun.PreTownRunPosition = Vector3.Zero;
+                TownRun.PreTownRunWorldId = -1;
+                TownRun.WasVendoring = false;
 
-                    CacheData.AbilityLastUsed.Clear();
-                    SpellHistory.HistoryQueue.Clear();
+                CacheData.AbilityLastUsed.Clear();
+                SpellHistory.HistoryQueue.Clear();
 
-                    DeathsThisRun = 0;
-                    LastDeathTime = DateTime.UtcNow;
-                    _hashsetItemStatsLookedAt = new HashSet<string>();
-                    _hashsetItemPicksLookedAt = new HashSet<string>();
-                    _hashsetItemFollowersIgnored = new HashSet<string>();
+                DeathsThisRun = 0;
+                LastDeathTime = DateTime.UtcNow;
+                _hashsetItemStatsLookedAt = new HashSet<string>();
+                _hashsetItemPicksLookedAt = new HashSet<string>();
+                _hashsetItemFollowersIgnored = new HashSet<string>();
 
-                    Blacklist60Seconds = new HashSet<int>();
-                    Blacklist90Seconds = new HashSet<int>();
-                    Blacklist15Seconds = new HashSet<int>();
-                    BacktrackList = new SortedList<int, Vector3>();
-                    TotalBacktracks = 0;
-                    HasMappedPlayerAbilities = false;
-                    PlayerMover.TotalAntiStuckAttempts = 1;
-                    PlayerMover.vSafeMovementLocation = Vector3.Zero;
-                    PlayerMover.LastPosition = Vector3.Zero;
-                    PlayerMover.TimesReachedStuckPoint = 0;
-                    PlayerMover.TimeLastRecordedPosition = DateTime.MinValue;
-                    PlayerMover.LastGeneratedStuckPosition = DateTime.MinValue;
-                    PlayerMover.TimesReachedMaxUnstucks = 0;
-                    PlayerMover.CancelUnstuckerForSeconds = 0;
-                    PlayerMover.LastCancelledUnstucker = DateTime.MinValue;
-                    NavHelper.UsedStuckSpots = new List<GridPoint>();
+                Blacklist60Seconds = new HashSet<int>();
+                Blacklist90Seconds = new HashSet<int>();
+                Blacklist15Seconds = new HashSet<int>();
+                BacktrackList = new SortedList<int, Vector3>();
+                TotalBacktracks = 0;
+                HasMappedPlayerAbilities = false;
+                PlayerMover.TotalAntiStuckAttempts = 1;
+                PlayerMover.vSafeMovementLocation = Vector3.Zero;
+                PlayerMover.LastPosition = Vector3.Zero;
+                PlayerMover.TimesReachedStuckPoint = 0;
+                PlayerMover.TimeLastRecordedPosition = DateTime.MinValue;
+                PlayerMover.LastGeneratedStuckPosition = DateTime.MinValue;
+                PlayerMover.TimesReachedMaxUnstucks = 0;
+                PlayerMover.CancelUnstuckerForSeconds = 0;
+                PlayerMover.LastCancelledUnstucker = DateTime.MinValue;
+                NavHelper.UsedStuckSpots = new List<GridPoint>();
 
-                    CacheData.FullClear();
+                CacheData.FullClear();
 
-                    // Reset all the caches
-                    ProfileHistory = new List<string>();
-                    CurrentProfile = "";
-                    FirstProfile = "";
+                // Reset all the caches
+                ProfileHistory = new List<string>();
+                CurrentProfile = "";
+                FirstProfile = "";
 
-                    Logger.Log("New Game, resetting Gold Inactivity Timer");
-                    GoldInactivity.Instance.ResetCheckGold();
+                Logger.Log("New Game, resetting Gold Inactivity Timer");
+                GoldInactivity.Instance.ResetCheckGold();
 
-                    CombatBase.IsQuestingMode = false;
+                CombatBase.IsQuestingMode = false;
 
-                    GenericCache.ClearCache();
-                    GenericBlacklist.ClearBlacklist();
-                }));
+                GenericCache.ClearCache();
+                GenericBlacklist.ClearBlacklist();
+            });
         }
     }
 }

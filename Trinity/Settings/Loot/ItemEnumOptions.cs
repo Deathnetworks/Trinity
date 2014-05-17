@@ -4,9 +4,11 @@ namespace Trinity.Config.Loot
 {
     public enum SalvageOption
     {
-        None = 0,
-        InfernoOnly = 1,
-        All = 2
+        Sell,
+        Salvage,
+        None,
+        InfernoOnly,
+        All
     }
 
     public enum ItemRuleType

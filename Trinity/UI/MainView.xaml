@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ut="clr-namespace:Trinity.UIComponents"
-             mc:Ignorable="d" Foreground="{DynamicResource TextBrush}"
+             mc:Ignorable="d" Foreground="{DynamicResource TextBrush}" Background="#555"
              MinHeight="470" MinWidth="432">
     <UserControl.Resources>
         <ResourceDictionary>

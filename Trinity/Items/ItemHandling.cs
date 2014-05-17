@@ -6,6 +6,7 @@ using Trinity.Cache;
 using Trinity.Config.Loot;
 using Trinity.Helpers;
 using Trinity.ItemRules;
+using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Common;
@@ -75,7 +76,7 @@ namespace Trinity
             }
 
             // Blood Shards == HoradricRelic
-            if (itemType == GItemType.HoradricRelic)
+            if (itemType == GItemType.HoradricRelic && ZetaDia.CPlayer.BloodshardCount < 500)
             {
                 return Settings.Loot.Pickup.BloodShards;
             }

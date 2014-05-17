@@ -18,11 +18,11 @@
             <TabItem Header="Pickup" Foreground="{DynamicResource TextBrush}">
                 <Border Tag="Items\ConfigPickup.xaml"/>
             </TabItem>
-            <TabItem Header="Scoring/TownRuns" Foreground="{DynamicResource TextBrush}">
-                <Border Tag="Items\ConfigScoring.xaml"/>
-            </TabItem>
             <TabItem Header="ItemRules" Foreground="{DynamicResource TextBrush}" Visibility="{Binding Path=Loot.ItemFilterMode, Converter={StaticResource enumVisibilityConverter}, ConverterParameter=TrinityWithItemRules}">
                 <Border Tag="Items\ConfigItemRules.xaml"/>
+            </TabItem>
+            <TabItem Header="Town Run" Foreground="{DynamicResource TextBrush}">
+                <Border Tag="Items\ConfigScoring.xaml"/>
             </TabItem>
             <TabItem Header="Mobile Notification" Foreground="{DynamicResource TextBrush}">
                 <Border Tag="Items\ConfigNotification.xaml"/>

@@ -459,6 +459,10 @@ namespace Trinity
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_Teleport, 35f, CurrentTarget.Position);
                 }
+                
+                // 2.0.5 Archon elemental runes
+                // This needs some checking on range i think
+
                 //392694, 392695, 392696 == Arcane Strike,
                 //392697, 392699, 392698 == Disintegration Wave
                 //392692, 392693, 392691 == Arcane Blast, Ice Blast 
@@ -469,13 +473,22 @@ namespace Trinity
                     blastPower = SNOPower.Wizard_Archon_DisintegrationWave;
 
                 HotbarSkills beamSkill = HotbarSkills.AssignedSkills
-                    .FirstOrDefault(p => p.Power == SNOPower.Wizard_Archon_DisintegrationWave || p.Power == (SNOPower)392697 || p.Power == (SNOPower)392699 || p.Power == (SNOPower)392698);
+                    .FirstOrDefault(p => p.Power == SNOPower.Wizard_Archon_DisintegrationWave ||
+                        p.Power == SNOPower.Wizard_Archon_DisintegrationWave_Cold ||
+                        p.Power == SNOPower.Wizard_Archon_DisintegrationWave_Fire ||
+                        p.Power == SNOPower.Wizard_Archon_DisintegrationWave_Lightning);
 
                 HotbarSkills strikeSkill = HotbarSkills.AssignedSkills
-                    .FirstOrDefault(p => p.Power == SNOPower.Wizard_Archon_ArcaneStrike || p.Power == (SNOPower)392694 || p.Power == (SNOPower)392695 || p.Power == (SNOPower)392696);
+                    .FirstOrDefault(p => p.Power == SNOPower.Wizard_Archon_ArcaneStrike ||
+                        p.Power == SNOPower.Wizard_Archon_ArcaneStrike_Fire ||
+                        p.Power == SNOPower.Wizard_Archon_ArcaneStrike_Cold ||
+                        p.Power == SNOPower.Wizard_Archon_ArcaneStrike_Lightning);
 
                 HotbarSkills blastSkill = HotbarSkills.AssignedSkills
-                    .FirstOrDefault(p => p.Power == SNOPower.Wizard_Archon_ArcaneBlast || p.Power == (SNOPower)392692 || p.Power == (SNOPower)392693 || p.Power == (SNOPower)392691);
+                    .FirstOrDefault(p => p.Power == SNOPower.Wizard_Archon_ArcaneBlast || 
+                        p.Power == SNOPower.Wizard_Archon_ArcaneBlast_Cold ||
+                        p.Power == SNOPower.Wizard_Archon_ArcaneBlast_Fire ||
+                        p.Power == SNOPower.Wizard_Archon_ArcaneBlast_Lightning);
 
                 if (beamSkill != null && beamSkill.Power != default(SNOPower))
                     beamPower = beamSkill.Power;
@@ -487,26 +500,27 @@ namespace Trinity
                     blastPower = blastSkill.Power;
 
                 // Arcane Blast - 2 second cooldown, big AoE
-                if (!useOocBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Archon_ArcaneBlast, CombatBase.CanCastFlags.NoTimer) && TargetUtil.AnyMobsInRange(15, 1) && CurrentTarget.IsFacingPlayer)
+                if (!useOocBuff && !Player.IsIncapacitated && CombatBase.CanCast(blastPower, CombatBase.CanCastFlags.NoTimer))
                 {
-                    return new TrinityPower(blastPower, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1);
+                    return new TrinityPower(blastPower, 10f, CurrentTarget.Position);
                 }
 
                 // Disintegrate
-                if (!useOocBuff && !isCurrentlyAvoiding && !Player.IsIncapacitated && (CurrentTarget.CountUnitsBehind(25f) > 2 || Settings.Combat.Wizard.NoArcaneStrike || Settings.Combat.Wizard.KiteLimit > 0))
+                if (!useOocBuff && !isCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(beamPower, CombatBase.CanCastFlags.NoTimer) && 
+                    (CurrentTarget.CountUnitsBehind(25f) > 2 || Settings.Combat.Wizard.NoArcaneStrike || Settings.Combat.Wizard.KiteLimit > 0))
                 {
                     return new TrinityPower(beamPower, 49f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0);
                 }
 
                 // Arcane Strike Rapid Spam at close-range only, and no AoE inbetween us and target
-                if (!useOocBuff && !Player.IsIncapacitated && !Settings.Combat.Wizard.NoArcaneStrike &&
+                if (!useOocBuff && !Player.IsIncapacitated && !Settings.Combat.Wizard.NoArcaneStrike && CombatBase.CanCast(strikePower, CombatBase.CanCastFlags.NoTimer) &&
                     !CacheData.TimeBoundAvoidance.Any(aoe => MathUtil.IntersectsPath(aoe.Position, aoe.Radius, Player.Position, CurrentTarget.Position)))
                 {
                     return new TrinityPower(strikePower, 7f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1);
                 }
 
                 // Disintegrate as final option just in case
-                if (!useOocBuff && !isCurrentlyAvoiding && !Player.IsIncapacitated)
+                if (!useOocBuff && !isCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(beamPower, CombatBase.CanCastFlags.NoTimer))
                 {
                     return new TrinityPower(beamPower, 49f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0);
                 }

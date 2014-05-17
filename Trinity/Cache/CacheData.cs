@@ -150,10 +150,10 @@ namespace Trinity
             MonsterTypes.Clear();
             Position.Clear();
             SummonedByACDId.Clear();
-            TimeBoundAvoidance.RemoveWhere(aoe => aoe.Expires < DateTime.UtcNow);
             UnitIsBurrowed.Clear();
             UnitMaxHealth.Clear();
             UnitMonsterAffix.Clear();
+            TimeBoundAvoidance.RemoveWhere(aoe => aoe.Expires < DateTime.UtcNow);
             NavigationObstacles.RemoveWhere(o => o.Position.Distance2DSqr(Trinity.Player.Position) > 90f * 90f);
         }
 

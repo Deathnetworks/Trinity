@@ -11,18 +11,19 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Template.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <DockPanel Grid.Row="0">
-            <Button Content="Dump Skills" Width="Auto" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Left" 
-                Command="{Binding DumpSkillsCommand}" Padding="0" Margin="10" />
-            <Button Content="Dump Items" Width="Auto" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Left" 
-                Command="{Binding DumpQuickItemsCommand}" Padding="0" Margin="10" />
-        </DockPanel>
-    </Grid>
+    <StackPanel>
+        <UniformGrid Columns="2">
+            <Button Content="Dump Skills" Command="{Binding DumpSkillsCommand}"/>
+            <Button Content="Quick Dump Items" Command="{Binding DumpQuickItemsCommand}" />
+            <Button Content="Full Dump Backpack Items" Command="{Binding Path=DumpBackpackCommand}"/>
+            <Button Content="Full Dump Equipped Items" Command="{Binding Path=DumpEquippedCommand}"/>
+            <Button Content="Full Dump Ground Items" Command="{Binding Path=DumpGroundItemsCommand}"/>
+            <Button Content="Full Dump Stash items" Command="{Binding Path=DumpStashCommand}"/>
+            <Button Content="Full Dump Merchant items" Command="{Binding Path=DumpMerchantItemsCommand}"/>
+            <Button Content="Full Dump ALL items (SLOW!!)" Command="{Binding Path=DumpAllItemsCommand}"/>
+
+        </UniformGrid>
+    </StackPanel>
 </UserControl>

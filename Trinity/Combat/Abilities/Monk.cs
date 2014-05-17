@@ -499,8 +499,8 @@ namespace Trinity
         {
             if (Monk_TempestRushReady())
                 return new TrinityPower(SNOPower.Monk_TempestRush, 5f, Vector3.Zero, -1, -1, 0, 0);
-            if (CombatBase.CanCast(SNOPower.Monk_DashingStrike))
-                return new TrinityPower(SNOPower.Monk_DashingStrike, Monk_MaxDashingStrikeRange, Vector3.Zero, -1, -1, 0, 0);
+            if (CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike))
+                return new TrinityPower(SNOPower.X1_Monk_DashingStrike, Monk_MaxDashingStrikeRange, Vector3.Zero, -1, -1, 0, 0);
             if (CombatBase.CanCast(SNOPower.Monk_FistsofThunder))
                 return new TrinityPower(SNOPower.Monk_FistsofThunder, 5f, Vector3.Zero, -1, -1, 0, 0);
             if (CombatBase.CanCast(SNOPower.Monk_DeadlyReach))

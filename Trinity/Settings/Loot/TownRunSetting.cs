@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 
 namespace Trinity.Config.Loot
@@ -21,6 +22,7 @@ namespace Trinity.Config.Loot
         private bool _StashBlues;
         private bool _ForceSalvageRares;
         private bool _KeepLegendaryUnid;
+        private bool _SellExtraPotions;
         #endregion Fields
 
         #region Events
@@ -96,7 +98,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(SalvageOption.All)]
+        [DefaultValue(SalvageOption.Salvage)]
         public SalvageOption SalvageWhiteItemOption
         {
             get
@@ -114,7 +116,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(SalvageOption.All)]
+        [DefaultValue(SalvageOption.Salvage)]
         public SalvageOption SalvageBlueItemOption
         {
             get
@@ -132,7 +134,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(SalvageOption.All)]
+        [DefaultValue(SalvageOption.Salvage)]
         public SalvageOption SalvageYellowItemOption
         {
             get
@@ -150,7 +152,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(SalvageOption.None)]
+        [DefaultValue(SalvageOption.Salvage)]
         public SalvageOption SalvageLegendaryItemOption
         {
             get
@@ -203,7 +205,7 @@ namespace Trinity.Config.Loot
             }
         }
 
-        
+
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool OpenHoradricCaches
@@ -292,6 +294,23 @@ namespace Trinity.Config.Loot
                 }
             }
         }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool SellExtraPotions
+        {
+            get
+            {
+                return _SellExtraPotions;
+            }
+            set
+            {
+                if (_SellExtraPotions != value)
+                {
+                    _SellExtraPotions = value;
+                    OnPropertyChanged("SellExtraPotions");
+                }
+            }
+        }
         #endregion Properties
 
         #region Methods
@@ -326,12 +345,64 @@ namespace Trinity.Config.Loot
         /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
         /// </summary>
         /// <param name="context"></param>
-        [OnDeserializing()]
+        [OnDeserializing]
         internal void OnDeserializingMethod(StreamingContext context)
         {
-            this.FreeBagSlots = 1;
-            this.FreeBagSlotsInTown = 6;
-            this.OpenHoradricCaches = true;
+            FreeBagSlots = 1;
+            FreeBagSlotsInTown = 6;
+            OpenHoradricCaches = true;
+            SellExtraPotions = true;
+            SalvageWhiteItemOption = SalvageOption.Salvage;
+            SalvageBlueItemOption = SalvageOption.Salvage;
+            SalvageYellowItemOption = SalvageOption.Salvage;
+            SalvageLegendaryItemOption = SalvageOption.Salvage;
+        }
+
+        /// <summary>
+        /// This will run after deserialization, for settings migration
+        /// </summary>
+        /// <param name="context"></param>
+        [OnDeserialized]
+        internal void OnDeserializedMethod(StreamingContext context)
+        {
+            // This is required for migrating from "None/InfernoOnly/All" to "Sell/Salvage" options
+
+            switch (SalvageWhiteItemOption)
+            {
+                case SalvageOption.None:
+                case SalvageOption.InfernoOnly:
+                case SalvageOption.All:
+                    SalvageWhiteItemOption = SalvageOption.Salvage;
+                    break;
+            }
+
+            switch (SalvageBlueItemOption)
+            {
+                case SalvageOption.None:
+                case SalvageOption.InfernoOnly:
+                case SalvageOption.All:
+                    SalvageBlueItemOption = SalvageOption.Salvage;
+                    break;
+            }
+
+            switch (SalvageYellowItemOption)
+            {
+                case SalvageOption.None:
+                case SalvageOption.InfernoOnly:
+                case SalvageOption.All:
+                    SalvageYellowItemOption = SalvageOption.Salvage;
+                    break;
+            }
+
+            switch (SalvageLegendaryItemOption)
+            {
+                case SalvageOption.None:
+                case SalvageOption.InfernoOnly:
+                case SalvageOption.All:
+                    SalvageLegendaryItemOption = SalvageOption.Salvage;
+                    break;
+            }
+
         }
 
         #endregion Methods

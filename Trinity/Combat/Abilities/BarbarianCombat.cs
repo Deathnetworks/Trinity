@@ -324,13 +324,17 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
+                bool hasBerserker = HotbarSkills.PassiveSkills.Any(p => p == SNOPower.Barbarian_Passive_BerserkerRage);
+                double minFury = hasBerserker ? Player.PrimaryResourceMax * 0.99 : 50f;
+                
                 return
-                    !UseOOCBuff &&
-                    !IsCurrentlyAvoiding &&
-                    !Player.IsIncapacitated &&
-                    CanCast(SNOPower.Barbarian_Earthquake) &&
-                    Player.PrimaryResource >= 50 &&
-                    TargetUtil.IsEliteTargetInRange(45f);
+                       !UseOOCBuff &&
+                       !IsCurrentlyAvoiding &&
+                       !Player.IsIncapacitated &&
+                       CanCast(SNOPower.Barbarian_Earthquake) &&
+                       Player.PrimaryResource >= minFury &&
+                       TargetUtil.IsEliteTargetInRange(45f);
+
             }
         }
 
@@ -664,8 +668,12 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
+                bool hasBerserker = HotbarSkills.PassiveSkills.Any(p => p == SNOPower.Barbarian_Passive_BerserkerRage);
+                double minFury = hasBerserker ? Player.PrimaryResourceMax * 0.99 : 0f;
+                
                 return !UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.X1_Barbarian_Avalanche_v2, CanCastFlags.NoTimer) &&
-                    Player.PrimaryResourcePct > 0.99 && (TargetUtil.AnyMobsInRange(3) || TargetUtil.IsEliteTargetInRange());
+                    Player.PrimaryResource >= minFury && (TargetUtil.AnyMobsInRange(3) || TargetUtil.IsEliteTargetInRange());
+
             }
         }
 

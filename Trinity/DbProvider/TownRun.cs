@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Windows.Documents;
 using Trinity.Config.Loot;
+using Trinity.Items;
 using Trinity.Notifications;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -36,9 +35,9 @@ namespace Trinity
         internal static bool LastTownRunCheckResult = false;
         // Random variables used during item handling and town-runs
 
-        private static bool _loggedAnythingThisStash = false;
+        private static bool _loggedAnythingThisStash;
 
-        private static bool _loggedJunkThisStash = false;
+        private static bool _loggedJunkThisStash;
         internal static string ValueItemStatString = "";
         internal static string JunkItemStatString = "";
         internal static bool TestingBackpack = false;
@@ -63,14 +62,10 @@ namespace Trinity
         internal static void VendorRunPulseCheck()
         {
             // If we're in town and vendoring
-            if (ZetaDia.IsInTown && BrainBehavior.IsVendoring)
+            if (Trinity.Player.IsInTown && BrainBehavior.IsVendoring)
             {
                 WasVendoring = true;
                 Trinity.ForceVendorRunASAP = true;
-            }
-            if (!ZetaDia.IsInTown && !BrainBehavior.IsVendoring && WasVendoring)
-            {
-
             }
         }
 
@@ -122,7 +117,7 @@ namespace Trinity
                         {
                             if (BrainBehavior.IsVendoring)
                             {
-                                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Looks like we are being asked to force a town-run by a profile/plugin/new DB feature, now doing so.");
+                                Logger.Log("Looks like we are being asked to force a town-run by a profile/plugin/new DB feature, now doing so.");
                             }
                         }
                         SetPreTownRunPosition();
@@ -138,7 +133,7 @@ namespace Trinity
                         Vector2 validLocation = TrinityItemManager.FindValidBackpackLocation(true);
                         if (validLocation.X < 0 || validLocation.Y < 0)
                         {
-                            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "No more space to pickup a 2-slot item, now running town-run routine. (TownRun)");
+                            Logger.Log("No more space to pickup a 2-slot item, now running town-run routine. (TownRun)");
                             if (!LastTownRunCheckResult)
                             {
                                 LastTownRunCheckResult = true;
@@ -367,21 +362,29 @@ namespace Trinity
         {
             return (randomTimer.IsRunning && randomTimer.ElapsedMilliseconds < randomTimerVal);
         }
-                internal static SalvageOption GetSalvageOption(ItemQuality thisquality)
+
+        internal static SalvageOption GetSalvageOption(ItemQuality qualityLevel)
         {
-            if (thisquality >= ItemQuality.Magic1 && thisquality <= ItemQuality.Magic3)
+            if (qualityLevel > ItemQuality.Normal && qualityLevel <= ItemQuality.Superior)
+            {
+                return Trinity.Settings.Loot.TownRun.SalvageWhiteItemOption;
+            }
+
+            if (qualityLevel >= ItemQuality.Magic1 && qualityLevel <= ItemQuality.Magic3)
             {
                 return Trinity.Settings.Loot.TownRun.SalvageBlueItemOption;
             }
-            else if (thisquality >= ItemQuality.Rare4 && thisquality <= ItemQuality.Rare6)
+            
+            if (qualityLevel >= ItemQuality.Rare4 && qualityLevel <= ItemQuality.Rare6)
             {
                 return Trinity.Settings.Loot.TownRun.SalvageYellowItemOption;
             }
-            else if (thisquality >= ItemQuality.Legendary)
+            
+            if (qualityLevel >= ItemQuality.Legendary)
             {
                 return Trinity.Settings.Loot.TownRun.SalvageLegendaryItemOption;
             }
-            return SalvageOption.None;
+            return SalvageOption.Sell;
         }
 
         internal static Stopwatch TownRunCheckTimer = new Stopwatch();
