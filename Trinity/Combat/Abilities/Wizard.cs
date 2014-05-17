@@ -395,44 +395,44 @@ namespace Trinity
             }
             else
             {
-                bool cancelArchon = false;
-                string reason = "";
+                //bool cancelArchon = false;
+                //string reason = "";
 
-                if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.RebuffArmor && !Wizard_HasWizardArmor())
-                {
-                    reason += "Rebuff Armor ";
-                    cancelArchon = true;
-                }
-                if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.RebuffMagicWeaponFamiliar &&
-                    (!CheckAbilityAndBuff(SNOPower.Wizard_MagicWeapon) || !Wizard_HasFamiliar()))
-                {
-                    if (!CheckAbilityAndBuff(SNOPower.Wizard_MagicWeapon))
-                        reason += "Rebuff Magic Weapon ";
-                    if (!Wizard_HasFamiliar())
-                        reason += "Rebuff Familiar ";
-                    cancelArchon = true;
-                }
+                //if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.RebuffArmor && !Wizard_HasWizardArmor())
+                //{
+                //    reason += "Rebuff Armor ";
+                //    cancelArchon = true;
+                //}
+                //if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.RebuffMagicWeaponFamiliar &&
+                //    (!CheckAbilityAndBuff(SNOPower.Wizard_MagicWeapon) || !Wizard_HasFamiliar()))
+                //{
+                //    if (!CheckAbilityAndBuff(SNOPower.Wizard_MagicWeapon))
+                //        reason += "Rebuff Magic Weapon ";
+                //    if (!Wizard_HasFamiliar())
+                //        reason += "Rebuff Familiar ";
+                //    cancelArchon = true;
+                //}
 
-                if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.Timer &&
-                    DateTime.UtcNow.Subtract(CacheData.AbilityLastUsed[SNOPower.Wizard_Archon]).TotalSeconds >= Settings.Combat.Wizard.ArchonCancelSeconds)
-                {
-                    reason += "Timer";
-                    cancelArchon = true;
-                }
+                //if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.Timer &&
+                //    DateTime.UtcNow.Subtract(CacheData.AbilityLastUsed[SNOPower.Wizard_Archon]).TotalSeconds >= Settings.Combat.Wizard.ArchonCancelSeconds)
+                //{
+                //    reason += "Timer";
+                //    cancelArchon = true;
+                //}
 
-                if (cancelArchon && Wizard_ShouldStartArchon())
-                {
-                    var archonBuff = ZetaDia.Me.GetBuff(SNOPower.Wizard_Archon);
-                    if (archonBuff != null && archonBuff.IsCancelable)
-                    {
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Canceling Archon: {0}", reason);
-                        // this actually cancels Archon
-                        archonBuff.Cancel();
+                //if (cancelArchon && Wizard_ShouldStartArchon())
+                //{
+                //    var archonBuff = ZetaDia.Me.GetBuff(SNOPower.Wizard_Archon);
+                //    if (archonBuff != null && archonBuff.IsCancelable)
+                //    {
+                //        Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Canceling Archon: {0}", reason);
+                //        // this actually cancels Archon
+                //        archonBuff.Cancel();
 
-                        // this SNOPower is fake - it isn't actually used, we're just putting it here to force a BehaviorTree return/recheck
-                        return new TrinityPower(SNOPower.Wizard_Archon_Cancel, 0f, Vector3.Zero, -1, -1, -1, -1);
-                    }
-                }
+                //        // this SNOPower is fake - it isn't actually used, we're just putting it here to force a BehaviorTree return/recheck
+                //        return new TrinityPower(SNOPower.Wizard_Archon_Cancel, 0f, Vector3.Zero, -1, -1, -1, -1);
+                //    }
+                //}
 
                 // Archon form
                 // Archon Slow Time for in combat

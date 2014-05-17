@@ -3,7 +3,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ut="clr-namespace:Trinity.UIComponents"
-             mc:Ignorable="d" Foreground="{DynamicResource TextBrush}"
+             mc:Ignorable="d" Foreground="{DynamicResource TextBrush}" Background="#555"
              d:DesignHeight="350" d:DesignWidth="390">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -83,18 +83,18 @@
                     <ComboBoxItem Content="Archon Form Only" Tag="ArchonOnly" IsSelected="True" ToolTip="Kite in Archon Form Only" />
                     <ComboBoxItem Content="Normal Form Only" Tag="NormalOnly" ToolTip="Kite in Normal Form Only" />
                 </ComboBox>
-                <TextBlock Grid.Column="0" Grid.Row="1"  Text="Cancel and Rebuff Archon:" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Normal" />
+                <!--<TextBlock Grid.Column="0" Grid.Row="1"  Text="Cancel and Rebuff Archon:" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Normal" />
                 <ComboBox Grid.Column="1" Grid.Row="1"   Width="215" SelectedValuePath="Tag" SelectedValue="{Binding Path=Wiz.ArchonCancelOption}" Margin="15,5,0,5">
                     <ComboBoxItem Content="Never" Tag="Never" ToolTip="Never cancel archon, let it expire on its own" />
                     <ComboBoxItem Content="After Timer Expires" Tag="Timer" IsSelected="True" ToolTip="Cancel Archon after the timer expires" />
                     <ComboBoxItem Content="To Rebuff Armor" Tag="RebuffArmor" ToolTip="Cancel Archon only to Rebuff Armor" />
                     <ComboBoxItem Content="To Rebuff MagicWeapon/Familiar" Tag="RebuffMagicWeaponFamiliar" ToolTip="Cancel Archon only to Rebuff Magic Weapon or Familiar" />
-                </ComboBox>
+                </ComboBox>-->
             </Grid>
         </Grid>
 
         <!-- Cancel Archon After Slider -->
-        <Grid Grid.Row="3" HorizontalAlignment="Center">
+        <!--<Grid Grid.Row="3" HorizontalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -102,8 +102,7 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Text="Cancel Archon After" FontWeight="Normal" TextAlignment="Center" VerticalAlignment="Center"
-                Visibility="{Binding Path=Wiz.ArchonCancelOption, Converter={StaticResource enumVisibilityConverter}, ConverterParameter=Timer}"
-                       />
+                Visibility="{Binding Path=Wiz.ArchonCancelOption, Converter={StaticResource enumVisibilityConverter}, ConverterParameter=Timer}" />
             <Slider Grid.Column="1" Template="{DynamicResource Slider}" Width="180" 
                 Visibility="{Binding Path=Wiz.ArchonCancelOption, Converter={StaticResource enumVisibilityConverter}, ConverterParameter=Timer}"
                 Interval="500" Maximum="300" Minimum="5" 
@@ -114,7 +113,7 @@
             <TextBlock Grid.Column="2"  Text="Seconds" FontWeight="Normal" TextAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0"
                 Visibility="{Binding Path=Wiz.ArchonCancelOption, Converter={StaticResource enumVisibilityConverter}, ConverterParameter=Timer}"
                        />
-        </Grid>
+        </Grid>-->
 
         <!-- Archon Mob Count / Range Sliders -->
         <Grid Grid.Row="4" HorizontalAlignment="Center">

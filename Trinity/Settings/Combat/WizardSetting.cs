@@ -916,19 +916,25 @@ namespace Trinity.Config.Combat
         /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
         /// </summary>
         /// <param name="context"></param>
-        [OnDeserializing()]
+        [OnDeserializing]
         internal void OnDeserializingMethod(StreamingContext context)
         {
-            this.ArchonMobDistance = 35;
-            this.ArchonMobCount = 3;
-            this.ArchonCancelSeconds = 300;
-            this.ArchonCancelOption = WizardArchonCancelOption.RebuffMagicWeaponFamiliar;
-            this.AvoidSuccubusStarHealth = 0.7f;
-            this.AvoidGrotesqueHealth = 1;
-            this.AvoidOrbiterHealth = 1;
-            this.AvoidWormholeHealth = 0.50f;
-            this.ArchonElitesOnly = true;
-            this.ArchonEliteDistance = 15f;
+            ArchonMobDistance = 35;
+            ArchonMobCount = 3;
+            ArchonCancelSeconds = 300;
+            ArchonCancelOption = WizardArchonCancelOption.RebuffMagicWeaponFamiliar;
+            AvoidSuccubusStarHealth = 0.7f;
+            AvoidGrotesqueHealth = 1;
+            AvoidOrbiterHealth = 1;
+            AvoidWormholeHealth = 0.50f;
+            ArchonElitesOnly = true;
+            ArchonEliteDistance = 15f;
+        }
+
+        [OnDeserialized]
+        internal void OnDeserializedMethod(StreamingContext context)
+        {
+            ArchonCancelOption = WizardArchonCancelOption.Never;
         }
 
         #endregion Methods
