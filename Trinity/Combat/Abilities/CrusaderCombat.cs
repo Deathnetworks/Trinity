@@ -21,7 +21,7 @@ namespace Trinity.Combat.Abilities
 
             if (!UseOOCBuff && IsCurrentlyAvoiding)
             {
-                if (CanCastSteedCharge())
+                if (CanCastSteedChargeOutOfCombat())
                 {
                     return new TrinityPower(SNOPower.X1_Crusader_SteedCharge);
                 }
@@ -288,10 +288,9 @@ namespace Trinity.Combat.Abilities
             return CanCast(SNOPower.x1_Crusader_Phalanx3) && (TargetUtil.ClusterExists(15f, 3) || TargetUtil.EliteOrTrashInRange(15f));
         }
 
-        private static bool CanCastSteedCharge()
+        private static bool CanCastSteedChargeOutOfCombat()
         {
-            return CanCast(SNOPower.X1_Crusader_SteedCharge)
-                && (TargetUtil.ClusterExists(CrusaderSettings.SteedChargeMinRange, 3) || TargetUtil.EliteOrTrashInRange(CrusaderSettings.SteedChargeMinRange));
+            return CanCast(SNOPower.X1_Crusader_SteedCharge) && CrusaderSettings.SteedChargeOOC && Player.MovementSpeed > 0 && !Player.IsInTown;
         }
 
         private static bool CanCastCondemn()

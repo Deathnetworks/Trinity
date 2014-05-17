@@ -124,6 +124,7 @@ namespace Trinity.Helpers
                 {
                     return false;
                 }
+                _lastCheckBag = DateTime.UtcNow;
 
                 // sometimes bosses take a LONG time
                 if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsBoss)
@@ -133,11 +134,9 @@ namespace Trinity.Helpers
                     return false;
                 }
 
-                _lastCheckBag = DateTime.UtcNow;
-
                 if (Trinity.Player.Coinage != _lastGoldAmount && Trinity.Player.Coinage != 0)
                 {
-                    Logger.LogDebug(LogCategory.GlobalHandler, "Gold Changed from {0} to {1}", _lastGoldAmount, Trinity.Player.Coinage);
+                    Logger.LogVerbose(LogCategory.GlobalHandler, "Gold Changed from {0} to {1}", _lastGoldAmount, Trinity.Player.Coinage);
                     _lastFoundGold = DateTime.UtcNow;
                     _lastGoldAmount = Trinity.Player.Coinage;
                 }
@@ -152,12 +151,12 @@ namespace Trinity.Helpers
                 }
                 if (goldUnchangedSeconds > 0)
                 {
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Gold unchanged for {0}s", goldUnchangedSeconds);
+                    Logger.Log(LogCategory.GlobalHandler, "Gold unchanged for {0}s", goldUnchangedSeconds);
                 }
             }
             catch (Exception e)
             {
-                Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, e.Message);
+                Logger.Log(LogCategory.GlobalHandler, "Error in GoldInactivity: " + e.Message);
             }
 
             return false;
