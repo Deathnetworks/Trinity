@@ -18,6 +18,7 @@ namespace Trinity.Config
         private bool _UseEmpoweredShrine;
         private bool _UseEnlightenedShrine;
         private bool _UseFleetingShrine;
+        private bool _OpenAnyContainer;
         private bool _InspectCorpses;
         private bool _OpenContainers;
         private bool _OpenRareChest;
@@ -210,6 +211,24 @@ namespace Trinity.Config
 
         [DataMember(IsRequired = false)]
         [DefaultValue(false)]
+        public bool OpenAnyContainer
+        {
+            get
+            {
+                return _OpenAnyContainer;
+            }
+            set
+            {
+                if (_OpenAnyContainer != value)
+                {
+                    _OpenAnyContainer = value;
+                    OnPropertyChanged("OpenAnyContainer");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
         public bool InspectCorpses
         {
             get
@@ -384,21 +403,21 @@ namespace Trinity.Config
         /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
         /// </summary>
         /// <param name="context"></param>
-        [OnDeserializing()]
+        [OnDeserializing]
         internal void OnDeserializingMethod(StreamingContext context)
         {
-            this.UseEmpoweredShrine = true;
-            this.UseEnlightenedShrine = true;
-            this.UseFleetingShrine = true;
-            this.UseFortuneShrine = true;
-            this.UseFrenzyShrine = true;
-            this.UseProtectionShrine = true;
-            this.HealthWellMinHealth = 75;
-            this.DestructibleOption = DestructibleIgnoreOption.OnlyIfStuck;
-            this.OpenContainers = true;
-            this.OpenRareChests = true;
-            this.OpenContainerDelay = 500;
-            this.EnableBountyEvents = true;
+            UseEmpoweredShrine = true;
+            UseEnlightenedShrine = true;
+            UseFleetingShrine = true;
+            UseFortuneShrine = true;
+            UseFrenzyShrine = true;
+            UseProtectionShrine = true;
+            HealthWellMinHealth = 75;
+            DestructibleOption = DestructibleIgnoreOption.OnlyIfStuck;
+            OpenContainers = true;
+            OpenRareChests = true;
+            OpenContainerDelay = 500;
+            EnableBountyEvents = true;
         }
         #endregion Methods
     }

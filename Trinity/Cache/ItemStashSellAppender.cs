@@ -7,20 +7,20 @@ using Trinity.Technicals;
 
 namespace Trinity.Cache
 {
-    public class ItemDroppedAppender : IDisposable
+    public class ItemStashSellAppender : IDisposable
     {
         bool _headerChecked;
-        public ItemDroppedAppender()
+        public ItemStashSellAppender()
         {
             _logItemQueue = new ConcurrentQueue<string>();
 
-            _droppedItemLogPath = Path.Combine(FileManager.TrinityLogsPath, "ItemsDropped.csv");
+            _itemLogPath = Path.Combine(FileManager.TrinityLogsPath, "StashSellSalvage.csv");
 
             CheckHeader();
 
             _queueThread = new Thread(QueueWorker)
             {
-                Name = "ItemDroppedWorker",
+                Name = "StashSellSalvageWorker",
                 IsBackground = true,
                 Priority = ThreadPriority.Lowest
             };
@@ -33,11 +33,11 @@ namespace Trinity.Cache
             if (_headerChecked)
                 return;
 
-            bool writeHeader = !File.Exists(_droppedItemLogPath);
+            bool writeHeader = !File.Exists(_itemLogPath);
 
             if (writeHeader)
             {
-                _logItemQueue.Enqueue("ActorSNO,GameBalanceID,Name,InternalName,DBBaseType,DBItemType,TBaseType,TItemType,Quality,Level,Pickup\n");
+                _logItemQueue.Enqueue("ActorSNO,Name,InternalName,DBBaseType,DBItemType,TBaseType,TItemType,Quality,Level,Action,Stats\n");
             }
             _headerChecked = true;
         }
@@ -52,10 +52,10 @@ namespace Trinity.Cache
             _queueThread = null;
         }
 
-        private readonly Mutex _mutex = new Mutex(false, "ItemDroppedMutex");
+        private readonly Mutex _mutex = new Mutex(false, "ItemStashedMutex");
 
-        private static ItemDroppedAppender _instance;
-        public static ItemDroppedAppender Instance { get { return _instance ?? (_instance = new ItemDroppedAppender()); } }
+        private static ItemStashSellAppender _instance;
+        public static ItemStashSellAppender Instance { get { return _instance ?? (_instance = new ItemStashSellAppender()); } }
 
         private StreamWriter _logWriter;
         private FileStream _fileStream;
@@ -63,26 +63,25 @@ namespace Trinity.Cache
         private readonly ConcurrentQueue<string> _logItemQueue;
 
         private Thread _queueThread;
-        private readonly string _droppedItemLogPath;
+        private readonly string _itemLogPath;
 
-        internal void AppendDroppedItem(PickupItem item)
+        internal void AppendItem(CachedACDItem item, string action)
         {
-            bool pickupItem;
-            CacheData.PickupItem.TryGetValue(item.RActorGUID, out pickupItem);
-
             StringBuilder sb = new StringBuilder();
 
-            sb.Append(FormatCSVField(item.ActorSNO));
-            sb.Append(FormatCSVField(item.BalanceID));
-            sb.Append(FormatCSVField(item.Name));
+            sb.Append(FormatCSVField(item.AcdItem.ActorSNO));
+            sb.Append(FormatCSVField(item.RealName));
             sb.Append(FormatCSVField(item.InternalName));
             sb.Append(FormatCSVField(item.DBBaseType.ToString()));
             sb.Append(FormatCSVField(item.DBItemType.ToString()));
-            sb.Append(FormatCSVField(item.TBaseType.ToString()));
-            sb.Append(FormatCSVField(item.TType.ToString()));
+            sb.Append(FormatCSVField(item.TrinityItemBaseType.ToString()));
+            sb.Append(FormatCSVField(item.TrinityItemType.ToString()));
             sb.Append(FormatCSVField(item.Quality.ToString()));
             sb.Append(FormatCSVField(item.Level));
-            sb.Append(FormatCSVField(pickupItem));
+            sb.Append(FormatCSVField(action));
+            var stats = item.AcdItem.Stats.ToString();
+            stats = stats.Replace("\r\n\t", " ").Replace(" - ", ": ");
+            sb.Append(FormatCSVField(stats));
             sb.Append("\n");
 
             _logItemQueue.Enqueue(sb.ToString());
@@ -98,10 +97,10 @@ namespace Trinity.Cache
             {
                 try
                 {
-                    CheckHeader(); 
-                    
+                    CheckHeader();
+
                     if (_fileStream == null)
-                        _fileStream = File.Open(_droppedItemLogPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
+                        _fileStream = File.Open(_itemLogPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
 
                     if (_logWriter == null)
                         _logWriter = new StreamWriter(_fileStream, Encoding.UTF8, bufferSize);
@@ -127,7 +126,7 @@ namespace Trinity.Cache
                             }
                             catch (Exception ex)
                             {
-                                Logger.LogError("Error in LogDroppedItems QueueWorker: " + ex.Message);
+                                Logger.LogError("Error in StashSellSalvage QueueWorker: " + ex.Message);
                             }
                             finally
                             {
@@ -142,7 +141,7 @@ namespace Trinity.Cache
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("Error in LogDroppedItems QueueWorker: " + ex.Message);
+                    Logger.LogError("Error in StashSellSalvage QueueWorker: " + ex.Message);
                 }
 
                 Thread.Sleep(10);

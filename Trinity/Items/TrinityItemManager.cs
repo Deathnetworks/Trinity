@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Trinity.Cache;
 using Trinity.Config.Loot;
 using Trinity.Helpers;
 using Trinity.ItemRules;
@@ -62,7 +63,10 @@ namespace Trinity.Items
 
         public override bool ShouldSalvageItem(ACDItem item)
         {
-            return ShouldSalvageItem(item, ItemEvaluationType.Salvage);
+            bool action = ShouldSalvageItem(item, ItemEvaluationType.Salvage);
+            if (action)
+                ItemStashSellAppender.Instance.AppendItem(CachedACDItem.GetCachedItem(item), "Salvage");
+            return action;
         }
 
         public bool ShouldSalvageItem(ACDItem item, ItemEvaluationType evaluationType)
@@ -85,7 +89,10 @@ namespace Trinity.Items
 
         public override bool ShouldSellItem(ACDItem item)
         {
-            return ShouldSellItem(item, ItemEvaluationType.Sell);
+            bool action = ShouldSellItem(item, ItemEvaluationType.Sell);
+            if (action)
+                ItemStashSellAppender.Instance.AppendItem(CachedACDItem.GetCachedItem(item), "Sell");
+            return action;
         }
 
         public bool ShouldSellItem(ACDItem item, ItemEvaluationType evaluationType)
@@ -110,7 +117,10 @@ namespace Trinity.Items
 
         public override bool ShouldStashItem(ACDItem item)
         {
-            return ShouldStashItem(item, ItemEvaluationType.Keep);
+            bool action = ShouldStashItem(item, ItemEvaluationType.Keep);
+            if (action)
+                ItemStashSellAppender.Instance.AppendItem(CachedACDItem.GetCachedItem(item), "Stash");
+            return action;
         }
 
         public bool ShouldStashItem(ACDItem item, ItemEvaluationType evaluationType)
@@ -616,7 +626,7 @@ namespace Trinity.Items
         {
             _lastBackPackCount = -1;
             _lastProtectedSlotsCount = -1;
-            _lastBackPackLocation = new Vector2(-2,-2);
+            _lastBackPackLocation = new Vector2(-2, -2);
             TownRun.LastCheckBackpackDurability = DateTime.MinValue;
         }
 

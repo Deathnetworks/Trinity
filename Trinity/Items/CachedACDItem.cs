@@ -167,7 +167,7 @@ namespace Trinity
             bool twoHanded,
             DyeType dyeType,
             ItemType itemType,
-            Zeta.Game.Internals.Actors.ItemBaseType itembasetype,
+            ItemBaseType itembasetype,
             FollowerType followerType,
             bool unidentified,
             int stackQuantity,
@@ -257,14 +257,13 @@ namespace Trinity
         {
             CachedACDItem item = (CachedACDItem)obj;
 
-            if (this.Row < item.Row)
+            if (Row < item.Row)
                 return -1;
-            else if (this.Column < item.Column)
+            if (Column < item.Column)
                 return -1;
-            else if (this.Column == item.Column && this.Row == item.Row)
+            if (Column == item.Column && Row == item.Row)
                 return 0;
-            else
-                return 1;
+            return 1;
         }
 
         public static CachedACDItem GetCachedItem(ACDItem item)
@@ -303,10 +302,12 @@ namespace Trinity
         {
             float damage = 0, healing = 0, toughness = 0;
 
-            float altDamage = 0, altHealing = 0, altToughness = 0;
+            float altDamage = 0;
+            float altToughness = 0;
 
             foreach (var slot in AcdItem.ValidInventorySlots)
             {
+                float altHealing = 0;
                 if (slot == InventorySlot.RightFinger)
                 {
                     AcdItem.GetStatChanges(out altDamage, out altHealing, out altToughness, true);
@@ -317,7 +318,7 @@ namespace Trinity
                 }
                 else
                 {
-                    AcdItem.GetStatChanges(out damage, out healing, out toughness, false);
+                    AcdItem.GetStatChanges(out damage, out healing, out toughness);
                 }
             }
             if ((altDamage + altToughness) > (damage + toughness))
@@ -326,9 +327,9 @@ namespace Trinity
                 toughness = altToughness;
             }
 
-            this.UpgradeDamage = damage;
-            this.UpgradeToughness = toughness;
-            this.UpgradeHealing = healing;
+            UpgradeDamage = damage;
+            UpgradeToughness = toughness;
+            UpgradeHealing = healing;
         }
     }
 }

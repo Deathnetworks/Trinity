@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using JetBrains.Annotations;
 using log4net;
 using log4net.Appender;
 using log4net.Layout;
@@ -12,19 +13,19 @@ namespace Trinity.Technicals
     /// <summary>
     /// Utilities help developer interact with DemonBuddy
     /// </summary>
-    //[DebuggerStepThrough]
+    [DebuggerStepThrough]
     internal class Logger
     {
-        private static readonly log4net.ILog _Logger = Zeta.Common.Logger.GetLoggerInstanceForType();
+        private static readonly ILog _Logger = Zeta.Common.Logger.GetLoggerInstanceForType();
         private static string prefix = "[Trinity]";
 
         public static string Prefix
         {
-            get { return Logger.prefix; }
-            set { Logger.prefix = value; }
+            get { return prefix; }
+            set { prefix = value; }
         }
 
-        private static Dictionary<LogCategory, string> _LastLogMessages = new Dictionary<LogCategory, string>();
+        private static readonly Dictionary<Tuple<LogCategory, TrinityLogLevel>, string> LastLogMessages = new Dictionary<Tuple<LogCategory, TrinityLogLevel>, string>();
 
         /// <summary>Logs the specified level.</summary>
         /// <param name="level">The logging level.</param>
@@ -40,13 +41,15 @@ namespace Trinity.Technicals
                 if (args.Length > 0)
                     msg = string.Format(msg, args);
 
-                if (!_LastLogMessages.ContainsKey(category))
-                    _LastLogMessages.Add(category, "");
+                var key = new Tuple<LogCategory, TrinityLogLevel>(category, level);
+
+                if (!LastLogMessages.ContainsKey(key))
+                    LastLogMessages.Add(key, "");
                 
                 string lastMessage;
-                if (_LastLogMessages.TryGetValue(category, out lastMessage) && lastMessage != msg)
+                if (LastLogMessages.TryGetValue(key, out lastMessage) && lastMessage != msg)
                 {
-                    _LastLogMessages[category] = msg;
+                    LastLogMessages[key] = msg;
 
                     switch (level)
                     {
