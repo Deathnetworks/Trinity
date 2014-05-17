@@ -82,6 +82,8 @@ namespace Trinity.Helpers
         /// </summary>
         internal void ResetCheckGold()
         {
+            Logger.LogDebug(LogCategory.GlobalHandler, "Resetting Gold Timer, Last gold changed from {0} to {1}", _lastGoldAmount, Trinity.Player.Coinage);
+            
             _lastCheckBag = DateTime.UtcNow;
             _lastFoundGold = DateTime.UtcNow;
             _lastGoldAmount = 0;
@@ -132,13 +134,12 @@ namespace Trinity.Helpers
                 }
 
                 _lastCheckBag = DateTime.UtcNow;
-                int currentGoldAmount = Trinity.Player.Coinage;
 
-                if (currentGoldAmount != _lastGoldAmount && currentGoldAmount != 0)
+                if (Trinity.Player.Coinage != _lastGoldAmount && Trinity.Player.Coinage != 0)
                 {
-                    Logger.LogDebug(LogCategory.GlobalHandler, "Gold Changed from {0} to {1}", _lastGoldAmount, currentGoldAmount);
+                    Logger.LogDebug(LogCategory.GlobalHandler, "Gold Changed from {0} to {1}", _lastGoldAmount, Trinity.Player.Coinage);
                     _lastFoundGold = DateTime.UtcNow;
-                    _lastGoldAmount = currentGoldAmount;
+                    _lastGoldAmount = Trinity.Player.Coinage;
                 }
 
                 int goldUnchangedSeconds = Convert.ToInt32(DateTime.UtcNow.Subtract(_lastFoundGold).TotalSeconds);
@@ -146,7 +147,7 @@ namespace Trinity.Helpers
                 {
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Gold inactivity after {0}s. Sending abort.", goldUnchangedSeconds);
                     _lastFoundGold = DateTime.UtcNow;
-                    _lastGoldAmount = currentGoldAmount;
+                    _lastGoldAmount = Trinity.Player.Coinage;
                     return true;
                 }
                 if (goldUnchangedSeconds > 0)

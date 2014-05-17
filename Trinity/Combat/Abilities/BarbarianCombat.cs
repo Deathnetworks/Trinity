@@ -58,15 +58,15 @@ namespace Trinity.Combat.Abilities
             }
 
             // Call of the Ancients
-            if (IsNull(power) && CanCastCallOfTheAncients)
+            if (IsNull(power) && CanUseCallOfTheAncients)
                 power = PowerCallOfTheAncients;
 
             // WOTB
-            if (IsNull(power) && CanCastWrathOfTheBerserker)
+            if (IsNull(power) && CanUseWrathOfTheBerserker)
                 power = PowerWrathOfTheBerserker;
 
             // Earthquake
-            if (IsNull(power) && CanCastEarthquake)
+            if (IsNull(power) && CanUseEarthquake)
                 power = PowerEarthquake;
 
             // Avalanche
@@ -78,7 +78,7 @@ namespace Trinity.Combat.Abilities
                 power = PowerWarCry;
 
             // Battle Rage
-            if (IsNull(power) && CanCastBattleRage)
+            if (IsNull(power) && CanUseBattleRage)
                 power = PowerBattleRage;
 
             // Rend
@@ -193,7 +193,7 @@ namespace Trinity.Combat.Abilities
                     Player.PrimaryResource <= V.F("Barbarian.CallOfTheAncients.MinFury");
             }
         }
-        public static bool CanCastCallOfTheAncients
+        public static bool CanUseCallOfTheAncients
         {
             get
             {
@@ -228,7 +228,7 @@ namespace Trinity.Combat.Abilities
                     (WOTBIgnoreElites || wotbElites || (Settings.Combat.Barbarian.WOTBMode == BarbarianWOTBMode.WhenReady));
             }
         }
-        public static bool CanCastWrathOfTheBerserker
+        public static bool CanUseWrathOfTheBerserker
         {
             get
             {
@@ -320,25 +320,27 @@ namespace Trinity.Combat.Abilities
                     Player.PrimaryResource <= 50;
             }
         }
-        public static bool CanCastEarthquake
+        public static bool CanUseEarthquake
         {
             get
             {
                 bool hasBerserker = HotbarSkills.PassiveSkills.Any(p => p == SNOPower.Barbarian_Passive_BerserkerRage);
                 double minFury = hasBerserker ? Player.PrimaryResourceMax * 0.99 : 50f;
-                
+                bool hasCaveIn = HotbarSkills.AssignedSkills.Any(p => p.Power == SNOPower.Barbarian_Earthquake && p.RuneIndex == 4);
+                float range = hasCaveIn ? 24f : 14f;
+
                 return
                        !UseOOCBuff &&
                        !IsCurrentlyAvoiding &&
                        !Player.IsIncapacitated &&
                        CanCast(SNOPower.Barbarian_Earthquake) &&
                        Player.PrimaryResource >= minFury &&
-                       TargetUtil.IsEliteTargetInRange(45f);
+                       TargetUtil.IsEliteTargetInRange(range);
 
             }
         }
 
-        public static bool CanCastBattleRage
+        public static bool CanUseBattleRage
         {
             get
             {
@@ -670,7 +672,7 @@ namespace Trinity.Combat.Abilities
             {
                 bool hasBerserker = HotbarSkills.PassiveSkills.Any(p => p == SNOPower.Barbarian_Passive_BerserkerRage);
                 double minFury = hasBerserker ? Player.PrimaryResourceMax * 0.99 : 0f;
-                
+
                 return !UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.X1_Barbarian_Avalanche_v2, CanCastFlags.NoTimer) &&
                     Player.PrimaryResource >= minFury && (TargetUtil.AnyMobsInRange(3) || TargetUtil.IsEliteTargetInRange());
 
@@ -680,7 +682,13 @@ namespace Trinity.Combat.Abilities
 
         public static TrinityPower PowerAvalanche { get { return new TrinityPower(SNOPower.X1_Barbarian_Avalanche_v2, 15f, TargetUtil.GetBestClusterUnit(15f, 45f).Position); } }
         public static TrinityPower PowerIgnorePain { get { return new TrinityPower(SNOPower.Barbarian_IgnorePain); } }
-        public static TrinityPower PowerEarthquake { get { return new TrinityPower(SNOPower.Barbarian_Earthquake); } }
+        public static TrinityPower PowerEarthquake
+        {
+            get
+            {
+                return new TrinityPower(SNOPower.Barbarian_Earthquake);
+            }
+        }
         public static TrinityPower PowerWrathOfTheBerserker { get { return new TrinityPower(SNOPower.Barbarian_WrathOfTheBerserker); } }
         public static TrinityPower PowerCallOfTheAncients { get { return new TrinityPower(SNOPower.Barbarian_CallOfTheAncients, V.I("Barbarian.CallOfTheAncients.TickDelay"), V.I("Barbarian.CallOfTheAncients.TickDelay")); } }
         public static TrinityPower PowerBattleRage { get { return new TrinityPower(SNOPower.Barbarian_BattleRage); } }

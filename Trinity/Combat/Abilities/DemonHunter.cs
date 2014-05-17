@@ -149,16 +149,21 @@ namespace Trinity
                 }
 
                 // Use Boar Taunt on 3 or more trash mobs in an area or on Unique/Elite/Champion
-                if (!UseOOCBuff && hasBoar && CombatBase.CanCast(SNOPower.X1_DemonHunter_Companion) && ((TargetUtil.ClusterExists(20f, 4) && TargetUtil.EliteOrTrashInRange(20f)) ||
-                    (CurrentTarget.IsEliteRareUnique && CurrentTarget.Distance <= 20f)))
+                if (hasBoar && CombatBase.CanCast(SNOPower.X1_DemonHunter_Companion) && ((TargetUtil.ClusterExists(20f, 4) && TargetUtil.EliteOrTrashInRange(20f)) ||
+                    (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.Distance <= 20f)))
                 {
                     return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
                 }
 
-                // Placeholder for Ferrets Logic - Unsure if utilities Exist to Determine Whether Gold and Health Globes are Within a Certain Range - Consider Interaction with Blood Vengeance for Optimized Results
+                // Ferrets used for picking up Health Globes when low on Health
+                if (hasFerret && ObjectCache.Any(o => o.Type == GObjectType.HealthGlobe && o.Distance < 60f) && Player.CurrentHealthPct < PlayerEmergencyHealthPotionLimit)
+                {
+                    return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
+                }
 
                 // Use Wolf Howl on Unique/Elite/Champion - Would help for farming trash, but trash farming should not need this - Used on Elites to reduce Deaths per hour
-                if (hasWolf && CombatBase.CanCast(SNOPower.X1_DemonHunter_Companion) && (TargetUtil.AnyMobsInRange(20) || CurrentTarget.IsEliteRareUnique))
+                if (hasWolf && CombatBase.CanCast(SNOPower.X1_DemonHunter_Companion) && 
+                    (TargetUtil.AnyMobsInRange(20) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance < 55f)))
                 {
                     return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
                 }
