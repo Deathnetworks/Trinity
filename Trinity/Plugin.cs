@@ -23,7 +23,7 @@ namespace Trinity
         {
             get
             {
-                return new Version(1, 9, 6);
+                return new Version(1, 9, 7);
             }
         }
 
@@ -142,7 +142,6 @@ namespace Trinity
                 {
                     PluginCheck.Start();
 
-                    HasMappedPlayerAbilities = false;
                     _isPluginEnabled = true;
 
                     // Settings are available after this... 

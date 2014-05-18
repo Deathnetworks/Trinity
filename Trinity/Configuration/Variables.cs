@@ -324,9 +324,6 @@ namespace Trinity
         private static float LastDistanceFromTarget;
         private static DateTime lastMovementCommand = DateTime.MinValue;
 
-        // Actual combat function variables
-        internal static bool HasMappedPlayerAbilities = false;
-
         // Contains our apparent *CURRENT* hotbar abilities, cached in a fast hash
         public static List<SNOPower> Hotbar = new List<SNOPower>();
 

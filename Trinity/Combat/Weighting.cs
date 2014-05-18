@@ -817,7 +817,7 @@ namespace Trinity
                         case GObjectType.Door:
                             {
                                 // Ignore doors where units are blocking our LoS
-                                if (ObjectCache.Any(u => u.IsUnit && u.HitPointsPct > 0 &&
+                                if (ObjectCache.Any(u => u.IsUnit && u.HitPointsPct > 0 && u.Distance < cacheObject.Distance &&
                                         MathUtil.IntersectsPath(u.Position, u.Radius, Player.Position, cacheObject.Position)))
                                 {
                                     cacheObject.Weight = 0;
@@ -826,12 +826,12 @@ namespace Trinity
                                 }
 
                                 // Prioritize doors where units are behind them
-                                //if (!ObjectCache.Any(u => u.IsUnit && u.HitPointsPct > 0 &&
-                                //    MathUtil.IntersectsPath(cacheObject.Position, cacheObject.Radius, Player.Position, u.Position)) && cacheObject.RadiusDistance <= 5f)
-                                //{
-                                //        cacheObject.Weight += 15000d;
-                                //        objWeightInfo += " BlockingUnit";
-                                //}
+                                if (ObjectCache.Any(u => u.IsUnit && u.HitPointsPct > 0 && u.Distance > cacheObject.Distance &&
+                                    MathUtil.IntersectsPath(cacheObject.Position, cacheObject.Radius, Player.Position, u.Position)))
+                                {
+                                    cacheObject.Weight += 15000d;
+                                    objWeightInfo += " BlockingUnit";
+                                }
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                 if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.Distance <= 25f)
@@ -843,7 +843,7 @@ namespace Trinity
                                 // We're standing on the damn thing... open it!!
                                 if (cacheObject.RadiusDistance <= 12f)
                                 {
-                                    cacheObject.Weight += 30000d;
+                                    cacheObject.Weight = MaxWeight;
                                     objWeightInfo += " <12f";
                                 }
                                 break;
@@ -1082,13 +1082,7 @@ namespace Trinity
                 if (CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0 && CurrentTarget.RActorGuid != LastTargetRactorGUID)
                 {
                     RecordTargetHistory();
-                    Logger.Log(TrinityLogLevel.Verbose,
-                                    LogCategory.Targetting,
-                                    "Target changed to name={2} sno={0} type={1} raGuid={3}",
-                                    CurrentTarget.InternalName,
-                                    CurrentTarget.ActorSNO,
-                                    CurrentTarget.Type,
-                                    CurrentTarget.RActorGuid);
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Target changed to {0} // {1} ({2})", CurrentTarget.ActorSNO, CurrentTarget.InternalName, CurrentTarget.Type);
                 }
             }
         }

@@ -51,7 +51,7 @@ namespace Trinity
             {
             }
 
-            HasMappedPlayerAbilities = false;
+            ShouldRefreshHotbarAbilities = false;
             if (!MaintainStatTracking)
             {
                 ItemStatsWhenStartedBot = DateTime.UtcNow;
@@ -210,7 +210,7 @@ namespace Trinity
                 Blacklist15Seconds = new HashSet<int>();
                 BacktrackList = new SortedList<int, Vector3>();
                 TotalBacktracks = 0;
-                HasMappedPlayerAbilities = false;
+                ShouldRefreshHotbarAbilities = true;
                 PlayerMover.TotalAntiStuckAttempts = 1;
                 PlayerMover.vSafeMovementLocation = Vector3.Zero;
                 PlayerMover.LastPosition = Vector3.Zero;

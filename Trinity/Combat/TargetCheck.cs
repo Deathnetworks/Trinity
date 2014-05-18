@@ -58,7 +58,7 @@ namespace Trinity
                 if (!HotbarRefreshTimer.IsRunning)
                     HotbarRefreshTimer.Start();
 
-                if (!HasMappedPlayerAbilities || HotbarRefreshTimer.ElapsedMilliseconds > 1000 || ShouldRefreshHotbarAbilities)
+                if (HotbarRefreshTimer.ElapsedMilliseconds > 1000 || ShouldRefreshHotbarAbilities)
                 {
                     PlayerInfoCache.RefreshHotbar();
                     // Pick an appropriate health set etc. based on class

@@ -803,10 +803,13 @@ namespace Trinity
                             return AddToCache;
                         }
 
-                        if (!isRareChest && (isChest || isCorpse) && Settings.WorldObject.OpenContainers && CurrentCacheObject.RadiusDistance <= Settings.WorldObject.ContainerOpenRange)
+                        if (!isRareChest && CurrentCacheObject.RadiusDistance <= Settings.WorldObject.ContainerOpenRange)
                         {
-                            AddToCache = true;
-                            return AddToCache;
+                            if ((isChest && Settings.WorldObject.OpenContainers) || (isCorpse && Settings.WorldObject.InspectCorpses))
+                            {
+                                AddToCache = true;
+                                return AddToCache;
+                            }
                         }
                       
                         if (CurrentCacheObject.IsQuestMonster)

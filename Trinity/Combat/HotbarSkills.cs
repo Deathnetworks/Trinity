@@ -80,7 +80,6 @@ namespace Trinity.Combat
                     CacheData.AbilityLastUsed.Add(power, DateTime.MinValue);
                 }
             }
-            Trinity.HasMappedPlayerAbilities = true;
             Trinity.ShouldRefreshHotbarAbilities = false;
             Trinity.HotbarRefreshTimer.Restart();
            
@@ -90,7 +89,7 @@ namespace Trinity.Combat
                 oldSkills.Add(skill);
             }
 
-            if (Trinity.Hotbar.Any(hb => !oldSkills.Any(old => old.Power == hb)))
+            if (Trinity.Hotbar.Any(hb => oldSkills.All(old => old.Power != hb)))
             {
                 _assignedSkills.Clear();
 
@@ -137,7 +136,7 @@ namespace Trinity.Combat
         /// <returns></returns>
         private static int GetRuneIndexFromPower(SNOPower power)
         {
-            int runeIndex = -999;
+            const int runeIndex = -999;
             HotbarSlot slot = GetHotbarSlotFromPower(power);
 
             if (slot != HotbarSlot.Invalid)

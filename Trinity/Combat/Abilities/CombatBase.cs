@@ -293,7 +293,6 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                Trinity.ShouldRefreshHotbarAbilities = true;
 
                 // Default attacks
                 if (!UseOOCBuff && !IsCurrentlyAvoiding)
@@ -302,6 +301,8 @@ namespace Trinity.Combat.Abilities
                     {
                         Trinity.Monk_TickSweepingWindSpam();
                     }
+
+                    Trinity.ShouldRefreshHotbarAbilities = true;
 
                     return new TrinityPower
                     {
