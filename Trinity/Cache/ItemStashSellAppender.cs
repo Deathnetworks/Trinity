@@ -80,7 +80,7 @@ namespace Trinity.Cache
             sb.Append(FormatCSVField(item.Level));
             sb.Append(FormatCSVField(action));
             var stats = item.AcdItem.Stats.ToString();
-            stats = stats.Replace("\r\n\t", " ").Replace(" - ", ": ");
+            stats = stats.Replace("\r\n\t", " ").Replace(" - ", ": ").Trim(new[] { '\r', '\n', '\t', ' ' });
             sb.Append(FormatCSVField(stats));
             sb.Append("\n");
 
