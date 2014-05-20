@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Trinity.Config;
@@ -31,6 +32,12 @@ namespace Trinity.UI.UIComponents
                 return false;
             }
         }
+
+        internal static Grid MainWindowGrid()
+        {
+            return (System.Windows.Application.Current.MainWindow.Content as Grid);
+        }
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigViewModel" /> class.

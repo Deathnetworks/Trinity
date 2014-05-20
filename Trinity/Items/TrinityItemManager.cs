@@ -349,9 +349,6 @@ namespace Trinity.Items
             if (Trinity.Settings.Loot.TownRun.StashBlues && cItem.Quality > ItemQuality.Superior && cItem.Quality < ItemQuality.Rare4)
                 return false;
 
-            if (cItem.Quality >= ItemQuality.Legendary && salvageOption == SalvageOption.Salvage)
-                return true;
-
             switch (trinityItemBaseType)
             {
                 case GItemBaseType.WeaponRange:

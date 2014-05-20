@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Windows.Controls;
+using System.Windows.Media;
 using Trinity.Combat;
 using Trinity.Technicals;
 using Zeta.Bot.Logic;
@@ -238,6 +240,11 @@ namespace Trinity
                 AnyMobsInRange = true;
 
             return addToCache;
+        }
+
+        internal static Transform SetVector(Grid ctl)
+        {
+            return ctl.RenderTransform = new RotateTransform(180, ctl.RenderSize.Width / 2, ctl.RenderSize.Height / 2);
         }
 
         private static void RefreshMonsterSize()

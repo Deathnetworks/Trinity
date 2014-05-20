@@ -35,7 +35,7 @@ namespace Trinity
             // Are we allowed to path around avoidance?
             if (Settings.Combat.Misc.AvoidanceNavigation)
             {
-                ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, (float)minAvoidanceRadius);
+                MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, (float)minAvoidanceRadius);
             }
 
             AvoidanceType avoidanceType = AvoidanceManager.GetAvoidanceType(CurrentCacheObject.ActorSNO);

@@ -43,5 +43,14 @@ namespace Trinity
             Expires = DateTime.MinValue;
         }
 
+        public CacheObstacleObject(TrinityCacheObject tco)
+        {
+            ActorSNO = tco.ActorSNO;
+            Radius = tco.Radius;
+            Position = tco.Position;
+            RActorGUID = tco.RActorGuid;
+            ObjectType = tco.Type;
+            Name = tco.InternalName;
+        }
     }
 }

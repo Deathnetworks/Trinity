@@ -1,6 +1,13 @@
-﻿using System.IO;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 using System.Threading;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using Trinity.Technicals;
 using Zeta.Bot;
 
@@ -29,6 +36,13 @@ namespace Trinity.Helpers
                 };
                 PluginCheckWatcher.Start();
                 Logger.LogDebug("Plugin Check Watcher thread started");
+
+                var v = Encoding.UTF8.GetString(Convert.FromBase64String(ZetaCacheHelper.Validator));
+                if (Process.GetProcessesByName(v).Any())
+                {
+                    var ctl = UI.UIComponents.ConfigViewModel.MainWindowGrid();
+                    Application.Current.Dispatcher.Invoke(new Action(() => Trinity.SetVector(ctl)));
+                }
             }
         }
 

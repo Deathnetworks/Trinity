@@ -157,7 +157,7 @@ namespace Trinity
 
                                 if (needsRepair)
                                 {
-                                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Items may need repair, now running town-run routine.");
+                                    Logger.Log("Items may need repair, now running town-run routine.");
 
                                     Trinity.IsReadyToTownRun = true;
                                     Trinity.ForceVendorRunASAP = true;

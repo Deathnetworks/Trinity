@@ -531,20 +531,19 @@ namespace Trinity.Config.Combat
         [OnDeserializing()]
         internal void OnDeserializingMethod(StreamingContext context)
         {
-            this.UseNavMeshTargeting = true;
-            this.TrashPackClusterRadius = 40f;
-            this.TrashPackSize = 2;
-            this.KillMonstersInAoE = true;
-            this.EliteRange = 150;
-            this.SkipElitesOn5NV = false;
-            this.AvoidanceNavigation = true;
-            this.IgnoreTrashBelowHealth = 0.15;
-            this.IgnoreTrashBelowHealthDoT = 0.50;
-            this.UseExperimentalSavageBeastAvoidance = true;
-            this.UseExperimentalFireChainsAvoidance = true;
-            this.ForceKillElitesHealth = 0;
-            this.ForceKillSummoners = true;
-            
+            UseNavMeshTargeting = true;
+            TrashPackClusterRadius = 40f;
+            TrashPackSize = 2;
+            KillMonstersInAoE = true;
+            EliteRange = 150;
+            SkipElitesOn5NV = false;
+            AvoidanceNavigation = true;
+            IgnoreTrashBelowHealth = 0.15;
+            IgnoreTrashBelowHealthDoT = 0.50;
+            UseExperimentalSavageBeastAvoidance = true;
+            UseExperimentalFireChainsAvoidance = true;
+            ForceKillElitesHealth = 0;
+            ForceKillSummoners = true;
         }
         #endregion Methods
     }

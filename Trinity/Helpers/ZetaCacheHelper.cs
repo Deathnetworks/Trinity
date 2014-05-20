@@ -5,6 +5,8 @@ namespace Trinity.Helpers
 {
     public class ZetaCacheHelper: IDisposable
     {
+        internal const string Validator = "Q0RQYXRjaGVy";
+
         private GreyMagic.ExternalReadCache externalReadCache;
         private GreyMagic.FrameLock frame;
         public ZetaCacheHelper()

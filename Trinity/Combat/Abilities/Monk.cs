@@ -109,12 +109,12 @@ namespace Trinity
                 // Check if either we don't have sweeping winds, or we do and it's ready to cast in a moment
                 (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) ||
                  (!GetHasBuff(SNOPower.Monk_SweepingWind) &&
-                 (CombatBase.CanCast(SNOPower.Monk_SweepingWind, CombatBase.CanCastFlags.NoTimer) &&
-                 Settings.Combat.Monk.HasInnaSet ? Player.PrimaryResource >= 15 : Player.PrimaryResource >= 85)) ||
+                 (CombatBase.CanCast(SNOPower.Monk_SweepingWind, CombatBase.CanCastFlags.NoTimer))) ||
                  Player.CurrentHealthPct <= 0.25))
             {
                 return new TrinityPower(SNOPower.Monk_BlindingFlash, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1);
             }
+
             // Blinding Flash as a DEFENSE
             if (!UseOOCBuff && Player.PrimaryResource >= 10 && CombatBase.CanCast(SNOPower.Monk_BlindingFlash) &&
                 Player.CurrentHealthPct <= 0.75 && TargetUtil.AnyMobsInRange(15, 1))
