@@ -78,6 +78,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cache\EquippedItemCache.cs" />
     <Compile Include="Cache\ItemStashSellAppender.cs" />
     <Compile Include="Cache\ItemDroppedAppender.cs" />
     <Compile Include="Cache\TrinityBountyInfo.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="Combat\Abilities\WitchDoctorCombat.cs" />
     <Compile Include="Combat\Abilities\Wizard.cs" />
     <Compile Include="Combat\Abilities\DemonHunter.cs" />
+    <Compile Include="Combat\Abilities\WizardCombat.cs" />
     <Compile Include="Combat\AvoidanceManager.cs" />
     <Compile Include="Combat\AvoidanceType.cs" />
     <Compile Include="Combat\SpellTracker.cs" />

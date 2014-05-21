@@ -69,6 +69,7 @@ namespace Trinity
 
         public bool InActiveEvent { get; set; }
         public bool HasEventInspectionTask { get; set; }
+        public EquippedItemCache EquippedItemCache { get { return EquippedItemCache.Instance; } }
 
         public PlayerInfoCache()
         {
@@ -202,6 +203,8 @@ namespace Trinity
                     Player.IsHidden = me.IsHidden;
                     Player.GameDifficulty = ZetaDia.Service.Hero.CurrentDifficulty;
 
+                    Player.EquippedItemCache.Update();
+
                     if (Player.CurrentHealthPct > 0)
                         Player.IsGhosted = ZetaDia.Me.CommonData.GetAttribute<int>(ActorAttributeType.Ghosted) > 0;
 
@@ -223,7 +226,7 @@ namespace Trinity
                         // Step 1 is event in progress, kill stuff
                         // Step 2 is event completed
                         // Step -1 is not started
-                        Player.InActiveEvent = ZetaDia.ActInfo.ActiveQuests.Any(q => DataDictionary.EventQuests.Contains(q.QuestSNO) && q.QuestStep != 13 );
+                        Player.InActiveEvent = ZetaDia.ActInfo.ActiveQuests.Any(q => DataDictionary.EventQuests.Contains(q.QuestSNO) && q.QuestStep != 13);
                         Player.HasEventInspectionTask = ZetaDia.ActInfo.ActiveQuests.Any(q => DataDictionary.EventQuests.Contains(q.QuestSNO) && q.QuestStep == 13);
 
                         //if (ZetaDia.ActInfo.ActiveBounty != null)

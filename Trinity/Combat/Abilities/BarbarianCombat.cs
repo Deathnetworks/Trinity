@@ -57,13 +57,13 @@ namespace Trinity.Combat.Abilities
                 }
             }
 
-            // Call of the Ancients
-            if (IsNull(power) && CanUseCallOfTheAncients)
-                power = PowerCallOfTheAncients;
-
             // WOTB
             if (IsNull(power) && CanUseWrathOfTheBerserker)
                 power = PowerWrathOfTheBerserker;
+
+            // Call of the Ancients
+            if (IsNull(power) && CanUseCallOfTheAncients)
+                power = PowerCallOfTheAncients;
 
             // Earthquake
             if (IsNull(power) && CanUseEarthquake)
@@ -202,6 +202,7 @@ namespace Trinity.Combat.Abilities
                     !IsCurrentlyAvoiding &&
                     CanCast(SNOPower.Barbarian_CallOfTheAncients) &&
                     !Player.IsIncapacitated &&
+	                !GetHasBuff(SNOPower.Barbarian_CallOfTheAncients) &&
                     (TargetUtil.EliteOrTrashInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange")) ||
                     TargetUtil.AnyMobsInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange"), 3) || TargetUtil.AnyElitesInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange")));
             }

@@ -103,7 +103,7 @@ namespace Trinity
                     Player.CurrentHealthPct <= 0.4 ||
                     (TargetUtil.AnyMobsInRange(15, 3)) ||
                     (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f) ||
-                // as pre-sweeping wind buff
+                    // as pre-sweeping wind buff
                     (TargetUtil.AnyMobsInRange(15, 1) && CombatBase.CanCast(SNOPower.Monk_SweepingWind) && !GetHasBuff(SNOPower.Monk_SweepingWind) && Settings.Combat.Monk.HasInnaSet)
                 ) &&
                 // Check if either we don't have sweeping winds, or we do and it's ready to cast in a moment
@@ -266,7 +266,7 @@ namespace Trinity
             {
                 GenerateMonkZigZag();
                 MaintainTempestRush = true;
-                string trUse = "Continuing Tempest Rush for Combat";
+                const string trUse = "Continuing Tempest Rush for Combat";
                 Monk_TempestRushStatus(trUse);
                 return new TrinityPower(SNOPower.Monk_TempestRush, 23f, CombatBase.ZigZagPosition, CurrentWorldDynamicId, -1, 0, 0);
             }
@@ -281,7 +281,7 @@ namespace Trinity
             {
                 GenerateMonkZigZag();
                 MaintainTempestRush = true;
-                string trUse = "Starting Tempest Rush for Combat";
+                const string trUse = "Starting Tempest Rush for Combat";
                 Monk_TempestRushStatus(trUse);
                 return new TrinityPower(SNOPower.Monk_TempestRush, 23f, CombatBase.ZigZagPosition, CurrentWorldDynamicId, -1, 0, 0);
             }
@@ -535,8 +535,6 @@ namespace Trinity
 
         internal static bool Monk_TempestRushReady()
         {
-            bool isReady = false;
-
             if (Player.ActorClass != ActorClass.Monk)
                 return false;
 
@@ -569,7 +567,7 @@ namespace Trinity
             if (PowerManager.CanCast(SNOPower.Monk_TempestRush) && currentSpirit > Settings.Combat.Monk.TR_MinSpirit && TimeSinceUse(SNOPower.Monk_TempestRush) > 550)
                 return true;
 
-            return isReady;
+            return false;
         }
         private static void Monk_MaintainTempestRush()
         {
@@ -618,7 +616,7 @@ namespace Trinity
             {
                 Vector3 target = LastTempestRushLocation;
 
-                string locationSource = "LastLocation";
+                const string locationSource = "LastLocation";
 
                 if (target.Distance2D(ZetaDia.Me.Position) <= 1f)
                 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Trinity.Cache;
 using Trinity.Combat;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
@@ -171,26 +172,36 @@ namespace Trinity
                     return new TrinityPower(SNOPower.Wizard_MagicWeapon, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 2);
                 }
 
-                // Hydra
-                if (!useOocBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Hydra, CombatBase.CanCastFlags.NoTimer) &&
-                    (CombatBase.TimeSpanSincePowerUse(SNOPower.Wizard_Hydra) > TimeSpan.FromSeconds(15) && SpellHistory.DistanceFromLastTarget(SNOPower.Wizard_Hydra) > 30f) && //LastPowerUsed != SNOPower.Wizard_Hydra &&
-                    (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 4) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f)) &&
-                    Player.PrimaryResource >= 15)
+                if (!useOocBuff && Hotbar.Contains(SNOPower.Wizard_Hydra))
                 {
-                    // For distant monsters, try to target a little bit in-front of them (as they run towards us), if it's not a treasure goblin
-                    float fExtraDistance = 0f;
-                    if (CurrentTarget.Distance > 17f && !CurrentTarget.IsTreasureGoblin)
-                    {
-                        fExtraDistance = CurrentTarget.Distance - 17f;
-                        if (fExtraDistance > 5f)
-                            fExtraDistance = 5f;
-                        if (CurrentTarget.Distance - fExtraDistance < 15f)
-                            fExtraDistance -= 2;
-                    }
-                    Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.Distance - fExtraDistance);
-                    return new TrinityPower(SNOPower.Wizard_Hydra, 30f, vNewTarget, CurrentWorldDynamicId, -1, 1, 2);
-                }
+                    var _15s = TimeSpan.FromSeconds(15);
 
+                    // This will check if We have the "Serpent Sparker" wand, and attempt to cast 2 Hydras in 15 seconds, 
+                    // or re-cast another hydra if we don't have 2 Hydras within 30f of our target
+                    bool serpentSparkerRecast = EquippedItemCache.Instance.ItemIds.Contains(WizardCombat.SerpentSparkerId) &&
+                        (SpellHistory.SpellUseCountInTime(SNOPower.Wizard_Hydra, _15s) < 2 || 
+                        SpellHistory.HistoryQueue.Any(s => s.Power.SNOPower == SNOPower.Wizard_Hydra && s.TimeSinceUse < _15s && s.TargetPosition.Distance2DSqr(CurrentTarget.Position) > 30f));
+
+                    // Hydra
+                    if (!Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Hydra, CombatBase.CanCastFlags.NoTimer) &&
+                        ((CombatBase.TimeSpanSincePowerUse(SNOPower.Wizard_Hydra) > TimeSpan.FromSeconds(15) && SpellHistory.DistanceFromLastTarget(SNOPower.Wizard_Hydra) > 30f) || serpentSparkerRecast) &&
+                        (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 4) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f)) &&
+                        Player.PrimaryResource >= 15)
+                    {
+                        // For distant monsters, try to target a little bit in-front of them (as they run towards us), if it's not a treasure goblin
+                        float fExtraDistance = 0f;
+                        if (CurrentTarget.Distance > 17f && !CurrentTarget.IsTreasureGoblin)
+                        {
+                            fExtraDistance = CurrentTarget.Distance - 17f;
+                            if (fExtraDistance > 5f)
+                                fExtraDistance = 5f;
+                            if (CurrentTarget.Distance - fExtraDistance < 15f)
+                                fExtraDistance -= 2;
+                        }
+                        var position = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.Distance - fExtraDistance);
+                        return new TrinityPower(SNOPower.Wizard_Hydra, 30f, position);
+                    }
+                }
                 // Archon
                 if (!useOocBuff && !isCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Wizard_Archon, CombatBase.CanCastFlags.NoTimer) && Wizard_ShouldStartArchon())
                 {
@@ -280,7 +291,7 @@ namespace Trinity
                 }
 
                 // Check to see if we have a signature spell on our hotbar, for energy twister check
-                bool bHasSignatureSpell = (Hotbar.Contains(SNOPower.Wizard_MagicMissile) || Hotbar.Contains(SNOPower.Wizard_ShockPulse) ||
+                bool hasSignatureSpell = (Hotbar.Contains(SNOPower.Wizard_MagicMissile) || Hotbar.Contains(SNOPower.Wizard_ShockPulse) ||
                     Hotbar.Contains(SNOPower.Wizard_SpectralBlade) || Hotbar.Contains(SNOPower.Wizard_Electrocute));
 
                 //SkillDict.Add("EnergyTwister", SNOPower.Wizard_EnergyTwister);
@@ -296,7 +307,7 @@ namespace Trinity
                 if (!useOocBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_EnergyTwister) &&
                     Player.PrimaryResource >= 35 &&
                     // If using storm chaser, then force a signature spell every 1 stack of the buff, if we have a signature spell
-                    (!bHasSignatureSpell || GetBuffStacks(SNOPower.Wizard_EnergyTwister) < 1) &&
+                    (!hasSignatureSpell || GetBuffStacks(SNOPower.Wizard_EnergyTwister) < 1) &&
                     ((!hasWickedWindRune && CurrentTarget.RadiusDistance <= 25f) ||
                     (hasWickedWindRune && CurrentTarget.RadiusDistance <= 60f)) &&
                     (!Hotbar.Contains(SNOPower.Wizard_Electrocute) || !DataDictionary.FastMovingMonsterIds.Contains(CurrentTarget.ActorSNO)))
@@ -310,7 +321,7 @@ namespace Trinity
                 // Wave of force
                 if (!useOocBuff && !Player.IsIncapacitated && !isCurrentlyAvoiding && Player.PrimaryResource >= 25 && CombatBase.CanCast(SNOPower.Wizard_WaveOfForce, CombatBase.CanCastFlags.NoTimer))
                 {
-                    return new TrinityPower(SNOPower.Wizard_WaveOfForce, 5f, CurrentTarget.Position, CurrentWorldDynamicId, -1, 1, 2);
+                    return new TrinityPower(SNOPower.Wizard_WaveOfForce, 20f, CurrentTarget.Position);
                 }
 
                 bool hasEntropy = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Disintegrate && s.RuneIndex == 2);
@@ -395,45 +406,7 @@ namespace Trinity
             }
             else
             {
-                //bool cancelArchon = false;
-                //string reason = "";
-
-                //if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.RebuffArmor && !Wizard_HasWizardArmor())
-                //{
-                //    reason += "Rebuff Armor ";
-                //    cancelArchon = true;
-                //}
-                //if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.RebuffMagicWeaponFamiliar &&
-                //    (!CheckAbilityAndBuff(SNOPower.Wizard_MagicWeapon) || !Wizard_HasFamiliar()))
-                //{
-                //    if (!CheckAbilityAndBuff(SNOPower.Wizard_MagicWeapon))
-                //        reason += "Rebuff Magic Weapon ";
-                //    if (!Wizard_HasFamiliar())
-                //        reason += "Rebuff Familiar ";
-                //    cancelArchon = true;
-                //}
-
-                //if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.Timer &&
-                //    DateTime.UtcNow.Subtract(CacheData.AbilityLastUsed[SNOPower.Wizard_Archon]).TotalSeconds >= Settings.Combat.Wizard.ArchonCancelSeconds)
-                //{
-                //    reason += "Timer";
-                //    cancelArchon = true;
-                //}
-
-                //if (cancelArchon && Wizard_ShouldStartArchon())
-                //{
-                //    var archonBuff = ZetaDia.Me.GetBuff(SNOPower.Wizard_Archon);
-                //    if (archonBuff != null && archonBuff.IsCancelable)
-                //    {
-                //        Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Canceling Archon: {0}", reason);
-                //        // this actually cancels Archon
-                //        archonBuff.Cancel();
-
-                //        // this SNOPower is fake - it isn't actually used, we're just putting it here to force a BehaviorTree return/recheck
-                //        return new TrinityPower(SNOPower.Wizard_Archon_Cancel, 0f, Vector3.Zero, -1, -1, -1, -1);
-                //    }
-                //}
-
+                
                 // Archon form
                 // Archon Slow Time for in combat
                 if (!useOocBuff && !Player.IsIncapacitated && 
