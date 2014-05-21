@@ -506,7 +506,7 @@ namespace Trinity
                 }
 
                 // Disintegrate
-                if (!useOocBuff && !isCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(beamPower, CombatBase.CanCastFlags.NoTimer) && 
+                if (!useOocBuff && !isCurrentlyAvoiding && !Player.IsIncapacitated && !Settings.Combat.Wizard.NoDesintegrationWave && CombatBase.CanCast(beamPower, CombatBase.CanCastFlags.NoTimer) && 
                     (CurrentTarget.CountUnitsBehind(25f) > 2 || Settings.Combat.Wizard.NoArcaneStrike || Settings.Combat.Wizard.KiteLimit > 0))
                 {
                     return new TrinityPower(beamPower, 49f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0);
