@@ -159,7 +159,8 @@
         <Grid Grid.Row="6" Margin="2">
             <UniformGrid Columns="2">
                 <CheckBox Margin="2" IsChecked="{Binding Path=Wiz.ArchonElitesOnly}">Use Archon on Elites Only</CheckBox>
-                <CheckBox Margin="2" IsChecked="{Binding Path=Wiz.NoArcaneStrike}">Disable Archon Arcane Strike</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=Wiz.NoDesintegrationWave}">Disable Archon Desintegration Wave</CheckBox>
+				 <CheckBox Margin="2" IsChecked="{Binding Path=Wiz.NoArcaneStrike}">Disable Archon Arcane Strike</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Wiz.WaitArchon}">Wait for Archon CD at Azmo</CheckBox>
             </UniformGrid>
         </Grid>
