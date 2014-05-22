@@ -257,7 +257,7 @@ namespace Trinity
            new DoubleInt(3337, (int)SNOAnim.Beast_start_charge_02), // A1 Savage Beast Charge - needs special handling!
            new DoubleInt(3337, (int)SNOAnim.Beast_charge_02), // A1 Savage Beast Charge - needs special handling!
            new DoubleInt(3337, (int)SNOAnim.Beast_charge_04), // A1 Savage Beast Charge - needs special handling!
-           new DoubleInt(330824, 330824), // Urzael flame 
+           new DoubleInt(330824, (int)SNOAnim.x1_Urzael_attack_06), // Urzael flame 
            new DoubleInt(330824, 348109), // Urzael Cannonball Aim
            new DoubleInt(330824, 344952), // Urzael Flying           
            
@@ -397,13 +397,13 @@ namespace Trinity
         public static Dictionary<int, float> DefaultAvoidanceCustomRadius { get { return defaultAvoidanceCustomRadius; } }
         private static readonly Dictionary<int, float> defaultAvoidanceCustomRadius = new Dictionary<int, float>()
         {
-            {330824, 65f }, // A5 Urzael animations
-            {360598, 25f }, // x1_Urzael_CeilingDebris_DamagingFire_wall
-            {359205, 25f }, // x1_Urzael_ceilingDebris_Impact_Beam
-            {360883, 25f }, // x1_Urzael_ceilingDebris_Impact_Circle
-            {362850, 25f }, // x1_Urzael_Cannonball_burning_invisible
-            {346976, 25f }, // x1_Urzael_Cannonball_burning_impact
-            {346975, 25f }, // x1_Urzael_Cannonball_burning
+            {330824, 35f }, // A5 Urzael animations
+            {360598, 10f }, // x1_Urzael_CeilingDebris_DamagingFire_wall
+            {359205, 20f }, // x1_Urzael_ceilingDebris_Impact_Beam
+            {360883, 20f }, // x1_Urzael_ceilingDebris_Impact_Circle
+            {362850, 12f }, // x1_Urzael_Cannonball_burning_invisible
+            {346976, 12f }, // x1_Urzael_Cannonball_burning_impact
+            {346975, 12f }, // x1_Urzael_Cannonball_burning
 
             {360738, 12f}, // X1_Adria_arcanePool
             {338889, 5f}, // x1_Adria_bouncingProjectile
@@ -778,6 +778,7 @@ namespace Trinity
             368515, // A5 Nephalem Switch -  Passage to Corvus 
             347276, // x1_Fortress_Soul_Grinder_A
             326937, // x1_Pand_BatteringRam_Hook_B
+            291368, // x1_Urzael_Boss
         };
 
         /// <summary>
