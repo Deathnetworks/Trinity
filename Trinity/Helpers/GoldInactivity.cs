@@ -10,7 +10,7 @@ using Zeta.Game;
 
 namespace Trinity.Helpers
 {
-    public class GoldInactivity : IDisposable
+    public class GoldInactivity
     {
         private int _lastGoldAmount;
         private DateTime _lastCheckBag = DateTime.MinValue;
@@ -18,64 +18,6 @@ namespace Trinity.Helpers
 
         private static GoldInactivity _instance;
         public static GoldInactivity Instance { get { return _instance ?? (_instance = new GoldInactivity()); } }
-
-        private Thread _watcherThread;
-
-        public GoldInactivity()
-        {
-            _watcherThread = new Thread(GoldInactivityWorker)
-            {
-                Name = "GoldInactivityWorker",
-                IsBackground = true,
-                Priority = ThreadPriority.Lowest
-            };
-            _watcherThread.Start();
-        }
-
-        public void Dispose()
-        {
-            try
-            {
-                if (_watcherThread != null)
-                    _watcherThread.Abort();
-                _watcherThread = null;
-            }
-            catch { }
-        }
-
-        private void GoldInactivityWorker()
-        {
-            while (true)
-            {
-                try
-                {
-                    if (BotMain.IsPaused)
-                    {
-                        PauseGoldTimer();
-                    }
-                }
-                catch (ThreadAbortException)
-                {
-                    // ssh
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogError("Error in GoldInactivityWatcher: {0}", ex.Message);
-                }
-                Thread.Sleep(1000);
-            }
-        }
-
-        private void PauseGoldTimer()
-        {
-            long pauseTicks = DateTime.UtcNow.Subtract(_lastFoundGold).Ticks;
-            _lastFoundGold = _lastFoundGold.AddTicks(pauseTicks);
-        }
-
-        ~GoldInactivity()
-        {
-            Dispose();
-        }
 
         /// <summary>
         /// Resets the gold inactivity timer
