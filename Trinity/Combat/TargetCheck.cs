@@ -48,12 +48,6 @@ namespace Trinity
                 {
                     return false;
                 }
-                
-                if (GoldInactivity.Instance.GoldInactive())
-                {
-                    BotMain.PauseWhile(GoldInactivity.Instance.GoldInactiveLeaveGame);
-                    return false;
-                }
 
                 if (!HotbarRefreshTimer.IsRunning)
                     HotbarRefreshTimer.Start();

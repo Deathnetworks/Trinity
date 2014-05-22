@@ -141,13 +141,6 @@ namespace Trinity
                         runStatus = HandlerRunStatus.TreeFailure;
                         return GetTreeSharpRunStatus(runStatus);
                     }
-                    if (GoldInactivity.Instance.GoldInactive())
-                    {
-                        BotMain.PauseWhile(GoldInactivity.Instance.GoldInactiveLeaveGame);
-                        Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Gold Inactivity Tripped", true);
-                        runStatus = HandlerRunStatus.TreeFailure;
-                        return GetTreeSharpRunStatus(runStatus);
-                    }
 
                     // Make sure we reset unstucker stuff here
                     PlayerMover.TimesReachedStuckPoint = 0;

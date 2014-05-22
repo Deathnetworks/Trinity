@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
-using Trinity.DbProvider;
 using Trinity.Technicals;
 using Zeta.Bot;
-using Zeta.Bot.Profile;
-using Zeta.Bot.Profile.Common;
 using Zeta.Game;
+using Zeta.TreeSharp;
 
 namespace Trinity.Helpers
 {
@@ -25,7 +22,7 @@ namespace Trinity.Helpers
         internal void ResetCheckGold()
         {
             Logger.LogDebug(LogCategory.GlobalHandler, "Resetting Gold Timer, Last gold changed from {0} to {1}", _lastGoldAmount, Trinity.Player.Coinage);
-            
+
             _lastCheckBag = DateTime.UtcNow;
             _lastFoundGold = DateTime.UtcNow;
             _lastGoldAmount = 0;
@@ -104,68 +101,11 @@ namespace Trinity.Helpers
             return false;
         }
 
-        private bool _isLeavingGame;
-        private bool _leaveGameInitiated;
-
         private readonly Stopwatch _leaveGameTimer = new Stopwatch();
 
-        /// <summary>
-        /// Leaves the game if gold inactivity timer is tripped
-        /// </summary>
-        internal bool GoldInactiveLeaveGame()
+        internal static Composite CreateGoldInactiveLeaveGame()
         {
-            if (_leaveGameTimer.IsRunning && _leaveGameTimer.ElapsedMilliseconds < 12000)
-            {
-                return true;
-            }
-
-            // Fixes a race condition crash. Zomg!
-            Thread.Sleep(5000);
-
-            if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
-            {
-                _isLeavingGame = false;
-                _leaveGameInitiated = false;
-                Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "GoldInactiveLeaveGame called but not in game!");
-                return false;
-            }
-
-            if (!BotMain.IsRunning)
-            {
-                return false;
-            }
-
-            if (!_isLeavingGame && !_leaveGameInitiated)
-            {
-                // Exit the game and reload the profile
-                PlayerMover.LastRestartedGame = DateTime.UtcNow;
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Gold Inactivity timer tripped - Anti-stuck measures exiting current game.");
-                // Reload this profile
-                ProfileManager.Load(ProfileManager.CurrentProfile.Path);
-                Trinity.ResetEverythingNewGame();
-                _isLeavingGame = true;
-                return true;
-            }
-
-            if (!_leaveGameInitiated && _isLeavingGame)
-            {
-                _leaveGameTimer.Start();
-                ZetaDia.Service.Party.LeaveGame(true);
-                Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "GoldInactiveLeaveGame initiated LeaveGame");
-                return true;
-            }
-
-            if (DateTime.UtcNow.Subtract(PlayerMover.LastRestartedGame).TotalSeconds <= 12)
-            {
-                Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "GoldInactiveLeaveGame waiting for LeaveGame");
-                return true;
-            }
-
-            _isLeavingGame = false;
-            _leaveGameInitiated = false;
-            Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "GoldInactiveLeaveGame finished");
-
-            return false;
+            return new Decorator(ret => Instance.GoldInactive(), CommonBehaviors.LeaveGame(ret => "Gold Inactivity Tripped"));
         }
 
     }
