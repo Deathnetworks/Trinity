@@ -54,10 +54,11 @@
                     HorizontalAlignment="Stretch" Margin="25,0,25,0"/>
                     </Grid>
                     <UniformGrid Grid.Row="1" Margin="5" Columns="3" HorizontalAlignment="Center">
-                        <CheckBox HorizontalAlignment="Center" Margin="2" IsChecked="{Binding Path=WorldObject.OpenAnyContainer}" ToolTip="Any Container">Open Any Container</CheckBox>
-                        <CheckBox HorizontalAlignment="Center" Margin="2" IsChecked="{Binding Path=WorldObject.InspectCorpses}" ToolTip="Dead Bodies">Inspect Corpses</CheckBox>
-                        <CheckBox HorizontalAlignment="Center" Margin="2" IsChecked="{Binding Path=WorldObject.OpenContainers}" ToolTip="Normal Chests">Open Chests</CheckBox>
-                        <CheckBox HorizontalAlignment="Center" Margin="2" IsChecked="{Binding Path=WorldObject.OpenRareChests}" ToolTip="Open Rare Chests">Open Rare Chests</CheckBox>
+                        <CheckBox HorizontalAlignment="Left" Margin="2" IsChecked="{Binding Path=WorldObject.OpenAnyContainer}" ToolTip="Any Container">Open Any Container</CheckBox>
+                        <CheckBox HorizontalAlignment="Left" Margin="2" IsChecked="{Binding Path=WorldObject.InspectCorpses}" ToolTip="Dead Bodies">Inspect Corpses</CheckBox>
+                        <CheckBox HorizontalAlignment="Left" Margin="2" IsChecked="{Binding Path=WorldObject.InspectGroundClicky}" ToolTip="Ground Clicky's, loose stones etc.">Ground Containers</CheckBox>
+                        <CheckBox HorizontalAlignment="Left" Margin="2" IsChecked="{Binding Path=WorldObject.OpenContainers}" ToolTip="Normal Chests">Open Chests</CheckBox>
+                        <CheckBox HorizontalAlignment="Left" Margin="2" IsChecked="{Binding Path=WorldObject.OpenRareChests}" ToolTip="Open Rare Chests">Open Rare Chests</CheckBox>
                     </UniformGrid>
                     <!--Delay after kill Settings-->
                     <Grid Grid.Row="2" Margin="5">

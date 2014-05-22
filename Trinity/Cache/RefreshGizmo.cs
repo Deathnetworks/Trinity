@@ -750,6 +750,8 @@ namespace Trinity
                             DataDictionary.ContainerWhiteListIds.Contains(CurrentCacheObject.ActorSNO); // We know it's a container but this is not a known rare chest
                         bool isCorpse = CurrentCacheObject.InternalName.ToLower().Contains("corpse");
 
+                        bool isGroundClicky = CurrentCacheObject.InternalName.ToLower().Contains("ground_clicky");
+
                         // We want to do some vendoring, so don't open anything new yet
                         if (ForceVendorRunASAP)
                         {
@@ -803,13 +805,16 @@ namespace Trinity
                             return AddToCache;
                         }
 
-                        if (!isRareChest && CurrentCacheObject.RadiusDistance <= Settings.WorldObject.ContainerOpenRange)
+                        if (CurrentCacheObject.RadiusDistance <= Settings.WorldObject.ContainerOpenRange)
                         {
-                            if ((isChest && Settings.WorldObject.OpenContainers) || (isCorpse && Settings.WorldObject.InspectCorpses))
-                            {
-                                AddToCache = true;
-                                return AddToCache;
-                            }
+                            if (isChest && Settings.WorldObject.OpenContainers)
+                                return true;
+
+                            if (isCorpse && Settings.WorldObject.InspectCorpses)
+                                return true;
+
+                            if (isGroundClicky && Settings.WorldObject.InspectGroundClicky)
+                                return true;
                         }
                       
                         if (CurrentCacheObject.IsQuestMonster)

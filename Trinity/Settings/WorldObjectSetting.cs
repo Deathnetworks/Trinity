@@ -19,6 +19,7 @@ namespace Trinity.Config
         private bool _UseEnlightenedShrine;
         private bool _UseFleetingShrine;
         private bool _OpenAnyContainer;
+        private bool _InspectGroundClicky;
         private bool _InspectCorpses;
         private bool _OpenContainers;
         private bool _OpenRareChest;
@@ -223,6 +224,24 @@ namespace Trinity.Config
                 {
                     _OpenAnyContainer = value;
                     OnPropertyChanged("OpenAnyContainer");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool InspectGroundClicky
+        {
+            get
+            {
+                return _InspectGroundClicky;
+            }
+            set
+            {
+                if (_InspectGroundClicky != value)
+                {
+                    _InspectGroundClicky = value;
+                    OnPropertyChanged("InspectGroundClicky");
                 }
             }
         }
