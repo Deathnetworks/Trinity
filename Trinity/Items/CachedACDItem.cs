@@ -1,4 +1,5 @@
 ﻿using System;
+using Trinity.Technicals;
 using Zeta.Game;
 using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
@@ -268,34 +269,45 @@ namespace Trinity
 
         public static CachedACDItem GetCachedItem(ACDItem item)
         {
-            CachedACDItem cItem = new CachedACDItem(item.Stats)
+            try
             {
-                AcdItem = item,
-                InternalName = item.InternalName,
-                RealName = item.Name,
-                Level = item.Level,
-                Quality = item.ItemQualityLevel,
-                GoldAmount = item.Gold,
-                BalanceID = item.GameBalanceId,
-                DynamicID = item.DynamicId,
-                OneHanded = item.IsOneHand,
-                TwoHanded = item.IsTwoHand,
-                DyeType = item.DyeType,
-                DBItemType = item.ItemType,
-                DBBaseType = item.ItemBaseType,
-                FollowerType = item.FollowerSpecialType,
-                IsUnidentified = item.IsUnidentified,
-                ItemStackQuantity = item.ItemStackQuantity,
-                Row = item.InventoryRow,
-                Column = item.InventoryColumn,
-                ItemLink = item.ItemLink,
-                TrinityItemType = Trinity.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType),
-                TrinityItemBaseType = Trinity.DetermineBaseType(Trinity.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType))
-            };
+                if (!item.IsValid)
+                    return default(CachedACDItem);
 
-            cItem.ComputeUpgrade();
+                CachedACDItem cItem = new CachedACDItem(item.Stats)
+                {
+                    AcdItem = item,
+                    InternalName = item.InternalName,
+                    RealName = item.Name,
+                    Level = item.Level,
+                    Quality = item.ItemQualityLevel,
+                    GoldAmount = item.Gold,
+                    BalanceID = item.GameBalanceId,
+                    DynamicID = item.DynamicId,
+                    OneHanded = item.IsOneHand,
+                    TwoHanded = item.IsTwoHand,
+                    DyeType = item.DyeType,
+                    DBItemType = item.ItemType,
+                    DBBaseType = item.ItemBaseType,
+                    FollowerType = item.FollowerSpecialType,
+                    IsUnidentified = item.IsUnidentified,
+                    ItemStackQuantity = item.ItemStackQuantity,
+                    Row = item.InventoryRow,
+                    Column = item.InventoryColumn,
+                    ItemLink = item.ItemLink,
+                    TrinityItemType = Trinity.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType),
+                    TrinityItemBaseType = Trinity.DetermineBaseType(Trinity.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType))
+                };
 
-            return cItem;
+                cItem.ComputeUpgrade();
+                return cItem;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error getting CachedItem {0}", ex.Message);
+                return default(CachedACDItem);
+            }
+
         }
 
         public void ComputeUpgrade()

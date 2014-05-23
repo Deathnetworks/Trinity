@@ -9,8 +9,10 @@ using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Navigation;
+using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Game;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
@@ -243,7 +245,7 @@ namespace Trinity
         {
             GenericCache.Shutdown();
             GenericBlacklist.Shutdown();
-            Helpers.PluginCheck.Shutdown();
+            PluginCheck.Shutdown();
         }
 
         /// <summary>
@@ -251,7 +253,7 @@ namespace Trinity
         /// </summary>
         public void OnInitialize()
         {
-            Helpers.PluginCheck.CheckAndInstallTrinityRoutine();
+            PluginCheck.CheckAndInstallTrinityRoutine();
             Logger.Log("Initialized v{0}", Version);
         }
 
@@ -284,7 +286,7 @@ namespace Trinity
         public Trinity()
         {
             _instance = this;
-            Helpers.PluginCheck.CheckAndInstallTrinityRoutine();
+            PluginCheck.CheckAndInstallTrinityRoutine();
         }
 
 

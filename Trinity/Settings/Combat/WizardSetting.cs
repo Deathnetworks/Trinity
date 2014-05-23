@@ -12,7 +12,7 @@ namespace Trinity.Config.Combat
         private int _KiteLimit;
         private bool _WaitArchon;
         private bool _NoArcaneStrike;
-		private bool _NoDesintegrationWave;
+		private bool _DisableDisintegrationWave;
         private bool _ArchonElitesOnly;
         private int _ArchonMobCount;
         private float _ArchonMobDistance;
@@ -110,18 +110,18 @@ namespace Trinity.Config.Combat
         }
 		[DataMember(IsRequired = false)]
         [DefaultValue(false)]
-		public bool NoDesintegrationWave
+		public bool DisableDisintegrationWave
         {
             get
             {
-                return _NoDesintegrationWave;
+                return _DisableDisintegrationWave;
             }
             set
             {
-                if (_NoDesintegrationWave != value)
+                if (_DisableDisintegrationWave != value)
                 {
-                    _NoDesintegrationWave = value;
-                    OnPropertyChanged("NoDesintegrationWave");
+                    _DisableDisintegrationWave = value;
+                    OnPropertyChanged("DisableDisintegrationWave");
                 }
             }
         }

@@ -287,7 +287,7 @@
                         <ComboBoxItem Content="70+" Tag="70" />
                         <ComboBoxItem Content="73+" Tag="73" />
                     </ComboBox>
-                    
+
                     <TextBlock Grid.Row="6" Grid.Column="0" FontWeight="Bold" Text="Follower:"/>
                     <CheckBox Grid.Row="6" Grid.Column="1"  Content="Magic Follower Items" IsChecked="{Binding Path=Pickup.PickupBlueFollowerItems}" Margin="8,2"/>
                     <CheckBox Grid.Row="6" Grid.Column="2"  Content="Rare Follower Items" IsChecked="{Binding Path=Pickup.PickupYellowFollowerItems}" Margin="8,2"/>
@@ -346,7 +346,7 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="2*" />
                 </Grid.ColumnDefinitions>
-                
+
                 <!-- Potions -->
                 <TextBlock FontWeight="Bold" Margin="5" Text="Potion Cap:" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                 <ComboBox Grid.Row="0" Grid.Column="1" SelectedValuePath="Tag" Margin="5" SelectedValue="{Binding Path=Pickup.PotionCount}" VerticalAlignment="Center">
@@ -358,14 +358,17 @@
                     <ComboBoxItem Content="Pickup All" Tag="6000" />
                 </ComboBox>
                 <!-- Pickup Gold? -->
-                
+
                 <!-- Gold Stack Size -->
-                <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding Path=Pickup.PickupGold}" Content="Pickup Gold?" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                <TextBlock Grid.Row="1" Grid.Column="1" Text="Minimum Stack:" HorizontalAlignment="Right" VerticalAlignment="Center" />
-                <Slider Grid.Row="1" Grid.Column="2" Template="{DynamicResource Slider}" IsEnabled="{Binding Path=Pickup.PickupGold}"
-                        Interval="500" Maximum="4000" Minimum="0" SmallChange="10" LargeChange="100"
+                <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Header="Gold Pickup Settings">
+                    <StackPanel>
+                        <CheckBox IsChecked="{Binding Path=Pickup.PickupGold}" Content="Pickup Gold?" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        <Slider Template="{DynamicResource Slider}" IsEnabled="{Binding Path=Pickup.PickupGold}"
+                        Interval="500" Maximum="30000" Minimum="0" SmallChange="10" LargeChange="100"
                         TickFrequency="100" TickPlacement="BottomRight" IsSnapToTickEnabled="True"
                         Value="{Binding Path=Pickup.MinimumGoldStack}" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </GroupBox>
             </Grid>
             <Grid Grid.Row="8">
                 <Grid>

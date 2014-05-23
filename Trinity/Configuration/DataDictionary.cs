@@ -253,14 +253,17 @@ namespace Trinity
         public static HashSet<DoubleInt> AvoidanceAnimations { get { return DataDictionary.avoidanceAnimations; } }
         private static readonly HashSet<DoubleInt> avoidanceAnimations = new HashSet<DoubleInt>
         {
-           new DoubleInt(3847, (int)SNOAnim.Stitch_Suicide_Bomb), // Corpulent_A: Stitch_Suicide_Bomb
-           new DoubleInt(3337, (int)SNOAnim.Beast_start_charge_02), // A1 Savage Beast Charge - needs special handling!
-           new DoubleInt(3337, (int)SNOAnim.Beast_charge_02), // A1 Savage Beast Charge - needs special handling!
-           new DoubleInt(3337, (int)SNOAnim.Beast_charge_04), // A1 Savage Beast Charge - needs special handling!
-           new DoubleInt(330824, (int)SNOAnim.x1_Urzael_attack_06), // Urzael flame 
-           new DoubleInt(330824, 348109), // Urzael Cannonball Aim
-           new DoubleInt(330824, 344952), // Urzael Flying           
-           
+            new DoubleInt(3847, (int)SNOAnim.Stitch_Suicide_Bomb), // Corpulent_A: Stitch_Suicide_Bomb
+            new DoubleInt(3337, (int)SNOAnim.Beast_start_charge_02), // A1 Savage Beast Charge - needs special handling!
+            new DoubleInt(3337, (int)SNOAnim.Beast_charge_02), // A1 Savage Beast Charge - needs special handling!
+            new DoubleInt(3337, (int)SNOAnim.Beast_charge_04), // A1 Savage Beast Charge - needs special handling!
+            new DoubleInt(330824, (int)SNOAnim.x1_Urzael_attack_06), // Urzael flame 
+            new DoubleInt(330824, 348109), // Urzael Cannonball Aim
+            new DoubleInt(330824, 344952), // Urzael Flying
+            new DoubleInt(343767, (int)SNOAnim.malletDemon_attack_01), // X1_LR_Boss_MalletDemon
+            new DoubleInt(106709, (int)SNOAnim.malletDemon_attack_01), // MalletDemon_A
+            new DoubleInt(219736, (int)SNOAnim.malletDemon_attack_01), // MalletDemon_A_Unique_01  
+            new DoubleInt(219751, (int)SNOAnim.malletDemon_attack_01), // MalletDemon_A_Unique_02 
        };
 
 
@@ -412,7 +415,10 @@ namespace Trinity
             {335505, 5f}, // x1_malthael_drainSoul_ghost
             {325136, 20f}, // x1_Malthael_DeathFogMonster
             {340512, 8f}, // x1_Malthael_Mephisto_LightningObject
-
+            {343767, 35f }, // Mallet Demons
+            {106709, 35f }, // Mallet Demons
+            {219736, 35f }, // Mallet Demons
+            {219751, 35f }, // Mallet Demons
         };
 
         /*
@@ -822,7 +828,6 @@ namespace Trinity
 			85790, //Cath_Lecturn_ LachdanansScroll
 			227305, //Lore_Inarius_Corrupt
 			137125, //FesteringWoods_WarriorsRest_Lore
-            289794, // X1_PandExt_ArmorRack
         };
 
         /// <summary>

@@ -321,7 +321,7 @@ namespace Trinity
                 // Wave of force
                 if (!useOocBuff && !Player.IsIncapacitated && !isCurrentlyAvoiding && Player.PrimaryResource >= 25 && CombatBase.CanCast(SNOPower.Wizard_WaveOfForce, CombatBase.CanCastFlags.NoTimer))
                 {
-                    return new TrinityPower(SNOPower.Wizard_WaveOfForce, 20f, CurrentTarget.Position);
+                    return new TrinityPower(SNOPower.Wizard_WaveOfForce, 15f, CurrentTarget.Position);
                 }
 
                 bool hasEntropy = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Disintegrate && s.RuneIndex == 2);
@@ -479,7 +479,7 @@ namespace Trinity
                 }
 
                 // Disintegrate
-                if (!useOocBuff && !isCurrentlyAvoiding && !Player.IsIncapacitated && !Settings.Combat.Wizard.NoDesintegrationWave && CombatBase.CanCast(beamPower, CombatBase.CanCastFlags.NoTimer) && 
+                if (!useOocBuff && !isCurrentlyAvoiding && !Player.IsIncapacitated && !Settings.Combat.Wizard.DisableDisintegrationWave && CombatBase.CanCast(beamPower, CombatBase.CanCastFlags.NoTimer) && 
                     (CurrentTarget.CountUnitsBehind(25f) > 2 || Settings.Combat.Wizard.NoArcaneStrike || Settings.Combat.Wizard.KiteLimit > 0))
                 {
                     return new TrinityPower(beamPower, 49f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0);

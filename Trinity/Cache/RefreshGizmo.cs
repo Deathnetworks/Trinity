@@ -746,9 +746,9 @@ namespace Trinity
 
                         bool isRareChest = CurrentCacheObject.InternalName.ToLower().Contains("chest_rare") || DataDictionary.ResplendentChestIds.Contains(CurrentCacheObject.ActorSNO);
                         bool isChest = (!isRareChest && CurrentCacheObject.InternalName.ToLower().Contains("chest")) ||
-                            CurrentCacheObject.InternalName.ToLower().Contains("rack") ||
                             DataDictionary.ContainerWhiteListIds.Contains(CurrentCacheObject.ActorSNO); // We know it's a container but this is not a known rare chest
                         bool isCorpse = CurrentCacheObject.InternalName.ToLower().Contains("corpse");
+                        bool isWeaponRack = CurrentCacheObject.InternalName.ToLower().Contains("rack");
 
                         bool isGroundClicky = CurrentCacheObject.InternalName.ToLower().Contains("ground_clicky");
 
@@ -814,6 +814,9 @@ namespace Trinity
                                 return true;
 
                             if (isGroundClicky && Settings.WorldObject.InspectGroundClicky)
+                                return true;
+
+                            if (isWeaponRack && Settings.WorldObject.InspectWeaponRacks)
                                 return true;
                         }
                       

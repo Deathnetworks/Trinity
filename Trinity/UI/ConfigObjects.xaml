@@ -57,6 +57,7 @@
                         <CheckBox HorizontalAlignment="Left" Margin="2" IsChecked="{Binding Path=WorldObject.OpenAnyContainer}" ToolTip="Any Container">Open Any Container</CheckBox>
                         <CheckBox HorizontalAlignment="Left" Margin="2" IsChecked="{Binding Path=WorldObject.InspectCorpses}" ToolTip="Dead Bodies">Inspect Corpses</CheckBox>
                         <CheckBox HorizontalAlignment="Left" Margin="2" IsChecked="{Binding Path=WorldObject.InspectGroundClicky}" ToolTip="Ground Clicky's, loose stones etc.">Ground Containers</CheckBox>
+                        <CheckBox HorizontalAlignment="Left" Margin="2" IsChecked="{Binding Path=WorldObject.InspectWeaponRacks}" ToolTip="Inspect Weapon Racks">Weapon Racks</CheckBox>
                         <CheckBox HorizontalAlignment="Left" Margin="2" IsChecked="{Binding Path=WorldObject.OpenContainers}" ToolTip="Normal Chests">Open Chests</CheckBox>
                         <CheckBox HorizontalAlignment="Left" Margin="2" IsChecked="{Binding Path=WorldObject.OpenRareChests}" ToolTip="Open Rare Chests">Open Rare Chests</CheckBox>
                     </UniformGrid>
