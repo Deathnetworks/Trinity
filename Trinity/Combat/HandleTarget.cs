@@ -526,8 +526,7 @@ namespace Trinity
                         CurrentTarget.Type != GObjectType.Backtrack &&
                         (CurrentTarget.Type != GObjectType.Item && CurrentTarget.Type != GObjectType.Gold && TargetCurrentDistance >= 6f) &&
                         (CurrentTarget.Type != GObjectType.Unit ||
-                        (CurrentTarget.IsUnit && !CurrentTarget.IsTreasureGoblin &&
-                        (!Settings.Combat.Barbarian.SelectiveWhirlwind || (Settings.Combat.Barbarian.SelectiveWhirlwind && _anyNonWwIgnoreMobsInRange && !DataDictionary.WhirlwindIgnoreSNOIds.Contains(CurrentTarget.ActorSNO))))))
+                        (CurrentTarget.IsUnit && !CurrentTarget.IsTreasureGoblin)))
                     {
                         // Special code to prevent whirlwind double-spam, this helps save fury
                         bool bUseThisLoop = SNOPower.Barbarian_Whirlwind != LastPowerUsed;

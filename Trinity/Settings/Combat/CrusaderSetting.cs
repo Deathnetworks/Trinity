@@ -7,6 +7,7 @@ namespace Trinity.Config.Combat
     public class CrusaderSetting : ITrinitySetting<CrusaderSetting>, IAvoidanceHealth, INotifyPropertyChanged
     {
         #region Fields
+        private bool _UseAkaratsOnCooldown;
         private int _TauntAoECount;
         private int _SweepAttackAoECount;
         private int _JudgmentAoECount;
@@ -77,6 +78,23 @@ namespace Trinity.Config.Combat
 
         #region Properties
 
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool UseAkaratsOffCooldown
+        {
+            get
+            {
+                return _UseAkaratsOnCooldown;
+            }
+            set
+            {
+                if (_UseAkaratsOnCooldown != value)
+                {
+                    _UseAkaratsOnCooldown = value;
+                    OnPropertyChanged("UseAkaratsOnCooldown");
+                }
+            }
+        }
         [DataMember(IsRequired = false)]
         [DefaultValue(5)]
         public int ProvokeAoECount

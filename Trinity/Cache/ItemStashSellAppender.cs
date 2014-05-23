@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -9,6 +10,8 @@ namespace Trinity.Cache
 {
     public class ItemStashSellAppender : IDisposable
     {
+        private HashSet<int> _loggedItems = new HashSet<int>();
+
         bool _headerChecked;
         public ItemStashSellAppender()
         {
@@ -108,12 +111,19 @@ namespace Trinity.Cache
                     string queueItem;
                     while (_logItemQueue.TryDequeue(out queueItem))
                     {
+                        int hashCode = queueItem.GetHashCode();
+                        if (_loggedItems.Contains(hashCode))
+                            continue;
+                        if (!_loggedItems.Contains(hashCode))
+                            _loggedItems.Add(hashCode);
+                        
                         bool success = false;
                         int attempts = 0;
                         while (!string.IsNullOrWhiteSpace(queueItem) && !success && attempts <= maxAttempts)
                         {
                             try
                             {
+
                                 _mutex.WaitOne();
 
                                 attempts++;

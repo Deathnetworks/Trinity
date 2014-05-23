@@ -426,14 +426,6 @@ namespace Trinity
          */
 
         /// <summary>
-        /// A special list of things *NOT* to use whirlwind on (eg because they move too quick/WW is ineffective on)
-        /// </summary>
-        public static HashSet<int> WhirlwindIgnoreSNOIds { get { return whirlwindIgnoreIds; } }
-        internal static readonly HashSet<int> whirlwindIgnoreIds = new HashSet<int> {
-            4304, 5984, 5985, 5987, 5988,
-         };
-
-        /// <summary>
         /// ActorSNO's of Very fast moving mobs (eg wasps), for special skill-selection decisions
         /// </summary>
         public static HashSet<int> FastMovingMonsterIds { get { return fastMovementMonsterIds; } }

@@ -87,6 +87,12 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.X1_Crusader_Consecration);
                 }
 
+                // Akarats when off Cooldown
+                if (CrusaderSettings.UseAkaratsOffCooldown && CanCast(SNOPower.X1_Crusader_AkaratsChampion))
+                {
+                    return new TrinityPower(SNOPower.X1_Crusader_AkaratsChampion);
+                }
+
                 // AkaratsChampion
                 if (CanCastAkaratsChampion())
                 {

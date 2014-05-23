@@ -436,11 +436,10 @@ namespace Trinity.Items
 
         private static SalvageOption GetSalvageOption(ItemQuality quality)
         {
-            if (quality > ItemQuality.Normal && quality <= ItemQuality.Superior)
+            if (quality >= ItemQuality.Normal && quality <= ItemQuality.Superior)
             {
                 return Trinity.Settings.Loot.TownRun.SalvageWhiteItemOption;
             }
-
             if (quality >= ItemQuality.Magic1 && quality <= ItemQuality.Magic3)
             {
                 return Trinity.Settings.Loot.TownRun.SalvageBlueItemOption;

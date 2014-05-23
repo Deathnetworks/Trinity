@@ -241,15 +241,11 @@
                 HorizontalAlignment="Stretch" Margin="2,0"/>
                     </Grid>
 
-                    <!--SteedChargeOOC-->
-                    <Grid Grid.Row="14">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="Use Steed Charge OOC" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
-                        <CheckBox Grid.Column="1" IsChecked="{Binding Path=Crusader.SteedChargeOOC}" />
-                    </Grid>
+                    <!-- Boolean Options -->
+                    <UniformGrid>
+                        <CheckBox IsChecked="{Binding Path=Crusader.SteedChargeOOC}" ToolTip="Use Steed Charge OOC" Content="Use Steed Charge OOC" />
+                        <CheckBox IsChecked="{Binding Path=Crusader.UseAkaratsOffCooldown}" Content="Use Akarats off CD" />
+                    </UniformGrid>
                 </StackPanel>
             </Grid>
 

@@ -37,11 +37,6 @@ namespace Trinity
         private static bool _isPluginEnabled;
 
         /// <summary>
-        /// A flag to say whether any NON-hashActorSNOWhirlwindIgnore things are around
-        /// </summary>
-        private static bool _anyNonWwIgnoreMobsInRange;
-
-        /// <summary>
         /// Used for a global bot-pause
         /// </summary>
         private const bool MainBotPaused = false;

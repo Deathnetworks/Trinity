@@ -180,13 +180,12 @@ namespace Trinity
                     // or re-cast another hydra if we don't have 2 Hydras within 30f of our target
                     bool serpentSparkerRecast = EquippedItemCache.Instance.ItemIds.Contains(WizardCombat.SerpentSparkerId) &&
                         (SpellHistory.SpellUseCountInTime(SNOPower.Wizard_Hydra, _15s) < 2 || 
-                        SpellHistory.HistoryQueue.Any(s => s.Power.SNOPower == SNOPower.Wizard_Hydra && s.TimeSinceUse < _15s && s.TargetPosition.Distance2DSqr(CurrentTarget.Position) > 30f));
+                        SpellHistory.HistoryQueue.Any(s => s.Power.SNOPower == SNOPower.Wizard_Hydra && s.TimeSinceUse < _15s && s.TargetPosition.Distance2DSqr(CurrentTarget.Position) > 45f));
 
                     // Hydra
                     if (!Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Hydra, CombatBase.CanCastFlags.NoTimer) &&
                         ((CombatBase.TimeSpanSincePowerUse(SNOPower.Wizard_Hydra) > TimeSpan.FromSeconds(15) && SpellHistory.DistanceFromLastTarget(SNOPower.Wizard_Hydra) > 30f) || serpentSparkerRecast) &&
-                        (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 4) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f)) &&
-                        Player.PrimaryResource >= 15)
+                        CurrentTarget.RadiusDistance <= 35f && Player.PrimaryResource >= 15)
                     {
                         // For distant monsters, try to target a little bit in-front of them (as they run towards us), if it's not a treasure goblin
                         float fExtraDistance = 0f;

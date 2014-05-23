@@ -119,7 +119,6 @@
                 </UniformGrid>
             </GroupBox>
             <UniformGrid Columns="2" Grid.Row="1">
-                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.SelectiveWhirlwind}" ToolTip="eg goblins, occultists">Selective Whirlwind Target</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.FuryDumpAlways}" ToolTip="Spam Sprint when at max fury">Fury Dump always</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.TargetBasedZigZag}" ToolTip="Uses Monster positions as WW points instead of random XYZ">Multi-Target Based ZigZag</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.ThreatShoutOOC}" ToolTip="Use Threating Shout Out of Combat to generate Fury">Use Threating Shout OOC</CheckBox>

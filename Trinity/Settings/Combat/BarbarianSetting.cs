@@ -729,24 +729,6 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool SelectiveWhirlwind
-        {
-            get
-            {
-                return _SelectiveWirlwind;
-            }
-            set
-            {
-                if (_SelectiveWirlwind != value)
-                {
-                    _SelectiveWirlwind = value;
-                    OnPropertyChanged("SelectiveWhirlwind");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool WaitWOTB
         {

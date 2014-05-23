@@ -80,13 +80,8 @@ namespace Trinity
                 bool inQuestArea = DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId);
                 bool usingTownPortal = TownRun.IsTryingToTownPortal();
 
-                foreach (TrinityCacheObject cacheObject in ObjectCache.OrderBy(c => c.Distance))
-                {
-                    bool elitesInRangeOfUnit = !CombatBase.IgnoringElites &&
-                        ObjectCache.Any(u => u.ACDGuid != cacheObject.ACDGuid && u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= 25f);
-
-                    bool shouldIgnoreTrashMobs =
-                        !(isKillBounty || Player.InActiveEvent) &&
+                bool shouldIgnoreTrashMobs =
+                    !(isKillBounty || Player.InActiveEvent) &&
                         !CombatBase.IsQuestingMode &&
                         !inQuestArea &&
                         !DataDictionary.RiftWorldIds.Contains(Player.WorldID) &&
@@ -94,11 +89,16 @@ namespace Trinity
                         !profileTagCheck &&
                         movementSpeed > 1 &&
                         Settings.Combat.Misc.TrashPackSize > 1 &&
-                        !elitesInRangeOfUnit &&
                         Player.Level >= 15 &&
                         Player.CurrentHealthPct > 0.10 &&
-                        DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds > 500
-                        ;
+                        DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds > 500;
+
+                foreach (TrinityCacheObject cacheObject in ObjectCache.OrderBy(c => c.Distance))
+                {
+                    bool elitesInRangeOfUnit = !CombatBase.IgnoringElites &&
+                        ObjectCache.Any(u => u.ACDGuid != cacheObject.ACDGuid && u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= 25f);
+
+                    bool shouldIgnoreTrashMob = shouldIgnoreTrashMobs && !elitesInRangeOfUnit;
 
                     string objWeightInfo = "";
 
@@ -124,7 +124,7 @@ namespace Trinity
                                 if (cacheObject.IsTrashMob)
                                 {
                                     // Ignore trash mobs < 15% health or 50% health with a DoT
-                                    if (cacheObject.IsTrashMob && shouldIgnoreTrashMobs &&
+                                    if (cacheObject.IsTrashMob && shouldIgnoreTrashMob &&
                                         (cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealth ||
                                          cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealthDoT && cacheObject.HasDotDPS) && !cacheObject.IsQuestMonster && !cacheObject.IsMinimapActive)
                                     {
@@ -138,7 +138,7 @@ namespace Trinity
 
                                     // Ignore Solitary Trash mobs (no elites present)
                                     // Except if has been primary target or if already low on health (<= 20%)
-                                    if (shouldIgnoreTrashMobs && !isInHotSpot &&
+                                    if (shouldIgnoreTrashMob && !isInHotSpot &&
                                         !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize) &&
                                         ignoreSummoner && !cacheObject.IsQuestMonster &&
                                         !cacheObject.IsMinimapActive && !cacheObject.IsBountyObjective)
@@ -151,7 +151,7 @@ namespace Trinity
                                         objWeightInfo = "Adding ";
                                     }
                                     objWeightInfo += String.Format("nearbyCount={0} radiusDistance={1:0} hotspot={2} ShouldIgnore={3} elitesInRange={4} hitPointsPc={5:0.0} summoner={6} quest:{7} minimap={8} ",
-                                        nearbyMonsterCount, cacheObject.RadiusDistance, isInHotSpot, shouldIgnoreTrashMobs, elitesInRangeOfUnit, cacheObject.HitPointsPct, ignoreSummoner, cacheObject.IsQuestMonster, cacheObject.IsMinimapActive);
+                                        nearbyMonsterCount, cacheObject.RadiusDistance, isInHotSpot, shouldIgnoreTrashMob, elitesInRangeOfUnit, cacheObject.HitPointsPct, ignoreSummoner, cacheObject.IsQuestMonster, cacheObject.IsMinimapActive);
 
                                     if (ignoring)
                                         break;
@@ -177,7 +177,7 @@ namespace Trinity
                                 }
 
                                 // Monster is in cache but not within kill range
-                                if (!cacheObject.IsBoss &&
+                                if (!cacheObject.IsBoss && !cacheObject.IsTreasureGoblin &&
                                     cacheObject.RadiusDistance > cacheObject.KillRange &&
                                     !cacheObject.IsQuestMonster &&
                                     !cacheObject.IsBountyObjective)
@@ -203,22 +203,17 @@ namespace Trinity
                                     break;
                                 }
 
-                                if (cacheObject.RadiusDistance <= 25f && !_anyNonWwIgnoreMobsInRange && !DataDictionary.WhirlwindIgnoreSNOIds.Contains(cacheObject.ActorSNO))
-                                {
-                                    _anyNonWwIgnoreMobsInRange = true;
-                                }
-
                                 // Force a close range target because we seem to be stuck *OR* if not ranged and currently rooted
                                 if (prioritizeCloseRangeUnits)
                                 {
-                                    double rangePercent = (50d - cacheObject.RadiusDistance) / 50d;
-                                    cacheObject.Weight = Math.Max(rangePercent * 2000d, 2d);
+                                    double rangePercent = (20d - cacheObject.RadiusDistance) / 20d;
+                                    cacheObject.Weight = Math.Max(rangePercent * MaxWeight, 200d);
 
                                     // Goblin priority KAMIKAZEEEEEEEE
                                     if (cacheObject.IsTreasureGoblin && Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze)
                                     {
-                                        objWeightInfo += "Goblin ";
-                                        cacheObject.Weight += 25000;
+                                        objWeightInfo += "GoblinKamikaze ";
+                                        cacheObject.Weight = MaxWeight;
                                     }
                                     objWeightInfo += "CloseRange ";
                                 }
@@ -298,70 +293,68 @@ namespace Trinity
                                             cacheObject.Weight += 10000d;
                                         }
 
-                                        // Give extra weight to ranged enemies
-                                        if ((Player.ActorClass == ActorClass.Barbarian || Player.ActorClass == ActorClass.Monk) &&
-                                            (cacheObject.MonsterSize == MonsterSize.Ranged || DataDictionary.RangedMonsterIds.Contains(CurrentCacheObject.ActorSNO)))
+                                        // Below actions only when not prioritizing close range units
+                                        if (!prioritizeCloseRangeUnits)
                                         {
-                                            objWeightInfo += "Ranged ";
-                                            cacheObject.Weight += 1100d;
-                                            cacheObject.ForceLeapAgainst = true;
-                                        }
+                                            // Give extra weight to ranged enemies
+                                            if ((Player.ActorClass == ActorClass.Barbarian || Player.ActorClass == ActorClass.Monk) &&
+                                                (cacheObject.MonsterSize == MonsterSize.Ranged || DataDictionary.RangedMonsterIds.Contains(CurrentCacheObject.ActorSNO)))
+                                            {
+                                                objWeightInfo += "Ranged ";
+                                                cacheObject.Weight += 1100d;
+                                                cacheObject.ForceLeapAgainst = true;
+                                            }
 
-                                        // Lower health gives higher weight - health is worth up to 1000ish extra weight
-                                        if (cacheObject.IsTrashMob && cacheObject.HitPointsPct < 0.20)
-                                        {
-                                            objWeightInfo += "LowHPTrash ";
-                                            cacheObject.Weight += Math.Max((1 - cacheObject.HitPointsPct) / 100 * 1000d, 100d);
-                                        }
+                                            // Lower health gives higher weight - health is worth up to 1000ish extra weight
+                                            if (cacheObject.IsTrashMob && cacheObject.HitPointsPct < 0.20 && cacheObject.HitPointsPct > 0.01)
+                                            {
+                                                objWeightInfo += "LowHPTrash ";
+                                                cacheObject.Weight += Math.Max((1 - cacheObject.HitPointsPct) / 100 * 1000d, 100d);
+                                            }
 
-                                        // Elites on low health get extra priority - up to 2500ish
-                                        if (cacheObject.IsEliteRareUnique && cacheObject.HitPointsPct < 25)
-                                        {
-                                            objWeightInfo += "LowHPElite ";
-                                            cacheObject.Weight += Math.Max((1 - cacheObject.HitPointsPct) / 100 * 2500d, 100d);
-                                        }
+                                            // Elites on low health get extra priority - up to 2500ish
+                                            if (cacheObject.IsEliteRareUnique && cacheObject.HitPointsPct < 0.25 && cacheObject.HitPointsPct > 0.01)
+                                            {
+                                                objWeightInfo += "LowHPElite ";
+                                                cacheObject.Weight += Math.Max((1 - cacheObject.HitPointsPct) / 100 * 2500d, 100d);
+                                            }
 
-                                        // Goblins on low health get extra priority - up to 2000ish
-                                        if (Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize && cacheObject.IsTreasureGoblin && cacheObject.HitPointsPct <= 0.98)
-                                        {
-                                            objWeightInfo += "LowHPGoblin ";
-                                            cacheObject.Weight += Math.Max((1 - cacheObject.HitPointsPct) / 100 * 2000d, 100d);
-                                        }
-                                        // Bonuses to priority type monsters from the dictionary/hashlist set at the top of the code
-                                        int extraPriority;
-                                        if (DataDictionary.MonsterCustomWeights.TryGetValue(cacheObject.ActorSNO, out extraPriority))
-                                        {
-                                            // adding a constant multiple of 3 to all weights here (e.g. 999 becomes 1998)
-                                            objWeightInfo += "XtraPriority ";
-                                            cacheObject.Weight += extraPriority * 2d;
-                                        }
+                                            // Bonuses to priority type monsters from the dictionary/hashlist set at the top of the code
+                                            int extraPriority;
+                                            if (DataDictionary.MonsterCustomWeights.TryGetValue(cacheObject.ActorSNO, out extraPriority))
+                                            {
+                                                // adding a constant multiple of 3 to all weights here (e.g. 999 becomes 1998)
+                                                objWeightInfo += "XtraPriority ";
+                                                cacheObject.Weight += extraPriority * 2d;
+                                            }
 
-                                        // Extra weight for summoners
-                                        if (!cacheObject.IsBoss && cacheObject.IsSummoner)
-                                        {
-                                            objWeightInfo += "Summoner ";
-                                            cacheObject.Weight += 2500;
+                                            // Extra weight for summoners
+                                            if (!cacheObject.IsBoss && cacheObject.IsSummoner)
+                                            {
+                                                objWeightInfo += "Summoner ";
+                                                cacheObject.Weight += 2500;
+                                            }
+
+                                            // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
+                                            if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.Distance <= 25f)
+                                            {
+                                                objWeightInfo += "LastTarget ";
+                                                cacheObject.Weight += 1000d;
+                                            }
                                         }
 
                                         // Close range get higher weights the more of them there are, to prevent body-blocking
-                                        //if (!cacheObject.IsBoss && cacheObject.RadiusDistance <= 10f)
-                                        //{
-                                        //    objWeightInfo += "CloseRange10f ";
-                                        //    cacheObject.Weight += (3000d * cacheObject.Radius);
-                                        //}
+                                        if (!cacheObject.IsBoss && cacheObject.RadiusDistance <= 10f)
+                                        {
+                                            objWeightInfo += "CloseRange10f ";
+                                            cacheObject.Weight += (3000d * cacheObject.Radius);
+                                        }
 
                                         // Special additional weight for corrupt growths in act 4 ONLY if they are at close range (not a standard priority thing)
                                         if ((cacheObject.ActorSNO == 210120 || cacheObject.ActorSNO == 210268) && cacheObject.Distance <= 25f)
                                         {
                                             objWeightInfo += "CorruptGrowth ";
                                             cacheObject.Weight += 5000d;
-                                        }
-
-                                        // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
-                                        if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.Distance <= 25f)
-                                        {
-                                            objWeightInfo += "LastTarget ";
-                                            cacheObject.Weight += 1000d;
                                         }
 
                                         // Prevent going less than 300 yet to prevent annoyances (should only lose this much weight from priority reductions in priority list?)
@@ -404,7 +397,14 @@ namespace Trinity
                                         }
 
                                         // Deal with treasure goblins - note, of priority is set to "0", then the is-a-goblin flag isn't even set for use here - the monster is ignored
-                                        if (cacheObject.IsTreasureGoblin && !ObjectCache.Any(u => (u.Type == GObjectType.Door || u.Type == GObjectType.Barricade) && u.RadiusDistance <= 40f))
+                                        // Goblins on low health get extra priority - up to 2000ish
+                                        if (Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize && cacheObject.IsTreasureGoblin && cacheObject.HitPointsPct <= 0.98)
+                                        {
+                                            objWeightInfo += "LowHPGoblin ";
+                                            cacheObject.Weight += Math.Max(((1 - cacheObject.HitPointsPct) / 100) * 2000d, 100d);
+                                        }
+                                        if (cacheObject.IsTreasureGoblin && !ObjectCache.Any(obj => (obj.Type == GObjectType.Door || obj.Type == GObjectType.Barricade) &&
+                                            !MathUtil.IntersectsPath(obj.Position, obj.Radius, Player.Position, cacheObject.Position)))
                                         {
                                             // Logging goblin sightings
                                             if (lastGoblinTime == DateTime.MinValue)
