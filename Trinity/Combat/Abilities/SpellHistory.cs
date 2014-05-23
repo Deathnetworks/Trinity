@@ -30,7 +30,7 @@ namespace Trinity.Combat.Abilities
                 MyPosition = Trinity.Player.Position,
                 TargetPosition = power.TargetPosition
             });
-            Logger.LogDebug(LogCategory.Targetting, "Recorded {0}", power);
+            Logger.Log("Recorded {0}", power);
 
             CacheData.AbilityLastUsed[power.SNOPower] = DateTime.UtcNow;
             Trinity.LastPowerUsed = power.SNOPower;
@@ -72,8 +72,8 @@ namespace Trinity.Combat.Abilities
         {
             if (_historyQueue.Any(i => i.Power.SNOPower == power))
             {
-                DateTime lookBack = DateTime.UtcNow.Subtract(time);
-                var spellCount = _historyQueue.Count(i => i.Power.SNOPower == power && i.UseTime >= lookBack);
+                var spellCount = _historyQueue.Count(i => i.Power.SNOPower == power && i.TimeSinceUse <= time);
+                //Logger.Log("Found {0}/{1} spells in {2} time for {3} power", spellCount, _historyQueue.Count(i => i.Power.SNOPower == power), time, power);
                 return spellCount;
             }
             return 0;

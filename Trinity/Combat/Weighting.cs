@@ -177,7 +177,7 @@ namespace Trinity
                                 }
 
                                 // Monster is in cache but not within kill range
-                                if (!cacheObject.IsBoss && !cacheObject.IsTreasureGoblin &&
+                                if (!cacheObject.IsBoss && !cacheObject.IsTreasureGoblin && LastTargetRactorGUID != cacheObject.RActorGuid &&
                                     cacheObject.RadiusDistance > cacheObject.KillRange &&
                                     !cacheObject.IsQuestMonster &&
                                     !cacheObject.IsBountyObjective)

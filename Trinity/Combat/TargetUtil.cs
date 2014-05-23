@@ -141,8 +141,8 @@ namespace Trinity
                 radius = 5f;
             if (maxRange > 300f)
                 maxRange = 300f;
-            if (minCount < 2)
-                minCount = 2;
+            if (minCount < 1)
+                minCount = 1;
 
             if (forceElites && ObjectCache.Any(u => u.IsUnit && u.IsBossOrEliteRareUnique && u.RadiusDistance < maxRange))
                 return true;
@@ -177,7 +177,7 @@ namespace Trinity
             var result =
                 (from u in ObjectCache
                  where u.IsUnit &&
-                 u.RadiusDistance <= maxRange                 
+                 u.RadiusDistance <= maxRange
                  orderby u.IsPlayerFacing(arcDegrees) descending
                  orderby u.CountUnitsInFront() descending
                  select u).FirstOrDefault();
@@ -251,25 +251,22 @@ namespace Trinity
             if (maxRange > 30f)
                 maxRange = 30f;
 
-            using (new Technicals.PerformanceLogger("TargetUtil.GetBestGlobeClusterPoint"))
-            {
-                Vector3 bestClusterPoint;
-                var clusterUnits =
-                    (from u in ObjectCache
-                     where u.Type == GObjectType.HealthGlobe &&
-                     (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
-                     u.RadiusDistance <= maxRange
-                     orderby u.NearbyUnitsWithinDistance(radius)
-                     orderby u.Distance descending
-                     select u.Position).ToList();
+            Vector3 bestClusterPoint;
+            var clusterUnits =
+                (from u in ObjectCache
+                 where u.Type == GObjectType.HealthGlobe &&
+                 (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
+                 u.RadiusDistance <= maxRange
+                 orderby u.NearbyUnitsWithinDistance(radius)
+                 orderby u.Distance descending
+                 select u.Position).ToList();
 
-                if (clusterUnits.Any())
-                    bestClusterPoint = clusterUnits.FirstOrDefault();
-                else
-                    bestClusterPoint = Trinity.Player.Position;
+            if (clusterUnits.Any())
+                bestClusterPoint = clusterUnits.FirstOrDefault();
+            else
+                bestClusterPoint = Trinity.Player.Position;
 
-                return bestClusterPoint;
-            }
+            return bestClusterPoint;
 
         }
         /// <summary>
@@ -288,25 +285,22 @@ namespace Trinity
             if (maxRange > 30f)
                 maxRange = 30f;
 
-            using (new PerformanceLogger("TargetUtil.GetBestGlobeClusterPoint"))
-            {
-                Vector3 bestClusterPoint;
-                var clusterUnits =
-                    (from u in ObjectCache
-                     where u.Type == GObjectType.PowerGlobe &&
-                     (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
-                     u.RadiusDistance <= maxRange
-                     orderby u.NearbyUnitsWithinDistance(radius)
-                     orderby u.Distance descending
-                     select u.Position).ToList();
+            Vector3 bestClusterPoint;
+            var clusterUnits =
+                (from u in ObjectCache
+                 where u.Type == GObjectType.PowerGlobe &&
+                 (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
+                 u.RadiusDistance <= maxRange
+                 orderby u.NearbyUnitsWithinDistance(radius)
+                 orderby u.Distance descending
+                 select u.Position).ToList();
 
-                if (clusterUnits.Any())
-                    bestClusterPoint = clusterUnits.FirstOrDefault();
-                else
-                    bestClusterPoint = Trinity.Player.Position;
+            if (clusterUnits.Any())
+                bestClusterPoint = clusterUnits.FirstOrDefault();
+            else
+                bestClusterPoint = Trinity.Player.Position;
 
-                return bestClusterPoint;
-            }
+            return bestClusterPoint;
         }
         /// <summary>
         /// Checks to see if there is a health globe around to grab
@@ -356,30 +350,27 @@ namespace Trinity
             if (maxRange > 300f)
                 maxRange = 300f;
 
-            using (new PerformanceLogger("TargetUtil.GetBestClusterUnit"))
-            {
-                TrinityCacheObject bestClusterUnit;
-                var clusterUnits =
-                    (from u in ObjectCache
-                     where u.IsUnit &&
-                     ((useWeights && u.Weight > 0) || !useWeights) &&
-                     (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
-                     u.RadiusDistance <= maxRange
-                     orderby !u.IsBossOrEliteRareUnique
-                     orderby u.NearbyUnitsWithinDistance(radius) descending
-                     orderby u.Distance
-                     orderby u.HitPointsPct descending
-                     select u).ToList();
+            TrinityCacheObject bestClusterUnit;
+            var clusterUnits =
+                (from u in ObjectCache
+                 where u.IsUnit &&
+                 ((useWeights && u.Weight > 0) || !useWeights) &&
+                 (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
+                 u.RadiusDistance <= maxRange
+                 orderby !u.IsBossOrEliteRareUnique
+                 orderby u.NearbyUnitsWithinDistance(radius) descending
+                 orderby u.Distance
+                 orderby u.HitPointsPct descending
+                 select u).ToList();
 
-                if (clusterUnits.Any())
-                    bestClusterUnit = clusterUnits.FirstOrDefault();
-                else if (Trinity.CurrentTarget != null)
-                    bestClusterUnit = Trinity.CurrentTarget;
-                else
-                    bestClusterUnit = default(TrinityCacheObject);
+            if (clusterUnits.Any())
+                bestClusterUnit = clusterUnits.FirstOrDefault();
+            else if (Trinity.CurrentTarget != null)
+                bestClusterUnit = Trinity.CurrentTarget;
+            else
+                bestClusterUnit = default(TrinityCacheObject);
 
-                return bestClusterUnit;
-            }
+            return bestClusterUnit;
         }
         /// <summary>
         /// Finds the optimal cluster position, works regardless if there is a cluster or not (will return single unit position if not). This is not a K-Means cluster, but rather a psuedo cluster based
@@ -407,31 +398,28 @@ namespace Trinity
                     break;
             }
 
-            using (new PerformanceLogger("TargetUtil.GetBestClusterPoint"))
-            {
-                Vector3 bestClusterPoint;
-                var clusterUnits =
-                    (from u in ObjectCache
-                     where (u.IsUnit || (includeHealthGlobes && u.Type == GObjectType.HealthGlobe)) &&
-                     ((useWeights && u.Weight > 0) || !useWeights) &&
-                     (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
-                     u.RadiusDistance <= maxRange
-                     orderby u.Type != GObjectType.HealthGlobe // if it's a globe this will be false and sorted at the top
-                     orderby !u.IsBossOrEliteRareUnique
-                     orderby u.NearbyUnitsWithinDistance(radius) descending
-                     orderby u.Distance
-                     orderby u.HitPointsPct descending
-                     select u.Position).ToList();
+            Vector3 bestClusterPoint;
+            var clusterUnits =
+                (from u in ObjectCache
+                 where (u.IsUnit || (includeHealthGlobes && u.Type == GObjectType.HealthGlobe)) &&
+                 ((useWeights && u.Weight > 0) || !useWeights) &&
+                 (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
+                 u.RadiusDistance <= maxRange
+                 orderby u.Type != GObjectType.HealthGlobe // if it's a globe this will be false and sorted at the top
+                 orderby !u.IsBossOrEliteRareUnique
+                 orderby u.NearbyUnitsWithinDistance(radius) descending
+                 orderby u.Distance
+                 orderby u.HitPointsPct descending
+                 select u.Position).ToList();
 
-                if (clusterUnits.Any())
-                    bestClusterPoint = clusterUnits.FirstOrDefault();
-                else if (Trinity.CurrentTarget != null)
-                    bestClusterPoint = Trinity.CurrentTarget.Position;
-                else
-                    bestClusterPoint = Trinity.Player.Position;
+            if (clusterUnits.Any())
+                bestClusterPoint = clusterUnits.FirstOrDefault();
+            else if (Trinity.CurrentTarget != null)
+                bestClusterPoint = Trinity.CurrentTarget.Position;
+            else
+                bestClusterPoint = Trinity.Player.Position;
 
-                return bestClusterPoint;
-            }
+            return bestClusterPoint;
         }
         /// <summary>
         /// Fast check to see if there are any attackable units within a certain distance
@@ -571,159 +559,149 @@ namespace Trinity
 
             Vector3 zigZagPoint = origin;
 
-            using (new PerformanceLogger("FindZigZagTargetLocation"))
+            bool useTargetBasedZigZag = false;
+            float maxDistance = 25f;
+            int minTargets = 2;
+
+            if (Trinity.Player.ActorClass == ActorClass.Monk)
             {
-                using (new PerformanceLogger("FindZigZagTargetLocation.CheckObjectCache"))
+                maxDistance = 20f;
+                minTargets = 3;
+                useTargetBasedZigZag = Trinity.Settings.Combat.Monk.TargetBasedZigZag;
+            }
+            if (Trinity.Player.ActorClass == ActorClass.Barbarian)
+            {
+                useTargetBasedZigZag = Trinity.Settings.Combat.Barbarian.TargetBasedZigZag;
+            }
+
+            int eliteCount = ObjectCache.Count(u => u.IsUnit && u.IsBossOrEliteRareUnique);
+            bool shouldZigZagElites = ((Trinity.CurrentTarget.IsBossOrEliteRareUnique && eliteCount > 1) || eliteCount == 0);
+
+            if (useTargetBasedZigZag && shouldZigZagElites && !AnyTreasureGoblinsPresent && ObjectCache.Count(o => o.IsUnit) >= minTargets)
+            {
+                bool attackInAoe = Trinity.Settings.Combat.Misc.KillMonstersInAoE;
+                var clusterPoint = TargetUtil.GetBestClusterPoint(ringDistance, ringDistance, false, attackInAoe);
+                if (clusterPoint.Distance2D(Player.Position) >= minDistance)
                 {
-                    bool useTargetBasedZigZag = false;
-                    float maxDistance = 25f;
-                    int minTargets = 2;
+                    Logger.Log(LogCategory.Movement, "Returning ZigZag: BestClusterPoint {0} r-dist={1} t-dist={2}", clusterPoint, ringDistance, clusterPoint.Distance2D(Player.Position));
+                    return clusterPoint;
+                }
 
-                    if (Trinity.Player.ActorClass == ActorClass.Monk)
+
+                var zigZagTargetList = new List<TrinityCacheObject>();
+                if (attackInAoe)
+                {
+                    zigZagTargetList =
+                        (from u in ObjectCache
+                         where u.IsUnit && u.Distance < maxDistance
+                         select u).ToList();
+                }
+                else
+                {
+                    zigZagTargetList =
+                        (from u in ObjectCache
+                         where u.IsUnit && u.Distance < maxDistance && !UnitOrPathInAoE(u)
+                         select u).ToList();
+                }
+
+                if (zigZagTargetList.Count() >= minTargets)
+                {
+                    zigZagPoint = zigZagTargetList.OrderByDescending(u => u.Distance).FirstOrDefault().Position;
+                    if (NavHelper.CanRayCast(zigZagPoint) && zigZagPoint.Distance2D(Player.Position) >= minDistance)
                     {
-                        maxDistance = 20f;
-                        minTargets = 3;
-                        useTargetBasedZigZag = Trinity.Settings.Combat.Monk.TargetBasedZigZag;
+                        Logger.Log(LogCategory.Movement, "Returning ZigZag: TargetBased {0} r-dist={1} t-dist={2}", zigZagPoint, ringDistance, zigZagPoint.Distance2D(Player.Position));
+                        return zigZagPoint;
                     }
-                    if (Trinity.Player.ActorClass == ActorClass.Barbarian)
+                }
+            }
+
+            Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
+            float highestWeightFound = float.NegativeInfinity;
+            Vector3 bestLocation = origin;
+
+            // the unit circle always starts at 0 :)
+            double min = 0;
+            // the maximum size of a unit circle
+            double max = 2 * Math.PI;
+            // the number of times we will iterate around the circle to find points
+            double piSlices = 16;
+
+            // We will do several "passes" to make sure we can get a point that we can least zig-zag to
+            // The total number of points tested will be piSlices * distancePasses.Count
+            List<float> distancePasses = new List<float>();
+            distancePasses.Add(ringDistance * 1 / 2); // Do one loop at 1/2 distance
+            distancePasses.Add(ringDistance * 3 / 4); // Do one loop at 3/4 distance
+            distancePasses.Add(ringDistance);         // Do one loop at exact distance
+
+            foreach (float distance in distancePasses)
+            {
+                for (double direction = min; direction < max; direction += (Math.PI / piSlices))
+                {
+                    // Starting weight is 1
+                    float pointWeight = 1f;
+
+                    // Find a new XY
+                    zigZagPoint = MathEx.GetPointAt(origin, distance, (float)direction);
+                    // Get the Z
+                    zigZagPoint.Z = Trinity.MainGridProvider.GetHeight(zigZagPoint.ToVector2());
+
+                    // Make sure we're actually zig-zagging our target, except if we're kiting
+
+                    float targetCircle = CurrentTarget.Radius;
+                    if (targetCircle <= 5f)
+                        targetCircle = 5f;
+                    if (targetCircle > 10f)
+                        targetCircle = 10f;
+
+                    bool intersectsPath = MathUtil.IntersectsPath(CurrentTarget.Position, targetCircle, myPos, zigZagPoint);
+                    if (CombatBase.PlayerKiteDistance <= 0 && !intersectsPath)
+                        continue;
+
+                    // if we're kiting, lets not actualy run through monsters
+                    if (CombatBase.PlayerKiteDistance > 0 && CacheData.MonsterObstacles.Any(m => m.Position.Distance(zigZagPoint) <= CombatBase.PlayerKiteDistance))
+                        continue;
+
+                    // Ignore point if any AoE in this point position
+                    if (CacheData.TimeBoundAvoidance.Any(m => m.Position.Distance(zigZagPoint) <= m.Radius && Player.CurrentHealthPct <= AvoidanceManager.GetAvoidanceHealthBySNO(m.ActorSNO, 1)))
+                        continue;
+
+                    // Make sure this point is in LoS/walkable (not around corners or into a wall)
+                    bool canRayCast = !Navigator.Raycast(Player.Position, zigZagPoint);
+                    if (!canRayCast)
+                        continue;
+
+                    float distanceToPoint = zigZagPoint.Distance2D(myPos);
+                    float distanceFromTargetToPoint = zigZagPoint.Distance2D(origin);
+
+                    // Lots of weight for points further away from us (e.g. behind our CurrentTarget)
+                    pointWeight *= distanceToPoint;
+
+                    // Add weight for any units in this point
+                    int monsterCount = ObjectCache.Count(u => u.IsUnit && u.Position.Distance2D(zigZagPoint) <= Math.Max(u.Radius, 10f));
+                    if (monsterCount > 0)
+                        pointWeight *= monsterCount;
+
+                    //Logger.Log(LogCategory.Movement, "ZigZag Point: {0} distance={1:0} distaceFromTarget={2:0} intersectsPath={3} weight={4:0} monsterCount={5}",
+                    //    zigZagPoint, distanceToPoint, distanceFromTargetToPoint, intersectsPath, pointWeight, monsterCount);
+
+                    // Use this one if it's more weight, or we haven't even found one yet, or if same weight as another with a random chance
+                    if (pointWeight > highestWeightFound)
                     {
-                        useTargetBasedZigZag = Trinity.Settings.Combat.Barbarian.TargetBasedZigZag;
-                    }
+                        highestWeightFound = pointWeight;
 
-                    int eliteCount = ObjectCache.Count(u => u.IsUnit && u.IsBossOrEliteRareUnique);
-                    bool shouldZigZagElites = ((Trinity.CurrentTarget.IsBossOrEliteRareUnique && eliteCount > 1) || eliteCount == 0);
-
-                    if (useTargetBasedZigZag && shouldZigZagElites && !AnyTreasureGoblinsPresent && ObjectCache.Count(o => o.IsUnit) >= minTargets)
-                    {
-                        bool attackInAoe = Trinity.Settings.Combat.Misc.KillMonstersInAoE;
-                        var clusterPoint = TargetUtil.GetBestClusterPoint(ringDistance, ringDistance, false, attackInAoe);
-                        if (clusterPoint.Distance2D(Player.Position) >= minDistance)
+                        if (Trinity.Settings.Combat.Misc.UseNavMeshTargeting)
                         {
-                            Logger.Log(LogCategory.Movement, "Returning ZigZag: BestClusterPoint {0} r-dist={1} t-dist={2}", clusterPoint, ringDistance, clusterPoint.Distance2D(Player.Position));
-                            return clusterPoint;
-                        }
-
-
-                        var zigZagTargetList = new List<TrinityCacheObject>();
-                        if (attackInAoe)
-                        {
-                            zigZagTargetList =
-                                (from u in ObjectCache
-                                 where u.IsUnit && u.Distance < maxDistance
-                                 select u).ToList();
+                            bestLocation = new Vector3(zigZagPoint.X, zigZagPoint.Y, Trinity.MainGridProvider.GetHeight(zigZagPoint.ToVector2()));
                         }
                         else
                         {
-                            zigZagTargetList =
-                                (from u in ObjectCache
-                                 where u.IsUnit && u.Distance < maxDistance && !UnitOrPathInAoE(u)
-                                 select u).ToList();
-                        }
-
-                        if (zigZagTargetList.Count() >= minTargets)
-                        {
-                            zigZagPoint = zigZagTargetList.OrderByDescending(u => u.Distance).FirstOrDefault().Position;
-                            if (NavHelper.CanRayCast(zigZagPoint) && zigZagPoint.Distance2D(Player.Position) >= minDistance)
-                            {
-                                Logger.Log(LogCategory.Movement, "Returning ZigZag: TargetBased {0} r-dist={1} t-dist={2}", zigZagPoint, ringDistance, zigZagPoint.Distance2D(Player.Position));
-                                return zigZagPoint;
-                            }
+                            bestLocation = new Vector3(zigZagPoint.X, zigZagPoint.Y, zigZagPoint.Z + 4);
                         }
                     }
-                }
-
-                Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
-
-                using (new PerformanceLogger("FindZigZagTargetLocation.RandomZigZagPoint"))
-                {
-                    float highestWeightFound = float.NegativeInfinity;
-                    Vector3 bestLocation = origin;
-
-                    // the unit circle always starts at 0 :)
-                    double min = 0;
-                    // the maximum size of a unit circle
-                    double max = 2 * Math.PI;
-                    // the number of times we will iterate around the circle to find points
-                    double piSlices = 16;
-
-                    // We will do several "passes" to make sure we can get a point that we can least zig-zag to
-                    // The total number of points tested will be piSlices * distancePasses.Count
-                    List<float> distancePasses = new List<float>();
-                    distancePasses.Add(ringDistance * 1 / 2); // Do one loop at 1/2 distance
-                    distancePasses.Add(ringDistance * 3 / 4); // Do one loop at 3/4 distance
-                    distancePasses.Add(ringDistance);         // Do one loop at exact distance
-
-                    foreach (float distance in distancePasses)
-                    {
-                        for (double direction = min; direction < max; direction += (Math.PI / piSlices))
-                        {
-                            // Starting weight is 1
-                            float pointWeight = 1f;
-
-                            // Find a new XY
-                            zigZagPoint = MathEx.GetPointAt(origin, distance, (float)direction);
-                            // Get the Z
-                            zigZagPoint.Z = Trinity.MainGridProvider.GetHeight(zigZagPoint.ToVector2());
-
-                            // Make sure we're actually zig-zagging our target, except if we're kiting
-
-                            float targetCircle = CurrentTarget.Radius;
-                            if (targetCircle <= 5f)
-                                targetCircle = 5f;
-                            if (targetCircle > 10f)
-                                targetCircle = 10f;
-
-                            bool intersectsPath = MathUtil.IntersectsPath(CurrentTarget.Position, targetCircle, myPos, zigZagPoint);
-                            if (CombatBase.PlayerKiteDistance <= 0 && !intersectsPath)
-                                continue;
-
-                            // if we're kiting, lets not actualy run through monsters
-                            if (CombatBase.PlayerKiteDistance > 0 && CacheData.MonsterObstacles.Any(m => m.Position.Distance(zigZagPoint) <= CombatBase.PlayerKiteDistance))
-                                continue;
-
-                            // Ignore point if any AoE in this point position
-                            if (CacheData.TimeBoundAvoidance.Any(m => m.Position.Distance(zigZagPoint) <= m.Radius && Player.CurrentHealthPct <= AvoidanceManager.GetAvoidanceHealthBySNO(m.ActorSNO, 1)))
-                                continue;
-
-                            // Make sure this point is in LoS/walkable (not around corners or into a wall)
-                            bool canRayCast = !Navigator.Raycast(Player.Position, zigZagPoint);
-                            if (!canRayCast)
-                                continue;
-
-                            float distanceToPoint = zigZagPoint.Distance2D(myPos);
-                            float distanceFromTargetToPoint = zigZagPoint.Distance2D(origin);
-
-                            // Lots of weight for points further away from us (e.g. behind our CurrentTarget)
-                            pointWeight *= distanceToPoint;
-
-                            // Add weight for any units in this point
-                            int monsterCount = ObjectCache.Count(u => u.IsUnit && u.Position.Distance2D(zigZagPoint) <= Math.Max(u.Radius, 10f));
-                            if (monsterCount > 0)
-                                pointWeight *= monsterCount;
-
-                            //Logger.Log(LogCategory.Movement, "ZigZag Point: {0} distance={1:0} distaceFromTarget={2:0} intersectsPath={3} weight={4:0} monsterCount={5}",
-                            //    zigZagPoint, distanceToPoint, distanceFromTargetToPoint, intersectsPath, pointWeight, monsterCount);
-
-                            // Use this one if it's more weight, or we haven't even found one yet, or if same weight as another with a random chance
-                            if (pointWeight > highestWeightFound)
-                            {
-                                highestWeightFound = pointWeight;
-
-                                if (Trinity.Settings.Combat.Misc.UseNavMeshTargeting)
-                                {
-                                    bestLocation = new Vector3(zigZagPoint.X, zigZagPoint.Y, Trinity.MainGridProvider.GetHeight(zigZagPoint.ToVector2()));
-                                }
-                                else
-                                {
-                                    bestLocation = new Vector3(zigZagPoint.X, zigZagPoint.Y, zigZagPoint.Z + 4);
-                                }
-                            }
-                        }
-                    }
-                    Logger.Log(LogCategory.Movement, "Returning ZigZag: RandomXY {0} r-dist={1} t-dist={2}", bestLocation, ringDistance, bestLocation.Distance2D(Player.Position));
-                    return bestLocation;
                 }
             }
+            Logger.Log(LogCategory.Movement, "Returning ZigZag: RandomXY {0} r-dist={1} t-dist={2}", bestLocation, ringDistance, bestLocation.Distance2D(Player.Position));
+            return bestLocation;
         }
 
         /// <summary>
@@ -733,7 +711,7 @@ namespace Trinity
         /// <returns></returns>
         internal static bool UnitOrPathInAoE(TrinityCacheObject u)
         {
-            return UnitInAoe(u) && PathToUnitIntersectsAoe(u);
+            return UnitInAoe(u) && PathToObjectIntersectsAoe(u);
         }
 
         /// <summary>
@@ -749,12 +727,12 @@ namespace Trinity
         /// <summary>
         /// Checks to see if the path-line to a unit goes through AoE
         /// </summary>
-        /// <param name="unit"></param>
+        /// <param name="obj"></param>
         /// <returns></returns>
-        internal static bool PathToUnitIntersectsAoe(TrinityCacheObject unit)
+        internal static bool PathToObjectIntersectsAoe(TrinityCacheObject obj)
         {
             return CacheData.TimeBoundAvoidance.Any(aoe =>
-                MathUtil.IntersectsPath(aoe.Position, aoe.Radius, unit.Position, Player.Position));
+                MathUtil.IntersectsPath(aoe.Position, aoe.Radius, obj.Position, Player.Position));
         }
 
     }

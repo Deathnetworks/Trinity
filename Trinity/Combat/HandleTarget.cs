@@ -367,6 +367,7 @@ namespace Trinity
                         switch (CurrentTarget.Type)
                         {
                             // These always have TargetRangeRequired=1f, but, we need to run directly to their center until we stop moving, then destroy them
+                            case GObjectType.Door:
                             case GObjectType.Barricade:
                             case GObjectType.Destructible:
                                 noRangeRequired = false;
@@ -399,7 +400,7 @@ namespace Trinity
                     // Are we currently incapacitated? If so then wait...
                     if (Player.IsIncapacitated || Player.IsRooted)
                     {
-                        runStatus = HandlerRunStatus.TreeFailure;
+                        runStatus = HandlerRunStatus.TreeRunning;
                         Logger.Log(LogCategory.Behavior, "Player is rooted or incapacitated!");
                         return GetTreeSharpRunStatus(runStatus);
                     }
@@ -556,7 +557,7 @@ namespace Trinity
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(TrinityLogLevel.Error, LogCategory.Behavior, "{0}", ex);
+                    Logger.LogError("Error in HandleTarget: {0}", ex.Message);
                     runStatus = HandlerRunStatus.TreeFailure;
                     return GetTreeSharpRunStatus(runStatus);
                 }

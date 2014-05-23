@@ -306,7 +306,7 @@ namespace Trinity.Combat.Abilities
 
         private static bool CanCastHeavensFury()
         {
-            return CanCast(SNOPower.X1_Crusader_HeavensFury3) && (TargetUtil.EliteOrTrashInRange(16f) || TargetUtil.ClusterExists(15f, CrusaderSettings.HeavensFuryAoECount));
+            return CanCast(SNOPower.X1_Crusader_HeavensFury3) && (TargetUtil.EliteOrTrashInRange(16f) || TargetUtil.ClusterExists(15f, 90f, CrusaderSettings.HeavensFuryAoECount));
         }
 
         private static bool CanCastFallingSword()

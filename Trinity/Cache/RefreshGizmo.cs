@@ -749,7 +749,6 @@ namespace Trinity
                             DataDictionary.ContainerWhiteListIds.Contains(CurrentCacheObject.ActorSNO); // We know it's a container but this is not a known rare chest
                         bool isCorpse = CurrentCacheObject.InternalName.ToLower().Contains("corpse");
                         bool isWeaponRack = CurrentCacheObject.InternalName.ToLower().Contains("rack");
-
                         bool isGroundClicky = CurrentCacheObject.InternalName.ToLower().Contains("ground_clicky");
 
                         // We want to do some vendoring, so don't open anything new yet
@@ -799,12 +798,14 @@ namespace Trinity
                             return AddToCache;
                         }
 
+                        // Resplendent chests have no range check
                         if (isRareChest && Settings.WorldObject.OpenRareChests)
                         {
                             AddToCache = true;
                             return AddToCache;
                         }
 
+                        // Regular container, check range
                         if (CurrentCacheObject.RadiusDistance <= Settings.WorldObject.ContainerOpenRange)
                         {
                             if (isChest && Settings.WorldObject.OpenContainers)
