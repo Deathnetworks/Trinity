@@ -192,8 +192,10 @@ namespace Trinity
 
                     bool distanceRecast = lastCast != null && lastCast.TargetPosition.Distance2DSqr(CurrentTarget.Position) > maxHydraDistSqr;
 
+                    bool twoAlredyCastIn5Sec = SpellHistory.SpellUseCountInTime(SNOPower.Wizard_Hydra, TimeSpan.FromSeconds(5)) >= 2;
+
                     if (!Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Hydra, CombatBase.CanCastFlags.NoTimer) &&
-                        (baseRecast || distanceRecast || serpentSparkerRecast1 ) &&
+                        (baseRecast || distanceRecast || serpentSparkerRecast1 ) && !twoAlredyCastIn5Sec &&
                         CurrentTarget.RadiusDistance <= maxHydraDistance && Player.PrimaryResource >= 15)
                     {
                         var pos = TargetUtil.GetBestClusterPoint(maxHydraDistance, 65f);

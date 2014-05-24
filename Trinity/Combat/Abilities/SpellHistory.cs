@@ -30,7 +30,7 @@ namespace Trinity.Combat.Abilities
                 MyPosition = Trinity.Player.Position,
                 TargetPosition = power.TargetPosition
             });
-            Logger.Log("Recorded {0}", power);
+            //Logger.Log("Recorded {0}", power);
 
             CacheData.AbilityLastUsed[power.SNOPower] = DateTime.UtcNow;
             Trinity.LastPowerUsed = power.SNOPower;
