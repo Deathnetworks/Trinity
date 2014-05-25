@@ -3,13 +3,22 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Trinity.Technicals;
+using Zeta.Game.Internals.Actors;
 
 namespace Trinity.Cache
 {
     public class ItemStashSellAppender : IDisposable
     {
+        internal static Regex ItemNameRegex = new Regex(@"-\d+", RegexOptions.Compiled);
+
+        internal static string GetCleanName(string itemInternalName)
+        {
+            return ItemNameRegex.Replace(itemInternalName, "");
+        }
+
         private HashSet<int> _loggedItems = new HashSet<int>();
 
         bool _headerChecked;
@@ -74,7 +83,12 @@ namespace Trinity.Cache
 
             sb.Append(FormatCSVField(item.AcdItem.ActorSNO));
             sb.Append(FormatCSVField(item.RealName));
-            sb.Append(FormatCSVField(item.InternalName));
+
+            if (item.Quality >= ItemQuality.Legendary || item.DBBaseType == ItemBaseType.Misc)
+                sb.Append(FormatCSVField(GetCleanName(item.InternalName)));
+            else
+                sb.Append(FormatCSVField(item.Quality + " " + item.DBBaseType));
+
             sb.Append(FormatCSVField(item.DBBaseType.ToString()));
             sb.Append(FormatCSVField(item.DBItemType.ToString()));
             sb.Append(FormatCSVField(item.TrinityItemBaseType.ToString()));
@@ -116,7 +130,7 @@ namespace Trinity.Cache
                             continue;
                         if (!_loggedItems.Contains(hashCode))
                             _loggedItems.Add(hashCode);
-                        
+
                         bool success = false;
                         int attempts = 0;
                         while (!string.IsNullOrWhiteSpace(queueItem) && !success && attempts <= maxAttempts)
