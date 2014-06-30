@@ -456,6 +456,20 @@ namespace Trinity
                     o.RadiusDistance <= range
                     select o).Count() >= minCount;
         }
+        /// <summary>
+        /// Checks if there are any mobs in range of the specified position
+        /// </summary>
+        internal static bool AnyMobsInRangeOfPosition(Vector3 position, float range = 15f, int unitsRequired = 1)
+        {
+            var inRangeCount = (from u in ObjectCache
+                                where u.IsUnit &&
+                                        u.Weight > 0 &&
+                                        u.CommonData != null && u.CommonData.IsValid &&
+                                        u.Position.Distance2D(position) <= range
+                                select u).Count();
+
+            return inRangeCount >= unitsRequired;
+        }
         internal static bool AnyTrashInRange(float range = 10f, int minCount = 1, bool useWeights = true)
         {
             if (range < 5f)
@@ -734,6 +748,66 @@ namespace Trinity
             return CacheData.TimeBoundAvoidance.Any(aoe =>
                 MathUtil.IntersectsPath(aoe.Position, aoe.Radius, obj.Position, Player.Position));
         }
+
+        /// <summary>
+        /// Checks if spell is tracked on any unit within range of specified position
+        /// </summary>
+        internal static bool IsUnitWithDebuffInRangeOfPosition(float range, Vector3 position, SNOPower power, int unitsRequiredWithDebuff = 1)
+        {
+            var unitsWithDebuff = (from u in ObjectCache
+
+                                   where u.IsUnit &&
+                                          u.Weight > 0 && 
+                                          u.CommonData != null && u.CommonData.IsValid &&
+                                          u.Position.Distance2D(position) <= range &&
+                                          SpellTracker.IsUnitTracked(u.ACDGuid, power)
+
+                                   select u).ToList();
+
+            // Make sure units exist
+            unitsWithDebuff.RemoveAll(u =>
+            {
+                var acd = ZetaDia.Actors.GetACDByGuid(u.ACDGuid);
+                return acd == null || !acd.IsValid;
+            });
+
+            return unitsWithDebuff.Count >= unitsRequiredWithDebuff;
+        }
+
+        /// <summary>
+        /// Creates a circular band or donut shape around player between min and max range and calculates the number of monsters inside.
+        /// </summary>
+        /// <param name="bandMinRange">Starting range for the band - monsters outside this value</param>
+        /// <param name="bandMaxRange">Ending range for the band - monsters inside this value</param>
+        /// <param name="percentage">Percentrage of monsters within bandMaxRange that must be within the band</param>
+        /// <returns>True if at least specified percentage of monsters are within the band</returns>
+        internal static bool IsPercentUnitsWithinBand(float bandMinRange = 10f, float bandMaxRange = 10f, double percentage = 50)
+        {
+            if (bandMinRange > bandMaxRange) bandMinRange = bandMaxRange;
+            if (bandMaxRange < bandMinRange) bandMaxRange = bandMinRange;
+            if (percentage < 0 || percentage > 100) percentage = 75;
+            if (percentage < 1) percentage = percentage * 100;
+
+            var totalWithinMaxRange = (from o in ObjectCache
+                                       where o.IsUnit && o.Weight > 0 &&
+                                       o.RadiusDistance <= bandMaxRange
+                                       select o).Count();
+
+            var totalWithinMinRange = (from o in ObjectCache
+                                       where o.IsUnit && o.Weight > 0 &&
+                                       o.RadiusDistance <= bandMinRange
+                                       select o).Count();
+
+            var totalWithinBand = totalWithinMaxRange - totalWithinMinRange;
+
+            double percentWithinBand = ((double)totalWithinBand / (double)totalWithinMaxRange) * 100;
+
+            //Logger.LogDebug("{0} of {6} mobs between {1} and {2} yards ({3:f2}%), needed={4}% result={5}", totalWithinBand, bandMinRange, bandMaxRange, percentWithinBand, percentage, percentWithinBand >= percentage, totalWithinMaxRange);
+
+            return percentWithinBand >= percentage;
+        }
+
+
 
     }
 }
