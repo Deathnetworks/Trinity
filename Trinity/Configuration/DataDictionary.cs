@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Trinity.Items;
+using Trinity.Reference;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
+using Trinity.Objects;
 namespace Trinity
 {
     /// <summary>
@@ -998,6 +1002,28 @@ namespace Trinity
             "Suwaiya",
             "Tecpatl",
             "Diabolic Wand"
+        };
+
+        public readonly static Dictionary<Item, SNOPower> PowerByItem = new Dictionary<Item, SNOPower>
+        {
+            { Legendary.HarringtonWaistguard, SNOPower.ItemPassive_Unique_Ring_685_x1 },
+            { Legendary.PoxFaulds, SNOPower.itemPassive_Unique_Pants_007_x1 },
+            { Legendary.RechelsRingofLarceny, SNOPower.ItemPassive_Unique_Ring_508_x1 },
+            { Legendary.BottomlessPotionofKulleAid, SNOPower.X1_Legendary_Potion_06 },
+            { Legendary.PridesFall, SNOPower.ItemPassive_Unique_Helm_017_x1 },
+            { Legendary.KekegisUnbreakableSpirit, SNOPower.ItemPassive_Unique_Ring_569_x1 },
+        };
+
+        public readonly static Dictionary<Item, string> MinionInternalNameTokenByItem = new Dictionary<Item, string>
+        {
+            { Legendary.Maximus, "DemonChains_ItemPassive" },
+            { Legendary.HauntofVaxo, "_shadowClone_" }
+        };
+
+        public readonly static Dictionary<Skill, Set> AllRuneSetsBySkill = new Dictionary<Skill, Set>
+        {
+            { Skills.Barbarian.FuriousCharge, Sets.TheLegacyOfRaekor },
+            { Skills.Wizard.Archon, Sets.TheLegacyOfRaekor },
         };
 
         #region Methods
