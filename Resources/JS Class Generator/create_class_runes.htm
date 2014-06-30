@@ -17,8 +17,11 @@
                             
 <div>                    
 using System;<br/>
+using System.Collections.Generic;<br/>
+using System.Linq;<br/>
 using Trinity.Helpers;<br/>
 using Trinity.Objects;<br/>
+using Trinity.Combat;<br/>
 using Zeta.Game;<br/>
 
 <br/>// AUTO-GENERATED on {{timestamp}}<br/><br/>    
@@ -46,7 +49,8 @@ namespace Trinity.Reference<br/>
                 Description = "No Rune Selected",<br/>
                 RequiredLevel = 0,<br/>
                 Tooltip = string.Empty,<br/>
-                TypeId = string.Empty,<br/>                
+                TypeId = string.Empty,<br/>     
+                RuneIndex = -1,<br/>
                 Class = ActorClass.{{Format name}}<br/>
             </span>
             };<br/><br/>      
@@ -68,7 +72,8 @@ namespace Trinity.Reference<br/>
                 RequiredLevel = {{requiredLevel}},<br/>
                 Tooltip = "{{tooltipParams}}",<br/>
                 TypeId = "{{type}}",<br/>
-                Skill = Skills.{{className}}.{{Strip ../name}},<br/>
+                RuneIndex = {{RuneIndex type}},<br/>
+                SkillIndex = {{../orderIndex}},<br/>
                 Class = ActorClass.{{Format className}}<br/>
             </span>
             };<br/>

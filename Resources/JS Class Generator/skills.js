@@ -168,7 +168,7 @@ var Skills = function() {
                     __proto__: Object
                     */
 
-                    skillData.orderIndex = skillIndex + 1;
+                    //skillData.orderIndex = skillIndex + 1;
                     skillData.className = className;
                     playerclass.skills.push(skillData);
                     data.skills.push(skillData);
@@ -219,7 +219,7 @@ var Skills = function() {
                     __proto__: Object
                     */
 
-                    passiveData.orderIndex = passiveIndex + 1;
+                    //passiveData.orderIndex = passiveIndex + 1;
                     passiveData.className = className;
                     playerclass.passives.push(passiveData);
                     data.passives.push(passiveData);

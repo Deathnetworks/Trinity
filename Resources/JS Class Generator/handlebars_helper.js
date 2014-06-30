@@ -47,17 +47,6 @@ Handlebars.registerHelper('tolower', function (options) {
     return options.fn(this).toLowerCase();
 });
 
-//Handlebars.registerHelper('each', function (items, options) {
-
-//    var out = "";
-
-//    for (var i = 0, l = items.length; i < l; i++) {
-//        out = out + "" + options.fn(items[i]) + "";
-//    }
-
-//    return out + "";
-//});
-
 // Convert a friendly name into something we can use as a class/property name
 Handlebars.registerHelper('Strip', function (string) {
 
@@ -78,6 +67,18 @@ Handlebars.registerHelper('StripRune', function (string, skill) {
     }
 
     return result;
+});
+
+// Convert a Type letter code to RuneIndex
+Handlebars.registerHelper('RuneIndex', function (string) {
+    switch (string) {
+        case "a" : return 0
+        case "b" : return 1
+        case "c" : return 2
+        case "d" : return 3
+        case "e" : return 4
+    }
+    return "-1"
 });
 
 var SpecificCaseWords = [
@@ -121,13 +122,6 @@ Handlebars.registerHelper('Format', function (string) {
 
     // title case
     else {
-        
-    //replace partial matches
-        //for (var i = 0; i < SpecificCaseWords.length; i++) {
-        //    if (string.toLowerCase().contains(SpecificCaseWords[i].toLowerCase())) {
-        //        string = string.toLowerCase().replace(SpecificCaseWords[i]., SpecificCaseWords[i])
-        //    }
-        //}
 
         return string.replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1); });
     }
