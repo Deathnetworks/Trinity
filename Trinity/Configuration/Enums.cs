@@ -121,4 +121,42 @@
         CursedChest,
         CursedShrine,
     }
+
+    public enum Element
+    {
+        Unknown = 0,
+        Physical,
+        Cold,
+        Fire,
+        Lightning,
+        Poison,
+        Arcane
+    }
+
+    public enum SpellCategory
+    {
+        Unknown = 0,
+        Primary,
+        Secondary,
+        Defensive,
+        Might,
+        Tactics,
+        Rage,
+        Techniques,
+        Focus,
+        Mantras,
+        Utility,
+        Laws,
+        Conviction,
+        Voodoo,
+        Decay,
+        Terror,
+        Hunting,
+        Archery,
+        Devices,
+        Conjuration,
+        Mastery,
+        Force,
+    }
+
 }
