@@ -6,6 +6,7 @@ using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.DbProvider;
 using Trinity.Items;
+using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Logic;
@@ -985,6 +986,10 @@ namespace Trinity
                                 // Very close containers get a weight increase
                                 if (cacheObject.Distance <= 8f)
                                     cacheObject.Weight += 600d;
+
+                                // Open container for the damage buff
+                                if (Legendary.HarringtonWaistguard.IsEquipped && !Legendary.HarringtonWaistguard.IsBuffActive)
+                                    cacheObject.Weight += 10000d;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                 if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.Distance <= 25f)
