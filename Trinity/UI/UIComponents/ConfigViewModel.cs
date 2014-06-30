@@ -1,16 +1,24 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
+using Trinity.Combat;
 using Trinity.Config;
 using Trinity.Config.Combat;
 using Trinity.Config.Loot;
 using Trinity.Helpers;
 using Trinity.Items;
+using Trinity.Reference;
 using Trinity.Technicals;
 using Trinity.UIComponents;
+using Trinity.Objects;
 using Zeta.Bot;
+using Zeta.Game;
+using Zeta.Common;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.UI.UIComponents
 {
@@ -133,6 +141,72 @@ namespace Trinity.UI.UIComponents
                                             catch (Exception ex)
                                             {
                                                 Logger.Log(LogCategory.UserInformation, "Exception Dumping ALL Items: {0}", ex);
+                                            }
+                                        });
+                DumpEquippedLegendaryCommand = new RelayCommand(
+                                        (parameter) =>
+                                        {
+                                            try
+                                            {
+                                                ZetaDia.Actors.Update();
+                                                using (ZetaDia.Memory.SaveCacheState())
+                                                {
+                                                    ZetaDia.Memory.TemporaryCacheState(false);
+
+                                                    if (ZetaDia.Me.IsValid && ZetaDia.IsInGame)
+                                                    {
+                                                        Action<Item> logItem = i => Logger.Log("Item: {0}: {1} ({2}) is Equipped", i.ItemType, i.Name, i.Id);
+
+                                                        Logger.Log("------ Equipped Legendaries: Items={0}, Sets={1} ------", Legendary.Equipped.Count, Sets.Equipped.Count);
+
+                                                        Legendary.Equipped.Where(c => !c.IsSetItem || !c.Set.IsEquipped).ForEach(i => logItem(i));
+
+                                                        Sets.Equipped.ForEach(s =>
+                                                        {
+                                                            Logger.Log("------ Set: {0} {1}: {2}/{3} Equipped. ActiveBonuses={4}/{5} ------",
+                                                                s.Name,
+                                                                s.IsClassRestricted ? "(" + s.ClassRestriction + ")" : string.Empty,
+                                                                s.EquippedItems.Count,
+                                                                s.Items.Count,
+                                                                s.CurrentBonuses,
+                                                                s.MaxBonuses);
+
+                                                            s.Items.Where(i => i.IsEquipped).ForEach(i => logItem(i));
+
+                                                        });
+                                                    }
+                                                }
+
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Logger.Log(LogCategory.UserInformation, "Exception Dumping Equipped Legendary Items: {0}", ex);
+                                            }
+                                        });
+                DumpEquippedSkillsCommand = new RelayCommand(
+                                        (parameter) =>
+                                        {
+                                            try
+                                            {
+                                                ZetaDia.Actors.Update();
+                                                using (ZetaDia.Memory.SaveCacheState())
+                                                {
+                                                    ZetaDia.Memory.TemporaryCacheState(false);
+
+                                                    if (ZetaDia.Me.IsValid && ZetaDia.IsInGame)
+                                                    {
+                                                        Logger.Log("------ Active Skills / Runes ------", Skills.ActiveSkills.Count, Skills.ActiveSkills.Count);
+
+                                                        Action<Skill> logItem = s => Logger.Log("Skill: {0} Rune={1}", s.Name, s.CurrentRune.Name);                                                        
+
+                                                        Skills.ActiveSkills.ForEach(logItem);
+                                                    }
+                                                }
+
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Logger.Log(LogCategory.UserInformation, "Exception Dumping Skill/Rune/Passive Items: {0}", ex);
                                             }
                                         });
                 DumpMerchantItemsCommand = new RelayCommand(
@@ -396,6 +470,25 @@ namespace Trinity.UI.UIComponents
         /// </summary>
         /// <value>The save command.</value>
         public ICommand DumpAllItemsCommand
+        {
+            get;
+            private set;
+        }
+        /// <summary>
+        /// Gets the test score command.
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand DumpEquippedSkillsCommand
+        {
+            get;
+            private set;
+        }
+        
+        /// <summary>
+        /// Gets the test score command.
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand DumpEquippedLegendaryCommand
         {
             get;
             private set;

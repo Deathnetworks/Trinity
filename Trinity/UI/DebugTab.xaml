@@ -23,7 +23,8 @@
             <Button Content="Full Dump Stash items" Command="{Binding Path=DumpStashCommand}"/>
             <Button Content="Full Dump Merchant items" Command="{Binding Path=DumpMerchantItemsCommand}"/>
             <Button Content="Full Dump ALL items (SLOW!!)" Command="{Binding Path=DumpAllItemsCommand}"/>
-
+            <Button Content="Dump Equipped Legendaries" Command="{Binding Path=DumpEquippedLegendaryCommand}"/>
+            <Button Content="Dump Skills,Runes,Passives" Command="{Binding Path=DumpEquippedSkillsCommand}"/>            
         </UniformGrid>
     </StackPanel>
 </UserControl>
