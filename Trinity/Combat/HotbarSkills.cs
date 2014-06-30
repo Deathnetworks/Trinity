@@ -12,6 +12,54 @@ namespace Trinity.Combat
     {
         private static HashSet<HotbarSkills> _assignedSkills = new HashSet<HotbarSkills>();
         private static HashSet<SNOPower> _passiveSkills = new HashSet<SNOPower>();
+        private static Dictionary<SNOPower, HotbarSkills> _skillBySNOPower = new Dictionary<SNOPower, HotbarSkills>();
+        private static Dictionary<HotbarSlot, HotbarSkills> _skillBySlot = new Dictionary<HotbarSlot, HotbarSkills>();        
+        private static HashSet<SNOPower> _assignedSNOPowers = new HashSet<SNOPower>();
+
+        private static bool ShouldUpdate
+        {
+            get { return Trinity.HotbarRefreshTimer.Elapsed > TimeSpan.FromSeconds(10); }
+        } 
+
+        /// <summary>
+        /// Assigned SNOPowers as HashSet
+        /// </summary>
+        internal static HashSet<SNOPower> AssignedSNOPowers
+        {
+            get
+            {
+                if (!_assignedSNOPowers.Any() || ShouldUpdate) 
+                    Update();
+
+                return _assignedSNOPowers;
+            }
+        }
+
+        /// <summary>
+        ///  Assigned skill by power
+        /// </summary>
+        internal static HotbarSkills BySNOPower(SNOPower power)
+        {
+            if (!_skillBySNOPower.Any() || ShouldUpdate) 
+                Update();
+
+            HotbarSkills hbs;
+            var result = _skillBySNOPower.TryGetValue(power, out hbs);
+            return result ? hbs : new HotbarSkills() { RuneIndex = -999 };
+        }
+
+        /// <summary>
+        ///  Assigned skill by slot
+        /// </summary>
+        internal static HotbarSkills BySlot(HotbarSlot slot)
+        {
+            if (!_skillBySlot.Any() || ShouldUpdate)
+                Update();
+
+            HotbarSkills hbs;
+            var result = _skillBySlot.TryGetValue(slot, out hbs);
+            return result ? hbs : new HotbarSkills() { RuneIndex = -999 };
+        }
 
         /// <summary>
         /// The currently assigned hotbar skills with runes and slots
@@ -23,6 +71,9 @@ namespace Trinity.Combat
                 if (_assignedSkills == null)
                 {
                     _assignedSkills = new HashSet<HotbarSkills>();
+                }
+                if (!_assignedSkills.Any())
+                {
                     Update();
                 }
                 return _assignedSkills;
@@ -33,6 +84,7 @@ namespace Trinity.Combat
             }
         }
 
+
         internal static HashSet<SNOPower> PassiveSkills
         {
             get
@@ -40,6 +92,9 @@ namespace Trinity.Combat
                 if (_passiveSkills == null)
                 {
                     _passiveSkills = new HashSet<SNOPower>();
+                }
+                if (!_passiveSkills.Any())
+                {
                     Update();
                 }
                 return _passiveSkills;
@@ -64,7 +119,9 @@ namespace Trinity.Combat
         /// </summary>
         internal static void Update(TrinityLogLevel logLevel = TrinityLogLevel.Debug, LogCategory logCategory = LogCategory.CacheManagement)
         {
-            Trinity.Hotbar = new List<SNOPower>();
+            //Logger.Log("Refreshing Hotbar {0} ms", Trinity.HotbarRefreshTimer.ElapsedMilliseconds);
+
+            Trinity.Hotbar = new List<SNOPower>();            
             
             for (int i = 0; i <= 5; i++)
             {
@@ -89,20 +146,19 @@ namespace Trinity.Combat
                 oldSkills.Add(skill);
             }
 
-            if (Trinity.Hotbar.Any(hb => oldSkills.All(old => old.Power != hb)))
-            {
-                _assignedSkills.Clear();
+            // Get current Skills and Runes 
+            _assignedSkills.Clear();                
 
-                foreach (SNOPower p in Trinity.Hotbar)
+            foreach (SNOPower p in Trinity.Hotbar)
+            {
+                _assignedSkills.Add(new HotbarSkills
                 {
-                    _assignedSkills.Add(new HotbarSkills
-                    {
-                        Power = p,
-                        Slot = GetHotbarSlotFromPower(p),
-                        RuneIndex = GetRuneIndexFromPower(p)
-                    });
-                }
+                    Power = p,
+                    Slot = GetHotbarSlotFromPower(p),
+                    RuneIndex = GetRuneIndexFromPower(p)
+                });
             }
+
 
             string skillList = "";
             foreach (HotbarSkills skill in AssignedSkills)
@@ -112,6 +168,10 @@ namespace Trinity.Combat
             Logger.Log(logLevel, logCategory, " Hotbar Skills (Skill/RuneIndex/Slot): " + skillList);
 
             PassiveSkills = new HashSet<SNOPower>(cPlayer.PassiveSkills);
+            
+            _skillBySNOPower = _assignedSkills.ToDictionary(v => v.Power, v => v);
+            _skillBySlot = _assignedSkills.ToDictionary(v => v.Slot, v => v);
+            _assignedSNOPowers = new HashSet<SNOPower>(_assignedSkills.Select(v => v.Power));
         }
 
 
