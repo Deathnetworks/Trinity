@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
@@ -13,10 +14,25 @@ namespace Trinity.Cache
         private HashSet<ACDItem> _items;
         public HashSet<ACDItem> Items
         {
-            get { return new HashSet<ACDItem>(_items.Where(i => i.IsValid)); }
+            get
+            {
+                if (ShouldUpdate)
+                    Update();
+
+                return new HashSet<ACDItem>(_items.Where(i => i.IsValid));                 
+            }
             set { _items = value; }
         }
-        public HashSet<int> ItemIds { get; set; }
+
+        private HashSet<int> _itemIds;
+        public HashSet<int> ItemIds
+        {
+            get
+            {
+                return new HashSet<int>(Items.Select(i => i.ActorSNO));
+            }
+            set { _itemIds = value; }
+        }
 
         public EquippedItemCache()
         {
@@ -33,6 +49,7 @@ namespace Trinity.Cache
                 return;
 
             var itemsList = ZetaDia.Me.Inventory.Equipped.Where(i => i.IsValid).ToList();
+            _lastUpdate = DateTime.UtcNow;
 
             if (!itemsList.Any())
                 return;
@@ -40,6 +57,12 @@ namespace Trinity.Cache
             Items = new HashSet<ACDItem>(itemsList);
             ItemIds = new HashSet<int>(itemsList.Select(i => i.ActorSNO));
         }
+
+        private DateTime _lastUpdate = DateTime.MinValue;
+        private bool ShouldUpdate
+        {
+            get { return DateTime.UtcNow.Subtract(_lastUpdate) > TimeSpan.FromSeconds(5); }
+        } 
 
     }
 }
