@@ -21,46 +21,10 @@ namespace Trinity.Objects
     /// </summary>
     public class Skill
     {
-        public List<Rune> Runes { get; set; }
-        public SNOPower SNOPower { get; set; }
-        public string Name { get; set; }
-        public SpellCategory Category { get; set; }
-        public string Description { get; set; }
-        public int RequiredLevel { get; set; }
-        public int Index { get; set; }
-        public string Tooltip { get; set; }
-        public string Slug { get; set; }
-        public ActorClass Class { get; set; }
-        public Resource Resource { get; set; }
-        public bool IsPrimary { get; set; }
-
         private int _cost;
-        public int Cost
-        {
-            get { return CurrentRune.ModifiedCost.HasValue ? CurrentRune.ModifiedCost.Value : _cost; }
-            set { _cost = value; }
-        }
-
         private TimeSpan _duration;
-        public TimeSpan Duration
-        {
-            get { return CurrentRune.ModifiedDuration.HasValue ? CurrentRune.ModifiedDuration.Value : _duration; }
-            set { _duration = value; }
-        }
-
         private TimeSpan _cooldown;
-        public TimeSpan Cooldown
-        {
-            get { return CurrentRune.ModifiedCooldown.HasValue ? CurrentRune.ModifiedCooldown.Value : _cooldown; }
-            set { _cooldown = value;  }
-        }
-
         private Element _element;
-        public Element Element
-        {
-            get { return CurrentRune.ModifiedElement.HasValue ? CurrentRune.ModifiedElement.Value : _element; }
-            set { _element = value; }
-        }
 
         public Skill()
         {
@@ -76,11 +40,120 @@ namespace Trinity.Objects
             Class = ActorClass.Invalid;
         }
 
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Slug { get; set; }
+
+        /// <summary>
+        /// The runes that may be selected for this skill
+        /// </summary>
+        public List<Rune> Runes { get; set; }
+
+        /// <summary>
+        /// DBs internal enum value for this skill
+        /// </summary>
+        public SNOPower SNOPower { get; set; }
+
+        /// <summary>
+        /// Name of the group of skills this belongs to as listed in d3 skill selection menu
+        /// Ie. Barbarian Primary, Might, Tactics or Rage skill groups.
+        /// </summary>
+        public SpellCategory Category { get; set; }
+
+        /// <summary>
+        /// The level required before this skill may be selected in diablo3
+        /// </summary>
+        public int RequiredLevel { get; set; }
+
+        /// <summary>
+        /// Zero-based index for this skill within the list of skills for this class
+        /// Maps to element position in Skills.[class name] 
+        /// </summary>
+        public int Index { get; set; }
+
+        /// <summary>
+        /// Code for mapping this skill to a tooltip using http://us.battle.net/d3/en/tooltip/         
+        /// </summary>
+        public string Tooltip { get; set; }
+
+        /// <summary>
+        /// Class this skill is used by (barbarian/wizard etc).
+        /// </summary>
+        public ActorClass Class { get; set; }
+
+        /// <summary>
+        /// Resource type used by this skill - mana, hatred, discipline etc.
+        /// </summary>
+        public Resource Resource { get; set; }
+
+        /// <summary>
+        /// If this skill is a special primary skill (free to cast or generators)
+        /// </summary>
+        public bool IsPrimary { get; set; }
+
+        /// <summary>
+        /// How much this spell costs to cast; uses rune value when applicable.
+        /// </summary>
+        public int Cost
+        {
+            get { return CurrentRune.ModifiedCost.HasValue ? CurrentRune.ModifiedCost.Value : _cost; }
+            set { _cost = value; }
+        }
+
+        /// <summary>
+        /// How long this spell or its effect will last; uses rune value when applicable.
+        /// </summary>
+        public TimeSpan Duration
+        {
+            get { return CurrentRune.ModifiedDuration.HasValue ? CurrentRune.ModifiedDuration.Value : _duration; }
+            set { _duration = value; }
+        }
+
+        /// <summary>
+        /// Base cooldown; uses rune value when applicable (does not take into account item cooldown reduction).
+        /// </summary>
+        public TimeSpan Cooldown
+        {
+            get { return CurrentRune.ModifiedCooldown.HasValue ? CurrentRune.ModifiedCooldown.Value : _cooldown; }
+            set { _cooldown = value;  }
+        }
+
+        /// <summary>
+        /// Element for this skill (lightning/fire etc); uses rune value when applicable.
+        /// </summary>
+        public Element Element
+        {
+            get { return CurrentRune.ModifiedElement.HasValue ? CurrentRune.ModifiedElement.Value : _element; }
+            set { _element = value; }
+        }
+
+        /// <summary>
+        /// If this passive is currently selected in the Diablo3 skills menu (skill is on the hotbar).
+        /// </summary>
         public bool IsActive
         {
             get { return Skills.ActiveIds.Contains(SNOPower); }
         }
 
+        /// <summary>
+        /// If the skill's associated buff is currently active, ie, archon, warcry etc.
+        /// </summary>
+        public bool IsBuffActive
+        {
+            get { return CombatBase.GetHasBuff(SNOPower); }
+        }
+
+        /// <summary>
+        /// Gets the current buff stack count
+        /// </summary>
+        public int BuffStacks
+        {
+            get { return CombatBase.GetBuffStacks(SNOPower); }
+        }
+
+        /// <summary>
+        /// The currently selected rune for this skill.        
+        /// </summary>
         public Rune CurrentRune
         {
             get
@@ -90,6 +163,9 @@ namespace Trinity.Objects
             }
         }
 
+        /// <summary>
+        /// If all runes for this skill are currently enabled
+        /// </summary>
         public bool IsAllRuneBonusActive
         {
             get
@@ -99,6 +175,9 @@ namespace Trinity.Objects
             }
         }
 
+        /// <summary>
+        /// If this skill has a rune equipped
+        /// </summary>
         public bool HasRuneEquipped
         {
             get
@@ -127,9 +206,12 @@ namespace Trinity.Objects
             return SpellTracker.IsUnitTracked(unit, SNOPower);
         }
 
-        public void TrackOnUnit(TrinityCacheObject unit)
+        /// <summary>
+        /// Record this skill as being on the specified unit; for the specified time.
+        /// </summary>
+        public void TrackOnUnit(TrinityCacheObject unit, float duration = 0f)
         {
-            SpellTracker.TrackSpellOnUnit(unit.ACDGuid, SNOPower);
+            SpellTracker.TrackSpellOnUnit(unit.ACDGuid, SNOPower, duration);
         }
 
         /// <summary>
@@ -140,6 +222,9 @@ namespace Trinity.Objects
             return CombatBase.TimeSincePowerUse(SNOPower);
         }
 
+        /// <summary>
+        /// Unique Identifier so that dictionarys can compare Skill objects.
+        /// </summary>        
         public override int GetHashCode()
         {
             return Index.GetHashCode() ^ Name.GetHashCode();

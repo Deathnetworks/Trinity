@@ -27,12 +27,10 @@ namespace Trinity
             }
         }
 
-        internal static void TrackSpellOnUnit(int acdGuid, SNOPower power)
+        internal static void TrackSpellOnUnit(int acdGuid, SNOPower power, float duration = 0f)
         {
             try
             {
-                float duration = 0;
-
                 if (CachedTrackedSpells.ContainsKey(power))
                 {
                     HotbarSkills skill = HotbarSkills.AssignedSkills.FirstOrDefault(p => p.Power == power);

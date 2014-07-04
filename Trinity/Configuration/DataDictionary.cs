@@ -1023,7 +1023,7 @@ namespace Trinity
         public readonly static Dictionary<Skill, Set> AllRuneSetsBySkill = new Dictionary<Skill, Set>
         {
             { Skills.Barbarian.FuriousCharge, Sets.TheLegacyOfRaekor },
-            { Skills.Wizard.Archon, Sets.TheLegacyOfRaekor },
+            { Skills.Wizard.Archon, Sets.VyrsAmazingArcana },
         };
 
         #region Methods
