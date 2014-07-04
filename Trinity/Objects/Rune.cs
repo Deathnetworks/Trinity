@@ -105,7 +105,7 @@ namespace Trinity.Objects
         public Element? ModifiedElement { get; set; }
 
         /// <summary>
-        /// Unique Identifier so that dictionarys can compare Skill objects.
+        /// Unique Identifier so that dictionarys can compare this object properly.
         /// </summary>   
         public override int GetHashCode()
         {
