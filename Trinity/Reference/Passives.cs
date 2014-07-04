@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Trinity.Helpers;
 using Trinity.Objects;
 using Zeta.Game;
@@ -1540,5 +1542,82 @@ namespace Trinity.Reference
                 Class = ActorClass.Wizard
             };
         }
+
+        /// <summary>
+        /// All passives that are currently active
+        /// </summary>
+        public static List<Passive> Active
+        {
+            get
+            {
+                if (ZetaDia.CPlayer.IsValid && ZetaDia.IsInGame && (!_active.Any() || DateTime.UtcNow.Subtract(_lastUpdatedActivePassives) > TimeSpan.FromSeconds(3)))
+                {
+                    _lastUpdatedActivePassives = DateTime.UtcNow;
+                    _active.Clear();
+                    _active = CurrentClass.Where(p => p.IsActive).ToList();
+                }
+                return _active;
+            }
+        }
+        private static List<Passive> _active = new List<Passive>();
+        private static DateTime _lastUpdatedActivePassives = DateTime.MinValue;
+
+        /// <summary>
+        /// All passives
+        /// </summary>        
+        public static List<Passive> All
+        {
+            get
+            {
+                if (!_all.Any())
+                {
+                    _all.AddRange(Barbarian.ToList());
+                    _all.AddRange(WitchDoctor.ToList());
+                    _all.AddRange(DemonHunter.ToList());
+                    _all.AddRange(Wizard.ToList());
+                    _all.AddRange(Crusader.ToList());
+                    _all.AddRange(Monk.ToList());
+                }
+                return _all;
+            }
+        }
+        private static List<Passive> _all = new List<Passive>();
+
+
+        /// <summary>
+        /// All passives for the specified class
+        /// </summary>
+        public static List<Passive> ByActorClass(ActorClass Class)
+        {
+            if (ZetaDia.Me.IsValid)
+            {
+                switch (ZetaDia.Me.ActorClass)
+                {
+                    case ActorClass.Barbarian:
+                        return Barbarian.ToList();
+                    case ActorClass.Crusader:
+                        return Crusader.ToList();
+                    case ActorClass.DemonHunter:
+                        return DemonHunter.ToList();
+                    case ActorClass.Monk:
+                        return Monk.ToList();
+                    case ActorClass.Witchdoctor:
+                        return WitchDoctor.ToList();
+                    case ActorClass.Wizard:
+                        return Wizard.ToList();
+                }
+            }
+            return new List<Passive>();
+        }
+
+        /// <summary>
+        /// Passives for the current class
+        /// </summary>
+        public static IEnumerable<Passive> CurrentClass
+        {
+            get { return ZetaDia.Me.IsValid ? ByActorClass(ZetaDia.Me.ActorClass) : new List<Passive>(); }
+        }
+
+    
     }
 }

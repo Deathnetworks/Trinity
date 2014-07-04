@@ -47,7 +47,6 @@ namespace Trinity.Reference<br/>
                 Index = 0,<br/>
                 Name = "None",<br/>
                 Description = "No Rune Selected",<br/>
-                RequiredLevel = 0,<br/>
                 Tooltip = string.Empty,<br/>
                 TypeId = string.Empty,<br/>     
                 RuneIndex = -1,<br/>
@@ -69,11 +68,16 @@ namespace Trinity.Reference<br/>
                 Index = {{orderIndex}},<br/>
                 Name = "{{name}}",<br/>
                 Description = "{{description}}",<br/>
-                RequiredLevel = {{requiredLevel}},<br/>
                 Tooltip = "{{tooltipParams}}",<br/>
                 TypeId = "{{type}}",<br/>
                 RuneIndex = {{RuneIndex type}},<br/>
                 SkillIndex = {{../orderIndex}},<br/>
+                                
+                {{{ICombatProperties description "Duration"}}}
+                {{{ICombatProperties description "Cost"}}}
+                {{{ICombatProperties description "Cooldown"}}}
+                {{{ICombatProperties description "Element" name}}}
+
                 Class = ActorClass.{{Format className}}<br/>
             </span>
             };<br/>

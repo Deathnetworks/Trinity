@@ -52,7 +52,7 @@ var Skills = function() {
                 objectString = objectString.replace(/(?:\r\n|\r|\n)/g, '');
 
                 // Double White Spaces
-                //objectString = objectString.replace(/\s{2,}/g, ' ');
+                objectString = objectString.replace(/\s{2,}/g, ' ');
 
                 if (objectString != "") {
 

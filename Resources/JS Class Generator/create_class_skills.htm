@@ -53,8 +53,16 @@ namespace Trinity.Reference<br/>
                 Description = "{{description}}",<br/>
                 Tooltip = "{{tooltipParams}}",<br/>
                 Category = SpellCategory.{{categoryName}},<br/>
+                IsPrimary = {{Bool primary}},<br/>
                 Class = ActorClass.{{Format className}},<br/>
-                Runes = new List&lt;Rune&gt;<br/>
+
+                {{{ICombatProperties description "Duration"}}}
+                {{{ICombatProperties description "Cost"}}}
+                {{{ICombatProperties description "Cooldown"}}}
+                {{{ICombatProperties description "Element" name}}}
+                {{{ICombatProperties description "Resource"}}}
+                
+                Runes = new List&lt;Rune&gt;<br/>                
                 {<br/>
                     <span>
                     Runes.{{className}}.None,<br/>    

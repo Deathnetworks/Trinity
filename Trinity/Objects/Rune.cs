@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Windows.Forms.VisualStyles;
 using Trinity.Combat;
 using Trinity.Reference;
 using Zeta.Common;
@@ -16,7 +15,6 @@ namespace Trinity.Objects
         public string Name { get; set; }
         public int Index { get; set; }
         public string Description { get; set; }
-        public int RequiredLevel { get; set; }
         public string TypeId { get; set; }
         public string Tooltip { get; set; }
         public ActorClass Class { get; set; }
@@ -32,7 +30,6 @@ namespace Trinity.Objects
             Name = "None";
             Index = -1;
             Description = string.Empty;
-            RequiredLevel = 0;
             TypeId = string.Empty;
             Tooltip = string.Empty;
             Class = ActorClass.Invalid;
@@ -60,6 +57,11 @@ namespace Trinity.Objects
         {
             get { return Skills.ByActorClass(Class).ElementAtOrDefault(SkillIndex); } 
         }
+
+        public TimeSpan? ModifiedDuration { get; set; }
+        public TimeSpan? ModifiedCooldown { get; set; }
+        public int? ModifiedCost { get; set; }
+        public Element? ModifiedElement { get; set; }
 
     }
 }

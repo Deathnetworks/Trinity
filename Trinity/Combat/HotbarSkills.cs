@@ -89,14 +89,9 @@ namespace Trinity.Combat
         {
             get
             {
-                if (_passiveSkills == null)
-                {
-                    _passiveSkills = new HashSet<SNOPower>();
-                }
-                if (!_passiveSkills.Any())
-                {
+                if (!_passiveSkills.Any() || ShouldUpdate)
                     Update();
-                }
+
                 return _passiveSkills;
             }
             set
@@ -140,7 +135,7 @@ namespace Trinity.Combat
             Trinity.ShouldRefreshHotbarAbilities = false;
             Trinity.HotbarRefreshTimer.Restart();
            
-            HashSet<HotbarSkills> oldSkills = new HashSet<HotbarSkills>();
+            var oldSkills = new HashSet<HotbarSkills>();
             foreach (var skill in _assignedSkills)
             {
                 oldSkills.Add(skill);

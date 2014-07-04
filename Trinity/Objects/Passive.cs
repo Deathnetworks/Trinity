@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Trinity.Combat;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 
@@ -38,5 +39,18 @@ namespace Trinity.Objects
         {
             return Index.GetHashCode() ^ Name.GetHashCode();
         }
+
+        public bool IsActive
+        {
+            get
+            {
+                if (ZetaDia.IsInGame && ZetaDia.Me.IsValid && Class == ZetaDia.Me.ActorClass)
+                {
+                    return HotbarSkills.PassiveSkills.Contains(SNOPower);
+                }
+                return false;
+            }
+        }
+
     }
 }

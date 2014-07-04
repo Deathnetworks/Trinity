@@ -130,7 +130,8 @@
         Fire,
         Lightning,
         Poison,
-        Arcane
+        Arcane,
+        Holy
     }
 
     public enum SpellCategory
@@ -158,5 +159,19 @@
         Mastery,
         Force,
     }
+
+    public enum Resource
+    {
+        Unknown = 0,
+        None,
+        Fury,
+        Arcane,
+        Wrath,
+        Mana,
+        Discipline,
+        Hatred,
+        Spirit
+    }
+
 
 }

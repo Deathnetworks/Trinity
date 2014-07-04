@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
+using Trinity;
 using Trinity.Combat;
 using Trinity.Combat.Abilities;
 using Trinity.Helpers;
@@ -27,15 +28,39 @@ namespace Trinity.Objects
         public string Description { get; set; }
         public int RequiredLevel { get; set; }
         public int Index { get; set; }
-
-        public bool IsPrimary
-        {
-            get { return Category == SpellCategory.Primary; }
-        }
-
         public string Tooltip { get; set; }
         public string Slug { get; set; }
         public ActorClass Class { get; set; }
+        public Resource Resource { get; set; }
+        public bool IsPrimary { get; set; }
+
+        private int _cost;
+        public int Cost
+        {
+            get { return CurrentRune.ModifiedCost.HasValue ? CurrentRune.ModifiedCost.Value : _cost; }
+            set { _cost = value; }
+        }
+
+        private TimeSpan _duration;
+        public TimeSpan Duration
+        {
+            get { return CurrentRune.ModifiedDuration.HasValue ? CurrentRune.ModifiedDuration.Value : _duration; }
+            set { _duration = value; }
+        }
+
+        private TimeSpan _cooldown;
+        public TimeSpan Cooldown
+        {
+            get { return CurrentRune.ModifiedCooldown.HasValue ? CurrentRune.ModifiedCooldown.Value : _cooldown; }
+            set { _cooldown = value;  }
+        }
+
+        private Element _element;
+        public Element Element
+        {
+            get { return CurrentRune.ModifiedElement.HasValue ? CurrentRune.ModifiedElement.Value : _element; }
+            set { _element = value; }
+        }
 
         public Skill()
         {
@@ -53,7 +78,7 @@ namespace Trinity.Objects
 
         public bool IsActive
         {
-            get { return Skills.ActiveSkillsSNOPowers.Contains(SNOPower); }
+            get { return Skills.ActiveIds.Contains(SNOPower); }
         }
 
         public Rune CurrentRune
@@ -95,9 +120,22 @@ namespace Trinity.Objects
         }
 
         /// <summary>
+        /// Checks if a unit is currently being tracked with a given SNOPower. When the spell is properly configured, this can be used to set a "timer" on a DoT re-cast, for example.
+        /// </summary>
+        public bool IsTrackedOnUnit(TrinityCacheObject unit)
+        {
+            return SpellTracker.IsUnitTracked(unit, SNOPower);
+        }
+
+        public void TrackOnUnit(TrinityCacheObject unit)
+        {
+            SpellTracker.TrackSpellOnUnit(unit.ACDGuid, SNOPower);
+        }
+
+        /// <summary>
         /// Gets the time in Millseconds since we've used the specified power
         /// </summary>
-        public double TimeSincePowerUse()
+        public double TimeSinceUse()
         {
             return CombatBase.TimeSincePowerUse(SNOPower);
         }
