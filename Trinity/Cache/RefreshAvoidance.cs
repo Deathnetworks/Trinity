@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using Trinity.Objects;
+using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot.Navigation;
 using Zeta.Common.Plugins;
@@ -93,6 +96,92 @@ namespace Trinity
                 }
             }
 
+            // Item based immunity
+            switch (avoidanceType)
+            {
+                case AvoidanceType.PoisonTree:
+                case AvoidanceType.PlagueCloud:
+                case AvoidanceType.PoisonEnchanted:
+                case AvoidanceType.PlagueHand:
+
+                    if (Legendary.MarasKaleidoscope.IsEquipped)
+                    {
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because MarasKaleidoscope is equipped", avoidanceType);
+                        minAvoidanceHealth = 0;
+                    }                        
+                    break;
+
+                case AvoidanceType.AzmoFireball:
+                case AvoidanceType.DiabloRingOfFire:
+                case AvoidanceType.DiabloMeteor:
+                case AvoidanceType.ButcherFloorPanel:
+                case AvoidanceType.Mortar:
+                case AvoidanceType.MageFire:
+                case AvoidanceType.MoltenTrail:
+                case AvoidanceType.MoltenBall:
+                case AvoidanceType.ShamanFire:
+
+                    if (Legendary.TheStarofAzkaranth.IsEquipped)
+                    {
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because TheStarofAzkaranth is equipped", avoidanceType);
+                        minAvoidanceHealth = 0;
+                    }
+                    break;
+                    
+                case AvoidanceType.FrozenPulse:
+                case AvoidanceType.IceBall:
+                case AvoidanceType.IceTrail:
+
+                    // Ignore if both items are equipped
+                    if (Legendary.TalismanofAranoch.IsEquipped)
+                    {
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because TalismanofAranoch is equipped", avoidanceType);
+                        minAvoidanceHealth = 0;
+                    }
+                    break;
+
+                case AvoidanceType.Orbiter:
+                case AvoidanceType.Thunderstorm:
+
+                    if (Legendary.XephirianAmulet.IsEquipped)
+                    {
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because XephirianAmulet is equipped", avoidanceType);
+                        minAvoidanceHealth = 0; 
+                    }                        
+                    break;
+
+                case AvoidanceType.Arcane:
+
+                    if (Legendary.CountessJuliasCameo.IsEquipped)
+                    {
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because CountessJuliasCameo is equipped", avoidanceType);
+                        minAvoidanceHealth = 0;
+                    }
+                    break;                   
+            }
+
+            // Set based immunity
+            if (Sets.BlackthornesBattlegear.IsMaxBonusActive)
+            {
+                var blackthornsImmunity = new HashSet<AvoidanceType>
+                {
+                    AvoidanceType.Desecrator,
+                    AvoidanceType.MoltenBall,
+                    AvoidanceType.MoltenCore,
+                    AvoidanceType.MoltenTrail,
+                    AvoidanceType.PlagueHand
+                };
+
+                if (blackthornsImmunity.Contains(avoidanceType))
+                {
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because BlackthornesBattlegear is equipped", avoidanceType);
+                    minAvoidanceHealth = 0;
+                }
+                    
+            }
+
+
+
             if (minAvoidanceHealth == 0)
             {
                 AddToCache = false;
@@ -101,6 +190,10 @@ namespace Trinity
                 return AddToCache;
 
             }
+
+
+
+
 
             // Add it to the list of known avoidance objects, *IF* our health is lower than this avoidance health limit
             if (minAvoidanceHealth >= Player.CurrentHealthPct)

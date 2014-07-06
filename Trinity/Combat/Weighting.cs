@@ -988,8 +988,8 @@ namespace Trinity
                                     cacheObject.Weight += 600d;
 
                                 // Open container for the damage buff
-                                if (Legendary.HarringtonWaistguard.IsEquipped && !Legendary.HarringtonWaistguard.IsBuffActive)
-                                    cacheObject.Weight += 10000d;
+                                if (Legendary.HarringtonWaistguard.IsEquipped && !Legendary.HarringtonWaistguard.IsBuffActive && ZetaDia.Me.IsInCombat && cacheObject.Distance < 80f)
+                                    cacheObject.Weight += 20000d;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                 if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.Distance <= 25f)

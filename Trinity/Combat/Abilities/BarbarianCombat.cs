@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using Trinity.Config.Combat;
+using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.Combat.Abilities
 {
@@ -64,6 +66,10 @@ namespace Trinity.Combat.Abilities
             // Call of the Ancients
             if (IsNull(power) && CanUseCallOfTheAncients)
                 power = PowerCallOfTheAncients;
+
+            // Leap with Earth Set.
+            if (IsNull(power) && CanUseLeap && Sets.MightOfTheEarth.IsThirdBonusActive)
+                power = PowerLeap;
 
             // Earthquake
             if (IsNull(power) && CanUseEarthquake)
@@ -325,8 +331,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                bool hasBerserker = HotbarSkills.PassiveSkills.Any(p => p == SNOPower.Barbarian_Passive_BerserkerRage);
-                double minFury = hasBerserker ? Player.PrimaryResourceMax * 0.99 : 50f;
+                double minFury = 50f;                
                 bool hasCaveIn = HotbarSkills.AssignedSkills.Any(p => p.Power == SNOPower.Barbarian_Earthquake && p.RuneIndex == 4);
                 float range = hasCaveIn ? 24f : 14f;
 
@@ -336,7 +341,7 @@ namespace Trinity.Combat.Abilities
                        !Player.IsIncapacitated &&
                        CanCast(SNOPower.Barbarian_Earthquake) &&
                        Player.PrimaryResource >= minFury &&
-                       TargetUtil.IsEliteTargetInRange(range);
+                       (TargetUtil.IsEliteTargetInRange(range) || TargetUtil.AnyMobsInRange(range, 10));
 
             }
         }
@@ -521,7 +526,9 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return !UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.X1_Barbarian_AncientSpear) && Player.PrimaryResource >= 25 &&
+                return !UseOOCBuff && !IsWaitingForSpecial && !IsCurrentlyAvoiding && CanCast(SNOPower.X1_Barbarian_AncientSpear) && Player.PrimaryResource >= 25 &&
+                    // Only boulder toss as a rage dump if we have excess resource
+                    (!Runes.Barbarian.BoulderToss.IsActive || Player.PrimaryResourcePct > 0.8) &&
                     CurrentTarget.HitPointsPct >= V.F("Barbarian.AncientSpear.MinHealthPct");
             }
         }
@@ -725,6 +732,10 @@ namespace Trinity.Combat.Abilities
             get
             {
                 var bestAoEUnit = TargetUtil.GetBestPierceTarget(35f);
+
+                if (Runes.Barbarian.BoulderToss.IsActive)
+                    bestAoEUnit = TargetUtil.GetBestClusterUnit(9f);                
+
                 return new TrinityPower(SNOPower.X1_Barbarian_AncientSpear, V.F("Barbarian.AncientSpear.UseRange"), bestAoEUnit.ACDGuid);
             }
         }

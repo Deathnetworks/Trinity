@@ -217,9 +217,12 @@ namespace Trinity.Objects
         /// <summary>
         /// Gets the time in Millseconds since we've used the specified power
         /// </summary>
-        public double TimeSinceUse()
+        public double TimeSinceUse
         {
-            return CombatBase.TimeSincePowerUse(SNOPower);
+            get
+            {
+                return CombatBase.TimeSincePowerUse(SNOPower);                
+            }
         }
 
         /// <summary>
