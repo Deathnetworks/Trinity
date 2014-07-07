@@ -807,7 +807,81 @@ namespace Trinity
             return percentWithinBand >= percentage;
         }
 
+        internal static TrinityCacheObject LowestHealthTarget(float range, Vector3 position = new Vector3(), SNOPower debuff = SNOPower.None)
+        {
+            if (position == new Vector3())
+                position = Player.Position;
 
+            TrinityCacheObject lowestHealthTarget;
+            var unitsByHealth = (from u in ObjectCache
+
+                                 where u.IsUnit &&
+                                        u.Weight > 0 &&
+                                        u.CommonData != null && u.CommonData.IsValid &&
+                                        u.Position.Distance2D(position) <= range &&
+                                        (debuff == SNOPower.None || !SpellTracker.IsUnitTracked(u.ACDGuid, debuff))
+                                 orderby u.HitPoints ascending
+                                 select u).ToList();
+
+            if (unitsByHealth.Any())
+                lowestHealthTarget = unitsByHealth.FirstOrDefault();
+            else if (Trinity.CurrentTarget != null)
+                lowestHealthTarget = Trinity.CurrentTarget;
+            else
+                lowestHealthTarget = default(TrinityCacheObject);
+
+            return lowestHealthTarget;
+        }
+
+        internal static TrinityCacheObject GetDashStrikeFarthestTarget(float maxRange, float procDistance = 33f, int arcDegrees = 0)
+        {
+            var result =
+                (from u in ObjectCache
+                 where u.IsUnit && u.Distance >= procDistance &&
+                 u.RadiusDistance <= maxRange
+                 orderby u.RadiusDistance descending
+                 select u).FirstOrDefault();
+            return result;
+        }
+
+        internal static Vector3 GetDashStrikeBestClusterPoint(float radius = 15f, float maxRange = 65f, float procDistance = 33f, bool useWeights = true, bool includeUnitsInAoe = true)
+        {
+            if (radius < 5f)
+                radius = 5f;
+            if (maxRange > 300f)
+                maxRange = 300f;
+
+            bool includeHealthGlobes = false;
+            switch (Trinity.Player.ActorClass)
+            {
+                case ActorClass.Barbarian:
+                    includeHealthGlobes = CombatBase.Hotbar.Contains(SNOPower.Barbarian_Whirlwind) &&
+                                          Trinity.Settings.Combat.Misc.CollectHealthGlobe &&
+                                          ObjectCache.Any(g => g.Type == GObjectType.HealthGlobe && g.Weight > 0);
+                    break;
+            }
+
+            Vector3 bestClusterPoint;
+            var clusterUnits =
+                (from u in ObjectCache
+                 where (u.IsUnit || (includeHealthGlobes && u.Type == GObjectType.HealthGlobe)) &&
+                 ((useWeights && u.Weight > 0) || !useWeights) &&
+                 (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
+                 u.RadiusDistance <= maxRange && u.Distance >= procDistance
+                 orderby u.Type != GObjectType.HealthGlobe // if it's a globe this will be false and sorted at the top
+                 orderby !u.IsBossOrEliteRareUnique
+                 orderby u.NearbyUnitsWithinDistance(radius) descending
+                 orderby u.Distance
+                 orderby u.HitPointsPct descending
+                 select u.Position).ToList();
+
+            if (clusterUnits.Any())
+                bestClusterPoint = clusterUnits.FirstOrDefault();
+            else
+                bestClusterPoint = Trinity.Player.Position;
+
+            return bestClusterPoint;
+        }
 
     }
 }

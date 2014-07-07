@@ -74,7 +74,7 @@ namespace Trinity
         /// <returns></returns>
         private static RunStatus GetTreeSharpRunStatus(HandlerRunStatus rs)
         {
-            Monk_MaintainTempestRush();
+            MonkCombat.Monk_MaintainTempestRush();
 
             RunStatus treeRunStatus;
 
@@ -184,7 +184,7 @@ namespace Trinity
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget was passed as null! Continuing...");
                     }
 
-                    Monk_MaintainTempestRush();
+                    MonkCombat.Monk_MaintainTempestRush();
 
                     CheckStaleCache();
                     using (new PerformanceLogger("HandleTarget.CheckForNewTarget"))
@@ -436,7 +436,7 @@ namespace Trinity
                         bool Monk_SpecialMovement = ((CurrentTarget.Type == GObjectType.Gold ||
                             CurrentTarget.IsUnit ||
                             CurrentTarget.Type == GObjectType.Barricade ||
-                            CurrentTarget.Type == GObjectType.Destructible) && (Monk_TempestRushReady()));
+                            CurrentTarget.Type == GObjectType.Destructible) && (MonkCombat.Monk_TempestRushReady()));
 
                         bool Attackable_SpecialMovement = ((CurrentTarget.Type == GObjectType.Avoidance &&
                             ObjectCache.Any(u => (u.IsUnit || u.Type == GObjectType.Destructible || u.Type == GObjectType.Barricade) &&
@@ -474,12 +474,12 @@ namespace Trinity
                                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Monk_TempestRush) && Player.PrimaryResource >= Settings.Combat.Monk.TR_MinSpirit &&
                                     ((CurrentTarget.Type == GObjectType.Item && CurrentTarget.Distance > 20f) || CurrentTarget.Type != GObjectType.Item) &&
                                     Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly &&
-                                    Monk_TempestRushReady())
+                                    MonkCombat.Monk_TempestRushReady())
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, CurrentDestination, CurrentWorldDynamicId, -1);
                                     CacheData.AbilityLastUsed[SNOPower.Monk_TempestRush] = DateTime.UtcNow;
                                     LastPowerUsed = SNOPower.Monk_TempestRush;
-                                    LastTempestRushLocation = CurrentDestination;
+                                    MonkCombat.LastTempestRushLocation = CurrentDestination;
                                     // Store the current destination for comparison incase of changes next loop
                                     LastMoveToTarget = CurrentDestination;
                                     // Reset total body-block count, since we should have moved
@@ -763,14 +763,14 @@ namespace Trinity
                                 Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "(NB: Attacking location of destructable)");
                                 ZetaDia.Me.UsePower(CombatBase.CurrentPower.SNOPower, vAttackPoint, CurrentWorldDynamicId, -1);
                                 if (CombatBase.CurrentPower.SNOPower == SNOPower.Monk_TempestRush)
-                                    LastTempestRushLocation = vAttackPoint;
+                                    MonkCombat.LastTempestRushLocation = vAttackPoint;
                             }
                             else
                             {
                                 // Standard attack - attack the ACDGUID (equivalent of left-clicking the object in-game)
                                 ZetaDia.Me.UsePower(CombatBase.CurrentPower.SNOPower, Vector3.Zero, -1, CurrentTarget.ACDGuid);
                                 if (CombatBase.CurrentPower.SNOPower == SNOPower.Monk_TempestRush)
-                                    LastTempestRushLocation = CurrentTarget.Position;
+                                    MonkCombat.LastTempestRushLocation = CurrentTarget.Position;
                             }
 
                             int interactAttempts;
@@ -1525,9 +1525,9 @@ namespace Trinity
                 {
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "UsePower SUCCESS {0} at {1} on {2} dist={3}", CombatBase.CurrentPower.SNOPower, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetACDGUID, dist);
                     if (CombatBase.CurrentPower.SNOPower == SNOPower.Monk_TempestRush)
-                        LastTempestRushLocation = CombatBase.CurrentPower.TargetPosition;
+                        MonkCombat.LastTempestRushLocation = CombatBase.CurrentPower.TargetPosition;
 
-                    Monk_MaintainTempestRush();
+                    MonkCombat.Monk_MaintainTempestRush();
                     SpellTracker.TrackSpellOnUnit(CombatBase.CurrentPower.TargetACDGUID, CombatBase.CurrentPower.SNOPower);
                     SpellHistory.RecordSpell(CombatBase.CurrentPower);
 

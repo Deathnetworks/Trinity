@@ -336,6 +336,8 @@ namespace Trinity
             335505, // x1_malthael_drainSoul_ghost
             325136, // x1_Malthael_DeathFogMonster
             340512, // x1_Malthael_Mephisto_LightningObject
+
+            359693, //Server Prop X1_Unique_Monster_Generic_AOE_DOT_Fire_10foot-24594 (359693)
         };
 
         /// <summary>

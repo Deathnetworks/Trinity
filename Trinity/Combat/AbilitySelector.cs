@@ -99,7 +99,7 @@ namespace Trinity
                             break;
                         // Monks
                         case ActorClass.Monk:
-                            power = GetMonkPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
+                            power = MonkCombat.GetPower();
                             break;
                         // Wizards
                         case ActorClass.Wizard:

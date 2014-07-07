@@ -690,6 +690,10 @@ namespace Trinity
                                     if (cacheObject.Distance <= 60f)
                                         cacheObject.Weight += 1500d;
 
+                                    // Primary resource is low and we're wearing Reapers Wraps
+                                    if (Me.IsInCombat && Player.PrimaryResourcePct < 0.3 && Legendary.ReapersWraps.IsEquipped && (TargetUtil.AnyMobsInRange(40, 5) || TargetUtil.AnyElitesInRange(40)))
+                                        cacheObject.Weight += 3000d;
+
                                     // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                     if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.Distance <= 25f)
                                         cacheObject.Weight += 800;

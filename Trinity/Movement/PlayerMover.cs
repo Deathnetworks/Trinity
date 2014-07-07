@@ -620,7 +620,7 @@ namespace Trinity.DbProvider
                     }
 
                     // Always set this from PlayerMover
-                    Trinity.LastTempestRushLocation = vTargetAimPoint;
+                    MonkCombat.LastTempestRushLocation = vTargetAimPoint;
 
                 }
 

@@ -299,7 +299,7 @@ namespace Trinity.Combat.Abilities
                 {
                     if (Trinity.Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_SweepingWind))
                     {
-                        Trinity.Monk_TickSweepingWindSpam();
+                        MonkCombat.Monk_TickSweepingWindSpam();
                     }
 
                     Trinity.ShouldRefreshHotbarAbilities = true;
@@ -508,5 +508,9 @@ namespace Trinity.Combat.Abilities
         {
             return power == null;
         }
+
+
+
     }
+
 }
