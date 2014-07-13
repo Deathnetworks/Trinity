@@ -261,10 +261,10 @@ namespace Trinity.Combat.Abilities
                         //Logger.LogNormal("{0} {1} is fully debuffed, switched to {2} {3}", oldTarget.InternalName, oldTarget.ACDGuid, CurrentTarget.InternalName, CurrentTarget.ACDGuid);
                     }
 
-                    // Save mana for locust swarm
-                    if (!CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Locust_Swarm) && CanCast(SNOPower.Witchdoctor_Locust_Swarm) && Player.PrimaryResource < 300)
+                    // Save mana for locust swarm || piranhas
+                    if (!CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Locust_Swarm) && Player.PrimaryResource < 300)
                     {
-                        //Logger.LogNormal("Saving for Locust Swarm");
+                        //Logger.LogNormal("Saving mana");
                         return CombatBase.DefaultPower;
                     }
 
