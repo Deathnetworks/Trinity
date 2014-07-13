@@ -16,6 +16,7 @@ namespace Trinity
     class TargetUtil
     {
         #region Helper fields
+
         private static List<TrinityCacheObject> ObjectCache
         {
             get
@@ -130,11 +131,6 @@ namespace Trinity
         /// <summary>
         /// Checks to make sure there's at least one valid cluster with the minimum monster count
         /// </summary>
-        /// <param name="radius"></param>
-        /// <param name="maxRange"></param>
-        /// <param name="minCount"></param>
-        /// <param name="forceElites"></param>
-        /// <returns></returns>
         internal static bool ClusterExists(float radius = 15f, float maxRange = 90f, int minCount = 2, bool forceElites = true)
         {
             if (radius < 5f)
@@ -155,6 +151,35 @@ namespace Trinity
                  select u).Any();
 
             return clusterCheck;
+        }
+        /// <summary>
+        /// Return a cluster of specified size and radius
+        /// </summary>
+        internal static Vector3 GetClusterPoint(float clusterRadius = 15f, int minCount = 2)
+        {
+            if (clusterRadius < 5f)
+                clusterRadius = 5f;
+            if (minCount < 1)
+                minCount = 1;
+
+            if (CurrentTarget == null)
+                return Player.Position;
+
+            if (ObjectCache.Any(u => u.IsUnit && u.IsBossOrEliteRareUnique && u.RadiusDistance < 200))
+                return CurrentTarget.Position;
+
+            var clusterUnit =
+                (from u in ObjectCache
+                 where u.IsUnit && u.CommonData!= null && u.CommonData.IsValid &&
+                 u.RadiusDistance <= 200 &&
+                 u.NearbyUnitsWithinDistance(clusterRadius) >= minCount
+                 orderby u.NearbyUnitsWithinDistance(clusterRadius)
+                 select u).FirstOrDefault();
+
+            if (clusterUnit == null)
+                return CurrentTarget.Position;
+
+            return clusterUnit.Position;
         }
 
         internal static TrinityCacheObject GetBestPierceTarget(float maxRange, int arcDegrees = 0)
@@ -372,6 +397,7 @@ namespace Trinity
 
             return bestClusterUnit;
         }
+
         /// <summary>
         /// Finds the optimal cluster position, works regardless if there is a cluster or not (will return single unit position if not). This is not a K-Means cluster, but rather a psuedo cluster based
         /// on the number of other monsters within a radius of any given unit
@@ -470,6 +496,44 @@ namespace Trinity
 
             return inRangeCount >= unitsRequired;
         }
+        /// <summary>
+        /// Checks if there are any mobs in range of the specified position
+        /// </summary>
+        internal static int NumMobsInRangeOfPosition(Vector3 position, float range = 15f)
+        {
+            return (from u in ObjectCache
+                                where u.IsUnit &&
+                                        u.Weight > 0 &&
+                                        u.CommonData != null && u.CommonData.IsValid &&
+                                        u.Position.Distance2D(position) <= range
+                                select u).Count();
+        }
+        /// <summary>
+        /// Checks if there are any bosses in range of the specified position
+        /// </summary>
+        internal static int NumBossInRangeOfPosition(Vector3 position, float range = 15f)
+        {
+            return (from u in ObjectCache
+                    where u.IsUnit &&
+                            u.Weight > 0 &&
+                            u.IsBoss &&
+                            u.CommonData != null && u.CommonData.IsValid &&
+                            u.Position.Distance2D(position) <= range
+                    select u).Count();
+        }
+        /// <summary>
+        /// Returns list of units within the specified range
+        /// </summary>
+        internal static List<TrinityCacheObject> ListUnitsInRangeOfPosition(Vector3 position, float range = 15f)
+        {
+            return (from u in ObjectCache
+                where u.IsUnit &&
+                    u.Weight > 0 &&
+                    u.CommonData != null && u.CommonData.IsValid &&
+                    u.Position.Distance2D(position) <= range
+                select u).ToList();
+        }
+
         internal static bool AnyTrashInRange(float range = 10f, int minCount = 1, bool useWeights = true)
         {
             if (range < 5f)
@@ -519,6 +583,34 @@ namespace Trinity
                     o.IsBossOrEliteRareUnique &&
                     o.RadiusDistance <= range
                     select o).Count() >= minCount;
+        }
+        /// <summary>
+        /// Checks if there are any mobs in range of the specified position
+        /// </summary>
+        internal static bool AnyElitesInRangeOfPosition(Vector3 position, float range = 15f, int unitsRequired = 1)
+        {
+            var inRangeCount = (from u in ObjectCache
+                                where u.IsUnit &&
+                                        u.Weight > 0 &&
+                                        u.IsBossOrEliteRareUnique &&
+                                        u.CommonData != null && u.CommonData.IsValid &&
+                                        u.Position.Distance2D(position) <= range
+                                select u).Count();
+
+            return inRangeCount >= unitsRequired;
+        }
+        /// <summary>
+        /// Count of elites within range of position
+        /// </summary>
+        internal static int NumElitesInRangeOfPosition(Vector3 position, float range = 15f)
+        {
+            return (from u in ObjectCache
+                                where u.IsUnit &&
+                                        u.Weight > 0 &&
+                                        u.IsBossOrEliteRareUnique &&
+                                        u.CommonData != null && u.CommonData.IsValid &&
+                                        u.Position.Distance2D(position) <= range
+                                select u).Count();
         }
         /// <summary>
         /// Returns true if there is any elite units within the given range
@@ -807,6 +899,93 @@ namespace Trinity
             return percentWithinBand >= percentage;
         }
 
+
+        internal static TrinityCacheObject GetBestHarvestTarget(float skillRange, float maxRange = 30f)
+        {
+            TrinityCacheObject harvestTarget =
+            (from u in ObjectCache
+             where u.IsUnit &&
+             u.RadiusDistance <= maxRange &&
+             u.IsBossOrEliteRareUnique &&
+             u.CommonData.GetAttribute<int>(ActorAttributeType.BuffVisualEffect) != 0
+             orderby u.NearbyUnitsWithinDistance(skillRange) descending
+             select u).FirstOrDefault();
+            if (harvestTarget != null)
+                return harvestTarget;
+
+            return (from u in ObjectCache
+                    where u.IsUnit &&
+                    u.RadiusDistance <= maxRange &&
+                    u.CommonData.GetAttribute<int>(ActorAttributeType.BuffVisualEffect) != 0
+                    orderby u.NearbyUnitsWithinDistance(skillRange) descending
+                    select u).FirstOrDefault();
+        }
+
+        internal static bool PercentOfMobsDebuffed(float maxRange = 30f, float minPercent = 0.5f)
+        {  
+            int debuffed = (from u in ObjectCache
+                            where u.IsUnit &&
+                            u.RadiusDistance <= maxRange &&
+                            u.CommonData.GetAttribute<int>(ActorAttributeType.BuffVisualEffect) != 0
+                            select u).Count();
+
+            int all = (from u in ObjectCache
+                       where u.IsUnit &&
+                       u.RadiusDistance <= maxRange
+                       select u).Count();
+
+            if (debuffed / all >= minPercent)
+                return true;
+
+            return false;
+        }
+
+        internal static int MobsWithDebuff(SNOPower power, float maxRange = 30f)
+        {
+            return (from u in ObjectCache
+                    where u.IsUnit &&
+                    u.RadiusDistance <= maxRange &&
+                    u.HasDebuff(power)
+                    select u).Count();
+        }
+
+        internal static int MobsWithDebuff(IEnumerable<SNOPower> powers, float maxRange = 30f)
+        {
+            return (from u in ObjectCache
+                    where u.IsUnit &&
+                    u.RadiusDistance <= maxRange &&
+                    powers.Any(u.HasDebuff)
+                    select u).Count();
+        }
+
+        internal static int MobsWithDebuff(IEnumerable<SNOPower> powers, IEnumerable<TrinityCacheObject> units)
+        {
+            return (from u in units
+                    where u.IsUnit &&
+                    powers.Any(u.HasDebuff)
+                    select u).Count();
+        }
+
+        internal static int DebuffCount(IEnumerable<SNOPower> powers, float maxRange = 30f)
+        {
+            return (from u in ObjectCache
+                    where u.IsUnit &&
+                    u.RadiusDistance <= maxRange &&
+                    powers.Any(u.HasDebuff)
+                    select powers.Count(u.HasDebuff)
+                    ).Sum();
+        }
+
+        internal static int DebuffCount(IEnumerable<SNOPower> powers, IEnumerable<TrinityCacheObject> units)
+        {
+            return (from u in units
+                    where u.IsUnit &&
+                    powers.Any(u.HasDebuff)
+                    select powers.Count(u.HasDebuff)
+                    ).Sum();
+        }
+
+
         internal static TrinityCacheObject LowestHealthTarget(float range, Vector3 position = new Vector3(), SNOPower debuff = SNOPower.None)
         {
             if (position == new Vector3())
@@ -831,6 +1010,33 @@ namespace Trinity
                 lowestHealthTarget = default(TrinityCacheObject);
 
             return lowestHealthTarget;
+        }
+
+        internal static TrinityCacheObject BestTargetWithoutDebuffs(float range, IEnumerable<SNOPower> debuffs, Vector3 position = new Vector3())
+        {
+            if (position == new Vector3())
+                position = Player.Position;
+
+            TrinityCacheObject target;
+            var unitsByWeight = (from u in ObjectCache
+
+                                 where u.IsUnit &&
+                                        u.Weight > 0 &&
+                                        u.CommonData != null && u.CommonData.IsValid &&
+                                        u.Position.Distance2D(position) <= range &&
+                                        !debuffs.All(u.HasDebuff)
+                                 orderby u.Weight descending 
+                                 select u).ToList();
+
+            if (unitsByWeight.Any())
+                target = unitsByWeight.FirstOrDefault();
+
+            else if (Trinity.CurrentTarget != null)
+                target = Trinity.CurrentTarget;
+            else
+                target = default(TrinityCacheObject);
+
+            return target;
         }
 
         internal static TrinityCacheObject GetDashStrikeFarthestTarget(float maxRange, float procDistance = 33f, int arcDegrees = 0)
@@ -882,6 +1088,8 @@ namespace Trinity
 
             return bestClusterPoint;
         }
+
+
 
     }
 }

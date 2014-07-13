@@ -96,6 +96,8 @@ namespace Trinity
                 c_IgnoreReason = "ACDInvalid";
             }
 
+            CurrentCacheObject.LastSeenTime = DateTime.UtcNow;
+
             // Position
             CurrentCacheObject.Position = CurrentCacheObject.Object.Position;
 

@@ -105,7 +105,9 @@
     <Compile Include="Combat\Abilities\WizardCombat.cs" />
     <Compile Include="Combat\AvoidanceManager.cs" />
     <Compile Include="Combat\AvoidanceType.cs" />
+    <Compile Include="Combat\Enemies.cs" />
     <Compile Include="Combat\SpellTracker.cs" />
+    <Compile Include="Configuration\Events.cs" />
     <Compile Include="Configuration\TVar.cs" />
     <Compile Include="Configuration\TVars.cs" />
     <Compile Include="DbProvider\DeathHandler.cs" />
@@ -161,6 +163,7 @@
     <Compile Include="Reference\Runes.cs" />
     <Compile Include="Reference\Sets.cs" />
     <Compile Include="Reference\Skills.cs" />
+    <Compile Include="Combat\CombatMovement.cs" />
     <Compile Include="Settings\Combat\CrusaderSetting.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Combat\HandleTarget.cs" />

@@ -1,17 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
-using System.Threading.Tasks;
-using Trinity;
 using Trinity.Combat;
 using Trinity.Combat.Abilities;
-using Trinity.Helpers;
 using Trinity.Reference;
 using Zeta.Game;
-using Zeta.Game.Internals;
+using Zeta.Common;
 using Zeta.Game.Internals.Actors;
 
 namespace Trinity.Objects
@@ -110,13 +104,35 @@ namespace Trinity.Objects
         }
 
         /// <summary>
-        /// Base cooldown; uses rune value when applicable (does not take into account item cooldown reduction).
+        /// Cooldown; uses rune value when applicable and cooldown reduction from items.
         /// </summary>
         public TimeSpan Cooldown
         {
-            get { return CurrentRune.ModifiedCooldown.HasValue ? CurrentRune.ModifiedCooldown.Value : _cooldown; }
+            get
+            {
+                var baseCooldown = CurrentRune.ModifiedCooldown.HasValue ? CurrentRune.ModifiedCooldown.Value : _cooldown;
+                var newCooldownMilliseconds = baseCooldown.TotalMilliseconds * (1 - Trinity.Player.CooldownReductionPct);
+                var finalCooldown = Trinity.Player.CooldownReductionPct > 0 ? TimeSpan.FromMilliseconds(newCooldownMilliseconds) : baseCooldown;
+                return finalCooldown;
+            }
             set { _cooldown = value;  }
         }
+
+        /// <summary>
+        /// Milliseconds until spell is off cooldown
+        /// </summary>
+        public int CooldownRemaining
+        {
+            get
+            {
+                if (TimeSinceUse > 9999999) return 0;
+                var castTime = DateTime.UtcNow.Subtract(TimeSpan.FromMilliseconds(TimeSinceUse));
+                var endTime = castTime.Add(Cooldown);                
+                var remainingMilliseconds = DateTime.UtcNow.Subtract(endTime).TotalMilliseconds;
+                return remainingMilliseconds < 0 ? (int)remainingMilliseconds * -1 : 0;;
+            }
+        }
+
 
         /// <summary>
         /// Element for this skill (lightning/fire etc); uses rune value when applicable.
@@ -183,9 +199,8 @@ namespace Trinity.Objects
             get
             {
                 if (ZetaDia.IsInGame && ZetaDia.Me.IsValid && ZetaDia.CPlayer.IsValid && IsActive)
-                {
                     return ZetaDia.CPlayer.GetActiveSkillBySlot(HotbarSkills.BySNOPower(SNOPower).Slot).HasRuneEquipped;
-                }
+
                 return false;
             }
         }        
@@ -203,26 +218,89 @@ namespace Trinity.Objects
         /// </summary>
         public bool IsTrackedOnUnit(TrinityCacheObject unit)
         {
-            return SpellTracker.IsUnitTracked(unit, SNOPower);
+            return unit.HasDebuff(SNOPower);
         }
 
         /// <summary>
-        /// Record this skill as being on the specified unit; for the specified time.
-        /// </summary>
-        public void TrackOnUnit(TrinityCacheObject unit, float duration = 0f)
-        {
-            SpellTracker.TrackSpellOnUnit(unit.ACDGuid, SNOPower, duration);
-        }
-
-        /// <summary>
-        /// Gets the time in Millseconds since we've used the specified power
+        /// Time since last used
         /// </summary>
         public double TimeSinceUse
         {
+            get {  return DateTime.UtcNow.Subtract(LastUsed).TotalMilliseconds; }
+        }
+
+        /// <summary>
+        /// When this spell was last used
+        /// </summary>
+        public DateTime LastUsed
+        {
             get
             {
-                return CombatBase.TimeSincePowerUse(SNOPower);                
+                DateTime dt;
+                return CacheData.AbilityLastUsed.TryGetValue(SNOPower, out dt) ? dt : DateTime.MinValue;
             }
+        }
+
+        /// <summary>
+        /// This skill as TrinityPower
+        /// </summary>
+        public TrinityPower ToPower
+        {
+            get { return new TrinityPower(SNOPower); }
+        }
+
+        /// <summary>
+        /// Cast this skill at the current position
+        /// </summary>
+        public void Cast()
+        {
+            Cast(Trinity.Player.Position, -1);
+        }
+
+        /// <summary>
+        /// Cast this skill at the specified position
+        /// </summary>
+        public void Cast(Vector3 position)
+        {
+            Cast(position, -1);
+        }
+
+        /// <summary>
+        /// Cast this skill at the specified target
+        /// </summary>
+        public void Cast (TrinityCacheObject target)
+        {
+            Cast(target.Position, target.ACDGuid);
+        }
+
+        /// <summary>
+        /// Cast this speed using TrinityPower
+        /// </summary>
+        public void Cast(TrinityPower power)
+        {
+            Cast(power.TargetPosition, power.TargetACDGUID);
+        }
+
+        /// <summary>
+        /// Cast this skill
+        /// </summary>
+        public void Cast(Vector3 clickPosition, int targetAcdGuid)
+        {
+            if (SNOPower != SNOPower.None && clickPosition != Vector3.Zero && IsActive && GameIsReady)
+            {
+                if (ZetaDia.Me.UsePower(SNOPower, clickPosition, Trinity.CurrentWorldDynamicId, targetAcdGuid))
+                {
+                    Trinity.LastPowerUsed = SNOPower;
+                    CacheData.AbilityLastUsed[SNOPower] = DateTime.UtcNow;
+                    SpellTracker.TrackSpellOnUnit(CombatBase.CurrentTarget.ACDGuid, SNOPower);
+                    SpellHistory.RecordSpell(SNOPower);
+                }
+            }
+        }
+
+        private bool GameIsReady
+        {
+            get { return ZetaDia.IsInGame && ZetaDia.Me.IsValid && !ZetaDia.IsLoadingWorld && !ZetaDia.IsInTown && !ZetaDia.IsPlayingCutscene; }
         }
 
         /// <summary>
@@ -234,6 +312,6 @@ namespace Trinity.Objects
         }
 
     }
-
-
 }
+
+

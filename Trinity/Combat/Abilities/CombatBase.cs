@@ -20,6 +20,7 @@ namespace Trinity.Combat.Abilities
         private static bool _isCombatAllowed = true;
         private static KiteMode _playerKiteMode = KiteMode.Never;
 
+        public static CombatMovementManager CombatMovement = new CombatMovementManager();
 
         public enum CanCastFlags
         {

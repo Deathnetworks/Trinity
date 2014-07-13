@@ -5,6 +5,7 @@ using System.Linq;
 using Trinity.Cache;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
+using Trinity.Configuration;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Common;
@@ -366,7 +367,9 @@ namespace Trinity
                         }
                     }
                 }
+
                 // We have a target and the cached was refreshed
+                Events.OnCacheUpdatedHandler.Invoke();
                 return true;
             }
         }

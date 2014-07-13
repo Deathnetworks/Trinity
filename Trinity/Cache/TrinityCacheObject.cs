@@ -98,6 +98,7 @@ namespace Trinity
         public ItemType DBItemType { get; set; }
         public FollowerType FollowerType { get; set; }
         public GItemType TrinityItemType { get; set; }
+        public DateTime LastSeenTime { get; set; }
         public bool IsElite { get; set; }
         public bool IsRare { get; set; }
         public bool IsUnique { get; set; }
@@ -228,6 +229,28 @@ namespace Trinity
                  u.IsUnit &&
                  MathUtil.IntersectsPath(u.Position, u.Radius, Trinity.Player.Position, this.Position)
                  select u).Count();
+        }
+
+        public bool HasDebuff(SNOPower debuffSNO)
+        {
+            try
+            {
+                if (CommonData.GetAttribute<int>(((int)debuffSNO << 12) + ((int)ActorAttributeType.PowerBuff0VisualEffect & 0xFFF)) == 1)
+                    return true;
+                if (CommonData.GetAttribute<int>(((int)debuffSNO << 12) + ((int)ActorAttributeType.PowerBuff0VisualEffectA & 0xFFF)) == 1)
+                    return true;
+                if (CommonData.GetAttribute<int>(((int)debuffSNO << 12) + ((int)ActorAttributeType.PowerBuff0VisualEffectB & 0xFFF)) == 1)
+                    return true;
+                if (CommonData.GetAttribute<int>(((int)debuffSNO << 12) + ((int)ActorAttributeType.PowerBuff0VisualEffectC & 0xFFF)) == 1)
+                    return true;
+                if (CommonData.GetAttribute<int>(((int)debuffSNO << 12) + ((int)ActorAttributeType.PowerBuff0VisualEffectD & 0xFFF)) == 1)
+                    return true;
+                if (CommonData.GetAttribute<int>(((int)debuffSNO << 12) + ((int)ActorAttributeType.PowerBuff0VisualEffectE & 0xFFF)) == 1)
+                    return true;
+
+            }
+            catch (Exception) { }
+            return false;
         }
     }
 }

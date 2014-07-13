@@ -35,6 +35,9 @@ namespace Trinity
         public double SecondaryResourceMax { get; set; }
         public double SecondaryResourceMissing { get; set; }
 
+        public float CooldownReductionPct { get; set; }
+        public float ResourceCostReductionPct { get; set; }
+
         public Vector3 Position { get; set; }
         public bool WaitingForReserveEnergy { get; set; }
         public int MyDynamicID { get; set; }
@@ -193,6 +196,9 @@ namespace Trinity
                     Player.ActorClass = me.ActorClass;
                     Player.BattleTag = FileManager.BattleTagName;
                     Player.LevelAreaId = ZetaDia.CurrentLevelAreaId;
+
+                    Player.CooldownReductionPct = ZetaDia.Me.CommonData.GetAttribute<float>(ActorAttributeType.PowerCooldownReductionPercentAll);
+                    Player.ResourceCostReductionPct = ZetaDia.Me.CommonData.GetAttribute<float>(ActorAttributeType.ResourceCostReductionPercentAll);                        
 
                     Player.CurrentExperience = ZetaDia.Me.CurrentExperience;
                     Player.ExperienceNextLevel = ZetaDia.Me.ExperienceNextLevel;

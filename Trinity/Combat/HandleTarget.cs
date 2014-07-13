@@ -216,6 +216,11 @@ namespace Trinity
                         }
                     }
 
+                    if (CombatBase.CombatMovement.IsQueuedMovement & CombatBase.IsCombatAllowed)
+                    {
+                        return CombatBase.CombatMovement.Execute();
+                    }
+
                     if (CurrentTarget == null && (ForceVendorRunASAP || IsReadyToTownRun) && !Zeta.Bot.Logic.BrainBehavior.IsVendoring && TownRun.TownRunTimerRunning())
                     {
                         Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "CurrentTarget is null but we are ready to to Town Run, waiting... ");

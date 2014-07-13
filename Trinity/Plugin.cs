@@ -3,6 +3,9 @@ using System.IO;
 using System.Threading;
 using System.Windows;
 using Trinity.Cache;
+using Trinity.Combat;
+using Trinity.Combat.Abilities;
+using Trinity.Configuration;
 using Trinity.DbProvider;
 using Trinity.Helpers;
 using Trinity.Items;
@@ -106,7 +109,7 @@ namespace Trinity
                     // Recording of all the XML's in use this run
                     UsedProfileManager.RecordProfile();
 
-                    Monk_MaintainTempestRush();
+                    MonkCombat.Monk_MaintainTempestRush();
                 }
                 catch (AccessViolationException)
                 {
@@ -181,6 +184,8 @@ namespace Trinity
                     BeginInvoke(BotManager.SetBotTicksPerSecond);
 
                     UI.UILoader.PreLoadWindowContent();
+
+                    Events.OnCacheUpdated += Enemies.Update;
 
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ENABLED: {0} now in action!", Description);
                 }

@@ -1,15 +1,32 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using Trinity.Reference;
 using Zeta.Common;
-using Zeta.Game;
 using Zeta.Game.Internals.Actors;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.Combat.Abilities
 {
     public class WitchDoctorCombat : CombatBase
     {
+
+        private static HashSet<SNOPower> harvesterDebuffs = new HashSet<SNOPower>
+        {
+            SNOPower.Witchdoctor_Haunt,
+            SNOPower.Witchdoctor_Locust_Swarm,
+            SNOPower.Witchdoctor_Piranhas,
+            SNOPower.Witchdoctor_AcidCloud
+        };
+
+        private static HashSet<SNOPower> harvesterCoreDebuffs = new HashSet<SNOPower>
+        {
+            SNOPower.Witchdoctor_Haunt,
+            SNOPower.Witchdoctor_Locust_Swarm,
+        };
+
         public static System.Diagnostics.Stopwatch VisionQuestRefreshTimer = new System.Diagnostics.Stopwatch();
         public static long GetTimeSinceLastVisionQuestRefresh()
         {
@@ -18,7 +35,6 @@ namespace Trinity.Combat.Abilities
 
             return VisionQuestRefreshTimer.ElapsedMilliseconds;
         }
-
 
         public static TrinityPower GetPower()
         {
@@ -30,7 +46,6 @@ namespace Trinity.Combat.Abilities
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
             }
-
 
             // Combat Avoidance Spells
             if (!UseOOCBuff && IsCurrentlyAvoiding)
@@ -50,6 +65,7 @@ namespace Trinity.Combat.Abilities
             // Combat Spells with a Target
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CurrentTarget != null)
             {
+
                 bool hasGraveInjustice = HotbarSkills.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice);
 
                 bool hasAngryChicken = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Hex && s.RuneIndex == 1);
@@ -69,6 +85,18 @@ namespace Trinity.Combat.Abilities
                 else if (Hotbar.Contains(SNOPower.Witchdoctor_ZombieCharger) && Player.PrimaryResource >= 150)
                     basicAttackRange = 30f;
 
+                // Summon Pets  -----------------------------------------------------------------------
+
+                // Zombie Dogs non-sacrifice build
+                if (!Skills.WitchDoctor.Sacrifice.IsActive && CanCast(SNOPower.Witchdoctor_SummonZombieDog) && Trinity.PlayerOwnedZombieDogCount <= 2)
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog);
+                }
+
+                if (CanCast(SNOPower.Witchdoctor_Gargantuan) && !Runes.WitchDoctor.RestlessGiant.IsActive && !Runes.WitchDoctor.WrathfulProtector.IsActive && Trinity.PlayerOwnedGargantuanCount == 0)
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_Gargantuan);
+                }
 
                 // Hex with angry chicken, is chicken, explode!
                 if (isChicken && (TargetUtil.AnyMobsInRange(12f, 1, false) || CurrentTarget.RadiusDistance <= 10f || UseDestructiblePower) &&
@@ -159,19 +187,90 @@ namespace Trinity.Combat.Abilities
                 bool hasVengefulSpirit = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SoulHarvest && s.RuneIndex == 4);
                 bool hasSwallowYourSoul = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SoulHarvest && s.RuneIndex == 3);
 
-                // Soul Harvest Any Elites or to increase buff stacks
-                if (CanCast(SNOPower.Witchdoctor_SoulHarvest) &&
-                    (TargetUtil.AnyMobsInRange(16f, GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) + 1, false) || (hasSwallowYourSoul && Player.PrimaryResourcePct <= 0.50) || TargetUtil.IsEliteTargetInRange(16f)))
+
+                // START Jade Harvester -----------------------------------------------------------------------
+
+                if (Sets.RaimentOfTheJadeHarvester.IsMaxBonusActive)
                 {
-                    return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest);
+
+                    // Piranhas
+                    if (CanCast(SNOPower.Witchdoctor_Piranhas) && Player.PrimaryResource >= 250 &&
+                        (TargetUtil.ClusterExists(15f, 45f) || TargetUtil.AnyElitesInRange(45f)) &&
+                        LastPowerUsed != SNOPower.Witchdoctor_Piranhas &&
+                        Player.PrimaryResource >= 250)
+                    {
+                        return new TrinityPower(SNOPower.Witchdoctor_Piranhas, 25f, Enemies.BestCluster.Position);
+                    }
+
+                    // Should we move to cluster for harvest
+                    if (IdealSoulHarvestCriteria(Enemies.BestLargeCluster))
+                    {
+                        //LogTargetArea("--- Found a good harvest location...", Enemies.BestLargeCluster);
+                        MoveToSoulHarvestPoint(Enemies.BestLargeCluster);
+                    }
+
+                    // Is there a slightly better position than right here
+                    if (MinimumSoulHarvestCriteria(Enemies.BestCluster) && (Enemies.BestCluster.EliteCount >= 2 || Enemies.BestCluster.UnitCount > 4))
+                    {
+                        //LogTargetArea("--- Found an average harvest location...", Enemies.BestCluster);
+                        MoveToSoulHarvestPoint(Enemies.BestCluster);
+                    }
+
+                    // Should we harvest right here?
+                    if (MinimumSoulHarvestCriteria(Enemies.CloseNearby))
+                    {
+                        //LogTargetArea("--- Harvesting (CurrentPosition)", Enemies.CloseNearby);
+                        return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest);
+                    }
+
+                    // Locust Swarm
+                    if (CanCast(SNOPower.Witchdoctor_Locust_Swarm) && Player.PrimaryResource >= 300 &&
+                        !CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Locust_Swarm))
+                    {
+                        return new TrinityPower(SNOPower.Witchdoctor_Locust_Swarm, 5f, CurrentTarget.ACDGuid);
+                    }
+
+                    // Haunt 
+                    if (Skills.WitchDoctor.Haunt.CanCast() && Player.PrimaryResource >= 50 &&
+                        !CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Haunt))
+                    {
+                        return new TrinityPower(SNOPower.Witchdoctor_Haunt, 21f, CurrentTarget.ACDGuid);
+                    }
+
+                    // Acid Cloud
+                    if (Skills.WitchDoctor.AcidCloud.CanCast() && Player.PrimaryResource >= 325 &&
+                        LastPowerUsed != SNOPower.Witchdoctor_AcidCloud)
+                    {
+                        Vector3 bestClusterPoint;
+                        if (Passives.WitchDoctor.GraveInjustice.IsActive)
+                            bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, Math.Min(Player.GoldPickupRadius + 8f, 30f));
+                        else
+                            bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, 30f);
+
+                        return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, rangedAttackMaxRange, bestClusterPoint);
+                    }
+
+                    // Spread the love around
+                    if (!CurrentTarget.IsTreasureGoblin && CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Locust_Swarm) &&
+                        CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Haunt) && Enemies.Nearby.UnitCount > 3 && 
+                        Enemies.Nearby.DebuffedPercent(harvesterCoreDebuffs) < 0.5)
+                    {
+                        //var oldTarget = Trinity.CurrentTarget;
+                        Trinity.Blacklist3Seconds.Add(CurrentTarget.RActorGuid);
+                        Trinity.CurrentTarget = Enemies.BestCluster.GetTargetWithoutDebuffs(harvesterCoreDebuffs);
+                        //Logger.LogNormal("{0} {1} is fully debuffed, switched to {2} {3}", oldTarget.InternalName, oldTarget.ACDGuid, CurrentTarget.InternalName, CurrentTarget.ACDGuid);
+                    }
+
+                    // Save mana for locust swarm
+                    if (!CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Locust_Swarm) && CanCast(SNOPower.Witchdoctor_Locust_Swarm) && Player.PrimaryResource < 300)
+                    {
+                        //Logger.LogNormal("Saving for Locust Swarm");
+                        return CombatBase.DefaultPower;
+                    }
+
                 }
 
-                // Soul Harvest with VengefulSpirit
-                if (CanCast(SNOPower.Witchdoctor_SoulHarvest) && hasVengefulSpirit &&
-                    TargetUtil.AnyMobsInRange(16, 3))
-                {
-                    return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest);
-                }
+                // END Jade Harvester -----------------------------------------------------------------------
 
                 // Sacrifice
                 if (CanCast(SNOPower.Witchdoctor_Sacrifice) && Trinity.PlayerOwnedZombieDogCount > 0 &&
@@ -213,11 +312,7 @@ namespace Trinity.Combat.Abilities
 
                 bool hasSacrifice = Hotbar.Contains(SNOPower.Witchdoctor_Sacrifice);
 
-                // Zombie Dogs non-sacrifice build
-                if (!hasSacrifice && CanCast(SNOPower.Witchdoctor_SummonZombieDog) && Trinity.PlayerOwnedZombieDogCount <= 2)
-                {
-                    return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog);
-                }
+
 
                 // Zombie Dogs for Sacrifice
                 if (hasSacrifice && CanCast(SNOPower.Witchdoctor_SummonZombieDog) &&
@@ -374,6 +469,20 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.Witchdoctor_ZombieCharger, zombieChargerRange, CurrentTarget.Position);
                 }
 
+                // Soul Harvest Any Elites or to increase buff stacks
+                if (!Sets.RaimentOfTheJadeHarvester.IsMaxBonusActive && CanCast(SNOPower.Witchdoctor_SoulHarvest) &&
+                    (TargetUtil.AnyMobsInRange(16f, GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) + 1, false) || (hasSwallowYourSoul && Player.PrimaryResourcePct <= 0.50) || TargetUtil.IsEliteTargetInRange(16f)))
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest);
+                }
+
+                // Soul Harvest with VengefulSpirit
+                if (!Sets.RaimentOfTheJadeHarvester.IsMaxBonusActive && CanCast(SNOPower.Witchdoctor_SoulHarvest) && hasVengefulSpirit &&
+                    TargetUtil.AnyMobsInRange(16, 3))
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest);
+                }
+
                 //skillDict.Add("Firebats", SNOPower.Witchdoctor_Firebats);
                 //runeDict.Add("DireBats", 0);
                 //runeDict.Add("VampireBats", 3);
@@ -499,7 +608,6 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog);
                 }
 
-
                 bool hasRestlessGiant = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Gargantuan && s.RuneIndex == 0);
                 bool hasWrathfulProtector = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Gargantuan && s.RuneIndex == 3);
 
@@ -515,13 +623,64 @@ namespace Trinity.Combat.Abilities
 
             return power;
         }
+        
+        private static readonly Func<TargetArea,bool> MinimumSoulHarvestCriteria = area =>
 
-        public static readonly HashSet<int> ZunimasaItemIds = new HashSet<int>()
+            //Harvest is off cooldown AND at least 2 debuffs exists && at least half of the units have a havestable debuff
+            Skills.WitchDoctor.SoulHarvest.CanCast() && area.TotalDebuffCount(harvesterCoreDebuffs) >= 2 && 
+            area.DebuffedCount(harvesterCoreDebuffs) >= area.UnitCount * 0.5 &&
+
+            // AND there's an elite, boss or more than 3 units or greater than half the units within sight are within this cluster
+            (area.EliteCount > 0 || area.BossCount > 0 || area.UnitCount >= 3 || area.UnitCount >= (float)Enemies.Nearby.UnitCount * 0.50);
+
+
+        private static readonly Func<TargetArea, bool> IdealSoulHarvestCriteria = area =>
+
+            // Harvest is off cooldown AND at least 7 debuffs are present (can be more than 1 per unit)
+            Skills.WitchDoctor.SoulHarvest.CanCast() && area.TotalDebuffCount(harvesterDebuffs) > 7 && 
+            
+            // AND average health accross units in area is more than 30%
+            area.AverageHealthPct > 0.3f &&
+
+            // AND at least 2 Elites, a boss or more than 5 units or 80% of the nearby units are within this area
+            (area.EliteCount >= 2 || area.BossCount > 0 || area.UnitCount >= 5 || area.UnitCount >= (float)Enemies.Nearby.UnitCount * 0.80);
+
+
+        private static readonly Action<string, TargetArea> LogTargetArea = (message, area) =>
         {
-            -960430780, // Zunimassa's String of Skulls
-            -1187722720, // Zunimassa's Pox
-            1941359608, // Zunimassa's Trail
+            Logger.LogNormal(message + " Units={0} Elites={1} DebuffedUnits={2} TotalDebuffs={4} AvgHealth={3:#.#} ---",
+                area.UnitCount,
+                area.EliteCount,
+                area.DebuffedCount(harvesterDebuffs),
+                area.AverageHealthPct * 100,
+                area.TotalDebuffCount(harvesterDebuffs));
         };
+
+        private static void MoveToSoulHarvestPoint(TargetArea area)
+        {
+            CombatMovement.Queue(new CombatMovement
+            {
+                Name = "Jade Harvest Location",
+                Destination = area.Position,
+                AcceptableDistance = 8f,
+                Verbose = false,
+                OnUpdate = m =>
+                {
+                    // Only change destination if the new target is way better
+                    if (IdealSoulHarvestCriteria(Enemies.BestLargeCluster) &&
+                        Enemies.BestLargeCluster.Position.Distance(m.Destination) > 10f)
+                        m.Destination = Enemies.BestLargeCluster.Position;
+                },
+                OnFinished = m =>
+                {
+                    if (MinimumSoulHarvestCriteria(Enemies.CloseNearby))
+                    {
+                        //LogTargetArea("--- Harvesting (CombatMovement)", area);
+                        Skills.WitchDoctor.SoulHarvest.Cast();                        
+                    }
+                }
+            });
+        }
 
         private static bool WitchDoctorHasPrimaryAttack
         {
