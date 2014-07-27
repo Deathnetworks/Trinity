@@ -19,6 +19,7 @@ namespace Trinity.Config.Combat
         private bool _UseDashingStrikeOOC;
         private int _MinCycloneTrashCount;
         private int _MinWoLTrashCount;
+        private int _MinJawBreakerRange;
         private bool _SpamSweepingWindOnLowHP;
         private float _AvoidArcaneHealth;
         private float _AvoidAzmoBodiesHealth;
@@ -284,6 +285,23 @@ namespace Trinity.Config.Combat
                 {
                     _MinWoLTrashCount = (int)value;
                     OnPropertyChanged("MinWoLTrashCount");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(33)]
+        public int MinJawBreakerRange
+        {
+            get
+            {
+                return _MinJawBreakerRange;
+            }
+            set
+            {
+                if (_MinJawBreakerRange != value)
+                {
+                    _MinJawBreakerRange = (int)value;
+                    OnPropertyChanged("MinJawBreakerRange");
                 }
             }
         }

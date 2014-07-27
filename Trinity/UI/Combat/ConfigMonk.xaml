@@ -21,6 +21,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -90,8 +91,21 @@
                 Value="{Binding Path=Monk.MinWoLTrashCount}" 
                 HorizontalAlignment="Stretch" Margin="2"/>
         </Grid>
+        <Grid Grid.Row="4" Margin="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Min. Jawbreaker Range" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+            <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                Interval="1" Maximum="35" Minimum="30"
+                SmallChange="1" LargeChange="1"
+                TickPlacement="BottomRight" IsSnapToTickEnabled="True"
+                Value="{Binding Path=Monk.MinJawBreakerRange}" 
+                HorizontalAlignment="Stretch" Margin="2"/>
+        </Grid>
         <!--Options for TR-->
-        <GroupBox Grid.Row="4" Margin="2" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+        <GroupBox Grid.Row="5" Margin="2" HorizontalAlignment="Stretch" VerticalAlignment="Top">
             <GroupBox.Header>
                 Tempest Rush
             </GroupBox.Header>
@@ -130,10 +144,10 @@
         </GroupBox>
 
 
-        <Grid Grid.Row="5" Margin="2">
+        <Grid Grid.Row="6" Margin="2">
             <ScrollViewer Tag="Combat\Avoidance.xaml" DataContext="{Binding Path=Monk}"/>
         </Grid>
         <!--Reset Button-->
-        <Button Grid.Row="6" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetMonkCommand}">Reset</Button>
+        <Button Grid.Row="7" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetMonkCommand}">Reset</Button>
     </Grid>
 </UserControl>

@@ -13,6 +13,7 @@ namespace Trinity.Combat.Abilities
     public class WitchDoctorCombat : CombatBase
     {
 
+
         private static HashSet<SNOPower> harvesterDebuffs = new HashSet<SNOPower>
         {
             SNOPower.Witchdoctor_Haunt,
@@ -39,13 +40,8 @@ namespace Trinity.Combat.Abilities
         public static TrinityPower GetPower()
         {
             TrinityPower power = null;
-
-
-            // Spirit Walk, always!
-            if (CanCast(SNOPower.Witchdoctor_SpiritWalk))
-            {
-                return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
-            }
+            //Min number of dogs to resummon
+            int MIN_ZombieDogs = Settings.Combat.WitchDoctor.TallMansFinger ? 0 : 2;
 
             // Combat Avoidance Spells
             if (!UseOOCBuff && IsCurrentlyAvoiding)
@@ -76,7 +72,7 @@ namespace Trinity.Combat.Abilities
                 // Set max ranged attack range, based on Grave Injustice, and current target NOT standing in avoidance, and health > 25%
                 float rangedAttackMaxRange = 30f;
                 if (hasGraveInjustice && !CurrentTarget.IsStandingInAvoidance && Player.CurrentHealthPct > 0.25)
-                    rangedAttackMaxRange = Math.Min(Player.GoldPickupRadius + 8f, 30f);
+                    rangedAttackMaxRange = Math.Min(Player.GoldPickupRadius + 20f, 30f);
 
                 // Set basic attack range, depending on whether or not we have Bears
                 float basicAttackRange = 35f;
@@ -88,7 +84,7 @@ namespace Trinity.Combat.Abilities
                 // Summon Pets  -----------------------------------------------------------------------
 
                 // Zombie Dogs non-sacrifice build
-                if (!Skills.WitchDoctor.Sacrifice.IsActive && CanCast(SNOPower.Witchdoctor_SummonZombieDog) && Trinity.PlayerOwnedZombieDogCount <= 2)
+                if (!Skills.WitchDoctor.Sacrifice.IsActive && CanCast(SNOPower.Witchdoctor_SummonZombieDog) && Trinity.PlayerOwnedZombieDogCount <= MIN_ZombieDogs)
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog);
                 }
@@ -252,7 +248,7 @@ namespace Trinity.Combat.Abilities
 
                     // Spread the love around
                     if (!CurrentTarget.IsTreasureGoblin && CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Locust_Swarm) &&
-                        CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Haunt) && Enemies.Nearby.UnitCount > 3 && 
+                        CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Haunt) && Enemies.Nearby.UnitCount > 3 &&
                         Enemies.Nearby.DebuffedPercent(harvesterCoreDebuffs) < 0.5)
                     {
                         //var oldTarget = Trinity.CurrentTarget;
@@ -316,7 +312,7 @@ namespace Trinity.Combat.Abilities
 
                 // Zombie Dogs for Sacrifice
                 if (hasSacrifice && CanCast(SNOPower.Witchdoctor_SummonZombieDog) &&
-                    (LastPowerUsed == SNOPower.Witchdoctor_Sacrifice || Trinity.PlayerOwnedZombieDogCount <= 2) &&
+                    (LastPowerUsed == SNOPower.Witchdoctor_Sacrifice || Trinity.PlayerOwnedZombieDogCount <= MIN_ZombieDogs) &&
                     CombatBase.LastPowerUsed != SNOPower.Witchdoctor_SummonZombieDog)
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog);
@@ -542,7 +538,7 @@ namespace Trinity.Combat.Abilities
                     hasRushOfEssence && !hasManitou)
                 {
                     if (hasWellOfSouls)
-                        return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 21f, CurrentTarget.ACDGuid);  
+                        return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 21f, CurrentTarget.ACDGuid);
 
                     return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 21f, CurrentTarget.ACDGuid);
                 }
@@ -603,7 +599,7 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Zombie Dogs non-sacrifice build
-                if (CanCast(SNOPower.Witchdoctor_SummonZombieDog) && Trinity.PlayerOwnedZombieDogCount <= 2)
+                if (CanCast(SNOPower.Witchdoctor_SummonZombieDog) && Trinity.PlayerOwnedZombieDogCount <= MIN_ZombieDogs)
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog);
                 }
@@ -623,11 +619,11 @@ namespace Trinity.Combat.Abilities
 
             return power;
         }
-        
-        private static readonly Func<TargetArea,bool> MinimumSoulHarvestCriteria = area =>
+
+        private static readonly Func<TargetArea, bool> MinimumSoulHarvestCriteria = area =>
 
             //Harvest is off cooldown AND at least 2 debuffs exists && at least half of the units have a havestable debuff
-            Skills.WitchDoctor.SoulHarvest.CanCast() && area.TotalDebuffCount(harvesterCoreDebuffs) >= 2 && 
+            Skills.WitchDoctor.SoulHarvest.CanCast() && area.TotalDebuffCount(harvesterCoreDebuffs) >= 2 &&
             area.DebuffedCount(harvesterCoreDebuffs) >= area.UnitCount * 0.5 &&
 
             // AND there's an elite, boss or more than 3 units or greater than half the units within sight are within this cluster
@@ -637,8 +633,8 @@ namespace Trinity.Combat.Abilities
         private static readonly Func<TargetArea, bool> IdealSoulHarvestCriteria = area =>
 
             // Harvest is off cooldown AND at least 7 debuffs are present (can be more than 1 per unit)
-            Skills.WitchDoctor.SoulHarvest.CanCast() && area.TotalDebuffCount(harvesterDebuffs) > 7 && 
-            
+            Skills.WitchDoctor.SoulHarvest.CanCast() && area.TotalDebuffCount(harvesterDebuffs) > 7 &&
+
             // AND average health accross units in area is more than 30%
             area.AverageHealthPct > 0.3f &&
 
@@ -676,7 +672,7 @@ namespace Trinity.Combat.Abilities
                     if (MinimumSoulHarvestCriteria(Enemies.CloseNearby))
                     {
                         //LogTargetArea("--- Harvesting (CombatMovement)", area);
-                        Skills.WitchDoctor.SoulHarvest.Cast();                        
+                        Skills.WitchDoctor.SoulHarvest.Cast();
                     }
                 }
             });

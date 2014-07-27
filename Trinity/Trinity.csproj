@@ -61,10 +61,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Demonbuddy">
-      <HintPath>..\..\..\Demonbuddy.exe</HintPath>
+      <HintPath>..\Demonbuddy.exe</HintPath>
     </Reference>
     <Reference Include="GreyMagic">
-      <HintPath>..\..\..\GreyMagic.dll</HintPath>
+      <HintPath>..\GreyMagic.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />

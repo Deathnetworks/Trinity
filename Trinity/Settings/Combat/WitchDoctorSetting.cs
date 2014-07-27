@@ -8,6 +8,7 @@ namespace Trinity.Config.Combat
     {
         #region Fields
         private bool _ZeroDogs;
+        private bool _TallMansFinger;
         private float _HealingJourneyHealth;
         private float _HonoredGuestMana;
         private float _FirebatsRange;
@@ -87,6 +88,24 @@ namespace Trinity.Config.Combat
             }
         }
 
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool TallMansFinger
+        {
+            get
+            {
+                return _TallMansFinger;
+            }
+            set
+            {
+                if (_TallMansFinger != value)
+                {
+                    _TallMansFinger = value;
+                    OnPropertyChanged("TallMansFinger");
+                }
+            }
+        }
+        
 
         [DataMember(IsRequired = false)]
         [DefaultValue(0.20f)]

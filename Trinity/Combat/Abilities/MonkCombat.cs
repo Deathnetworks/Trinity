@@ -170,9 +170,10 @@ namespace Trinity.Combat.Abilities
             // Dashing Strike
             if (CanCastDashingStrike)
             {
-                if (Legendary.Jawbreaker.IsEquipped)
+                TrinityPower dash = null;
+                if (Legendary.Jawbreaker.IsEquipped && (dash = JawBreakerDashingStrike()) != null)
                 {
-                    return JawBreakerDashingStrike();
+                    return dash;
                 }
 
                 var cluster15Y3M = TargetUtil.ClusterExists(15f, 3);
@@ -437,8 +438,8 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         internal static TrinityPower JawBreakerDashingStrike()
         {
-            const float procDistance = 33f;
-            var farthestTarget = TargetUtil.GetDashStrikeFarthestTarget(49f);
+            float Monk_JawbreakerRange = Convert.ToSingle(Settings.Combat.Monk.MinJawBreakerRange);
+            var farthestTarget = TargetUtil.GetDashStrikeFarthestTarget(49f, Monk_JawbreakerRange);
 
             // able to cast
             if (TargetUtil.AnyMobsInRange(25f, 3) || TargetUtil.IsEliteTargetInRange(70f)) // surround by mobs or elite engaged.
@@ -449,7 +450,7 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.X1_Monk_DashingStrike, Monk_MaxDashingStrikeRange, farthestTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 2);
                 }
                 // no free target found, get a nearby cluster point instead.
-                var bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, procDistance);
+                var bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, Monk_JawbreakerRange);
                 Monk_TickSweepingWindSpam();
                 return new TrinityPower(SNOPower.X1_Monk_DashingStrike, Monk_MaxDashingStrikeRange, bestClusterPoint, Trinity.CurrentWorldDynamicId, -1, 2, 2);
             }
@@ -457,7 +458,7 @@ namespace Trinity.Combat.Abilities
             //usually this trigger after dash to the farthest target. dash a single mobs >30 yards, trying to dash back the cluster
             if (TargetUtil.ClusterExists(20, 50, 3)) 
             {
-                var dashStrikeBestClusterPoint = TargetUtil.GetDashStrikeBestClusterPoint(20f, 50f);
+                var dashStrikeBestClusterPoint = TargetUtil.GetDashStrikeBestClusterPoint(20f, 50f, Monk_JawbreakerRange);
                 if (dashStrikeBestClusterPoint != Trinity.Player.Position)
                 {
                     Monk_TickSweepingWindSpam();
@@ -496,8 +497,8 @@ namespace Trinity.Combat.Abilities
         {
             if (Monk_TempestRushReady())
                 return new TrinityPower(SNOPower.Monk_TempestRush, 5f, Vector3.Zero, -1, -1, 0, 0);
-            if (CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike))
-                return new TrinityPower(SNOPower.X1_Monk_DashingStrike, Monk_MaxDashingStrikeRange, Vector3.Zero, -1, -1, 0, 0);
+            //if (CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike))
+            //    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, Monk_MaxDashingStrikeRange, Vector3.Zero, -1, -1, 0, 0);
             if (CombatBase.CanCast(SNOPower.Monk_FistsofThunder))
                 return new TrinityPower(SNOPower.Monk_FistsofThunder, 5f, Vector3.Zero, -1, -1, 0, 0);
             if (CombatBase.CanCast(SNOPower.Monk_DeadlyReach))
