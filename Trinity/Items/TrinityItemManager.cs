@@ -292,7 +292,7 @@ namespace Trinity.Items
         private bool ItemRulesSalvageSell(ACDItem item, ItemEvaluationType evaluationType)
         {
             ItemEvents.ResetTownRun();
-            if (!item.IsPotion)
+            if (!item.IsPotion || item.ItemType != ItemType.Potion)
                 Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation,
                     "Incoming {0} Request: {1}, {2}, {3}, {4}, {5}",
                     evaluationType, item.ItemQualityLevel, item.Level, item.ItemBaseType,
