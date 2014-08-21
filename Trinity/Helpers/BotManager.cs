@@ -37,8 +37,9 @@ namespace Trinity.Helpers
                 // We still want the main VendorRun logic, we're just going to take control of *when* this logic kicks in
                 var vendorDecorator = TreeHooks.Instance.Hooks["VendorRun"][0] as Decorator;
                 if (vendorDecorator != null)
-                    StoreAndReplaceHook("VendorRun", new Decorator(TownRun.TownRunCanRun, TownRun.TownRunWrapper(vendorDecorator.Children[0])));
-
+                {
+                    StoreAndReplaceHook("VendorRun", new Decorator(TownRun.TownRunCanRun, new ActionRunCoroutine(ret => TownRun.TownRunCoroutineWrapper(vendorDecorator))));
+                }
                 // Loot tree is now empty and never runs (Loot is handled through combat)
                 // This is for special out of combat handling like Horadric Cache
                 Composite lootComposite = TreeHooks.Instance.Hooks["Loot"][0];

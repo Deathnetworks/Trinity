@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Navigation;
 using Trinity.Config.Loot;
 using Trinity.Items;
 using Trinity.Notifications;
 using Trinity.Technicals;
 using Zeta.Bot;
+using Zeta.Bot.Coroutines;
 using Zeta.Bot.Logic;
 using Zeta.Bot.Profile;
 using Zeta.Bot.Profile.Common;
@@ -98,14 +101,6 @@ namespace Trinity
                     Trinity.IsReadyToTownRun = false;
 
                     if (Trinity.Player.IsDead)
-                    {
-                        return false;
-                    }
-
-                    var a5hubMaxRangePoint = new Vector3(441.0972f, 519.0328f, 7.718145f);
-                    var a5waypoint = new Vector3(556.9158f, 524.3738f, 2.796464f);
-                    var a5hubRange = a5waypoint.Distance2D(a5hubMaxRangePoint);
-                    if (Trinity.Player.LevelAreaId == 270011 && Trinity.Player.Position.Distance2D(a5waypoint) >= a5hubRange)
                     {
                         return false;
                     }
@@ -248,25 +243,23 @@ namespace Trinity
             }
         }
 
-        public static Composite TownRunWrapper(Composite original)
+        public static async Task<bool> TownRunCoroutineWrapper(Decorator original)
         {
-            return
-            new Sequence(
-                original,
-                new Action(delegate
-                {
-                    if (!BrainBehavior.IsVendoring)
-                    {
-                        Logger.Log("TownRun complete");
-                        Trinity.IsReadyToTownRun = false;
-                        Trinity.ForceVendorRunASAP = false;
-                        TownRunCheckTimer.Reset();
-                        SendEmailNotification();
-                        SendMobileNotifications();
-                    }
-                    return RunStatus.Success;
-                })
-            );
+            foreach (var child in original.Children)
+            {
+                await child.ExecuteCoroutine();
+            }
+
+            if (!BrainBehavior.IsVendoring)
+            {
+                Logger.Log("TownRun complete");
+                Trinity.IsReadyToTownRun = false;
+                Trinity.ForceVendorRunASAP = false;
+                TownRunCheckTimer.Reset();
+                SendEmailNotification();
+                SendMobileNotifications();
+            }
+            return true;
         }
 
         internal static bool TownRunTimerFinished()
@@ -374,12 +367,12 @@ namespace Trinity
             {
                 return Trinity.Settings.Loot.TownRun.SalvageBlueItemOption;
             }
-            
+
             if (qualityLevel >= ItemQuality.Rare4 && qualityLevel <= ItemQuality.Rare6)
             {
                 return Trinity.Settings.Loot.TownRun.SalvageYellowItemOption;
             }
-            
+
             if (qualityLevel >= ItemQuality.Legendary)
             {
                 return Trinity.Settings.Loot.TownRun.SalvageLegendaryItemOption;
