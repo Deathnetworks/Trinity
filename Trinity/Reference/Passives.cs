@@ -640,16 +640,16 @@ namespace Trinity.Reference
             /// <summary>
             /// The duration of control-impairing effects on you are reduced by 25%. Whenever you are hit by a Stun, Freeze, Fear, Immobilize or Charm, you gain 15% increased damage for 10 seconds. 
             /// </summary>
-            public static Passive Provocation = new Passive
-            {
-                Index = 9,
-                Name = "Provocation",
-                SNOPower = SNOPower.Monk_Passive_Pacifism,
-                RequiredLevel = 30,
-                Description = " The duration of control-impairing effects on you are reduced by 25%. Whenever you are hit by a Stun, Freeze, Fear, Immobilize or Charm, you gain 15% increased damage for 10 seconds. ",
-                Tooltip = "skill/monk/provocation",
-                Class = ActorClass.Monk
-            };
+            //public static Passive Provocation = new Passive
+            //{
+            //    Index = 9,
+            //    Name = "Provocation",
+            //    SNOPower = SNOPower.Monk_Passive_Pacifism,
+            //    RequiredLevel = 30,
+            //    Description = " The duration of control-impairing effects on you are reduced by 25%. Whenever you are hit by a Stun, Freeze, Fear, Immobilize or Charm, you gain 15% increased damage for 10 seconds. ",
+            //    Tooltip = "skill/monk/provocation",
+            //    Class = ActorClass.Monk
+            //};
 
             /// <summary>
             /// Reduce all cooldowns by 20%. 
@@ -682,16 +682,16 @@ namespace Trinity.Reference
             /// <summary>
             /// Your resistance to all elements is equal to your highest elemental resistance. 
             /// </summary>
-            public static Passive OneWithEverything = new Passive
-            {
-                Index = 12,
-                Name = "One With Everything",
-                SNOPower = SNOPower.Monk_Passive_OneWithEverything,
-                RequiredLevel = 45,
-                Description = " Your resistance to all elements is equal to your highest elemental resistance. ",
-                Tooltip = "skill/monk/one-with-everything",
-                Class = ActorClass.Monk
-            };
+            //public static Passive OneWithEverything = new Passive
+            //{
+            //    Index = 12,
+            //    Name = "One With Everything",
+            //    SNOPower = SNOPower.Monk_Passive_OneWithEverything,
+            //    RequiredLevel = 45,
+            //    Description = " Your resistance to all elements is equal to your highest elemental resistance. ",
+            //    Tooltip = "skill/monk/one-with-everything",
+            //    Class = ActorClass.Monk
+            //};
 
             /// <summary>
             /// Each different Spirit Generator you use increases your damage by 10% for 3 seconds. 
