@@ -160,10 +160,13 @@
     <Compile Include="Objects\Skill.cs" />
     <Compile Include="Reference\Legendary.cs" />
     <Compile Include="Reference\Passives.cs" />
+    <Compile Include="Reference\PassiveUtils.cs" />
+    <Compile Include="Reference\RuneUtils.cs" />
     <Compile Include="Reference\Runes.cs" />
     <Compile Include="Reference\Sets.cs" />
     <Compile Include="Reference\Skills.cs" />
     <Compile Include="Combat\CombatMovement.cs" />
+    <Compile Include="Reference\ActiveUtils.cs" />
     <Compile Include="Settings\Combat\CrusaderSetting.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Combat\HandleTarget.cs" />
