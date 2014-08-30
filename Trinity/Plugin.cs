@@ -24,13 +24,7 @@ namespace Trinity
     /// </summary>
     public partial class Trinity
     {
-        public Version Version
-        {
-            get
-            {
-                return new Version(2, 0, 0);
-            }
-        }
+        public Version Version { get { return new Version(2, 0, 1); } }
 
         public string Author
         {
@@ -66,7 +60,8 @@ namespace Trinity
                     var loginSubmitButton = Zeta.Game.Internals.UIElement.FromName("Root.NormalLayer.BattleNetLogin_main.LayoutRoot.LoginContainer.SubmitButton");
                     if (loginSubmitButton != null && loginSubmitButton.IsValid && loginSubmitButton.IsVisible && BotMain.IsRunning)
                     {
-                        new Thread(() => {
+                        new Thread(() =>
+                        {
                             BotMain.Stop();
                             Thread.Sleep(1000);
                             BotMain.Start();

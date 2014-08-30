@@ -89,7 +89,7 @@ namespace Trinity
             369366, // x1_Event_Horde_GuardSlaughter,
             369381, // x1_Event_Horde_HunterKillers,
             368035, // x1_Event_Horde_InfernalSky,
-            365269, // x1_Event_Horde_SpiderTrap,
+            // 365269, // x1_Event_Horde_SpiderTrap,
             366331, // x1_Event_Horde_UdderChaos,
             239301, // x1_Event_Jar_Of_Souls_NecroVersion,
             370334, // x1_Event_SpeedKill_Angel_Corrupt_A,
