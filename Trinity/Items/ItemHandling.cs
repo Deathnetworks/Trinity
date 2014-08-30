@@ -57,6 +57,11 @@ namespace Trinity
             GItemType itemType = DetermineItemType(item.InternalName, item.DBItemType, item.ItemFollowerType);
             GItemBaseType baseType = DetermineBaseType(itemType);
 
+            // Pickup Ramaladni's Gift
+            if (itemType == GItemType.ConsumableAddSockets)
+            {
+                return true;
+            }
 
             // Pickup Legendary potions
             if (itemType == GItemType.HealthPotion && item.Quality >= ItemQuality.Legendary)
@@ -387,6 +392,7 @@ namespace Trinity
             if (name.StartsWith("wizardhat_")) return GItemType.WizardHat;
             if (name.StartsWith("xbow_")) return GItemType.TwoHandCrossbow;
             if (name == "console_powerglobe") return GItemType.PowerGlobe;
+            if (name == "consumable_add_sockets") return GItemType.ConsumableAddSockets; // Ramaladni's Gift
 
             // Follower item types
             if (name.StartsWith("jewelbox_") || dbItemType == ItemType.FollowerSpecial)
@@ -532,46 +538,6 @@ namespace Trinity
             }
             return itemBaseType;
         }
-
-        /// <summary>
-        /// Search backpack to see if we have room for a 2-slot item anywhere
-        /// </summary>
-        //internal static Vector2 SortingFindLocationBackpack(bool isOriginalTwoSlot)
-        //{
-        //    int x = -1;
-        //    int y = -1;
-        //    for (int row = 0; row <= 5; row++)
-        //    {
-        //        for (int col = 0; col <= 9; col++)
-        //        {
-        //            if (!BackpackSlotBlocked[col, row])
-        //            {
-        //                bool notEnoughSpace = false;
-        //                if (row < 5)
-        //                {
-        //                    notEnoughSpace = (isOriginalTwoSlot && BackpackSlotBlocked[col, row + 1]);
-        //                }
-        //                else
-        //                {
-        //                    if (isOriginalTwoSlot)
-        //                        notEnoughSpace = true;
-        //                }
-        //                if (!notEnoughSpace)
-        //                {
-        //                    x = col;
-        //                    y = row;
-        //                    goto FoundPackLocation;
-        //                }
-        //            }
-        //        }
-        //    }
-        //FoundPackLocation:
-        //    if ((x < 0) || (y < 0))
-        //    {
-        //        return new Vector2(-1, -1);
-        //    }
-        //    return new Vector2(x, y);
-        //}
 
         /// <summary>
         /// Output test scores for everything in the backpack

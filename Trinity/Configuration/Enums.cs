@@ -15,6 +15,7 @@
         CeremonialKnife,
         Chest,
         Cloak,
+        ConsumableAddSockets,
         CraftTome,
         CraftingMaterial,
         CraftingPlan,

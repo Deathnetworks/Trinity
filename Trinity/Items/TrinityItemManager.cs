@@ -211,6 +211,13 @@ namespace Trinity.Items
                 return true;
             }
 
+            if (tItemType == GItemType.ConsumableAddSockets)
+            {
+                if (evaluationType == ItemEvaluationType.Keep)
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep Ramaladni's Gift)", cItem.RealName, cItem.InternalName, tItemType);
+                return true;
+            }
+
             if (Trinity.Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
             {
                 Interpreter.InterpreterAction action = Trinity.StashRule.checkItem(item, evaluationType);
