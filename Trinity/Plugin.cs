@@ -24,7 +24,13 @@ namespace Trinity
     /// </summary>
     public partial class Trinity
     {
-        public Version Version { get { return new Version(2, 0, 1); } }
+        public Version Version
+        {
+            get
+            {
+                return new Version(2, 1, 1);
+            }
+        }
 
         public string Author
         {

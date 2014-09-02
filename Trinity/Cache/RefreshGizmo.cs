@@ -26,8 +26,9 @@ namespace Trinity
 
             bool openResplendentChest = CurrentCacheObject.InternalName.ToLower().Contains("chest_rare");
 
-            // Ignore it if it's not in range yet, except health wells and resplendent chests if we're opening chests
-            if ((CurrentCacheObject.RadiusDistance > CurrentBotLootRange || CurrentCacheObject.RadiusDistance > 50) && CurrentCacheObject.Type != GObjectType.HealthWell && CurrentCacheObject.Type != GObjectType.Shrine && CurrentCacheObject.RActorGuid != LastTargetRactorGUID)
+            // Ignore it if it's not in range yet, except shrines, pools of reflection and resplendent chests if we're opening chests
+            if ((CurrentCacheObject.RadiusDistance > CurrentBotLootRange || CurrentCacheObject.RadiusDistance > 50) && CurrentCacheObject.Type != GObjectType.HealthWell &&
+                CurrentCacheObject.Type != GObjectType.Shrine && CurrentCacheObject.RActorGuid != LastTargetRactorGUID)
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "NotInRange";

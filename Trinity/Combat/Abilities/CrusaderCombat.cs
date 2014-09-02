@@ -82,11 +82,21 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Consecration
-                if (CanCastConsecration())
+                bool hasSGround = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_Crusader_Consecration && s.RuneIndex == 3);
+                if (!hasSGround)
                 {
-                    return new TrinityPower(SNOPower.X1_Crusader_Consecration);
+                    if (CanCastConsecration())
+                    {
+                        return new TrinityPower(SNOPower.X1_Crusader_Consecration);
+                    }
                 }
-
+                else
+                {
+                    if (CanCastConsecration() && hasSGround && (TargetUtil.AnyMobsInRange(15f, 5) || TargetUtil.IsEliteTargetInRange(15f)))
+                    {
+                        return new TrinityPower(SNOPower.X1_Crusader_Consecration);
+                    }
+                }
                 // Akarats when off Cooldown
                 if (CrusaderSettings.UseAkaratsOffCooldown && CanCast(SNOPower.X1_Crusader_AkaratsChampion))
                 {
@@ -150,7 +160,8 @@ namespace Trinity.Combat.Abilities
                 // Fist of Heavens
                 if (CanCastFistOfHeavens())
                 {
-                    return new TrinityPower(SNOPower.X1_Crusader_FistOfTheHeavens, 65f, TargetUtil.GetBestClusterUnit(8f).Position);
+                    float range = Settings.Combat.Crusader.FistOfHeavensDist;
+                    return new TrinityPower(SNOPower.X1_Crusader_FistOfTheHeavens, range, TargetUtil.GetBestClusterUnit(8f).Position);
                 }
 
                 // Blessed Hammer

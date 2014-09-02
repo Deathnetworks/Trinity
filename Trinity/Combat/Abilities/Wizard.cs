@@ -4,6 +4,7 @@ using Trinity.Cache;
 using Trinity.Combat;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
+using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Common;
@@ -52,9 +53,9 @@ namespace Trinity
 
                 bool hasCalamity = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Teleport && s.RuneIndex == 0);
                 // Offensive Teleport: Calamity
-                if (CombatBase.CanCast(SNOPower.Wizard_Teleport) && hasCalamity)
+                if (CombatBase.CanCast(SNOPower.Wizard_Teleport, CombatBase.CanCastFlags.NoTimer) && hasCalamity)
                 {
-                    var bestClusterPoint = TargetUtil.GetBestClusterPoint();
+                    var bestClusterPoint = TargetUtil.GetBestClusterPoint(5f, 10f);
                     return new TrinityPower(SNOPower.Wizard_Teleport, 55f, bestClusterPoint);
                 }
 
@@ -242,9 +243,20 @@ namespace Trinity
                     Player.WaitingForReserveEnergy = true;
                 }
                 // Explosive Blast
-                if (!useOocBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_ExplosiveBlast, CombatBase.CanCastFlags.NoTimer) && Player.PrimaryResource >= 20)
+                //We should check if Wand of Woh is equipped to define the best routine
+                if (Legendary.WandofWoh.IsEquipped)
                 {
-                    return new TrinityPower(SNOPower.Wizard_ExplosiveBlast, 12f, CurrentTarget.Position);
+                    if (!useOocBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_ExplosiveBlast, CombatBase.CanCastFlags.NoTimer) && !Player.IsInTown)
+                    {
+                        return new TrinityPower(SNOPower.Wizard_ExplosiveBlast, 10f);
+                    }
+                }
+                else
+                {
+                    if (!useOocBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_ExplosiveBlast, CombatBase.CanCastFlags.NoTimer) && Player.PrimaryResource >= 20)
+                    {
+                        return new TrinityPower(SNOPower.Wizard_ExplosiveBlast, 12f, CurrentTarget.Position);
+                    }
                 }
 
                 //SkillDict.Add("Blizzard", SNOPower.Wizard_Blizzard);

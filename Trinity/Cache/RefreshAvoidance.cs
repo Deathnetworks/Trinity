@@ -90,6 +90,9 @@ namespace Trinity
                     case AvoidanceType.BeastCharge:
                         minAvoidanceHealth = V.F("Barbarian.Avoidance.WOTB.BeastCharge");
                         break;
+                    case AvoidanceType.MoltenCore:
+                        minAvoidanceHealth = V.F("Barbarian.Avoidance.WOTB.MoltenCore");
+                        break;
                     default:
                         minAvoidanceHealth *= V.F("Barbarian.Avoidance.WOTB.Other");
                         break;

@@ -343,13 +343,24 @@ namespace Trinity.Combat.Abilities
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_MassConfusion, 0f, CurrentTarget.ACDGuid);
                 }
-                // Big Bad Voodoo, elites and bosses only
-                if (CanCast(SNOPower.Witchdoctor_BigBadVoodoo) &&
-                    (TargetUtil.EliteOrTrashInRange(25f) || (CurrentTarget.IsBoss && CurrentTarget.Distance <= 30f)))
-                {
-                    return new TrinityPower(SNOPower.Witchdoctor_BigBadVoodoo);
-                }
 
+                if (!Settings.Combat.WitchDoctor.UseBigBadVoodooOffCooldown)
+                {
+                    // Big Bad Voodoo, elites and bosses only
+                    if (CanCast(SNOPower.Witchdoctor_BigBadVoodoo) &&
+                        (TargetUtil.EliteOrTrashInRange(25f) || (CurrentTarget.IsBoss && CurrentTarget.Distance <= 30f)))
+                    {
+                        return new TrinityPower(SNOPower.Witchdoctor_BigBadVoodoo);
+                    }
+                }
+                else
+                {
+                    // Big Bad Voodo, cast whenever available
+                    if (!UseOOCBuff && !Player.IsIncapacitated && CanCast(SNOPower.Witchdoctor_BigBadVoodoo))
+                    {
+                        return new TrinityPower(SNOPower.Witchdoctor_BigBadVoodoo);
+                    }
+                }
                 // Grasp of the Dead
                 if (CanCast(SNOPower.Witchdoctor_GraspOfTheDead) &&
                     (TargetUtil.AnyMobsInRange(30, 2) || TargetUtil.EliteOrTrashInRange(30f)) &&
@@ -432,7 +443,8 @@ namespace Trinity.Combat.Abilities
                 // Haunt 
                 if (CanCast(SNOPower.Witchdoctor_Haunt) &&
                     Player.PrimaryResource >= 50 &&
-                    !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.Witchdoctor_Haunt))
+                    !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.Witchdoctor_Haunt) &&
+                    LastPowerUsed != SNOPower.Witchdoctor_Haunt)
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_Haunt, 21f, CurrentTarget.ACDGuid);
                 }
@@ -583,6 +595,22 @@ namespace Trinity.Combat.Abilities
                     WitchDoctorCombat.VisionQuestRefreshTimer.Restart();
                     return new TrinityPower(SNOPower.Witchdoctor_Firebomb, basicAttackRange, CurrentTarget.ACDGuid);
                 }
+				
+				//Hexing Pants Mod
+				if(Legendary.HexingPantsofMrYan.IsEquipped && CurrentTarget.IsUnit && 
+				//!CanCast(SNOPower.Witchdoctor_Piranhas) && 
+				CurrentTarget.RadiusDistance > 10f)			
+				{
+					return new TrinityPower(SNOPower.Walk, 10f, CurrentTarget.Position);
+				}
+				
+				if(Legendary.HexingPantsofMrYan.IsEquipped && CurrentTarget.IsUnit && 
+				//!CanCast(SNOPower.Witchdoctor_Piranhas) && 
+				CurrentTarget.RadiusDistance < 10f)			
+				{
+					Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, -10f);
+					return new TrinityPower(SNOPower.Walk, 10f, vNewTarget);
+				}	
 
             }
 
@@ -603,7 +631,9 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Zombie Dogs non-sacrifice build
-                if (CanCast(SNOPower.Witchdoctor_SummonZombieDog) && Trinity.PlayerOwnedZombieDogCount <= 2)
+                if (CanCast(SNOPower.Witchdoctor_SummonZombieDog) &&
+                ((Legendary.TheTallMansFinger.IsEquipped && Trinity.PlayerOwnedZombieDogCount < 1) ||
+                (!Legendary.TheTallMansFinger.IsEquipped && Trinity.PlayerOwnedZombieDogCount <= 2)))
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog);
                 }

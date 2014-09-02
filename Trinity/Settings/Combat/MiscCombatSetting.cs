@@ -18,6 +18,7 @@ namespace Trinity.Config.Combat
         private bool _AllowBacktracking;
         private int _DelayAfterKill;
         private bool _UseNavMeshTargeting;
+        private bool _HiPriorityHG;
         private int _TrashPackSize;
         private float _TrashPackClusterRadius;
         private bool _IgnoreElites;
@@ -99,6 +100,24 @@ namespace Trinity.Config.Combat
                 {
                     _UseNavMeshTargeting = value;
                     OnPropertyChanged("UseNavMeshTargeting");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool HiPriorityHG
+        {
+            get
+            {
+                return _HiPriorityHG;
+            }
+            set
+            {
+                if (_HiPriorityHG != value)
+                {
+                    _HiPriorityHG = value;
+                    OnPropertyChanged("HiPriorityHG");
                 }
             }
         }

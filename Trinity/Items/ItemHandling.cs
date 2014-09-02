@@ -517,7 +517,7 @@ namespace Trinity
             // Misc Items
             else if (itemType == GItemType.CraftingMaterial || itemType == GItemType.CraftTome || itemType == GItemType.LootRunKey || itemType == GItemType.HoradricRelic ||
                 itemType == GItemType.SpecialItem || itemType == GItemType.CraftingPlan || itemType == GItemType.HealthPotion || itemType == GItemType.HoradricCache ||
-                itemType == GItemType.Dye || itemType == GItemType.StaffOfHerding || itemType == GItemType.InfernalKey)
+                itemType == GItemType.Dye || itemType == GItemType.StaffOfHerding || itemType == GItemType.InfernalKey || itemType == GItemType.ConsumableAddSockets)
             {
                 itemBaseType = GItemBaseType.Misc;
             }

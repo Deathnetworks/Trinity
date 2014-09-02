@@ -194,6 +194,7 @@ namespace Trinity
         // These values below are set on a per-class basis later on, so don't bother changing them here! These are the old default values
         public static double PlayerEmergencyHealthPotionLimit = 0.35;
         private static double _playerEmergencyHealthGlobeLimit = 0.35;
+        private static double _playerHealthGlobeResource = 0.35;
 
         /*
          *  Blacklists

@@ -18,6 +18,7 @@ namespace Trinity.Config
         private bool _UseEmpoweredShrine;
         private bool _UseEnlightenedShrine;
         private bool _UseFleetingShrine;
+        private bool _HiPriorityShrines;
         private bool _OpenAnyContainer;
         private bool _InspectWeaponRacks;
         private bool _InspectGroundClicky;
@@ -207,6 +208,24 @@ namespace Trinity.Config
                 {
                     _UseFleetingShrine = value;
                     OnPropertyChanged("UseFleetingShrine");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool HiPriorityShrines
+        {
+            get
+            {
+                return _HiPriorityShrines;
+            }
+            set
+            {
+                if (_HiPriorityShrines != value)
+                {
+                    _HiPriorityShrines = value;
+                    OnPropertyChanged("HiPriorityShrines");
                 }
             }
         }

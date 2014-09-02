@@ -8,6 +8,7 @@ using Trinity.Combat;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Helpers;
+using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Dungeons;
@@ -25,14 +26,14 @@ namespace Trinity.DbProvider
     // Player Mover Class
     public class PlayerMover : IPlayerMover
     {
-        private static readonly HashSet<int> BasicMovementOnlyIDs = new HashSet<int> { 138989, 176074, 176076, 176077, 176536, 260330 };
-        // 138989 = health pool, 176074 = protection, 176076 = fortune, 176077 = frenzied, 176536 = portal in leorics, 260330 = cooldown shrine
+        private static readonly HashSet<int> BasicMovementOnlyIDs = new HashSet<int> { 138989, 176074, 176076, 176077, 176536, 260330, 330695, 330696, 330697, 330698, 330699 };
+        // 138989 = health pool, 176074 = protection, 176076 = fortune, 176077 = frenzied, 176536 = portal in leorics, 260330 = cooldown shrine, 330695 to 330699 = pylons
         // Exp shrines = ???? Other shrines ????
 
 
         private static bool ShrinesInArea(Vector3 targetpos)
         {
-            return Trinity.ObjectCache.Any(o => BasicMovementOnlyIDs.Contains(o.ActorSNO) && Vector3.Distance(o.Position, targetpos) <= 10f);
+            return Trinity.ObjectCache.Any(o => BasicMovementOnlyIDs.Contains(o.ActorSNO) && Vector3.Distance(o.Position, targetpos) <= 50f);
         }
 
         private static DateTime _lastUsedMoveStop = DateTime.MinValue;
@@ -526,7 +527,9 @@ namespace Trinity.DbProvider
                 }
 
                 bool hasTacticalAdvantage = HotbarSkills.PassiveSkills.Any(s => s == SNOPower.DemonHunter_Passive_TacticalAdvantage);
-                int vaultDelay = hasTacticalAdvantage ? 2000 : Trinity.Settings.Combat.DemonHunter.VaultMovementDelay;
+                bool hasDoubleDanettas = Sets.DanettasHatred.IsFirstBonusActive;
+                bool TacticalAndDanettas = (hasTacticalAdvantage && !hasDoubleDanettas);
+                int vaultDelay = TacticalAndDanettas ? 2000 : Trinity.Settings.Combat.DemonHunter.VaultMovementDelay;
 
                 // DemonHunter Vault
                 if (Trinity.Hotbar.Contains(SNOPower.DemonHunter_Vault) && !bTooMuchZChange && Trinity.Settings.Combat.DemonHunter.VaultMode != DemonHunterVaultMode.CombatOnly &&

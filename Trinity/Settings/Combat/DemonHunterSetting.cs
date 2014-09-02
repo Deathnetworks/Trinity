@@ -9,6 +9,7 @@ namespace Trinity.Config.Combat
         #region Fields
         private float _PotionLevel;
         private float _HealthGlobeLevel;
+        private float _HealthGlobeLevelResource;
         private int _KiteLimit;
         private int _VaultMovementDelay;
         private bool _SpamSmokeScreen;
@@ -106,6 +107,24 @@ namespace Trinity.Config.Combat
                 {
                     _HealthGlobeLevel = value;
                     OnPropertyChanged("HealthGlobeLevel");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(0.5f)]
+        public float HealthGlobeLevelResource
+        {
+            get
+            {
+                return _HealthGlobeLevelResource;
+            }
+            set
+            {
+                if (_HealthGlobeLevelResource != value)
+                {
+                    _HealthGlobeLevelResource = value;
+                    OnPropertyChanged("HealthGlobeLevelResource");
                 }
             }
         }

@@ -61,18 +61,21 @@ namespace Trinity
                         case ActorClass.Barbarian:
                             PlayerEmergencyHealthPotionLimit = Settings.Combat.Barbarian.PotionLevel;
                             _playerEmergencyHealthGlobeLimit = Settings.Combat.Barbarian.HealthGlobeLevel;
+                            _playerHealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
                             CombatBase.PlayerKiteDistance = Settings.Combat.Barbarian.KiteLimit;
                             CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Never;
                             break;
                         case ActorClass.Crusader:
                             PlayerEmergencyHealthPotionLimit = Settings.Combat.Crusader.PotionLevel;
                             _playerEmergencyHealthGlobeLimit = Settings.Combat.Crusader.HealthGlobeLevel;
+                            _playerHealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
                             CombatBase.PlayerKiteDistance = 0;
                             CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Never;
                             break;
                         case ActorClass.Monk:
                             PlayerEmergencyHealthPotionLimit = Settings.Combat.Monk.PotionLevel;
                             _playerEmergencyHealthGlobeLimit = Settings.Combat.Monk.HealthGlobeLevel;
+                            _playerHealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
                             // Monks never kite :)
                             CombatBase.PlayerKiteDistance = 0;
                             CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Never;
@@ -80,18 +83,21 @@ namespace Trinity
                         case ActorClass.Wizard:
                             PlayerEmergencyHealthPotionLimit = Settings.Combat.Wizard.PotionLevel;
                             _playerEmergencyHealthGlobeLimit = Settings.Combat.Wizard.HealthGlobeLevel;
+                            _playerHealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
                             CombatBase.PlayerKiteDistance = Settings.Combat.Wizard.KiteLimit;
                             CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Always;
                             break;
                         case ActorClass.Witchdoctor:
                             PlayerEmergencyHealthPotionLimit = Settings.Combat.WitchDoctor.PotionLevel;
                             _playerEmergencyHealthGlobeLimit = Settings.Combat.WitchDoctor.HealthGlobeLevel;
+                            _playerHealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
                             CombatBase.PlayerKiteDistance = Settings.Combat.WitchDoctor.KiteLimit;
                             CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Always;
                             break;
                         case ActorClass.DemonHunter:
                             PlayerEmergencyHealthPotionLimit = Settings.Combat.DemonHunter.PotionLevel;
                             _playerEmergencyHealthGlobeLimit = Settings.Combat.DemonHunter.HealthGlobeLevel;
+                            _playerHealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
                             CombatBase.PlayerKiteDistance = Settings.Combat.DemonHunter.KiteLimit;
                             CombatBase.PlayerKiteMode = Settings.Combat.DemonHunter.KiteMode;
                             break;

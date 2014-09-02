@@ -41,7 +41,7 @@
             <UniformGrid Grid.Row="1" Columns="2" HorizontalAlignment="Stretch">
                 <CheckBox IsChecked="{Binding Advanced.GoldInactivityEnabled}" Content="Enable Gold Inactivity" Height="20" Margin="5,0"/>
                 <Slider Template="{DynamicResource Slider}" IsEnabled="{Binding Advanced.GoldInactivityEnabled}"
-                	Interval="500" Maximum="600" Minimum="0" SmallChange="1" TickFrequency="10" TickPlacement="BottomRight"
+                	Interval="500" Maximum="1800" Minimum="0" SmallChange="1" TickFrequency="10" TickPlacement="BottomRight"
                 	Value="{Binding Advanced.GoldInactivityTimer}" IsSnapToTickEnabled="True"
                 	ToolTip="Number of seconds after which if no gold is collected the game will restart" Margin="5,0,5,0"/>
             </UniformGrid>

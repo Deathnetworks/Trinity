@@ -33,7 +33,6 @@ namespace Trinity
                 if (!diaItem.CommonData.IsValid)
                     return false;
 
-                GItemBaseType itemBaseType;
                 c_ItemQuality = diaItem.CommonData.ItemQualityLevel;
                 ((DiaItem)c_diaObject).CommonData.GetAttribute<int>(ActorAttributeType.ItemQualityLevelIdentified);
                 c_ItemDisplayName = diaItem.CommonData.Name;
@@ -51,16 +50,13 @@ namespace Trinity
                 c_item_GItemType = DetermineItemType(CurrentCacheObject.InternalName, c_DBItemType, c_item_tFollowerType);
 
                 // And temporarily store the base type
-                itemBaseType = DetermineBaseType(c_item_GItemType);
+                GItemBaseType itemBaseType = DetermineBaseType(c_item_GItemType);
 
-                // Compute item quality from item link for Crafting Plans (Blacksmith or Jewler)
-                if (itemBaseType == GItemBaseType.Misc || itemBaseType == GItemBaseType.Unknown)
+                // Compute item quality from item link 
+                if (!CacheData.ItemLinkQuality.TryGetValue(CurrentCacheObject.ACDGuid, out c_ItemQuality))
                 {
-                    if (!CacheData.ItemLinkQuality.TryGetValue(CurrentCacheObject.ACDGuid, out c_ItemQuality))
-                    {
-                        c_ItemQuality = diaItem.CommonData.ItemLinkColorQuality();
-                        CacheData.ItemLinkQuality.Add(CurrentCacheObject.ACDGuid, c_ItemQuality);
-                    }
+                    c_ItemQuality = diaItem.CommonData.ItemLinkColorQuality();
+                    CacheData.ItemLinkQuality.Add(CurrentCacheObject.ACDGuid, c_ItemQuality);
                 }
 
                 if (itemBaseType == GItemBaseType.Gem)
@@ -88,10 +84,8 @@ namespace Trinity
                     if (CurrentCacheObject.Distance > (CurrentBotLootRange + range))
                     {
                         c_IgnoreSubStep = "OutOfRange";
-                        AddToCache = false;
                         // return here to save CPU on reading unncessary attributes for out of range items;
-                        if (!AddToCache)
-                            return AddToCache;
+                        return false;
                     }
                 }
 
@@ -132,16 +126,14 @@ namespace Trinity
                 if (c_item_GItemType == GItemType.HealthGlobe)
                 {
                     CurrentCacheObject.Type = GObjectType.HealthGlobe;
-                    AddToCache = true;
-                    return AddToCache;
+                    return true;
                 }
 
                 // Treat all globes as a yes
                 if (c_item_GItemType == GItemType.PowerGlobe)
                 {
                     CurrentCacheObject.Type = GObjectType.PowerGlobe;
-                    AddToCache = true;
-                    return AddToCache;
+                    return true;
                 }
 
                 // Item stats
@@ -176,7 +168,6 @@ namespace Trinity
                     CacheData.PickupItem.Add(CurrentCacheObject.RActorGuid, AddToCache);
                 }
 
-                // Using DB built-in item rules
                 if (AddToCache && ForceVendorRunASAP)
                     c_IgnoreSubStep = "ForcedVendoring";
 

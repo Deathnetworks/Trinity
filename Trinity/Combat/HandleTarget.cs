@@ -451,6 +451,9 @@ namespace Trinity
                         if ((CurrentTarget.Type == GObjectType.Avoidance ||
                             CurrentTarget.Type == GObjectType.HealthGlobe ||
                             CurrentTarget.Type == GObjectType.PowerGlobe ||
+							(CurrentTarget.Type == GObjectType.Gold && CombatBase.CanCast(SNOPower.DemonHunter_Vault)) ||
+							((CurrentTarget.Type == GObjectType.Container || CurrentTarget.Type == GObjectType.Item) && 
+							CurrentTarget.Distance > 18f && CombatBase.CanCast(SNOPower.DemonHunter_Vault)) ||
                             Monk_SpecialMovement ||
                             (CurrentTarget.Type == GObjectType.Backtrack && Settings.Combat.Misc.AllowOOCMovement))
                             && NavHelper.CanRayCast(Player.Position, CurrentDestination)

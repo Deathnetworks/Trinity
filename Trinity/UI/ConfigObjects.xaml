@@ -97,6 +97,9 @@
                         <RadioButton GroupName="WorldObjectShrine" Content="Ignore shrines" IsChecked="{Binding Path=WorldObject.UseShrine, Converter={StaticResource boolInverterConverter}}" Margin="5"/>
                         <RadioButton GroupName="WorldObjectShrine" Content="Use shrines" IsChecked="{Binding Path=WorldObject.UseShrine}" Margin="5"/>
                     </UniformGrid>
+                    <UniformGrid Margin="50,0,50,0" Columns="1" HorizontalAlignment="Center">
+                        <CheckBox Margin="2" IsChecked="{Binding Path=WorldObject.HiPriorityShrines}">Give higher priority to shrines</CheckBox>
+                    </UniformGrid>
                     <UniformGrid Margin="50,0,50,0" Columns="3" HorizontalAlignment="Center">
                         <CheckBox Margin="2" IsChecked="{Binding Path=WorldObject.UseEnlightenedShrine}" ToolTip="Enable collection of Enlightened Shrines">Use Enlightened</CheckBox>
                         <CheckBox Margin="2" IsChecked="{Binding Path=WorldObject.UseFrenzyShrine}" ToolTip="Enable collection of Frenzy Shrines">Use Frenzy</CheckBox>

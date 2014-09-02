@@ -244,6 +244,17 @@ namespace Trinity.Reference
             FirstBonusItemCount = 2
         };
 
+        public static Set DanettasHatred = new Set
+        {
+            Name = "Danetta's Hatred",
+            Items = new List<Item>
+            {
+                Legendary.DanettasSpite,
+                Legendary.DanettasRevenge
+            },
+            FirstBonusItemCount = 2
+        };
+
         public static Set GuardiansJeopardy = new Set
         {
             Name = "Guardian's Jeopardy",

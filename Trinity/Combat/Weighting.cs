@@ -43,6 +43,15 @@ namespace Trinity
                 bool prioritizeCloseRangeUnits = (avoidanceNearby || _forceCloseRangeTarget || Player.IsRooted || DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds < 1000 &&
                     ObjectCache.Count(u => u.IsUnit && u.RadiusDistance < 10f) >= 3);
 
+                bool HiPriorityHealthGlobes = Settings.Combat.Misc.HiPriorityHG;
+
+                bool HealthGlobeEmergency = (Player.CurrentHealthPct <= _playerEmergencyHealthGlobeLimit || Player.PrimaryResourcePct <= _playerHealthGlobeResource) &&
+                     ObjectCache.Any(g => g.Type == GObjectType.HealthGlobe) && HiPriorityHealthGlobes;
+
+                bool HiPriorityShrine = Settings.WorldObject.HiPriorityShrines;
+
+                bool GetHiPriorityShrine = ObjectCache.Any(o => o.Type == GObjectType.Shrine) && HiPriorityShrine;
+
                 bool profileTagCheck = false;
 
                 string behaviorName = "";
@@ -64,14 +73,16 @@ namespace Trinity
                     Player.ActiveBounty != null &&
                     Player.ActiveBounty.Info.KillCount > 0;
 
+
+
                 bool shouldIgnoreElites =
-                     !(isKillBounty || Player.InActiveEvent) &&
+                     (!(isKillBounty || Player.InActiveEvent) &&
                      !CombatBase.IsQuestingMode &&
                      !DataDictionary.RiftWorldIds.Contains(Player.WorldID) &&
                      !DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId) &&
                      !profileTagCheck &&
                      !TownRun.IsTryingToTownPortal() &&
-                     CombatBase.IgnoringElites;
+                     CombatBase.IgnoringElites) || HealthGlobeEmergency || GetHiPriorityShrine;
 
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight,
                     "Starting weights: packSize={0} packRadius={1} MovementSpeed={2:0.0} Elites={3} AoEs={4} disableIgnoreTag={5} ({6}) closeRangePriority={7} townRun={8} questingArea={9} level={10} isQuestingMode={11}",
@@ -82,7 +93,7 @@ namespace Trinity
                 bool usingTownPortal = TownRun.IsTryingToTownPortal();
 
                 bool shouldIgnoreTrashMobs =
-                    !(isKillBounty || Player.InActiveEvent) &&
+                    (!(isKillBounty || Player.InActiveEvent) &&
                         !CombatBase.IsQuestingMode &&
                         !inQuestArea &&
                         !DataDictionary.RiftWorldIds.Contains(Player.WorldID) &&
@@ -92,7 +103,8 @@ namespace Trinity
                         Settings.Combat.Misc.TrashPackSize > 1 &&
                         Player.Level >= 15 &&
                         Player.CurrentHealthPct > 0.10 &&
-                        DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds > 500;
+                        DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds > 500) ||
+                        HealthGlobeEmergency || GetHiPriorityShrine;
 
                 foreach (TrinityCacheObject cacheObject in ObjectCache.OrderBy(c => c.Distance))
                 {
@@ -649,26 +661,43 @@ namespace Trinity
 
                                 // Weight Health Globes
 
-                                bool witchDoctorManaLow =
-                                    Player.ActorClass == ActorClass.Witchdoctor &&
-                                    Player.PrimaryResourcePct <= 0.15 &&
-                                    HotbarSkills.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GruesomeFeast);
+                                //bool witchDoctorManaLow =
+                                //    Player.ActorClass == ActorClass.Witchdoctor &&
+                                //    Player.PrimaryResourcePct <= 0.15 &&
+                                //   HotbarSkills.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GruesomeFeast);
 
                                 if ((Player.CurrentHealthPct >= 1 || !Settings.Combat.Misc.CollectHealthGlobe))
                                 {
                                     cacheObject.Weight = 0;
                                 }
                                 // Give all globes super low weight if we don't urgently need them, but are not 100% health
-                                else if (!witchDoctorManaLow && (Player.CurrentHealthPct > _playerEmergencyHealthGlobeLimit))
+                                //else if (!witchDoctorManaLow && (Player.CurrentHealthPct > _playerEmergencyHealthGlobeLimit))
+                                else if (Player.CurrentHealthPct > _playerEmergencyHealthGlobeLimit)
                                 {
                                     double myHealth = Player.CurrentHealthPct;
 
                                     double minPartyHealth = 1d;
                                     if (ObjectCache.Any(p => p.Type == GObjectType.Player && p.RActorGuid != Player.RActorGuid))
                                         minPartyHealth = ObjectCache.Where(p => p.Type == GObjectType.Player && p.RActorGuid != Player.RActorGuid).Min(p => p.HitPointsPct);
-
-                                    if (myHealth > 0d && myHealth < V.D("Weight.Globe.MinPlayerHealthPct"))
-                                        cacheObject.Weight = (1d - myHealth) * 5000d;
+                                    // If we're giving high priority to health globes, give it higher weight and check for resource level
+                                    if (HiPriorityHealthGlobes)
+                                    {
+                                        if (!Legendary.ReapersWraps.IsEquipped)
+                                        {
+                                            if ((myHealth > 0d && myHealth < V.D("Weight.Globe.MinPlayerHealthPct")))
+                                                cacheObject.Weight = .9 * MaxWeight;
+                                        }
+                                        else
+                                        {
+                                            if (myHealth > 0d && myHealth < V.D("Weight.Globe.MinPlayerHealthPct") || Player.PrimaryResourcePct <= _playerHealthGlobeResource)
+                                                cacheObject.Weight = .9 * MaxWeight;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (myHealth > 0d && myHealth < V.D("Weight.Globe.MinPlayerHealthPct"))
+                                            cacheObject.Weight = (1d - myHealth) * 5000d;
+                                    }
 
                                     // Added weight for lowest health of party member
                                     if (minPartyHealth > 0d && minPartyHealth < V.D("Weight.Globe.MinPartyHealthPct"))
@@ -677,10 +706,16 @@ namespace Trinity
                                 else
                                 {
                                     // Ok we have globes enabled, and our health is low
-                                    cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 17000d;
-
-                                    if (witchDoctorManaLow)
-                                        cacheObject.Weight += 10000d; // 10k for WD's!
+                                    if (HiPriorityHealthGlobes)
+                                    {                                        
+                                        cacheObject.Weight = MaxWeight;
+                                    }
+                                    else
+                                    {
+                                        cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 17000d;
+                                    }
+                                    //if (witchDoctorManaLow)
+                                    //    cacheObject.Weight += 10000d; // 10k for WD's!
 
                                     // Point-blank items get a weight increase
                                     if (cacheObject.Distance <= 15f)
@@ -704,14 +739,25 @@ namespace Trinity
                                 foreach (CacheObstacleObject tempobstacle in CacheData.MonsterObstacles.Where(cp =>
                                     MathUtil.IntersectsPath(cp.Position, cp.Radius, Player.Position, point)))
                                 {
-                                    cacheObject.Weight *= 0.85;
+                                    if (HiPriorityHealthGlobes)
+                                        cacheObject.Weight *= 1;
+                                    else
+                                        cacheObject.Weight *= 0.85;
                                 }
 
                                 if (cacheObject.Distance > 10f)
                                 {
                                     // See if there's any AOE avoidance in that spot, if so reduce the weight by 10%
-                                    if (CacheData.TimeBoundAvoidance.Any(cp => MathUtil.IntersectsPath(cp.Position, cp.Radius, Player.Position, cacheObject.Position)))
-                                        cacheObject.Weight *= 0.9;
+                                    if (HiPriorityHealthGlobes)
+                                    {
+                                        if (CacheData.TimeBoundAvoidance.Any(cp => MathUtil.IntersectsPath(cp.Position, cp.Radius, Player.Position, cacheObject.Position)))
+                                            cacheObject.Weight *= 1;
+                                    }
+                                    else
+                                    {
+                                        if (CacheData.TimeBoundAvoidance.Any(cp => MathUtil.IntersectsPath(cp.Position, cp.Radius, Player.Position, cacheObject.Position)))
+                                            cacheObject.Weight *= .9;
+                                    }
 
                                 }
 
@@ -790,7 +836,13 @@ namespace Trinity
                                 double maxWeight = Player.IsInRift ? 15000d : 100d;
 
                                 // Weight Shrines
-                                cacheObject.Weight = Math.Max(((maxRange - cacheObject.RadiusDistance) / maxRange * 15000d), 100d);
+
+                                if (Settings.WorldObject.HiPriorityShrines)
+                                {
+                                    cacheObject.Weight = MaxWeight;
+                                }
+                                else
+                                    cacheObject.Weight = Math.Max(((maxRange - cacheObject.RadiusDistance) / maxRange * 15000d), 100d);
 
                                 // Very close shrines get a weight increase
                                 if (cacheObject.Distance <= 30f)

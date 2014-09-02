@@ -10,9 +10,9 @@ namespace Trinity.Config.Combat
         private TempestRushOption _TROption;
         private float _PotionLevel;
         private float _HealthGlobeLevel;
+        private float _HealthGlobeLevelResource;
         private int _TR_MinSpirit;
         private int _TR_MinDist;
-        private bool _HasInnaSet;
         private bool _SWBeforeWoL;
         private bool _DisableMantraSpam;
         private bool _TargetBasedZigZag;
@@ -110,6 +110,24 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
+        [DefaultValue(0.5f)]
+        public float HealthGlobeLevelResource
+        {
+            get
+            {
+                return _HealthGlobeLevelResource;
+            }
+            set
+            {
+                if (_HealthGlobeLevelResource != value)
+                {
+                    _HealthGlobeLevelResource = value;
+                    OnPropertyChanged("HealthGlobeLevelResource");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
         [DefaultValue(60)]
         public float TR_MinSpirit
         {
@@ -159,24 +177,6 @@ namespace Trinity.Config.Combat
                 {
                     _TROption = value;
                     OnPropertyChanged("TROption");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool HasInnaSet
-        {
-            get
-            {
-                return _HasInnaSet;
-            }
-            set
-            {
-                if (_HasInnaSet != value)
-                {
-                    _HasInnaSet = value;
-                    OnPropertyChanged("HasInnaSet");
                 }
             }
         }
