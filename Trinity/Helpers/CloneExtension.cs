@@ -91,7 +91,6 @@ namespace System
 
         public static T Copy<T>(this T original)
         {
-            System.Diagnostics.Debug.WriteLine(string.Format("Cloning {0}", original.GetType().Name));
             return (T)Copy((Object)original);
         }
     }
