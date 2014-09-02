@@ -19,6 +19,9 @@ namespace Trinity
         private const ulong bountyRewardDialogHash = 0x278249110947CA00;
         private const ulong gamePotionHash = 0xE1F43DD874E42728;
 
+        //[1F4E3570] Mouseover: 0x1B876AD677C9080, Name: Root.NormalLayer.stash_dialog_mainPage.button_purchase
+        private const ulong stashBuyNewTabButtonHash = 0x1B876AD677C9080;
+
         public static UIElement GamePotion
         {
             get { return UIElement.FromHash(gamePotionHash); }
@@ -83,7 +86,7 @@ namespace Trinity
         {
             get
             {
-                return UIElement.FromHash(0xF495983BA9BE450F);
+                return UIElement.FromHash(partyFollowerBossAcceptHash);
             }
         }
 
@@ -93,7 +96,7 @@ namespace Trinity
         {
             get
             {
-                return UIElement.FromHash(0x891D21408238D18E);
+                return UIElement.FromHash(genericOKHash);
             }
         }
 
@@ -104,6 +107,14 @@ namespace Trinity
             get
             {
                 return UIElement.FromHash(talkToInteractButton1Hash);
+            }
+        }
+
+        public static UIElement StashBuyNewTabButton
+        {
+            get
+            {
+                return UIElement.FromHash(stashBuyNewTabButtonHash);
             }
         }
 
@@ -119,6 +130,13 @@ namespace Trinity
             return true;
         }
 
+        /// <summary>
+        /// Checks to see if ZetaDia.Me.IsValid, element is visible, triggers fireWorldTransferStart if needed and clicks the element
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="name"></param>
+        /// <param name="fireWorldTransfer"></param>
+        /// <returns></returns>
         public static bool SafeClickElement(UIElement element, string name = "", bool fireWorldTransfer = false)
         {
             if (!ZetaDia.Me.IsValid)
@@ -148,6 +166,8 @@ namespace Trinity
             if (ZetaDia.IsInGame && SafeClickElement(PartyFollowerBossAccept, "Party Follower Boss Accept", true))
                 return;
             if (ZetaDia.IsInGame && SafeClickElement(TalktoInteractButton1, "Conversation Button"))
+                return;
+            if (ZetaDia.IsInGame && SafeClickElement(StashBuyNewTabButton, "Buying new Stash Tab"))
                 return;
 
             if (DateTime.UtcNow.Subtract(_lastCheckedUiButtons).TotalMilliseconds <= 500)

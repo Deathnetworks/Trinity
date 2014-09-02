@@ -467,7 +467,7 @@ namespace Trinity
         /// <returns></returns>
         internal static GItemBaseType DetermineBaseType(GItemType itemType)
         {
-            GItemBaseType itemBaseType = GItemBaseType.Unknown;
+            GItemBaseType itemBaseType = GItemBaseType.Misc;
 
             // One Handed Weapons
             if (itemType == GItemType.Axe || itemType == GItemType.CeremonialKnife || itemType == GItemType.Dagger || itemType == GItemType.Flail ||
