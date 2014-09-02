@@ -392,7 +392,7 @@ namespace Trinity
             if (name.StartsWith("wizardhat_")) return GItemType.WizardHat;
             if (name.StartsWith("xbow_")) return GItemType.TwoHandCrossbow;
             if (name == "console_powerglobe") return GItemType.PowerGlobe;
-            if (name == "consumable_add_sockets") return GItemType.ConsumableAddSockets; // Ramaladni's Gift
+            if (name.StartsWith("consumable_add_sockets")) return GItemType.ConsumableAddSockets; // Ramaladni's Gift
 
             // Follower item types
             if (name.StartsWith("jewelbox_") || dbItemType == ItemType.FollowerSpecial)
