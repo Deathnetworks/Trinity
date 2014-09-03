@@ -191,6 +191,23 @@ namespace Trinity
                     {
                         AddToCache = true;
 
+                        var gizmoDoor = c_diaObject as GizmoDoor;
+                        if (gizmoDoor != null && gizmoDoor.IsLocked)
+                        {
+                            MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
+                            CacheData.NavigationObstacles.Add(new CacheObstacleObject
+                            {
+                                ActorSNO = CurrentCacheObject.ActorSNO,
+                                Radius = CurrentCacheObject.Radius,
+                                Position = CurrentCacheObject.Position,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
+                                ObjectType = CurrentCacheObject.Type,
+                            });
+                            
+                            c_IgnoreSubStep = "IsLocked";
+                            return false;
+                        }
+
                         if (c_diaObject is DiaGizmo && ((DiaGizmo)c_diaObject).HasBeenOperated)
                         {
                             AddToCache = false;
@@ -508,6 +525,13 @@ namespace Trinity
                     {
                         AddToCache = true;
 
+                        var gizmoDestructible = c_diaObject as GizmoDestructible;
+                        if (gizmoDestructible != null && gizmoDestructible.HitpointsCurrentPct <= 0)
+                        {
+                            c_IgnoreSubStep = "HitPoints0";
+                            return false;
+                        }
+
                         if (noDamage)
                         {
                             MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
@@ -595,6 +619,13 @@ namespace Trinity
                 case GObjectType.Destructible:
                     {
                         AddToCache = true;
+
+                        var gizmoDestructible = c_diaObject as GizmoDestructible;
+                        if (gizmoDestructible != null && gizmoDestructible.HitpointsCurrentPct <= 0)
+                        {
+                            c_IgnoreSubStep = "HitPoints0";
+                            return false;
+                        }
 
                         if (noDamage)
                         {
