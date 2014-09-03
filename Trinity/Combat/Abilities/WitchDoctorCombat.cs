@@ -87,17 +87,6 @@ namespace Trinity.Combat.Abilities
 
                 // Summon Pets  -----------------------------------------------------------------------
 
-                // Zombie Dogs non-sacrifice build
-                if (!Skills.WitchDoctor.Sacrifice.IsActive && CanCast(SNOPower.Witchdoctor_SummonZombieDog) && Trinity.PlayerOwnedZombieDogCount <= 2)
-                {
-                    return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog);
-                }
-
-                if (CanCast(SNOPower.Witchdoctor_Gargantuan) && !Runes.WitchDoctor.RestlessGiant.IsActive && !Runes.WitchDoctor.WrathfulProtector.IsActive && Trinity.PlayerOwnedGargantuanCount == 0)
-                {
-                    return new TrinityPower(SNOPower.Witchdoctor_Gargantuan);
-                }
-
                 // Hex with angry chicken, is chicken, explode!
                 if (isChicken && (TargetUtil.AnyMobsInRange(12f, 1, false) || CurrentTarget.RadiusDistance <= 10f || UseDestructiblePower) &&
                     CanCast(SNOPower.Witchdoctor_Hex_Explode))

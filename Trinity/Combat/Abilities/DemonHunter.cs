@@ -65,18 +65,21 @@ namespace Trinity
                 return new TrinityPower(SNOPower.DemonHunter_SmokeScreen, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1);
             }
 
-
-            int sentryCoolDown = SpellHistory.SpellUseCountInTime(SNOPower.DemonHunter_Sentry, TimeSpan.FromSeconds(24)) >= 4 ? 12 : 6;
-
             // Sentry Turret
-            if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.DemonHunter_Sentry, CombatBase.CanCastFlags.NoTimer) &&
-                (TargetUtil.AnyElitesInRange(50) || TargetUtil.AnyMobsInRange(50, 2) || TargetUtil.IsEliteTargetInRange(50)) &&
-                Player.PrimaryResource >= 30 &&
-                (SpellHistory.TimeSinceUse(SNOPower.DemonHunter_Sentry) > TimeSpan.FromSeconds(sentryCoolDown) || SpellHistory.DistanceFromLastUsePosition(SNOPower.DemonHunter_Sentry) > 7.5))
-            {
+            int sentryCoolDown = SpellHistory.SpellUseCountInTime(SNOPower.DemonHunter_Sentry, TimeSpan.FromSeconds(24)) >= 4 ? 12 : 6;
+            bool hasBombadiersRucksack = Legendary.BombadiersRucksack.IsEquipped;
+            int maxSentries = hasBombadiersRucksack ? 4 : 2;
+            int sentryCount = ZetaDia.Actors.GetActorsOfType<DiaUnit>(true).Where(u => u.ActorSNO == 150025 && u.Distance < 60).Count();
+            bool hasM6 = Sets.EmbodimentOfTheMarauder.IsThirdBonusActive;
+            bool sentryCheck = (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.DemonHunter_Sentry, CombatBase.CanCastFlags.NoTimer) &&
+                (TargetUtil.AnyElitesInRange(50) || TargetUtil.AnyMobsInRange(50) || TargetUtil.IsEliteTargetInRange(50)) &&
+                Player.PrimaryResource >= 30 && sentryCount < maxSentries &&
+                (SpellHistory.TimeSinceUse(SNOPower.DemonHunter_Sentry) > TimeSpan.FromSeconds(sentryCoolDown) || SpellHistory.DistanceFromLastUsePosition(SNOPower.DemonHunter_Sentry) > 7.5));
 
-                return new TrinityPower(SNOPower.DemonHunter_Sentry, 65f, TargetUtil.GetBestClusterPoint());
-            }
+                if (hasM6 && sentryCheck || !hasM6 && sentryCheck && (TargetUtil.AnyMobsInRange(55f, 1)))
+                {
+                    return new TrinityPower(SNOPower.DemonHunter_Sentry, 65f, TargetUtil.GetBestClusterPoint());
+                }
 
             // Caltrops
             if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.DemonHunter_Caltrops) &&
@@ -347,7 +350,6 @@ namespace Trinity
             }
 
             // Impale
-            bool hasM6 = Sets.EmbodimentOfTheMarauder.IsThirdBonusActive;
             bool impalecheck = !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Impale) && !Player.IsIncapacitated &&
                 (!TargetUtil.AnyMobsInRange(12, 4));
             if (!hasM6)
