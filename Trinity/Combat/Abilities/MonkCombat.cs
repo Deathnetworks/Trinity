@@ -282,7 +282,7 @@ namespace Trinity.Combat.Abilities
             }
 
             //Use Mantra of Healing active if health is low for shield or spam it if we're using SWK build.
-            bool isSWK = Sets.MonkeyKingsGar.IsSecondBonusActive;
+            bool isSWK = Sets.MonkeyKingsGarb.IsSecondBonusActive;
             if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfHealing_v2) &&
                 (!isSWK && Player.CurrentHealthPct <= V.F("Monk.MantraOfHealing.UseHealthPct") || isSWK) &&
                 !Player.IsIncapacitated && !GetHasBuff(SNOPower.X1_Monk_MantraOfHealing_v2))
