@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Trinity.Cache;
 using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Game;
@@ -164,18 +165,32 @@ namespace Trinity.Combat.Abilities
             // Hydra
             if (CanCast(SNOPower.Wizard_Hydra))
             {
+                var _14s = TimeSpan.FromSeconds(14);
                 const float maxHydraDistance = 30f;
+                const float maxHydraDistSqr = maxHydraDistance * maxHydraDistance;
 
                 // This will check if We have the "Serpent Sparker" wand, and attempt to cast a 2nd hydra immediately after the first
-                bool hasSerpentsSparker = Legendary.SerpentsSparker.IsEquipped;
-                bool hydraCheck = (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_Hydra, CanCastFlags.NoTimer) &&
-                    CurrentTarget.RadiusDistance <= maxHydraDistance && Player.PrimaryResource >= 15);
+                bool serpentSparkerRecast1 = EquippedItemCache.Instance.ItemIds.Contains(SerpentSparkerId) && LastPowerUsed == SNOPower.Wizard_Hydra &&
+                    SpellHistory.SpellUseCountInTime(SNOPower.Wizard_Hydra, TimeSpan.FromSeconds(2)) < 2;
 
-                if (hasSerpentsSparker && hydraCheck && Trinity.PlayerOwnedHydraCount < 2 || !hasSerpentsSparker && hydraCheck && Trinity.PlayerOwnedHydraCount == 0)
+                bool baseRecast = TimeSpanSincePowerUse(SNOPower.Wizard_Hydra) > TimeSpan.FromSeconds(14);
+                var lastCast = SpellHistory.HistoryQueue
+                    .Where(p => p.Power.SNOPower == SNOPower.Wizard_Hydra && p.TimeSinceUse < _14s)
+                    .OrderBy(s => s.TimeSinceUse).ThenBy(p => p.Power.TargetPosition.Distance2DSqr(CurrentTarget.Position))
+                    .FirstOrDefault();
+
+                bool distanceRecast = lastCast != null && lastCast.TargetPosition.Distance2DSqr(CurrentTarget.Position) > maxHydraDistSqr;
+
+                bool twoAlredyCastIn5Sec = SpellHistory.SpellUseCountInTime(SNOPower.Wizard_Hydra, TimeSpan.FromSeconds(5)) >= 2;
+
+                if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_Hydra, CanCastFlags.NoTimer) &&
+                    (baseRecast || distanceRecast || serpentSparkerRecast1) && !twoAlredyCastIn5Sec &&
+                    CurrentTarget.RadiusDistance <= maxHydraDistance && Player.PrimaryResource >= 15)
                 {
                     var pos = TargetUtil.GetBestClusterPoint(maxHydraDistance);
                     return new TrinityPower(SNOPower.Wizard_Hydra, maxHydraDistance, pos);
                 }
+
             }
 
             // Archon
