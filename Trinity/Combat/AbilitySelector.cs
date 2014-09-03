@@ -103,7 +103,7 @@ namespace Trinity
                             break;
                         // Wizards
                         case ActorClass.Wizard:
-                            power = GetWizardPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
+                            power = WizardCombat.GetPower();
                             break;
                         // Witch Doctors
                         case ActorClass.Witchdoctor:

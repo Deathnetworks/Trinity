@@ -620,6 +620,14 @@ namespace Trinity
             159098 
         };
 
+        public static HashSet<int> WizardHydraIds { get { return wizardHydraIds; } }
+        private static readonly HashSet<int> wizardHydraIds = new HashSet<int>
+        { 
+            80745, // Wizard_HydraHead_Default_1
+            80757, // Wizard_HydraHead_Default_2
+            80758, // Wizard_HydraHead_Default_3
+        };
+
         /// <summary>
         /// World-object dictionaries eg large object lists, ignore lists etc.
         /// A list of SNO's to *FORCE* to type: Item. (BE CAREFUL WITH THIS!).
