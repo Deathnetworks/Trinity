@@ -196,7 +196,7 @@ namespace Trinity
                 }
                 // Not heading straight for a safe-spot?
                 // No valid targets but we were told to stay put?
-                if (CurrentTarget == null && _shouldStayPutDuringAvoidance && !_standingInAvoidance)
+                if (CurrentTarget == null && _shouldStayPutDuringAvoidance && !_standingInAvoidance && Settings.Combat.Misc.AvoidAoEOutOfCombat)
                 {
                     CurrentTarget = new TrinityCacheObject()
                                         {

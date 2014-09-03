@@ -32,6 +32,7 @@ namespace Trinity.Config.Combat
         private int _ForceKillElitesHealth;
         private bool _ForceKillSummoners;
         private bool _ProfileTagOverride;
+        private bool _AvoidAoEOutOfCombat;
         #endregion Fields
 
         #region Events
@@ -509,7 +510,25 @@ namespace Trinity.Config.Combat
                 {
                     _ForceKillSummoners = value;
                     OnPropertyChanged("ForceKillSummoners");
-             }
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool AvoidAoEOutOfCombat
+        {
+            get
+            {
+                return _AvoidAoEOutOfCombat;
+            }
+            set
+            {
+                if (_AvoidAoEOutOfCombat != value)
+                {
+                    _AvoidAoEOutOfCombat = value;
+                    OnPropertyChanged("AvoidAoEOutOfCombat");
+                }
             }
         }
 
@@ -563,6 +582,7 @@ namespace Trinity.Config.Combat
             UseExperimentalFireChainsAvoidance = true;
             ForceKillElitesHealth = 0;
             ForceKillSummoners = true;
+            AvoidAoEOutOfCombat = true;
         }
         #endregion Methods
     }

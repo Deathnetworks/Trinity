@@ -194,6 +194,7 @@
                         <CheckBox IsChecked="{Binding Path=Misc.KillMonstersInAoE}" ToolTip="Attack units standing in AoE">Attack Mobs in AoE</CheckBox>
                         <CheckBox IsChecked="{Binding Path=Misc.UseExperimentalSavageBeastAvoidance}" ToolTip="Use Experimental Savage Beast Charge Avoidance">Avoid Savage Beast Charge</CheckBox>
                         <CheckBox IsChecked="{Binding Path=Misc.UseExperimentalFireChainsAvoidance}" ToolTip="Use Experimental Fire Chains Avoidance">Avoid Fire Chains</CheckBox>
+                        <CheckBox IsChecked="{Binding Path=Misc.AvoidAoEOutOfCombat}" ToolTip="Avoid AoE out of combat (Arcane, molten, etc)">Avoid AoE out of combat</CheckBox>
                     </UniformGrid>
                 </GroupBox>
             </StackPanel>
