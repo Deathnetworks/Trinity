@@ -296,7 +296,6 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-
                 // Default attacks
                 if (!UseOOCBuff && !IsCurrentlyAvoiding)
                 {

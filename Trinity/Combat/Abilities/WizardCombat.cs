@@ -30,25 +30,21 @@ namespace Trinity.Combat.Abilities
             // Buffs
             if (UseOOCBuff)
             {
-                power = GetBuffPower();
+                return GetBuffPower();
             }
-
             // In Combat, Avoiding
-            if (!IsNull(power) && !UseOOCBuff && IsCurrentlyAvoiding)
+            if (IsCurrentlyAvoiding)
             {
-                power = GetCombatPower();
+                return GetCombatAvoidancePower();
             }
-
             // In combat, Not Avoiding
-            if (!IsNull(power) && !UseOOCBuff && !IsCurrentlyAvoiding && CurrentTarget != null)
+            if (CurrentTarget != null)
             {
-                GetCombatPower();
+                return GetCombatPower();
             }
 
             // Default attacks
-            power = DefaultPower;
-
-            return power;
+            return DefaultPower;
         }
 
         /// <summary>
@@ -341,7 +337,7 @@ namespace Trinity.Combat.Abilities
             }
 
             // Default Attacks
-            if (IsNull(null))
+            if (IsNull(power))
                 power = DefaultPower;
 
             return power;
