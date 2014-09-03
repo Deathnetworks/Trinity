@@ -69,11 +69,10 @@ namespace Trinity
             int sentryCoolDown = SpellHistory.SpellUseCountInTime(SNOPower.DemonHunter_Sentry, TimeSpan.FromSeconds(24)) >= 4 ? 12 : 6;
             bool hasBombadiersRucksack = Legendary.BombadiersRucksack.IsEquipped;
             int maxSentries = hasBombadiersRucksack ? 4 : 2;
-            int sentryCount = ZetaDia.Actors.GetActorsOfType<DiaUnit>(true).Where(u => u.ActorSNO == 150025 && u.Distance < 60).Count();
             bool hasM6 = Sets.EmbodimentOfTheMarauder.IsThirdBonusActive;
             bool sentryCheck = (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.DemonHunter_Sentry, CombatBase.CanCastFlags.NoTimer) &&
                 (TargetUtil.AnyElitesInRange(50) || TargetUtil.AnyMobsInRange(50) || TargetUtil.IsEliteTargetInRange(50)) &&
-                Player.PrimaryResource >= 30 && sentryCount < maxSentries &&
+                Player.PrimaryResource >= 30 && Trinity.PlayerOwnedDHSentryCount < maxSentries &&
                 (SpellHistory.TimeSinceUse(SNOPower.DemonHunter_Sentry) > TimeSpan.FromSeconds(sentryCoolDown) || SpellHistory.DistanceFromLastUsePosition(SNOPower.DemonHunter_Sentry) > 7.5));
 
                 if (hasM6 && sentryCheck || !hasM6 && sentryCheck && (TargetUtil.AnyMobsInRange(55f, 1)))

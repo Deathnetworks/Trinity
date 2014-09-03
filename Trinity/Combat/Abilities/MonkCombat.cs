@@ -281,14 +281,17 @@ namespace Trinity.Combat.Abilities
                 }
             }
 
-            //Use Mantra of Healing active if health is low for shield.
-            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfHealing_v2) && Player.CurrentHealthPct <= V.F("Monk.MantraOfHealing.UseHealthPct") &&
+            //Use Mantra of Healing active if health is low for shield or spam it if we're using SWK build.
+            bool isSWK = Sets.MonkeyKingsGar.IsSecondBonusActive;
+            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfHealing_v2) &&
+                (!isSWK && Player.CurrentHealthPct <= V.F("Monk.MantraOfHealing.UseHealthPct") || isSWK) &&
                 !Player.IsIncapacitated && !GetHasBuff(SNOPower.X1_Monk_MantraOfHealing_v2))
             {
                 return new TrinityPower(SNOPower.X1_Monk_MantraOfHealing_v2);
             }
 
-            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && Player.CurrentHealthPct <= V.F("Monk.MantraOfHealing.UseHealthPct") &&
+            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) &&
+                (!isSWK && Player.CurrentHealthPct <= V.F("Monk.MantraOfHealing.UseHealthPct") || isSWK) &&
                 !GetHasBuff(SNOPower.X1_Monk_MantraOfEvasion_v2) && CurrentTarget != null)
             {
                 return new TrinityPower(SNOPower.X1_Monk_MantraOfEvasion_v2);
