@@ -63,6 +63,12 @@ namespace Trinity
                 return true;
             }
 
+            // Tiered Rift Keys
+            if (itemType == GItemType.TieredLootrunKey)
+            {
+                return true;
+            }
+
             // Pickup Legendary potions
             if (itemType == GItemType.HealthPotion && item.Quality >= ItemQuality.Legendary)
             {
@@ -393,6 +399,7 @@ namespace Trinity
             if (name.StartsWith("xbow_")) return GItemType.TwoHandCrossbow;
             if (name == "console_powerglobe") return GItemType.PowerGlobe;
             if (name.StartsWith("consumable_add_sockets")) return GItemType.ConsumableAddSockets; // Ramaladni's Gift
+            if (name.StartsWith("tieredlootrunkey_")) return GItemType.TieredLootrunKey;
 
             // Follower item types
             if (name.StartsWith("jewelbox_") || dbItemType == ItemType.FollowerSpecial)
@@ -517,7 +524,8 @@ namespace Trinity
             // Misc Items
             else if (itemType == GItemType.CraftingMaterial || itemType == GItemType.CraftTome || itemType == GItemType.LootRunKey || itemType == GItemType.HoradricRelic ||
                 itemType == GItemType.SpecialItem || itemType == GItemType.CraftingPlan || itemType == GItemType.HealthPotion || itemType == GItemType.HoradricCache ||
-                itemType == GItemType.Dye || itemType == GItemType.StaffOfHerding || itemType == GItemType.InfernalKey || itemType == GItemType.ConsumableAddSockets)
+                itemType == GItemType.Dye || itemType == GItemType.StaffOfHerding || itemType == GItemType.InfernalKey || itemType == GItemType.ConsumableAddSockets ||
+                itemType == GItemType.TieredLootrunKey)
             {
                 itemBaseType = GItemBaseType.Misc;
             }

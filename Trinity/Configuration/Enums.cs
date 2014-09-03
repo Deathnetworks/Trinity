@@ -55,6 +55,7 @@
         SpiritStone,
         StaffOfHerding,
         Sword,
+        TieredLootrunKey,
         Topaz,
         TwoHandAxe,
         TwoHandBow,
