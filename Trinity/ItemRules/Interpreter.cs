@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Trinity.Cache;
+using Trinity.Helpers;
 using Trinity.ItemRules.Core;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -801,7 +802,8 @@ namespace Trinity.ItemRules
             itemDic.Add("[TYPE]", result);
 
             // - QUALITY -------------------------------------------------------//
-            itemDic.Add("[QUALITY]", Regex.Replace(item.ItemQualityLevel.ToString(), @"[\d-]", string.Empty));
+            //itemDic.Add("[QUALITY]", Regex.Replace(item.ItemQualityLevel.ToString(), @"[\d-]", string.Empty));
+            itemDic.Add("[QUALITY]", Regex.Replace(item.ItemLinkColorQuality().ToString(), @"[\d-]", string.Empty));
             itemDic.Add("[D3QUALITY]", item.ItemQualityLevel.ToString());
 
             // - ROLL ----------------------------------------------------------//

@@ -523,6 +523,8 @@ namespace Trinity.Items
                         break;
                 }
 
+                itemList.RemoveAll(i => i == null);
+                itemList.RemoveAll(i => !i.IsValid);
 
                 foreach (var item in itemList.OrderBy(i => i.InventorySlot).ThenBy(i => i.Name))
                 {
