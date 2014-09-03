@@ -477,6 +477,20 @@ namespace Trinity
                         return false;
                     }
                 }
+                // Count up Demon Hunter sentries
+                if (Player.ActorClass == ActorClass.DemonHunter)
+                {
+                    if (DataDictionary.DemonHunterSentryIds.Contains(CurrentCacheObject.ActorSNO))
+                    {
+                        if (CurrentCacheObject.IsSummonedByPlayer)
+                        {
+                            PlayerOwnedDHSentryCount++;
+                            c_IgnoreSubStep = "IsPlayerSummoned";
+                        }
+                        return false;
+                    }
+                }
+                // Count up Wiz hydras
                 if (Player.ActorClass == ActorClass.Wizard)
                 {
                     if (DataDictionary.WizardHydraIds.Contains(CurrentCacheObject.ActorSNO))

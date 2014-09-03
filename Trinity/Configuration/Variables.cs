@@ -140,6 +140,7 @@ namespace Trinity
         internal static int PlayerOwnedGargantuanCount = 0;
         internal static int PlayerOwnedZombieDogCount = 0;
         internal static int PlayerOwnedDHPetsCount = 0;
+        internal static int PlayerOwnedDHSentryCount = 0;
         internal static int PlayerOwnedHydraCount = 0;
 
         // These are a bunch of safety counters for how many times in a row we register having *NO* ability to select when we need one (eg all off cooldown)

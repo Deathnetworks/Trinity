@@ -634,6 +634,7 @@ namespace Trinity
                 PlayerOwnedGargantuanCount = 0;
                 PlayerOwnedZombieDogCount = 0;
                 PlayerOwnedDHPetsCount = 0;
+                PlayerOwnedDHSentryCount = 0;
 
                 // Flag for if we should search for an avoidance spot or not
                 _standingInAvoidance = false;

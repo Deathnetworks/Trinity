@@ -620,6 +620,11 @@ namespace Trinity
             159098 
         };
 
+        public static HashSet<int> DemonHunterSentryIds { get { return demonHunterSentryIds; } }
+        private static readonly HashSet<int> demonHunterSentryIds = new HashSet<int> { 
+            141402
+        };
+
         public static HashSet<int> WizardHydraIds { get { return wizardHydraIds; } }
         private static readonly HashSet<int> wizardHydraIds = new HashSet<int>
         { 
