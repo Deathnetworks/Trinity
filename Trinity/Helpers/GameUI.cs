@@ -167,9 +167,6 @@ namespace Trinity
                 return;
             if (ZetaDia.IsInGame && SafeClickElement(TalktoInteractButton1, "Conversation Button"))
                 return;
-            if (ZetaDia.IsInGame && SafeClickElement(StashBuyNewTabButton, "Buying new Stash Tab"))
-                return;
-
             if (DateTime.UtcNow.Subtract(_lastCheckedUiButtons).TotalMilliseconds <= 500)
                 return;
 
@@ -192,6 +189,9 @@ namespace Trinity
                 return;
             if (ZetaDia.IsInGame && SafeClickElement(ConfirmTimedDungeonOK, "Confirm Timed Dungeon OK Button", true))
                 return;
+            if (ZetaDia.IsInGame && SafeClickElement(StashBuyNewTabButton, "Buying new Stash Tab"))
+                return;
+
         }
 
         public static bool IsPartyDialogVisible
