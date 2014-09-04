@@ -91,7 +91,6 @@ namespace Trinity.Helpers
                     qualityResult = ItemQuality.Inferior;
                     break;
                 case "":
-                    Logger.Log("Invalid Item Link color={0} internalName={1} name={2} gameBalanceId={3}", linkColor, item.InternalName, item.Name, item.GameBalanceId);
                     qualityResult = item.ItemQualityLevel;
                     break;
                 default:
