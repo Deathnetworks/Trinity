@@ -152,8 +152,8 @@ namespace Trinity
             }
 
             // Summons by the player 
-            AddToCache = RefreshStepCachedSummons(AddToCache);
-            if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return AddToCache; }
+            AddToCache = RefreshStepCachedSummons();
+            if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return false; }
 
             using (new PerformanceLogger("RefreshDiaObject.CachedType"))
             {

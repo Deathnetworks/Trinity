@@ -24,7 +24,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <!--Emergency Health, Hota/WW Slider, Threating Shout -->
+        <!--Emergency Health, Resource, Hota/WW Slider, Threating Shout -->
         <Grid Grid.Row="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -36,8 +36,6 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Potion %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
                 <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
@@ -46,15 +44,31 @@
                     TickPlacement="None" 
                     Value="{Binding Path=Barb.PotionLevel, Converter={StaticResource percentConverter}}" 
                     HorizontalAlignment="Stretch" Margin="2,0"/>
-                <TextBlock Grid.Column="2" Text="Globe %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
-                <Slider Grid.Column="3" Template="{DynamicResource Slider}" 
-                    Interval="500" Maximum="100" Minimum="0" 
-                    SmallChange="1" LargeChange="5"
-                    TickPlacement="None" 
-                    Value="{Binding Path=Barb.HealthGlobeLevel, Converter={StaticResource percentConverter}}" 
-                    HorizontalAlignment="Stretch" Margin="2,0"/>
             </Grid>
-            <Grid Grid.Row="1">
+            <Grid Grid.Row="1" Margin="2">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <TextBlock Text="Globe Health %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+              <Slider Grid.Column="1" Template="{DynamicResource Slider}"
+                      Interval="500" Maximum="100" Minimum="0"
+                      SmallChange="1" LargeChange="5"
+                      TickPlacement="None"
+                      Value="{Binding Path=Barb.HealthGlobeLevel, Converter={StaticResource percentConverter}}"
+                      HorizontalAlignment="Stretch" Margin="2"/>
+              <TextBlock Grid.Column="2" Text="Globe Resource %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+              <Slider Grid.Column="3" Template="{DynamicResource Slider}"
+                      Interval="500" Maximum="100" Minimum="0"
+                      SmallChange="1" LargeChange="5"
+                      TickPlacement="None"
+                      Value="{Binding Path=Barb.HealthGlobeLevelResource, Converter={StaticResource percentConverter}}"
+                      HorizontalAlignment="Stretch" Margin="2"
+                      ToolTip="Only applies when Reaper's Wraps are equipped"/>
+            </Grid>
+            <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*" />
                     <ColumnDefinition Width="3*" />
@@ -68,7 +82,7 @@
                     HorizontalAlignment="Stretch" Margin="2,0" MinWidth="245" 
                     ToolTip="Minimum Health to use Hammer of the Ancients, only applies when Whirlwind is available" />
             </Grid>
-            <Grid Grid.Row="2">
+            <Grid Grid.Row="3">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
@@ -81,7 +95,7 @@
                 Value="{Binding Path=Barb.MinThreatShoutMobCount}" 
                 HorizontalAlignment="Stretch" Margin="2,0"/>
             </Grid>
-            <Grid Grid.Row="3">
+            <Grid Grid.Row="4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="3*"/>
@@ -116,6 +130,7 @@
                     <CheckBox Margin="2" IsChecked="{Binding Path=Barb.FuryDumpWOTB}">Fury Dump (Sprint)</CheckBox>
                     <CheckBox Margin="2" IsChecked="{Binding Barb.IgnoreAvoidanceInWOTB}" ToolTip="Avoidance Health Triggers Reduced" Content="Modify AoE Health"/>
                     <CheckBox Margin="2" IsChecked="{Binding Barb.IgnoreGoldInWOTB}" ToolTip="Ignores gold when WOTB is up" Content="Ignore Gold Stacks"/>
+                    <CheckBox Margin="2" IsChecked="{Binding Path=Barb.WOTBEmergencyHealth}" ToolTip="Force use WOTB if health is below emergency health" Content="Use WOTB on emergencies"/>
                 </UniformGrid>
             </GroupBox>
             <UniformGrid Columns="2" Grid.Row="1">

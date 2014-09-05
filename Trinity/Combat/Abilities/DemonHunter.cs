@@ -2,6 +2,7 @@
 using System.Linq;
 using Trinity.Combat;
 using Trinity.Combat.Abilities;
+using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Game;
@@ -64,18 +65,20 @@ namespace Trinity
                 return new TrinityPower(SNOPower.DemonHunter_SmokeScreen, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1);
             }
 
-
-            int sentryCoolDown = SpellHistory.SpellUseCountInTime(SNOPower.DemonHunter_Sentry, TimeSpan.FromSeconds(24)) >= 4 ? 12 : 6;
-
             // Sentry Turret
-            if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.DemonHunter_Sentry, CombatBase.CanCastFlags.NoTimer) &&
-                (TargetUtil.AnyElitesInRange(50) || TargetUtil.AnyMobsInRange(50, 2) || TargetUtil.IsEliteTargetInRange(50)) &&
-                Player.PrimaryResource >= 30 &&
-                (SpellHistory.TimeSinceUse(SNOPower.DemonHunter_Sentry) > TimeSpan.FromSeconds(sentryCoolDown) || SpellHistory.DistanceFromLastUsePosition(SNOPower.DemonHunter_Sentry) > 7.5))
-            {
+            int sentryCoolDown = SpellHistory.SpellUseCountInTime(SNOPower.DemonHunter_Sentry, TimeSpan.FromSeconds(24)) >= 4 ? 12 : 6;
+            bool hasBombadiersRucksack = Legendary.BombadiersRucksack.IsEquipped;
+            int maxSentries = hasBombadiersRucksack ? 4 : 2;
+            bool hasM6 = Sets.EmbodimentOfTheMarauder.IsThirdBonusActive;
+            bool sentryCheck = (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.DemonHunter_Sentry, CombatBase.CanCastFlags.NoTimer) &&
+                (TargetUtil.AnyElitesInRange(50) || TargetUtil.AnyMobsInRange(50) || TargetUtil.IsEliteTargetInRange(50)) &&
+                Player.PrimaryResource >= 30 && Trinity.PlayerOwnedDHSentryCount < maxSentries &&
+                (SpellHistory.TimeSinceUse(SNOPower.DemonHunter_Sentry) > TimeSpan.FromSeconds(sentryCoolDown) || SpellHistory.DistanceFromLastUsePosition(SNOPower.DemonHunter_Sentry) > 7.5));
 
-                return new TrinityPower(SNOPower.DemonHunter_Sentry, 65f, TargetUtil.GetBestClusterPoint());
-            }
+                if (hasM6 && sentryCheck || !hasM6 && sentryCheck && (TargetUtil.AnyMobsInRange(55f, 1)))
+                {
+                    return new TrinityPower(SNOPower.DemonHunter_Sentry, 65f, TargetUtil.GetBestClusterPoint());
+                }
 
             // Caltrops
             if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.DemonHunter_Caltrops) &&
@@ -162,8 +165,8 @@ namespace Trinity
                 }
 
                 // Use Wolf Howl on Unique/Elite/Champion - Would help for farming trash, but trash farming should not need this - Used on Elites to reduce Deaths per hour
-                if (hasWolf && CombatBase.CanCast(SNOPower.X1_DemonHunter_Companion) && 
-                    (TargetUtil.AnyMobsInRange(20) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance < 55f)))
+                if (hasWolf && CombatBase.CanCast(SNOPower.X1_DemonHunter_Companion) &&
+                    ((CurrentTarget.IsBossOrEliteRareUnique || TargetUtil.AnyMobsInRange(40, 10)) && CurrentTarget.RadiusDistance < 25f))
                 {
                     return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
                 }
@@ -198,9 +201,7 @@ namespace Trinity
             // Vault
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_Vault) && !Player.IsRooted && !Player.IsIncapacitated &&
                 Settings.Combat.DemonHunter.VaultMode != Config.Combat.DemonHunterVaultMode.MovementOnly &&
-                // Only use vault to retreat if < level 60, or if in inferno difficulty for level 60's
-                (Player.Level < 60 || Player.GameDifficulty > GameDifficulty.Master) &&
-                (CurrentTarget.RadiusDistance <= 10f || TargetUtil.AnyMobsInRange(10)) &&
+                (TargetUtil.AnyMobsInRange(7f,6) || Player.CurrentHealthPct <= 0.7) &&
                 // if we have ShadowPower and Disicpline is >= 16
                 // or if we don't have ShadoWpower and Discipline is >= 22
                 (Player.SecondaryResource >= (Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) ? 22 : 16)) &&
@@ -348,12 +349,25 @@ namespace Trinity
             }
 
             // Impale
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Impale) && !Player.IsIncapacitated &&
-                (!TargetUtil.AnyMobsInRange(12, 4)) &&
-                ((Player.PrimaryResource >= 25 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve) &&
-                CurrentTarget.RadiusDistance <= 50f)
+            bool impalecheck = !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Impale) && !Player.IsIncapacitated &&
+                (!TargetUtil.AnyMobsInRange(12, 4));
+            if (!hasM6)
             {
-                return new TrinityPower(SNOPower.DemonHunter_Impale, 50f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1);
+                if (impalecheck &&
+                    ((Player.PrimaryResource >= 25 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve) &&
+                    CurrentTarget.RadiusDistance <= 50f)
+                {
+                    return new TrinityPower(SNOPower.DemonHunter_Impale, 50f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1);
+                }
+            }
+            //We don't want to spam Impale if we have M6 equipped
+            else
+            {
+                if (impalecheck && ((Player.PrimaryResource >= 75 && !Player.WaitingForReserveEnergy)) &&
+                CurrentTarget.RadiusDistance <= 50f)
+                {
+                    return new TrinityPower(SNOPower.DemonHunter_Impale, 50f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1);
+                }
             }
 
             // Evasive Fire
@@ -387,6 +401,23 @@ namespace Trinity
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Grenades) && !Player.IsIncapacitated)
             {
                 return new TrinityPower(SNOPower.DemonHunter_Grenades, 40f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 5, 5);
+            }
+
+            //Hexing Pants Mod
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && CurrentTarget != null)
+            {
+                if (Legendary.HexingPantsofMrYan.IsEquipped && CurrentTarget.IsUnit &&
+                CurrentTarget.RadiusDistance > 10f)
+                {
+                    return new TrinityPower(SNOPower.Walk, 10f, CurrentTarget.Position);
+                }
+
+                if (Legendary.HexingPantsofMrYan.IsEquipped && CurrentTarget.IsUnit &&
+                CurrentTarget.RadiusDistance < 10f)
+                {
+                    Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, -10f);
+                    return new TrinityPower(SNOPower.Walk, 10f, vNewTarget);
+                }
             }
 
             // Default attacks

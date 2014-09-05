@@ -24,6 +24,8 @@ namespace Trinity.Combat.Abilities
             get { return Trinity.Settings.Combat.Monk; }
         }
 
+        private static bool hasInnaSet = Sets.Innas.IsThirdBonusActive;
+
         public static TrinityPower GetPower()
         {     
 
@@ -64,7 +66,7 @@ namespace Trinity.Combat.Abilities
                     (TargetUtil.AnyMobsInRange(15, 3)) ||
                     (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f) ||
                     // as pre-sweeping wind buff
-                    (TargetUtil.AnyMobsInRange(15, 1) && CombatBase.CanCast(SNOPower.Monk_SweepingWind) && !GetHasBuff(SNOPower.Monk_SweepingWind) && Settings.Combat.Monk.HasInnaSet)
+                    (TargetUtil.AnyMobsInRange(15, 1) && CombatBase.CanCast(SNOPower.Monk_SweepingWind) && !GetHasBuff(SNOPower.Monk_SweepingWind) && hasInnaSet)
                 ) &&
                 // Check if either we don't have sweeping winds, or we do and it's ready to cast in a moment
                 (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) ||
@@ -116,7 +118,7 @@ namespace Trinity.Combat.Abilities
 
 
             // Sweeping winds spam
-            if ((Player.PrimaryResource >= 75 || (Settings.Combat.Monk.HasInnaSet && Player.PrimaryResource >= 5)) &&
+            if ((Player.PrimaryResource >= 75 || (hasInnaSet && Player.PrimaryResource >= 5)) &&
                 CombatBase.CanCast(SNOPower.Monk_SweepingWind, CombatBase.CanCastFlags.NoTimer) && GetHasBuff(SNOPower.Monk_SweepingWind) &&
                 DateTime.UtcNow.Subtract(Trinity.SweepWindSpam).TotalMilliseconds >= 4000 && DateTime.UtcNow.Subtract(Trinity.SweepWindSpam).TotalMilliseconds <= 5400)
             {
@@ -124,11 +126,11 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.Monk_SweepingWind, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 0, 0);
             }
 
-            float minSweepingWindSpirit = Settings.Combat.Monk.HasInnaSet ? 5f : 75f;
+            float minSweepingWindSpirit = hasInnaSet ? 5f : 75f;
 
             // Sweeping wind
             if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Monk_SweepingWind) && !GetHasBuff(SNOPower.Monk_SweepingWind) &&
-                ((TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(20, 1) || Settings.Combat.Monk.HasInnaSet ||
+                ((TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(20, 1) || hasInnaSet ||
                 (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 25f)) &&
                 // Check our mantras, if we have them, are up first
                 Monk_HasMantraAbilityAndBuff() &&
@@ -280,14 +282,17 @@ namespace Trinity.Combat.Abilities
                 }
             }
 
-            //Use Mantra of Healing active if health is low for shield.
-            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfHealing_v2) && Player.CurrentHealthPct <= V.F("Monk.MantraOfHealing.UseHealthPct") &&
+            //Use Mantra of Healing active if health is low for shield or spam it if we're using SWK build.
+            bool isSWK = Sets.MonkeyKingsGarb.IsSecondBonusActive;
+            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfHealing_v2) &&
+                (!isSWK && Player.CurrentHealthPct <= V.F("Monk.MantraOfHealing.UseHealthPct") || isSWK) &&
                 !Player.IsIncapacitated && !GetHasBuff(SNOPower.X1_Monk_MantraOfHealing_v2))
             {
                 return new TrinityPower(SNOPower.X1_Monk_MantraOfHealing_v2);
             }
 
-            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && Player.CurrentHealthPct <= V.F("Monk.MantraOfHealing.UseHealthPct") &&
+            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) &&
+                (!isSWK && Player.CurrentHealthPct <= V.F("Monk.MantraOfHealing.UseHealthPct") || isSWK) &&
                 !GetHasBuff(SNOPower.X1_Monk_MantraOfEvasion_v2) && CurrentTarget != null)
             {
                 return new TrinityPower(SNOPower.X1_Monk_MantraOfEvasion_v2);

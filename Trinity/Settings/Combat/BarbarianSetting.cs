@@ -9,6 +9,7 @@ namespace Trinity.Config.Combat
         #region Fields
         private float _PotionLevel;
         private float _HealthGlobeLevel;
+        private float _HealthGlobeLevelResource;
         private int _KiteLimit;
         private bool _SelectiveWirlwind;
         private bool _WaitWOTB;
@@ -26,6 +27,7 @@ namespace Trinity.Config.Combat
         private BarbarianSprintMode _SprintMode;
         private bool _UseLeapOOC;
         private bool _UseChargeOOC;
+        private bool _WOTBEmergencyHealth;
         private float _AvoidArcaneHealth;
         private float _AvoidAzmoBodiesHealth;
         private float _AvoidAzmoFireBallHealth;
@@ -111,6 +113,24 @@ namespace Trinity.Config.Combat
                 {
                     _HealthGlobeLevel = value;
                     OnPropertyChanged("HealthGlobeLevel");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(0.5f)]
+        public float HealthGlobeLevelResource
+        {
+            get
+            {
+                return _HealthGlobeLevelResource;
+            }
+            set
+            {
+                if (_HealthGlobeLevelResource != value)
+                {
+                    _HealthGlobeLevelResource = value;
+                    OnPropertyChanged("HealthGlobeLevelResource");
                 }
             }
         }
@@ -742,6 +762,24 @@ namespace Trinity.Config.Combat
                 {
                     _WaitWOTB = value;
                     OnPropertyChanged("WaitWOTB");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool WOTBEmergencyHealth
+        {
+            get
+            {
+                return _WOTBEmergencyHealth;
+            }
+            set
+            {
+                if (_WOTBEmergencyHealth != value)
+                {
+                    _WOTBEmergencyHealth = value;
+                    OnPropertyChanged("WOTBEmergencyHealth");
                 }
             }
         }

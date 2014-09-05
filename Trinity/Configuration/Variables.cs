@@ -136,10 +136,12 @@ namespace Trinity
         private static DateTime _lastClearedAvoidanceBlackspots = DateTime.MinValue;
 
         // A count for player mystic ally, gargantuans, and zombie dogs
-        private static int PlayerOwnedMysticAllyCount = 0;
-        public static int PlayerOwnedGargantuanCount = 0;
-        public static int PlayerOwnedZombieDogCount = 0;
-        private static int PlayerOwnedDHPetsCount = 0;
+        internal static int PlayerOwnedMysticAllyCount = 0;
+        internal static int PlayerOwnedGargantuanCount = 0;
+        internal static int PlayerOwnedZombieDogCount = 0;
+        internal static int PlayerOwnedDHPetsCount = 0;
+        internal static int PlayerOwnedDHSentryCount = 0;
+        internal static int PlayerOwnedHydraCount = 0;
 
         // These are a bunch of safety counters for how many times in a row we register having *NO* ability to select when we need one (eg all off cooldown)
 
@@ -194,6 +196,7 @@ namespace Trinity
         // These values below are set on a per-class basis later on, so don't bother changing them here! These are the old default values
         public static double PlayerEmergencyHealthPotionLimit = 0.35;
         private static double _playerEmergencyHealthGlobeLimit = 0.35;
+        private static double _playerHealthGlobeResource = 0.35;
 
         /*
          *  Blacklists

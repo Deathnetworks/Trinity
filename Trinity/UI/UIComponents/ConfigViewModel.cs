@@ -195,15 +195,15 @@ namespace Trinity.UI.UIComponents
 
                                                     if (ZetaDia.Me.IsValid && ZetaDia.IsInGame)
                                                     {
-                                                        Logger.Log("------ Active Skills / Runes ------", Skills.Active.Count, Skills.Active.Count);
+                                                        Logger.Log("------ Active Skills / Runes ------", ActiveUtils.Active.Count, ActiveUtils.Active.Count);
 
-                                                        Action<Skill> logSkill = s => Logger.Log("Skill: {0} Rune={1}", s.Name, s.CurrentRune.Name);                                                        
+                                                        Action<Skill> logSkill = s => Logger.Log("Skill: {0} Rune={1}", s.Name, s.CurrentRune.Name);
 
-                                                        Skills.Active.ForEach(logSkill);
+                                                        ActiveUtils.Active.ForEach(logSkill);
 
                                                         Action<Passive> logPassive = p => Logger.Log("Passive: {0}", p.Name);
 
-                                                        Passives.Active.ForEach(logPassive);
+                                                        PassiveUtils.Active.ForEach(logPassive);
 
                                                     }
                                                 }

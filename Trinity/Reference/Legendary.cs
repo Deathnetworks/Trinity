@@ -283,6 +283,7 @@ namespace Trinity.Reference
         // HandCrossbow   
         public static Item BalefireCaster = new Item(192528, "Balefire Caster", ItemType.HandCrossbow);
         public static Item Blitzbolter = new Item(195078, "Blitzbolter", ItemType.HandCrossbow);
+        public static Item DanettasSpite = new Item(211745, "Danetta's Spite", ItemType.HandCrossbow);
         public static Item DanettasRevenge = new Item(211749, "Danetta's Revenge", ItemType.HandCrossbow);
         public static Item Dawn = new Item(196409, "Dawn", ItemType.HandCrossbow);
         public static Item Helltrapper = new Item(271914, "Helltrapper", ItemType.HandCrossbow);

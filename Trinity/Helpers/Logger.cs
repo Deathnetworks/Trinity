@@ -38,9 +38,15 @@ namespace Trinity.Technicals
             {
                 string msg = string.Format(prefix + "{0} {1}", category != LogCategory.UserInformation ? "[" + category.ToString() + "]" : string.Empty, formatMessage);
 
+                try
+                {
                 if (args.Length > 0)
                     msg = string.Format(msg, args);
-
+                }
+                catch
+                {
+                    msg = msg + " || " + args;
+                }
                 var key = new Tuple<LogCategory, TrinityLogLevel>(category, level);
 
                 if (!LastLogMessages.ContainsKey(key))

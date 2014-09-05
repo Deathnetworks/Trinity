@@ -196,7 +196,7 @@ namespace Trinity
                 }
                 // Not heading straight for a safe-spot?
                 // No valid targets but we were told to stay put?
-                if (CurrentTarget == null && _shouldStayPutDuringAvoidance && !_standingInAvoidance)
+                if (CurrentTarget == null && _shouldStayPutDuringAvoidance && !_standingInAvoidance && Settings.Combat.Misc.AvoidAoEOutOfCombat)
                 {
                     CurrentTarget = new TrinityCacheObject()
                                         {
@@ -634,6 +634,7 @@ namespace Trinity
                 PlayerOwnedGargantuanCount = 0;
                 PlayerOwnedZombieDogCount = 0;
                 PlayerOwnedDHPetsCount = 0;
+                PlayerOwnedDHSentryCount = 0;
 
                 // Flag for if we should search for an avoidance spot or not
                 _standingInAvoidance = false;

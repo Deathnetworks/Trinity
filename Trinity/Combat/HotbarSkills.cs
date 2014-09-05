@@ -5,7 +5,6 @@ using Trinity.Technicals;
 using Zeta.Game;
 using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
-using System.Linq.Expressions;
 
 namespace Trinity.Combat
 {
@@ -147,30 +146,34 @@ namespace Trinity.Combat
 
             foreach (SNOPower p in Trinity.Hotbar)
             {
-                if (_assignedSkills.Count(x => x.Power == p) == 0)
+                _assignedSkills.Add(new HotbarSkills
                 {
-                    _assignedSkills.Add(new HotbarSkills
-                    {
-                        Power = p,
-                        Slot = GetHotbarSlotFromPower(p),
-                        RuneIndex = GetRuneIndexFromPower(p)
-                    });
-                }
+                    Power = p,
+                    Slot = GetHotbarSlotFromPower(p),
+                    RuneIndex = GetRuneIndexFromPower(p)
+                });
             }
 
 
             string skillList = "";
-            foreach (HotbarSkills skill in AssignedSkills)
+
+            _passiveSkills = new HashSet<SNOPower>(cPlayer.PassiveSkills);
+            _assignedSNOPowers = new HashSet<SNOPower>(_assignedSkills.Select(v => v.Power));
+
+            foreach (var skill in _assignedSkills)
             {
                 skillList += " " + skill.Power + "/" + skill.RuneIndex + "/" + skill.Slot;
+                
+                if (!_skillBySNOPower.ContainsKey(skill.Power))
+                    _skillBySNOPower.Add(skill.Power, skill);
+
+                if (!_skillBySlot.ContainsKey(skill.Slot))
+                {
+                    _skillBySlot.Add(skill.Slot, skill);
+                }
             }
             Logger.Log(logLevel, logCategory, " Hotbar Skills (Skill/RuneIndex/Slot): " + skillList);
 
-            PassiveSkills = new HashSet<SNOPower>(cPlayer.PassiveSkills);
-
-            _skillBySNOPower = _assignedSkills.ToDictionary(v => v.Power, v => v);
-            _skillBySlot = _assignedSkills.ToDictionary(v => v.Slot, v => v);
-            _assignedSNOPowers = new HashSet<SNOPower>(_assignedSkills.Select(v => v.Power));
         }
 
 

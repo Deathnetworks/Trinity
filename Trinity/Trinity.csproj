@@ -100,7 +100,6 @@
     <Compile Include="Combat\Abilities\SpellHistory.cs" />
     <Compile Include="Combat\Abilities\SpellHistoryItem.cs" />
     <Compile Include="Combat\Abilities\WitchDoctorCombat.cs" />
-    <Compile Include="Combat\Abilities\Wizard.cs" />
     <Compile Include="Combat\Abilities\DemonHunter.cs" />
     <Compile Include="Combat\Abilities\WizardCombat.cs" />
     <Compile Include="Combat\AvoidanceManager.cs" />
@@ -160,10 +159,13 @@
     <Compile Include="Objects\Skill.cs" />
     <Compile Include="Reference\Legendary.cs" />
     <Compile Include="Reference\Passives.cs" />
+    <Compile Include="Reference\PassiveUtils.cs" />
+    <Compile Include="Reference\RuneUtils.cs" />
     <Compile Include="Reference\Runes.cs" />
     <Compile Include="Reference\Sets.cs" />
     <Compile Include="Reference\Skills.cs" />
     <Compile Include="Combat\CombatMovement.cs" />
+    <Compile Include="Reference\ActiveUtils.cs" />
     <Compile Include="Settings\Combat\CrusaderSetting.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Combat\HandleTarget.cs" />

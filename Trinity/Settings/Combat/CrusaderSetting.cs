@@ -21,9 +21,11 @@ namespace Trinity.Config.Combat
         private int _HeavensFuryAoECount;
         private int _CondemnAoECount;
         private bool _SteedChargeOOC;
-        private float _SteedChargeMinRange;          
+        private float _SteedChargeMinRange;
+        private float _FistOfHeavensDist;
         private float _PotionLevel;
         private float _HealthGlobeLevel;
+        private float _HealthGlobeLevelResource;
         private float _AvoidArcaneHealth;
         private float _AvoidAzmoBodiesHealth;
         private float _AvoidAzmoFireBallHealth;
@@ -358,7 +360,23 @@ namespace Trinity.Config.Combat
             }
         }
 
-
+        [DataMember(IsRequired = false)]
+        [DefaultValue(65f)]
+        public float FistOfHeavensDist
+        {
+            get
+            {
+                return _FistOfHeavensDist;
+            }
+            set
+            {
+                if (_FistOfHeavensDist != value)
+                {
+                    _FistOfHeavensDist = value;
+                    OnPropertyChanged("FistOfHeavensDist");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(0.35f)]
@@ -396,6 +414,23 @@ namespace Trinity.Config.Combat
             }
         }
 
+        [DataMember(IsRequired = false)]
+        [DefaultValue(0.5f)]
+        public float HealthGlobeLevelResource
+        {
+            get
+            {
+                return _HealthGlobeLevelResource;
+            }
+            set
+            {
+                if (_HealthGlobeLevelResource != value)
+                {
+                    _HealthGlobeLevelResource = value;
+                    OnPropertyChanged("HealthGlobeLevelResource");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(1f)]

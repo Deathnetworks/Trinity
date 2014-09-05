@@ -65,30 +65,33 @@ namespace Trinity.Helpers
 
             switch (linkColor)
             {
-                case "{c:ff00ff00}":
+                case "{c:ff00ff00}": // Green
                     qualityResult = ItemQuality.Legendary;
                     break;
-                case "{c:ffff8000}":
+                case "{c:ffff8000}": // Orange
                     qualityResult = ItemQuality.Legendary;
                     break;
-                case "{c:ffffff00}":
+                case "{c:ffffff00}": // Yellow
                     qualityResult = ItemQuality.Rare4;
                     break;
-                case "{c:ff6969ff}":
+                case "{c:ff6969ff}": // Magic Blue 
                     qualityResult = ItemQuality.Magic1;
                     break;
-                case "{c:ffffffff}":
+                case "{c:ffffffff}": // White
                     qualityResult = ItemQuality.Normal;
                     break;
                     // got this off a "lore book" - not sure what it actually equates to
-                case "{c:ff99bbff}":
+                case "{c:ff99bbff}": // Gem Blue
                     qualityResult = ItemQuality.Normal;
                     break;
-                case "{c:ffc236ff}":
+                case "{c:ffc236ff}": // Purple
                     qualityResult = ItemQuality.Special;
                     break;
+                case "{c:ff888888}": // Gray
+                    qualityResult = ItemQuality.Inferior;
+                    break;
                 case "":
-                    qualityResult = ItemQuality.Invalid;
+                    qualityResult = item.ItemQualityLevel;
                     break;
                 default:
                     Logger.Log("Invalid Item Link color={0} internalName={1} name={2} gameBalanceId={3}", linkColor, item.InternalName, item.Name, item.GameBalanceId);

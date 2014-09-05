@@ -133,7 +133,7 @@ namespace Trinity
         public bool HasBeenRaycastable { get; set; }
         public bool HasBeenInLoS { get; set; }
         [NoCopy]
-        public bool IsBossOrEliteRareUnique { get { return (this.IsUnit && (IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
+        public bool IsBossOrEliteRareUnique { get { return (this.IsUnit && (IsEliteRareUnique || IsBoss)); } }
         [NoCopy]
         public bool IsTrashMob { get { return (this.IsUnit && !(IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
         [NoCopy]

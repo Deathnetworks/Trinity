@@ -424,7 +424,7 @@ namespace Trinity
             }
             return monsterType;
         }
-        private static bool RefreshStepCachedSummons(bool AddToCache)
+        private static bool RefreshStepCachedSummons()
         {
             if (CurrentCacheObject.Unit != null && CurrentCacheObject.Unit.IsValid)
             {
@@ -451,7 +451,6 @@ namespace Trinity
                     CurrentCacheObject.IsSummonedByPlayer = true;
                 }
 
-
                 // Count up Mystic Allys, gargantuans, and zombies - if the player has those skills
                 if (Player.ActorClass == ActorClass.Monk)
                 {
@@ -462,7 +461,7 @@ namespace Trinity
                             PlayerOwnedMysticAllyCount++;
                             c_IgnoreSubStep = "IsPlayerSummoned";
                         }
-                        AddToCache = false;
+                        return false;
                     }
                 }
                 // Count up Demon Hunter pets
@@ -475,7 +474,33 @@ namespace Trinity
                             PlayerOwnedDHPetsCount++;
                             c_IgnoreSubStep = "IsPlayerSummoned";
                         }
-                        AddToCache = false;
+                        return false;
+                    }
+                }
+                // Count up Demon Hunter sentries
+                if (Player.ActorClass == ActorClass.DemonHunter)
+                {
+                    if (DataDictionary.DemonHunterSentryIds.Contains(CurrentCacheObject.ActorSNO))
+                    {
+                        if (CurrentCacheObject.IsSummonedByPlayer)
+                        {
+                            PlayerOwnedDHSentryCount++;
+                            c_IgnoreSubStep = "IsPlayerSummoned";
+                        }
+                        return false;
+                    }
+                }
+                // Count up Wiz hydras
+                if (Player.ActorClass == ActorClass.Wizard)
+                {
+                    if (DataDictionary.WizardHydraIds.Contains(CurrentCacheObject.ActorSNO))
+                    {
+                        if (CurrentCacheObject.IsSummonedByPlayer)
+                        {
+                            PlayerOwnedHydraCount++;
+                            c_IgnoreSubStep = "IsPlayerSummoned";
+                        }
+                        return false;
                     }
                 }
                 // Count up zombie dogs and gargantuans next
@@ -488,7 +513,7 @@ namespace Trinity
                             PlayerOwnedGargantuanCount++;
                             c_IgnoreSubStep = "IsPlayerSummoned";
                         }
-                        AddToCache = false;
+                        return false;
                     }
                     if (DataDictionary.ZombieDogIds.Contains(CurrentCacheObject.ActorSNO))
                     {
@@ -497,11 +522,11 @@ namespace Trinity
                             PlayerOwnedZombieDogCount++;
                             c_IgnoreSubStep = "IsPlayerSummoned";
                         }
-                        AddToCache = false;
+                        return false;
                     }
                 }
             }
-            return AddToCache;
+            return true;
         }
 
     }

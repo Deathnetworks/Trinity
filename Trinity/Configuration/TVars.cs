@@ -27,11 +27,12 @@ namespace Trinity
             Set(new TVar("Barbarian.IgnorePain.MinHealth", 0.45f, "Ignore Pain Emergency Use Minimum Health Percent"));
             Set(new TVar("Barbarian.Avoidance.WOTB.Other", 0.3f, "General WOTB Avoidance health multiplier"));
             Set(new TVar("Barbarian.Avoidance.WOTB.Desecrator", 0.2f, "WOTB Desecrator health multiplier"));
-            Set(new TVar("Barbarian.Avoidance.WOTB.Arcane", 0f, "WOTB Arcane health multiplier"));
+            Set(new TVar("Barbarian.Avoidance.WOTB.Arcane", 0.75f, "WOTB Arcane health multiplier"));
             Set(new TVar("Barbarian.Avoidance.WOTB.IceBall", 0f, "WOTB IceBall health multiplier"));
             Set(new TVar("Barbarian.Avoidance.WOTB.PoisonTree", 1f, "WOTB Poison Tree / Spore health multiplier"));
             Set(new TVar("Barbarian.Avoidance.WOTB.Belial", 1f, "WOTB Belial health multiplier"));
             Set(new TVar("Barbarian.Avoidance.WOTB.BeastCharge", 1f, "WOTB Belial health multiplier"));
+            Set(new TVar("Barbarian.Avoidance.WOTB.MoltenCore", 1f, "WOTB MoltenCore health multiplier"));
             Set(new TVar("Barbarian.ThreatShout.Range", 25f, "Threating Shout Mob Range distance"));
             Set(new TVar("Barbarian.ThreatShout.OOCMaxFury", 25, "Threating Shout Out of Combat Max Fury"));
             Set(new TVar("Barbarian.WarCry.MaxFury", 40, "Maximum Fury to cast WarCry (with buff)"));
@@ -62,6 +63,7 @@ namespace Trinity
             Set(new TVar("Barbarian.Whirlwind.EliteRange", 25f, "Minimum Fury"));
             Set(new TVar("Barbarian.Whirlwind.EliteCount", 1, "Minimum Fury"));
             Set(new TVar("Barbarian.Whirlwind.UseForMovement", true, "Use Whirlwind when moving near ignored mobs"));
+            Set(new TVar("Barbarian.Whirlwind.RLTWZigZag", 2f, "Whirlwind RLTW ZigZag Range"));
             Set(new TVar("Barbarian.Whirlwind.ZigZagDistance", 20f, "Whirlwind ZigZag Range"));
             Set(new TVar("Barbarian.Whirlwind.ZigZagMaxTime", 600, "Maximum time to keep a zig zag point before forcing a new point (millseconds)"));
             Set(new TVar("Barbarian.Bash.UseRange", 6f, "Power Use Range"));

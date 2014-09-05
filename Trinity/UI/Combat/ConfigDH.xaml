@@ -28,8 +28,6 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Potion %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
                 <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
@@ -38,13 +36,30 @@
                     TickPlacement="None" 
                     Value="{Binding Path=DH.PotionLevel, Converter={StaticResource percentConverter}}" 
                     HorizontalAlignment="Stretch" Margin="2"/>
-                <TextBlock Grid.Column="2" Text="Globe %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
-                <Slider Grid.Column="3" Template="{DynamicResource Slider}" 
-                    Interval="500" Maximum="100" Minimum="0" 
-                    SmallChange="1" LargeChange="5"
-                    TickPlacement="None" 
-                    Value="{Binding Path=DH.HealthGlobeLevel, Converter={StaticResource percentConverter}}" 
-                    HorizontalAlignment="Stretch" Margin="2"/>
+            </Grid>
+
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <TextBlock Text="Globe Health %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+              <Slider Grid.Column="1" Template="{DynamicResource Slider}"
+                      Interval="500" Maximum="100" Minimum="0"
+                      SmallChange="1" LargeChange="5"
+                      TickPlacement="None"
+                      Value="{Binding Path=DH.HealthGlobeLevel, Converter={StaticResource percentConverter}}"
+                      HorizontalAlignment="Stretch" Margin="2"/>
+              <TextBlock Grid.Column="2" Text="Globe Resource %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+              <Slider Grid.Column="3" Template="{DynamicResource Slider}"
+                      Interval="500" Maximum="100" Minimum="0"
+                      SmallChange="1" LargeChange="5"
+                      TickPlacement="None"
+                      Value="{Binding Path=DH.HealthGlobeLevelResource, Converter={StaticResource percentConverter}}"
+                      HorizontalAlignment="Stretch" Margin="2"
+                      ToolTip="Only applies when Reaper's Wraps are equipped"/>
             </Grid>
             <!--Kite-->
             <Grid>

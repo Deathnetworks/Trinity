@@ -460,11 +460,17 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return
-                    !UseOOCBuff &&
-                    !Player.IsIncapacitated &&
-                    CanCast(SNOPower.Barbarian_Leap) &&
-                    (TargetUtil.ClusterExists(15f, 35f, V.I("Barbarian.Leap.TrashCount")) || CurrentTarget.IsBossOrEliteRareUnique);
+                bool leapresult = !UseOOCBuff &&
+                        !Player.IsIncapacitated &&
+                        CanCast(SNOPower.Barbarian_Leap);
+                if (Legendary.LutSocks.IsEquipped) // This will now cast whenever leap is available and an enemy is around. Disable Leap OOC option. The last line will prevent you from leaping on destructibles
+                {
+                    return leapresult && TargetUtil.AnyMobsInRange(15f, 1);
+                }   
+                else
+                {
+                    return leapresult && (TargetUtil.ClusterExists(15f, 35f, V.I("Barbarian.Leap.TrashCount")) || CurrentTarget.IsBossOrEliteRareUnique);
+                }
             }
         }
         public static bool CanUseRend
@@ -645,9 +651,18 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && !IsWaitingForSpecial && CanCast(SNOPower.Barbarian_HammerOfTheAncients) &&
+                bool hotaresult = !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && !IsWaitingForSpecial && CanCast(SNOPower.Barbarian_HammerOfTheAncients) &&
                     (Player.PrimaryResource >= V.F("Barbarian.HammerOfTheAncients.MinFury") || LastPowerUsed == SNOPower.Barbarian_HammerOfTheAncients) &&
                     (!Hotbar.Contains(SNOPower.Barbarian_Whirlwind) || (Player.CurrentHealthPct >= Settings.Combat.Barbarian.MinHotaHealth && Hotbar.Contains(SNOPower.Barbarian_Whirlwind)));
+
+                if (Legendary.LutSocks.IsEquipped)
+                {
+                    return !CanUseLeap && hotaresult;
+                }
+                else
+                {
+                    return hotaresult;
+                }
             }
         }
         public static bool CanUseHammerOfTheAncientsElitesOnly
@@ -656,14 +671,29 @@ namespace Trinity.Combat.Abilities
             {
                 bool canUseHota = CanUseHammerOfTheAncients;
 
-                if (canUseHota)
+                if (Legendary.LutSocks.IsEquipped)
                 {
-                    bool hotaElites = (CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.IsTreasureGoblin) && TargetUtil.EliteOrTrashInRange(10f);
+                    if (canUseHota)
+                    {
+                        bool hotaElites = (CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.IsTreasureGoblin) && TargetUtil.EliteOrTrashInRange(10f);
 
-                    bool hotaTrash = IgnoringElites && CurrentTarget.IsTrashMob &&
-                        (TargetUtil.EliteOrTrashInRange(6f) || CurrentTarget.MonsterSize == Zeta.Game.Internals.SNO.MonsterSize.Big);
+                        bool hotaTrash = IgnoringElites && CurrentTarget.IsTrashMob &&
+                            (TargetUtil.EliteOrTrashInRange(6f) || CurrentTarget.MonsterSize == Zeta.Game.Internals.SNO.MonsterSize.Big);
 
-                    return canUseHota && (hotaElites || hotaTrash);
+                        return canUseHota && (hotaElites || hotaTrash);
+                    }
+                }
+                else
+                {
+                    if (canUseHota && !CanUseLeap)
+                    {
+                        bool hotaElites = (CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.IsTreasureGoblin) && TargetUtil.EliteOrTrashInRange(10f);
+
+                        bool hotaTrash = IgnoringElites && CurrentTarget.IsTrashMob &&
+                            (TargetUtil.EliteOrTrashInRange(6f) || CurrentTarget.MonsterSize == Zeta.Game.Internals.SNO.MonsterSize.Big);
+
+                        return canUseHota && (hotaElites || hotaTrash);
+                    }
                 }
                 return false;
             }
@@ -719,9 +749,18 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                Vector3 aoeTarget = TargetUtil.GetBestClusterPoint(15f, 35f, false);
-
-                return new TrinityPower(SNOPower.Barbarian_Leap, V.F("Barbarian.Leap.UseRange"), aoeTarget);
+                // For Call of Arreat rune. Will do all quakes on top of each other
+                bool hasCallOfArreat = HotbarSkills.AssignedSkills.Any(p => p.Power == SNOPower.Barbarian_Leap && p.RuneIndex == 0);
+                if (Legendary.LutSocks.IsEquipped && hasCallOfArreat)
+                {
+                    Vector3 aoeTarget = TargetUtil.GetBestClusterPoint(7f, 9f, false);
+                    return new TrinityPower(SNOPower.Barbarian_Leap, V.F("Barbarian.Leap.UseRange"), aoeTarget);
+                }
+                else
+                {
+                    Vector3 aoeTarget = TargetUtil.GetBestClusterPoint(15f, 35f, false);
+                    return new TrinityPower(SNOPower.Barbarian_Leap, V.F("Barbarian.Leap.UseRange"), aoeTarget);
+                }
             }
         }
         public static TrinityPower PowerRend { get { return new TrinityPower(SNOPower.Barbarian_Rend, V.I("Barbarian.Rend.TickDelay"), V.I("Barbarian.Rend.TickDelay")); } }
@@ -747,12 +786,22 @@ namespace Trinity.Combat.Abilities
                     (DateTime.UtcNow.Subtract(Trinity.LastChangedZigZag).TotalMilliseconds >= V.I("Barbarian.Whirlwind.ZigZagMaxTime") ||
                     CurrentTarget.ACDGuid != Trinity.LastZigZagUnitAcdGuid ||
                     ZigZagPosition.Distance2D(Player.Position) <= 5f);
+                bool hasRLTW = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_Sprint && s.RuneIndex == 2);
 
                 if (shouldGetNewZigZag)
                 {
-                    var wwdist = V.F("Barbarian.Whirlwind.ZigZagDistance");
-
-                    ZigZagPosition = TargetUtil.GetZigZagTarget(CurrentTarget.Position, wwdist);
+                    if (hasRLTW)
+                    {
+                        var wwdist = V.F("Barbarian.Whirlwind.RLTWZigZag");
+                        ZigZagPosition = TargetUtil.GetZigZagTarget(CurrentTarget.Position, wwdist);
+                        return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), ZigZagPosition, Trinity.CurrentWorldDynamicId, -1, 0, 1);
+                    }
+                    if (!hasRLTW)
+                    {
+                        var wwdist = V.F("Barbarian.Whirlwind.ZigZagDistance");
+                        ZigZagPosition = TargetUtil.GetZigZagTarget(CurrentTarget.Position, wwdist);
+                        return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), ZigZagPosition, Trinity.CurrentWorldDynamicId, -1, 0, 1);
+                    }
 
                     Trinity.LastZigZagUnitAcdGuid = CurrentTarget.ACDGuid;
                     Trinity.LastChangedZigZag = DateTime.UtcNow;

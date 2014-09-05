@@ -18,6 +18,7 @@ namespace Trinity.Config.Combat
         private bool _AllowBacktracking;
         private int _DelayAfterKill;
         private bool _UseNavMeshTargeting;
+        private bool _HiPriorityHG;
         private int _TrashPackSize;
         private float _TrashPackClusterRadius;
         private bool _IgnoreElites;
@@ -31,6 +32,7 @@ namespace Trinity.Config.Combat
         private int _ForceKillElitesHealth;
         private bool _ForceKillSummoners;
         private bool _ProfileTagOverride;
+        private bool _AvoidAoEOutOfCombat;
         #endregion Fields
 
         #region Events
@@ -99,6 +101,24 @@ namespace Trinity.Config.Combat
                 {
                     _UseNavMeshTargeting = value;
                     OnPropertyChanged("UseNavMeshTargeting");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool HiPriorityHG
+        {
+            get
+            {
+                return _HiPriorityHG;
+            }
+            set
+            {
+                if (_HiPriorityHG != value)
+                {
+                    _HiPriorityHG = value;
+                    OnPropertyChanged("HiPriorityHG");
                 }
             }
         }
@@ -490,7 +510,25 @@ namespace Trinity.Config.Combat
                 {
                     _ForceKillSummoners = value;
                     OnPropertyChanged("ForceKillSummoners");
-             }
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool AvoidAoEOutOfCombat
+        {
+            get
+            {
+                return _AvoidAoEOutOfCombat;
+            }
+            set
+            {
+                if (_AvoidAoEOutOfCombat != value)
+                {
+                    _AvoidAoEOutOfCombat = value;
+                    OnPropertyChanged("AvoidAoEOutOfCombat");
+                }
             }
         }
 
@@ -544,6 +582,7 @@ namespace Trinity.Config.Combat
             UseExperimentalFireChainsAvoidance = true;
             ForceKillElitesHealth = 0;
             ForceKillSummoners = true;
+            AvoidAoEOutOfCombat = true;
         }
         #endregion Methods
     }

@@ -25,11 +25,9 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <!--Emergency Health-->
+        <!--Emergency Health and Resource-->
         <Grid Grid.Row="0" Margin="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
@@ -40,23 +38,39 @@
                     TickPlacement="None" 
                     Value="{Binding Path=Monk.PotionLevel, Converter={StaticResource percentConverter}}" 
                     HorizontalAlignment="Stretch" Margin="2"/>
-            <TextBlock Grid.Column="2" Text="Globe %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
-            <Slider Grid.Column="3" Template="{DynamicResource Slider}" 
-                    Interval="500" Maximum="100" Minimum="0" 
-                    SmallChange="1" LargeChange="5"
-                    TickPlacement="None" 
-                    Value="{Binding Path=Monk.HealthGlobeLevel, Converter={StaticResource percentConverter}}" 
-                    HorizontalAlignment="Stretch" Margin="2"/>
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="2">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+          <TextBlock Text="Globe Health %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+          <Slider Grid.Column="1" Template="{DynamicResource Slider}"
+                  Interval="500" Maximum="100" Minimum="0"
+                  SmallChange="1" LargeChange="5"
+                  TickPlacement="None"
+                  Value="{Binding Path=Monk.HealthGlobeLevel, Converter={StaticResource percentConverter}}"
+                  HorizontalAlignment="Stretch" Margin="2"/>
+          <TextBlock Grid.Column="2" Text="Globe Resource %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+          <Slider Grid.Column="3" Template="{DynamicResource Slider}"
+                  Interval="500" Maximum="100" Minimum="0"
+                  SmallChange="1" LargeChange="5"
+                  TickPlacement="None"
+                  Value="{Binding Path=Monk.HealthGlobeLevelResource, Converter={StaticResource percentConverter}}"
+                  HorizontalAlignment="Stretch" Margin="2"
+                  ToolTip="Only applies when Reaper's Wraps are equipped"/>
         </Grid>
         <!--CheckBox-->
-        <Grid Grid.Row="1" Margin="2">
+        <Grid Grid.Row="2" Margin="2">
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
             </Grid.RowDefinitions>
             <UniformGrid Grid.Row="0" Columns="2" HorizontalAlignment="Center">
-                <CheckBox Margin="2" IsChecked="{Binding Path=Monk.HasInnaSet}" ToolTip="Sweeping Wind for 5 Spirit">Inna's set</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Monk.SWBeforeWoL}" ToolTip="Always use Sweeping Wind before Wave of Light">Always use SW before WoL</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Monk.DisableMantraSpam}" ToolTip="Disable Spamming Mantras (for the 3-sec. buff)">Disable Mantra Spam</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Monk.SpamSweepingWindOnLowHP}" ToolTip="Use with Transcendance Passive for Health Regen">Spam Sweeping Wind on Low HP</CheckBox>
@@ -64,7 +78,7 @@
             </UniformGrid>
         </Grid>
 
-        <Grid Grid.Row="2" Margin="2">
+        <Grid Grid.Row="3" Margin="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -78,7 +92,7 @@
                 HorizontalAlignment="Stretch" Margin="2"/>
         </Grid>
 
-        <Grid Grid.Row="3" Margin="2">
+        <Grid Grid.Row="4" Margin="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>

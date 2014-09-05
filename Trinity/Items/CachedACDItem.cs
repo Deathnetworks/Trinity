@@ -1,4 +1,5 @@
 ﻿using System;
+using Trinity.Helpers;
 using Trinity.Technicals;
 using Zeta.Game;
 using Zeta.Game.Internals;
@@ -280,7 +281,7 @@ namespace Trinity
                     InternalName = item.InternalName,
                     RealName = item.Name,
                     Level = item.Level,
-                    Quality = item.ItemQualityLevel,
+                    Quality = item.ItemLinkColorQuality(),
                     GoldAmount = item.Gold,
                     BalanceID = item.GameBalanceId,
                     DynamicID = item.DynamicId,

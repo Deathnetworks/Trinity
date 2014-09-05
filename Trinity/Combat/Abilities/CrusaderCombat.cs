@@ -2,6 +2,7 @@
 using System.Linq;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
+using Trinity.Reference;
 
 namespace Trinity.Combat.Abilities
 {
@@ -82,11 +83,12 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Consecration
-                if (CanCastConsecration())
+                bool hasSGround = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_Crusader_Consecration && s.RuneIndex == 3);
+                if ((!hasSGround && CanCastConsecration()) ||
+                   (hasSGround && CanCastConsecration() && (TargetUtil.AnyMobsInRange(15f, 5) || TargetUtil.IsEliteTargetInRange(15f))))
                 {
                     return new TrinityPower(SNOPower.X1_Crusader_Consecration);
                 }
-
                 // Akarats when off Cooldown
                 if (CrusaderSettings.UseAkaratsOffCooldown && CanCast(SNOPower.X1_Crusader_AkaratsChampion))
                 {
@@ -115,9 +117,20 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // HeavensFury
-                if (CanCastHeavensFury())
+                bool isHolyShotgun = (Legendary.FateoftheFell.IsEquipped && Sets.ArmorOfAkkhan.IsThirdBonusActive);
+                if (!isHolyShotgun)
                 {
-                    return new TrinityPower(SNOPower.X1_Crusader_HeavensFury3, 16f, TargetUtil.GetBestClusterPoint());
+                    if (CanCastHeavensFury(isHolyShotgun))
+                    {
+                        return new TrinityPower(SNOPower.X1_Crusader_HeavensFury3, 16f, TargetUtil.GetBestClusterPoint());
+                    }
+                }
+                else
+                {
+                    if (CanCastHeavensFury(isHolyShotgun))
+                    {
+                        return new TrinityPower(SNOPower.X1_Crusader_HeavensFury3, 7f, CurrentTarget.ACDGuid);
+                    }
                 }
 
                 // Condemn
@@ -150,7 +163,8 @@ namespace Trinity.Combat.Abilities
                 // Fist of Heavens
                 if (CanCastFistOfHeavens())
                 {
-                    return new TrinityPower(SNOPower.X1_Crusader_FistOfTheHeavens, 65f, TargetUtil.GetBestClusterUnit(8f).Position);
+                    float range = Settings.Combat.Crusader.FistOfHeavensDist;
+                    return new TrinityPower(SNOPower.X1_Crusader_FistOfTheHeavens, range, TargetUtil.GetBestClusterUnit(8f).Position);
                 }
 
                 // Blessed Hammer
@@ -304,9 +318,10 @@ namespace Trinity.Combat.Abilities
             return CanCast(SNOPower.X1_Crusader_Condemn) && (TargetUtil.EliteOrTrashInRange(16f) || TargetUtil.AnyMobsInRange(15f, CrusaderSettings.CondemnAoECount));
         }
 
-        private static bool CanCastHeavensFury()
+        private static bool CanCastHeavensFury(bool isHolyShotgun)
         {
-            return CanCast(SNOPower.X1_Crusader_HeavensFury3) && (TargetUtil.EliteOrTrashInRange(16f) || TargetUtil.ClusterExists(15f, 90f, CrusaderSettings.HeavensFuryAoECount));
+                return (!isHolyShotgun && CanCast(SNOPower.X1_Crusader_HeavensFury3) && (TargetUtil.EliteOrTrashInRange(16f) || TargetUtil.ClusterExists(15f, 90f, CrusaderSettings.HeavensFuryAoECount))) ||
+                    (isHolyShotgun && CanCast(SNOPower.X1_Crusader_HeavensFury3) && TargetUtil.AnyMobsInRange(15f, 1));
         }
 
         private static bool CanCastFallingSword()

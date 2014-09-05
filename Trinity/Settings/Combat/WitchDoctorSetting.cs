@@ -13,8 +13,10 @@ namespace Trinity.Config.Combat
         private float _HonoredGuestMana;
         private float _FirebatsRange;
         private bool _UseFetishArmyOffCooldown;
+        private bool _UseBigBadVoodooOffCooldown;
         private float _PotionLevel;
         private float _HealthGlobeLevel;
+        private float _HealthGlobeLevelResource;
         private int _KiteLimit;
         private float _AvoidArcaneHealth;
         private float _AvoidAzmoBodiesHealth;
@@ -156,6 +158,18 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool UseBigBadVoodooOffCooldown
+        {
+            get { return _UseBigBadVoodooOffCooldown; }
+            set
+            {
+                _UseBigBadVoodooOffCooldown = value;
+                OnPropertyChanged("UseBigBadVoodooOffCooldown");
+            }
+        }
+
+        [DataMember(IsRequired = false)]
         [DefaultValue(0.35f)]
         public float PotionLevel
         {
@@ -187,6 +201,24 @@ namespace Trinity.Config.Combat
                 {
                     _HealthGlobeLevel = value;
                     OnPropertyChanged("HealthGlobeLevel");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(0.5f)]
+        public float HealthGlobeLevelResource
+        {
+            get
+            {
+                return _HealthGlobeLevelResource;
+            }
+            set
+            {
+                if (_HealthGlobeLevelResource != value)
+                {
+                    _HealthGlobeLevelResource = value;
+                    OnPropertyChanged("HealthGlobeLevelResource");
                 }
             }
         }
