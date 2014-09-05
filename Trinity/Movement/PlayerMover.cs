@@ -638,9 +638,9 @@ namespace Trinity.DbProvider
                 bool hasCalamity = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Teleport && s.RuneIndex == 0);
 
                 // Teleport for a wizard 
-                if (!hasCalamity && CombatBase.CanCast(SNOPower.Wizard_Teleport, CombatBase.CanCastFlags.NoTimer) &&
-                    CombatBase.TimeSincePowerUse(SNOPower.Wizard_Teleport) > 250 &&
-                    destinationDistance >= 10f && !ShrinesInArea(vMoveToTarget))
+                 if (CombatBase.CanCast(SNOPower.Wizard_Teleport, CombatBase.CanCastFlags.NoTimer) &&
+                    CombatBase.TimeSincePowerUse(SNOPower.Wizard_Teleport) > 1350 &&
+                    destinationDistance >= 25f && !ShrinesInArea(vMoveToTarget))
                 {
                     var maxTeleportRange = 75f;
 

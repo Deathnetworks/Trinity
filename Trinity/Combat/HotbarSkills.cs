@@ -5,6 +5,7 @@ using Trinity.Technicals;
 using Zeta.Game;
 using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
+using System.Linq.Expressions;
 
 namespace Trinity.Combat
 {
@@ -13,13 +14,13 @@ namespace Trinity.Combat
         private static HashSet<HotbarSkills> _assignedSkills = new HashSet<HotbarSkills>();
         private static HashSet<SNOPower> _passiveSkills = new HashSet<SNOPower>();
         private static Dictionary<SNOPower, HotbarSkills> _skillBySNOPower = new Dictionary<SNOPower, HotbarSkills>();
-        private static Dictionary<HotbarSlot, HotbarSkills> _skillBySlot = new Dictionary<HotbarSlot, HotbarSkills>();        
+        private static Dictionary<HotbarSlot, HotbarSkills> _skillBySlot = new Dictionary<HotbarSlot, HotbarSkills>();
         private static HashSet<SNOPower> _assignedSNOPowers = new HashSet<SNOPower>();
 
         private static bool ShouldUpdate
         {
             get { return Trinity.HotbarRefreshTimer.Elapsed > TimeSpan.FromSeconds(10); }
-        } 
+        }
 
         /// <summary>
         /// Assigned SNOPowers as HashSet
@@ -28,7 +29,7 @@ namespace Trinity.Combat
         {
             get
             {
-                if (!_assignedSNOPowers.Any() || ShouldUpdate) 
+                if (!_assignedSNOPowers.Any() || ShouldUpdate)
                     Update();
 
                 return _assignedSNOPowers;
@@ -40,7 +41,7 @@ namespace Trinity.Combat
         /// </summary>
         internal static HotbarSkills BySNOPower(SNOPower power)
         {
-            if (!_skillBySNOPower.Any() || ShouldUpdate) 
+            if (!_skillBySNOPower.Any() || ShouldUpdate)
                 Update();
 
             HotbarSkills hbs;
@@ -116,8 +117,8 @@ namespace Trinity.Combat
         {
             //Logger.Log("Refreshing Hotbar {0} ms", Trinity.HotbarRefreshTimer.ElapsedMilliseconds);
 
-            Trinity.Hotbar = new List<SNOPower>();            
-            
+            Trinity.Hotbar = new List<SNOPower>();
+
             for (int i = 0; i <= 5; i++)
             {
                 SNOPower power = cPlayer.GetPowerForSlot((HotbarSlot)i);
@@ -134,7 +135,7 @@ namespace Trinity.Combat
             }
             Trinity.ShouldRefreshHotbarAbilities = false;
             Trinity.HotbarRefreshTimer.Restart();
-           
+
             var oldSkills = new HashSet<HotbarSkills>();
             foreach (var skill in _assignedSkills)
             {
@@ -142,16 +143,19 @@ namespace Trinity.Combat
             }
 
             // Get current Skills and Runes 
-            _assignedSkills.Clear();                
+            _assignedSkills.Clear();
 
             foreach (SNOPower p in Trinity.Hotbar)
             {
-                _assignedSkills.Add(new HotbarSkills
+                if (_assignedSkills.Count(x => x.Power == p) == 0)
                 {
-                    Power = p,
-                    Slot = GetHotbarSlotFromPower(p),
-                    RuneIndex = GetRuneIndexFromPower(p)
-                });
+                    _assignedSkills.Add(new HotbarSkills
+                    {
+                        Power = p,
+                        Slot = GetHotbarSlotFromPower(p),
+                        RuneIndex = GetRuneIndexFromPower(p)
+                    });
+                }
             }
 
 
@@ -163,7 +167,7 @@ namespace Trinity.Combat
             Logger.Log(logLevel, logCategory, " Hotbar Skills (Skill/RuneIndex/Slot): " + skillList);
 
             PassiveSkills = new HashSet<SNOPower>(cPlayer.PassiveSkills);
-            
+
             _skillBySNOPower = _assignedSkills.ToDictionary(v => v.Power, v => v);
             _skillBySlot = _assignedSkills.ToDictionary(v => v.Slot, v => v);
             _assignedSNOPowers = new HashSet<SNOPower>(_assignedSkills.Select(v => v.Power));

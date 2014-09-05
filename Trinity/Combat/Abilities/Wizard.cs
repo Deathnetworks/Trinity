@@ -48,14 +48,26 @@ namespace Trinity
 
                     // Teleport already called from PlayerMover, not here (since it's a "movement" spell, not a buff)
                 }
-
-
-                bool hasCalamity = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Teleport && s.RuneIndex == 0);
-                // Offensive Teleport: Calamity
-                if (CombatBase.CanCast(SNOPower.Wizard_Teleport) && hasCalamity)
+                
+                // Explosive Blast
+                if (!useOocBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_ExplosiveBlast, CombatBase.CanCastFlags.NoTimer) && Player.PrimaryResource >= 20)
                 {
-                    var bestClusterPoint = TargetUtil.GetBestClusterPoint();
-                    return new TrinityPower(SNOPower.Wizard_Teleport, 55f, bestClusterPoint);
+                    return new TrinityPower(SNOPower.Wizard_ExplosiveBlast, 12f, CurrentTarget.Position);
+                }
+                
+                
+                
+                
+                
+                bool hasCalamity = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Teleport && s.RuneIndex == 0);
+                if (TargetUtil.AnyMobsInRange(25f, 3) || TargetUtil.IsEliteTargetInRange(70f))
+                {
+                    // Offensive Teleport: Calamity
+                    if (CombatBase.CanCast(SNOPower.Wizard_Teleport, CombatBase.CanCastFlags.NoTimer) && hasCalamity)
+                    {
+                        var bestClusterPoint = TargetUtil.GetBestClusterPoint(5f, 10f);
+                        return new TrinityPower(SNOPower.Wizard_Teleport, 55f, bestClusterPoint);
+                    }
                 }
 
                 bool hasSafePassage = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Teleport && s.RuneIndex == 1);
@@ -241,11 +253,7 @@ namespace Trinity
                     }
                     Player.WaitingForReserveEnergy = true;
                 }
-                // Explosive Blast
-                if (!useOocBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_ExplosiveBlast, CombatBase.CanCastFlags.NoTimer) && Player.PrimaryResource >= 20)
-                {
-                    return new TrinityPower(SNOPower.Wizard_ExplosiveBlast, 12f, CurrentTarget.Position);
-                }
+                
 
                 //SkillDict.Add("Blizzard", SNOPower.Wizard_Blizzard);
                 //RuneDict.Add("GraspingChill", 2);
@@ -532,16 +540,7 @@ namespace Trinity
         }
 
         private static TrinityPower GetWizardDestructablePower()
-        {
-            if (Hotbar.Contains(SNOPower.Wizard_WaveOfForce) && Player.PrimaryResource >= 25)
-                return new TrinityPower(SNOPower.Wizard_WaveOfForce, 9f);
-
-            if (Hotbar.Contains(SNOPower.Wizard_EnergyTwister) && Player.PrimaryResource >= 35)
-                return new TrinityPower(SNOPower.Wizard_EnergyTwister, 9f);
-
-            if (Hotbar.Contains(SNOPower.Wizard_ArcaneOrb))
-                return new TrinityPower(SNOPower.Wizard_ArcaneOrb, 35f);
-
+        {        
             if (Hotbar.Contains(SNOPower.Wizard_MagicMissile))
                 return new TrinityPower(SNOPower.Wizard_MagicMissile, 15f);
 
@@ -553,6 +552,15 @@ namespace Trinity
 
             if (Hotbar.Contains(SNOPower.Wizard_Electrocute))
                 return new TrinityPower(SNOPower.Wizard_Electrocute, 9f);
+                
+            if (Hotbar.Contains(SNOPower.Wizard_WaveOfForce) && Player.PrimaryResource >= 25)
+                return new TrinityPower(SNOPower.Wizard_WaveOfForce, 9f);
+
+            if (Hotbar.Contains(SNOPower.Wizard_EnergyTwister) && Player.PrimaryResource >= 35)
+                return new TrinityPower(SNOPower.Wizard_EnergyTwister, 9f);
+
+            if (Hotbar.Contains(SNOPower.Wizard_ArcaneOrb))
+                return new TrinityPower(SNOPower.Wizard_ArcaneOrb, 35f);
 
             if (Hotbar.Contains(SNOPower.Wizard_ArcaneTorrent))
                 return new TrinityPower(SNOPower.Wizard_ArcaneTorrent, 9f);
