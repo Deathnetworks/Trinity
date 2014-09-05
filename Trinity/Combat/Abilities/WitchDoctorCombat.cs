@@ -41,11 +41,6 @@ namespace Trinity.Combat.Abilities
             TrinityPower power = null;
 
 
-            // Spirit Walk, always!
-            if (CanCast(SNOPower.Witchdoctor_SpiritWalk))
-            {
-                return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
-            }
 
             // Combat Avoidance Spells
             if (!UseOOCBuff && IsCurrentlyAvoiding)
