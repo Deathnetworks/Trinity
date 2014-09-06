@@ -12,6 +12,7 @@ namespace Trinity.Config.Combat
         private float _HonoredGuestMana;
         private float _FirebatsRange;
         private bool _UseFetishArmyOffCooldown;
+        private bool _SpamHorrify;
         private bool _UseBigBadVoodooOffCooldown;
         private float _PotionLevel;
         private float _HealthGlobeLevel;
@@ -135,6 +136,18 @@ namespace Trinity.Config.Combat
             {
                 _UseFetishArmyOffCooldown = value;
                 OnPropertyChanged("UseFetishArmyOffCooldown");
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool SpamHorrify
+        {
+            get { return _SpamHorrify; }
+            set
+            {
+                _SpamHorrify = value;
+                OnPropertyChanged("SpamHorrify");
             }
         }
 

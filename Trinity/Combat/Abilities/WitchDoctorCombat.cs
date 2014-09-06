@@ -397,6 +397,12 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.Witchdoctor_Horrify);
                 }
 
+                // Spam Horrify
+                if (CanCast(SNOPower.Witchdoctor_Horrify) && Settings.Combat.WitchDoctor.SpamHorrify)
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_Horrify);
+                }
+
                 // Fetish Army, elites only
                 if (CanCast(SNOPower.Witchdoctor_FetishArmy) &&
                     (TargetUtil.EliteOrTrashInRange(30f) || TargetUtil.IsEliteTargetInRange(30f) || Settings.Combat.WitchDoctor.UseFetishArmyOffCooldown))
