@@ -281,8 +281,9 @@ namespace Trinity
             221225, // Arcane 2
             5482,   // Poison Tree
             6578,   // Poison Tree
-            4803,   // Molten Core
-            4804,   // Molten Core 
+            4803,   // monsterAffix_Molten_deathStart_Proxy
+            4804,   // monsterAffix_Molten_deathExplosion_Proxy 
+            4806,   // monsterAffix_Electrified_deathExplosion_proxy
             224225, // Molten Core 2
             247987, // Molten Core 2
             95868,  // Molten Trail

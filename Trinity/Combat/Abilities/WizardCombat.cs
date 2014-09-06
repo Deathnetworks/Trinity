@@ -163,14 +163,15 @@ namespace Trinity.Combat.Abilities
             }
 
             // Hydra
-            if (CanCast(SNOPower.Wizard_Hydra))
+            if (CanCast(SNOPower.Wizard_Hydra, CanCastFlags.NoTimer))
             {
                 var _14s = TimeSpan.FromSeconds(14);
                 const float maxHydraDistance = 30f;
                 const float maxHydraDistSqr = maxHydraDistance * maxHydraDistance;
 
                 // This will check if We have the "Serpent Sparker" wand, and attempt to cast a 2nd hydra immediately after the first
-                bool serpentSparkerRecast1 = EquippedItemCache.Instance.ItemIds.Contains(SerpentSparkerId) && LastPowerUsed == SNOPower.Wizard_Hydra &&
+                
+                bool serpentSparkerRecast1 = Legendary.SerpentsSparker.IsEquipped && LastPowerUsed == SNOPower.Wizard_Hydra &&
                     SpellHistory.SpellUseCountInTime(SNOPower.Wizard_Hydra, TimeSpan.FromSeconds(2)) < 2;
 
                 bool baseRecast = TimeSpanSincePowerUse(SNOPower.Wizard_Hydra) > TimeSpan.FromSeconds(14);

@@ -33,13 +33,12 @@ namespace Trinity
                 (!GetHasBuff(SNOPower.DemonHunter_ShadowPower) || Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit) && // if we don't have the buff or our health is low
                 ((!hasPunishment && Player.SecondaryResource >= 14) || (hasPunishment && Player.SecondaryResource >= 39)) && // Save some Discipline for Preparation
                 (Settings.Combat.DemonHunter.SpamShadowPower && Player.SecondaryResource >= 28)) // When spamming Shadow Power, save some Discipline for emergencies
-                
             {
                 return new TrinityPower(SNOPower.DemonHunter_ShadowPower);
             }
 
             // NotSpam Shadow Power
-            if(!UseOOCBuff && !Settings.Combat.DemonHunter.SpamShadowPower && CombatBase.CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
+            if (!UseOOCBuff && !Settings.Combat.DemonHunter.SpamShadowPower && CombatBase.CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
                 (!GetHasBuff(SNOPower.DemonHunter_ShadowPower) || Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit) && // if we don't have the buff or our health is low
                 ((!hasPunishment && Player.SecondaryResource >= 14) || (hasPunishment && Player.SecondaryResource >= 39)) && // Save some Discipline for Preparation
                 (Player.CurrentHealthPct < 1f || Player.IsRooted || TargetUtil.AnyMobsInRange(15)))
@@ -48,8 +47,8 @@ namespace Trinity
             }
 
             // Vengeance
-            if (!IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.X1_DemonHunter_Vengeance, CombatBase.CanCastFlags.NoTimer) && 
-                ((!Settings.Combat.DemonHunter.VengeanceElitesOnly && TargetUtil.AnyMobsInRange(60, 6)) || TargetUtil.IsEliteTargetInRange(60f) ))
+            if (!IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.X1_DemonHunter_Vengeance, CombatBase.CanCastFlags.NoTimer) &&
+                ((!Settings.Combat.DemonHunter.VengeanceElitesOnly && TargetUtil.AnyMobsInRange(60, 6)) || TargetUtil.IsEliteTargetInRange(60f)))
             {
                 return new TrinityPower(SNOPower.X1_DemonHunter_Vengeance);
             }
@@ -75,10 +74,10 @@ namespace Trinity
                 Player.PrimaryResource >= 30 && Trinity.PlayerOwnedDHSentryCount < maxSentries &&
                 (SpellHistory.TimeSinceUse(SNOPower.DemonHunter_Sentry) > TimeSpan.FromSeconds(sentryCoolDown) || SpellHistory.DistanceFromLastUsePosition(SNOPower.DemonHunter_Sentry) > 7.5));
 
-                if (hasM6 && sentryCheck || !hasM6 && sentryCheck && (TargetUtil.AnyMobsInRange(55f, 1)))
-                {
-                    return new TrinityPower(SNOPower.DemonHunter_Sentry, 65f, TargetUtil.GetBestClusterPoint());
-                }
+            if (hasM6 && sentryCheck || !hasM6 && sentryCheck && (TargetUtil.AnyMobsInRange(55f, 1)))
+            {
+                return new TrinityPower(SNOPower.DemonHunter_Sentry, 65f, TargetUtil.GetBestClusterPoint());
+            }
 
             // Caltrops
             if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.DemonHunter_Caltrops) &&
@@ -201,7 +200,7 @@ namespace Trinity
             // Vault
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_Vault) && !Player.IsRooted && !Player.IsIncapacitated &&
                 Settings.Combat.DemonHunter.VaultMode != Config.Combat.DemonHunterVaultMode.MovementOnly &&
-                (TargetUtil.AnyMobsInRange(7f,6) || Player.CurrentHealthPct <= 0.7) &&
+                (TargetUtil.AnyMobsInRange(7f, 6) || Player.CurrentHealthPct <= 0.7) &&
                 // if we have ShadowPower and Disicpline is >= 16
                 // or if we don't have ShadoWpower and Discipline is >= 22
                 (Player.SecondaryResource >= (Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) ? 22 : 16)) &&
@@ -335,7 +334,7 @@ namespace Trinity
             }
 
             // Rapid Fire
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_RapidFire, CombatBase.CanCastFlags.NoTimer) && 
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_RapidFire, CombatBase.CanCastFlags.NoTimer) &&
                 !Player.IsIncapacitated && Player.PrimaryResource >= 16 &&
                 (Player.PrimaryResource >= Settings.Combat.DemonHunter.RapidFireMinHatred || CombatBase.LastPowerUsed == SNOPower.DemonHunter_RapidFire))
             {

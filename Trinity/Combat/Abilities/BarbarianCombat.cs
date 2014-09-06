@@ -179,10 +179,9 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return
-                    !UseOOCBuff &&
-                    CanCast(SNOPower.Barbarian_IgnorePain) &&
-                    Player.CurrentHealthPct <= V.F("Barbarian.IgnorePain.MinHealth");
+                return !UseOOCBuff &&
+                        CanCast(SNOPower.Barbarian_IgnorePain) &&
+                        (Player.CurrentHealthPct <= V.F("Barbarian.IgnorePain.MinHealth"));
             }
         }
         public static bool ShouldWaitForCallOfTheAncients
@@ -208,7 +207,7 @@ namespace Trinity.Combat.Abilities
                     !IsCurrentlyAvoiding &&
                     CanCast(SNOPower.Barbarian_CallOfTheAncients) &&
                     !Player.IsIncapacitated &&
-	                !GetHasBuff(SNOPower.Barbarian_CallOfTheAncients) &&
+                    !GetHasBuff(SNOPower.Barbarian_CallOfTheAncients) &&
                     (TargetUtil.EliteOrTrashInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange")) ||
                     TargetUtil.AnyMobsInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange"), 3) || TargetUtil.AnyElitesInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange")));
             }
@@ -331,7 +330,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                double minFury = 50f;                
+                double minFury = 50f;
                 bool hasCaveIn = HotbarSkills.AssignedSkills.Any(p => p.Power == SNOPower.Barbarian_Earthquake && p.RuneIndex == 4);
                 float range = hasCaveIn ? 24f : 14f;
 
@@ -449,10 +448,8 @@ namespace Trinity.Combat.Abilities
 
                 bool currentEliteTargetInRange = CurrentTarget.RadiusDistance > 7f && CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 35f;
 
-                return
-                    !UseOOCBuff &&
-                    CanCast(SNOPower.Barbarian_FuriousCharge, CanCastFlags.NoTimer) &&
-                    (currentEliteTargetInRange || unitsInFrontOfBestTarget >= 3);
+                return CanCast(SNOPower.Barbarian_FuriousCharge, CanCastFlags.NoTimer) &&
+                    (currentEliteTargetInRange || unitsInFrontOfBestTarget >= 3 || Sets.TheLegacyOfRaekor.IsFullyEquipped);
 
             }
         }
@@ -466,7 +463,7 @@ namespace Trinity.Combat.Abilities
                 if (Legendary.LutSocks.IsEquipped) // This will now cast whenever leap is available and an enemy is around. Disable Leap OOC option. The last line will prevent you from leaping on destructibles
                 {
                     return leapresult && TargetUtil.AnyMobsInRange(15f, 1);
-                }   
+                }
                 else
                 {
                     return leapresult && (TargetUtil.ClusterExists(15f, 35f, V.I("Barbarian.Leap.TrashCount")) || CurrentTarget.IsBossOrEliteRareUnique);
@@ -773,7 +770,7 @@ namespace Trinity.Combat.Abilities
                 var bestAoEUnit = TargetUtil.GetBestPierceTarget(35f);
 
                 if (Runes.Barbarian.BoulderToss.IsActive)
-                    bestAoEUnit = TargetUtil.GetBestClusterUnit(9f);                
+                    bestAoEUnit = TargetUtil.GetBestClusterUnit(9f);
 
                 return new TrinityPower(SNOPower.X1_Barbarian_AncientSpear, V.F("Barbarian.AncientSpear.UseRange"), bestAoEUnit.ACDGuid);
             }
