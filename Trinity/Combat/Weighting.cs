@@ -707,7 +707,7 @@ namespace Trinity
                                 {
                                     // Ok we have globes enabled, and our health is low
                                     if (HiPriorityHealthGlobes)
-                                    {                                        
+                                    {
                                         cacheObject.Weight = MaxWeight;
                                     }
                                     else
@@ -833,13 +833,12 @@ namespace Trinity
                         case GObjectType.Shrine:
                             {
                                 float maxRange = Player.IsInRift ? 300f : 75f;
-                                double maxWeight = Player.IsInRift ? 15000d : 100d;
+                                double maxWeight = Player.IsInRift ? MaxWeight * 0.75d : 100d;
 
                                 // Weight Shrines
-
                                 if (Settings.WorldObject.HiPriorityShrines)
                                 {
-                                    cacheObject.Weight = MaxWeight;
+                                    cacheObject.Weight = MaxWeight * 0.75;
                                 }
                                 else
                                     cacheObject.Weight = Math.Max(((maxRange - cacheObject.RadiusDistance) / maxRange * 15000d), 100d);
@@ -848,7 +847,8 @@ namespace Trinity
                                 if (cacheObject.Distance <= 30f)
                                     cacheObject.Weight += 10000d;
 
-                                if (cacheObject.Weight > 0)
+                                // Disable safety checks for Rift Pylons
+                                if (!Player.IsInRift && cacheObject.Weight > 0)
                                 {
                                     // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                     if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.Distance <= 25f)
