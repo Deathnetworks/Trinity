@@ -467,7 +467,7 @@ namespace Trinity.Combat.Abilities
 
             if (GetHasBuff(SNOPower.Pages_Buff_Infinite_Casting))
             {
-                delay = delay * 0.75d;
+                delay = delay * 0.25d;
             }
 
             return delay;
