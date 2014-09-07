@@ -15,7 +15,7 @@ namespace Trinity
         private static bool RefreshAvoidance(bool AddToCache)
         {
             AddToCache = true;
-            
+
             try
             {
                 CurrentCacheObject.Animation = CurrentCacheObject.Object.CommonData.CurrentAnimation;
@@ -45,7 +45,7 @@ namespace Trinity
 
             // Beast Charge should set aoe position as players current position!
             if (avoidanceType == AvoidanceType.BeastCharge)
-                CurrentCacheObject.Position = Trinity.Player.Position;
+                CurrentCacheObject.Position = Player.Position;
 
             // Monks with Serenity up ignore all AOE's
             if (Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_Serenity) && GetHasBuff(SNOPower.Monk_Serenity))
@@ -111,7 +111,7 @@ namespace Trinity
                     {
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because MarasKaleidoscope is equipped", avoidanceType);
                         minAvoidanceHealth = 0;
-                    }                        
+                    }
                     break;
 
                 case AvoidanceType.AzmoFireball:
@@ -130,7 +130,7 @@ namespace Trinity
                         minAvoidanceHealth = 0;
                     }
                     break;
-                    
+
                 case AvoidanceType.FrozenPulse:
                 case AvoidanceType.IceBall:
                 case AvoidanceType.IceTrail:
@@ -149,8 +149,8 @@ namespace Trinity
                     if (Legendary.XephirianAmulet.IsEquipped)
                     {
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because XephirianAmulet is equipped", avoidanceType);
-                        minAvoidanceHealth = 0; 
-                    }                        
+                        minAvoidanceHealth = 0;
+                    }
                     break;
 
                 case AvoidanceType.Arcane:
@@ -160,7 +160,7 @@ namespace Trinity
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because CountessJuliasCameo is equipped", avoidanceType);
                         minAvoidanceHealth = 0;
                     }
-                    break;                   
+                    break;
             }
 
             // Set based immunity
@@ -180,7 +180,7 @@ namespace Trinity
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because BlackthornesBattlegear is equipped", avoidanceType);
                     minAvoidanceHealth = 0;
                 }
-                    
+
             }
 
 
@@ -193,8 +193,6 @@ namespace Trinity
                 return AddToCache;
 
             }
-
-
 
 
 
@@ -213,8 +211,23 @@ namespace Trinity
                     Rotation = CurrentCacheObject.Rotation
                 });
 
+                bool areaOfEffectInPath = false;
+                var currentPath = Navigator.GetNavigationProviderAs<DefaultNavigationProvider>().CurrentPath;
+                if (Settings.Combat.Misc.AvoidanceNavigation)
+                {
+                    foreach (var point in currentPath)
+                    {
+                        if (CurrentCacheObject.Position.Distance2DSqr(point) <= (minAvoidanceRadius * minAvoidanceRadius))
+                        {
+                            areaOfEffectInPath = true;
+                            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Navigator Pathing through avoidance, setting IsStandingInAvoidance=True");
+                            break;
+                        }
+                    }
+                }
+
                 // Is this one under our feet? If so flag it up so we can find an avoidance spot
-                if (CurrentCacheObject.Distance <= minAvoidanceRadius)
+                if (CurrentCacheObject.Distance <= minAvoidanceRadius || areaOfEffectInPath)
                 {
                     _standingInAvoidance = true;
 

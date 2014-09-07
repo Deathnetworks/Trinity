@@ -18,6 +18,8 @@ namespace Trinity
         private const ulong potionButtonHash = 0xE1F43DD874E42728;
         private const ulong bountyRewardDialogHash = 0x278249110947CA00;
         private const ulong gamePotionHash = 0xE1F43DD874E42728;
+        //Mouseover: 0xE9F673BF3A02ECD5, Name: Root.NormalLayer.TieredRiftReward_main.LayoutRoot.button_exit
+        private const ulong tieredRiftRewardContinueHash = 0xE9F673BF3A02ECD5;
 
         //[1F4E3570] Mouseover: 0x1B876AD677C9080, Name: Root.NormalLayer.stash_dialog_mainPage.button_purchase
         private const ulong stashBuyNewTabButtonHash = 0x1B876AD677C9080;
@@ -118,6 +120,14 @@ namespace Trinity
             }
         }
 
+        public static UIElement TieredRiftRewardContinueButton
+        {
+            get
+            {
+                return UIElement.FromHash(tieredRiftRewardContinueHash);
+            }
+        }
+
         public static bool IsElementVisible(UIElement element)
         {
             if (element == null)
@@ -190,6 +200,8 @@ namespace Trinity
             if (ZetaDia.IsInGame && SafeClickElement(ConfirmTimedDungeonOK, "Confirm Timed Dungeon OK Button", true))
                 return;
             if (ZetaDia.IsInGame && SafeClickElement(StashBuyNewTabButton, "Buying new Stash Tab"))
+                return;
+            if (ZetaDia.IsInGame && SafeClickElement(TieredRiftRewardContinueButton, "Tiered Rift Reward Continue Button"))
                 return;
 
         }

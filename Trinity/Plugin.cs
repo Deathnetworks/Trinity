@@ -146,9 +146,9 @@ namespace Trinity
                 }
                 else
                 {
-                    PluginCheck.Start();
-
                     _isPluginEnabled = true;
+
+                    PluginCheck.Start();
 
                     // Settings are available after this... 
                     LoadConfiguration();
