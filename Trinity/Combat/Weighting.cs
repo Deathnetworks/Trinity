@@ -1070,13 +1070,12 @@ namespace Trinity
                     }
 
                     // Force the character to stay where it is if there is nothing available that is out of avoidance stuff and we aren't already in avoidance stuff
-                    if (cacheObject.Weight == 1 && !_standingInAvoidance && ObjectCache.Any(o => o.Type == GObjectType.Avoidance))
+                    if (cacheObject.Weight == 1 && !_standingInAvoidance && ObjectCache.Any(o => cacheObject.Position.Distance2D(o.Position) <= o.Radius && o.Type == GObjectType.Avoidance))
                     {
                         cacheObject.Weight = 0;
                         _shouldStayPutDuringAvoidance = true;
                         objWeightInfo += "StayPutAoE ";
                     }
-
 
                     // Prevent current target dynamic ranged weighting flip-flop 
                     if (LastTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight <= 1 && !navBlocking)
