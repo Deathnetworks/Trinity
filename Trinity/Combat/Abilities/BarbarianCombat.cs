@@ -248,6 +248,7 @@ namespace Trinity.Combat.Abilities
 
                 bool anyTime = (Settings.Combat.Barbarian.WOTBMode == BarbarianWOTBMode.WhenReady && !Player.IsInTown);
                 bool hasBuff = GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
+                bool hasInfiniteCasting = GetHasBuff(SNOPower.Pages_Buff_Infinite_Casting);
                 bool canCast = CanCast(SNOPower.Barbarian_WrathOfTheBerserker, CanCastFlags.NoTimer);
 
                 bool emergencyHealth = Player.CurrentHealthPct <= V.F("Barbarian.WOTB.EmergencyHealth");
@@ -258,7 +259,7 @@ namespace Trinity.Combat.Abilities
                     // Don't still have the buff
                     !hasBuff &&
                     canCast &&
-                    (WOTBGoblins || WOTBIgnoreElites || WOTBElitesPresent || anyTime || emergencyHealth);
+                    (WOTBGoblins || WOTBIgnoreElites || WOTBElitesPresent || anyTime || emergencyHealth || hasInfiniteCasting);
 
                 return result;
             }
