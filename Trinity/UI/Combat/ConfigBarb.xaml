@@ -127,14 +127,14 @@
                     <!--<CheckBox Margin="2" IsChecked="{Binding Path=Barb.WOTBHardOnly}" ToolTip="Saves WOTB for use on elites with Arcane, Frozen, Jailer, Molten, Electrified and Reflects Damage">Use WOTB on hard elites only</CheckBox>-->
                     <CheckBox Margin="2" IsChecked="{Binding Path=Barb.WaitWOTB}">Wait for cooldown at Azmo</CheckBox>
                     <CheckBox Margin="2" IsChecked="{Binding Path=Barb.UseWOTBGoblin}">Use on Goblins</CheckBox>
-                    <CheckBox Margin="2" IsChecked="{Binding Path=Barb.FuryDumpWOTB}">Fury Dump (Sprint)</CheckBox>
+                    <CheckBox Margin="2" IsChecked="{Binding Path=Barb.FuryDumpWOTB}">Fury Dump</CheckBox>
                     <CheckBox Margin="2" IsChecked="{Binding Barb.IgnoreAvoidanceInWOTB}" ToolTip="Avoidance Health Triggers Reduced" Content="Modify AoE Health"/>
                     <CheckBox Margin="2" IsChecked="{Binding Barb.IgnoreGoldInWOTB}" ToolTip="Ignores gold when WOTB is up" Content="Ignore Gold Stacks"/>
                     <CheckBox Margin="2" IsChecked="{Binding Path=Barb.WOTBEmergencyHealth}" ToolTip="Force use WOTB if health is below emergency health" Content="Use WOTB on emergencies"/>
                 </UniformGrid>
             </GroupBox>
             <UniformGrid Columns="2" Grid.Row="1">
-                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.FuryDumpAlways}" ToolTip="Spam Sprint when at max fury">Fury Dump always</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.FuryDumpAlways}" ToolTip="Spam fury spenders when at max fury">Fury Dump always</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.TargetBasedZigZag}" ToolTip="Uses Monster positions as WW points instead of random XYZ">Multi-Target Based ZigZag</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.ThreatShoutOOC}" ToolTip="Use Threating Shout Out of Combat to generate Fury">Use Threating Shout OOC</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.UseLeapOOC}" ToolTip="Leap Out Of Combat">Leap OOC</CheckBox>
