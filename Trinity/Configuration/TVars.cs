@@ -25,6 +25,7 @@ namespace Trinity
             // Barbarian 
             Set(new TVar("Barbarian.MinEnergyReserve", 10, "Ignore Pain Emergency Use Minimum Health Percent"));
             Set(new TVar("Barbarian.IgnorePain.MinHealth", 0.45f, "Ignore Pain Emergency Use Minimum Health Percent"));
+            Set(new TVar("Barbarian.FuryDumpRaekor.MinHealth", 0.85f, "Health at which to start dumping fury"));
             Set(new TVar("Barbarian.Avoidance.WOTB.Other", 0.3f, "General WOTB Avoidance health multiplier"));
             Set(new TVar("Barbarian.Avoidance.WOTB.Desecrator", 0.2f, "WOTB Desecrator health multiplier"));
             Set(new TVar("Barbarian.Avoidance.WOTB.Arcane", 0.75f, "WOTB Arcane health multiplier"));
