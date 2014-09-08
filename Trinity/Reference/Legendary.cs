@@ -34,7 +34,9 @@ namespace Trinity.Reference
             SetName = "",
         };
 
-        // AUTO-GENERATED on Mon, 08 Sep 2014 02:34:02 GMT
+
+        // AUTO-GENERATED on Mon, 08 Sep 2014 20:37:19 GMT
+
 
         /// <summary>
         /// Split Tusk 
@@ -101,13 +103,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item MaskOfJeram = new Item
         {
-            Id = 299443,
+            Id = 0,
             Name = "Mask of Jeram",
             Quality = ItemQuality.Legendary,
             Slug = "mask-of-jeram",
             ItemType = ItemType.VoodooMask,
             BaseType = ItemBaseType.Armor,
-            InternalName = "voodoomask_norm_unique_08",
+            InternalName = "",
             DataUrl = "https://us.battle.net/api/d3/data/item/mask-of-jeram",
             Url = "https://us.battle.net/d3/en/item/mask-of-jeram",
             RelativeUrl = "/d3/en/item/mask-of-jeram",
@@ -201,13 +203,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item SeeNoEvil = new Item
         {
-            Id = 0,
+            Id = 222171,
             Name = "See No Evil",
             Quality = ItemQuality.Legendary,
             Slug = "see-no-evil",
             ItemType = ItemType.SpiritStone,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "spiritStone_norm_unique_13",
             DataUrl = "https://us.battle.net/api/d3/data/item/see-no-evil",
             Url = "https://us.battle.net/d3/en/item/see-no-evil",
             RelativeUrl = "/d3/en/item/see-no-evil",
@@ -221,13 +223,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item GyanaNaKashu = new Item
         {
-            Id = 0,
+            Id = 222169,
             Name = "Gyana Na Kashu",
             Quality = ItemQuality.Legendary,
             Slug = "gyana-na-kashu",
             ItemType = ItemType.SpiritStone,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "spiritStone_norm_unique_05",
             DataUrl = "https://us.battle.net/api/d3/data/item/gyana-na-kashu",
             Url = "https://us.battle.net/d3/en/item/gyana-na-kashu",
             RelativeUrl = "/d3/en/item/gyana-na-kashu",
@@ -241,13 +243,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item ErlangShen = new Item
         {
-            Id = 0,
+            Id = 222173,
             Name = "Erlang Shen",
             Quality = ItemQuality.Legendary,
             Slug = "erlang-shen",
             ItemType = ItemType.SpiritStone,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "spiritStone_norm_unique_07",
             DataUrl = "https://us.battle.net/api/d3/data/item/erlang-shen",
             Url = "https://us.battle.net/d3/en/item/erlang-shen",
             RelativeUrl = "/d3/en/item/erlang-shen",
@@ -267,7 +269,7 @@ namespace Trinity.Reference
             Slug = "the-minds-eye",
             ItemType = ItemType.SpiritStone,
             BaseType = ItemBaseType.Armor,
-            InternalName = "spiritStone_norm_unique_06",
+            InternalName = "spiritstone_norm_unique_06",
             DataUrl = "https://us.battle.net/api/d3/data/item/the-minds-eye",
             Url = "https://us.battle.net/d3/en/item/the-minds-eye",
             RelativeUrl = "/d3/en/item/the-minds-eye",
@@ -281,13 +283,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item EyeOfPeshkov = new Item
         {
-            Id = 0,
+            Id = 299464,
             Name = "Eye of Peshkov",
             Quality = ItemQuality.Legendary,
             Slug = "eye-of-peshkov",
             ItemType = ItemType.SpiritStone,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "spiritstone_norm_unique_16",
             DataUrl = "https://us.battle.net/api/d3/data/item/eye-of-peshkov",
             Url = "https://us.battle.net/d3/en/item/eye-of-peshkov",
             RelativeUrl = "/d3/en/item/eye-of-peshkov",
@@ -301,13 +303,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item KekegisUnbreakableSpirit = new Item
         {
-            Id = 0,
+            Id = 299461,
             Name = "Kekegi's Unbreakable Spirit",
             Quality = ItemQuality.Legendary,
             Slug = "kekegis-unbreakable-spirit",
             ItemType = ItemType.SpiritStone,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "spiritstone_norm_unique_15",
             DataUrl = "https://us.battle.net/api/d3/data/item/kekegis-unbreakable-spirit",
             Url = "https://us.battle.net/d3/en/item/kekegis-unbreakable-spirit",
             RelativeUrl = "/d3/en/item/kekegis-unbreakable-spirit",
@@ -341,13 +343,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item BezoarStone = new Item
         {
-            Id = 0,
+            Id = 222306,
             Name = "Bezoar Stone",
             Quality = ItemQuality.Legendary,
             Slug = "bezoar-stone",
             ItemType = ItemType.SpiritStone,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "spiritStone_norm_unique_11",
             DataUrl = "https://us.battle.net/api/d3/data/item/bezoar-stone",
             Url = "https://us.battle.net/d3/en/item/bezoar-stone",
             RelativeUrl = "/d3/en/item/bezoar-stone",
@@ -381,13 +383,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item Madstone = new Item
         {
-            Id = 0,
+            Id = 221572,
             Name = "Madstone",
             Quality = ItemQuality.Legendary,
             Slug = "madstone",
             ItemType = ItemType.SpiritStone,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "spiritStone_norm_unique_03",
             DataUrl = "https://us.battle.net/api/d3/data/item/madstone",
             Url = "https://us.battle.net/d3/en/item/madstone",
             RelativeUrl = "/d3/en/item/madstone",
@@ -401,13 +403,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item TzoKrinsGaze = new Item
         {
-            Id = 0,
+            Id = 222305,
             Name = "Tzo Krin's Gaze",
             Quality = ItemQuality.Legendary,
             Slug = "tzo-krins-gaze",
             ItemType = ItemType.SpiritStone,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "spiritStone_norm_unique_12",
             DataUrl = "https://us.battle.net/api/d3/data/item/tzo-krins-gaze",
             Url = "https://us.battle.net/d3/en/item/tzo-krins-gaze",
             RelativeUrl = "/d3/en/item/tzo-krins-gaze",
@@ -437,746 +439,6 @@ namespace Trinity.Reference
         };
 
         /// <summary>
-        /// The Swami The damage bonus from kills while in Archon form now lasts for 10–15 seconds after Archon expires.
-        /// </summary>
-        public static Item TheSwami = new Item
-        {
-            Id = 218681,
-            Name = "The Swami",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-swami",
-            ItemType = ItemType.WizardHat,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "wizardHat_norm_unique_03",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-swami",
-            Url = "https://us.battle.net/d3/en/item/the-swami",
-            RelativeUrl = "/d3/en/item/the-swami",
-            IsCrafted = false,
-            LegendaryAffix = "The damage bonus from kills while in Archon form now lasts for 10–15 seconds after Archon expires.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Dark Mage's Shade Automatically cast Diamond Skin when you fall below 35% Life. This effect may occur once every 15–20 seconds.
-        /// </summary>
-        public static Item DarkMagesShade = new Item
-        {
-            Id = 224908,
-            Name = "Dark Mage's Shade",
-            Quality = ItemQuality.Legendary,
-            Slug = "dark-mages-shade",
-            ItemType = ItemType.WizardHat,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "wizardHat_norm_unique_05",
-            DataUrl = "https://us.battle.net/api/d3/data/item/dark-mages-shade",
-            Url = "https://us.battle.net/d3/en/item/dark-mages-shade",
-            RelativeUrl = "/d3/en/item/dark-mages-shade",
-            IsCrafted = false,
-            LegendaryAffix = "Automatically cast Diamond Skin when you fall below 35% Life. This effect may occur once every 15–20 seconds.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Archmage's Vicalyke Your Mirror Images have a chance to multiply when killed by enemies.
-        /// </summary>
-        public static Item ArchmagesVicalyke = new Item
-        {
-            Id = 299471,
-            Name = "Archmage's Vicalyke",
-            Quality = ItemQuality.Legendary,
-            Slug = "archmages-vicalyke",
-            ItemType = ItemType.WizardHat,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "wizardhat_norm_unique_06",
-            DataUrl = "https://us.battle.net/api/d3/data/item/archmages-vicalyke",
-            Url = "https://us.battle.net/d3/en/item/archmages-vicalyke",
-            RelativeUrl = "/d3/en/item/archmages-vicalyke",
-            IsCrafted = false,
-            LegendaryAffix = "Your Mirror Images have a chance to multiply when killed by enemies.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// The Magistrate Frost Hydra now periodically casts Frost Nova.
-        /// </summary>
-        public static Item TheMagistrate = new Item
-        {
-            Id = 325579,
-            Name = "The Magistrate",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-magistrate",
-            ItemType = ItemType.WizardHat,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "wizardhat_norm_unique_08",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-magistrate",
-            Url = "https://us.battle.net/d3/en/item/the-magistrate",
-            RelativeUrl = "/d3/en/item/the-magistrate",
-            IsCrafted = false,
-            LegendaryAffix = "Frost Hydra now periodically casts Frost Nova.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Velvet Camaral Double the number of enemies your Electrocute jumps to.
-        /// </summary>
-        public static Item VelvetCamaral = new Item
-        {
-            Id = 0,
-            Name = "Velvet Camaral",
-            Quality = ItemQuality.Legendary,
-            Slug = "velvet-camaral",
-            ItemType = ItemType.WizardHat,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/velvet-camaral",
-            Url = "https://us.battle.net/d3/en/item/velvet-camaral",
-            RelativeUrl = "/d3/en/item/velvet-camaral",
-            IsCrafted = false,
-            LegendaryAffix = "Double the number of enemies your Electrocute jumps to.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Storm Crow 20–40% chance to cast a fiery ball when attacking.
-        /// </summary>
-        public static Item StormCrow = new Item
-        {
-            Id = 220694,
-            Name = "Storm Crow",
-            Quality = ItemQuality.Legendary,
-            Slug = "storm-crow",
-            ItemType = ItemType.WizardHat,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "wizardHat_norm_unique_04",
-            DataUrl = "https://us.battle.net/api/d3/data/item/storm-crow",
-            Url = "https://us.battle.net/d3/en/item/storm-crow",
-            RelativeUrl = "/d3/en/item/storm-crow",
-            IsCrafted = false,
-            LegendaryAffix = "20–40% chance to cast a fiery ball when attacking.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Broken Crown 
-        /// </summary>
-        public static Item BrokenCrown = new Item
-        {
-            Id = 220630,
-            Name = "Broken Crown",
-            Quality = ItemQuality.Legendary,
-            Slug = "broken-crown",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Helm_norm_unique_02",
-            DataUrl = "https://us.battle.net/api/d3/data/item/broken-crown",
-            Url = "https://us.battle.net/d3/en/item/broken-crown",
-            RelativeUrl = "/d3/en/item/broken-crown",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Leoric's Crown Increase the effect of any gem socketed into this item by 75–100%.
-        /// </summary>
-        public static Item LeoricsCrown = new Item
-        {
-            Id = 196024,
-            Name = "Leoric's Crown",
-            Quality = ItemQuality.Legendary,
-            Slug = "leorics-crown",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Helm_norm_unique_01",
-            DataUrl = "https://us.battle.net/api/d3/data/item/leorics-crown",
-            Url = "https://us.battle.net/d3/en/item/leorics-crown",
-            RelativeUrl = "/d3/en/item/leorics-crown",
-            IsCrafted = false,
-            LegendaryAffix = "Increase the effect of any gem socketed into this item by 75–100%.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Cain's Memory 
-        /// </summary>
-        public static Item CainsMemory = new Item
-        {
-            Id = 0,
-            Name = "Cain's Memory",
-            Quality = ItemQuality.Legendary,
-            Slug = "cains-laurel",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/cains-laurel",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/cains-laurel",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/cains-laurel",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Cain's Fate",
-        };
-
-        /// <summary>
-        /// Blind Faith 
-        /// </summary>
-        public static Item BlindFaith = new Item
-        {
-            Id = 197037,
-            Name = "Blind Faith",
-            Quality = ItemQuality.Legendary,
-            Slug = "blind-faith",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Helm_norm_unique_07",
-            DataUrl = "https://us.battle.net/api/d3/data/item/blind-faith",
-            Url = "https://us.battle.net/d3/en/item/blind-faith",
-            RelativeUrl = "/d3/en/item/blind-faith",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Deathseer's Cowl 15–20% chance on being hit by an Undead enemy to charm it for 2 seconds.
-        /// </summary>
-        public static Item DeathseersCowl = new Item
-        {
-            Id = 298146,
-            Name = "Deathseer's Cowl",
-            Quality = ItemQuality.Legendary,
-            Slug = "deathseers-cowl",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "helm_norm_unique_14",
-            DataUrl = "https://us.battle.net/api/d3/data/item/deathseers-cowl",
-            Url = "https://us.battle.net/d3/en/item/deathseers-cowl",
-            RelativeUrl = "/d3/en/item/deathseers-cowl",
-            IsCrafted = false,
-            LegendaryAffix = "15–20% chance on being hit by an Undead enemy to charm it for 2 seconds.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Aughild's Peak 
-        /// </summary>
-        public static Item AughildsPeak = new Item
-        {
-            Id = 0,
-            Name = "Aughild's Peak",
-            Quality = ItemQuality.Legendary,
-            Slug = "aughilds-brow",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/aughilds-brow",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/aughilds-brow",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/aughilds-brow",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Aughild's Victory",
-        };
-
-        /// <summary>
-        /// Skull of Resonance Threatening Shout has a chance to Charm enemies and cause them to join your side.
-        /// </summary>
-        public static Item SkullOfResonance = new Item
-        {
-            Id = 220549,
-            Name = "Skull of Resonance",
-            Quality = ItemQuality.Legendary,
-            Slug = "skull-of-resonance",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Helm_norm_unique_04",
-            DataUrl = "https://us.battle.net/api/d3/data/item/skull-of-resonance",
-            Url = "https://us.battle.net/d3/en/item/skull-of-resonance",
-            RelativeUrl = "/d3/en/item/skull-of-resonance",
-            IsCrafted = false,
-            LegendaryAffix = "Threatening Shout has a chance to Charm enemies and cause them to join your side.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Guardian's Foresight 
-        /// </summary>
-        public static Item GuardiansForesight = new Item
-        {
-            Id = 0,
-            Name = "Guardian's Foresight",
-            Quality = ItemQuality.Legendary,
-            Slug = "guardians-watch",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/guardians-watch",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/guardians-watch",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/guardians-watch",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Guardian's Contingency",
-        };
-
-        /// <summary>
-        /// Andariel's Visage Chance on hit to release a Poison Nova that deals 100–130% weapon damage as Poison to enemies within 10 yards.
-        /// </summary>
-        public static Item AndarielsVisage = new Item
-        {
-            Id = 198014,
-            Name = "Andariel's Visage",
-            Quality = ItemQuality.Legendary,
-            Slug = "andariels-visage",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "helm_norm_unique_03",
-            DataUrl = "https://us.battle.net/api/d3/data/item/andariels-visage",
-            Url = "https://us.battle.net/d3/en/item/andariels-visage",
-            RelativeUrl = "/d3/en/item/andariels-visage",
-            IsCrafted = false,
-            LegendaryAffix = "Chance on hit to release a Poison Nova that deals 100–130% weapon damage as Poison to enemies within 10 yards.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Mempo of Twilight 
-        /// </summary>
-        public static Item MempoOfTwilight = new Item
-        {
-            Id = 223577,
-            Name = "Mempo of Twilight",
-            Quality = ItemQuality.Legendary,
-            Slug = "mempo-of-twilight",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Helm_norm_unique_12",
-            DataUrl = "https://us.battle.net/api/d3/data/item/mempo-of-twilight",
-            Url = "https://us.battle.net/d3/en/item/mempo-of-twilight",
-            RelativeUrl = "/d3/en/item/mempo-of-twilight",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Immortal King's Triumph 
-        /// </summary>
-        public static Item ImmortalKingsTriumph = new Item
-        {
-            Id = 210265,
-            Name = "Immortal King's Triumph",
-            Quality = ItemQuality.Legendary,
-            Slug = "immortal-kings-triumph",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Helm_norm_unique_08",
-            DataUrl = "https://us.battle.net/api/d3/data/item/immortal-kings-triumph",
-            Url = "https://us.battle.net/d3/en/item/immortal-kings-triumph",
-            RelativeUrl = "/d3/en/item/immortal-kings-triumph",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Immortal King's Call",
-        };
-
-        /// <summary>
-        /// Natalya's Sight 
-        /// </summary>
-        public static Item NatalyasSight = new Item
-        {
-            Id = 210851,
-            Name = "Natalya's Sight",
-            Quality = ItemQuality.Legendary,
-            Slug = "natalyas-sight",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "helm_norm_unique_09",
-            DataUrl = "https://us.battle.net/api/d3/data/item/natalyas-sight",
-            Url = "https://us.battle.net/d3/en/item/natalyas-sight",
-            RelativeUrl = "/d3/en/item/natalyas-sight",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Natalya's Vengeance",
-        };
-
-        /// <summary>
-        /// Tal Rasha's Guise of Wisdom 
-        /// </summary>
-        public static Item TalRashasGuiseOfWisdom = new Item
-        {
-            Id = 211531,
-            Name = "Tal Rasha's Guise of Wisdom",
-            Quality = ItemQuality.Legendary,
-            Slug = "tal-rashas-guise-of-wisdom",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Helm_norm_unique_10",
-            DataUrl = "https://us.battle.net/api/d3/data/item/tal-rashas-guise-of-wisdom",
-            Url = "https://us.battle.net/d3/en/item/tal-rashas-guise-of-wisdom",
-            RelativeUrl = "/d3/en/item/tal-rashas-guise-of-wisdom",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Tal Rasha's Elements",
-        };
-
-        /// <summary>
-        /// The Helm of Command 
-        /// </summary>
-        public static Item TheHelmOfCommand = new Item
-        {
-            Id = 0,
-            Name = "The Helm of Command",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-helm-of-command",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/the-helm-of-command",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/the-helm-of-command",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/the-helm-of-command",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Sage's Orbit 
-        /// </summary>
-        public static Item SagesOrbit = new Item
-        {
-            Id = 0,
-            Name = "Sage's Orbit",
-            Quality = ItemQuality.Legendary,
-            Slug = "sages-stones",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/sages-stones",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/sages-stones",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/sages-stones",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Sage's Plight",
-        };
-
-        /// <summary>
-        /// Crown of the Invoker 
-        /// </summary>
-        public static Item CrownOfTheInvoker = new Item
-        {
-            Id = 335028,
-            Name = "Crown of the Invoker",
-            Quality = ItemQuality.Legendary,
-            Slug = "crown-of-the-invoker",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "helm_norm_set_12",
-            DataUrl = "https://us.battle.net/api/d3/data/item/crown-of-the-invoker",
-            Url = "https://us.battle.net/d3/en/item/crown-of-the-invoker",
-            RelativeUrl = "/d3/en/item/crown-of-the-invoker",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Thorns of the Invoker",
-        };
-
-        /// <summary>
-        /// Eyes of the Earth 
-        /// </summary>
-        public static Item EyesOfTheEarth = new Item
-        {
-            Id = 340528,
-            Name = "Eyes of the Earth",
-            Quality = ItemQuality.Legendary,
-            Slug = "eyes-of-the-earth",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "helm_norm_set_15",
-            DataUrl = "https://us.battle.net/api/d3/data/item/eyes-of-the-earth",
-            Url = "https://us.battle.net/d3/en/item/eyes-of-the-earth",
-            RelativeUrl = "/d3/en/item/eyes-of-the-earth",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Might of the Earth",
-        };
-
-        /// <summary>
-        /// Firebird's Plume 
-        /// </summary>
-        public static Item FirebirdsPlume = new Item
-        {
-            Id = 358791,
-            Name = "Firebird's Plume",
-            Quality = ItemQuality.Legendary,
-            Slug = "firebirds-plume",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "helm_norm_set_06",
-            DataUrl = "https://us.battle.net/api/d3/data/item/firebirds-plume",
-            Url = "https://us.battle.net/d3/en/item/firebirds-plume",
-            RelativeUrl = "/d3/en/item/firebirds-plume",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Firebird's Finery",
-        };
-
-        /// <summary>
-        /// Helltooth Mask 
-        /// </summary>
-        public static Item HelltoothMask = new Item
-        {
-            Id = 0,
-            Name = "Helltooth Mask",
-            Quality = ItemQuality.Legendary,
-            Slug = "helltooth-mask",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/helltooth-mask",
-            Url = "https://us.battle.net/d3/en/item/helltooth-mask",
-            RelativeUrl = "/d3/en/item/helltooth-mask",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Helltooth Harness",
-        };
-
-        /// <summary>
-        /// Helm of Akkhan 
-        /// </summary>
-        public static Item HelmOfAkkhan = new Item
-        {
-            Id = 358799,
-            Name = "Helm of Akkhan",
-            Quality = ItemQuality.Legendary,
-            Slug = "helm-of-akkhan",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "helm_norm_set_10",
-            DataUrl = "https://us.battle.net/api/d3/data/item/helm-of-akkhan",
-            Url = "https://us.battle.net/d3/en/item/helm-of-akkhan",
-            RelativeUrl = "/d3/en/item/helm-of-akkhan",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Armor of Akkhan",
-        };
-
-        /// <summary>
-        /// Jade Harvester's Wisdom 
-        /// </summary>
-        public static Item JadeHarvestersWisdom = new Item
-        {
-            Id = 338040,
-            Name = "Jade Harvester's Wisdom",
-            Quality = ItemQuality.Legendary,
-            Slug = "jade-harvesters-wisdom",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "helm_norm_set_09",
-            DataUrl = "https://us.battle.net/api/d3/data/item/jade-harvesters-wisdom",
-            Url = "https://us.battle.net/d3/en/item/jade-harvesters-wisdom",
-            RelativeUrl = "/d3/en/item/jade-harvesters-wisdom",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Raiment of the Jade Harvester",
-        };
-
-        /// <summary>
-        /// Marauder's Visage 
-        /// </summary>
-        public static Item MaraudersVisage = new Item
-        {
-            Id = 336994,
-            Name = "Marauder's Visage",
-            Quality = ItemQuality.Legendary,
-            Slug = "marauders-visage",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "helm_norm_set_07",
-            DataUrl = "https://us.battle.net/api/d3/data/item/marauders-visage",
-            Url = "https://us.battle.net/d3/en/item/marauders-visage",
-            RelativeUrl = "/d3/en/item/marauders-visage",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Embodiment of the Marauder",
-        };
-
-        /// <summary>
-        /// Mask of the Searing Sky 
-        /// </summary>
-        public static Item MaskOfTheSearingSky = new Item
-        {
-            Id = 338034,
-            Name = "Mask of the Searing Sky",
-            Quality = ItemQuality.Legendary,
-            Slug = "mask-of-the-searing-sky",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "helm_norm_set_08",
-            DataUrl = "https://us.battle.net/api/d3/data/item/mask-of-the-searing-sky",
-            Url = "https://us.battle.net/d3/en/item/mask-of-the-searing-sky",
-            RelativeUrl = "/d3/en/item/mask-of-the-searing-sky",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Raiment of a Thousand Storms",
-        };
-
-        /// <summary>
-        /// Raekor's Will 
-        /// </summary>
-        public static Item RaekorsWill = new Item
-        {
-            Id = 336988,
-            Name = "Raekor's Will",
-            Quality = ItemQuality.Legendary,
-            Slug = "raekors-will",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "helm_norm_set_05",
-            DataUrl = "https://us.battle.net/api/d3/data/item/raekors-will",
-            Url = "https://us.battle.net/d3/en/item/raekors-will",
-            RelativeUrl = "/d3/en/item/raekors-will",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "The Legacy of Raekor",
-        };
-
-        /// <summary>
-        /// Roland's Visage 
-        /// </summary>
-        public static Item RolandsVisage = new Item
-        {
-            Id = 0,
-            Name = "Roland's Visage",
-            Quality = ItemQuality.Legendary,
-            Slug = "rolands-visage",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/rolands-visage",
-            Url = "https://us.battle.net/d3/en/item/rolands-visage",
-            RelativeUrl = "/d3/en/item/rolands-visage",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Roland's Legacy",
-        };
-
-        /// <summary>
-        /// Sunwuko's Crown 
-        /// </summary>
-        public static Item SunwukosCrown = new Item
-        {
-            Id = 0,
-            Name = "Sunwuko's Crown",
-            Quality = ItemQuality.Legendary,
-            Slug = "sunwukos-crown",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/sunwukos-crown",
-            Url = "https://us.battle.net/d3/en/item/sunwukos-crown",
-            RelativeUrl = "/d3/en/item/sunwukos-crown",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Monkey King's Garb",
-        };
-
-        /// <summary>
-        /// The Helm of Rule 
-        /// </summary>
-        public static Item TheHelmOfRule = new Item
-        {
-            Id = 0,
-            Name = "The Helm of Rule",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-helm-of-rule",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/the-helm-of-rule",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/the-helm-of-rule",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/the-helm-of-rule",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Aughild's Spike 
-        /// </summary>
-        public static Item AughildsSpike = new Item
-        {
-            Id = 223972,
-            Name = "Aughild's Spike",
-            Quality = ItemQuality.Legendary,
-            Slug = "aughilds-spike",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Helm_norm_set_03",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/aughilds-spike",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/aughilds-spike",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/aughilds-spike",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Aughild's Authority",
-        };
-
-        /// <summary>
-        /// Cain's Insight 
-        /// </summary>
-        public static Item CainsInsight = new Item
-        {
-            Id = 0,
-            Name = "Cain's Insight",
-            Quality = ItemQuality.Legendary,
-            Slug = "cains-insight",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/cains-insight",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/cains-insight",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/cains-insight",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Cain's Destiny",
-        };
-
-        /// <summary>
-        /// Guardian's Gaze 
-        /// </summary>
-        public static Item GuardiansGaze = new Item
-        {
-            Id = 0,
-            Name = "Guardian's Gaze",
-            Quality = ItemQuality.Legendary,
-            Slug = "guardians-gaze",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/guardians-gaze",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/guardians-gaze",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/guardians-gaze",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Guardian's Jeopardy",
-        };
-
-        /// <summary>
-        /// Sage's Apogee 
-        /// </summary>
-        public static Item SagesApogee = new Item
-        {
-            Id = 0,
-            Name = "Sage's Apogee",
-            Quality = ItemQuality.Legendary,
-            Slug = "sages-apogee",
-            ItemType = ItemType.Helm,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/sages-apogee",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/sages-apogee",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/sages-apogee",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Sage's Journey",
-        };
-
-        /// <summary>
         /// Homing Pads Your Town Portal is no longer interrupted by taking damage. While casting Town Portal you gain a protective bubble that reduces damage taken by 50–65%.
         /// </summary>
         public static Item HomingPads = new Item
@@ -1187,7 +449,7 @@ namespace Trinity.Reference
             Slug = "homing-pads",
             ItemType = ItemType.Shoulder,
             BaseType = ItemBaseType.Armor,
-            InternalName = "shoulderpads_norm_unique_01",
+            InternalName = "shoulderPads_norm_unique_01",
             DataUrl = "https://us.battle.net/api/d3/data/item/homing-pads",
             Url = "https://us.battle.net/d3/en/item/homing-pads",
             RelativeUrl = "/d3/en/item/homing-pads",
@@ -1227,7 +489,7 @@ namespace Trinity.Reference
             Slug = "death-watch-mantle",
             ItemType = ItemType.Shoulder,
             BaseType = ItemBaseType.Armor,
-            InternalName = "shoulderpads_norm_unique_02",
+            InternalName = "shoulderPads_norm_unique_02",
             DataUrl = "https://us.battle.net/api/d3/data/item/death-watch-mantle",
             Url = "https://us.battle.net/d3/en/item/death-watch-mantle",
             RelativeUrl = "/d3/en/item/death-watch-mantle",
@@ -1501,13 +763,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item PauldronsOfAkkhan = new Item
         {
-            Id = 358801,
+            Id = 0,
             Name = "Pauldrons of Akkhan",
             Quality = ItemQuality.Legendary,
             Slug = "pauldrons-of-akkhan",
             ItemType = ItemType.Shoulder,
             BaseType = ItemBaseType.Armor,
-            InternalName = "shoulderpads_norm_set_10",
+            InternalName = "",
             DataUrl = "https://us.battle.net/api/d3/data/item/pauldrons-of-akkhan",
             Url = "https://us.battle.net/d3/en/item/pauldrons-of-akkhan",
             RelativeUrl = "/d3/en/item/pauldrons-of-akkhan",
@@ -1521,13 +783,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item RaekorsBurden = new Item
         {
-            Id = 336989,
+            Id = 0,
             Name = "Raekor's Burden",
             Quality = ItemQuality.Legendary,
             Slug = "raekors-burden",
             ItemType = ItemType.Shoulder,
             BaseType = ItemBaseType.Armor,
-            InternalName = "shoulderpads_norm_set_05",
+            InternalName = "",
             DataUrl = "https://us.battle.net/api/d3/data/item/raekors-burden",
             Url = "https://us.battle.net/d3/en/item/raekors-burden",
             RelativeUrl = "/d3/en/item/raekors-burden",
@@ -1541,13 +803,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item RolandsMantle = new Item
         {
-            Id = 0,
+            Id = 404699,
             Name = "Roland's Mantle",
             Quality = ItemQuality.Legendary,
             Slug = "rolands-mantle",
             ItemType = ItemType.Shoulder,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "p1_shoulderPads_norm_set_01",
             DataUrl = "https://us.battle.net/api/d3/data/item/rolands-mantle",
             Url = "https://us.battle.net/d3/en/item/rolands-mantle",
             RelativeUrl = "/d3/en/item/rolands-mantle",
@@ -1581,13 +843,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item SunwukosBalance = new Item
         {
-            Id = 0,
+            Id = 336175,
             Name = "Sunwuko's Balance",
             Quality = ItemQuality.Legendary,
             Slug = "sunwukos-balance",
             ItemType = ItemType.Shoulder,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "shoulderpads_norm_set_11",
             DataUrl = "https://us.battle.net/api/d3/data/item/sunwukos-balance",
             Url = "https://us.battle.net/d3/en/item/sunwukos-balance",
             RelativeUrl = "/d3/en/item/sunwukos-balance",
@@ -1601,13 +863,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item Corruption = new Item
         {
-            Id = 0,
+            Id = 223619,
             Name = "Corruption",
             Quality = ItemQuality.Legendary,
             Slug = "corruption",
             ItemType = ItemType.Shoulder,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "shoulderPads_norm_unique_04",
             DataUrl = "https://us.battle.net/api/d3/data/recipe/corruption",
             Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/corruption",
             RelativeUrl = "/d3/en/artisan/blacksmith/recipe/corruption",
@@ -1621,13 +883,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item AshearasCustodian = new Item
         {
-            Id = 0,
+            Id = 225132,
             Name = "Asheara's Custodian",
             Quality = ItemQuality.Legendary,
             Slug = "ashearas-custodian",
             ItemType = ItemType.Shoulder,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "shoulderPads_norm_unique_07",
             DataUrl = "https://us.battle.net/api/d3/data/recipe/ashearas-custodian",
             Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/ashearas-custodian",
             RelativeUrl = "/d3/en/artisan/blacksmith/recipe/ashearas-custodian",
@@ -1641,13 +903,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item AughildsPower = new Item
         {
-            Id = 224051,
+            Id = 299443,
             Name = "Aughild's Power",
             Quality = ItemQuality.Legendary,
             Slug = "aughilds-power",
             ItemType = ItemType.Shoulder,
             BaseType = ItemBaseType.Armor,
-            InternalName = "shoulderPads_norm_set_02",
+            InternalName = "voodoomask_norm_unique_08",
             DataUrl = "https://us.battle.net/api/d3/data/recipe/aughilds-power",
             Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/aughilds-power",
             RelativeUrl = "/d3/en/artisan/blacksmith/recipe/aughilds-power",
@@ -1681,19 +943,559 @@ namespace Trinity.Reference
         /// </summary>
         public static Item DemonsAileron = new Item
         {
-            Id = 0,
+            Id = 224397,
             Name = "Demon's Aileron",
             Quality = ItemQuality.Legendary,
             Slug = "demons-aileron",
             ItemType = ItemType.Shoulder,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "shoulderPads_norm_unique_06",
             DataUrl = "https://us.battle.net/api/d3/data/recipe/demons-aileron",
             Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/demons-aileron",
             RelativeUrl = "/d3/en/artisan/blacksmith/recipe/demons-aileron",
             IsCrafted = true,
             LegendaryAffix = "",
             SetName = "Demon's Hide",
+        };
+
+        /// <summary>
+        /// Beckon Sail When receiving fatal damage, you instead automatically cast Smoke Screen and are healed to 25% Life. This effect may occur once every 120 seconds.
+        /// </summary>
+        public static Item BeckonSail = new Item
+        {
+            Id = 223150,
+            Name = "Beckon Sail",
+            Quality = ItemQuality.Legendary,
+            Slug = "beckon-sail",
+            ItemType = ItemType.Chest,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Cloak_norm_unique_02",
+            DataUrl = "https://us.battle.net/api/d3/data/item/beckon-sail",
+            Url = "https://us.battle.net/d3/en/item/beckon-sail",
+            RelativeUrl = "/d3/en/item/beckon-sail",
+            IsCrafted = false,
+            LegendaryAffix = "When receiving fatal damage, you instead automatically cast Smoke Screen and are healed to 25% Life. This effect may occur once every 120 seconds.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Blackfeather Dodging or getting hit by a ranged attack automatically shoots a homing rocket back at the attacker for 600–800% weapon damage as Physical.
+        /// </summary>
+        public static Item Blackfeather = new Item
+        {
+            Id = 332206,
+            Name = "Blackfeather",
+            Quality = ItemQuality.Legendary,
+            Slug = "blackfeather",
+            ItemType = ItemType.Chest,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "cloak_norm_unique_01",
+            DataUrl = "https://us.battle.net/api/d3/data/item/blackfeather",
+            Url = "https://us.battle.net/d3/en/item/blackfeather",
+            RelativeUrl = "/d3/en/item/blackfeather",
+            IsCrafted = false,
+            LegendaryAffix = "Dodging or getting hit by a ranged attack automatically shoots a homing rocket back at the attacker for 600–800% weapon damage as Physical.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// The Cloak of the Garwulf Companion - Wolf Companion now summons 3 wolves.
+        /// </summary>
+        public static Item TheCloakOfTheGarwulf = new Item
+        {
+            Id = 223151,
+            Name = "The Cloak of the Garwulf",
+            Quality = ItemQuality.Legendary,
+            Slug = "the-cloak-of-the-garwulf",
+            ItemType = ItemType.Chest,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Cloak_norm_unique_03",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-cloak-of-the-garwulf",
+            Url = "https://us.battle.net/d3/en/item/the-cloak-of-the-garwulf",
+            RelativeUrl = "/d3/en/item/the-cloak-of-the-garwulf",
+            IsCrafted = false,
+            LegendaryAffix = "Companion - Wolf Companion now summons 3 wolves.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Cape of the Dark Night Automatically drop Caltrops when you are hit. This effect may only occur once every 6 seconds.
+        /// </summary>
+        public static Item CapeOfTheDarkNight = new Item
+        {
+            Id = 223149,
+            Name = "Cape of the Dark Night",
+            Quality = ItemQuality.Legendary,
+            Slug = "cape-of-the-dark-night",
+            ItemType = ItemType.Chest,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Cloak_norm_unique_01",
+            DataUrl = "https://us.battle.net/api/d3/data/item/cape-of-the-dark-night",
+            Url = "https://us.battle.net/d3/en/item/cape-of-the-dark-night",
+            RelativeUrl = "/d3/en/item/cape-of-the-dark-night",
+            IsCrafted = false,
+            LegendaryAffix = "Automatically drop Caltrops when you are hit. This effect may only occur once every 6 seconds.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Natalya's Embrace 
+        /// </summary>
+        public static Item NatalyasEmbrace = new Item
+        {
+            Id = 208934,
+            Name = "Natalya's Embrace",
+            Quality = ItemQuality.Legendary,
+            Slug = "natalyas-embrace",
+            ItemType = ItemType.Chest,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Cloak_norm_set_03",
+            DataUrl = "https://us.battle.net/api/d3/data/item/natalyas-embrace",
+            Url = "https://us.battle.net/d3/en/item/natalyas-embrace",
+            RelativeUrl = "/d3/en/item/natalyas-embrace",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Natalya's Vengeance",
+        };
+
+        /// <summary>
+        /// Gungdo Gear 
+        /// </summary>
+        public static Item GungdoGear = new Item
+        {
+            Id = 193688,
+            Name = "Gungdo Gear",
+            Quality = ItemQuality.Legendary,
+            Slug = "gungdo-gear",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Bracers_norm_unique_06",
+            DataUrl = "https://us.battle.net/api/d3/data/item/gungdo-gear",
+            Url = "https://us.battle.net/d3/en/item/gungdo-gear",
+            RelativeUrl = "/d3/en/item/gungdo-gear",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Steady Strikers 
+        /// </summary>
+        public static Item SteadyStrikers = new Item
+        {
+            Id = 193686,
+            Name = "Steady Strikers",
+            Quality = ItemQuality.Legendary,
+            Slug = "steady-strikers",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "bracers_norm_unique_04",
+            DataUrl = "https://us.battle.net/api/d3/data/item/steady-strikers",
+            Url = "https://us.battle.net/d3/en/item/steady-strikers",
+            RelativeUrl = "/d3/en/item/steady-strikers",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Slave Bonds 
+        /// </summary>
+        public static Item SlaveBonds = new Item
+        {
+            Id = 193685,
+            Name = "Slave Bonds",
+            Quality = ItemQuality.Legendary,
+            Slug = "slave-bonds",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Bracers_norm_unique_03",
+            DataUrl = "https://us.battle.net/api/d3/data/item/slave-bonds",
+            Url = "https://us.battle.net/d3/en/item/slave-bonds",
+            RelativeUrl = "/d3/en/item/slave-bonds",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Ancient Parthan Defenders Each stunned enemy within 25 yards reduces your damage taken by 9–12%.
+        /// </summary>
+        public static Item AncientParthanDefenders = new Item
+        {
+            Id = 298116,
+            Name = "Ancient Parthan Defenders",
+            Quality = ItemQuality.Legendary,
+            Slug = "ancient-parthan-defenders",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "bracers_norm_unique_12",
+            DataUrl = "https://us.battle.net/api/d3/data/item/ancient-parthan-defenders",
+            Url = "https://us.battle.net/d3/en/item/ancient-parthan-defenders",
+            RelativeUrl = "/d3/en/item/ancient-parthan-defenders",
+            IsCrafted = false,
+            LegendaryAffix = "Each stunned enemy within 25 yards reduces your damage taken by 9–12%.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Custerian Wristguards Picking up gold grants experience.
+        /// </summary>
+        public static Item CusterianWristguards = new Item
+        {
+            Id = 298122,
+            Name = "Custerian Wristguards",
+            Quality = ItemQuality.Legendary,
+            Slug = "custerian-wristguards",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "bracers_norm_unique_17",
+            DataUrl = "https://us.battle.net/api/d3/data/item/custerian-wristguards",
+            Url = "https://us.battle.net/d3/en/item/custerian-wristguards",
+            RelativeUrl = "/d3/en/item/custerian-wristguards",
+            IsCrafted = false,
+            LegendaryAffix = "Picking up gold grants experience.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Nemesis Bracers Shrines will spawn an enemy champion.
+        /// </summary>
+        public static Item NemesisBracers = new Item
+        {
+            Id = 205615,
+            Name = "Nemesis Bracers",
+            Quality = ItemQuality.Legendary,
+            Slug = "nemesis-bracers",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "chestArmor_norm_unique_088",
+            DataUrl = "https://us.battle.net/api/d3/data/item/nemesis-bracers",
+            Url = "https://us.battle.net/d3/en/item/nemesis-bracers",
+            RelativeUrl = "/d3/en/item/nemesis-bracers",
+            IsCrafted = false,
+            LegendaryAffix = "Shrines will spawn an enemy champion.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Warzechian Armguards Every time you destroy a wreckable object, you gain a short burst of speed.
+        /// </summary>
+        public static Item WarzechianArmguards = new Item
+        {
+            Id = 298115,
+            Name = "Warzechian Armguards",
+            Quality = ItemQuality.Legendary,
+            Slug = "warzechian-armguards",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "bracers_norm_unique_11",
+            DataUrl = "https://us.battle.net/api/d3/data/item/warzechian-armguards",
+            Url = "https://us.battle.net/d3/en/item/warzechian-armguards",
+            RelativeUrl = "/d3/en/item/warzechian-armguards",
+            IsCrafted = false,
+            LegendaryAffix = "Every time you destroy a wreckable object, you gain a short burst of speed.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Aughild's Ultimatum 
+        /// </summary>
+        public static Item AughildsUltimatum = new Item
+        {
+            Id = 0,
+            Name = "Aughild's Ultimatum",
+            Quality = ItemQuality.Legendary,
+            Slug = "aughilds-demands",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/aughilds-demands",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/aughilds-demands",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/aughilds-demands",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Aughild's Victory",
+        };
+
+        /// <summary>
+        /// Promise of Glory 4–6% chance to spawn a Nephalem Glory globe when you Blind an enemy.
+        /// </summary>
+        public static Item PromiseOfGlory = new Item
+        {
+            Id = 193684,
+            Name = "Promise of Glory",
+            Quality = ItemQuality.Legendary,
+            Slug = "promise-of-glory",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Bracers_norm_unique_02",
+            DataUrl = "https://us.battle.net/api/d3/data/item/promise-of-glory",
+            Url = "https://us.battle.net/d3/en/item/promise-of-glory",
+            RelativeUrl = "/d3/en/item/promise-of-glory",
+            IsCrafted = false,
+            LegendaryAffix = "4–6% chance to spawn a Nephalem Glory globe when you Blind an enemy.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Guardian's Deflector 
+        /// </summary>
+        public static Item GuardiansDeflector = new Item
+        {
+            Id = 0,
+            Name = "Guardian's Deflector",
+            Quality = ItemQuality.Legendary,
+            Slug = "guardians-bands",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/guardians-bands",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/guardians-bands",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/guardians-bands",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Guardian's Contingency",
+        };
+
+        /// <summary>
+        /// Lacuni Prowlers 
+        /// </summary>
+        public static Item LacuniProwlers = new Item
+        {
+            Id = 193687,
+            Name = "Lacuni Prowlers",
+            Quality = ItemQuality.Legendary,
+            Slug = "lacuni-prowlers",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Bracers_norm_unique_05",
+            DataUrl = "https://us.battle.net/api/d3/data/item/lacuni-prowlers",
+            Url = "https://us.battle.net/d3/en/item/lacuni-prowlers",
+            RelativeUrl = "/d3/en/item/lacuni-prowlers",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Strongarm Bracers Enemies hit by knockbacks suffer 20–30% more damage for 5 seconds when they land.
+        /// </summary>
+        public static Item StrongarmBracers = new Item
+        {
+            Id = 193692,
+            Name = "Strongarm Bracers",
+            Quality = ItemQuality.Legendary,
+            Slug = "strongarm-bracers",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Bracers_norm_unique_07",
+            DataUrl = "https://us.battle.net/api/d3/data/item/strongarm-bracers",
+            Url = "https://us.battle.net/d3/en/item/strongarm-bracers",
+            RelativeUrl = "/d3/en/item/strongarm-bracers",
+            IsCrafted = false,
+            LegendaryAffix = "Enemies hit by knockbacks suffer 20–30% more damage for 5 seconds when they land.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Wondrous Deflectors 
+        /// </summary>
+        public static Item WondrousDeflectors = new Item
+        {
+            Id = 0,
+            Name = "Wondrous Deflectors",
+            Quality = ItemQuality.Legendary,
+            Slug = "wondrous-deflectors",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/wondrous-deflectors",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/wondrous-deflectors",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/wondrous-deflectors",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Demon's Revenge 
+        /// </summary>
+        public static Item DemonsRevenge = new Item
+        {
+            Id = 0,
+            Name = "Demon's Revenge",
+            Quality = ItemQuality.Legendary,
+            Slug = "demons-manacles",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/demons-manacles",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/demons-manacles",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/demons-manacles",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Demon's Skin",
+        };
+
+        /// <summary>
+        /// Trag'Oul Coils Healing wells replenish all resources and reduce all cooldowns by 45–60 seconds.
+        /// </summary>
+        public static Item TragoulCoils = new Item
+        {
+            Id = 298119,
+            Name = "Trag'Oul Coils",
+            Quality = ItemQuality.Legendary,
+            Slug = "tragoul-coils",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "bracers_norm_unique_14",
+            DataUrl = "https://us.battle.net/api/d3/data/item/tragoul-coils",
+            Url = "https://us.battle.net/d3/en/item/tragoul-coils",
+            RelativeUrl = "/d3/en/item/tragoul-coils",
+            IsCrafted = false,
+            LegendaryAffix = "Healing wells replenish all resources and reduce all cooldowns by 45–60 seconds.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Krelm's Buff Bracers You are immune to Knockback and Stun effects.
+        /// </summary>
+        public static Item KrelmsBuffBracers = new Item
+        {
+            Id = 336185,
+            Name = "Krelm's Buff Bracers",
+            Quality = ItemQuality.Legendary,
+            Slug = "krelms-buff-bracers",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "bracers_norm_set_02",
+            DataUrl = "https://us.battle.net/api/d3/data/item/krelms-buff-bracers",
+            Url = "https://us.battle.net/d3/en/item/krelms-buff-bracers",
+            RelativeUrl = "/d3/en/item/krelms-buff-bracers",
+            IsCrafted = false,
+            LegendaryAffix = "You are immune to Knockback and Stun effects.",
+            SetName = "Krelm’s Buff Bulwark",
+        };
+
+        /// <summary>
+        /// Shackles of the Invoker 
+        /// </summary>
+        public static Item ShacklesOfTheInvoker = new Item
+        {
+            Id = 335030,
+            Name = "Shackles of the Invoker",
+            Quality = ItemQuality.Legendary,
+            Slug = "shackles-of-the-invoker",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "bracers_norm_set_12",
+            DataUrl = "https://us.battle.net/api/d3/data/item/shackles-of-the-invoker",
+            Url = "https://us.battle.net/d3/en/item/shackles-of-the-invoker",
+            RelativeUrl = "/d3/en/item/shackles-of-the-invoker",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Thorns of the Invoker",
+        };
+
+        /// <summary>
+        /// Kethryes' Splint 
+        /// </summary>
+        public static Item KethryesSplint = new Item
+        {
+            Id = 193683,
+            Name = "Kethryes' Splint",
+            Quality = ItemQuality.Legendary,
+            Slug = "kethryes-splint",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Bracers_norm_unique_01",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/kethryes-splint",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/kethryes-splint",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/kethryes-splint",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Reaper's Wraps Health globes restore 25–30% of your primary resource.
+        /// </summary>
+        public static Item ReapersWraps = new Item
+        {
+            Id = 0,
+            Name = "Reaper's Wraps",
+            Quality = ItemQuality.Legendary,
+            Slug = "reapers-wraps",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/reapers-wraps",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/reapers-wraps",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/reapers-wraps",
+            IsCrafted = true,
+            LegendaryAffix = "Health globes restore 25–30% of your primary resource.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Aughild's Search 
+        /// </summary>
+        public static Item AughildsSearch = new Item
+        {
+            Id = 212581,
+            Name = "Aughild's Search",
+            Quality = ItemQuality.Legendary,
+            Slug = "aughilds-search",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Ring_norm_unique_010",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/aughilds-search",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/aughilds-search",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/aughilds-search",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Aughild's Authority",
+        };
+
+        /// <summary>
+        /// Demon's Animus 
+        /// </summary>
+        public static Item DemonsAnimus = new Item
+        {
+            Id = 222741,
+            Name = "Demon's Animus",
+            Quality = ItemQuality.Legendary,
+            Slug = "demons-animus",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Bracers_norm_unique_08",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/demons-animus",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/demons-animus",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/demons-animus",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Demon's Hide",
+        };
+
+        /// <summary>
+        /// Guardian's Aversion 
+        /// </summary>
+        public static Item GuardiansAversion = new Item
+        {
+            Id = 0,
+            Name = "Guardian's Aversion",
+            Quality = ItemQuality.Legendary,
+            Slug = "guardians-aversion",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/guardians-aversion",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/guardians-aversion",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/guardians-aversion",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Guardian's Jeopardy",
         };
 
         /// <summary>
@@ -1707,7 +1509,7 @@ namespace Trinity.Reference
             Slug = "aquila-cuirass",
             ItemType = ItemType.Chest,
             BaseType = ItemBaseType.Armor,
-            InternalName = "chestArmor_norm_unique_047",
+            InternalName = "chestarmor_norm_unique_047",
             DataUrl = "https://us.battle.net/api/d3/data/item/aquila-cuirass",
             Url = "https://us.battle.net/d3/en/item/aquila-cuirass",
             RelativeUrl = "/d3/en/item/aquila-cuirass",
@@ -1781,13 +1583,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item Cindercoat = new Item
         {
-            Id = 222455,
+            Id = 0,
             Name = "Cindercoat",
             Quality = ItemQuality.Legendary,
             Slug = "cindercoat",
             ItemType = ItemType.Chest,
             BaseType = ItemBaseType.Armor,
-            InternalName = "chestArmor_norm_unique_049",
+            InternalName = "",
             DataUrl = "https://us.battle.net/api/d3/data/item/cindercoat",
             Url = "https://us.battle.net/d3/en/item/cindercoat",
             RelativeUrl = "/d3/en/item/cindercoat",
@@ -1841,13 +1643,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item Goldskin = new Item
         {
-            Id = 205616,
+            Id = 205642,
             Name = "Goldskin",
             Quality = ItemQuality.Legendary,
             Slug = "goldskin",
             ItemType = ItemType.Chest,
             BaseType = ItemBaseType.Armor,
-            InternalName = "chestarmor_norm_unique_089",
+            InternalName = "Gloves_norm_unique_078",
             DataUrl = "https://us.battle.net/api/d3/data/item/goldskin",
             Url = "https://us.battle.net/d3/en/item/goldskin",
             RelativeUrl = "/d3/en/item/goldskin",
@@ -1867,7 +1669,7 @@ namespace Trinity.Reference
             Slug = "tyraels-might",
             ItemType = ItemType.Chest,
             BaseType = ItemBaseType.Armor,
-            InternalName = "chestarmor_norm_unique_075",
+            InternalName = "chestArmor_norm_unique_075",
             DataUrl = "https://us.battle.net/api/d3/data/item/tyraels-might",
             Url = "https://us.battle.net/d3/en/item/tyraels-might",
             RelativeUrl = "/d3/en/item/tyraels-might",
@@ -1887,7 +1689,7 @@ namespace Trinity.Reference
             Slug = "blackthornes-surcoat",
             ItemType = ItemType.Chest,
             BaseType = ItemBaseType.Armor,
-            InternalName = "chestarmor_norm_unique_050",
+            InternalName = "chestArmor_norm_unique_050",
             DataUrl = "https://us.battle.net/api/d3/data/item/blackthornes-surcoat",
             Url = "https://us.battle.net/d3/en/item/blackthornes-surcoat",
             RelativeUrl = "/d3/en/item/blackthornes-surcoat",
@@ -1961,13 +1763,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item ZunimassasMarrow = new Item
         {
-            Id = 205615,
+            Id = 0,
             Name = "Zunimassa's Marrow",
             Quality = ItemQuality.Legendary,
             Slug = "zunimassas-marrow",
             ItemType = ItemType.Chest,
             BaseType = ItemBaseType.Armor,
-            InternalName = "chestArmor_norm_unique_088",
+            InternalName = "",
             DataUrl = "https://us.battle.net/api/d3/data/item/zunimassas-marrow",
             Url = "https://us.battle.net/d3/en/item/zunimassas-marrow",
             RelativeUrl = "/d3/en/item/zunimassas-marrow",
@@ -2181,13 +1983,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item RolandsBearing = new Item
         {
-            Id = 0,
+            Id = 404095,
             Name = "Roland's Bearing",
             Quality = ItemQuality.Legendary,
             Slug = "rolands-bearing",
             ItemType = ItemType.Chest,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "chestArmor_norm_base_flippy",
             DataUrl = "https://us.battle.net/api/d3/data/item/rolands-bearing",
             Url = "https://us.battle.net/d3/en/item/rolands-bearing",
             RelativeUrl = "/d3/en/item/rolands-bearing",
@@ -2201,13 +2003,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item TheShadowsBane = new Item
         {
-            Id = 0,
+            Id = 332359,
             Name = "The Shadow's Bane",
             Quality = ItemQuality.Legendary,
             Slug = "the-shadows-bane",
             ItemType = ItemType.Chest,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "chestarmor_norm_set_14",
             DataUrl = "https://us.battle.net/api/d3/data/item/the-shadows-bane",
             Url = "https://us.battle.net/d3/en/item/the-shadows-bane",
             RelativeUrl = "/d3/en/item/the-shadows-bane",
@@ -2241,13 +2043,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item MantleOfTheRydraelm = new Item
         {
-            Id = 0,
+            Id = 205609,
             Name = "Mantle of the Rydraelm",
             Quality = ItemQuality.Legendary,
             Slug = "mantle-of-the-rydraelm",
             ItemType = ItemType.Chest,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "chestArmor_norm_unique_076",
             DataUrl = "https://us.battle.net/api/d3/data/recipe/mantle-of-the-rydraelm",
             Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/mantle-of-the-rydraelm",
             RelativeUrl = "/d3/en/artisan/blacksmith/recipe/mantle-of-the-rydraelm",
@@ -2261,13 +2063,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item AughildsRule = new Item
         {
-            Id = 197193,
+            Id = 364697,
             Name = "Aughild's Rule",
             Quality = ItemQuality.Legendary,
             Slug = "aughilds-rule",
             ItemType = ItemType.Chest,
             BaseType = ItemBaseType.Armor,
-            InternalName = "chestArmor_norm_unique_043",
+            InternalName = "CraftingReagent_Legendary_Unique_InfernalMachine_Diablo_x1",
             DataUrl = "https://us.battle.net/api/d3/data/recipe/aughilds-rule",
             Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/aughilds-rule",
             RelativeUrl = "/d3/en/artisan/blacksmith/recipe/aughilds-rule",
@@ -2301,13 +2103,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item DemonsMarrow = new Item
         {
-            Id = 0,
+            Id = 205612,
             Name = "Demon's Marrow",
             Quality = ItemQuality.Legendary,
             Slug = "demons-marrow",
             ItemType = ItemType.Chest,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "chestArmor_norm_unique_085",
             DataUrl = "https://us.battle.net/api/d3/data/recipe/demons-marrow",
             Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/demons-marrow",
             RelativeUrl = "/d3/en/artisan/blacksmith/recipe/demons-marrow",
@@ -2317,543 +2119,1483 @@ namespace Trinity.Reference
         };
 
         /// <summary>
-        /// Beckon Sail When receiving fatal damage, you instead automatically cast Smoke Screen and are healed to 25% Life. This effect may occur once every 120 seconds.
+        /// Broken Crown 
         /// </summary>
-        public static Item BeckonSail = new Item
+        public static Item BrokenCrown = new Item
         {
-            Id = 223150,
-            Name = "Beckon Sail",
+            Id = 220630,
+            Name = "Broken Crown",
             Quality = ItemQuality.Legendary,
-            Slug = "beckon-sail",
-            ItemType = ItemType.Chest,
+            Slug = "broken-crown",
+            ItemType = ItemType.Helm,
             BaseType = ItemBaseType.Armor,
-            InternalName = "cloak_norm_unique_02",
-            DataUrl = "https://us.battle.net/api/d3/data/item/beckon-sail",
-            Url = "https://us.battle.net/d3/en/item/beckon-sail",
-            RelativeUrl = "/d3/en/item/beckon-sail",
-            IsCrafted = false,
-            LegendaryAffix = "When receiving fatal damage, you instead automatically cast Smoke Screen and are healed to 25% Life. This effect may occur once every 120 seconds.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Blackfeather Dodging or getting hit by a ranged attack automatically shoots a homing rocket back at the attacker for 600–800% weapon damage as Physical.
-        /// </summary>
-        public static Item Blackfeather = new Item
-        {
-            Id = 332206,
-            Name = "Blackfeather",
-            Quality = ItemQuality.Legendary,
-            Slug = "blackfeather",
-            ItemType = ItemType.Chest,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "cloak_norm_unique_01",
-            DataUrl = "https://us.battle.net/api/d3/data/item/blackfeather",
-            Url = "https://us.battle.net/d3/en/item/blackfeather",
-            RelativeUrl = "/d3/en/item/blackfeather",
-            IsCrafted = false,
-            LegendaryAffix = "Dodging or getting hit by a ranged attack automatically shoots a homing rocket back at the attacker for 600–800% weapon damage as Physical.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// The Cloak of the Garwulf Companion - Wolf Companion now summons 3 wolves.
-        /// </summary>
-        public static Item TheCloakOfTheGarwulf = new Item
-        {
-            Id = 223151,
-            Name = "The Cloak of the Garwulf",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-cloak-of-the-garwulf",
-            ItemType = ItemType.Chest,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Cloak_norm_unique_03",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-cloak-of-the-garwulf",
-            Url = "https://us.battle.net/d3/en/item/the-cloak-of-the-garwulf",
-            RelativeUrl = "/d3/en/item/the-cloak-of-the-garwulf",
-            IsCrafted = false,
-            LegendaryAffix = "Companion - Wolf Companion now summons 3 wolves.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Cape of the Dark Night Automatically drop Caltrops when you are hit. This effect may only occur once every 6 seconds.
-        /// </summary>
-        public static Item CapeOfTheDarkNight = new Item
-        {
-            Id = 223149,
-            Name = "Cape of the Dark Night",
-            Quality = ItemQuality.Legendary,
-            Slug = "cape-of-the-dark-night",
-            ItemType = ItemType.Chest,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "cloak_norm_unique_01",
-            DataUrl = "https://us.battle.net/api/d3/data/item/cape-of-the-dark-night",
-            Url = "https://us.battle.net/d3/en/item/cape-of-the-dark-night",
-            RelativeUrl = "/d3/en/item/cape-of-the-dark-night",
-            IsCrafted = false,
-            LegendaryAffix = "Automatically drop Caltrops when you are hit. This effect may only occur once every 6 seconds.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Natalya's Embrace 
-        /// </summary>
-        public static Item NatalyasEmbrace = new Item
-        {
-            Id = 208934,
-            Name = "Natalya's Embrace",
-            Quality = ItemQuality.Legendary,
-            Slug = "natalyas-embrace",
-            ItemType = ItemType.Chest,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Cloak_norm_set_03",
-            DataUrl = "https://us.battle.net/api/d3/data/item/natalyas-embrace",
-            Url = "https://us.battle.net/d3/en/item/natalyas-embrace",
-            RelativeUrl = "/d3/en/item/natalyas-embrace",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Natalya's Vengeance",
-        };
-
-        /// <summary>
-        /// Gungdo Gear 
-        /// </summary>
-        public static Item GungdoGear = new Item
-        {
-            Id = 193688,
-            Name = "Gungdo Gear",
-            Quality = ItemQuality.Legendary,
-            Slug = "gungdo-gear",
-            ItemType = ItemType.Bracer,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "bracers_norm_unique_06",
-            DataUrl = "https://us.battle.net/api/d3/data/item/gungdo-gear",
-            Url = "https://us.battle.net/d3/en/item/gungdo-gear",
-            RelativeUrl = "/d3/en/item/gungdo-gear",
+            InternalName = "Helm_norm_unique_02",
+            DataUrl = "https://us.battle.net/api/d3/data/item/broken-crown",
+            Url = "https://us.battle.net/d3/en/item/broken-crown",
+            RelativeUrl = "/d3/en/item/broken-crown",
             IsCrafted = false,
             LegendaryAffix = "",
             SetName = "",
         };
 
         /// <summary>
-        /// Steady Strikers 
+        /// Leoric's Crown Increase the effect of any gem socketed into this item by 75–100%.
         /// </summary>
-        public static Item SteadyStrikers = new Item
+        public static Item LeoricsCrown = new Item
         {
-            Id = 193686,
-            Name = "Steady Strikers",
+            Id = 196024,
+            Name = "Leoric's Crown",
             Quality = ItemQuality.Legendary,
-            Slug = "steady-strikers",
-            ItemType = ItemType.Bracer,
+            Slug = "leorics-crown",
+            ItemType = ItemType.Helm,
             BaseType = ItemBaseType.Armor,
-            InternalName = "bracers_norm_unique_04",
-            DataUrl = "https://us.battle.net/api/d3/data/item/steady-strikers",
-            Url = "https://us.battle.net/d3/en/item/steady-strikers",
-            RelativeUrl = "/d3/en/item/steady-strikers",
+            InternalName = "Helm_norm_unique_01",
+            DataUrl = "https://us.battle.net/api/d3/data/item/leorics-crown",
+            Url = "https://us.battle.net/d3/en/item/leorics-crown",
+            RelativeUrl = "/d3/en/item/leorics-crown",
             IsCrafted = false,
-            LegendaryAffix = "",
+            LegendaryAffix = "Increase the effect of any gem socketed into this item by 75–100%.",
             SetName = "",
         };
 
         /// <summary>
-        /// Slave Bonds 
+        /// Cain's Memory 
         /// </summary>
-        public static Item SlaveBonds = new Item
-        {
-            Id = 193685,
-            Name = "Slave Bonds",
-            Quality = ItemQuality.Legendary,
-            Slug = "slave-bonds",
-            ItemType = ItemType.Bracer,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Bracers_norm_unique_03",
-            DataUrl = "https://us.battle.net/api/d3/data/item/slave-bonds",
-            Url = "https://us.battle.net/d3/en/item/slave-bonds",
-            RelativeUrl = "/d3/en/item/slave-bonds",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Ancient Parthan Defenders Each stunned enemy within 25 yards reduces your damage taken by 9–12%.
-        /// </summary>
-        public static Item AncientParthanDefenders = new Item
-        {
-            Id = 298116,
-            Name = "Ancient Parthan Defenders",
-            Quality = ItemQuality.Legendary,
-            Slug = "ancient-parthan-defenders",
-            ItemType = ItemType.Bracer,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "bracers_norm_unique_12",
-            DataUrl = "https://us.battle.net/api/d3/data/item/ancient-parthan-defenders",
-            Url = "https://us.battle.net/d3/en/item/ancient-parthan-defenders",
-            RelativeUrl = "/d3/en/item/ancient-parthan-defenders",
-            IsCrafted = false,
-            LegendaryAffix = "Each stunned enemy within 25 yards reduces your damage taken by 9–12%.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Custerian Wristguards Picking up gold grants experience.
-        /// </summary>
-        public static Item CusterianWristguards = new Item
-        {
-            Id = 298122,
-            Name = "Custerian Wristguards",
-            Quality = ItemQuality.Legendary,
-            Slug = "custerian-wristguards",
-            ItemType = ItemType.Bracer,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "bracers_norm_unique_17",
-            DataUrl = "https://us.battle.net/api/d3/data/item/custerian-wristguards",
-            Url = "https://us.battle.net/d3/en/item/custerian-wristguards",
-            RelativeUrl = "/d3/en/item/custerian-wristguards",
-            IsCrafted = false,
-            LegendaryAffix = "Picking up gold grants experience.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Nemesis Bracers Shrines will spawn an enemy champion.
-        /// </summary>
-        public static Item NemesisBracers = new Item
-        {
-            Id = 298121,
-            Name = "Nemesis Bracers",
-            Quality = ItemQuality.Legendary,
-            Slug = "nemesis-bracers",
-            ItemType = ItemType.Bracer,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "bracers_norm_unique_16",
-            DataUrl = "https://us.battle.net/api/d3/data/item/nemesis-bracers",
-            Url = "https://us.battle.net/d3/en/item/nemesis-bracers",
-            RelativeUrl = "/d3/en/item/nemesis-bracers",
-            IsCrafted = false,
-            LegendaryAffix = "Shrines will spawn an enemy champion.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Warzechian Armguards Every time you destroy a wreckable object, you gain a short burst of speed.
-        /// </summary>
-        public static Item WarzechianArmguards = new Item
-        {
-            Id = 298115,
-            Name = "Warzechian Armguards",
-            Quality = ItemQuality.Legendary,
-            Slug = "warzechian-armguards",
-            ItemType = ItemType.Bracer,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "bracers_norm_unique_11",
-            DataUrl = "https://us.battle.net/api/d3/data/item/warzechian-armguards",
-            Url = "https://us.battle.net/d3/en/item/warzechian-armguards",
-            RelativeUrl = "/d3/en/item/warzechian-armguards",
-            IsCrafted = false,
-            LegendaryAffix = "Every time you destroy a wreckable object, you gain a short burst of speed.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Aughild's Ultimatum 
-        /// </summary>
-        public static Item AughildsUltimatum = new Item
+        public static Item CainsMemory = new Item
         {
             Id = 0,
-            Name = "Aughild's Ultimatum",
+            Name = "Cain's Memory",
             Quality = ItemQuality.Legendary,
-            Slug = "aughilds-demands",
-            ItemType = ItemType.Bracer,
+            Slug = "cains-laurel",
+            ItemType = ItemType.Helm,
             BaseType = ItemBaseType.Armor,
             InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/aughilds-demands",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/aughilds-demands",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/aughilds-demands",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/cains-laurel",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/cains-laurel",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/cains-laurel",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Cain's Fate",
+        };
+
+        /// <summary>
+        /// Blind Faith 
+        /// </summary>
+        public static Item BlindFaith = new Item
+        {
+            Id = 197037,
+            Name = "Blind Faith",
+            Quality = ItemQuality.Legendary,
+            Slug = "blind-faith",
+            ItemType = ItemType.Helm,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "helm_norm_unique_07",
+            DataUrl = "https://us.battle.net/api/d3/data/item/blind-faith",
+            Url = "https://us.battle.net/d3/en/item/blind-faith",
+            RelativeUrl = "/d3/en/item/blind-faith",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Deathseer's Cowl 15–20% chance on being hit by an Undead enemy to charm it for 2 seconds.
+        /// </summary>
+        public static Item DeathseersCowl = new Item
+        {
+            Id = 298146,
+            Name = "Deathseer's Cowl",
+            Quality = ItemQuality.Legendary,
+            Slug = "deathseers-cowl",
+            ItemType = ItemType.Helm,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "helm_norm_unique_14",
+            DataUrl = "https://us.battle.net/api/d3/data/item/deathseers-cowl",
+            Url = "https://us.battle.net/d3/en/item/deathseers-cowl",
+            RelativeUrl = "/d3/en/item/deathseers-cowl",
+            IsCrafted = false,
+            LegendaryAffix = "15–20% chance on being hit by an Undead enemy to charm it for 2 seconds.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Aughild's Peak 
+        /// </summary>
+        public static Item AughildsPeak = new Item
+        {
+            Id = 0,
+            Name = "Aughild's Peak",
+            Quality = ItemQuality.Legendary,
+            Slug = "aughilds-brow",
+            ItemType = ItemType.Helm,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/aughilds-brow",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/aughilds-brow",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/aughilds-brow",
             IsCrafted = true,
             LegendaryAffix = "",
             SetName = "Aughild's Victory",
         };
 
         /// <summary>
-        /// Promise of Glory 4–6% chance to spawn a Nephalem Glory globe when you Blind an enemy.
+        /// Skull of Resonance Threatening Shout has a chance to Charm enemies and cause them to join your side.
         /// </summary>
-        public static Item PromiseOfGlory = new Item
+        public static Item SkullOfResonance = new Item
         {
-            Id = 193684,
-            Name = "Promise of Glory",
+            Id = 220549,
+            Name = "Skull of Resonance",
             Quality = ItemQuality.Legendary,
-            Slug = "promise-of-glory",
-            ItemType = ItemType.Bracer,
+            Slug = "skull-of-resonance",
+            ItemType = ItemType.Helm,
             BaseType = ItemBaseType.Armor,
-            InternalName = "Bracers_norm_unique_02",
-            DataUrl = "https://us.battle.net/api/d3/data/item/promise-of-glory",
-            Url = "https://us.battle.net/d3/en/item/promise-of-glory",
-            RelativeUrl = "/d3/en/item/promise-of-glory",
+            InternalName = "Helm_norm_unique_04",
+            DataUrl = "https://us.battle.net/api/d3/data/item/skull-of-resonance",
+            Url = "https://us.battle.net/d3/en/item/skull-of-resonance",
+            RelativeUrl = "/d3/en/item/skull-of-resonance",
             IsCrafted = false,
-            LegendaryAffix = "4–6% chance to spawn a Nephalem Glory globe when you Blind an enemy.",
+            LegendaryAffix = "Threatening Shout has a chance to Charm enemies and cause them to join your side.",
             SetName = "",
         };
 
         /// <summary>
-        /// Guardian's Deflector 
+        /// Guardian's Foresight 
         /// </summary>
-        public static Item GuardiansDeflector = new Item
+        public static Item GuardiansForesight = new Item
         {
             Id = 0,
-            Name = "Guardian's Deflector",
+            Name = "Guardian's Foresight",
             Quality = ItemQuality.Legendary,
-            Slug = "guardians-bands",
-            ItemType = ItemType.Bracer,
+            Slug = "guardians-watch",
+            ItemType = ItemType.Helm,
             BaseType = ItemBaseType.Armor,
             InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/guardians-bands",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/guardians-bands",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/guardians-bands",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/guardians-watch",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/guardians-watch",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/guardians-watch",
             IsCrafted = true,
             LegendaryAffix = "",
             SetName = "Guardian's Contingency",
         };
 
         /// <summary>
-        /// Lacuni Prowlers 
+        /// Andariel's Visage Chance on hit to release a Poison Nova that deals 100–130% weapon damage as Poison to enemies within 10 yards.
         /// </summary>
-        public static Item LacuniProwlers = new Item
+        public static Item AndarielsVisage = new Item
         {
-            Id = 193687,
-            Name = "Lacuni Prowlers",
+            Id = 198014,
+            Name = "Andariel's Visage",
             Quality = ItemQuality.Legendary,
-            Slug = "lacuni-prowlers",
-            ItemType = ItemType.Bracer,
+            Slug = "andariels-visage",
+            ItemType = ItemType.Helm,
             BaseType = ItemBaseType.Armor,
-            InternalName = "Bracers_norm_unique_05",
-            DataUrl = "https://us.battle.net/api/d3/data/item/lacuni-prowlers",
-            Url = "https://us.battle.net/d3/en/item/lacuni-prowlers",
-            RelativeUrl = "/d3/en/item/lacuni-prowlers",
+            InternalName = "Helm_norm_unique_03",
+            DataUrl = "https://us.battle.net/api/d3/data/item/andariels-visage",
+            Url = "https://us.battle.net/d3/en/item/andariels-visage",
+            RelativeUrl = "/d3/en/item/andariels-visage",
+            IsCrafted = false,
+            LegendaryAffix = "Chance on hit to release a Poison Nova that deals 100–130% weapon damage as Poison to enemies within 10 yards.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Mempo of Twilight 
+        /// </summary>
+        public static Item MempoOfTwilight = new Item
+        {
+            Id = 223577,
+            Name = "Mempo of Twilight",
+            Quality = ItemQuality.Legendary,
+            Slug = "mempo-of-twilight",
+            ItemType = ItemType.Helm,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Helm_norm_unique_12",
+            DataUrl = "https://us.battle.net/api/d3/data/item/mempo-of-twilight",
+            Url = "https://us.battle.net/d3/en/item/mempo-of-twilight",
+            RelativeUrl = "/d3/en/item/mempo-of-twilight",
             IsCrafted = false,
             LegendaryAffix = "",
             SetName = "",
         };
 
         /// <summary>
-        /// Strongarm Bracers Enemies hit by knockbacks suffer 20–30% more damage for 5 seconds when they land.
+        /// Immortal King's Triumph 
         /// </summary>
-        public static Item StrongarmBracers = new Item
+        public static Item ImmortalKingsTriumph = new Item
         {
-            Id = 193692,
-            Name = "Strongarm Bracers",
+            Id = 210265,
+            Name = "Immortal King's Triumph",
             Quality = ItemQuality.Legendary,
-            Slug = "strongarm-bracers",
-            ItemType = ItemType.Bracer,
+            Slug = "immortal-kings-triumph",
+            ItemType = ItemType.Helm,
             BaseType = ItemBaseType.Armor,
-            InternalName = "Bracers_norm_unique_07",
-            DataUrl = "https://us.battle.net/api/d3/data/item/strongarm-bracers",
-            Url = "https://us.battle.net/d3/en/item/strongarm-bracers",
-            RelativeUrl = "/d3/en/item/strongarm-bracers",
+            InternalName = "Helm_norm_unique_08",
+            DataUrl = "https://us.battle.net/api/d3/data/item/immortal-kings-triumph",
+            Url = "https://us.battle.net/d3/en/item/immortal-kings-triumph",
+            RelativeUrl = "/d3/en/item/immortal-kings-triumph",
             IsCrafted = false,
-            LegendaryAffix = "Enemies hit by knockbacks suffer 20–30% more damage for 5 seconds when they land.",
-            SetName = "",
+            LegendaryAffix = "",
+            SetName = "Immortal King's Call",
         };
 
         /// <summary>
-        /// Wondrous Deflectors 
+        /// Natalya's Sight 
         /// </summary>
-        public static Item WondrousDeflectors = new Item
+        public static Item NatalyasSight = new Item
+        {
+            Id = 210851,
+            Name = "Natalya's Sight",
+            Quality = ItemQuality.Legendary,
+            Slug = "natalyas-sight",
+            ItemType = ItemType.Helm,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "helm_norm_unique_09",
+            DataUrl = "https://us.battle.net/api/d3/data/item/natalyas-sight",
+            Url = "https://us.battle.net/d3/en/item/natalyas-sight",
+            RelativeUrl = "/d3/en/item/natalyas-sight",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Natalya's Vengeance",
+        };
+
+        /// <summary>
+        /// Tal Rasha's Guise of Wisdom 
+        /// </summary>
+        public static Item TalRashasGuiseOfWisdom = new Item
+        {
+            Id = 211531,
+            Name = "Tal Rasha's Guise of Wisdom",
+            Quality = ItemQuality.Legendary,
+            Slug = "tal-rashas-guise-of-wisdom",
+            ItemType = ItemType.Helm,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Helm_norm_unique_10",
+            DataUrl = "https://us.battle.net/api/d3/data/item/tal-rashas-guise-of-wisdom",
+            Url = "https://us.battle.net/d3/en/item/tal-rashas-guise-of-wisdom",
+            RelativeUrl = "/d3/en/item/tal-rashas-guise-of-wisdom",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Tal Rasha's Elements",
+        };
+
+        /// <summary>
+        /// The Helm of Command 
+        /// </summary>
+        public static Item TheHelmOfCommand = new Item
         {
             Id = 0,
-            Name = "Wondrous Deflectors",
+            Name = "The Helm of Command",
             Quality = ItemQuality.Legendary,
-            Slug = "wondrous-deflectors",
-            ItemType = ItemType.Bracer,
+            Slug = "the-helm-of-command",
+            ItemType = ItemType.Helm,
             BaseType = ItemBaseType.Armor,
             InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/wondrous-deflectors",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/wondrous-deflectors",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/wondrous-deflectors",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/the-helm-of-command",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/the-helm-of-command",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/the-helm-of-command",
             IsCrafted = true,
             LegendaryAffix = "",
             SetName = "",
         };
 
         /// <summary>
-        /// Demon's Revenge 
+        /// Sage's Orbit 
         /// </summary>
-        public static Item DemonsRevenge = new Item
+        public static Item SagesOrbit = new Item
         {
             Id = 0,
-            Name = "Demon's Revenge",
+            Name = "Sage's Orbit",
             Quality = ItemQuality.Legendary,
-            Slug = "demons-manacles",
-            ItemType = ItemType.Bracer,
+            Slug = "sages-stones",
+            ItemType = ItemType.Helm,
             BaseType = ItemBaseType.Armor,
             InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/demons-manacles",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/demons-manacles",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/demons-manacles",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/sages-stones",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/sages-stones",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/sages-stones",
             IsCrafted = true,
             LegendaryAffix = "",
-            SetName = "Demon's Skin",
+            SetName = "Sage's Plight",
         };
 
         /// <summary>
-        /// Trag'Oul Coils Healing wells replenish all resources and reduce all cooldowns by 45–60 seconds.
+        /// Crown of the Invoker 
         /// </summary>
-        public static Item TragoulCoils = new Item
+        public static Item CrownOfTheInvoker = new Item
         {
-            Id = 298119,
-            Name = "Trag'Oul Coils",
+            Id = 335028,
+            Name = "Crown of the Invoker",
             Quality = ItemQuality.Legendary,
-            Slug = "tragoul-coils",
-            ItemType = ItemType.Bracer,
+            Slug = "crown-of-the-invoker",
+            ItemType = ItemType.Helm,
             BaseType = ItemBaseType.Armor,
-            InternalName = "bracers_norm_unique_14",
-            DataUrl = "https://us.battle.net/api/d3/data/item/tragoul-coils",
-            Url = "https://us.battle.net/d3/en/item/tragoul-coils",
-            RelativeUrl = "/d3/en/item/tragoul-coils",
-            IsCrafted = false,
-            LegendaryAffix = "Healing wells replenish all resources and reduce all cooldowns by 45–60 seconds.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Krelm's Buff Bracers You are immune to Knockback and Stun effects.
-        /// </summary>
-        public static Item KrelmsBuffBracers = new Item
-        {
-            Id = 0,
-            Name = "Krelm's Buff Bracers",
-            Quality = ItemQuality.Legendary,
-            Slug = "krelms-buff-bracers",
-            ItemType = ItemType.Bracer,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/krelms-buff-bracers",
-            Url = "https://us.battle.net/d3/en/item/krelms-buff-bracers",
-            RelativeUrl = "/d3/en/item/krelms-buff-bracers",
-            IsCrafted = false,
-            LegendaryAffix = "You are immune to Knockback and Stun effects.",
-            SetName = "Krelm’s Buff Bulwark",
-        };
-
-        /// <summary>
-        /// Shackles of the Invoker 
-        /// </summary>
-        public static Item ShacklesOfTheInvoker = new Item
-        {
-            Id = 335030,
-            Name = "Shackles of the Invoker",
-            Quality = ItemQuality.Legendary,
-            Slug = "shackles-of-the-invoker",
-            ItemType = ItemType.Bracer,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "bracers_norm_set_12",
-            DataUrl = "https://us.battle.net/api/d3/data/item/shackles-of-the-invoker",
-            Url = "https://us.battle.net/d3/en/item/shackles-of-the-invoker",
-            RelativeUrl = "/d3/en/item/shackles-of-the-invoker",
+            InternalName = "helm_norm_set_12",
+            DataUrl = "https://us.battle.net/api/d3/data/item/crown-of-the-invoker",
+            Url = "https://us.battle.net/d3/en/item/crown-of-the-invoker",
+            RelativeUrl = "/d3/en/item/crown-of-the-invoker",
             IsCrafted = false,
             LegendaryAffix = "",
             SetName = "Thorns of the Invoker",
         };
 
         /// <summary>
-        /// Kethryes' Splint 
+        /// Eyes of the Earth 
         /// </summary>
-        public static Item KethryesSplint = new Item
+        public static Item EyesOfTheEarth = new Item
+        {
+            Id = 340528,
+            Name = "Eyes of the Earth",
+            Quality = ItemQuality.Legendary,
+            Slug = "eyes-of-the-earth",
+            ItemType = ItemType.Helm,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "helm_norm_set_15",
+            DataUrl = "https://us.battle.net/api/d3/data/item/eyes-of-the-earth",
+            Url = "https://us.battle.net/d3/en/item/eyes-of-the-earth",
+            RelativeUrl = "/d3/en/item/eyes-of-the-earth",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Might of the Earth",
+        };
+
+        /// <summary>
+        /// Firebird's Plume 
+        /// </summary>
+        public static Item FirebirdsPlume = new Item
+        {
+            Id = 358791,
+            Name = "Firebird's Plume",
+            Quality = ItemQuality.Legendary,
+            Slug = "firebirds-plume",
+            ItemType = ItemType.Helm,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "helm_norm_set_06",
+            DataUrl = "https://us.battle.net/api/d3/data/item/firebirds-plume",
+            Url = "https://us.battle.net/d3/en/item/firebirds-plume",
+            RelativeUrl = "/d3/en/item/firebirds-plume",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Firebird's Finery",
+        };
+
+        /// <summary>
+        /// Helltooth Mask 
+        /// </summary>
+        public static Item HelltoothMask = new Item
+        {
+            Id = 369016,
+            Name = "Helltooth Mask",
+            Quality = ItemQuality.Legendary,
+            Slug = "helltooth-mask",
+            ItemType = ItemType.Helm,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "helm_norm_set_16",
+            DataUrl = "https://us.battle.net/api/d3/data/item/helltooth-mask",
+            Url = "https://us.battle.net/d3/en/item/helltooth-mask",
+            RelativeUrl = "/d3/en/item/helltooth-mask",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Helltooth Harness",
+        };
+
+        /// <summary>
+        /// Helm of Akkhan 
+        /// </summary>
+        public static Item HelmOfAkkhan = new Item
         {
             Id = 0,
-            Name = "Kethryes' Splint",
+            Name = "Helm of Akkhan",
             Quality = ItemQuality.Legendary,
-            Slug = "kethryes-splint",
-            ItemType = ItemType.Bracer,
+            Slug = "helm-of-akkhan",
+            ItemType = ItemType.Helm,
             BaseType = ItemBaseType.Armor,
             InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/kethryes-splint",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/kethryes-splint",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/kethryes-splint",
+            DataUrl = "https://us.battle.net/api/d3/data/item/helm-of-akkhan",
+            Url = "https://us.battle.net/d3/en/item/helm-of-akkhan",
+            RelativeUrl = "/d3/en/item/helm-of-akkhan",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Armor of Akkhan",
+        };
+
+        /// <summary>
+        /// Jade Harvester's Wisdom 
+        /// </summary>
+        public static Item JadeHarvestersWisdom = new Item
+        {
+            Id = 338040,
+            Name = "Jade Harvester's Wisdom",
+            Quality = ItemQuality.Legendary,
+            Slug = "jade-harvesters-wisdom",
+            ItemType = ItemType.Helm,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "helm_norm_set_09",
+            DataUrl = "https://us.battle.net/api/d3/data/item/jade-harvesters-wisdom",
+            Url = "https://us.battle.net/d3/en/item/jade-harvesters-wisdom",
+            RelativeUrl = "/d3/en/item/jade-harvesters-wisdom",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Raiment of the Jade Harvester",
+        };
+
+        /// <summary>
+        /// Marauder's Visage 
+        /// </summary>
+        public static Item MaraudersVisage = new Item
+        {
+            Id = 336994,
+            Name = "Marauder's Visage",
+            Quality = ItemQuality.Legendary,
+            Slug = "marauders-visage",
+            ItemType = ItemType.Helm,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "helm_norm_set_07",
+            DataUrl = "https://us.battle.net/api/d3/data/item/marauders-visage",
+            Url = "https://us.battle.net/d3/en/item/marauders-visage",
+            RelativeUrl = "/d3/en/item/marauders-visage",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Embodiment of the Marauder",
+        };
+
+        /// <summary>
+        /// Mask of the Searing Sky 
+        /// </summary>
+        public static Item MaskOfTheSearingSky = new Item
+        {
+            Id = 338034,
+            Name = "Mask of the Searing Sky",
+            Quality = ItemQuality.Legendary,
+            Slug = "mask-of-the-searing-sky",
+            ItemType = ItemType.Helm,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "helm_norm_set_08",
+            DataUrl = "https://us.battle.net/api/d3/data/item/mask-of-the-searing-sky",
+            Url = "https://us.battle.net/d3/en/item/mask-of-the-searing-sky",
+            RelativeUrl = "/d3/en/item/mask-of-the-searing-sky",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Raiment of a Thousand Storms",
+        };
+
+        /// <summary>
+        /// Raekor's Will 
+        /// </summary>
+        public static Item RaekorsWill = new Item
+        {
+            Id = 336988,
+            Name = "Raekor's Will",
+            Quality = ItemQuality.Legendary,
+            Slug = "raekors-will",
+            ItemType = ItemType.Helm,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "helm_norm_set_05",
+            DataUrl = "https://us.battle.net/api/d3/data/item/raekors-will",
+            Url = "https://us.battle.net/d3/en/item/raekors-will",
+            RelativeUrl = "/d3/en/item/raekors-will",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "The Legacy of Raekor",
+        };
+
+        /// <summary>
+        /// Roland's Visage 
+        /// </summary>
+        public static Item RolandsVisage = new Item
+        {
+            Id = 404700,
+            Name = "Roland's Visage",
+            Quality = ItemQuality.Legendary,
+            Slug = "rolands-visage",
+            ItemType = ItemType.Helm,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Helm_norm_base_flippy",
+            DataUrl = "https://us.battle.net/api/d3/data/item/rolands-visage",
+            Url = "https://us.battle.net/d3/en/item/rolands-visage",
+            RelativeUrl = "/d3/en/item/rolands-visage",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Roland's Legacy",
+        };
+
+        /// <summary>
+        /// Sunwuko's Crown 
+        /// </summary>
+        public static Item SunwukosCrown = new Item
+        {
+            Id = 336173,
+            Name = "Sunwuko's Crown",
+            Quality = ItemQuality.Legendary,
+            Slug = "sunwukos-crown",
+            ItemType = ItemType.Helm,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "helm_norm_set_11",
+            DataUrl = "https://us.battle.net/api/d3/data/item/sunwukos-crown",
+            Url = "https://us.battle.net/d3/en/item/sunwukos-crown",
+            RelativeUrl = "/d3/en/item/sunwukos-crown",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Monkey King's Garb",
+        };
+
+        /// <summary>
+        /// The Helm of Rule 
+        /// </summary>
+        public static Item TheHelmOfRule = new Item
+        {
+            Id = 222889,
+            Name = "The Helm of Rule",
+            Quality = ItemQuality.Legendary,
+            Slug = "the-helm-of-rule",
+            ItemType = ItemType.Helm,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Helm_norm_unique_11",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/the-helm-of-rule",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/the-helm-of-rule",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/the-helm-of-rule",
             IsCrafted = true,
             LegendaryAffix = "",
             SetName = "",
         };
 
         /// <summary>
-        /// Reaper's Wraps Health globes restore 25–30% of your primary resource.
+        /// Aughild's Spike 
         /// </summary>
-        public static Item ReapersWraps = new Item
+        public static Item AughildsSpike = new Item
         {
-            Id = 298118,
-            Name = "Reaper's Wraps",
+            Id = 0,
+            Name = "Aughild's Spike",
             Quality = ItemQuality.Legendary,
-            Slug = "reapers-wraps",
-            ItemType = ItemType.Bracer,
+            Slug = "aughilds-spike",
+            ItemType = ItemType.Helm,
             BaseType = ItemBaseType.Armor,
-            InternalName = "bracers_norm_unique_13",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/reapers-wraps",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/reapers-wraps",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/reapers-wraps",
-            IsCrafted = true,
-            LegendaryAffix = "Health globes restore 25–30% of your primary resource.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Aughild's Search 
-        /// </summary>
-        public static Item AughildsSearch = new Item
-        {
-            Id = 222972,
-            Name = "Aughild's Search",
-            Quality = ItemQuality.Legendary,
-            Slug = "aughilds-search",
-            ItemType = ItemType.Bracer,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Bracers_norm_unique_09",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/aughilds-search",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/aughilds-search",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/aughilds-search",
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/aughilds-spike",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/aughilds-spike",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/aughilds-spike",
             IsCrafted = true,
             LegendaryAffix = "",
             SetName = "Aughild's Authority",
         };
 
         /// <summary>
-        /// Demon's Animus 
+        /// Cain's Insight 
         /// </summary>
-        public static Item DemonsAnimus = new Item
+        public static Item CainsInsight = new Item
         {
-            Id = 0,
-            Name = "Demon's Animus",
+            Id = 222559,
+            Name = "Cain's Insight",
             Quality = ItemQuality.Legendary,
-            Slug = "demons-animus",
-            ItemType = ItemType.Bracer,
+            Slug = "cains-insight",
+            ItemType = ItemType.Helm,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/demons-animus",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/demons-animus",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/demons-animus",
+            InternalName = "Helm_norm_set_02",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/cains-insight",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/cains-insight",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/cains-insight",
             IsCrafted = true,
             LegendaryAffix = "",
-            SetName = "Demon's Hide",
+            SetName = "Cain's Destiny",
         };
 
         /// <summary>
-        /// Guardian's Aversion 
+        /// Guardian's Gaze 
         /// </summary>
-        public static Item GuardiansAversion = new Item
+        public static Item GuardiansGaze = new Item
         {
             Id = 0,
-            Name = "Guardian's Aversion",
+            Name = "Guardian's Gaze",
             Quality = ItemQuality.Legendary,
-            Slug = "guardians-aversion",
-            ItemType = ItemType.Bracer,
+            Slug = "guardians-gaze",
+            ItemType = ItemType.Helm,
             BaseType = ItemBaseType.Armor,
             InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/guardians-aversion",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/guardians-aversion",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/guardians-aversion",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/guardians-gaze",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/guardians-gaze",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/guardians-gaze",
             IsCrafted = true,
             LegendaryAffix = "",
             SetName = "Guardian's Jeopardy",
+        };
+
+        /// <summary>
+        /// Sage's Apogee 
+        /// </summary>
+        public static Item SagesApogee = new Item
+        {
+            Id = 221624,
+            Name = "Sage's Apogee",
+            Quality = ItemQuality.Legendary,
+            Slug = "sages-apogee",
+            ItemType = ItemType.Helm,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Helm_inferno_set_01",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/sages-apogee",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/sages-apogee",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/sages-apogee",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Sage's Journey",
+        };
+
+        /// <summary>
+        /// The Swami The damage bonus from kills while in Archon form now lasts for 10–15 seconds after Archon expires.
+        /// </summary>
+        public static Item TheSwami = new Item
+        {
+            Id = 218681,
+            Name = "The Swami",
+            Quality = ItemQuality.Legendary,
+            Slug = "the-swami",
+            ItemType = ItemType.WizardHat,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "wizardhat_norm_unique_03",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-swami",
+            Url = "https://us.battle.net/d3/en/item/the-swami",
+            RelativeUrl = "/d3/en/item/the-swami",
+            IsCrafted = false,
+            LegendaryAffix = "The damage bonus from kills while in Archon form now lasts for 10–15 seconds after Archon expires.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Dark Mage's Shade Automatically cast Diamond Skin when you fall below 35% Life. This effect may occur once every 15–20 seconds.
+        /// </summary>
+        public static Item DarkMagesShade = new Item
+        {
+            Id = 224908,
+            Name = "Dark Mage's Shade",
+            Quality = ItemQuality.Legendary,
+            Slug = "dark-mages-shade",
+            ItemType = ItemType.WizardHat,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "wizardhat_norm_unique_05",
+            DataUrl = "https://us.battle.net/api/d3/data/item/dark-mages-shade",
+            Url = "https://us.battle.net/d3/en/item/dark-mages-shade",
+            RelativeUrl = "/d3/en/item/dark-mages-shade",
+            IsCrafted = false,
+            LegendaryAffix = "Automatically cast Diamond Skin when you fall below 35% Life. This effect may occur once every 15–20 seconds.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Archmage's Vicalyke Your Mirror Images have a chance to multiply when killed by enemies.
+        /// </summary>
+        public static Item ArchmagesVicalyke = new Item
+        {
+            Id = 299471,
+            Name = "Archmage's Vicalyke",
+            Quality = ItemQuality.Legendary,
+            Slug = "archmages-vicalyke",
+            ItemType = ItemType.WizardHat,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "wizardhat_norm_unique_06",
+            DataUrl = "https://us.battle.net/api/d3/data/item/archmages-vicalyke",
+            Url = "https://us.battle.net/d3/en/item/archmages-vicalyke",
+            RelativeUrl = "/d3/en/item/archmages-vicalyke",
+            IsCrafted = false,
+            LegendaryAffix = "Your Mirror Images have a chance to multiply when killed by enemies.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// The Magistrate Frost Hydra now periodically casts Frost Nova.
+        /// </summary>
+        public static Item TheMagistrate = new Item
+        {
+            Id = 325579,
+            Name = "The Magistrate",
+            Quality = ItemQuality.Legendary,
+            Slug = "the-magistrate",
+            ItemType = ItemType.WizardHat,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "wizardhat_norm_unique_08",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-magistrate",
+            Url = "https://us.battle.net/d3/en/item/the-magistrate",
+            RelativeUrl = "/d3/en/item/the-magistrate",
+            IsCrafted = false,
+            LegendaryAffix = "Frost Hydra now periodically casts Frost Nova.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Velvet Camaral Double the number of enemies your Electrocute jumps to.
+        /// </summary>
+        public static Item VelvetCamaral = new Item
+        {
+            Id = 299472,
+            Name = "Velvet Camaral",
+            Quality = ItemQuality.Legendary,
+            Slug = "velvet-camaral",
+            ItemType = ItemType.WizardHat,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "wizardhat_norm_unique_07",
+            DataUrl = "https://us.battle.net/api/d3/data/item/velvet-camaral",
+            Url = "https://us.battle.net/d3/en/item/velvet-camaral",
+            RelativeUrl = "/d3/en/item/velvet-camaral",
+            IsCrafted = false,
+            LegendaryAffix = "Double the number of enemies your Electrocute jumps to.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Storm Crow 20–40% chance to cast a fiery ball when attacking.
+        /// </summary>
+        public static Item StormCrow = new Item
+        {
+            Id = 220694,
+            Name = "Storm Crow",
+            Quality = ItemQuality.Legendary,
+            Slug = "storm-crow",
+            ItemType = ItemType.WizardHat,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "wizardHat_norm_unique_04",
+            DataUrl = "https://us.battle.net/api/d3/data/item/storm-crow",
+            Url = "https://us.battle.net/d3/en/item/storm-crow",
+            RelativeUrl = "/d3/en/item/storm-crow",
+            IsCrafted = false,
+            LegendaryAffix = "20–40% chance to cast a fiery ball when attacking.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Cain's Scribe 
+        /// </summary>
+        public static Item CainsScribe = new Item
+        {
+            Id = 0,
+            Name = "Cain's Scribe",
+            Quality = ItemQuality.Legendary,
+            Slug = "cains-warmers",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/cains-warmers",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/cains-warmers",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/cains-warmers",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Cain's Fate",
+        };
+
+        /// <summary>
+        /// Stone Gauntlets 
+        /// </summary>
+        public static Item StoneGauntlets = new Item
+        {
+            Id = 205640,
+            Name = "Stone Gauntlets",
+            Quality = ItemQuality.Legendary,
+            Slug = "stone-gauntlets",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Gloves_norm_unique_076",
+            DataUrl = "https://us.battle.net/api/d3/data/item/stone-gauntlets",
+            Url = "https://us.battle.net/d3/en/item/stone-gauntlets",
+            RelativeUrl = "/d3/en/item/stone-gauntlets",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Magefist 
+        /// </summary>
+        public static Item Magefist = new Item
+        {
+            Id = 197206,
+            Name = "Magefist",
+            Quality = ItemQuality.Legendary,
+            Slug = "magefist",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Gloves_norm_unique_044",
+            DataUrl = "https://us.battle.net/api/d3/data/item/magefist",
+            Url = "https://us.battle.net/d3/en/item/magefist",
+            RelativeUrl = "/d3/en/item/magefist",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// St. Archew's Gage When there are 5 or more enemies within 12 yards, you gain an absorb shield equal to 20–25% of your maximum Life for 6 seconds. This effect may occur once every 30 seconds.
+        /// </summary>
+        public static Item StArchewsGage = new Item
+        {
+            Id = 332172,
+            Name = "St. Archew's Gage",
+            Quality = ItemQuality.Legendary,
+            Slug = "st-archews-gage",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "gloves_norm_unique_01",
+            DataUrl = "https://us.battle.net/api/d3/data/item/st-archews-gage",
+            Url = "https://us.battle.net/d3/en/item/st-archews-gage",
+            RelativeUrl = "/d3/en/item/st-archews-gage",
+            IsCrafted = false,
+            LegendaryAffix = "When there are 5 or more enemies within 12 yards, you gain an absorb shield equal to 20–25% of your maximum Life for 6 seconds. This effect may occur once every 30 seconds.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Pendergrasps 
+        /// </summary>
+        public static Item Pendergrasps = new Item
+        {
+            Id = 0,
+            Name = "Pendergrasps",
+            Quality = ItemQuality.Legendary,
+            Slug = "pendergrasps",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/pendergrasps",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/pendergrasps",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/pendergrasps",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Gladiator Gauntlets After earning a massacre bonus, gold rains from sky.
+        /// </summary>
+        public static Item GladiatorGauntlets = new Item
+        {
+            Id = 205635,
+            Name = "Gladiator Gauntlets",
+            Quality = ItemQuality.Legendary,
+            Slug = "gladiator-gauntlets",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Gloves_norm_unique_090",
+            DataUrl = "https://us.battle.net/api/d3/data/item/gladiator-gauntlets",
+            Url = "https://us.battle.net/d3/en/item/gladiator-gauntlets",
+            RelativeUrl = "/d3/en/item/gladiator-gauntlets",
+            IsCrafted = false,
+            LegendaryAffix = "After earning a massacre bonus, gold rains from sky.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Asheara's Iron Fist 
+        /// </summary>
+        public static Item AshearasIronFist = new Item
+        {
+            Id = 0,
+            Name = "Asheara's Iron Fist",
+            Quality = ItemQuality.Legendary,
+            Slug = "ashearas-clasp",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/ashearas-clasp",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/ashearas-clasp",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/ashearas-clasp",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Asheara's Uniform",
+        };
+
+        /// <summary>
+        /// Frostburn Your Chill effects have up to a 34–45% chance to Freeze instead of Slow.
+        /// </summary>
+        public static Item Frostburn = new Item
+        {
+            Id = 197205,
+            Name = "Frostburn",
+            Quality = ItemQuality.Legendary,
+            Slug = "frostburn",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Gloves_norm_unique_043",
+            DataUrl = "https://us.battle.net/api/d3/data/item/frostburn",
+            Url = "https://us.battle.net/d3/en/item/frostburn",
+            RelativeUrl = "/d3/en/item/frostburn",
+            IsCrafted = false,
+            LegendaryAffix = "Your Chill effects have up to a 34–45% chance to Freeze instead of Slow.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Tasker and Theo Increase attack speed of your pets by 40–50%.
+        /// </summary>
+        public static Item TaskerAndTheo = new Item
+        {
+            Id = 0,
+            Name = "Tasker and Theo",
+            Quality = ItemQuality.Legendary,
+            Slug = "tasker-and-theo",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/tasker-and-theo",
+            Url = "https://us.battle.net/d3/en/item/tasker-and-theo",
+            RelativeUrl = "/d3/en/item/tasker-and-theo",
+            IsCrafted = false,
+            LegendaryAffix = "Increase attack speed of your pets by 40–50%.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Immortal King's Irons 
+        /// </summary>
+        public static Item ImmortalKingsIrons = new Item
+        {
+            Id = 205631,
+            Name = "Immortal King's Irons",
+            Quality = ItemQuality.Legendary,
+            Slug = "immortal-kings-irons",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Gloves_norm_unique_086",
+            DataUrl = "https://us.battle.net/api/d3/data/item/immortal-kings-irons",
+            Url = "https://us.battle.net/d3/en/item/immortal-kings-irons",
+            RelativeUrl = "/d3/en/item/immortal-kings-irons",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Immortal King's Call",
+        };
+
+        /// <summary>
+        /// Sage's Gesture 
+        /// </summary>
+        public static Item SagesGesture = new Item
+        {
+            Id = 0,
+            Name = "Sage's Gesture",
+            Quality = ItemQuality.Legendary,
+            Slug = "sages-grasp",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/sages-grasp",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/sages-grasp",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/sages-grasp",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Sage's Plight",
+        };
+
+        /// <summary>
+        /// Firebird's Talons 
+        /// </summary>
+        public static Item FirebirdsTalons = new Item
+        {
+            Id = 358789,
+            Name = "Firebird's Talons",
+            Quality = ItemQuality.Legendary,
+            Slug = "firebirds-talons",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "gloves_norm_set_06",
+            DataUrl = "https://us.battle.net/api/d3/data/item/firebirds-talons",
+            Url = "https://us.battle.net/d3/en/item/firebirds-talons",
+            RelativeUrl = "/d3/en/item/firebirds-talons",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Firebird's Finery",
+        };
+
+        /// <summary>
+        /// Fists of Thunder 
+        /// </summary>
+        public static Item FistsOfThunder = new Item
+        {
+            Id = 338033,
+            Name = "Fists of Thunder",
+            Quality = ItemQuality.Legendary,
+            Slug = "fists-of-thunder",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "gloves_norm_set_08",
+            DataUrl = "https://us.battle.net/api/d3/data/item/fists-of-thunder",
+            Url = "https://us.battle.net/d3/en/item/fists-of-thunder",
+            RelativeUrl = "/d3/en/item/fists-of-thunder",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Raiment of a Thousand Storms",
+        };
+
+        /// <summary>
+        /// Gauntlets of Akkhan 
+        /// </summary>
+        public static Item GauntletsOfAkkhan = new Item
+        {
+            Id = 0,
+            Name = "Gauntlets of Akkhan",
+            Quality = ItemQuality.Legendary,
+            Slug = "gauntlets-of-akkhan",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/gauntlets-of-akkhan",
+            Url = "https://us.battle.net/d3/en/item/gauntlets-of-akkhan",
+            RelativeUrl = "/d3/en/item/gauntlets-of-akkhan",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Armor of Akkhan",
+        };
+
+        /// <summary>
+        /// Helltooth Gauntlets 
+        /// </summary>
+        public static Item HelltoothGauntlets = new Item
+        {
+            Id = 363094,
+            Name = "Helltooth Gauntlets",
+            Quality = ItemQuality.Legendary,
+            Slug = "helltooth-gauntlets",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "gloves_norm_set_16",
+            DataUrl = "https://us.battle.net/api/d3/data/item/helltooth-gauntlets",
+            Url = "https://us.battle.net/d3/en/item/helltooth-gauntlets",
+            RelativeUrl = "/d3/en/item/helltooth-gauntlets",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Helltooth Harness",
+        };
+
+        /// <summary>
+        /// Jade Harvester's Mercy 
+        /// </summary>
+        public static Item JadeHarvestersMercy = new Item
+        {
+            Id = 338039,
+            Name = "Jade Harvester's Mercy",
+            Quality = ItemQuality.Legendary,
+            Slug = "jade-harvesters-mercy",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "gloves_norm_set_09",
+            DataUrl = "https://us.battle.net/api/d3/data/item/jade-harvesters-mercy",
+            Url = "https://us.battle.net/d3/en/item/jade-harvesters-mercy",
+            RelativeUrl = "/d3/en/item/jade-harvesters-mercy",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Raiment of the Jade Harvester",
+        };
+
+        /// <summary>
+        /// Marauder's Gloves 
+        /// </summary>
+        public static Item MaraudersGloves = new Item
+        {
+            Id = 336992,
+            Name = "Marauder's Gloves",
+            Quality = ItemQuality.Legendary,
+            Slug = "marauders-gloves",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "gloves_norm_set_07",
+            DataUrl = "https://us.battle.net/api/d3/data/item/marauders-gloves",
+            Url = "https://us.battle.net/d3/en/item/marauders-gloves",
+            RelativeUrl = "/d3/en/item/marauders-gloves",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Embodiment of the Marauder",
+        };
+
+        /// <summary>
+        /// Pride of the Invoker 
+        /// </summary>
+        public static Item PrideOfTheInvoker = new Item
+        {
+            Id = 335027,
+            Name = "Pride of the Invoker",
+            Quality = ItemQuality.Legendary,
+            Slug = "pride-of-the-invoker",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "gloves_norm_set_12",
+            DataUrl = "https://us.battle.net/api/d3/data/item/pride-of-the-invoker",
+            Url = "https://us.battle.net/d3/en/item/pride-of-the-invoker",
+            RelativeUrl = "/d3/en/item/pride-of-the-invoker",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Thorns of the Invoker",
+        };
+
+        /// <summary>
+        /// Pull of the Earth 
+        /// </summary>
+        public static Item PullOfTheEarth = new Item
+        {
+            Id = 340523,
+            Name = "Pull of the Earth",
+            Quality = ItemQuality.Legendary,
+            Slug = "pull-of-the-earth",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "gloves_norm_set_15",
+            DataUrl = "https://us.battle.net/api/d3/data/item/pull-of-the-earth",
+            Url = "https://us.battle.net/d3/en/item/pull-of-the-earth",
+            RelativeUrl = "/d3/en/item/pull-of-the-earth",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Might of the Earth",
+        };
+
+        /// <summary>
+        /// Raekor's Wraps 
+        /// </summary>
+        public static Item RaekorsWraps = new Item
+        {
+            Id = 336985,
+            Name = "Raekor's Wraps",
+            Quality = ItemQuality.Legendary,
+            Slug = "raekors-wraps",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "gloves_norm_set_05",
+            DataUrl = "https://us.battle.net/api/d3/data/item/raekors-wraps",
+            Url = "https://us.battle.net/d3/en/item/raekors-wraps",
+            RelativeUrl = "/d3/en/item/raekors-wraps",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "The Legacy of Raekor",
+        };
+
+        /// <summary>
+        /// Roland's Grasp 
+        /// </summary>
+        public static Item RolandsGrasp = new Item
+        {
+            Id = 404096,
+            Name = "Roland's Grasp",
+            Quality = ItemQuality.Legendary,
+            Slug = "rolands-grasp",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Gloves_norm_base_flippy",
+            DataUrl = "https://us.battle.net/api/d3/data/item/rolands-grasp",
+            Url = "https://us.battle.net/d3/en/item/rolands-grasp",
+            RelativeUrl = "/d3/en/item/rolands-grasp",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Roland's Legacy",
+        };
+
+        /// <summary>
+        /// Sunwuko's Paws 
+        /// </summary>
+        public static Item SunwukosPaws = new Item
+        {
+            Id = 336172,
+            Name = "Sunwuko's Paws",
+            Quality = ItemQuality.Legendary,
+            Slug = "sunwukos-paws",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "gloves_norm_set_11",
+            DataUrl = "https://us.battle.net/api/d3/data/item/sunwukos-paws",
+            Url = "https://us.battle.net/d3/en/item/sunwukos-paws",
+            RelativeUrl = "/d3/en/item/sunwukos-paws",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Monkey King's Garb",
+        };
+
+        /// <summary>
+        /// The Shadow's Grasp 
+        /// </summary>
+        public static Item TheShadowsGrasp = new Item
+        {
+            Id = 332362,
+            Name = "The Shadow's Grasp",
+            Quality = ItemQuality.Legendary,
+            Slug = "the-shadows-grasp",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "gloves_norm_set_14",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-shadows-grasp",
+            Url = "https://us.battle.net/d3/en/item/the-shadows-grasp",
+            RelativeUrl = "/d3/en/item/the-shadows-grasp",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "The Shadow’s Mantle",
+        };
+
+        /// <summary>
+        /// Vyr's Grasping Gauntlets 
+        /// </summary>
+        public static Item VyrsGraspingGauntlets = new Item
+        {
+            Id = 346210,
+            Name = "Vyr's Grasping Gauntlets",
+            Quality = ItemQuality.Legendary,
+            Slug = "vyrs-grasping-gauntlets",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "gloves_norm_set_13",
+            DataUrl = "https://us.battle.net/api/d3/data/item/vyrs-grasping-gauntlets",
+            Url = "https://us.battle.net/d3/en/item/vyrs-grasping-gauntlets",
+            RelativeUrl = "/d3/en/item/vyrs-grasping-gauntlets",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Vyr's Amazing Arcana",
+        };
+
+        /// <summary>
+        /// Penders Purchase 
+        /// </summary>
+        public static Item PendersPurchase = new Item
+        {
+            Id = 197207,
+            Name = "Penders Purchase",
+            Quality = ItemQuality.Legendary,
+            Slug = "penders-purchase",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Gloves_norm_unique_045",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/penders-purchase",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/penders-purchase",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/penders-purchase",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Asheara's Ward 
+        /// </summary>
+        public static Item AshearasWard = new Item
+        {
+            Id = 205636,
+            Name = "Asheara's Ward",
+            Quality = ItemQuality.Legendary,
+            Slug = "ashearas-ward",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Gloves_norm_unique_073",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/ashearas-ward",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/ashearas-ward",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/ashearas-ward",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Asheara's Vestments",
+        };
+
+        /// <summary>
+        /// Cain's Scrivener 
+        /// </summary>
+        public static Item CainsScrivener = new Item
+        {
+            Id = 0,
+            Name = "Cain's Scrivener",
+            Quality = ItemQuality.Legendary,
+            Slug = "cains-scriviner",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/cains-scriviner",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/cains-scriviner",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/cains-scriviner",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Cain's Destiny",
+        };
+
+        /// <summary>
+        /// Sage's Purchase 
+        /// </summary>
+        public static Item SagesPurchase = new Item
+        {
+            Id = 205632,
+            Name = "Sage's Purchase",
+            Quality = ItemQuality.Legendary,
+            Slug = "sages-purchase",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Gloves_norm_unique_087",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/sages-purchase",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/sages-purchase",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/sages-purchase",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Sage's Journey",
+        };
+
+        /// <summary>
+        /// Girdle of Giants 
+        /// </summary>
+        public static Item GirdleOfGiants = new Item
+        {
+            Id = 212232,
+            Name = "Girdle of Giants",
+            Quality = ItemQuality.Legendary,
+            Slug = "girdle-of-giants",
+            ItemType = ItemType.Belt,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "BarbBelt_norm_unique_04",
+            DataUrl = "https://us.battle.net/api/d3/data/item/girdle-of-giants",
+            Url = "https://us.battle.net/d3/en/item/girdle-of-giants",
+            RelativeUrl = "/d3/en/item/girdle-of-giants",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// The Undisputed Champion 
+        /// </summary>
+        public static Item TheUndisputedChampion = new Item
+        {
+            Id = 193676,
+            Name = "The Undisputed Champion",
+            Quality = ItemQuality.Legendary,
+            Slug = "the-undisputed-champion",
+            ItemType = ItemType.Belt,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "BarbBelt_norm_unique_06",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-undisputed-champion",
+            Url = "https://us.battle.net/d3/en/item/the-undisputed-champion",
+            RelativeUrl = "/d3/en/item/the-undisputed-champion",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Kotuur's Brace 
+        /// </summary>
+        public static Item KotuursBrace = new Item
+        {
+            Id = 193674,
+            Name = "Kotuur's Brace",
+            Quality = ItemQuality.Legendary,
+            Slug = "kotuurs-brace",
+            ItemType = ItemType.Belt,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "BarbBelt_norm_unique_07",
+            DataUrl = "https://us.battle.net/api/d3/data/item/kotuurs-brace",
+            Url = "https://us.battle.net/d3/en/item/kotuurs-brace",
+            RelativeUrl = "/d3/en/item/kotuurs-brace",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Pride of Cassius Increases the duration of Ignore Pain by 4–6 seconds.
+        /// </summary>
+        public static Item PrideOfCassius = new Item
+        {
+            Id = 193673,
+            Name = "Pride of Cassius",
+            Quality = ItemQuality.Legendary,
+            Slug = "pride-of-cassius",
+            ItemType = ItemType.Belt,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "BarbBelt_norm_unique_02",
+            DataUrl = "https://us.battle.net/api/d3/data/item/pride-of-cassius",
+            Url = "https://us.battle.net/d3/en/item/pride-of-cassius",
+            RelativeUrl = "/d3/en/item/pride-of-cassius",
+            IsCrafted = false,
+            LegendaryAffix = "Increases the duration of Ignore Pain by 4–6 seconds.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Chilanik's Chain Using War Cry increases the movement speed for you and all allies affected by 30–40% for 10 seconds.
+        /// </summary>
+        public static Item ChilaniksChain = new Item
+        {
+            Id = 298133,
+            Name = "Chilanik's Chain",
+            Quality = ItemQuality.Legendary,
+            Slug = "chilaniks-chain",
+            ItemType = ItemType.Belt,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "barbbelt_norm_unique_10",
+            DataUrl = "https://us.battle.net/api/d3/data/item/chilaniks-chain",
+            Url = "https://us.battle.net/d3/en/item/chilaniks-chain",
+            RelativeUrl = "/d3/en/item/chilaniks-chain",
+            IsCrafted = false,
+            LegendaryAffix = "Using War Cry increases the movement speed for you and all allies affected by 30–40% for 10 seconds.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Dread Iron 
+        /// </summary>
+        public static Item DreadIron = new Item
+        {
+            Id = 193672,
+            Name = "Dread Iron",
+            Quality = ItemQuality.Legendary,
+            Slug = "dread-iron",
+            ItemType = ItemType.Belt,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "BarbBelt_norm_unique_01",
+            DataUrl = "https://us.battle.net/api/d3/data/item/dread-iron",
+            Url = "https://us.battle.net/d3/en/item/dread-iron",
+            RelativeUrl = "/d3/en/item/dread-iron",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Ageless Might 
+        /// </summary>
+        public static Item AgelessMight = new Item
+        {
+            Id = 193675,
+            Name = "Ageless Might",
+            Quality = ItemQuality.Legendary,
+            Slug = "ageless-might",
+            ItemType = ItemType.Belt,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "BarbBelt_norm_unique_08",
+            DataUrl = "https://us.battle.net/api/d3/data/item/ageless-might",
+            Url = "https://us.battle.net/d3/en/item/ageless-might",
+            RelativeUrl = "/d3/en/item/ageless-might",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Lamentation Rend can now stack up to 2 times on an enemy.
+        /// </summary>
+        public static Item Lamentation = new Item
+        {
+            Id = 212234,
+            Name = "Lamentation",
+            Quality = ItemQuality.Legendary,
+            Slug = "lamentation",
+            ItemType = ItemType.Belt,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "barbbelt_norm_unique_05",
+            DataUrl = "https://us.battle.net/api/d3/data/item/lamentation",
+            Url = "https://us.battle.net/d3/en/item/lamentation",
+            RelativeUrl = "/d3/en/item/lamentation",
+            IsCrafted = false,
+            LegendaryAffix = "Rend can now stack up to 2 times on an enemy.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Immortal King's Tribal Binding 
+        /// </summary>
+        public static Item ImmortalKingsTribalBinding = new Item
+        {
+            Id = 212235,
+            Name = "Immortal King's Tribal Binding",
+            Quality = ItemQuality.Legendary,
+            Slug = "immortal-kings-tribal-binding",
+            ItemType = ItemType.Belt,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "BarbBelt_norm_unique_09",
+            DataUrl = "https://us.battle.net/api/d3/data/item/immortal-kings-tribal-binding",
+            Url = "https://us.battle.net/d3/en/item/immortal-kings-tribal-binding",
+            RelativeUrl = "/d3/en/item/immortal-kings-tribal-binding",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Immortal King's Call",
         };
 
         /// <summary>
@@ -2867,7 +3609,7 @@ namespace Trinity.Reference
             Slug = "goldwrap",
             ItemType = ItemType.Belt,
             BaseType = ItemBaseType.Armor,
-            InternalName = "Belt_norm_unique_08",
+            InternalName = "belt_norm_unique_08",
             DataUrl = "https://us.battle.net/api/d3/data/item/goldwrap",
             Url = "https://us.battle.net/d3/en/item/goldwrap",
             RelativeUrl = "/d3/en/item/goldwrap",
@@ -2927,7 +3669,7 @@ namespace Trinity.Reference
             Slug = "saffron-wrap",
             ItemType = ItemType.Belt,
             BaseType = ItemBaseType.Armor,
-            InternalName = "belt_norm_unique_01",
+            InternalName = "Belt_norm_unique_01",
             DataUrl = "https://us.battle.net/api/d3/data/item/saffron-wrap",
             Url = "https://us.battle.net/d3/en/item/saffron-wrap",
             RelativeUrl = "/d3/en/item/saffron-wrap",
@@ -3001,13 +3743,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HarringtonWaistguard = new Item
         {
-            Id = 298129,
+            Id = 210432,
             Name = "Harrington Waistguard",
             Quality = ItemQuality.Legendary,
             Slug = "harrington-waistguard",
             ItemType = ItemType.Belt,
             BaseType = ItemBaseType.Armor,
-            InternalName = "belt_norm_unique_19",
+            InternalName = "StaffOfCow",
             DataUrl = "https://us.battle.net/api/d3/data/item/harrington-waistguard",
             Url = "https://us.battle.net/d3/en/item/harrington-waistguard",
             RelativeUrl = "/d3/en/item/harrington-waistguard",
@@ -3021,13 +3763,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HwojWrap = new Item
         {
-            Id = 298131,
+            Id = 193670,
             Name = "Hwoj Wrap",
             Quality = ItemQuality.Legendary,
             Slug = "hwoj-wrap",
             ItemType = ItemType.Belt,
             BaseType = ItemBaseType.Armor,
-            InternalName = "belt_norm_unique_21",
+            InternalName = "Belt_norm_unique_07",
             DataUrl = "https://us.battle.net/api/d3/data/item/hwoj-wrap",
             Url = "https://us.battle.net/d3/en/item/hwoj-wrap",
             RelativeUrl = "/d3/en/item/hwoj-wrap",
@@ -3127,7 +3869,7 @@ namespace Trinity.Reference
             Slug = "thundergods-vigor",
             ItemType = ItemType.Belt,
             BaseType = ItemBaseType.Armor,
-            InternalName = "barbbelt_norm_unique_03",
+            InternalName = "BarbBelt_norm_unique_03",
             DataUrl = "https://us.battle.net/api/d3/data/item/thundergods-vigor",
             Url = "https://us.battle.net/d3/en/item/thundergods-vigor",
             RelativeUrl = "/d3/en/item/thundergods-vigor",
@@ -3161,13 +3903,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HellcatWaistguard = new Item
         {
-            Id = 193668,
+            Id = 0,
             Name = "Hellcat Waistguard",
             Quality = ItemQuality.Legendary,
             Slug = "hellcat-waistguard",
             ItemType = ItemType.Belt,
             BaseType = ItemBaseType.Armor,
-            InternalName = "belt_norm_unique_05",
+            InternalName = "",
             DataUrl = "https://us.battle.net/api/d3/data/item/hellcat-waistguard",
             Url = "https://us.battle.net/d3/en/item/hellcat-waistguard",
             RelativeUrl = "/d3/en/item/hellcat-waistguard",
@@ -3181,13 +3923,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item TheWitchingHour = new Item
         {
-            Id = 193670,
+            Id = 0,
             Name = "The Witching Hour",
             Quality = ItemQuality.Legendary,
             Slug = "the-witching-hour",
             ItemType = ItemType.Belt,
             BaseType = ItemBaseType.Armor,
-            InternalName = "Belt_norm_unique_07",
+            InternalName = "",
             DataUrl = "https://us.battle.net/api/d3/data/item/the-witching-hour",
             Url = "https://us.battle.net/d3/en/item/the-witching-hour",
             RelativeUrl = "/d3/en/item/the-witching-hour",
@@ -3301,13 +4043,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item KrelmsBuffBelt = new Item
         {
-            Id = 336184,
+            Id = 0,
             Name = "Krelm's Buff Belt",
             Quality = ItemQuality.Legendary,
             Slug = "krelms-buff-belt",
             ItemType = ItemType.Belt,
             BaseType = ItemBaseType.Armor,
-            InternalName = "belt_norm_set_02",
+            InternalName = "",
             DataUrl = "https://us.battle.net/api/d3/data/item/krelms-buff-belt",
             Url = "https://us.battle.net/d3/en/item/krelms-buff-belt",
             RelativeUrl = "/d3/en/item/krelms-buff-belt",
@@ -3381,19 +4123,719 @@ namespace Trinity.Reference
         /// </summary>
         public static Item GuardiansCase = new Item
         {
-            Id = 0,
+            Id = 222976,
             Name = "Guardian's Case",
             Quality = ItemQuality.Legendary,
             Slug = "guardians-case",
             ItemType = ItemType.Belt,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "Belt_norm_unique_13",
             DataUrl = "https://us.battle.net/api/d3/data/recipe/guardians-case",
             Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/guardians-case",
             RelativeUrl = "/d3/en/artisan/blacksmith/recipe/guardians-case",
             IsCrafted = true,
             LegendaryAffix = "",
             SetName = "Guardian's Jeopardy",
+        };
+
+        /// <summary>
+        /// Hellfire Amulet Strength 
+        /// </summary>
+        public static Item HellfireAmuletStrength = new Item
+        {
+            Id = 0,
+            Name = "Hellfire Amulet Strength",
+            Quality = ItemQuality.Legendary,
+            Slug = "hellfire-amulet-of-strength",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/hellfire-amulet-of-strength",
+            Url = "https://us.battle.net/d3/en/artisan/jeweler/recipe/hellfire-amulet-of-strength",
+            RelativeUrl = "/d3/en/artisan/jeweler/recipe/hellfire-amulet-of-strength",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Hellfire Amulet Intelligence 
+        /// </summary>
+        public static Item HellfireAmuletIntelligence = new Item
+        {
+            Id = 0,
+            Name = "Hellfire Amulet Intelligence",
+            Quality = ItemQuality.Legendary,
+            Slug = "hellfire-amulet-of-intelligence",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/hellfire-amulet-of-intelligence",
+            Url = "https://us.battle.net/d3/en/artisan/jeweler/recipe/hellfire-amulet-of-intelligence",
+            RelativeUrl = "/d3/en/artisan/jeweler/recipe/hellfire-amulet-of-intelligence",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Hellfire Amulet Dexterity 
+        /// </summary>
+        public static Item HellfireAmuletDexterity = new Item
+        {
+            Id = 0,
+            Name = "Hellfire Amulet Dexterity",
+            Quality = ItemQuality.Legendary,
+            Slug = "hellfire-amulet-of-dexterity",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/hellfire-amulet-of-dexterity",
+            Url = "https://us.battle.net/d3/en/artisan/jeweler/recipe/hellfire-amulet-of-dexterity",
+            RelativeUrl = "/d3/en/artisan/jeweler/recipe/hellfire-amulet-of-dexterity",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Moonlight Ward Hitting an enemy within 15 yards has a chance to ward you with shards of Arcane energy that explode when enemies get close, dealing 240–320% weapon damage as Arcane to enemies within 15 yards.
+        /// </summary>
+        public static Item MoonlightWard = new Item
+        {
+            Id = 197813,
+            Name = "Moonlight Ward",
+            Quality = ItemQuality.Legendary,
+            Slug = "moonlight-ward",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "Amulet_norm_unique_03",
+            DataUrl = "https://us.battle.net/api/d3/data/item/moonlight-ward",
+            Url = "https://us.battle.net/d3/en/item/moonlight-ward",
+            RelativeUrl = "/d3/en/item/moonlight-ward",
+            IsCrafted = false,
+            LegendaryAffix = "Hitting an enemy within 15 yards has a chance to ward you with shards of Arcane energy that explode when enemies get close, dealing 240–320% weapon damage as Arcane to enemies within 15 yards.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Squirt's Necklace 
+        /// </summary>
+        public static Item SquirtsNecklace = new Item
+        {
+            Id = 197819,
+            Name = "Squirt's Necklace",
+            Quality = ItemQuality.Legendary,
+            Slug = "squirts-necklace",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "amulet_norm_unique_08",
+            DataUrl = "https://us.battle.net/api/d3/data/item/squirts-necklace",
+            Url = "https://us.battle.net/d3/en/item/squirts-necklace",
+            RelativeUrl = "/d3/en/item/squirts-necklace",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Eye of Etlich 
+        /// </summary>
+        public static Item EyeOfEtlich = new Item
+        {
+            Id = 197823,
+            Name = "Eye of Etlich",
+            Quality = ItemQuality.Legendary,
+            Slug = "eye-of-etlich",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "Amulet_norm_unique_12",
+            DataUrl = "https://us.battle.net/api/d3/data/item/eye-of-etlich",
+            Url = "https://us.battle.net/d3/en/item/eye-of-etlich",
+            RelativeUrl = "/d3/en/item/eye-of-etlich",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Rondal's Locket 
+        /// </summary>
+        public static Item RondalsLocket = new Item
+        {
+            Id = 197818,
+            Name = "Rondal's Locket",
+            Quality = ItemQuality.Legendary,
+            Slug = "rondals-locket",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "Amulet_norm_unique_07",
+            DataUrl = "https://us.battle.net/api/d3/data/item/rondals-locket",
+            Url = "https://us.battle.net/d3/en/item/rondals-locket",
+            RelativeUrl = "/d3/en/item/rondals-locket",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Talisman of Aranoch Prevent all Cold damage taken and heal yourself for 10–15% of the amount prevented.
+        /// </summary>
+        public static Item TalismanOfAranoch = new Item
+        {
+            Id = 0,
+            Name = "Talisman of Aranoch",
+            Quality = ItemQuality.Legendary,
+            Slug = "talisman-of-aranoch",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/talisman-of-aranoch",
+            Url = "https://us.battle.net/d3/en/item/talisman-of-aranoch",
+            RelativeUrl = "/d3/en/item/talisman-of-aranoch",
+            IsCrafted = false,
+            LegendaryAffix = "Prevent all Cold damage taken and heal yourself for 10–15% of the amount prevented.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Ancestors' Grace When receiving fatal damage, you are instead restored to 100% of maximum Life and resources. This item is destroyed in the process.
+        /// </summary>
+        public static Item AncestorsGrace = new Item
+        {
+            Id = 0,
+            Name = "Ancestors' Grace",
+            Quality = ItemQuality.Legendary,
+            Slug = "ancestors-grace",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/ancestors-grace",
+            Url = "https://us.battle.net/d3/en/item/ancestors-grace",
+            RelativeUrl = "/d3/en/item/ancestors-grace",
+            IsCrafted = false,
+            LegendaryAffix = "When receiving fatal damage, you are instead restored to 100% of maximum Life and resources. This item is destroyed in the process.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Countess Julia's Cameo Prevent all Arcane damage taken and heal yourself for 20–25% of the amount prevented.
+        /// </summary>
+        public static Item CountessJuliasCameo = new Item
+        {
+            Id = 192468,
+            Name = "Countess Julia's Cameo",
+            Quality = ItemQuality.Legendary,
+            Slug = "countess-julias-cameo",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "Mojo_norm_unique_02",
+            DataUrl = "https://us.battle.net/api/d3/data/item/countess-julias-cameo",
+            Url = "https://us.battle.net/d3/en/item/countess-julias-cameo",
+            RelativeUrl = "/d3/en/item/countess-julias-cameo",
+            IsCrafted = false,
+            LegendaryAffix = "Prevent all Arcane damage taken and heal yourself for 20–25% of the amount prevented.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Dovu Energy Trap Increases duration of Stun effects by 20–25%.
+        /// </summary>
+        public static Item DovuEnergyTrap = new Item
+        {
+            Id = 298054,
+            Name = "Dovu Energy Trap",
+            Quality = ItemQuality.Legendary,
+            Slug = "dovu-energy-trap",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "amulet_norm_unique_23",
+            DataUrl = "https://us.battle.net/api/d3/data/item/dovu-energy-trap",
+            Url = "https://us.battle.net/d3/en/item/dovu-energy-trap",
+            RelativeUrl = "/d3/en/item/dovu-energy-trap",
+            IsCrafted = false,
+            LegendaryAffix = "Increases duration of Stun effects by 20–25%.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Haunt of Vaxo Summons shadow clones to your aid when you Stun an enemy. This effect may occur once every 30 seconds.
+        /// </summary>
+        public static Item HauntOfVaxo = new Item
+        {
+            Id = 222464,
+            Name = "Haunt of Vaxo",
+            Quality = ItemQuality.Legendary,
+            Slug = "haunt-of-vaxo",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "Boots_norm_unique_051",
+            DataUrl = "https://us.battle.net/api/d3/data/item/haunt-of-vaxo",
+            Url = "https://us.battle.net/d3/en/item/haunt-of-vaxo",
+            RelativeUrl = "/d3/en/item/haunt-of-vaxo",
+            IsCrafted = false,
+            LegendaryAffix = "Summons shadow clones to your aid when you Stun an enemy. This effect may occur once every 30 seconds.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Rakoff's Glass of Life Enemies you kill have a 3–4% additional chance to drop a health globe.
+        /// </summary>
+        public static Item RakoffsGlassOfLife = new Item
+        {
+            Id = 298055,
+            Name = "Rakoff's Glass of Life",
+            Quality = ItemQuality.Legendary,
+            Slug = "rakoffs-glass-of-life",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "amulet_norm_unique_24",
+            DataUrl = "https://us.battle.net/api/d3/data/item/rakoffs-glass-of-life",
+            Url = "https://us.battle.net/d3/en/item/rakoffs-glass-of-life",
+            RelativeUrl = "/d3/en/item/rakoffs-glass-of-life",
+            IsCrafted = false,
+            LegendaryAffix = "Enemies you kill have a 3–4% additional chance to drop a health globe.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// The Ess of Johan Chance on hit to pull in enemies toward your target and Slow them by 60–80%.
+        /// </summary>
+        public static Item TheEssOfJohan = new Item
+        {
+            Id = 298051,
+            Name = "The Ess of Johan",
+            Quality = ItemQuality.Legendary,
+            Slug = "the-ess-of-johan",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "amulet_norm_unique_20",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-ess-of-johan",
+            Url = "https://us.battle.net/d3/en/item/the-ess-of-johan",
+            RelativeUrl = "/d3/en/item/the-ess-of-johan",
+            IsCrafted = false,
+            LegendaryAffix = "Chance on hit to pull in enemies toward your target and Slow them by 60–80%.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Holy Beacon 
+        /// </summary>
+        public static Item HolyBeacon = new Item
+        {
+            Id = 197822,
+            Name = "Holy Beacon",
+            Quality = ItemQuality.Legendary,
+            Slug = "holy-beacon",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "amulet_norm_unique_11",
+            DataUrl = "https://us.battle.net/api/d3/data/item/holy-beacon",
+            Url = "https://us.battle.net/d3/en/item/holy-beacon",
+            RelativeUrl = "/d3/en/item/holy-beacon",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Kymbo's Gold Picking up gold heals you for an amount equal to the gold that was picked up.
+        /// </summary>
+        public static Item KymbosGold = new Item
+        {
+            Id = 216525,
+            Name = "Kymbo's Gold",
+            Quality = ItemQuality.Legendary,
+            Slug = "kymbos-gold",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "Mojo_norm_unique_07",
+            DataUrl = "https://us.battle.net/api/d3/data/item/kymbos-gold",
+            Url = "https://us.battle.net/d3/en/item/kymbos-gold",
+            RelativeUrl = "/d3/en/item/kymbos-gold",
+            IsCrafted = false,
+            LegendaryAffix = "Picking up gold heals you for an amount equal to the gold that was picked up.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// The Flavor of Time 
+        /// </summary>
+        public static Item TheFlavorOfTime = new Item
+        {
+            Id = 193659,
+            Name = "The Flavor of Time",
+            Quality = ItemQuality.Legendary,
+            Slug = "the-flavor-of-time",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "Amulet_norm_unique_01",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-flavor-of-time",
+            Url = "https://us.battle.net/d3/en/item/the-flavor-of-time",
+            RelativeUrl = "/d3/en/item/the-flavor-of-time",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Mara's Kaleidoscope Prevent all Poison damage taken and heal yourself for 10–15% of the amount prevented.
+        /// </summary>
+        public static Item MarasKaleidoscope = new Item
+        {
+            Id = 0,
+            Name = "Mara's Kaleidoscope",
+            Quality = ItemQuality.Legendary,
+            Slug = "maras-kaleidoscope",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/maras-kaleidoscope",
+            Url = "https://us.battle.net/d3/en/item/maras-kaleidoscope",
+            RelativeUrl = "/d3/en/item/maras-kaleidoscope",
+            IsCrafted = false,
+            LegendaryAffix = "Prevent all Poison damage taken and heal yourself for 10–15% of the amount prevented.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Ouroboros 
+        /// </summary>
+        public static Item Ouroboros = new Item
+        {
+            Id = 197815,
+            Name = "Ouroboros",
+            Quality = ItemQuality.Legendary,
+            Slug = "ouroboros",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "Amulet_norm_unique_05",
+            DataUrl = "https://us.battle.net/api/d3/data/item/ouroboros",
+            Url = "https://us.battle.net/d3/en/item/ouroboros",
+            RelativeUrl = "/d3/en/item/ouroboros",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// The Star of Azkaranth Prevent all Fire damage taken and heal yourself for 10–15% of the amount prevented.
+        /// </summary>
+        public static Item TheStarOfAzkaranth = new Item
+        {
+            Id = 197817,
+            Name = "The Star of Azkaranth",
+            Quality = ItemQuality.Legendary,
+            Slug = "the-star-of-azkaranth",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "amulet_norm_unique_06",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-star-of-azkaranth",
+            Url = "https://us.battle.net/d3/en/item/the-star-of-azkaranth",
+            RelativeUrl = "/d3/en/item/the-star-of-azkaranth",
+            IsCrafted = false,
+            LegendaryAffix = "Prevent all Fire damage taken and heal yourself for 10–15% of the amount prevented.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Xephirian Amulet Prevent all Lightning damage taken and heal yourself for 10–15% of the amount prevented.
+        /// </summary>
+        public static Item XephirianAmulet = new Item
+        {
+            Id = 197814,
+            Name = "Xephirian Amulet",
+            Quality = ItemQuality.Legendary,
+            Slug = "xephirian-amulet",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "Amulet_norm_unique_04",
+            DataUrl = "https://us.battle.net/api/d3/data/item/xephirian-amulet",
+            Url = "https://us.battle.net/d3/en/item/xephirian-amulet",
+            RelativeUrl = "/d3/en/item/xephirian-amulet",
+            IsCrafted = false,
+            LegendaryAffix = "Prevent all Lightning damage taken and heal yourself for 10–15% of the amount prevented.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Blackthorne's Duncraig Cross 
+        /// </summary>
+        public static Item BlackthornesDuncraigCross = new Item
+        {
+            Id = 298050,
+            Name = "Blackthorne's Duncraig Cross",
+            Quality = ItemQuality.Legendary,
+            Slug = "blackthornes-duncraig-cross",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "amulet_norm_unique_19",
+            DataUrl = "https://us.battle.net/api/d3/data/item/blackthornes-duncraig-cross",
+            Url = "https://us.battle.net/d3/en/item/blackthornes-duncraig-cross",
+            RelativeUrl = "/d3/en/item/blackthornes-duncraig-cross",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Blackthorne's Battlegear",
+        };
+
+        /// <summary>
+        /// Tal Rasha's Allegiance 
+        /// </summary>
+        public static Item TalRashasAllegiance = new Item
+        {
+            Id = 222486,
+            Name = "Tal Rasha's Allegiance",
+            Quality = ItemQuality.Legendary,
+            Slug = "tal-rashas-allegiance",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "Amulet_norm_unique_14",
+            DataUrl = "https://us.battle.net/api/d3/data/item/tal-rashas-allegiance",
+            Url = "https://us.battle.net/d3/en/item/tal-rashas-allegiance",
+            RelativeUrl = "/d3/en/item/tal-rashas-allegiance",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Tal Rasha's Elements",
+        };
+
+        /// <summary>
+        /// The Traveler's Pledge 
+        /// </summary>
+        public static Item TheTravelersPledge = new Item
+        {
+            Id = 222490,
+            Name = "The Traveler's Pledge",
+            Quality = ItemQuality.Legendary,
+            Slug = "the-travelers-pledge",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "Amulet_norm_unique_15",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-travelers-pledge",
+            Url = "https://us.battle.net/d3/en/item/the-travelers-pledge",
+            RelativeUrl = "/d3/en/item/the-travelers-pledge",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Endless Walk",
+        };
+
+        /// <summary>
+        /// Halcyon's Ascent 
+        /// </summary>
+        public static Item HalcyonsAscent = new Item
+        {
+            Id = 298056,
+            Name = "Halcyon's Ascent",
+            Quality = ItemQuality.Legendary,
+            Slug = "halcyons-ascent",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "amulet_norm_unique_25",
+            DataUrl = "https://us.battle.net/api/d3/data/item/halcyons-ascent",
+            Url = "https://us.battle.net/d3/en/item/halcyons-ascent",
+            RelativeUrl = "/d3/en/item/halcyons-ascent",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Sunwuko's Shines 
+        /// </summary>
+        public static Item SunwukosShines = new Item
+        {
+            Id = 336174,
+            Name = "Sunwuko's Shines",
+            Quality = ItemQuality.Legendary,
+            Slug = "sunwukos-shines",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.None,
+            InternalName = "amulet_norm_set_11",
+            DataUrl = "https://us.battle.net/api/d3/data/item/sunwukos-shines",
+            Url = "https://us.battle.net/d3/en/item/sunwukos-shines",
+            RelativeUrl = "/d3/en/item/sunwukos-shines",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Monkey King's Garb",
+        };
+
+        /// <summary>
+        /// Gazing Demise 
+        /// </summary>
+        public static Item GazingDemise = new Item
+        {
+            Id = 194995,
+            Name = "Gazing Demise",
+            Quality = ItemQuality.Legendary,
+            Slug = "gazing-demise",
+            ItemType = ItemType.Mojo,
+            BaseType = ItemBaseType.None,
+            InternalName = "Mojo_norm_unique_05",
+            DataUrl = "https://us.battle.net/api/d3/data/item/gazing-demise",
+            Url = "https://us.battle.net/d3/en/item/gazing-demise",
+            RelativeUrl = "/d3/en/item/gazing-demise",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Homunculus A Zombie Dog is automatically summoned to your side every 4–6 seconds.
+        /// </summary>
+        public static Item Homunculus = new Item
+        {
+            Id = 194991,
+            Name = "Homunculus",
+            Quality = ItemQuality.Legendary,
+            Slug = "homunculus",
+            ItemType = ItemType.Mojo,
+            BaseType = ItemBaseType.None,
+            InternalName = "Mojo_norm_unique_04",
+            DataUrl = "https://us.battle.net/api/d3/data/item/homunculus",
+            Url = "https://us.battle.net/d3/en/item/homunculus",
+            RelativeUrl = "/d3/en/item/homunculus",
+            IsCrafted = false,
+            LegendaryAffix = "A Zombie Dog is automatically summoned to your side every 4–6 seconds.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Bitterness 
+        /// </summary>
+        public static Item Bitterness = new Item
+        {
+            Id = 194988,
+            Name = "Bitterness",
+            Quality = ItemQuality.Legendary,
+            Slug = "bitterness",
+            ItemType = ItemType.Mojo,
+            BaseType = ItemBaseType.None,
+            InternalName = "Mojo_norm_unique_03",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/bitterness",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/bitterness",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/bitterness",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Shukrani's Triumph Spirit Walk lasts until you attack or until an enemy is within 30 yards of you.
+        /// </summary>
+        public static Item ShukranisTriumph = new Item
+        {
+            Id = 272070,
+            Name = "Shukrani's Triumph",
+            Quality = ItemQuality.Legendary,
+            Slug = "shukranis-triumph",
+            ItemType = ItemType.Mojo,
+            BaseType = ItemBaseType.None,
+            InternalName = "mojo_norm_unique_11",
+            DataUrl = "https://us.battle.net/api/d3/data/item/shukranis-triumph",
+            Url = "https://us.battle.net/d3/en/item/shukranis-triumph",
+            RelativeUrl = "/d3/en/item/shukranis-triumph",
+            IsCrafted = false,
+            LegendaryAffix = "Spirit Walk lasts until you attack or until an enemy is within 30 yards of you.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Thing of the Deep 
+        /// </summary>
+        public static Item ThingOfTheDeep = new Item
+        {
+            Id = 0,
+            Name = "Thing of the Deep",
+            Quality = ItemQuality.Legendary,
+            Slug = "thing-of-the-deep",
+            ItemType = ItemType.Mojo,
+            BaseType = ItemBaseType.None,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/thing-of-the-deep",
+            Url = "https://us.battle.net/d3/en/item/thing-of-the-deep",
+            RelativeUrl = "/d3/en/item/thing-of-the-deep",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Uhkapian Serpent 25–30% of the damage you take is redirected to your Zombie Dogs.
+        /// </summary>
+        public static Item UhkapianSerpent = new Item
+        {
+            Id = 191278,
+            Name = "Uhkapian Serpent",
+            Quality = ItemQuality.Legendary,
+            Slug = "uhkapian-serpent",
+            ItemType = ItemType.Mojo,
+            BaseType = ItemBaseType.None,
+            InternalName = "Mojo_norm_unique_01",
+            DataUrl = "https://us.battle.net/api/d3/data/item/uhkapian-serpent",
+            Url = "https://us.battle.net/d3/en/item/uhkapian-serpent",
+            RelativeUrl = "/d3/en/item/uhkapian-serpent",
+            IsCrafted = false,
+            LegendaryAffix = "25–30% of the damage you take is redirected to your Zombie Dogs.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Manajuma's Gory Fetch 
+        /// </summary>
+        public static Item ManajumasGoryFetch = new Item
+        {
+            Id = 210993,
+            Name = "Manajuma's Gory Fetch",
+            Quality = ItemQuality.Legendary,
+            Slug = "manajumas-gory-fetch",
+            ItemType = ItemType.Mojo,
+            BaseType = ItemBaseType.None,
+            InternalName = "Mojo_norm_unique_06",
+            DataUrl = "https://us.battle.net/api/d3/data/item/manajumas-gory-fetch",
+            Url = "https://us.battle.net/d3/en/item/manajumas-gory-fetch",
+            RelativeUrl = "/d3/en/item/manajumas-gory-fetch",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Manajuma's Way",
+        };
+
+        /// <summary>
+        /// Zunimassa's String of Skulls 
+        /// </summary>
+        public static Item ZunimassasStringOfSkulls = new Item
+        {
+            Id = 0,
+            Name = "Zunimassa's String of Skulls",
+            Quality = ItemQuality.Legendary,
+            Slug = "zunimassas-string-of-skulls",
+            ItemType = ItemType.Mojo,
+            BaseType = ItemBaseType.None,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/zunimassas-string-of-skulls",
+            Url = "https://us.battle.net/d3/en/item/zunimassas-string-of-skulls",
+            RelativeUrl = "/d3/en/item/zunimassas-string-of-skulls",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Zunimassa's Haunt",
+        };
+
+        /// <summary>
+        /// Spite 
+        /// </summary>
+        public static Item Spite = new Item
+        {
+            Id = 0,
+            Name = "Spite",
+            Quality = ItemQuality.Legendary,
+            Slug = "spite",
+            ItemType = ItemType.Mojo,
+            BaseType = ItemBaseType.None,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/spite",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/spite",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/spite",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
         };
 
         /// <summary>
@@ -3501,13 +4943,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item SwampLandWaders = new Item
         {
-            Id = 209057,
+            Id = 0,
             Name = "Swamp Land Waders",
             Quality = ItemQuality.Legendary,
             Slug = "swamp-land-waders",
             ItemType = ItemType.Legs,
             BaseType = ItemBaseType.Armor,
-            InternalName = "pants_norm_unique_075",
+            InternalName = "",
             DataUrl = "https://us.battle.net/api/d3/data/item/swamp-land-waders",
             Url = "https://us.battle.net/d3/en/item/swamp-land-waders",
             RelativeUrl = "/d3/en/item/swamp-land-waders",
@@ -3601,13 +5043,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item Gehennas = new Item
         {
-            Id = 0,
+            Id = 222476,
             Name = "Gehennas",
             Quality = ItemQuality.Legendary,
             Slug = "gehennas",
             ItemType = ItemType.Legs,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "pants_norm_unique_049",
             DataUrl = "https://us.battle.net/api/d3/data/recipe/gehennas",
             Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/gehennas",
             RelativeUrl = "/d3/en/artisan/blacksmith/recipe/gehennas",
@@ -3721,13 +5163,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item MaraudersEncasement = new Item
         {
-            Id = 336993,
+            Id = 0,
             Name = "Marauder's Encasement",
             Quality = ItemQuality.Legendary,
             Slug = "marauders-encasement",
             ItemType = ItemType.Legs,
             BaseType = ItemBaseType.Armor,
-            InternalName = "pants_norm_set_07",
+            InternalName = "",
             DataUrl = "https://us.battle.net/api/d3/data/item/marauders-encasement",
             Url = "https://us.battle.net/d3/en/item/marauders-encasement",
             RelativeUrl = "/d3/en/item/marauders-encasement",
@@ -3761,13 +5203,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item RolandsDetermination = new Item
         {
-            Id = 0,
+            Id = 404097,
             Name = "Roland's Determination",
             Quality = ItemQuality.Legendary,
             Slug = "rolands-determination",
             ItemType = ItemType.Legs,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "p1_Pants_norm_set_01",
             DataUrl = "https://us.battle.net/api/d3/data/item/rolands-determination",
             Url = "https://us.battle.net/d3/en/item/rolands-determination",
             RelativeUrl = "/d3/en/item/rolands-determination",
@@ -3801,13 +5243,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item TheShadowsCoil = new Item
         {
-            Id = 0,
+            Id = 332361,
             Name = "The Shadow's Coil",
             Quality = ItemQuality.Legendary,
             Slug = "the-shadows-coil",
             ItemType = ItemType.Legs,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "pants_norm_set_14",
             DataUrl = "https://us.battle.net/api/d3/data/item/the-shadows-coil",
             Url = "https://us.battle.net/d3/en/item/the-shadows-coil",
             RelativeUrl = "/d3/en/item/the-shadows-coil",
@@ -3881,13 +5323,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item AshearasPace = new Item
         {
-            Id = 0,
+            Id = 209054,
             Name = "Asheara's Pace",
             Quality = ItemQuality.Legendary,
             Slug = "ashearas-pace",
             ItemType = ItemType.Legs,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "pants_norm_unique_073",
             DataUrl = "https://us.battle.net/api/d3/data/recipe/ashearas-pace",
             Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/ashearas-pace",
             RelativeUrl = "/d3/en/artisan/blacksmith/recipe/ashearas-pace",
@@ -3901,13 +5343,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item CainsHabit = new Item
         {
-            Id = 197218,
+            Id = 0,
             Name = "Cain's Habit",
             Quality = ItemQuality.Legendary,
             Slug = "cains-habit",
             ItemType = ItemType.Legs,
             BaseType = ItemBaseType.Armor,
-            InternalName = "pants_norm_unique_046",
+            InternalName = "",
             DataUrl = "https://us.battle.net/api/d3/data/recipe/cains-habit",
             Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/cains-habit",
             RelativeUrl = "/d3/en/artisan/blacksmith/recipe/cains-habit",
@@ -3921,13 +5363,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item CaptainCrimsonsThrust = new Item
         {
-            Id = 197214,
+            Id = 0,
             Name = "Captain Crimson's Thrust",
             Quality = ItemQuality.Legendary,
             Slug = "captain-crimsons-thrust",
             ItemType = ItemType.Legs,
             BaseType = ItemBaseType.Armor,
-            InternalName = "pants_norm_unique_043",
+            InternalName = "",
             DataUrl = "https://us.battle.net/api/d3/data/recipe/captain-crimsons-thrust",
             Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/captain-crimsons-thrust",
             RelativeUrl = "/d3/en/artisan/blacksmith/recipe/captain-crimsons-thrust",
@@ -3941,1139 +5383,19 @@ namespace Trinity.Reference
         /// </summary>
         public static Item DemonsPlate = new Item
         {
-            Id = 0,
+            Id = 205644,
             Name = "Demon's Plate",
             Quality = ItemQuality.Legendary,
             Slug = "demons-plate",
             ItemType = ItemType.Legs,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "pants_norm_unique_085",
             DataUrl = "https://us.battle.net/api/d3/data/recipe/demons-plate",
             Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/demons-plate",
             RelativeUrl = "/d3/en/artisan/blacksmith/recipe/demons-plate",
             IsCrafted = true,
             LegendaryAffix = "",
             SetName = "Demon's Hide",
-        };
-
-        /// <summary>
-        /// Lut Socks Leap can be cast again within 2 seconds before the cooldown begins.
-        /// </summary>
-        public static Item LutSocks = new Item
-        {
-            Id = 205622,
-            Name = "Lut Socks",
-            Quality = ItemQuality.Legendary,
-            Slug = "lut-socks",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Boots_norm_unique_077",
-            DataUrl = "https://us.battle.net/api/d3/data/item/lut-socks",
-            Url = "https://us.battle.net/d3/en/item/lut-socks",
-            RelativeUrl = "/d3/en/item/lut-socks",
-            IsCrafted = false,
-            LegendaryAffix = "Leap can be cast again within 2 seconds before the cooldown begins.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// The Crudest Boots Mystic Ally summons two Mystic Allies that fight by your side.
-        /// </summary>
-        public static Item TheCrudestBoots = new Item
-        {
-            Id = 205620,
-            Name = "The Crudest Boots",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-crudest-boots",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Boots_norm_unique_075",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-crudest-boots",
-            Url = "https://us.battle.net/d3/en/item/the-crudest-boots",
-            RelativeUrl = "/d3/en/item/the-crudest-boots",
-            IsCrafted = false,
-            LegendaryAffix = "Mystic Ally summons two Mystic Allies that fight by your side.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Cain's Sandals 
-        /// </summary>
-        public static Item CainsSandals = new Item
-        {
-            Id = 0,
-            Name = "Cain's Sandals",
-            Quality = ItemQuality.Legendary,
-            Slug = "cains-slippers",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/cains-slippers",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/cains-slippers",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/cains-slippers",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Cain's Fate",
-        };
-
-        /// <summary>
-        /// Boj Anglers 
-        /// </summary>
-        public static Item BojAnglers = new Item
-        {
-            Id = 197224,
-            Name = "Boj Anglers",
-            Quality = ItemQuality.Legendary,
-            Slug = "boj-anglers",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Boots_norm_unique_045",
-            DataUrl = "https://us.battle.net/api/d3/data/item/boj-anglers",
-            Url = "https://us.battle.net/d3/en/item/boj-anglers",
-            RelativeUrl = "/d3/en/item/boj-anglers",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Captain Crimson's Whalers 
-        /// </summary>
-        public static Item CaptainCrimsonsWhalers = new Item
-        {
-            Id = 0,
-            Name = "Captain Crimson's Whalers",
-            Quality = ItemQuality.Legendary,
-            Slug = "captain-crimsons-deck-boots",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/captain-crimsons-deck-boots",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/captain-crimsons-deck-boots",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/captain-crimsons-deck-boots",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Captain Crimson's Finery",
-        };
-
-        /// <summary>
-        /// Irontoe Mudsputters Gain up to 25% increased movement speed based on amount of Life missing.
-        /// </summary>
-        public static Item IrontoeMudsputters = new Item
-        {
-            Id = 339125,
-            Name = "Irontoe Mudsputters",
-            Quality = ItemQuality.Legendary,
-            Slug = "irontoe-mudsputters",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "boots_norm_unique_04",
-            DataUrl = "https://us.battle.net/api/d3/data/item/irontoe-mudsputters",
-            Url = "https://us.battle.net/d3/en/item/irontoe-mudsputters",
-            RelativeUrl = "/d3/en/item/irontoe-mudsputters",
-            IsCrafted = false,
-            LegendaryAffix = "Gain up to 25% increased movement speed based on amount of Life missing.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Fire Walkers Burn the ground you walk on, dealing 100% weapon damage each second.
-        /// </summary>
-        public static Item FireWalkers = new Item
-        {
-            Id = 205624,
-            Name = "Fire Walkers",
-            Quality = ItemQuality.Legendary,
-            Slug = "fire-walkers",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Boots_norm_unique_085",
-            DataUrl = "https://us.battle.net/api/d3/data/item/fire-walkers",
-            Url = "https://us.battle.net/d3/en/item/fire-walkers",
-            RelativeUrl = "/d3/en/item/fire-walkers",
-            IsCrafted = false,
-            LegendaryAffix = "Burn the ground you walk on, dealing 100% weapon damage each second.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Lost Boys 
-        /// </summary>
-        public static Item LostBoys = new Item
-        {
-            Id = 0,
-            Name = "Lost Boys",
-            Quality = ItemQuality.Legendary,
-            Slug = "lost-boys",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/lost-boys",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/lost-boys",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/lost-boys",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Asheara's Tracks 
-        /// </summary>
-        public static Item AshearasTracks = new Item
-        {
-            Id = 0,
-            Name = "Asheara's Tracks",
-            Quality = ItemQuality.Legendary,
-            Slug = "ashearas-lock",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/ashearas-lock",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/ashearas-lock",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/ashearas-lock",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Asheara's Uniform",
-        };
-
-        /// <summary>
-        /// Ice Climbers Gain immunity to Freeze and Immobilize effects.
-        /// </summary>
-        public static Item IceClimbers = new Item
-        {
-            Id = 222464,
-            Name = "Ice Climbers",
-            Quality = ItemQuality.Legendary,
-            Slug = "ice-climbers",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Boots_norm_unique_051",
-            DataUrl = "https://us.battle.net/api/d3/data/item/ice-climbers",
-            Url = "https://us.battle.net/d3/en/item/ice-climbers",
-            RelativeUrl = "/d3/en/item/ice-climbers",
-            IsCrafted = false,
-            LegendaryAffix = "Gain immunity to Freeze and Immobilize effects.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Blackthorne's Spurs 
-        /// </summary>
-        public static Item BlackthornesSpurs = new Item
-        {
-            Id = 222463,
-            Name = "Blackthorne's Spurs",
-            Quality = ItemQuality.Legendary,
-            Slug = "blackthornes-spurs",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Boots_norm_unique_050",
-            DataUrl = "https://us.battle.net/api/d3/data/item/blackthornes-spurs",
-            Url = "https://us.battle.net/d3/en/item/blackthornes-spurs",
-            RelativeUrl = "/d3/en/item/blackthornes-spurs",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Blackthorne's Battlegear",
-        };
-
-        /// <summary>
-        /// Immortal King's Stride 
-        /// </summary>
-        public static Item ImmortalKingsStride = new Item
-        {
-            Id = 205625,
-            Name = "Immortal King's Stride",
-            Quality = ItemQuality.Legendary,
-            Slug = "immortal-kings-stride",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Boots_norm_unique_086",
-            DataUrl = "https://us.battle.net/api/d3/data/item/immortal-kings-stride",
-            Url = "https://us.battle.net/d3/en/item/immortal-kings-stride",
-            RelativeUrl = "/d3/en/item/immortal-kings-stride",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Immortal King's Call",
-        };
-
-        /// <summary>
-        /// Natalya's Bloody Footprints 
-        /// </summary>
-        public static Item NatalyasBloodyFootprints = new Item
-        {
-            Id = 197223,
-            Name = "Natalya's Bloody Footprints",
-            Quality = ItemQuality.Legendary,
-            Slug = "natalyas-bloody-footprints",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Boots_norm_unique_044",
-            DataUrl = "https://us.battle.net/api/d3/data/item/natalyas-bloody-footprints",
-            Url = "https://us.battle.net/d3/en/item/natalyas-bloody-footprints",
-            RelativeUrl = "/d3/en/item/natalyas-bloody-footprints",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Natalya's Vengeance",
-        };
-
-        /// <summary>
-        /// Zunimassa's Trail 
-        /// </summary>
-        public static Item ZunimassasTrail = new Item
-        {
-            Id = 205627,
-            Name = "Zunimassa's Trail",
-            Quality = ItemQuality.Legendary,
-            Slug = "zunimassas-trail",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Boots_norm_unique_088",
-            DataUrl = "https://us.battle.net/api/d3/data/item/zunimassas-trail",
-            Url = "https://us.battle.net/d3/en/item/zunimassas-trail",
-            RelativeUrl = "/d3/en/item/zunimassas-trail",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Zunimassa's Haunt",
-        };
-
-        /// <summary>
-        /// Sage's Journey 
-        /// </summary>
-        public static Item SagesJourney = new Item
-        {
-            Id = 0,
-            Name = "Sage's Journey",
-            Quality = ItemQuality.Legendary,
-            Slug = "sages-seekers",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/sages-seekers",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/sages-seekers",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/sages-seekers",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Sage's Plight",
-        };
-
-        /// <summary>
-        /// Eight-Demon Boots 
-        /// </summary>
-        public static Item EightdemonBoots = new Item
-        {
-            Id = 0,
-            Name = "Eight-Demon Boots",
-            Quality = ItemQuality.Legendary,
-            Slug = "eightdemon-boots",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/eightdemon-boots",
-            Url = "https://us.battle.net/d3/en/item/eightdemon-boots",
-            RelativeUrl = "/d3/en/item/eightdemon-boots",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Raiment of a Thousand Storms",
-        };
-
-        /// <summary>
-        /// Firebird's Tarsi 
-        /// </summary>
-        public static Item FirebirdsTarsi = new Item
-        {
-            Id = 358793,
-            Name = "Firebird's Tarsi",
-            Quality = ItemQuality.Legendary,
-            Slug = "firebirds-tarsi",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "boots_norm_set_06",
-            DataUrl = "https://us.battle.net/api/d3/data/item/firebirds-tarsi",
-            Url = "https://us.battle.net/d3/en/item/firebirds-tarsi",
-            RelativeUrl = "/d3/en/item/firebirds-tarsi",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Firebird's Finery",
-        };
-
-        /// <summary>
-        /// Helltooth Greaves 
-        /// </summary>
-        public static Item HelltoothGreaves = new Item
-        {
-            Id = 340524,
-            Name = "Helltooth Greaves",
-            Quality = ItemQuality.Legendary,
-            Slug = "helltooth-greaves",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "boots_norm_set_16",
-            DataUrl = "https://us.battle.net/api/d3/data/item/helltooth-greaves",
-            Url = "https://us.battle.net/d3/en/item/helltooth-greaves",
-            RelativeUrl = "/d3/en/item/helltooth-greaves",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Helltooth Harness",
-        };
-
-        /// <summary>
-        /// Jade Harvester's Swiftness 
-        /// </summary>
-        public static Item JadeHarvestersSwiftness = new Item
-        {
-            Id = 338037,
-            Name = "Jade Harvester's Swiftness",
-            Quality = ItemQuality.Legendary,
-            Slug = "jade-harvesters-swiftness",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "boots_norm_set_09",
-            DataUrl = "https://us.battle.net/api/d3/data/item/jade-harvesters-swiftness",
-            Url = "https://us.battle.net/d3/en/item/jade-harvesters-swiftness",
-            RelativeUrl = "/d3/en/item/jade-harvesters-swiftness",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Raiment of the Jade Harvester",
-        };
-
-        /// <summary>
-        /// Marauder's Treads 
-        /// </summary>
-        public static Item MaraudersTreads = new Item
-        {
-            Id = 336995,
-            Name = "Marauder's Treads",
-            Quality = ItemQuality.Legendary,
-            Slug = "marauders-treads",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "boots_norm_set_07",
-            DataUrl = "https://us.battle.net/api/d3/data/item/marauders-treads",
-            Url = "https://us.battle.net/d3/en/item/marauders-treads",
-            RelativeUrl = "/d3/en/item/marauders-treads",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Embodiment of the Marauder",
-        };
-
-        /// <summary>
-        /// Raekor's Striders 
-        /// </summary>
-        public static Item RaekorsStriders = new Item
-        {
-            Id = 336987,
-            Name = "Raekor's Striders",
-            Quality = ItemQuality.Legendary,
-            Slug = "raekors-striders",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "boots_norm_set_05",
-            DataUrl = "https://us.battle.net/api/d3/data/item/raekors-striders",
-            Url = "https://us.battle.net/d3/en/item/raekors-striders",
-            RelativeUrl = "/d3/en/item/raekors-striders",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "The Legacy of Raekor",
-        };
-
-        /// <summary>
-        /// Roland's Stride 
-        /// </summary>
-        public static Item RolandsStride = new Item
-        {
-            Id = 0,
-            Name = "Roland's Stride",
-            Quality = ItemQuality.Legendary,
-            Slug = "rolands-stride",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/rolands-stride",
-            Url = "https://us.battle.net/d3/en/item/rolands-stride",
-            RelativeUrl = "/d3/en/item/rolands-stride",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Roland's Legacy",
-        };
-
-        /// <summary>
-        /// Sabatons of Akkhan 
-        /// </summary>
-        public static Item SabatonsOfAkkhan = new Item
-        {
-            Id = 358795,
-            Name = "Sabatons of Akkhan",
-            Quality = ItemQuality.Legendary,
-            Slug = "sabatons-of-akkhan",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "boots_norm_set_10",
-            DataUrl = "https://us.battle.net/api/d3/data/item/sabatons-of-akkhan",
-            Url = "https://us.battle.net/d3/en/item/sabatons-of-akkhan",
-            RelativeUrl = "/d3/en/item/sabatons-of-akkhan",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Armor of Akkhan",
-        };
-
-        /// <summary>
-        /// The Shadow's Heels 
-        /// </summary>
-        public static Item TheShadowsHeels = new Item
-        {
-            Id = 0,
-            Name = "The Shadow's Heels",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-shadows-heels",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-shadows-heels",
-            Url = "https://us.battle.net/d3/en/item/the-shadows-heels",
-            RelativeUrl = "/d3/en/item/the-shadows-heels",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "The Shadow’s Mantle",
-        };
-
-        /// <summary>
-        /// Vyr's Swaggering Stance 
-        /// </summary>
-        public static Item VyrsSwaggeringStance = new Item
-        {
-            Id = 332363,
-            Name = "Vyr's Swaggering Stance",
-            Quality = ItemQuality.Legendary,
-            Slug = "vyrs-swaggering-stance",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "boots_norm_set_13",
-            DataUrl = "https://us.battle.net/api/d3/data/item/vyrs-swaggering-stance",
-            Url = "https://us.battle.net/d3/en/item/vyrs-swaggering-stance",
-            RelativeUrl = "/d3/en/item/vyrs-swaggering-stance",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Vyr's Amazing Arcana",
-        };
-
-        /// <summary>
-        /// Board Walkers 
-        /// </summary>
-        public static Item BoardWalkers = new Item
-        {
-            Id = 0,
-            Name = "Board Walkers",
-            Quality = ItemQuality.Legendary,
-            Slug = "board-walkers",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/board-walkers",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/board-walkers",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/board-walkers",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Asheara's Finders 
-        /// </summary>
-        public static Item AshearasFinders = new Item
-        {
-            Id = 0,
-            Name = "Asheara's Finders",
-            Quality = ItemQuality.Legendary,
-            Slug = "ashearas-finders",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/ashearas-finders",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/ashearas-finders",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/ashearas-finders",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Asheara's Vestments",
-        };
-
-        /// <summary>
-        /// Cain's Travelers 
-        /// </summary>
-        public static Item CainsTravelers = new Item
-        {
-            Id = 197225,
-            Name = "Cain's Travelers",
-            Quality = ItemQuality.Legendary,
-            Slug = "cains-travelers",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Boots_norm_unique_046",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/cains-travelers",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/cains-travelers",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/cains-travelers",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Cain's Destiny",
-        };
-
-        /// <summary>
-        /// Captain Crimson's Waders 
-        /// </summary>
-        public static Item CaptainCrimsonsWaders = new Item
-        {
-            Id = 197221,
-            Name = "Captain Crimson's Waders",
-            Quality = ItemQuality.Legendary,
-            Slug = "captain-crimsons-waders",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Boots_norm_unique_043",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/captain-crimsons-waders",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/captain-crimsons-waders",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/captain-crimsons-waders",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Captain Crimson's Trimmings",
-        };
-
-        /// <summary>
-        /// Sage's Passage 
-        /// </summary>
-        public static Item SagesPassage = new Item
-        {
-            Id = 0,
-            Name = "Sage's Passage",
-            Quality = ItemQuality.Legendary,
-            Slug = "sages-passage",
-            ItemType = ItemType.Boots,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/sages-passage",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/sages-passage",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/sages-passage",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Sage's Journey",
-        };
-
-        /// <summary>
-        /// Hellfire Amulet Strength 
-        /// </summary>
-        public static Item HellfireAmuletStrength = new Item
-        {
-            Id = 0,
-            Name = "Hellfire Amulet Strength",
-            Quality = ItemQuality.Legendary,
-            Slug = "hellfire-amulet-of-strength",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/hellfire-amulet-of-strength",
-            Url = "https://us.battle.net/d3/en/artisan/jeweler/recipe/hellfire-amulet-of-strength",
-            RelativeUrl = "/d3/en/artisan/jeweler/recipe/hellfire-amulet-of-strength",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Hellfire Amulet Intelligence 
-        /// </summary>
-        public static Item HellfireAmuletIntelligence = new Item
-        {
-            Id = 0,
-            Name = "Hellfire Amulet Intelligence",
-            Quality = ItemQuality.Legendary,
-            Slug = "hellfire-amulet-of-intelligence",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/hellfire-amulet-of-intelligence",
-            Url = "https://us.battle.net/d3/en/artisan/jeweler/recipe/hellfire-amulet-of-intelligence",
-            RelativeUrl = "/d3/en/artisan/jeweler/recipe/hellfire-amulet-of-intelligence",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Hellfire Amulet Dexterity 
-        /// </summary>
-        public static Item HellfireAmuletDexterity = new Item
-        {
-            Id = 0,
-            Name = "Hellfire Amulet Dexterity",
-            Quality = ItemQuality.Legendary,
-            Slug = "hellfire-amulet-of-dexterity",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/hellfire-amulet-of-dexterity",
-            Url = "https://us.battle.net/d3/en/artisan/jeweler/recipe/hellfire-amulet-of-dexterity",
-            RelativeUrl = "/d3/en/artisan/jeweler/recipe/hellfire-amulet-of-dexterity",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Moonlight Ward Hitting an enemy within 15 yards has a chance to ward you with shards of Arcane energy that explode when enemies get close, dealing 240–320% weapon damage as Arcane to enemies within 15 yards.
-        /// </summary>
-        public static Item MoonlightWard = new Item
-        {
-            Id = 197813,
-            Name = "Moonlight Ward",
-            Quality = ItemQuality.Legendary,
-            Slug = "moonlight-ward",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "Amulet_norm_unique_03",
-            DataUrl = "https://us.battle.net/api/d3/data/item/moonlight-ward",
-            Url = "https://us.battle.net/d3/en/item/moonlight-ward",
-            RelativeUrl = "/d3/en/item/moonlight-ward",
-            IsCrafted = false,
-            LegendaryAffix = "Hitting an enemy within 15 yards has a chance to ward you with shards of Arcane energy that explode when enemies get close, dealing 240–320% weapon damage as Arcane to enemies within 15 yards.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Squirt's Necklace 
-        /// </summary>
-        public static Item SquirtsNecklace = new Item
-        {
-            Id = 197819,
-            Name = "Squirt's Necklace",
-            Quality = ItemQuality.Legendary,
-            Slug = "squirts-necklace",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "Amulet_norm_unique_08",
-            DataUrl = "https://us.battle.net/api/d3/data/item/squirts-necklace",
-            Url = "https://us.battle.net/d3/en/item/squirts-necklace",
-            RelativeUrl = "/d3/en/item/squirts-necklace",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Eye of Etlich 
-        /// </summary>
-        public static Item EyeOfEtlich = new Item
-        {
-            Id = 197823,
-            Name = "Eye of Etlich",
-            Quality = ItemQuality.Legendary,
-            Slug = "eye-of-etlich",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "Amulet_norm_unique_12",
-            DataUrl = "https://us.battle.net/api/d3/data/item/eye-of-etlich",
-            Url = "https://us.battle.net/d3/en/item/eye-of-etlich",
-            RelativeUrl = "/d3/en/item/eye-of-etlich",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Rondal's Locket 
-        /// </summary>
-        public static Item RondalsLocket = new Item
-        {
-            Id = 197818,
-            Name = "Rondal's Locket",
-            Quality = ItemQuality.Legendary,
-            Slug = "rondals-locket",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "Amulet_norm_unique_07",
-            DataUrl = "https://us.battle.net/api/d3/data/item/rondals-locket",
-            Url = "https://us.battle.net/d3/en/item/rondals-locket",
-            RelativeUrl = "/d3/en/item/rondals-locket",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Talisman of Aranoch Prevent all Cold damage taken and heal yourself for 10–15% of the amount prevented.
-        /// </summary>
-        public static Item TalismanOfAranoch = new Item
-        {
-            Id = 197821,
-            Name = "Talisman of Aranoch",
-            Quality = ItemQuality.Legendary,
-            Slug = "talisman-of-aranoch",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "Amulet_norm_unique_10",
-            DataUrl = "https://us.battle.net/api/d3/data/item/talisman-of-aranoch",
-            Url = "https://us.battle.net/d3/en/item/talisman-of-aranoch",
-            RelativeUrl = "/d3/en/item/talisman-of-aranoch",
-            IsCrafted = false,
-            LegendaryAffix = "Prevent all Cold damage taken and heal yourself for 10–15% of the amount prevented.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Ancestors' Grace When receiving fatal damage, you are instead restored to 100% of maximum Life and resources. This item is destroyed in the process.
-        /// </summary>
-        public static Item AncestorsGrace = new Item
-        {
-            Id = 0,
-            Name = "Ancestors' Grace",
-            Quality = ItemQuality.Legendary,
-            Slug = "ancestors-grace",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/ancestors-grace",
-            Url = "https://us.battle.net/d3/en/item/ancestors-grace",
-            RelativeUrl = "/d3/en/item/ancestors-grace",
-            IsCrafted = false,
-            LegendaryAffix = "When receiving fatal damage, you are instead restored to 100% of maximum Life and resources. This item is destroyed in the process.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Countess Julia's Cameo Prevent all Arcane damage taken and heal yourself for 20–25% of the amount prevented.
-        /// </summary>
-        public static Item CountessJuliasCameo = new Item
-        {
-            Id = 298050,
-            Name = "Countess Julia's Cameo",
-            Quality = ItemQuality.Legendary,
-            Slug = "countess-julias-cameo",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "amulet_norm_unique_19",
-            DataUrl = "https://us.battle.net/api/d3/data/item/countess-julias-cameo",
-            Url = "https://us.battle.net/d3/en/item/countess-julias-cameo",
-            RelativeUrl = "/d3/en/item/countess-julias-cameo",
-            IsCrafted = false,
-            LegendaryAffix = "Prevent all Arcane damage taken and heal yourself for 20–25% of the amount prevented.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Dovu Energy Trap Increases duration of Stun effects by 20–25%.
-        /// </summary>
-        public static Item DovuEnergyTrap = new Item
-        {
-            Id = 298054,
-            Name = "Dovu Energy Trap",
-            Quality = ItemQuality.Legendary,
-            Slug = "dovu-energy-trap",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "amulet_norm_unique_23",
-            DataUrl = "https://us.battle.net/api/d3/data/item/dovu-energy-trap",
-            Url = "https://us.battle.net/d3/en/item/dovu-energy-trap",
-            RelativeUrl = "/d3/en/item/dovu-energy-trap",
-            IsCrafted = false,
-            LegendaryAffix = "Increases duration of Stun effects by 20–25%.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Haunt of Vaxo Summons shadow clones to your aid when you Stun an enemy. This effect may occur once every 30 seconds.
-        /// </summary>
-        public static Item HauntOfVaxo = new Item
-        {
-            Id = 297806,
-            Name = "Haunt of Vaxo",
-            Quality = ItemQuality.Legendary,
-            Slug = "haunt-of-vaxo",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "amulet_norm_unique_17",
-            DataUrl = "https://us.battle.net/api/d3/data/item/haunt-of-vaxo",
-            Url = "https://us.battle.net/d3/en/item/haunt-of-vaxo",
-            RelativeUrl = "/d3/en/item/haunt-of-vaxo",
-            IsCrafted = false,
-            LegendaryAffix = "Summons shadow clones to your aid when you Stun an enemy. This effect may occur once every 30 seconds.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Rakoff's Glass of Life Enemies you kill have a 3–4% additional chance to drop a health globe.
-        /// </summary>
-        public static Item RakoffsGlassOfLife = new Item
-        {
-            Id = 298055,
-            Name = "Rakoff's Glass of Life",
-            Quality = ItemQuality.Legendary,
-            Slug = "rakoffs-glass-of-life",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "amulet_norm_unique_24",
-            DataUrl = "https://us.battle.net/api/d3/data/item/rakoffs-glass-of-life",
-            Url = "https://us.battle.net/d3/en/item/rakoffs-glass-of-life",
-            RelativeUrl = "/d3/en/item/rakoffs-glass-of-life",
-            IsCrafted = false,
-            LegendaryAffix = "Enemies you kill have a 3–4% additional chance to drop a health globe.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// The Ess of Johan Chance on hit to pull in enemies toward your target and Slow them by 60–80%.
-        /// </summary>
-        public static Item TheEssOfJohan = new Item
-        {
-            Id = 298051,
-            Name = "The Ess of Johan",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-ess-of-johan",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "amulet_norm_unique_20",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-ess-of-johan",
-            Url = "https://us.battle.net/d3/en/item/the-ess-of-johan",
-            RelativeUrl = "/d3/en/item/the-ess-of-johan",
-            IsCrafted = false,
-            LegendaryAffix = "Chance on hit to pull in enemies toward your target and Slow them by 60–80%.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Holy Beacon 
-        /// </summary>
-        public static Item HolyBeacon = new Item
-        {
-            Id = 0,
-            Name = "Holy Beacon",
-            Quality = ItemQuality.Legendary,
-            Slug = "holy-beacon",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/holy-beacon",
-            Url = "https://us.battle.net/d3/en/item/holy-beacon",
-            RelativeUrl = "/d3/en/item/holy-beacon",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Kymbo's Gold Picking up gold heals you for an amount equal to the gold that was picked up.
-        /// </summary>
-        public static Item KymbosGold = new Item
-        {
-            Id = 197812,
-            Name = "Kymbo's Gold",
-            Quality = ItemQuality.Legendary,
-            Slug = "kymbos-gold",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "Amulet_norm_unique_02",
-            DataUrl = "https://us.battle.net/api/d3/data/item/kymbos-gold",
-            Url = "https://us.battle.net/d3/en/item/kymbos-gold",
-            RelativeUrl = "/d3/en/item/kymbos-gold",
-            IsCrafted = false,
-            LegendaryAffix = "Picking up gold heals you for an amount equal to the gold that was picked up.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// The Flavor of Time 
-        /// </summary>
-        public static Item TheFlavorOfTime = new Item
-        {
-            Id = 193659,
-            Name = "The Flavor of Time",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-flavor-of-time",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "Amulet_norm_unique_01",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-flavor-of-time",
-            Url = "https://us.battle.net/d3/en/item/the-flavor-of-time",
-            RelativeUrl = "/d3/en/item/the-flavor-of-time",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Mara's Kaleidoscope Prevent all Poison damage taken and heal yourself for 10–15% of the amount prevented.
-        /// </summary>
-        public static Item MarasKaleidoscope = new Item
-        {
-            Id = 197824,
-            Name = "Mara's Kaleidoscope",
-            Quality = ItemQuality.Legendary,
-            Slug = "maras-kaleidoscope",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "Amulet_norm_unique_13",
-            DataUrl = "https://us.battle.net/api/d3/data/item/maras-kaleidoscope",
-            Url = "https://us.battle.net/d3/en/item/maras-kaleidoscope",
-            RelativeUrl = "/d3/en/item/maras-kaleidoscope",
-            IsCrafted = false,
-            LegendaryAffix = "Prevent all Poison damage taken and heal yourself for 10–15% of the amount prevented.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Ouroboros 
-        /// </summary>
-        public static Item Ouroboros = new Item
-        {
-            Id = 197815,
-            Name = "Ouroboros",
-            Quality = ItemQuality.Legendary,
-            Slug = "ouroboros",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "Amulet_norm_unique_05",
-            DataUrl = "https://us.battle.net/api/d3/data/item/ouroboros",
-            Url = "https://us.battle.net/d3/en/item/ouroboros",
-            RelativeUrl = "/d3/en/item/ouroboros",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// The Star of Azkaranth Prevent all Fire damage taken and heal yourself for 10–15% of the amount prevented.
-        /// </summary>
-        public static Item TheStarOfAzkaranth = new Item
-        {
-            Id = 0,
-            Name = "The Star of Azkaranth",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-star-of-azkaranth",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-star-of-azkaranth",
-            Url = "https://us.battle.net/d3/en/item/the-star-of-azkaranth",
-            RelativeUrl = "/d3/en/item/the-star-of-azkaranth",
-            IsCrafted = false,
-            LegendaryAffix = "Prevent all Fire damage taken and heal yourself for 10–15% of the amount prevented.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Xephirian Amulet Prevent all Lightning damage taken and heal yourself for 10–15% of the amount prevented.
-        /// </summary>
-        public static Item XephirianAmulet = new Item
-        {
-            Id = 197814,
-            Name = "Xephirian Amulet",
-            Quality = ItemQuality.Legendary,
-            Slug = "xephirian-amulet",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "Amulet_norm_unique_04",
-            DataUrl = "https://us.battle.net/api/d3/data/item/xephirian-amulet",
-            Url = "https://us.battle.net/d3/en/item/xephirian-amulet",
-            RelativeUrl = "/d3/en/item/xephirian-amulet",
-            IsCrafted = false,
-            LegendaryAffix = "Prevent all Lightning damage taken and heal yourself for 10–15% of the amount prevented.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Blackthorne's Duncraig Cross 
-        /// </summary>
-        public static Item BlackthornesDuncraigCross = new Item
-        {
-            Id = 224189,
-            Name = "Blackthorne's Duncraig Cross",
-            Quality = ItemQuality.Legendary,
-            Slug = "blackthornes-duncraig-cross",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "Amulet_norm_unique_16",
-            DataUrl = "https://us.battle.net/api/d3/data/item/blackthornes-duncraig-cross",
-            Url = "https://us.battle.net/d3/en/item/blackthornes-duncraig-cross",
-            RelativeUrl = "/d3/en/item/blackthornes-duncraig-cross",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Blackthorne's Battlegear",
-        };
-
-        /// <summary>
-        /// Tal Rasha's Allegiance 
-        /// </summary>
-        public static Item TalRashasAllegiance = new Item
-        {
-            Id = 222486,
-            Name = "Tal Rasha's Allegiance",
-            Quality = ItemQuality.Legendary,
-            Slug = "tal-rashas-allegiance",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "amulet_norm_unique_14",
-            DataUrl = "https://us.battle.net/api/d3/data/item/tal-rashas-allegiance",
-            Url = "https://us.battle.net/d3/en/item/tal-rashas-allegiance",
-            RelativeUrl = "/d3/en/item/tal-rashas-allegiance",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Tal Rasha's Elements",
-        };
-
-        /// <summary>
-        /// The Traveler's Pledge 
-        /// </summary>
-        public static Item TheTravelersPledge = new Item
-        {
-            Id = 222490,
-            Name = "The Traveler's Pledge",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-travelers-pledge",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "amulet_norm_unique_15",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-travelers-pledge",
-            Url = "https://us.battle.net/d3/en/item/the-travelers-pledge",
-            RelativeUrl = "/d3/en/item/the-travelers-pledge",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Endless Walk",
-        };
-
-        /// <summary>
-        /// Halcyon's Ascent 
-        /// </summary>
-        public static Item HalcyonsAscent = new Item
-        {
-            Id = 298056,
-            Name = "Halcyon's Ascent",
-            Quality = ItemQuality.Legendary,
-            Slug = "halcyons-ascent",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "amulet_norm_unique_25",
-            DataUrl = "https://us.battle.net/api/d3/data/item/halcyons-ascent",
-            Url = "https://us.battle.net/d3/en/item/halcyons-ascent",
-            RelativeUrl = "/d3/en/item/halcyons-ascent",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Sunwuko's Shines 
-        /// </summary>
-        public static Item SunwukosShines = new Item
-        {
-            Id = 336174,
-            Name = "Sunwuko's Shines",
-            Quality = ItemQuality.Legendary,
-            Slug = "sunwukos-shines",
-            ItemType = ItemType.Amulet,
-            BaseType = ItemBaseType.None,
-            InternalName = "amulet_norm_set_11",
-            DataUrl = "https://us.battle.net/api/d3/data/item/sunwukos-shines",
-            Url = "https://us.battle.net/d3/en/item/sunwukos-shines",
-            RelativeUrl = "/d3/en/item/sunwukos-shines",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Monkey King's Garb",
         };
 
         /// <summary>
@@ -5321,13 +5643,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item BandOfTheRueChambers = new Item
         {
-            Id = 0,
+            Id = 298093,
             Name = "Band of the Rue Chambers",
             Quality = ItemQuality.Legendary,
             Slug = "band-of-the-rue-chambers",
             ItemType = ItemType.Ring,
             BaseType = ItemBaseType.None,
-            InternalName = "",
+            InternalName = "ring_norm_unique_030",
             DataUrl = "https://us.battle.net/api/d3/data/item/band-of-the-rue-chambers",
             Url = "https://us.battle.net/d3/en/item/band-of-the-rue-chambers",
             RelativeUrl = "/d3/en/item/band-of-the-rue-chambers",
@@ -5381,13 +5703,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item TheTallMansFinger = new Item
         {
-            Id = 298088,
+            Id = 0,
             Name = "The Tall Man's Finger",
             Quality = ItemQuality.Legendary,
             Slug = "the-tall-mans-finger",
             ItemType = ItemType.Ring,
             BaseType = ItemBaseType.None,
-            InternalName = "ring_norm_unique_025",
+            InternalName = "",
             DataUrl = "https://us.battle.net/api/d3/data/item/the-tall-mans-finger",
             Url = "https://us.battle.net/d3/en/item/the-tall-mans-finger",
             RelativeUrl = "/d3/en/item/the-tall-mans-finger",
@@ -5447,7 +5769,7 @@ namespace Trinity.Reference
             Slug = "eternal-union",
             ItemType = ItemType.Ring,
             BaseType = ItemBaseType.None,
-            InternalName = "ring_norm_unique_007",
+            InternalName = "Ring_norm_unique_007",
             DataUrl = "https://us.battle.net/api/d3/data/item/eternal-union",
             Url = "https://us.battle.net/d3/en/item/eternal-union",
             RelativeUrl = "/d3/en/item/eternal-union",
@@ -5487,7 +5809,7 @@ namespace Trinity.Reference
             Slug = "obsidian-ring-of-the-zodiac",
             ItemType = ItemType.Ring,
             BaseType = ItemBaseType.None,
-            InternalName = "Ring_norm_unique_023",
+            InternalName = "ring_norm_unique_023",
             DataUrl = "https://us.battle.net/api/d3/data/item/obsidian-ring-of-the-zodiac",
             Url = "https://us.battle.net/d3/en/item/obsidian-ring-of-the-zodiac",
             RelativeUrl = "/d3/en/item/obsidian-ring-of-the-zodiac",
@@ -5507,7 +5829,7 @@ namespace Trinity.Reference
             Slug = "band-of-hollow-whispers",
             ItemType = ItemType.Ring,
             BaseType = ItemBaseType.None,
-            InternalName = "Ring_norm_unique_001",
+            InternalName = "ring_norm_unique_001",
             DataUrl = "https://us.battle.net/api/d3/data/item/band-of-hollow-whispers",
             Url = "https://us.battle.net/d3/en/item/band-of-hollow-whispers",
             RelativeUrl = "/d3/en/item/band-of-hollow-whispers",
@@ -5547,7 +5869,7 @@ namespace Trinity.Reference
             Slug = "oculus-ring",
             ItemType = ItemType.Ring,
             BaseType = ItemBaseType.None,
-            InternalName = "ring_norm_unique_017",
+            InternalName = "Ring_norm_unique_017",
             DataUrl = "https://us.battle.net/api/d3/data/item/oculus-ring",
             Url = "https://us.battle.net/d3/en/item/oculus-ring",
             RelativeUrl = "/d3/en/item/oculus-ring",
@@ -5581,13 +5903,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item StoneOfJordan = new Item
         {
-            Id = 212582,
+            Id = 0,
             Name = "Stone of Jordan",
             Quality = ItemQuality.Legendary,
             Slug = "stone-of-jordan",
             ItemType = ItemType.Ring,
             BaseType = ItemBaseType.None,
-            InternalName = "Ring_norm_unique_019",
+            InternalName = "",
             DataUrl = "https://us.battle.net/api/d3/data/item/stone-of-jordan",
             Url = "https://us.battle.net/d3/en/item/stone-of-jordan",
             RelativeUrl = "/d3/en/item/stone-of-jordan",
@@ -5601,13 +5923,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item Unity = new Item
         {
-            Id = 212581,
+            Id = 0,
             Name = "Unity",
             Quality = ItemQuality.Legendary,
             Slug = "unity",
             ItemType = ItemType.Ring,
             BaseType = ItemBaseType.None,
-            InternalName = "Ring_norm_unique_010",
+            InternalName = "",
             DataUrl = "https://us.battle.net/api/d3/data/item/unity",
             Url = "https://us.battle.net/d3/en/item/unity",
             RelativeUrl = "/d3/en/item/unity",
@@ -5627,7 +5949,7 @@ namespace Trinity.Reference
             Slug = "litany-of-the-undaunted",
             ItemType = ItemType.Ring,
             BaseType = ItemBaseType.None,
-            InternalName = "ring_norm_unique_015",
+            InternalName = "Ring_norm_unique_015",
             DataUrl = "https://us.battle.net/api/d3/data/item/litany-of-the-undaunted",
             Url = "https://us.battle.net/d3/en/item/litany-of-the-undaunted",
             RelativeUrl = "/d3/en/item/litany-of-the-undaunted",
@@ -5687,7 +6009,7 @@ namespace Trinity.Reference
             Slug = "the-wailing-host",
             ItemType = ItemType.Ring,
             BaseType = ItemBaseType.None,
-            InternalName = "Ring_norm_unique_014",
+            InternalName = "ring_norm_unique_014",
             DataUrl = "https://us.battle.net/api/d3/data/item/the-wailing-host",
             Url = "https://us.battle.net/d3/en/item/the-wailing-host",
             RelativeUrl = "/d3/en/item/the-wailing-host",
@@ -5757,183 +6079,603 @@ namespace Trinity.Reference
         };
 
         /// <summary>
-        /// Girdle of Giants 
+        /// Lut Socks Leap can be cast again within 2 seconds before the cooldown begins.
         /// </summary>
-        public static Item GirdleOfGiants = new Item
+        public static Item LutSocks = new Item
         {
-            Id = 212232,
-            Name = "Girdle of Giants",
+            Id = 205622,
+            Name = "Lut Socks",
             Quality = ItemQuality.Legendary,
-            Slug = "girdle-of-giants",
-            ItemType = ItemType.Belt,
+            Slug = "lut-socks",
+            ItemType = ItemType.Boots,
             BaseType = ItemBaseType.Armor,
-            InternalName = "BarbBelt_norm_unique_04",
-            DataUrl = "https://us.battle.net/api/d3/data/item/girdle-of-giants",
-            Url = "https://us.battle.net/d3/en/item/girdle-of-giants",
-            RelativeUrl = "/d3/en/item/girdle-of-giants",
+            InternalName = "Boots_norm_unique_077",
+            DataUrl = "https://us.battle.net/api/d3/data/item/lut-socks",
+            Url = "https://us.battle.net/d3/en/item/lut-socks",
+            RelativeUrl = "/d3/en/item/lut-socks",
             IsCrafted = false,
-            LegendaryAffix = "",
+            LegendaryAffix = "Leap can be cast again within 2 seconds before the cooldown begins.",
             SetName = "",
         };
 
         /// <summary>
-        /// The Undisputed Champion 
+        /// The Crudest Boots Mystic Ally summons two Mystic Allies that fight by your side.
         /// </summary>
-        public static Item TheUndisputedChampion = new Item
+        public static Item TheCrudestBoots = new Item
         {
-            Id = 193676,
-            Name = "The Undisputed Champion",
+            Id = 205620,
+            Name = "The Crudest Boots",
             Quality = ItemQuality.Legendary,
-            Slug = "the-undisputed-champion",
-            ItemType = ItemType.Belt,
+            Slug = "the-crudest-boots",
+            ItemType = ItemType.Boots,
             BaseType = ItemBaseType.Armor,
-            InternalName = "BarbBelt_norm_unique_06",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-undisputed-champion",
-            Url = "https://us.battle.net/d3/en/item/the-undisputed-champion",
-            RelativeUrl = "/d3/en/item/the-undisputed-champion",
+            InternalName = "Boots_norm_unique_075",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-crudest-boots",
+            Url = "https://us.battle.net/d3/en/item/the-crudest-boots",
+            RelativeUrl = "/d3/en/item/the-crudest-boots",
             IsCrafted = false,
-            LegendaryAffix = "",
+            LegendaryAffix = "Mystic Ally summons two Mystic Allies that fight by your side.",
             SetName = "",
         };
 
         /// <summary>
-        /// Kotuur's Brace 
+        /// Cain's Sandals 
         /// </summary>
-        public static Item KotuursBrace = new Item
-        {
-            Id = 193674,
-            Name = "Kotuur's Brace",
-            Quality = ItemQuality.Legendary,
-            Slug = "kotuurs-brace",
-            ItemType = ItemType.Belt,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "BarbBelt_norm_unique_07",
-            DataUrl = "https://us.battle.net/api/d3/data/item/kotuurs-brace",
-            Url = "https://us.battle.net/d3/en/item/kotuurs-brace",
-            RelativeUrl = "/d3/en/item/kotuurs-brace",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Pride of Cassius Increases the duration of Ignore Pain by 4–6 seconds.
-        /// </summary>
-        public static Item PrideOfCassius = new Item
+        public static Item CainsSandals = new Item
         {
             Id = 0,
-            Name = "Pride of Cassius",
+            Name = "Cain's Sandals",
             Quality = ItemQuality.Legendary,
-            Slug = "pride-of-cassius",
-            ItemType = ItemType.Belt,
+            Slug = "cains-slippers",
+            ItemType = ItemType.Boots,
             BaseType = ItemBaseType.Armor,
             InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/pride-of-cassius",
-            Url = "https://us.battle.net/d3/en/item/pride-of-cassius",
-            RelativeUrl = "/d3/en/item/pride-of-cassius",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/cains-slippers",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/cains-slippers",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/cains-slippers",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Cain's Fate",
+        };
+
+        /// <summary>
+        /// Boj Anglers 
+        /// </summary>
+        public static Item BojAnglers = new Item
+        {
+            Id = 197224,
+            Name = "Boj Anglers",
+            Quality = ItemQuality.Legendary,
+            Slug = "boj-anglers",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Boots_norm_unique_045",
+            DataUrl = "https://us.battle.net/api/d3/data/item/boj-anglers",
+            Url = "https://us.battle.net/d3/en/item/boj-anglers",
+            RelativeUrl = "/d3/en/item/boj-anglers",
             IsCrafted = false,
-            LegendaryAffix = "Increases the duration of Ignore Pain by 4–6 seconds.",
+            LegendaryAffix = "",
             SetName = "",
         };
 
         /// <summary>
-        /// Chilanik's Chain Using War Cry increases the movement speed for you and all allies affected by 30–40% for 10 seconds.
+        /// Captain Crimson's Whalers 
         /// </summary>
-        public static Item ChilaniksChain = new Item
+        public static Item CaptainCrimsonsWhalers = new Item
         {
             Id = 0,
-            Name = "Chilanik's Chain",
+            Name = "Captain Crimson's Whalers",
             Quality = ItemQuality.Legendary,
-            Slug = "chilaniks-chain",
-            ItemType = ItemType.Belt,
+            Slug = "captain-crimsons-deck-boots",
+            ItemType = ItemType.Boots,
             BaseType = ItemBaseType.Armor,
             InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/chilaniks-chain",
-            Url = "https://us.battle.net/d3/en/item/chilaniks-chain",
-            RelativeUrl = "/d3/en/item/chilaniks-chain",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/captain-crimsons-deck-boots",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/captain-crimsons-deck-boots",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/captain-crimsons-deck-boots",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Captain Crimson's Finery",
+        };
+
+        /// <summary>
+        /// Irontoe Mudsputters Gain up to 25% increased movement speed based on amount of Life missing.
+        /// </summary>
+        public static Item IrontoeMudsputters = new Item
+        {
+            Id = 339125,
+            Name = "Irontoe Mudsputters",
+            Quality = ItemQuality.Legendary,
+            Slug = "irontoe-mudsputters",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "boots_norm_unique_04",
+            DataUrl = "https://us.battle.net/api/d3/data/item/irontoe-mudsputters",
+            Url = "https://us.battle.net/d3/en/item/irontoe-mudsputters",
+            RelativeUrl = "/d3/en/item/irontoe-mudsputters",
             IsCrafted = false,
-            LegendaryAffix = "Using War Cry increases the movement speed for you and all allies affected by 30–40% for 10 seconds.",
+            LegendaryAffix = "Gain up to 25% increased movement speed based on amount of Life missing.",
             SetName = "",
         };
 
         /// <summary>
-        /// Dread Iron 
+        /// Fire Walkers Burn the ground you walk on, dealing 100% weapon damage each second.
         /// </summary>
-        public static Item DreadIron = new Item
+        public static Item FireWalkers = new Item
         {
-            Id = 193672,
-            Name = "Dread Iron",
+            Id = 205624,
+            Name = "Fire Walkers",
             Quality = ItemQuality.Legendary,
-            Slug = "dread-iron",
-            ItemType = ItemType.Belt,
+            Slug = "fire-walkers",
+            ItemType = ItemType.Boots,
             BaseType = ItemBaseType.Armor,
-            InternalName = "BarbBelt_norm_unique_01",
-            DataUrl = "https://us.battle.net/api/d3/data/item/dread-iron",
-            Url = "https://us.battle.net/d3/en/item/dread-iron",
-            RelativeUrl = "/d3/en/item/dread-iron",
+            InternalName = "Boots_norm_unique_085",
+            DataUrl = "https://us.battle.net/api/d3/data/item/fire-walkers",
+            Url = "https://us.battle.net/d3/en/item/fire-walkers",
+            RelativeUrl = "/d3/en/item/fire-walkers",
             IsCrafted = false,
+            LegendaryAffix = "Burn the ground you walk on, dealing 100% weapon damage each second.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Lost Boys 
+        /// </summary>
+        public static Item LostBoys = new Item
+        {
+            Id = 0,
+            Name = "Lost Boys",
+            Quality = ItemQuality.Legendary,
+            Slug = "lost-boys",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/lost-boys",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/lost-boys",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/lost-boys",
+            IsCrafted = true,
             LegendaryAffix = "",
             SetName = "",
         };
 
         /// <summary>
-        /// Ageless Might 
+        /// Asheara's Tracks 
         /// </summary>
-        public static Item AgelessMight = new Item
+        public static Item AshearasTracks = new Item
         {
-            Id = 193675,
-            Name = "Ageless Might",
+            Id = 0,
+            Name = "Asheara's Tracks",
             Quality = ItemQuality.Legendary,
-            Slug = "ageless-might",
-            ItemType = ItemType.Belt,
+            Slug = "ashearas-lock",
+            ItemType = ItemType.Boots,
             BaseType = ItemBaseType.Armor,
-            InternalName = "BarbBelt_norm_unique_08",
-            DataUrl = "https://us.battle.net/api/d3/data/item/ageless-might",
-            Url = "https://us.battle.net/d3/en/item/ageless-might",
-            RelativeUrl = "/d3/en/item/ageless-might",
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/ashearas-lock",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/ashearas-lock",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/ashearas-lock",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Asheara's Uniform",
+        };
+
+        /// <summary>
+        /// Ice Climbers Gain immunity to Freeze and Immobilize effects.
+        /// </summary>
+        public static Item IceClimbers = new Item
+        {
+            Id = 0,
+            Name = "Ice Climbers",
+            Quality = ItemQuality.Legendary,
+            Slug = "ice-climbers",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/ice-climbers",
+            Url = "https://us.battle.net/d3/en/item/ice-climbers",
+            RelativeUrl = "/d3/en/item/ice-climbers",
+            IsCrafted = false,
+            LegendaryAffix = "Gain immunity to Freeze and Immobilize effects.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Blackthorne's Spurs 
+        /// </summary>
+        public static Item BlackthornesSpurs = new Item
+        {
+            Id = 222463,
+            Name = "Blackthorne's Spurs",
+            Quality = ItemQuality.Legendary,
+            Slug = "blackthornes-spurs",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Boots_norm_unique_050",
+            DataUrl = "https://us.battle.net/api/d3/data/item/blackthornes-spurs",
+            Url = "https://us.battle.net/d3/en/item/blackthornes-spurs",
+            RelativeUrl = "/d3/en/item/blackthornes-spurs",
             IsCrafted = false,
             LegendaryAffix = "",
-            SetName = "",
+            SetName = "Blackthorne's Battlegear",
         };
 
         /// <summary>
-        /// Lamentation Rend can now stack up to 2 times on an enemy.
+        /// Immortal King's Stride 
         /// </summary>
-        public static Item Lamentation = new Item
+        public static Item ImmortalKingsStride = new Item
         {
-            Id = 212234,
-            Name = "Lamentation",
+            Id = 205625,
+            Name = "Immortal King's Stride",
             Quality = ItemQuality.Legendary,
-            Slug = "lamentation",
-            ItemType = ItemType.Belt,
+            Slug = "immortal-kings-stride",
+            ItemType = ItemType.Boots,
             BaseType = ItemBaseType.Armor,
-            InternalName = "barbbelt_norm_unique_05",
-            DataUrl = "https://us.battle.net/api/d3/data/item/lamentation",
-            Url = "https://us.battle.net/d3/en/item/lamentation",
-            RelativeUrl = "/d3/en/item/lamentation",
-            IsCrafted = false,
-            LegendaryAffix = "Rend can now stack up to 2 times on an enemy.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Immortal King's Tribal Binding 
-        /// </summary>
-        public static Item ImmortalKingsTribalBinding = new Item
-        {
-            Id = 212235,
-            Name = "Immortal King's Tribal Binding",
-            Quality = ItemQuality.Legendary,
-            Slug = "immortal-kings-tribal-binding",
-            ItemType = ItemType.Belt,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "BarbBelt_norm_unique_09",
-            DataUrl = "https://us.battle.net/api/d3/data/item/immortal-kings-tribal-binding",
-            Url = "https://us.battle.net/d3/en/item/immortal-kings-tribal-binding",
-            RelativeUrl = "/d3/en/item/immortal-kings-tribal-binding",
+            InternalName = "Boots_norm_unique_086",
+            DataUrl = "https://us.battle.net/api/d3/data/item/immortal-kings-stride",
+            Url = "https://us.battle.net/d3/en/item/immortal-kings-stride",
+            RelativeUrl = "/d3/en/item/immortal-kings-stride",
             IsCrafted = false,
             LegendaryAffix = "",
             SetName = "Immortal King's Call",
+        };
+
+        /// <summary>
+        /// Natalya's Bloody Footprints 
+        /// </summary>
+        public static Item NatalyasBloodyFootprints = new Item
+        {
+            Id = 197223,
+            Name = "Natalya's Bloody Footprints",
+            Quality = ItemQuality.Legendary,
+            Slug = "natalyas-bloody-footprints",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Boots_norm_unique_044",
+            DataUrl = "https://us.battle.net/api/d3/data/item/natalyas-bloody-footprints",
+            Url = "https://us.battle.net/d3/en/item/natalyas-bloody-footprints",
+            RelativeUrl = "/d3/en/item/natalyas-bloody-footprints",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Natalya's Vengeance",
+        };
+
+        /// <summary>
+        /// Zunimassa's Trail 
+        /// </summary>
+        public static Item ZunimassasTrail = new Item
+        {
+            Id = 205627,
+            Name = "Zunimassa's Trail",
+            Quality = ItemQuality.Legendary,
+            Slug = "zunimassas-trail",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Boots_norm_unique_088",
+            DataUrl = "https://us.battle.net/api/d3/data/item/zunimassas-trail",
+            Url = "https://us.battle.net/d3/en/item/zunimassas-trail",
+            RelativeUrl = "/d3/en/item/zunimassas-trail",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Zunimassa's Haunt",
+        };
+
+        /// <summary>
+        /// Sage's Journey 
+        /// </summary>
+        public static Item SagesJourney = new Item
+        {
+            Id = 0,
+            Name = "Sage's Journey",
+            Quality = ItemQuality.Legendary,
+            Slug = "sages-seekers",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/sages-seekers",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/sages-seekers",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/sages-seekers",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Sage's Plight",
+        };
+
+        /// <summary>
+        /// Eight-Demon Boots 
+        /// </summary>
+        public static Item EightdemonBoots = new Item
+        {
+            Id = 0,
+            Name = "Eight-Demon Boots",
+            Quality = ItemQuality.Legendary,
+            Slug = "eightdemon-boots",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/eightdemon-boots",
+            Url = "https://us.battle.net/d3/en/item/eightdemon-boots",
+            RelativeUrl = "/d3/en/item/eightdemon-boots",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Raiment of a Thousand Storms",
+        };
+
+        /// <summary>
+        /// Firebird's Tarsi 
+        /// </summary>
+        public static Item FirebirdsTarsi = new Item
+        {
+            Id = 358793,
+            Name = "Firebird's Tarsi",
+            Quality = ItemQuality.Legendary,
+            Slug = "firebirds-tarsi",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "boots_norm_set_06",
+            DataUrl = "https://us.battle.net/api/d3/data/item/firebirds-tarsi",
+            Url = "https://us.battle.net/d3/en/item/firebirds-tarsi",
+            RelativeUrl = "/d3/en/item/firebirds-tarsi",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Firebird's Finery",
+        };
+
+        /// <summary>
+        /// Helltooth Greaves 
+        /// </summary>
+        public static Item HelltoothGreaves = new Item
+        {
+            Id = 340524,
+            Name = "Helltooth Greaves",
+            Quality = ItemQuality.Legendary,
+            Slug = "helltooth-greaves",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "boots_norm_set_16",
+            DataUrl = "https://us.battle.net/api/d3/data/item/helltooth-greaves",
+            Url = "https://us.battle.net/d3/en/item/helltooth-greaves",
+            RelativeUrl = "/d3/en/item/helltooth-greaves",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Helltooth Harness",
+        };
+
+        /// <summary>
+        /// Jade Harvester's Swiftness 
+        /// </summary>
+        public static Item JadeHarvestersSwiftness = new Item
+        {
+            Id = 338037,
+            Name = "Jade Harvester's Swiftness",
+            Quality = ItemQuality.Legendary,
+            Slug = "jade-harvesters-swiftness",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "boots_norm_set_09",
+            DataUrl = "https://us.battle.net/api/d3/data/item/jade-harvesters-swiftness",
+            Url = "https://us.battle.net/d3/en/item/jade-harvesters-swiftness",
+            RelativeUrl = "/d3/en/item/jade-harvesters-swiftness",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Raiment of the Jade Harvester",
+        };
+
+        /// <summary>
+        /// Marauder's Treads 
+        /// </summary>
+        public static Item MaraudersTreads = new Item
+        {
+            Id = 336995,
+            Name = "Marauder's Treads",
+            Quality = ItemQuality.Legendary,
+            Slug = "marauders-treads",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "boots_norm_set_07",
+            DataUrl = "https://us.battle.net/api/d3/data/item/marauders-treads",
+            Url = "https://us.battle.net/d3/en/item/marauders-treads",
+            RelativeUrl = "/d3/en/item/marauders-treads",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Embodiment of the Marauder",
+        };
+
+        /// <summary>
+        /// Raekor's Striders 
+        /// </summary>
+        public static Item RaekorsStriders = new Item
+        {
+            Id = 336987,
+            Name = "Raekor's Striders",
+            Quality = ItemQuality.Legendary,
+            Slug = "raekors-striders",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "boots_norm_set_05",
+            DataUrl = "https://us.battle.net/api/d3/data/item/raekors-striders",
+            Url = "https://us.battle.net/d3/en/item/raekors-striders",
+            RelativeUrl = "/d3/en/item/raekors-striders",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "The Legacy of Raekor",
+        };
+
+        /// <summary>
+        /// Roland's Stride 
+        /// </summary>
+        public static Item RolandsStride = new Item
+        {
+            Id = 404094,
+            Name = "Roland's Stride",
+            Quality = ItemQuality.Legendary,
+            Slug = "rolands-stride",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "p1_Boots_norm_set_01",
+            DataUrl = "https://us.battle.net/api/d3/data/item/rolands-stride",
+            Url = "https://us.battle.net/d3/en/item/rolands-stride",
+            RelativeUrl = "/d3/en/item/rolands-stride",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Roland's Legacy",
+        };
+
+        /// <summary>
+        /// Sabatons of Akkhan 
+        /// </summary>
+        public static Item SabatonsOfAkkhan = new Item
+        {
+            Id = 358795,
+            Name = "Sabatons of Akkhan",
+            Quality = ItemQuality.Legendary,
+            Slug = "sabatons-of-akkhan",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "boots_norm_set_10",
+            DataUrl = "https://us.battle.net/api/d3/data/item/sabatons-of-akkhan",
+            Url = "https://us.battle.net/d3/en/item/sabatons-of-akkhan",
+            RelativeUrl = "/d3/en/item/sabatons-of-akkhan",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Armor of Akkhan",
+        };
+
+        /// <summary>
+        /// The Shadow's Heels 
+        /// </summary>
+        public static Item TheShadowsHeels = new Item
+        {
+            Id = 332364,
+            Name = "The Shadow's Heels",
+            Quality = ItemQuality.Legendary,
+            Slug = "the-shadows-heels",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "boots_norm_set_14",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-shadows-heels",
+            Url = "https://us.battle.net/d3/en/item/the-shadows-heels",
+            RelativeUrl = "/d3/en/item/the-shadows-heels",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "The Shadow’s Mantle",
+        };
+
+        /// <summary>
+        /// Vyr's Swaggering Stance 
+        /// </summary>
+        public static Item VyrsSwaggeringStance = new Item
+        {
+            Id = 332363,
+            Name = "Vyr's Swaggering Stance",
+            Quality = ItemQuality.Legendary,
+            Slug = "vyrs-swaggering-stance",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "boots_norm_set_13",
+            DataUrl = "https://us.battle.net/api/d3/data/item/vyrs-swaggering-stance",
+            Url = "https://us.battle.net/d3/en/item/vyrs-swaggering-stance",
+            RelativeUrl = "/d3/en/item/vyrs-swaggering-stance",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Vyr's Amazing Arcana",
+        };
+
+        /// <summary>
+        /// Board Walkers 
+        /// </summary>
+        public static Item BoardWalkers = new Item
+        {
+            Id = 205621,
+            Name = "Board Walkers",
+            Quality = ItemQuality.Legendary,
+            Slug = "board-walkers",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Boots_norm_unique_076",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/board-walkers",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/board-walkers",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/board-walkers",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Asheara's Finders 
+        /// </summary>
+        public static Item AshearasFinders = new Item
+        {
+            Id = 205618,
+            Name = "Asheara's Finders",
+            Quality = ItemQuality.Legendary,
+            Slug = "ashearas-finders",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Boots_norm_unique_073",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/ashearas-finders",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/ashearas-finders",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/ashearas-finders",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Asheara's Vestments",
+        };
+
+        /// <summary>
+        /// Cain's Travelers 
+        /// </summary>
+        public static Item CainsTravelers = new Item
+        {
+            Id = 0,
+            Name = "Cain's Travelers",
+            Quality = ItemQuality.Legendary,
+            Slug = "cains-travelers",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/cains-travelers",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/cains-travelers",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/cains-travelers",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Cain's Destiny",
+        };
+
+        /// <summary>
+        /// Captain Crimson's Waders 
+        /// </summary>
+        public static Item CaptainCrimsonsWaders = new Item
+        {
+            Id = 197221,
+            Name = "Captain Crimson's Waders",
+            Quality = ItemQuality.Legendary,
+            Slug = "captain-crimsons-waders",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "Boots_norm_unique_043",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/captain-crimsons-waders",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/captain-crimsons-waders",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/captain-crimsons-waders",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Captain Crimson's Trimmings",
+        };
+
+        /// <summary>
+        /// Sage's Passage 
+        /// </summary>
+        public static Item SagesPassage = new Item
+        {
+            Id = 0,
+            Name = "Sage's Passage",
+            Quality = ItemQuality.Legendary,
+            Slug = "sages-passage",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/sages-passage",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/sages-passage",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/sages-passage",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Sage's Journey",
         };
 
         /// <summary>
@@ -5941,13 +6683,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item AkaratsAwakening = new Item
         {
-            Id = 0,
+            Id = 299414,
             Name = "Akarat's Awakening",
             Quality = ItemQuality.Legendary,
             Slug = "akarats-awakening",
             ItemType = ItemType.Shield,
             BaseType = ItemBaseType.None,
-            InternalName = "",
+            InternalName = "crushield_norm_unique_04",
             DataUrl = "https://us.battle.net/api/d3/data/item/akarats-awakening",
             Url = "https://us.battle.net/d3/en/item/akarats-awakening",
             RelativeUrl = "/d3/en/item/akarats-awakening",
@@ -6101,418 +6843,18 @@ namespace Trinity.Reference
         /// </summary>
         public static Item PiroMarella = new Item
         {
-            Id = 0,
+            Id = 299411,
             Name = "Piro Marella",
             Quality = ItemQuality.Legendary,
             Slug = "piro-marella",
             ItemType = ItemType.Shield,
             BaseType = ItemBaseType.None,
-            InternalName = "",
+            InternalName = "crushield_norm_unique_01",
             DataUrl = "https://us.battle.net/api/d3/data/recipe/piro-marella",
             Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/piro-marella",
             RelativeUrl = "/d3/en/artisan/blacksmith/recipe/piro-marella",
             IsCrafted = true,
             LegendaryAffix = "Reduces the Wrath cost of Shield Bash by 40–50%.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Gazing Demise 
-        /// </summary>
-        public static Item GazingDemise = new Item
-        {
-            Id = 194995,
-            Name = "Gazing Demise",
-            Quality = ItemQuality.Legendary,
-            Slug = "gazing-demise",
-            ItemType = ItemType.Mojo,
-            BaseType = ItemBaseType.None,
-            InternalName = "Mojo_norm_unique_05",
-            DataUrl = "https://us.battle.net/api/d3/data/item/gazing-demise",
-            Url = "https://us.battle.net/d3/en/item/gazing-demise",
-            RelativeUrl = "/d3/en/item/gazing-demise",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Homunculus A Zombie Dog is automatically summoned to your side every 4–6 seconds.
-        /// </summary>
-        public static Item Homunculus = new Item
-        {
-            Id = 194991,
-            Name = "Homunculus",
-            Quality = ItemQuality.Legendary,
-            Slug = "homunculus",
-            ItemType = ItemType.Mojo,
-            BaseType = ItemBaseType.None,
-            InternalName = "Mojo_norm_unique_04",
-            DataUrl = "https://us.battle.net/api/d3/data/item/homunculus",
-            Url = "https://us.battle.net/d3/en/item/homunculus",
-            RelativeUrl = "/d3/en/item/homunculus",
-            IsCrafted = false,
-            LegendaryAffix = "A Zombie Dog is automatically summoned to your side every 4–6 seconds.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Bitterness 
-        /// </summary>
-        public static Item Bitterness = new Item
-        {
-            Id = 0,
-            Name = "Bitterness",
-            Quality = ItemQuality.Legendary,
-            Slug = "bitterness",
-            ItemType = ItemType.Mojo,
-            BaseType = ItemBaseType.None,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/bitterness",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/bitterness",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/bitterness",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Shukrani's Triumph Spirit Walk lasts until you attack or until an enemy is within 30 yards of you.
-        /// </summary>
-        public static Item ShukranisTriumph = new Item
-        {
-            Id = 0,
-            Name = "Shukrani's Triumph",
-            Quality = ItemQuality.Legendary,
-            Slug = "shukranis-triumph",
-            ItemType = ItemType.Mojo,
-            BaseType = ItemBaseType.None,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/shukranis-triumph",
-            Url = "https://us.battle.net/d3/en/item/shukranis-triumph",
-            RelativeUrl = "/d3/en/item/shukranis-triumph",
-            IsCrafted = false,
-            LegendaryAffix = "Spirit Walk lasts until you attack or until an enemy is within 30 yards of you.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Thing of the Deep 
-        /// </summary>
-        public static Item ThingOfTheDeep = new Item
-        {
-            Id = 192468,
-            Name = "Thing of the Deep",
-            Quality = ItemQuality.Legendary,
-            Slug = "thing-of-the-deep",
-            ItemType = ItemType.Mojo,
-            BaseType = ItemBaseType.None,
-            InternalName = "Mojo_norm_unique_02",
-            DataUrl = "https://us.battle.net/api/d3/data/item/thing-of-the-deep",
-            Url = "https://us.battle.net/d3/en/item/thing-of-the-deep",
-            RelativeUrl = "/d3/en/item/thing-of-the-deep",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Uhkapian Serpent 25–30% of the damage you take is redirected to your Zombie Dogs.
-        /// </summary>
-        public static Item UhkapianSerpent = new Item
-        {
-            Id = 191278,
-            Name = "Uhkapian Serpent",
-            Quality = ItemQuality.Legendary,
-            Slug = "uhkapian-serpent",
-            ItemType = ItemType.Mojo,
-            BaseType = ItemBaseType.None,
-            InternalName = "Mojo_norm_unique_01",
-            DataUrl = "https://us.battle.net/api/d3/data/item/uhkapian-serpent",
-            Url = "https://us.battle.net/d3/en/item/uhkapian-serpent",
-            RelativeUrl = "/d3/en/item/uhkapian-serpent",
-            IsCrafted = false,
-            LegendaryAffix = "25–30% of the damage you take is redirected to your Zombie Dogs.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Manajuma's Gory Fetch 
-        /// </summary>
-        public static Item ManajumasGoryFetch = new Item
-        {
-            Id = 210993,
-            Name = "Manajuma's Gory Fetch",
-            Quality = ItemQuality.Legendary,
-            Slug = "manajumas-gory-fetch",
-            ItemType = ItemType.Mojo,
-            BaseType = ItemBaseType.None,
-            InternalName = "Mojo_norm_unique_06",
-            DataUrl = "https://us.battle.net/api/d3/data/item/manajumas-gory-fetch",
-            Url = "https://us.battle.net/d3/en/item/manajumas-gory-fetch",
-            RelativeUrl = "/d3/en/item/manajumas-gory-fetch",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Manajuma's Way",
-        };
-
-        /// <summary>
-        /// Zunimassa's String of Skulls 
-        /// </summary>
-        public static Item ZunimassasStringOfSkulls = new Item
-        {
-            Id = 216525,
-            Name = "Zunimassa's String of Skulls",
-            Quality = ItemQuality.Legendary,
-            Slug = "zunimassas-string-of-skulls",
-            ItemType = ItemType.Mojo,
-            BaseType = ItemBaseType.None,
-            InternalName = "Mojo_norm_unique_07",
-            DataUrl = "https://us.battle.net/api/d3/data/item/zunimassas-string-of-skulls",
-            Url = "https://us.battle.net/d3/en/item/zunimassas-string-of-skulls",
-            RelativeUrl = "/d3/en/item/zunimassas-string-of-skulls",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Zunimassa's Haunt",
-        };
-
-        /// <summary>
-        /// Spite 
-        /// </summary>
-        public static Item Spite = new Item
-        {
-            Id = 0,
-            Name = "Spite",
-            Quality = ItemQuality.Legendary,
-            Slug = "spite",
-            ItemType = ItemType.Mojo,
-            BaseType = ItemBaseType.None,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/spite",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/spite",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/spite",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Winter Flurry Enemies killed by Cold damage have a 15–20% chance to release a Frost Nova.
-        /// </summary>
-        public static Item WinterFlurry = new Item
-        {
-            Id = 0,
-            Name = "Winter Flurry",
-            Quality = ItemQuality.Legendary,
-            Slug = "winter-flurry",
-            ItemType = ItemType.Orb,
-            BaseType = ItemBaseType.None,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/winter-flurry",
-            Url = "https://us.battle.net/d3/en/item/winter-flurry",
-            RelativeUrl = "/d3/en/item/winter-flurry",
-            IsCrafted = false,
-            LegendaryAffix = "Enemies killed by Cold damage have a 15–20% chance to release a Frost Nova.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Light of Grace Ray of Frost now pierces.
-        /// </summary>
-        public static Item LightOfGrace = new Item
-        {
-            Id = 272038,
-            Name = "Light of Grace",
-            Quality = ItemQuality.Legendary,
-            Slug = "light-of-grace",
-            ItemType = ItemType.Orb,
-            BaseType = ItemBaseType.None,
-            InternalName = "orb_norm_unique_09",
-            DataUrl = "https://us.battle.net/api/d3/data/item/light-of-grace",
-            Url = "https://us.battle.net/d3/en/item/light-of-grace",
-            RelativeUrl = "/d3/en/item/light-of-grace",
-            IsCrafted = false,
-            LegendaryAffix = "Ray of Frost now pierces.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Mirrorball Magic Missile fires 1–2 extra missiles.
-        /// </summary>
-        public static Item Mirrorball = new Item
-        {
-            Id = 272022,
-            Name = "Mirrorball",
-            Quality = ItemQuality.Legendary,
-            Slug = "mirrorball",
-            ItemType = ItemType.Orb,
-            BaseType = ItemBaseType.None,
-            InternalName = "orb_norm_unique_07",
-            DataUrl = "https://us.battle.net/api/d3/data/item/mirrorball",
-            Url = "https://us.battle.net/d3/en/item/mirrorball",
-            RelativeUrl = "/d3/en/item/mirrorball",
-            IsCrafted = false,
-            LegendaryAffix = "Magic Missile fires 1–2 extra missiles.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Myken's Ball of Hate Electrocute can chain to enemies that have already been hit.
-        /// </summary>
-        public static Item MykensBallOfHate = new Item
-        {
-            Id = 272037,
-            Name = "Myken's Ball of Hate",
-            Quality = ItemQuality.Legendary,
-            Slug = "mykens-ball-of-hate",
-            ItemType = ItemType.Orb,
-            BaseType = ItemBaseType.None,
-            InternalName = "orb_norm_unique_08",
-            DataUrl = "https://us.battle.net/api/d3/data/item/mykens-ball-of-hate",
-            Url = "https://us.battle.net/d3/en/item/mykens-ball-of-hate",
-            RelativeUrl = "/d3/en/item/mykens-ball-of-hate",
-            IsCrafted = false,
-            LegendaryAffix = "Electrocute can chain to enemies that have already been hit.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Singularity 
-        /// </summary>
-        public static Item Singularity = new Item
-        {
-            Id = 0,
-            Name = "Singularity",
-            Quality = ItemQuality.Legendary,
-            Slug = "singularity",
-            ItemType = ItemType.Orb,
-            BaseType = ItemBaseType.None,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/singularity",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/singularity",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/singularity",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// The Oculus Taking damage has up to a 15–20% chance to reset the cooldown on Teleport.
-        /// </summary>
-        public static Item TheOculus = new Item
-        {
-            Id = 192320,
-            Name = "The Oculus",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-oculus",
-            ItemType = ItemType.Orb,
-            BaseType = ItemBaseType.None,
-            InternalName = "orb_norm_unique_02",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-oculus",
-            Url = "https://us.battle.net/d3/en/item/the-oculus",
-            RelativeUrl = "/d3/en/item/the-oculus",
-            IsCrafted = false,
-            LegendaryAffix = "Taking damage has up to a 15–20% chance to reset the cooldown on Teleport.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Triumvirate 
-        /// </summary>
-        public static Item Triumvirate = new Item
-        {
-            Id = 195325,
-            Name = "Triumvirate",
-            Quality = ItemQuality.Legendary,
-            Slug = "triumvirate",
-            ItemType = ItemType.Orb,
-            BaseType = ItemBaseType.None,
-            InternalName = "orb_norm_unique_04",
-            DataUrl = "https://us.battle.net/api/d3/data/item/triumvirate",
-            Url = "https://us.battle.net/d3/en/item/triumvirate",
-            RelativeUrl = "/d3/en/item/triumvirate",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Chantodo's Force 
-        /// </summary>
-        public static Item ChantodosForce = new Item
-        {
-            Id = 212277,
-            Name = "Chantodo's Force",
-            Quality = ItemQuality.Legendary,
-            Slug = "chantodos-force",
-            ItemType = ItemType.Orb,
-            BaseType = ItemBaseType.None,
-            InternalName = "orb_norm_unique_05",
-            DataUrl = "https://us.battle.net/api/d3/data/item/chantodos-force",
-            Url = "https://us.battle.net/d3/en/item/chantodos-force",
-            RelativeUrl = "/d3/en/item/chantodos-force",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Chantodo's Resolve",
-        };
-
-        /// <summary>
-        /// Tal Rasha's Unwavering Glare 
-        /// </summary>
-        public static Item TalRashasUnwaveringGlare = new Item
-        {
-            Id = 212780,
-            Name = "Tal Rasha's Unwavering Glare",
-            Quality = ItemQuality.Legendary,
-            Slug = "tal-rashas-unwavering-glare",
-            ItemType = ItemType.Orb,
-            BaseType = ItemBaseType.None,
-            InternalName = "orb_norm_unique_06",
-            DataUrl = "https://us.battle.net/api/d3/data/item/tal-rashas-unwavering-glare",
-            Url = "https://us.battle.net/d3/en/item/tal-rashas-unwavering-glare",
-            RelativeUrl = "/d3/en/item/tal-rashas-unwavering-glare",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Tal Rasha's Elements",
-        };
-
-        /// <summary>
-        /// Firebird's Eye 
-        /// </summary>
-        public static Item FirebirdsEye = new Item
-        {
-            Id = 358819,
-            Name = "Firebird's Eye",
-            Quality = ItemQuality.Legendary,
-            Slug = "firebirds-eye",
-            ItemType = ItemType.Orb,
-            BaseType = ItemBaseType.None,
-            InternalName = "orb_norm_set_06",
-            DataUrl = "https://us.battle.net/api/d3/data/item/firebirds-eye",
-            Url = "https://us.battle.net/d3/en/item/firebirds-eye",
-            RelativeUrl = "/d3/en/item/firebirds-eye",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Firebird's Finery",
-        };
-
-        /// <summary>
-        /// Cosmic Strand Teleport gains the effect of the Wormhole rune.
-        /// </summary>
-        public static Item CosmicStrand = new Item
-        {
-            Id = 0,
-            Name = "Cosmic Strand",
-            Quality = ItemQuality.Legendary,
-            Slug = "cosmic-strand",
-            ItemType = ItemType.Orb,
-            BaseType = ItemBaseType.None,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/cosmic-strand",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/cosmic-strand",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/cosmic-strand",
-            IsCrafted = true,
-            LegendaryAffix = "Teleport gains the effect of the Wormhole rune.",
             SetName = "",
         };
 
@@ -6527,7 +6869,7 @@ namespace Trinity.Reference
             Slug = "denial",
             ItemType = ItemType.Shield,
             BaseType = ItemBaseType.None,
-            InternalName = "shield_norm_unique_03",
+            InternalName = "Shield_norm_unique_03",
             DataUrl = "https://us.battle.net/api/d3/data/item/denial",
             Url = "https://us.battle.net/d3/en/item/denial",
             RelativeUrl = "/d3/en/item/denial",
@@ -6541,13 +6883,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item WallOfBone = new Item
         {
-            Id = 0,
+            Id = 152667,
             Name = "Wall of Bone",
             Quality = ItemQuality.Legendary,
             Slug = "wall-of-bone",
             ItemType = ItemType.Shield,
             BaseType = ItemBaseType.None,
-            InternalName = "",
+            InternalName = "Shield_norm_unique_04",
             DataUrl = "https://us.battle.net/api/d3/data/recipe/wall-of-bone",
             Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/wall-of-bone",
             RelativeUrl = "/d3/en/artisan/blacksmith/recipe/wall-of-bone",
@@ -6741,13 +7083,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HallowedBarricade = new Item
         {
-            Id = 0,
+            Id = 223758,
             Name = "Hallowed Barricade",
             Quality = ItemQuality.Legendary,
             Slug = "hallowed-barricade",
             ItemType = ItemType.Shield,
             BaseType = ItemBaseType.None,
-            InternalName = "",
+            InternalName = "Shield_norm_set_01",
             DataUrl = "https://us.battle.net/api/d3/data/recipe/hallowed-barricade",
             Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/hallowed-barricade",
             RelativeUrl = "/d3/en/artisan/blacksmith/recipe/hallowed-barricade",
@@ -6757,563 +7099,223 @@ namespace Trinity.Reference
         };
 
         /// <summary>
-        /// Cain's Scribe 
+        /// Winter Flurry Enemies killed by Cold damage have a 15–20% chance to release a Frost Nova.
         /// </summary>
-        public static Item CainsScribe = new Item
+        public static Item WinterFlurry = new Item
+        {
+            Id = 184199,
+            Name = "Winter Flurry",
+            Quality = ItemQuality.Legendary,
+            Slug = "winter-flurry",
+            ItemType = ItemType.Orb,
+            BaseType = ItemBaseType.None,
+            InternalName = "orb_norm_unique_01",
+            DataUrl = "https://us.battle.net/api/d3/data/item/winter-flurry",
+            Url = "https://us.battle.net/d3/en/item/winter-flurry",
+            RelativeUrl = "/d3/en/item/winter-flurry",
+            IsCrafted = false,
+            LegendaryAffix = "Enemies killed by Cold damage have a 15–20% chance to release a Frost Nova.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Light of Grace Ray of Frost now pierces.
+        /// </summary>
+        public static Item LightOfGrace = new Item
+        {
+            Id = 272038,
+            Name = "Light of Grace",
+            Quality = ItemQuality.Legendary,
+            Slug = "light-of-grace",
+            ItemType = ItemType.Orb,
+            BaseType = ItemBaseType.None,
+            InternalName = "orb_norm_unique_09",
+            DataUrl = "https://us.battle.net/api/d3/data/item/light-of-grace",
+            Url = "https://us.battle.net/d3/en/item/light-of-grace",
+            RelativeUrl = "/d3/en/item/light-of-grace",
+            IsCrafted = false,
+            LegendaryAffix = "Ray of Frost now pierces.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Mirrorball Magic Missile fires 1–2 extra missiles.
+        /// </summary>
+        public static Item Mirrorball = new Item
+        {
+            Id = 272022,
+            Name = "Mirrorball",
+            Quality = ItemQuality.Legendary,
+            Slug = "mirrorball",
+            ItemType = ItemType.Orb,
+            BaseType = ItemBaseType.None,
+            InternalName = "orb_norm_unique_07",
+            DataUrl = "https://us.battle.net/api/d3/data/item/mirrorball",
+            Url = "https://us.battle.net/d3/en/item/mirrorball",
+            RelativeUrl = "/d3/en/item/mirrorball",
+            IsCrafted = false,
+            LegendaryAffix = "Magic Missile fires 1–2 extra missiles.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Myken's Ball of Hate Electrocute can chain to enemies that have already been hit.
+        /// </summary>
+        public static Item MykensBallOfHate = new Item
+        {
+            Id = 272037,
+            Name = "Myken's Ball of Hate",
+            Quality = ItemQuality.Legendary,
+            Slug = "mykens-ball-of-hate",
+            ItemType = ItemType.Orb,
+            BaseType = ItemBaseType.None,
+            InternalName = "orb_norm_unique_08",
+            DataUrl = "https://us.battle.net/api/d3/data/item/mykens-ball-of-hate",
+            Url = "https://us.battle.net/d3/en/item/mykens-ball-of-hate",
+            RelativeUrl = "/d3/en/item/mykens-ball-of-hate",
+            IsCrafted = false,
+            LegendaryAffix = "Electrocute can chain to enemies that have already been hit.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Singularity 
+        /// </summary>
+        public static Item Singularity = new Item
         {
             Id = 0,
-            Name = "Cain's Scribe",
+            Name = "Singularity",
             Quality = ItemQuality.Legendary,
-            Slug = "cains-warmers",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
+            Slug = "singularity",
+            ItemType = ItemType.Orb,
+            BaseType = ItemBaseType.None,
             InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/cains-warmers",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/cains-warmers",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/cains-warmers",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Cain's Fate",
-        };
-
-        /// <summary>
-        /// Stone Gauntlets 
-        /// </summary>
-        public static Item StoneGauntlets = new Item
-        {
-            Id = 205640,
-            Name = "Stone Gauntlets",
-            Quality = ItemQuality.Legendary,
-            Slug = "stone-gauntlets",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "gloves_norm_unique_076",
-            DataUrl = "https://us.battle.net/api/d3/data/item/stone-gauntlets",
-            Url = "https://us.battle.net/d3/en/item/stone-gauntlets",
-            RelativeUrl = "/d3/en/item/stone-gauntlets",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Magefist 
-        /// </summary>
-        public static Item Magefist = new Item
-        {
-            Id = 197206,
-            Name = "Magefist",
-            Quality = ItemQuality.Legendary,
-            Slug = "magefist",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Gloves_norm_unique_044",
-            DataUrl = "https://us.battle.net/api/d3/data/item/magefist",
-            Url = "https://us.battle.net/d3/en/item/magefist",
-            RelativeUrl = "/d3/en/item/magefist",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// St. Archew's Gage When there are 5 or more enemies within 12 yards, you gain an absorb shield equal to 20–25% of your maximum Life for 6 seconds. This effect may occur once every 30 seconds.
-        /// </summary>
-        public static Item StArchewsGage = new Item
-        {
-            Id = 332172,
-            Name = "St. Archew's Gage",
-            Quality = ItemQuality.Legendary,
-            Slug = "st-archews-gage",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "gloves_norm_unique_01",
-            DataUrl = "https://us.battle.net/api/d3/data/item/st-archews-gage",
-            Url = "https://us.battle.net/d3/en/item/st-archews-gage",
-            RelativeUrl = "/d3/en/item/st-archews-gage",
-            IsCrafted = false,
-            LegendaryAffix = "When there are 5 or more enemies within 12 yards, you gain an absorb shield equal to 20–25% of your maximum Life for 6 seconds. This effect may occur once every 30 seconds.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Pendergrasps 
-        /// </summary>
-        public static Item Pendergrasps = new Item
-        {
-            Id = 0,
-            Name = "Pendergrasps",
-            Quality = ItemQuality.Legendary,
-            Slug = "pendergrasps",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/pendergrasps",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/pendergrasps",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/pendergrasps",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/singularity",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/singularity",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/singularity",
             IsCrafted = true,
             LegendaryAffix = "",
             SetName = "",
         };
 
         /// <summary>
-        /// Gladiator Gauntlets After earning a massacre bonus, gold rains from sky.
+        /// The Oculus Taking damage has up to a 15–20% chance to reset the cooldown on Teleport.
         /// </summary>
-        public static Item GladiatorGauntlets = new Item
+        public static Item TheOculus = new Item
         {
-            Id = 205635,
-            Name = "Gladiator Gauntlets",
+            Id = 192320,
+            Name = "The Oculus",
             Quality = ItemQuality.Legendary,
-            Slug = "gladiator-gauntlets",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "gloves_norm_unique_090",
-            DataUrl = "https://us.battle.net/api/d3/data/item/gladiator-gauntlets",
-            Url = "https://us.battle.net/d3/en/item/gladiator-gauntlets",
-            RelativeUrl = "/d3/en/item/gladiator-gauntlets",
+            Slug = "the-oculus",
+            ItemType = ItemType.Orb,
+            BaseType = ItemBaseType.None,
+            InternalName = "orb_norm_unique_02",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-oculus",
+            Url = "https://us.battle.net/d3/en/item/the-oculus",
+            RelativeUrl = "/d3/en/item/the-oculus",
             IsCrafted = false,
-            LegendaryAffix = "After earning a massacre bonus, gold rains from sky.",
+            LegendaryAffix = "Taking damage has up to a 15–20% chance to reset the cooldown on Teleport.",
             SetName = "",
         };
 
         /// <summary>
-        /// Asheara's Iron Fist 
+        /// Triumvirate 
         /// </summary>
-        public static Item AshearasIronFist = new Item
+        public static Item Triumvirate = new Item
         {
-            Id = 0,
-            Name = "Asheara's Iron Fist",
+            Id = 195325,
+            Name = "Triumvirate",
             Quality = ItemQuality.Legendary,
-            Slug = "ashearas-clasp",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/ashearas-clasp",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/ashearas-clasp",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/ashearas-clasp",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Asheara's Uniform",
-        };
-
-        /// <summary>
-        /// Frostburn Your Chill effects have up to a 34–45% chance to Freeze instead of Slow.
-        /// </summary>
-        public static Item Frostburn = new Item
-        {
-            Id = 197205,
-            Name = "Frostburn",
-            Quality = ItemQuality.Legendary,
-            Slug = "frostburn",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Gloves_norm_unique_043",
-            DataUrl = "https://us.battle.net/api/d3/data/item/frostburn",
-            Url = "https://us.battle.net/d3/en/item/frostburn",
-            RelativeUrl = "/d3/en/item/frostburn",
+            Slug = "triumvirate",
+            ItemType = ItemType.Orb,
+            BaseType = ItemBaseType.None,
+            InternalName = "orb_norm_unique_04",
+            DataUrl = "https://us.battle.net/api/d3/data/item/triumvirate",
+            Url = "https://us.battle.net/d3/en/item/triumvirate",
+            RelativeUrl = "/d3/en/item/triumvirate",
             IsCrafted = false,
-            LegendaryAffix = "Your Chill effects have up to a 34–45% chance to Freeze instead of Slow.",
+            LegendaryAffix = "",
             SetName = "",
         };
 
         /// <summary>
-        /// Tasker and Theo Increase attack speed of your pets by 40–50%.
+        /// Chantodo's Force 
         /// </summary>
-        public static Item TaskerAndTheo = new Item
+        public static Item ChantodosForce = new Item
         {
-            Id = 205642,
-            Name = "Tasker and Theo",
+            Id = 212277,
+            Name = "Chantodo's Force",
             Quality = ItemQuality.Legendary,
-            Slug = "tasker-and-theo",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Gloves_norm_unique_078",
-            DataUrl = "https://us.battle.net/api/d3/data/item/tasker-and-theo",
-            Url = "https://us.battle.net/d3/en/item/tasker-and-theo",
-            RelativeUrl = "/d3/en/item/tasker-and-theo",
-            IsCrafted = false,
-            LegendaryAffix = "Increase attack speed of your pets by 40–50%.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Immortal King's Irons 
-        /// </summary>
-        public static Item ImmortalKingsIrons = new Item
-        {
-            Id = 205631,
-            Name = "Immortal King's Irons",
-            Quality = ItemQuality.Legendary,
-            Slug = "immortal-kings-irons",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "Gloves_norm_unique_086",
-            DataUrl = "https://us.battle.net/api/d3/data/item/immortal-kings-irons",
-            Url = "https://us.battle.net/d3/en/item/immortal-kings-irons",
-            RelativeUrl = "/d3/en/item/immortal-kings-irons",
+            Slug = "chantodos-force",
+            ItemType = ItemType.Orb,
+            BaseType = ItemBaseType.None,
+            InternalName = "orb_norm_unique_05",
+            DataUrl = "https://us.battle.net/api/d3/data/item/chantodos-force",
+            Url = "https://us.battle.net/d3/en/item/chantodos-force",
+            RelativeUrl = "/d3/en/item/chantodos-force",
             IsCrafted = false,
             LegendaryAffix = "",
-            SetName = "Immortal King's Call",
+            SetName = "Chantodo's Resolve",
         };
 
         /// <summary>
-        /// Sage's Gesture 
+        /// Tal Rasha's Unwavering Glare 
         /// </summary>
-        public static Item SagesGesture = new Item
+        public static Item TalRashasUnwaveringGlare = new Item
         {
-            Id = 0,
-            Name = "Sage's Gesture",
+            Id = 212780,
+            Name = "Tal Rasha's Unwavering Glare",
             Quality = ItemQuality.Legendary,
-            Slug = "sages-grasp",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/sages-grasp",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/sages-grasp",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/sages-grasp",
-            IsCrafted = true,
+            Slug = "tal-rashas-unwavering-glare",
+            ItemType = ItemType.Orb,
+            BaseType = ItemBaseType.None,
+            InternalName = "orb_norm_unique_06",
+            DataUrl = "https://us.battle.net/api/d3/data/item/tal-rashas-unwavering-glare",
+            Url = "https://us.battle.net/d3/en/item/tal-rashas-unwavering-glare",
+            RelativeUrl = "/d3/en/item/tal-rashas-unwavering-glare",
+            IsCrafted = false,
             LegendaryAffix = "",
-            SetName = "Sage's Plight",
+            SetName = "Tal Rasha's Elements",
         };
 
         /// <summary>
-        /// Firebird's Talons 
+        /// Firebird's Eye 
         /// </summary>
-        public static Item FirebirdsTalons = new Item
+        public static Item FirebirdsEye = new Item
         {
-            Id = 358789,
-            Name = "Firebird's Talons",
+            Id = 358819,
+            Name = "Firebird's Eye",
             Quality = ItemQuality.Legendary,
-            Slug = "firebirds-talons",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "gloves_norm_set_06",
-            DataUrl = "https://us.battle.net/api/d3/data/item/firebirds-talons",
-            Url = "https://us.battle.net/d3/en/item/firebirds-talons",
-            RelativeUrl = "/d3/en/item/firebirds-talons",
+            Slug = "firebirds-eye",
+            ItemType = ItemType.Orb,
+            BaseType = ItemBaseType.None,
+            InternalName = "orb_norm_set_06",
+            DataUrl = "https://us.battle.net/api/d3/data/item/firebirds-eye",
+            Url = "https://us.battle.net/d3/en/item/firebirds-eye",
+            RelativeUrl = "/d3/en/item/firebirds-eye",
             IsCrafted = false,
             LegendaryAffix = "",
             SetName = "Firebird's Finery",
         };
 
         /// <summary>
-        /// Fists of Thunder 
+        /// Cosmic Strand Teleport gains the effect of the Wormhole rune.
         /// </summary>
-        public static Item FistsOfThunder = new Item
+        public static Item CosmicStrand = new Item
         {
-            Id = 0,
-            Name = "Fists of Thunder",
+            Id = 195127,
+            Name = "Cosmic Strand",
             Quality = ItemQuality.Legendary,
-            Slug = "fists-of-thunder",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/fists-of-thunder",
-            Url = "https://us.battle.net/d3/en/item/fists-of-thunder",
-            RelativeUrl = "/d3/en/item/fists-of-thunder",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Raiment of a Thousand Storms",
-        };
-
-        /// <summary>
-        /// Gauntlets of Akkhan 
-        /// </summary>
-        public static Item GauntletsOfAkkhan = new Item
-        {
-            Id = 358798,
-            Name = "Gauntlets of Akkhan",
-            Quality = ItemQuality.Legendary,
-            Slug = "gauntlets-of-akkhan",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "gloves_norm_set_10",
-            DataUrl = "https://us.battle.net/api/d3/data/item/gauntlets-of-akkhan",
-            Url = "https://us.battle.net/d3/en/item/gauntlets-of-akkhan",
-            RelativeUrl = "/d3/en/item/gauntlets-of-akkhan",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Armor of Akkhan",
-        };
-
-        /// <summary>
-        /// Helltooth Gauntlets 
-        /// </summary>
-        public static Item HelltoothGauntlets = new Item
-        {
-            Id = 363094,
-            Name = "Helltooth Gauntlets",
-            Quality = ItemQuality.Legendary,
-            Slug = "helltooth-gauntlets",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "gloves_norm_set_16",
-            DataUrl = "https://us.battle.net/api/d3/data/item/helltooth-gauntlets",
-            Url = "https://us.battle.net/d3/en/item/helltooth-gauntlets",
-            RelativeUrl = "/d3/en/item/helltooth-gauntlets",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Helltooth Harness",
-        };
-
-        /// <summary>
-        /// Jade Harvester's Mercy 
-        /// </summary>
-        public static Item JadeHarvestersMercy = new Item
-        {
-            Id = 338039,
-            Name = "Jade Harvester's Mercy",
-            Quality = ItemQuality.Legendary,
-            Slug = "jade-harvesters-mercy",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "gloves_norm_set_09",
-            DataUrl = "https://us.battle.net/api/d3/data/item/jade-harvesters-mercy",
-            Url = "https://us.battle.net/d3/en/item/jade-harvesters-mercy",
-            RelativeUrl = "/d3/en/item/jade-harvesters-mercy",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Raiment of the Jade Harvester",
-        };
-
-        /// <summary>
-        /// Marauder's Gloves 
-        /// </summary>
-        public static Item MaraudersGloves = new Item
-        {
-            Id = 336992,
-            Name = "Marauder's Gloves",
-            Quality = ItemQuality.Legendary,
-            Slug = "marauders-gloves",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "gloves_norm_set_07",
-            DataUrl = "https://us.battle.net/api/d3/data/item/marauders-gloves",
-            Url = "https://us.battle.net/d3/en/item/marauders-gloves",
-            RelativeUrl = "/d3/en/item/marauders-gloves",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Embodiment of the Marauder",
-        };
-
-        /// <summary>
-        /// Pride of the Invoker 
-        /// </summary>
-        public static Item PrideOfTheInvoker = new Item
-        {
-            Id = 335027,
-            Name = "Pride of the Invoker",
-            Quality = ItemQuality.Legendary,
-            Slug = "pride-of-the-invoker",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "gloves_norm_set_12",
-            DataUrl = "https://us.battle.net/api/d3/data/item/pride-of-the-invoker",
-            Url = "https://us.battle.net/d3/en/item/pride-of-the-invoker",
-            RelativeUrl = "/d3/en/item/pride-of-the-invoker",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Thorns of the Invoker",
-        };
-
-        /// <summary>
-        /// Pull of the Earth 
-        /// </summary>
-        public static Item PullOfTheEarth = new Item
-        {
-            Id = 340523,
-            Name = "Pull of the Earth",
-            Quality = ItemQuality.Legendary,
-            Slug = "pull-of-the-earth",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "gloves_norm_set_15",
-            DataUrl = "https://us.battle.net/api/d3/data/item/pull-of-the-earth",
-            Url = "https://us.battle.net/d3/en/item/pull-of-the-earth",
-            RelativeUrl = "/d3/en/item/pull-of-the-earth",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Might of the Earth",
-        };
-
-        /// <summary>
-        /// Raekor's Wraps 
-        /// </summary>
-        public static Item RaekorsWraps = new Item
-        {
-            Id = 336985,
-            Name = "Raekor's Wraps",
-            Quality = ItemQuality.Legendary,
-            Slug = "raekors-wraps",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "gloves_norm_set_05",
-            DataUrl = "https://us.battle.net/api/d3/data/item/raekors-wraps",
-            Url = "https://us.battle.net/d3/en/item/raekors-wraps",
-            RelativeUrl = "/d3/en/item/raekors-wraps",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "The Legacy of Raekor",
-        };
-
-        /// <summary>
-        /// Roland's Grasp 
-        /// </summary>
-        public static Item RolandsGrasp = new Item
-        {
-            Id = 0,
-            Name = "Roland's Grasp",
-            Quality = ItemQuality.Legendary,
-            Slug = "rolands-grasp",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/rolands-grasp",
-            Url = "https://us.battle.net/d3/en/item/rolands-grasp",
-            RelativeUrl = "/d3/en/item/rolands-grasp",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Roland's Legacy",
-        };
-
-        /// <summary>
-        /// Sunwuko's Paws 
-        /// </summary>
-        public static Item SunwukosPaws = new Item
-        {
-            Id = 0,
-            Name = "Sunwuko's Paws",
-            Quality = ItemQuality.Legendary,
-            Slug = "sunwukos-paws",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/sunwukos-paws",
-            Url = "https://us.battle.net/d3/en/item/sunwukos-paws",
-            RelativeUrl = "/d3/en/item/sunwukos-paws",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Monkey King's Garb",
-        };
-
-        /// <summary>
-        /// The Shadow's Grasp 
-        /// </summary>
-        public static Item TheShadowsGrasp = new Item
-        {
-            Id = 332362,
-            Name = "The Shadow's Grasp",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-shadows-grasp",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "gloves_norm_set_14",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-shadows-grasp",
-            Url = "https://us.battle.net/d3/en/item/the-shadows-grasp",
-            RelativeUrl = "/d3/en/item/the-shadows-grasp",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "The Shadow’s Mantle",
-        };
-
-        /// <summary>
-        /// Vyr's Grasping Gauntlets 
-        /// </summary>
-        public static Item VyrsGraspingGauntlets = new Item
-        {
-            Id = 346210,
-            Name = "Vyr's Grasping Gauntlets",
-            Quality = ItemQuality.Legendary,
-            Slug = "vyrs-grasping-gauntlets",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "gloves_norm_set_13",
-            DataUrl = "https://us.battle.net/api/d3/data/item/vyrs-grasping-gauntlets",
-            Url = "https://us.battle.net/d3/en/item/vyrs-grasping-gauntlets",
-            RelativeUrl = "/d3/en/item/vyrs-grasping-gauntlets",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Vyr's Amazing Arcana",
-        };
-
-        /// <summary>
-        /// Penders Purchase 
-        /// </summary>
-        public static Item PendersPurchase = new Item
-        {
-            Id = 0,
-            Name = "Penders Purchase",
-            Quality = ItemQuality.Legendary,
-            Slug = "penders-purchase",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/penders-purchase",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/penders-purchase",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/penders-purchase",
+            Slug = "cosmic-strand",
+            ItemType = ItemType.Orb,
+            BaseType = ItemBaseType.None,
+            InternalName = "orb_norm_unique_03",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/cosmic-strand",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/cosmic-strand",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/cosmic-strand",
             IsCrafted = true,
-            LegendaryAffix = "",
+            LegendaryAffix = "Teleport gains the effect of the Wormhole rune.",
             SetName = "",
-        };
-
-        /// <summary>
-        /// Asheara's Ward 
-        /// </summary>
-        public static Item AshearasWard = new Item
-        {
-            Id = 0,
-            Name = "Asheara's Ward",
-            Quality = ItemQuality.Legendary,
-            Slug = "ashearas-ward",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/ashearas-ward",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/ashearas-ward",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/ashearas-ward",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Asheara's Vestments",
-        };
-
-        /// <summary>
-        /// Cain's Scrivener 
-        /// </summary>
-        public static Item CainsScrivener = new Item
-        {
-            Id = 0,
-            Name = "Cain's Scrivener",
-            Quality = ItemQuality.Legendary,
-            Slug = "cains-scriviner",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/cains-scriviner",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/cains-scriviner",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/cains-scriviner",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Cain's Destiny",
-        };
-
-        /// <summary>
-        /// Sage's Purchase 
-        /// </summary>
-        public static Item SagesPurchase = new Item
-        {
-            Id = 0,
-            Name = "Sage's Purchase",
-            Quality = ItemQuality.Legendary,
-            Slug = "sages-purchase",
-            ItemType = ItemType.Gloves,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/sages-purchase",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/sages-purchase",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/sages-purchase",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Sage's Journey",
         };
 
         /// <summary>
@@ -7321,13 +7323,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item FletchersPride = new Item
         {
-            Id = 0,
+            Id = 197629,
             Name = "Fletcher's Pride",
             Quality = ItemQuality.Legendary,
             Slug = "fletchers-pride",
             ItemType = ItemType.Quiver,
             BaseType = ItemBaseType.None,
-            InternalName = "",
+            InternalName = "Quiver_norm_unique_06",
             DataUrl = "https://us.battle.net/api/d3/data/item/fletchers-pride",
             Url = "https://us.battle.net/d3/en/item/fletchers-pride",
             RelativeUrl = "/d3/en/item/fletchers-pride",
@@ -7347,7 +7349,7 @@ namespace Trinity.Reference
             Slug = "sin-seekers",
             ItemType = ItemType.Quiver,
             BaseType = ItemBaseType.None,
-            InternalName = "quiver_norm_unique_02",
+            InternalName = "Quiver_norm_unique_02",
             DataUrl = "https://us.battle.net/api/d3/data/item/sin-seekers",
             Url = "https://us.battle.net/d3/en/item/sin-seekers",
             RelativeUrl = "/d3/en/item/sin-seekers",
@@ -7367,7 +7369,7 @@ namespace Trinity.Reference
             Slug = "holy-point-shot",
             ItemType = ItemType.Quiver,
             BaseType = ItemBaseType.None,
-            InternalName = "quiver_norm_unique_04",
+            InternalName = "Quiver_norm_unique_04",
             DataUrl = "https://us.battle.net/api/d3/data/item/holy-point-shot",
             Url = "https://us.battle.net/d3/en/item/holy-point-shot",
             RelativeUrl = "/d3/en/item/holy-point-shot",
@@ -7381,13 +7383,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item SpinesOfSeethingHatred = new Item
         {
-            Id = 197628,
+            Id = 0,
             Name = "Spines of Seething Hatred",
             Quality = ItemQuality.Legendary,
             Slug = "spines-of-seething-hatred",
             ItemType = ItemType.Quiver,
             BaseType = ItemBaseType.None,
-            InternalName = "Quiver_norm_unique_05",
+            InternalName = "",
             DataUrl = "https://us.battle.net/api/d3/data/item/spines-of-seething-hatred",
             Url = "https://us.battle.net/d3/en/item/spines-of-seething-hatred",
             RelativeUrl = "/d3/en/item/spines-of-seething-hatred",
@@ -7421,13 +7423,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item EmimeisDuffel = new Item
         {
-            Id = 0,
+            Id = 298172,
             Name = "Emimei's Duffel",
             Quality = ItemQuality.Legendary,
             Slug = "emimeis-duffel",
             ItemType = ItemType.Quiver,
             BaseType = ItemBaseType.None,
-            InternalName = "",
+            InternalName = "quiver_norm_unique_10",
             DataUrl = "https://us.battle.net/api/d3/data/item/emimeis-duffel",
             Url = "https://us.battle.net/d3/en/item/emimeis-duffel",
             RelativeUrl = "/d3/en/item/emimeis-duffel",
@@ -7487,7 +7489,7 @@ namespace Trinity.Reference
             Slug = "dead-mans-legacy",
             ItemType = ItemType.Quiver,
             BaseType = ItemBaseType.None,
-            InternalName = "Quiver_norm_unique_07",
+            InternalName = "quiver_norm_unique_07",
             DataUrl = "https://us.battle.net/api/d3/data/item/dead-mans-legacy",
             Url = "https://us.battle.net/d3/en/item/dead-mans-legacy",
             RelativeUrl = "/d3/en/item/dead-mans-legacy",
@@ -7521,138 +7523,18 @@ namespace Trinity.Reference
         /// </summary>
         public static Item ArchfiendArrows = new Item
         {
-            Id = 0,
+            Id = 197626,
             Name = "Archfiend Arrows",
             Quality = ItemQuality.Legendary,
             Slug = "archfiend-arrows",
             ItemType = ItemType.Quiver,
             BaseType = ItemBaseType.None,
-            InternalName = "",
+            InternalName = "Quiver_norm_unique_03",
             DataUrl = "https://us.battle.net/api/d3/data/recipe/archfiend-arrows",
             Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/archfiend-arrows",
             RelativeUrl = "/d3/en/artisan/blacksmith/recipe/archfiend-arrows",
             IsCrafted = true,
             LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// The Barber 
-        /// </summary>
-        public static Item TheBarber = new Item
-        {
-            Id = 195174,
-            Name = "The Barber",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-barber",
-            ItemType = ItemType.Dagger,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "Dagger_norm_unique_03",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-barber",
-            Url = "https://us.battle.net/d3/en/item/the-barber",
-            RelativeUrl = "/d3/en/item/the-barber",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Pig Sticker Squeal!
-        /// </summary>
-        public static Item PigSticker = new Item
-        {
-            Id = 221313,
-            Name = "Pig Sticker",
-            Quality = ItemQuality.Legendary,
-            Slug = "pig-sticker",
-            ItemType = ItemType.Dagger,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "dagger_norm_unique_06",
-            DataUrl = "https://us.battle.net/api/d3/data/item/pig-sticker",
-            Url = "https://us.battle.net/d3/en/item/pig-sticker",
-            RelativeUrl = "/d3/en/item/pig-sticker",
-            IsCrafted = false,
-            LegendaryAffix = "Squeal!",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Kill 
-        /// </summary>
-        public static Item Kill = new Item
-        {
-            Id = 192579,
-            Name = "Kill",
-            Quality = ItemQuality.Legendary,
-            Slug = "kill",
-            ItemType = ItemType.Dagger,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "Dagger_norm_unique_02",
-            DataUrl = "https://us.battle.net/api/d3/data/item/kill",
-            Url = "https://us.battle.net/d3/en/item/kill",
-            RelativeUrl = "/d3/en/item/kill",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Wizardspike Performing an attack has a 20–25% chance to hurl a Frozen Orb.
-        /// </summary>
-        public static Item Wizardspike = new Item
-        {
-            Id = 219329,
-            Name = "Wizardspike",
-            Quality = ItemQuality.Legendary,
-            Slug = "wizardspike",
-            ItemType = ItemType.Dagger,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "dagger_norm_unique_05",
-            DataUrl = "https://us.battle.net/api/d3/data/item/wizardspike",
-            Url = "https://us.battle.net/d3/en/item/wizardspike",
-            RelativeUrl = "/d3/en/item/wizardspike",
-            IsCrafted = false,
-            LegendaryAffix = "Performing an attack has a 20–25% chance to hurl a Frozen Orb.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Blood-Magic Blade Blood oozes from you.
-        /// </summary>
-        public static Item BloodmagicBlade = new Item
-        {
-            Id = 0,
-            Name = "Blood-Magic Blade",
-            Quality = ItemQuality.Legendary,
-            Slug = "bloodmagic-blade",
-            ItemType = ItemType.Dagger,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/bloodmagic-blade",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/bloodmagic-blade",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/bloodmagic-blade",
-            IsCrafted = true,
-            LegendaryAffix = "Blood oozes from you.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Blood-Magic Edge Blood oozes from you.
-        /// </summary>
-        public static Item BloodmagicEdge = new Item
-        {
-            Id = 0,
-            Name = "Blood-Magic Edge",
-            Quality = ItemQuality.Legendary,
-            Slug = "bloodmagic-edge",
-            ItemType = ItemType.Dagger,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/bloodmagic-edge",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/bloodmagic-edge",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/bloodmagic-edge",
-            IsCrafted = true,
-            LegendaryAffix = "Blood oozes from you.",
             SetName = "",
         };
 
@@ -7681,13 +7563,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item FleshTearer = new Item
         {
-            Id = 116388,
+            Id = 358801,
             Name = "Flesh Tearer",
             Quality = ItemQuality.Legendary,
             Slug = "flesh-tearer",
             ItemType = ItemType.Axe,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "Axe_norm_unique_03",
+            InternalName = "shoulderpads_norm_set_10",
             DataUrl = "https://us.battle.net/api/d3/data/item/flesh-tearer",
             Url = "https://us.battle.net/d3/en/item/flesh-tearer",
             RelativeUrl = "/d3/en/item/flesh-tearer",
@@ -7747,7 +7629,7 @@ namespace Trinity.Reference
             Slug = "the-butchers-sickle",
             ItemType = ItemType.Axe,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "axe_norm_unique_06",
+            InternalName = "Axe_norm_unique_06",
             DataUrl = "https://us.battle.net/api/d3/data/item/the-butchers-sickle",
             Url = "https://us.battle.net/d3/en/item/the-butchers-sickle",
             RelativeUrl = "/d3/en/item/the-butchers-sickle",
@@ -7837,226 +7719,6 @@ namespace Trinity.Reference
         };
 
         /// <summary>
-        /// Odyn Son 20–40% chance to Chain Lightning enemies when you hit them.
-        /// </summary>
-        public static Item OdynSon = new Item
-        {
-            Id = 188185,
-            Name = "Odyn Son",
-            Quality = ItemQuality.Legendary,
-            Slug = "odyn-son",
-            ItemType = ItemType.Mace,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "Mace_norm_unique_08",
-            DataUrl = "https://us.battle.net/api/d3/data/item/odyn-son",
-            Url = "https://us.battle.net/d3/en/item/odyn-son",
-            RelativeUrl = "/d3/en/item/odyn-son",
-            IsCrafted = false,
-            LegendaryAffix = "20–40% chance to Chain Lightning enemies when you hit them.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Nutcracker 
-        /// </summary>
-        public static Item Nutcracker = new Item
-        {
-            Id = 188169,
-            Name = "Nutcracker",
-            Quality = ItemQuality.Legendary,
-            Slug = "nutcracker",
-            ItemType = ItemType.Mace,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "Mace_norm_unique_03",
-            DataUrl = "https://us.battle.net/api/d3/data/item/nutcracker",
-            Url = "https://us.battle.net/d3/en/item/nutcracker",
-            RelativeUrl = "/d3/en/item/nutcracker",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Telranden's Hand 
-        /// </summary>
-        public static Item TelrandensHand = new Item
-        {
-            Id = 188189,
-            Name = "Telranden's Hand",
-            Quality = ItemQuality.Legendary,
-            Slug = "telrandens-hand",
-            ItemType = ItemType.Mace,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "mace_norm_unique_09",
-            DataUrl = "https://us.battle.net/api/d3/data/item/telrandens-hand",
-            Url = "https://us.battle.net/d3/en/item/telrandens-hand",
-            RelativeUrl = "/d3/en/item/telrandens-hand",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Jace's Hammer of Vigilance Increase the size of your Blessed Hammers.
-        /// </summary>
-        public static Item JacesHammerOfVigilance = new Item
-        {
-            Id = 0,
-            Name = "Jace's Hammer of Vigilance",
-            Quality = ItemQuality.Legendary,
-            Slug = "jaces-hammer-of-vigilance",
-            ItemType = ItemType.Mace,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/jaces-hammer-of-vigilance",
-            Url = "https://us.battle.net/d3/en/item/jaces-hammer-of-vigilance",
-            RelativeUrl = "/d3/en/item/jaces-hammer-of-vigilance",
-            IsCrafted = false,
-            LegendaryAffix = "Increase the size of your Blessed Hammers.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Solanium Critical Hits have a 3–4% chance to spawn a health globe.
-        /// </summary>
-        public static Item Solanium = new Item
-        {
-            Id = 271662,
-            Name = "Solanium",
-            Quality = ItemQuality.Legendary,
-            Slug = "solanium",
-            ItemType = ItemType.Mace,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "mace_norm_unique_11",
-            DataUrl = "https://us.battle.net/api/d3/data/item/solanium",
-            Url = "https://us.battle.net/d3/en/item/solanium",
-            RelativeUrl = "/d3/en/item/solanium",
-            IsCrafted = false,
-            LegendaryAffix = "Critical Hits have a 3–4% chance to spawn a health globe.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Nailbiter 
-        /// </summary>
-        public static Item Nailbiter = new Item
-        {
-            Id = 188158,
-            Name = "Nailbiter",
-            Quality = ItemQuality.Legendary,
-            Slug = "nailbiter",
-            ItemType = ItemType.Mace,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "Mace_norm_unique_02",
-            DataUrl = "https://us.battle.net/api/d3/data/item/nailbiter",
-            Url = "https://us.battle.net/d3/en/item/nailbiter",
-            RelativeUrl = "/d3/en/item/nailbiter",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Neanderthal 
-        /// </summary>
-        public static Item Neanderthal = new Item
-        {
-            Id = 102665,
-            Name = "Neanderthal",
-            Quality = ItemQuality.Legendary,
-            Slug = "neanderthal",
-            ItemType = ItemType.Mace,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "Mace_norm_unique_01",
-            DataUrl = "https://us.battle.net/api/d3/data/item/neanderthal",
-            Url = "https://us.battle.net/d3/en/item/neanderthal",
-            RelativeUrl = "/d3/en/item/neanderthal",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Echoing Fury 
-        /// </summary>
-        public static Item EchoingFury = new Item
-        {
-            Id = 188181,
-            Name = "Echoing Fury",
-            Quality = ItemQuality.Legendary,
-            Slug = "echoing-fury",
-            ItemType = ItemType.Mace,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "Mace_norm_unique_07",
-            DataUrl = "https://us.battle.net/api/d3/data/item/echoing-fury",
-            Url = "https://us.battle.net/d3/en/item/echoing-fury",
-            RelativeUrl = "/d3/en/item/echoing-fury",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Sun Keeper 
-        /// </summary>
-        public static Item SunKeeper = new Item
-        {
-            Id = 188173,
-            Name = "Sun Keeper",
-            Quality = ItemQuality.Legendary,
-            Slug = "sun-keeper",
-            ItemType = ItemType.Mace,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "Mace_norm_unique_04",
-            DataUrl = "https://us.battle.net/api/d3/data/item/sun-keeper",
-            Url = "https://us.battle.net/d3/en/item/sun-keeper",
-            RelativeUrl = "/d3/en/item/sun-keeper",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Earthshatter 20–35% chance to cause the ground to shudder when attacking.
-        /// </summary>
-        public static Item Earthshatter = new Item
-        {
-            Id = 0,
-            Name = "Earthshatter",
-            Quality = ItemQuality.Legendary,
-            Slug = "earthshatter",
-            ItemType = ItemType.Mace,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/earthshatter",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/earthshatter",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/earthshatter",
-            IsCrafted = true,
-            LegendaryAffix = "20–35% chance to cause the ground to shudder when attacking.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Devastator 
-        /// </summary>
-        public static Item Devastator = new Item
-        {
-            Id = 188177,
-            Name = "Devastator",
-            Quality = ItemQuality.Legendary,
-            Slug = "devastator",
-            ItemType = ItemType.Mace,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "Mace_norm_unique_06",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/devastator",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/devastator",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/devastator",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
         /// Scrimshaw 
         /// </summary>
         public static Item Scrimshaw = new Item
@@ -8087,7 +7749,7 @@ namespace Trinity.Reference
             Slug = "arreats-law",
             ItemType = ItemType.Spear,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "spear_norm_unique_01",
+            InternalName = "Spear_norm_unique_01",
             DataUrl = "https://us.battle.net/api/d3/data/item/arreats-law",
             Url = "https://us.battle.net/d3/en/item/arreats-law",
             RelativeUrl = "/d3/en/item/arreats-law",
@@ -8127,7 +7789,7 @@ namespace Trinity.Reference
             Slug = "empyrean-messenger",
             ItemType = ItemType.Spear,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "Spear_norm_unique_02",
+            InternalName = "spear_norm_unique_02",
             DataUrl = "https://us.battle.net/api/d3/data/item/empyrean-messenger",
             Url = "https://us.battle.net/d3/en/item/empyrean-messenger",
             RelativeUrl = "/d3/en/item/empyrean-messenger",
@@ -8141,18 +7803,458 @@ namespace Trinity.Reference
         /// </summary>
         public static Item AkaneshTheHeraldOfRighteousness = new Item
         {
-            Id = 0,
+            Id = 272043,
             Name = "Akanesh, the Herald of Righteousness",
             Quality = ItemQuality.Legendary,
             Slug = "akanesh-the-herald-of-righteousness",
             ItemType = ItemType.Spear,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
+            InternalName = "spear_norm_unique_05",
             DataUrl = "https://us.battle.net/api/d3/data/item/akanesh-the-herald-of-righteousness",
             Url = "https://us.battle.net/d3/en/item/akanesh-the-herald-of-righteousness",
             RelativeUrl = "/d3/en/item/akanesh-the-herald-of-righteousness",
             IsCrafted = false,
             LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Fleshrake 
+        /// </summary>
+        public static Item Fleshrake = new Item
+        {
+            Id = 145850,
+            Name = "Fleshrake",
+            Quality = ItemQuality.Legendary,
+            Slug = "fleshrake",
+            ItemType = ItemType.FistWeapon,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "fistWeapon_norm_unique_03",
+            DataUrl = "https://us.battle.net/api/d3/data/item/fleshrake",
+            Url = "https://us.battle.net/d3/en/item/fleshrake",
+            RelativeUrl = "/d3/en/item/fleshrake",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Rabid Strike 
+        /// </summary>
+        public static Item RabidStrike = new Item
+        {
+            Id = 196472,
+            Name = "Rabid Strike",
+            Quality = ItemQuality.Legendary,
+            Slug = "rabid-strike",
+            ItemType = ItemType.FistWeapon,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "fistweapon_norm_unique_10",
+            DataUrl = "https://us.battle.net/api/d3/data/item/rabid-strike",
+            Url = "https://us.battle.net/d3/en/item/rabid-strike",
+            RelativeUrl = "/d3/en/item/rabid-strike",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Scarbringer 
+        /// </summary>
+        public static Item Scarbringer = new Item
+        {
+            Id = 130557,
+            Name = "Scarbringer",
+            Quality = ItemQuality.Legendary,
+            Slug = "scarbringer",
+            ItemType = ItemType.FistWeapon,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "fistWeapon_norm_unique_01",
+            DataUrl = "https://us.battle.net/api/d3/data/item/scarbringer",
+            Url = "https://us.battle.net/d3/en/item/scarbringer",
+            RelativeUrl = "/d3/en/item/scarbringer",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Sledge Fist 
+        /// </summary>
+        public static Item SledgeFist = new Item
+        {
+            Id = 175938,
+            Name = "Sledge Fist",
+            Quality = ItemQuality.Legendary,
+            Slug = "sledge-fist",
+            ItemType = ItemType.FistWeapon,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "fistWeapon_norm_unique_07",
+            DataUrl = "https://us.battle.net/api/d3/data/item/sledge-fist",
+            Url = "https://us.battle.net/d3/en/item/sledge-fist",
+            RelativeUrl = "/d3/en/item/sledge-fist",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Jawbreaker When Dashing Strike hits an enemy more than 30–35 yards away, its Charge cost is refunded.
+        /// </summary>
+        public static Item Jawbreaker = new Item
+        {
+            Id = 271957,
+            Name = "Jawbreaker",
+            Quality = ItemQuality.Legendary,
+            Slug = "jawbreaker",
+            ItemType = ItemType.FistWeapon,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "fistweapon_norm_unique_14",
+            DataUrl = "https://us.battle.net/api/d3/data/item/jawbreaker",
+            Url = "https://us.battle.net/d3/en/item/jawbreaker",
+            RelativeUrl = "/d3/en/item/jawbreaker",
+            IsCrafted = false,
+            LegendaryAffix = "When Dashing Strike hits an enemy more than 30–35 yards away, its Charge cost is refunded.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Logan's Claw 
+        /// </summary>
+        public static Item LogansClaw = new Item
+        {
+            Id = 145849,
+            Name = "Logan's Claw",
+            Quality = ItemQuality.Legendary,
+            Slug = "logans-claw",
+            ItemType = ItemType.FistWeapon,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "fistweapon_norm_unique_02",
+            DataUrl = "https://us.battle.net/api/d3/data/item/logans-claw",
+            Url = "https://us.battle.net/d3/en/item/logans-claw",
+            RelativeUrl = "/d3/en/item/logans-claw",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Demon Hand 
+        /// </summary>
+        public static Item DemonHand = new Item
+        {
+            Id = 0,
+            Name = "Demon Hand",
+            Quality = ItemQuality.Legendary,
+            Slug = "demon-hand",
+            ItemType = ItemType.FistWeapon,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/demon-hand",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/demon-hand",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/demon-hand",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Crystal Fist 
+        /// </summary>
+        public static Item CrystalFist = new Item
+        {
+            Id = 175939,
+            Name = "Crystal Fist",
+            Quality = ItemQuality.Legendary,
+            Slug = "crystal-fist",
+            ItemType = ItemType.FistWeapon,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "fistWeapon_norm_unique_08",
+            DataUrl = "https://us.battle.net/api/d3/data/item/crystal-fist",
+            Url = "https://us.battle.net/d3/en/item/crystal-fist",
+            RelativeUrl = "/d3/en/item/crystal-fist",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// The Fist of Az'Turrasq Exploding Palm's on-death explosion damage is increased by 75–100%.
+        /// </summary>
+        public static Item TheFistOfAzturrasq = new Item
+        {
+            Id = 175937,
+            Name = "The Fist of Az'Turrasq",
+            Quality = ItemQuality.Legendary,
+            Slug = "the-fist-of-azturrasq",
+            ItemType = ItemType.FistWeapon,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "fistWeapon_norm_unique_06",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-fist-of-azturrasq",
+            Url = "https://us.battle.net/d3/en/item/the-fist-of-azturrasq",
+            RelativeUrl = "/d3/en/item/the-fist-of-azturrasq",
+            IsCrafted = false,
+            LegendaryAffix = "Exploding Palm's on-death explosion damage is increased by 75–100%.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Won Khim Lau 
+        /// </summary>
+        public static Item WonKhimLau = new Item
+        {
+            Id = 145851,
+            Name = "Won Khim Lau",
+            Quality = ItemQuality.Legendary,
+            Slug = "won-khim-lau",
+            ItemType = ItemType.FistWeapon,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "fistWeapon_norm_unique_04",
+            DataUrl = "https://us.battle.net/api/d3/data/item/won-khim-lau",
+            Url = "https://us.battle.net/d3/en/item/won-khim-lau",
+            RelativeUrl = "/d3/en/item/won-khim-lau",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Shenlong's Fist of Legend 
+        /// </summary>
+        public static Item ShenlongsFistOfLegend = new Item
+        {
+            Id = 208996,
+            Name = "Shenlong's Fist of Legend",
+            Quality = ItemQuality.Legendary,
+            Slug = "shenlongs-fist-of-legend",
+            ItemType = ItemType.FistWeapon,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "fistWeapon_norm_unique_12",
+            DataUrl = "https://us.battle.net/api/d3/data/item/shenlongs-fist-of-legend",
+            Url = "https://us.battle.net/d3/en/item/shenlongs-fist-of-legend",
+            RelativeUrl = "/d3/en/item/shenlongs-fist-of-legend",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Shenlong's Spirit",
+        };
+
+        /// <summary>
+        /// Shenlong's Relentless Assault 
+        /// </summary>
+        public static Item ShenlongsRelentlessAssault = new Item
+        {
+            Id = 208898,
+            Name = "Shenlong's Relentless Assault",
+            Quality = ItemQuality.Legendary,
+            Slug = "shenlongs-relentless-assault",
+            ItemType = ItemType.FistWeapon,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "fistWeapon_norm_unique_11",
+            DataUrl = "https://us.battle.net/api/d3/data/item/shenlongs-relentless-assault",
+            Url = "https://us.battle.net/d3/en/item/shenlongs-relentless-assault",
+            RelativeUrl = "/d3/en/item/shenlongs-relentless-assault",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Shenlong's Spirit",
+        };
+
+        /// <summary>
+        /// Hallowed Hand 
+        /// </summary>
+        public static Item HallowedHand = new Item
+        {
+            Id = 0,
+            Name = "Hallowed Hand",
+            Quality = ItemQuality.Legendary,
+            Slug = "hallowed-touch",
+            ItemType = ItemType.FistWeapon,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/hallowed-touch",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/hallowed-touch",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/hallowed-touch",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Hallowed Defenders",
+        };
+
+        /// <summary>
+        /// Vengeful Wind Increases the maximum stack count of Sweeping Wind by 3.
+        /// </summary>
+        public static Item VengefulWind = new Item
+        {
+            Id = 403775,
+            Name = "Vengeful Wind",
+            Quality = ItemQuality.Legendary,
+            Slug = "vengeful-wind",
+            ItemType = ItemType.FistWeapon,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "p1_fistWeapon_norm_unique_02",
+            DataUrl = "https://us.battle.net/api/d3/data/item/vengeful-wind",
+            Url = "https://us.battle.net/d3/en/item/vengeful-wind",
+            RelativeUrl = "/d3/en/item/vengeful-wind",
+            IsCrafted = false,
+            LegendaryAffix = "Increases the maximum stack count of Sweeping Wind by 3.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Demon Claw 
+        /// </summary>
+        public static Item DemonClaw = new Item
+        {
+            Id = 0,
+            Name = "Demon Claw",
+            Quality = ItemQuality.Legendary,
+            Slug = "demon-claw",
+            ItemType = ItemType.FistWeapon,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/demon-claw",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/demon-claw",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/demon-claw",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Hallowed Hold 
+        /// </summary>
+        public static Item HallowedHold = new Item
+        {
+            Id = 0,
+            Name = "Hallowed Hold",
+            Quality = ItemQuality.Legendary,
+            Slug = "hallowed-hold",
+            ItemType = ItemType.FistWeapon,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/hallowed-hold",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/hallowed-hold",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/hallowed-hold",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Hallowed Protectors",
+        };
+
+        /// <summary>
+        /// The Barber 
+        /// </summary>
+        public static Item TheBarber = new Item
+        {
+            Id = 195174,
+            Name = "The Barber",
+            Quality = ItemQuality.Legendary,
+            Slug = "the-barber",
+            ItemType = ItemType.Dagger,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "Dagger_norm_unique_03",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-barber",
+            Url = "https://us.battle.net/d3/en/item/the-barber",
+            RelativeUrl = "/d3/en/item/the-barber",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Pig Sticker Squeal!
+        /// </summary>
+        public static Item PigSticker = new Item
+        {
+            Id = 221313,
+            Name = "Pig Sticker",
+            Quality = ItemQuality.Legendary,
+            Slug = "pig-sticker",
+            ItemType = ItemType.Dagger,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "dagger_norm_unique_06",
+            DataUrl = "https://us.battle.net/api/d3/data/item/pig-sticker",
+            Url = "https://us.battle.net/d3/en/item/pig-sticker",
+            RelativeUrl = "/d3/en/item/pig-sticker",
+            IsCrafted = false,
+            LegendaryAffix = "Squeal!",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Kill 
+        /// </summary>
+        public static Item Kill = new Item
+        {
+            Id = 192579,
+            Name = "Kill",
+            Quality = ItemQuality.Legendary,
+            Slug = "kill",
+            ItemType = ItemType.Dagger,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "Dagger_norm_unique_02",
+            DataUrl = "https://us.battle.net/api/d3/data/item/kill",
+            Url = "https://us.battle.net/d3/en/item/kill",
+            RelativeUrl = "/d3/en/item/kill",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Wizardspike Performing an attack has a 20–25% chance to hurl a Frozen Orb.
+        /// </summary>
+        public static Item Wizardspike = new Item
+        {
+            Id = 219329,
+            Name = "Wizardspike",
+            Quality = ItemQuality.Legendary,
+            Slug = "wizardspike",
+            ItemType = ItemType.Dagger,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "Dagger_norm_unique_05",
+            DataUrl = "https://us.battle.net/api/d3/data/item/wizardspike",
+            Url = "https://us.battle.net/d3/en/item/wizardspike",
+            RelativeUrl = "/d3/en/item/wizardspike",
+            IsCrafted = false,
+            LegendaryAffix = "Performing an attack has a 20–25% chance to hurl a Frozen Orb.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Blood-Magic Blade Blood oozes from you.
+        /// </summary>
+        public static Item BloodmagicBlade = new Item
+        {
+            Id = 0,
+            Name = "Blood-Magic Blade",
+            Quality = ItemQuality.Legendary,
+            Slug = "bloodmagic-blade",
+            ItemType = ItemType.Dagger,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/bloodmagic-blade",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/bloodmagic-blade",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/bloodmagic-blade",
+            IsCrafted = true,
+            LegendaryAffix = "Blood oozes from you.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Blood-Magic Edge Blood oozes from you.
+        /// </summary>
+        public static Item BloodmagicEdge = new Item
+        {
+            Id = 0,
+            Name = "Blood-Magic Edge",
+            Quality = ItemQuality.Legendary,
+            Slug = "bloodmagic-edge",
+            ItemType = ItemType.Dagger,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/bloodmagic-edge",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/bloodmagic-edge",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/bloodmagic-edge",
+            IsCrafted = true,
+            LegendaryAffix = "Blood oozes from you.",
             SetName = "",
         };
 
@@ -8181,13 +8283,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item UmbralOath = new Item
         {
-            Id = 0,
+            Id = 192540,
             Name = "Umbral Oath",
             Quality = ItemQuality.Legendary,
             Slug = "umbral-oath",
             ItemType = ItemType.CeremonialDagger,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
+            InternalName = "ceremonialDagger_norm_unique_01",
             DataUrl = "https://us.battle.net/api/d3/data/recipe/umbral-oath",
             Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/umbral-oath",
             RelativeUrl = "/d3/en/artisan/blacksmith/recipe/umbral-oath",
@@ -8221,13 +8323,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item SacredHarvester = new Item
         {
-            Id = 0,
+            Id = 403748,
             Name = "Sacred Harvester",
             Quality = ItemQuality.Legendary,
             Slug = "sacred-harvester",
             ItemType = ItemType.CeremonialDagger,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
+            InternalName = "p1_ceremonialDagger_norm_unique_01",
             DataUrl = "https://us.battle.net/api/d3/data/item/sacred-harvester",
             Url = "https://us.battle.net/d3/en/item/sacred-harvester",
             RelativeUrl = "/d3/en/item/sacred-harvester",
@@ -8241,13 +8343,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item TheDaggerOfDarts = new Item
         {
-            Id = 0,
+            Id = 403767,
             Name = "The Dagger of Darts",
             Quality = ItemQuality.Legendary,
             Slug = "the-dagger-of-darts",
             ItemType = ItemType.CeremonialDagger,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
+            InternalName = "p1_ceremonialDagger_norm_unique_02",
             DataUrl = "https://us.battle.net/api/d3/data/item/the-dagger-of-darts",
             Url = "https://us.battle.net/d3/en/item/the-dagger-of-darts",
             RelativeUrl = "/d3/en/item/the-dagger-of-darts",
@@ -8281,13 +8383,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item TheSpiderQueensGrasp = new Item
         {
-            Id = 0,
+            Id = 222978,
             Name = "The Spider Queen's Grasp",
             Quality = ItemQuality.Legendary,
             Slug = "the-spider-queens-grasp",
             ItemType = ItemType.CeremonialDagger,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
+            InternalName = "ceremonialDagger_norm_unique_05",
             DataUrl = "https://us.battle.net/api/d3/data/item/the-spider-queens-grasp",
             Url = "https://us.battle.net/d3/en/item/the-spider-queens-grasp",
             RelativeUrl = "/d3/en/item/the-spider-queens-grasp",
@@ -8437,323 +8539,223 @@ namespace Trinity.Reference
         };
 
         /// <summary>
-        /// Fleshrake 
+        /// Odyn Son 20–40% chance to Chain Lightning enemies when you hit them.
         /// </summary>
-        public static Item Fleshrake = new Item
+        public static Item OdynSon = new Item
         {
-            Id = 0,
-            Name = "Fleshrake",
+            Id = 188185,
+            Name = "Odyn Son",
             Quality = ItemQuality.Legendary,
-            Slug = "fleshrake",
-            ItemType = ItemType.FistWeapon,
+            Slug = "odyn-son",
+            ItemType = ItemType.Mace,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/fleshrake",
-            Url = "https://us.battle.net/d3/en/item/fleshrake",
-            RelativeUrl = "/d3/en/item/fleshrake",
+            InternalName = "Mace_norm_unique_08",
+            DataUrl = "https://us.battle.net/api/d3/data/item/odyn-son",
+            Url = "https://us.battle.net/d3/en/item/odyn-son",
+            RelativeUrl = "/d3/en/item/odyn-son",
+            IsCrafted = false,
+            LegendaryAffix = "20–40% chance to Chain Lightning enemies when you hit them.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Nutcracker 
+        /// </summary>
+        public static Item Nutcracker = new Item
+        {
+            Id = 188169,
+            Name = "Nutcracker",
+            Quality = ItemQuality.Legendary,
+            Slug = "nutcracker",
+            ItemType = ItemType.Mace,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "Mace_norm_unique_03",
+            DataUrl = "https://us.battle.net/api/d3/data/item/nutcracker",
+            Url = "https://us.battle.net/d3/en/item/nutcracker",
+            RelativeUrl = "/d3/en/item/nutcracker",
             IsCrafted = false,
             LegendaryAffix = "",
             SetName = "",
         };
 
         /// <summary>
-        /// Rabid Strike 
+        /// Telranden's Hand 
         /// </summary>
-        public static Item RabidStrike = new Item
+        public static Item TelrandensHand = new Item
         {
-            Id = 0,
-            Name = "Rabid Strike",
+            Id = 188189,
+            Name = "Telranden's Hand",
             Quality = ItemQuality.Legendary,
-            Slug = "rabid-strike",
-            ItemType = ItemType.FistWeapon,
+            Slug = "telrandens-hand",
+            ItemType = ItemType.Mace,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/rabid-strike",
-            Url = "https://us.battle.net/d3/en/item/rabid-strike",
-            RelativeUrl = "/d3/en/item/rabid-strike",
+            InternalName = "Mace_norm_unique_09",
+            DataUrl = "https://us.battle.net/api/d3/data/item/telrandens-hand",
+            Url = "https://us.battle.net/d3/en/item/telrandens-hand",
+            RelativeUrl = "/d3/en/item/telrandens-hand",
             IsCrafted = false,
             LegendaryAffix = "",
             SetName = "",
         };
 
         /// <summary>
-        /// Scarbringer 
+        /// Jace's Hammer of Vigilance Increase the size of your Blessed Hammers.
         /// </summary>
-        public static Item Scarbringer = new Item
+        public static Item JacesHammerOfVigilance = new Item
         {
-            Id = 0,
-            Name = "Scarbringer",
+            Id = 271648,
+            Name = "Jace's Hammer of Vigilance",
             Quality = ItemQuality.Legendary,
-            Slug = "scarbringer",
-            ItemType = ItemType.FistWeapon,
+            Slug = "jaces-hammer-of-vigilance",
+            ItemType = ItemType.Mace,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/scarbringer",
-            Url = "https://us.battle.net/d3/en/item/scarbringer",
-            RelativeUrl = "/d3/en/item/scarbringer",
+            InternalName = "mace_norm_unique_10",
+            DataUrl = "https://us.battle.net/api/d3/data/item/jaces-hammer-of-vigilance",
+            Url = "https://us.battle.net/d3/en/item/jaces-hammer-of-vigilance",
+            RelativeUrl = "/d3/en/item/jaces-hammer-of-vigilance",
+            IsCrafted = false,
+            LegendaryAffix = "Increase the size of your Blessed Hammers.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Solanium Critical Hits have a 3–4% chance to spawn a health globe.
+        /// </summary>
+        public static Item Solanium = new Item
+        {
+            Id = 271662,
+            Name = "Solanium",
+            Quality = ItemQuality.Legendary,
+            Slug = "solanium",
+            ItemType = ItemType.Mace,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "mace_norm_unique_11",
+            DataUrl = "https://us.battle.net/api/d3/data/item/solanium",
+            Url = "https://us.battle.net/d3/en/item/solanium",
+            RelativeUrl = "/d3/en/item/solanium",
+            IsCrafted = false,
+            LegendaryAffix = "Critical Hits have a 3–4% chance to spawn a health globe.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Nailbiter 
+        /// </summary>
+        public static Item Nailbiter = new Item
+        {
+            Id = 188158,
+            Name = "Nailbiter",
+            Quality = ItemQuality.Legendary,
+            Slug = "nailbiter",
+            ItemType = ItemType.Mace,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "Mace_norm_unique_02",
+            DataUrl = "https://us.battle.net/api/d3/data/item/nailbiter",
+            Url = "https://us.battle.net/d3/en/item/nailbiter",
+            RelativeUrl = "/d3/en/item/nailbiter",
             IsCrafted = false,
             LegendaryAffix = "",
             SetName = "",
         };
 
         /// <summary>
-        /// Sledge Fist 
+        /// Neanderthal 
         /// </summary>
-        public static Item SledgeFist = new Item
+        public static Item Neanderthal = new Item
         {
-            Id = 0,
-            Name = "Sledge Fist",
+            Id = 102665,
+            Name = "Neanderthal",
             Quality = ItemQuality.Legendary,
-            Slug = "sledge-fist",
-            ItemType = ItemType.FistWeapon,
+            Slug = "neanderthal",
+            ItemType = ItemType.Mace,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/sledge-fist",
-            Url = "https://us.battle.net/d3/en/item/sledge-fist",
-            RelativeUrl = "/d3/en/item/sledge-fist",
+            InternalName = "Mace_norm_unique_01",
+            DataUrl = "https://us.battle.net/api/d3/data/item/neanderthal",
+            Url = "https://us.battle.net/d3/en/item/neanderthal",
+            RelativeUrl = "/d3/en/item/neanderthal",
             IsCrafted = false,
             LegendaryAffix = "",
             SetName = "",
         };
 
         /// <summary>
-        /// Jawbreaker When Dashing Strike hits an enemy more than 30–35 yards away, its Charge cost is refunded.
+        /// Echoing Fury 
         /// </summary>
-        public static Item Jawbreaker = new Item
+        public static Item EchoingFury = new Item
         {
-            Id = 0,
-            Name = "Jawbreaker",
+            Id = 188181,
+            Name = "Echoing Fury",
             Quality = ItemQuality.Legendary,
-            Slug = "jawbreaker",
-            ItemType = ItemType.FistWeapon,
+            Slug = "echoing-fury",
+            ItemType = ItemType.Mace,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/jawbreaker",
-            Url = "https://us.battle.net/d3/en/item/jawbreaker",
-            RelativeUrl = "/d3/en/item/jawbreaker",
-            IsCrafted = false,
-            LegendaryAffix = "When Dashing Strike hits an enemy more than 30–35 yards away, its Charge cost is refunded.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Logan's Claw 
-        /// </summary>
-        public static Item LogansClaw = new Item
-        {
-            Id = 0,
-            Name = "Logan's Claw",
-            Quality = ItemQuality.Legendary,
-            Slug = "logans-claw",
-            ItemType = ItemType.FistWeapon,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/logans-claw",
-            Url = "https://us.battle.net/d3/en/item/logans-claw",
-            RelativeUrl = "/d3/en/item/logans-claw",
+            InternalName = "Mace_norm_unique_07",
+            DataUrl = "https://us.battle.net/api/d3/data/item/echoing-fury",
+            Url = "https://us.battle.net/d3/en/item/echoing-fury",
+            RelativeUrl = "/d3/en/item/echoing-fury",
             IsCrafted = false,
             LegendaryAffix = "",
             SetName = "",
         };
 
         /// <summary>
-        /// Demon Hand 
+        /// Sun Keeper 
         /// </summary>
-        public static Item DemonHand = new Item
+        public static Item SunKeeper = new Item
         {
             Id = 0,
-            Name = "Demon Hand",
+            Name = "Sun Keeper",
             Quality = ItemQuality.Legendary,
-            Slug = "demon-hand",
-            ItemType = ItemType.FistWeapon,
+            Slug = "sun-keeper",
+            ItemType = ItemType.Mace,
             BaseType = ItemBaseType.Weapon,
             InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/demon-hand",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/demon-hand",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/demon-hand",
+            DataUrl = "https://us.battle.net/api/d3/data/item/sun-keeper",
+            Url = "https://us.battle.net/d3/en/item/sun-keeper",
+            RelativeUrl = "/d3/en/item/sun-keeper",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Earthshatter 20–35% chance to cause the ground to shudder when attacking.
+        /// </summary>
+        public static Item Earthshatter = new Item
+        {
+            Id = 0,
+            Name = "Earthshatter",
+            Quality = ItemQuality.Legendary,
+            Slug = "earthshatter",
+            ItemType = ItemType.Mace,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/earthshatter",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/earthshatter",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/earthshatter",
+            IsCrafted = true,
+            LegendaryAffix = "20–35% chance to cause the ground to shudder when attacking.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Devastator 
+        /// </summary>
+        public static Item Devastator = new Item
+        {
+            Id = 188177,
+            Name = "Devastator",
+            Quality = ItemQuality.Legendary,
+            Slug = "devastator",
+            ItemType = ItemType.Mace,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "Mace_norm_unique_06",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/devastator",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/devastator",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/devastator",
             IsCrafted = true,
             LegendaryAffix = "",
             SetName = "",
-        };
-
-        /// <summary>
-        /// Crystal Fist 
-        /// </summary>
-        public static Item CrystalFist = new Item
-        {
-            Id = 0,
-            Name = "Crystal Fist",
-            Quality = ItemQuality.Legendary,
-            Slug = "crystal-fist",
-            ItemType = ItemType.FistWeapon,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/crystal-fist",
-            Url = "https://us.battle.net/d3/en/item/crystal-fist",
-            RelativeUrl = "/d3/en/item/crystal-fist",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// The Fist of Az'Turrasq Exploding Palm's on-death explosion damage is increased by 75–100%.
-        /// </summary>
-        public static Item TheFistOfAzturrasq = new Item
-        {
-            Id = 0,
-            Name = "The Fist of Az'Turrasq",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-fist-of-azturrasq",
-            ItemType = ItemType.FistWeapon,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-fist-of-azturrasq",
-            Url = "https://us.battle.net/d3/en/item/the-fist-of-azturrasq",
-            RelativeUrl = "/d3/en/item/the-fist-of-azturrasq",
-            IsCrafted = false,
-            LegendaryAffix = "Exploding Palm's on-death explosion damage is increased by 75–100%.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Won Khim Lau 
-        /// </summary>
-        public static Item WonKhimLau = new Item
-        {
-            Id = 0,
-            Name = "Won Khim Lau",
-            Quality = ItemQuality.Legendary,
-            Slug = "won-khim-lau",
-            ItemType = ItemType.FistWeapon,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/won-khim-lau",
-            Url = "https://us.battle.net/d3/en/item/won-khim-lau",
-            RelativeUrl = "/d3/en/item/won-khim-lau",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Shenlong's Fist of Legend 
-        /// </summary>
-        public static Item ShenlongsFistOfLegend = new Item
-        {
-            Id = 208996,
-            Name = "Shenlong's Fist of Legend",
-            Quality = ItemQuality.Legendary,
-            Slug = "shenlongs-fist-of-legend",
-            ItemType = ItemType.FistWeapon,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "fistWeapon_norm_unique_12",
-            DataUrl = "https://us.battle.net/api/d3/data/item/shenlongs-fist-of-legend",
-            Url = "https://us.battle.net/d3/en/item/shenlongs-fist-of-legend",
-            RelativeUrl = "/d3/en/item/shenlongs-fist-of-legend",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Shenlong's Spirit",
-        };
-
-        /// <summary>
-        /// Shenlong's Relentless Assault 
-        /// </summary>
-        public static Item ShenlongsRelentlessAssault = new Item
-        {
-            Id = 0,
-            Name = "Shenlong's Relentless Assault",
-            Quality = ItemQuality.Legendary,
-            Slug = "shenlongs-relentless-assault",
-            ItemType = ItemType.FistWeapon,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/shenlongs-relentless-assault",
-            Url = "https://us.battle.net/d3/en/item/shenlongs-relentless-assault",
-            RelativeUrl = "/d3/en/item/shenlongs-relentless-assault",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Shenlong's Spirit",
-        };
-
-        /// <summary>
-        /// Hallowed Hand 
-        /// </summary>
-        public static Item HallowedHand = new Item
-        {
-            Id = 0,
-            Name = "Hallowed Hand",
-            Quality = ItemQuality.Legendary,
-            Slug = "hallowed-touch",
-            ItemType = ItemType.FistWeapon,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/hallowed-touch",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/hallowed-touch",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/hallowed-touch",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Hallowed Defenders",
-        };
-
-        /// <summary>
-        /// Vengeful Wind Increases the maximum stack count of Sweeping Wind by 3.
-        /// </summary>
-        public static Item VengefulWind = new Item
-        {
-            Id = 0,
-            Name = "Vengeful Wind",
-            Quality = ItemQuality.Legendary,
-            Slug = "vengeful-wind",
-            ItemType = ItemType.FistWeapon,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/vengeful-wind",
-            Url = "https://us.battle.net/d3/en/item/vengeful-wind",
-            RelativeUrl = "/d3/en/item/vengeful-wind",
-            IsCrafted = false,
-            LegendaryAffix = "Increases the maximum stack count of Sweeping Wind by 3.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Demon Claw 
-        /// </summary>
-        public static Item DemonClaw = new Item
-        {
-            Id = 0,
-            Name = "Demon Claw",
-            Quality = ItemQuality.Legendary,
-            Slug = "demon-claw",
-            ItemType = ItemType.FistWeapon,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/demon-claw",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/demon-claw",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/demon-claw",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Hallowed Hold 
-        /// </summary>
-        public static Item HallowedHold = new Item
-        {
-            Id = 0,
-            Name = "Hallowed Hold",
-            Quality = ItemQuality.Legendary,
-            Slug = "hallowed-hold",
-            ItemType = ItemType.FistWeapon,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/hallowed-hold",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/hallowed-hold",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/hallowed-hold",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Hallowed Protectors",
         };
 
         /// <summary>
@@ -8781,13 +8783,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item GyrfalconsFoote = new Item
         {
-            Id = 0,
+            Id = 299427,
             Name = "Gyrfalcon's Foote",
             Quality = ItemQuality.Legendary,
             Slug = "gyrfalcons-foote",
             ItemType = ItemType.Flail,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
+            InternalName = "flail1h_norm_unique_05",
             DataUrl = "https://us.battle.net/api/d3/data/item/gyrfalcons-foote",
             Url = "https://us.battle.net/d3/en/item/gyrfalcons-foote",
             RelativeUrl = "/d3/en/item/gyrfalcons-foote",
@@ -8861,13 +8863,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item Swiftmount = new Item
         {
-            Id = 0,
+            Id = 299425,
             Name = "Swiftmount",
             Quality = ItemQuality.Legendary,
             Slug = "swiftmount",
             ItemType = ItemType.Flail,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
+            InternalName = "flail1h_norm_unique_03",
             DataUrl = "https://us.battle.net/api/d3/data/item/swiftmount",
             Url = "https://us.battle.net/d3/en/item/swiftmount",
             RelativeUrl = "/d3/en/item/swiftmount",
@@ -8894,6 +8896,406 @@ namespace Trinity.Reference
             IsCrafted = true,
             LegendaryAffix = "Smite now jumps to 3 additional enemies.",
             SetName = "",
+        };
+
+        /// <summary>
+        /// Monster Hunter 
+        /// </summary>
+        public static Item MonsterHunter = new Item
+        {
+            Id = 115140,
+            Name = "Monster Hunter",
+            Quality = ItemQuality.Legendary,
+            Slug = "monster-hunter",
+            ItemType = ItemType.Sword,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "Sword_norm_unique_01",
+            DataUrl = "https://us.battle.net/api/d3/data/item/monster-hunter",
+            Url = "https://us.battle.net/d3/en/item/monster-hunter",
+            RelativeUrl = "/d3/en/item/monster-hunter",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Wildwood 
+        /// </summary>
+        public static Item Wildwood = new Item
+        {
+            Id = 0,
+            Name = "Wildwood",
+            Quality = ItemQuality.Legendary,
+            Slug = "wildwood",
+            ItemType = ItemType.Sword,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/wildwood",
+            Url = "https://us.battle.net/d3/en/item/wildwood",
+            RelativeUrl = "/d3/en/item/wildwood",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Born's Searing Spite 
+        /// </summary>
+        public static Item BornsSearingSpite = new Item
+        {
+            Id = 0,
+            Name = "Born's Searing Spite",
+            Quality = ItemQuality.Legendary,
+            Slug = "borns-seething-rage",
+            ItemType = ItemType.Sword,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/borns-seething-rage",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/borns-seething-rage",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/borns-seething-rage",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Born's Defiance",
+        };
+
+        /// <summary>
+        /// Doombringer 
+        /// </summary>
+        public static Item Doombringer = new Item
+        {
+            Id = 185397,
+            Name = "Doombringer",
+            Quality = ItemQuality.Legendary,
+            Slug = "doombringer",
+            ItemType = ItemType.Sword,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "sword_norm_unique_07",
+            DataUrl = "https://us.battle.net/api/d3/data/item/doombringer",
+            Url = "https://us.battle.net/d3/en/item/doombringer",
+            RelativeUrl = "/d3/en/item/doombringer",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// The Ancient Bonesaber of Zumakalis 
+        /// </summary>
+        public static Item TheAncientBonesaberOfZumakalis = new Item
+        {
+            Id = 194481,
+            Name = "The Ancient Bonesaber of Zumakalis",
+            Quality = ItemQuality.Legendary,
+            Slug = "the-ancient-bonesaber-of-zumakalis",
+            ItemType = ItemType.Sword,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "Sword_norm_unique_08",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-ancient-bonesaber-of-zumakalis",
+            Url = "https://us.battle.net/d3/en/item/the-ancient-bonesaber-of-zumakalis",
+            RelativeUrl = "/d3/en/item/the-ancient-bonesaber-of-zumakalis",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Exarian 
+        /// </summary>
+        public static Item Exarian = new Item
+        {
+            Id = 271617,
+            Name = "Exarian",
+            Quality = ItemQuality.Legendary,
+            Slug = "exarian",
+            ItemType = ItemType.Sword,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "sword_norm_unique_13",
+            DataUrl = "https://us.battle.net/api/d3/data/item/exarian",
+            Url = "https://us.battle.net/d3/en/item/exarian",
+            RelativeUrl = "/d3/en/item/exarian",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Fulminator Lightning damage has a chance to turn enemies into lightning rods, causing them to pulse 167–222% weapon damage as Lightning every second to nearby enemies for 6 seconds.
+        /// </summary>
+        public static Item Fulminator = new Item
+        {
+            Id = 271631,
+            Name = "Fulminator",
+            Quality = ItemQuality.Legendary,
+            Slug = "fulminator",
+            ItemType = ItemType.Sword,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "sword_norm_unique_15",
+            DataUrl = "https://us.battle.net/api/d3/data/item/fulminator",
+            Url = "https://us.battle.net/d3/en/item/fulminator",
+            RelativeUrl = "/d3/en/item/fulminator",
+            IsCrafted = false,
+            LegendaryAffix = "Lightning damage has a chance to turn enemies into lightning rods, causing them to pulse 167–222% weapon damage as Lightning every second to nearby enemies for 6 seconds.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Gift of Silaria 
+        /// </summary>
+        public static Item GiftOfSilaria = new Item
+        {
+            Id = 271630,
+            Name = "Gift of Silaria",
+            Quality = ItemQuality.Legendary,
+            Slug = "gift-of-silaria",
+            ItemType = ItemType.Sword,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "sword_norm_unique_14",
+            DataUrl = "https://us.battle.net/api/d3/data/item/gift-of-silaria",
+            Url = "https://us.battle.net/d3/en/item/gift-of-silaria",
+            RelativeUrl = "/d3/en/item/gift-of-silaria",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Rimeheart 10% chance on hit to instantly deal 10000% weapon damage as Cold to enemies that are Frozen.
+        /// </summary>
+        public static Item Rimeheart = new Item
+        {
+            Id = 271636,
+            Name = "Rimeheart",
+            Quality = ItemQuality.Legendary,
+            Slug = "rimeheart",
+            ItemType = ItemType.Sword,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "sword_norm_unique_20",
+            DataUrl = "https://us.battle.net/api/d3/data/item/rimeheart",
+            Url = "https://us.battle.net/d3/en/item/rimeheart",
+            RelativeUrl = "/d3/en/item/rimeheart",
+            IsCrafted = false,
+            LegendaryAffix = "10% chance on hit to instantly deal 10000% weapon damage as Cold to enemies that are Frozen.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Thunderfury, Blessed Blade of the Windseeker Chance on hit to blast your enemy with Lightning, dealing 279–372% weapon damage as Lightning and then jumping to additional nearby enemies. Each enemy hit has their attack speed and movement speed reduced by 30% for 3 seconds. Jumps up to 5 targets.
+        /// </summary>
+        public static Item ThunderfuryBlessedBladeOfTheWindseeker = new Item
+        {
+            Id = 229716,
+            Name = "Thunderfury, Blessed Blade of the Windseeker",
+            Quality = ItemQuality.Legendary,
+            Slug = "thunderfury-blessed-blade-of-the-windseeker",
+            ItemType = ItemType.Sword,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "sword_norm_unique_12",
+            DataUrl = "https://us.battle.net/api/d3/data/item/thunderfury-blessed-blade-of-the-windseeker",
+            Url = "https://us.battle.net/d3/en/item/thunderfury-blessed-blade-of-the-windseeker",
+            RelativeUrl = "/d3/en/item/thunderfury-blessed-blade-of-the-windseeker",
+            IsCrafted = false,
+            LegendaryAffix = "Chance on hit to blast your enemy with Lightning, dealing 279–372% weapon damage as Lightning and then jumping to additional nearby enemies. Each enemy hit has their attack speed and movement speed reduced by 30% for 3 seconds. Jumps up to 5 targets.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Sever Slain enemies rest in pieces.
+        /// </summary>
+        public static Item Sever = new Item
+        {
+            Id = 115141,
+            Name = "Sever",
+            Quality = ItemQuality.Legendary,
+            Slug = "sever",
+            ItemType = ItemType.Sword,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "Sword_norm_unique_02",
+            DataUrl = "https://us.battle.net/api/d3/data/item/sever",
+            Url = "https://us.battle.net/d3/en/item/sever",
+            RelativeUrl = "/d3/en/item/sever",
+            IsCrafted = false,
+            LegendaryAffix = "Slain enemies rest in pieces.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Skycutter Chance to summon angelic assistance when attacking.
+        /// </summary>
+        public static Item Skycutter = new Item
+        {
+            Id = 182347,
+            Name = "Skycutter",
+            Quality = ItemQuality.Legendary,
+            Slug = "skycutter",
+            ItemType = ItemType.Sword,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "Sword_norm_unique_04",
+            DataUrl = "https://us.battle.net/api/d3/data/item/skycutter",
+            Url = "https://us.battle.net/d3/en/item/skycutter",
+            RelativeUrl = "/d3/en/item/skycutter",
+            IsCrafted = false,
+            LegendaryAffix = "Chance to summon angelic assistance when attacking.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Azurewrath Undead enemies within 25 yards take 30–40% weapon damage as Holy every second and are sometimes knocked back.
+        /// </summary>
+        public static Item Azurewrath = new Item
+        {
+            Id = 192511,
+            Name = "Azurewrath",
+            Quality = ItemQuality.Legendary,
+            Slug = "azurewrath",
+            ItemType = ItemType.Sword,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "sword_norm_unique_06",
+            DataUrl = "https://us.battle.net/api/d3/data/item/azurewrath",
+            Url = "https://us.battle.net/d3/en/item/azurewrath",
+            RelativeUrl = "/d3/en/item/azurewrath",
+            IsCrafted = false,
+            LegendaryAffix = "Undead enemies within 25 yards take 30–40% weapon damage as Holy every second and are sometimes knocked back.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Devil Tongue 
+        /// </summary>
+        public static Item DevilTongue = new Item
+        {
+            Id = 189552,
+            Name = "Devil Tongue",
+            Quality = ItemQuality.Legendary,
+            Slug = "devil-tongue",
+            ItemType = ItemType.Sword,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "Sword_norm_unique_05",
+            DataUrl = "https://us.battle.net/api/d3/data/item/devil-tongue",
+            Url = "https://us.battle.net/d3/en/item/devil-tongue",
+            RelativeUrl = "/d3/en/item/devil-tongue",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Griswold's Masterpiece 
+        /// </summary>
+        public static Item GriswoldsMasterpiece = new Item
+        {
+            Id = 0,
+            Name = "Griswold's Masterpiece",
+            Quality = ItemQuality.Legendary,
+            Slug = "griswolds-masterpiece",
+            ItemType = ItemType.Sword,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/griswolds-masterpiece",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/griswolds-masterpiece",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/griswolds-masterpiece",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Shard of Hate Elemental skills have a chance to trigger a powerful attack that deals 200–250% weapon damage: Cold skills trigger Freezing Skull Poison skills trigger Poison Nova Lightning skills trigger Charged Bolt
+        /// </summary>
+        public static Item ShardOfHate = new Item
+        {
+            Id = 376463,
+            Name = "Shard of Hate",
+            Quality = ItemQuality.Legendary,
+            Slug = "shard-of-hate",
+            ItemType = ItemType.Sword,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "sword_norm_promo_02",
+            DataUrl = "https://us.battle.net/api/d3/data/item/shard-of-hate",
+            Url = "https://us.battle.net/d3/en/item/shard-of-hate",
+            RelativeUrl = "/d3/en/item/shard-of-hate",
+            IsCrafted = false,
+            LegendaryAffix = "Elemental skills have a chance to trigger a powerful attack that deals 200–250% weapon damage: Cold skills trigger Freezing Skull Poison skills trigger Poison Nova Lightning skills trigger Charged Bolt",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Little Rogue 
+        /// </summary>
+        public static Item LittleRogue = new Item
+        {
+            Id = 313291,
+            Name = "Little Rogue",
+            Quality = ItemQuality.Legendary,
+            Slug = "little-rogue",
+            ItemType = ItemType.Sword,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "sword_norm_set_03",
+            DataUrl = "https://us.battle.net/api/d3/data/item/little-rogue",
+            Url = "https://us.battle.net/d3/en/item/little-rogue",
+            RelativeUrl = "/d3/en/item/little-rogue",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Istvan's Paired Blades",
+        };
+
+        /// <summary>
+        /// The Slanderer 
+        /// </summary>
+        public static Item TheSlanderer = new Item
+        {
+            Id = 313290,
+            Name = "The Slanderer",
+            Quality = ItemQuality.Legendary,
+            Slug = "the-slanderer",
+            ItemType = ItemType.Sword,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "sword_norm_set_02",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-slanderer",
+            Url = "https://us.battle.net/d3/en/item/the-slanderer",
+            RelativeUrl = "/d3/en/item/the-slanderer",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Istvan's Paired Blades",
+        };
+
+        /// <summary>
+        /// Griswold's Perfection 
+        /// </summary>
+        public static Item GriswoldsPerfection = new Item
+        {
+            Id = 270977,
+            Name = "Griswold's Perfection",
+            Quality = ItemQuality.Legendary,
+            Slug = "griswolds-perfection",
+            ItemType = ItemType.Sword,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "Sword_norm_unique_10",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/griswolds-perfection",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/griswolds-perfection",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/griswolds-perfection",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Born's Furious Wrath 
+        /// </summary>
+        public static Item BornsFuriousWrath = new Item
+        {
+            Id = 223408,
+            Name = "Born's Furious Wrath",
+            Quality = ItemQuality.Legendary,
+            Slug = "borns-furious-wrath",
+            ItemType = ItemType.Sword,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "Sword_norm_set_01",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/borns-furious-wrath",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/borns-furious-wrath",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/borns-furious-wrath",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Born's Command",
         };
 
         /// <summary>
@@ -8927,7 +9329,7 @@ namespace Trinity.Reference
             Slug = "ambos-pride",
             ItemType = ItemType.MightyWeapon,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "mightyWeapon_1H_norm_unique_03",
+            InternalName = "mightyweapon_1h_norm_unique_03",
             DataUrl = "https://us.battle.net/api/d3/data/item/ambos-pride",
             Url = "https://us.battle.net/d3/en/item/ambos-pride",
             RelativeUrl = "/d3/en/item/ambos-pride",
@@ -8961,13 +9363,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item BladeOfTheWarlord = new Item
         {
-            Id = 0,
+            Id = 193611,
             Name = "Blade of the Warlord",
             Quality = ItemQuality.Legendary,
             Slug = "blade-of-the-warlord",
             ItemType = ItemType.MightyWeapon,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
+            InternalName = "mightyweapon_1h_norm_unique_04",
             DataUrl = "https://us.battle.net/api/d3/data/item/blade-of-the-warlord",
             Url = "https://us.battle.net/d3/en/item/blade-of-the-warlord",
             RelativeUrl = "/d3/en/item/blade-of-the-warlord",
@@ -9097,126 +9499,6 @@ namespace Trinity.Reference
         };
 
         /// <summary>
-        /// The Executioner 
-        /// </summary>
-        public static Item TheExecutioner = new Item
-        {
-            Id = 186560,
-            Name = "The Executioner",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-executioner",
-            ItemType = ItemType.Axe,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "twoHandedAxe_norm_unique_02",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-executioner",
-            Url = "https://us.battle.net/d3/en/item/the-executioner",
-            RelativeUrl = "/d3/en/item/the-executioner",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Butcher's Carver The Butcher still inhabits his carver.
-        /// </summary>
-        public static Item ButchersCarver = new Item
-        {
-            Id = 186494,
-            Name = "Butcher's Carver",
-            Quality = ItemQuality.Legendary,
-            Slug = "butchers-carver",
-            ItemType = ItemType.Axe,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "twoHandedAxe_norm_unique_03",
-            DataUrl = "https://us.battle.net/api/d3/data/item/butchers-carver",
-            Url = "https://us.battle.net/d3/en/item/butchers-carver",
-            RelativeUrl = "/d3/en/item/butchers-carver",
-            IsCrafted = false,
-            LegendaryAffix = "The Butcher still inhabits his carver.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Messerschmidt's Reaver 
-        /// </summary>
-        public static Item MesserschmidtsReaver = new Item
-        {
-            Id = 191065,
-            Name = "Messerschmidt's Reaver",
-            Quality = ItemQuality.Legendary,
-            Slug = "messerschmidts-reaver",
-            ItemType = ItemType.Axe,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "twoHandedAxe_norm_unique_04",
-            DataUrl = "https://us.battle.net/api/d3/data/item/messerschmidts-reaver",
-            Url = "https://us.battle.net/d3/en/item/messerschmidts-reaver",
-            RelativeUrl = "/d3/en/item/messerschmidts-reaver",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Skorn 
-        /// </summary>
-        public static Item Skorn = new Item
-        {
-            Id = 192887,
-            Name = "Skorn",
-            Quality = ItemQuality.Legendary,
-            Slug = "skorn",
-            ItemType = ItemType.Axe,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "twohandedaxe_norm_unique_05",
-            DataUrl = "https://us.battle.net/api/d3/data/item/skorn",
-            Url = "https://us.battle.net/d3/en/item/skorn",
-            RelativeUrl = "/d3/en/item/skorn",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Fire Brand 25–50% chance to cast a fireball when attacking.
-        /// </summary>
-        public static Item FireBrand = new Item
-        {
-            Id = 0,
-            Name = "Fire Brand",
-            Quality = ItemQuality.Legendary,
-            Slug = "fire-brand",
-            ItemType = ItemType.Axe,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/fire-brand",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/fire-brand",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/fire-brand",
-            IsCrafted = true,
-            LegendaryAffix = "25–50% chance to cast a fireball when attacking.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Cinder Switch 25–50% chance to cast a fireball when attacking.
-        /// </summary>
-        public static Item CinderSwitch = new Item
-        {
-            Id = 0,
-            Name = "Cinder Switch",
-            Quality = ItemQuality.Legendary,
-            Slug = "cinder-switch",
-            ItemType = ItemType.Axe,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/cinder-switch",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/cinder-switch",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/cinder-switch",
-            IsCrafted = true,
-            LegendaryAffix = "25–50% chance to cast a fireball when attacking.",
-            SetName = "",
-        };
-
-        /// <summary>
         /// Pledge of Caldeum 
         /// </summary>
         public static Item PledgeOfCaldeum = new Item
@@ -9287,7 +9569,7 @@ namespace Trinity.Reference
             Slug = "heart-slaughter",
             ItemType = ItemType.Polearm,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "Polearm_norm_unique_02",
+            InternalName = "polearm_norm_unique_02",
             DataUrl = "https://us.battle.net/api/d3/data/item/heart-slaughter",
             Url = "https://us.battle.net/d3/en/item/heart-slaughter",
             RelativeUrl = "/d3/en/item/heart-slaughter",
@@ -9301,13 +9583,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item Vigilance = new Item
         {
-            Id = 0,
+            Id = 195491,
             Name = "Vigilance",
             Quality = ItemQuality.Legendary,
             Slug = "vigilance",
             ItemType = ItemType.Polearm,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
+            InternalName = "Polearm_norm_unique_03",
             DataUrl = "https://us.battle.net/api/d3/data/item/vigilance",
             Url = "https://us.battle.net/d3/en/item/vigilance",
             RelativeUrl = "/d3/en/item/vigilance",
@@ -9317,182 +9599,442 @@ namespace Trinity.Reference
         };
 
         /// <summary>
-        /// Arthef's Spark of Life Heal for 3–4% of your missing Life when you kill an Undead enemy.
+        /// The Executioner 
         /// </summary>
-        public static Item ArthefsSparkOfLife = new Item
+        public static Item TheExecutioner = new Item
         {
-            Id = 59633,
-            Name = "Arthef's Spark of Life",
+            Id = 186560,
+            Name = "The Executioner",
             Quality = ItemQuality.Legendary,
-            Slug = "arthefs-spark-of-life",
-            ItemType = ItemType.Mace,
+            Slug = "the-executioner",
+            ItemType = ItemType.Axe,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "twoHandedMace_norm_unique_01",
-            DataUrl = "https://us.battle.net/api/d3/data/item/arthefs-spark-of-life",
-            Url = "https://us.battle.net/d3/en/item/arthefs-spark-of-life",
-            RelativeUrl = "/d3/en/item/arthefs-spark-of-life",
-            IsCrafted = false,
-            LegendaryAffix = "Heal for 3–4% of your missing Life when you kill an Undead enemy.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Crushbane 
-        /// </summary>
-        public static Item Crushbane = new Item
-        {
-            Id = 99227,
-            Name = "Crushbane",
-            Quality = ItemQuality.Legendary,
-            Slug = "crushbane",
-            ItemType = ItemType.Mace,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "twohandedmace_norm_unique_02",
-            DataUrl = "https://us.battle.net/api/d3/data/item/crushbane",
-            Url = "https://us.battle.net/d3/en/item/crushbane",
-            RelativeUrl = "/d3/en/item/crushbane",
+            InternalName = "twoHandedAxe_norm_unique_02",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-executioner",
+            Url = "https://us.battle.net/d3/en/item/the-executioner",
+            RelativeUrl = "/d3/en/item/the-executioner",
             IsCrafted = false,
             LegendaryAffix = "",
             SetName = "",
         };
 
         /// <summary>
-        /// Skywarden Every 60 seconds, gain a random Law for 60 seconds.
+        /// Butcher's Carver The Butcher still inhabits his carver.
         /// </summary>
-        public static Item Skywarden = new Item
+        public static Item ButchersCarver = new Item
         {
-            Id = 190840,
-            Name = "Skywarden",
+            Id = 186494,
+            Name = "Butcher's Carver",
             Quality = ItemQuality.Legendary,
-            Slug = "skywarden",
-            ItemType = ItemType.Mace,
+            Slug = "butchers-carver",
+            ItemType = ItemType.Axe,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "twoHandedMace_norm_unique_03",
-            DataUrl = "https://us.battle.net/api/d3/data/item/skywarden",
-            Url = "https://us.battle.net/d3/en/item/skywarden",
-            RelativeUrl = "/d3/en/item/skywarden",
+            InternalName = "twoHandedAxe_norm_unique_03",
+            DataUrl = "https://us.battle.net/api/d3/data/item/butchers-carver",
+            Url = "https://us.battle.net/d3/en/item/butchers-carver",
+            RelativeUrl = "/d3/en/item/butchers-carver",
             IsCrafted = false,
-            LegendaryAffix = "Every 60 seconds, gain a random Law for 60 seconds.",
+            LegendaryAffix = "The Butcher still inhabits his carver.",
             SetName = "",
         };
 
         /// <summary>
-        /// Wrath of the Bone King 
+        /// Messerschmidt's Reaver 
         /// </summary>
-        public static Item WrathOfTheBoneKing = new Item
+        public static Item MesserschmidtsReaver = new Item
         {
-            Id = 191584,
-            Name = "Wrath of the Bone King",
+            Id = 191065,
+            Name = "Messerschmidt's Reaver",
             Quality = ItemQuality.Legendary,
-            Slug = "wrath-of-the-bone-king",
-            ItemType = ItemType.Mace,
+            Slug = "messerschmidts-reaver",
+            ItemType = ItemType.Axe,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "twoHandedMace_norm_unique_06",
-            DataUrl = "https://us.battle.net/api/d3/data/item/wrath-of-the-bone-king",
-            Url = "https://us.battle.net/d3/en/item/wrath-of-the-bone-king",
-            RelativeUrl = "/d3/en/item/wrath-of-the-bone-king",
+            InternalName = "twoHandedAxe_norm_unique_04",
+            DataUrl = "https://us.battle.net/api/d3/data/item/messerschmidts-reaver",
+            Url = "https://us.battle.net/d3/en/item/messerschmidts-reaver",
+            RelativeUrl = "/d3/en/item/messerschmidts-reaver",
             IsCrafted = false,
             LegendaryAffix = "",
             SetName = "",
         };
 
         /// <summary>
-        /// The Furnace Increases damage against elites by 40–50%.
+        /// Skorn 
         /// </summary>
-        public static Item TheFurnace = new Item
+        public static Item Skorn = new Item
         {
-            Id = 0,
-            Name = "The Furnace",
+            Id = 192887,
+            Name = "Skorn",
             Quality = ItemQuality.Legendary,
-            Slug = "the-furnace",
-            ItemType = ItemType.Mace,
+            Slug = "skorn",
+            ItemType = ItemType.Axe,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-furnace",
-            Url = "https://us.battle.net/d3/en/item/the-furnace",
-            RelativeUrl = "/d3/en/item/the-furnace",
+            InternalName = "twoHandedAxe_norm_unique_05",
+            DataUrl = "https://us.battle.net/api/d3/data/item/skorn",
+            Url = "https://us.battle.net/d3/en/item/skorn",
+            RelativeUrl = "/d3/en/item/skorn",
             IsCrafted = false,
-            LegendaryAffix = "Increases damage against elites by 40–50%.",
+            LegendaryAffix = "",
             SetName = "",
         };
 
         /// <summary>
-        /// Cataclysm 25–50% chance to sunder the ground your enemies walk on when you attack.
+        /// Fire Brand 25–50% chance to cast a fireball when attacking.
         /// </summary>
-        public static Item Cataclysm = new Item
+        public static Item FireBrand = new Item
         {
             Id = 0,
-            Name = "Cataclysm",
+            Name = "Fire Brand",
             Quality = ItemQuality.Legendary,
-            Slug = "cataclysm",
-            ItemType = ItemType.Mace,
+            Slug = "fire-brand",
+            ItemType = ItemType.Axe,
             BaseType = ItemBaseType.Weapon,
             InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/cataclysm",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/cataclysm",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/cataclysm",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/fire-brand",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/fire-brand",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/fire-brand",
             IsCrafted = true,
-            LegendaryAffix = "25–50% chance to sunder the ground your enemies walk on when you attack.",
+            LegendaryAffix = "25–50% chance to cast a fireball when attacking.",
             SetName = "",
         };
 
         /// <summary>
-        /// Schaefer's Hammer Getting hit has a chance to charge you with Lightning, causing you to deal 190–250% weapon damage as Lightning every second for 5 seconds to nearby enemies.
+        /// Cinder Switch 25–50% chance to cast a fireball when attacking.
         /// </summary>
-        public static Item SchaefersHammer = new Item
+        public static Item CinderSwitch = new Item
         {
-            Id = 197717,
-            Name = "Schaefer's Hammer",
+            Id = 6329,
+            Name = "Cinder Switch",
             Quality = ItemQuality.Legendary,
-            Slug = "schaefers-hammer",
-            ItemType = ItemType.Mace,
+            Slug = "cinder-switch",
+            ItemType = ItemType.Axe,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "twohandedmace_norm_unique_07",
-            DataUrl = "https://us.battle.net/api/d3/data/item/schaefers-hammer",
-            Url = "https://us.battle.net/d3/en/item/schaefers-hammer",
-            RelativeUrl = "/d3/en/item/schaefers-hammer",
+            InternalName = "twoHandedAxe_norm_unique_01",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/cinder-switch",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/cinder-switch",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/cinder-switch",
+            IsCrafted = true,
+            LegendaryAffix = "25–50% chance to cast a fireball when attacking.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Baleful Remnant Enemies killed while Akarat's Champion is active turn into Phalanx Avatars for 10 seconds.
+        /// </summary>
+        public static Item BalefulRemnant = new Item
+        {
+            Id = 299435,
+            Name = "Baleful Remnant",
+            Quality = ItemQuality.Legendary,
+            Slug = "baleful-remnant",
+            ItemType = ItemType.Flail,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "flail2h_norm_unique_02",
+            DataUrl = "https://us.battle.net/api/d3/data/item/baleful-remnant",
+            Url = "https://us.battle.net/d3/en/item/baleful-remnant",
+            RelativeUrl = "/d3/en/item/baleful-remnant",
             IsCrafted = false,
-            LegendaryAffix = "Getting hit has a chance to charge you with Lightning, causing you to deal 190–250% weapon damage as Lightning every second for 5 seconds to nearby enemies.",
+            LegendaryAffix = "Enemies killed while Akarat's Champion is active turn into Phalanx Avatars for 10 seconds.",
             SetName = "",
         };
 
         /// <summary>
-        /// Sledge of Athskeleng 
+        /// Fate of the Fell Gain two additional rays of Heaven’s Fury.
         /// </summary>
-        public static Item SledgeOfAthskeleng = new Item
+        public static Item FateOfTheFell = new Item
         {
-            Id = 190866,
-            Name = "Sledge of Athskeleng",
+            Id = 299436,
+            Name = "Fate of the Fell",
             Quality = ItemQuality.Legendary,
-            Slug = "sledge-of-athskeleng",
-            ItemType = ItemType.Mace,
+            Slug = "fate-of-the-fell",
+            ItemType = ItemType.Flail,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "twoHandedMace_norm_unique_04",
-            DataUrl = "https://us.battle.net/api/d3/data/item/sledge-of-athskeleng",
-            Url = "https://us.battle.net/d3/en/item/sledge-of-athskeleng",
-            RelativeUrl = "/d3/en/item/sledge-of-athskeleng",
+            InternalName = "flail2h_norm_unique_03",
+            DataUrl = "https://us.battle.net/api/d3/data/item/fate-of-the-fell",
+            Url = "https://us.battle.net/d3/en/item/fate-of-the-fell",
+            RelativeUrl = "/d3/en/item/fate-of-the-fell",
+            IsCrafted = false,
+            LegendaryAffix = "Gain two additional rays of Heaven’s Fury.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Golden Flense Sweep Attack restores 3–4 Wrath for each enemy hit.
+        /// </summary>
+        public static Item GoldenFlense = new Item
+        {
+            Id = 299437,
+            Name = "Golden Flense",
+            Quality = ItemQuality.Legendary,
+            Slug = "golden-flense",
+            ItemType = ItemType.Flail,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "flail2h_norm_unique_04",
+            DataUrl = "https://us.battle.net/api/d3/data/item/golden-flense",
+            Url = "https://us.battle.net/d3/en/item/golden-flense",
+            RelativeUrl = "/d3/en/item/golden-flense",
+            IsCrafted = false,
+            LegendaryAffix = "Sweep Attack restores 3–4 Wrath for each enemy hit.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// The Mortal Drama Double the number of Bombardment impacts.
+        /// </summary>
+        public static Item TheMortalDrama = new Item
+        {
+            Id = 299431,
+            Name = "The Mortal Drama",
+            Quality = ItemQuality.Legendary,
+            Slug = "the-mortal-drama",
+            ItemType = ItemType.Flail,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "flail2h_norm_unique_01",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-mortal-drama",
+            Url = "https://us.battle.net/d3/en/item/the-mortal-drama",
+            RelativeUrl = "/d3/en/item/the-mortal-drama",
+            IsCrafted = false,
+            LegendaryAffix = "Double the number of Bombardment impacts.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Balance 
+        /// </summary>
+        public static Item Balance = new Item
+        {
+            Id = 195145,
+            Name = "Balance",
+            Quality = ItemQuality.Legendary,
+            Slug = "balance",
+            ItemType = ItemType.Daibo,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "combatstaff_norm_unique_04",
+            DataUrl = "https://us.battle.net/api/d3/data/item/balance",
+            Url = "https://us.battle.net/d3/en/item/balance",
+            RelativeUrl = "/d3/en/item/balance",
             IsCrafted = false,
             LegendaryAffix = "",
             SetName = "",
         };
 
         /// <summary>
-        /// Sunder 25–50% chance to sunder the ground your enemies walk on when you attack.
+        /// Lai Yui's Taiji 
         /// </summary>
-        public static Item Sunder = new Item
+        public static Item LaiYuisTaiji = new Item
         {
             Id = 0,
-            Name = "Sunder",
+            Name = "Lai Yui's Taiji",
             Quality = ItemQuality.Legendary,
-            Slug = "sunder",
-            ItemType = ItemType.Mace,
+            Slug = "lai-yuis-taiji",
+            ItemType = ItemType.Daibo,
             BaseType = ItemBaseType.Weapon,
             InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/sunder",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/sunder",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/sunder",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/lai-yuis-taiji",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/lai-yuis-taiji",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/lai-yuis-taiji",
             IsCrafted = true,
-            LegendaryAffix = "25–50% chance to sunder the ground your enemies walk on when you attack.",
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// The Flow of Eternity Reduces the cooldown of Seven-Sided Strike by 45–60%.
+        /// </summary>
+        public static Item TheFlowOfEternity = new Item
+        {
+            Id = 197072,
+            Name = "The Flow of Eternity",
+            Quality = ItemQuality.Legendary,
+            Slug = "the-flow-of-eternity",
+            ItemType = ItemType.Daibo,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "combatStaff_norm_unique_06",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-flow-of-eternity",
+            Url = "https://us.battle.net/d3/en/item/the-flow-of-eternity",
+            RelativeUrl = "/d3/en/item/the-flow-of-eternity",
+            IsCrafted = false,
+            LegendaryAffix = "Reduces the cooldown of Seven-Sided Strike by 45–60%.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// The Paddle Slap!
+        /// </summary>
+        public static Item ThePaddle = new Item
+        {
+            Id = 197068,
+            Name = "The Paddle",
+            Quality = ItemQuality.Legendary,
+            Slug = "the-paddle",
+            ItemType = ItemType.Daibo,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "combatStaff_norm_unique_03",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-paddle",
+            Url = "https://us.battle.net/d3/en/item/the-paddle",
+            RelativeUrl = "/d3/en/item/the-paddle",
+            IsCrafted = false,
+            LegendaryAffix = "Slap!",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Staff of Kyro 
+        /// </summary>
+        public static Item StaffOfKyro = new Item
+        {
+            Id = 271749,
+            Name = "Staff of Kyro",
+            Quality = ItemQuality.Legendary,
+            Slug = "staff-of-kyro",
+            ItemType = ItemType.Daibo,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "combatstaff_norm_unique_09",
+            DataUrl = "https://us.battle.net/api/d3/data/item/staff-of-kyro",
+            Url = "https://us.battle.net/d3/en/item/staff-of-kyro",
+            RelativeUrl = "/d3/en/item/staff-of-kyro",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Warstaff of General Quang Tempest Rush gains the effect of the Tailwind rune.
+        /// </summary>
+        public static Item WarstaffOfGeneralQuang = new Item
+        {
+            Id = 271765,
+            Name = "Warstaff of General Quang",
+            Quality = ItemQuality.Legendary,
+            Slug = "warstaff-of-general-quang",
+            ItemType = ItemType.Daibo,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "combatstaff_norm_unique_10",
+            DataUrl = "https://us.battle.net/api/d3/data/item/warstaff-of-general-quang",
+            Url = "https://us.battle.net/d3/en/item/warstaff-of-general-quang",
+            RelativeUrl = "/d3/en/item/warstaff-of-general-quang",
+            IsCrafted = false,
+            LegendaryAffix = "Tempest Rush gains the effect of the Tailwind rune.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Incense Torch of the Grand Temple Reduces the Spirit cost of Wave of Light by 40–50%.
+        /// </summary>
+        public static Item IncenseTorchOfTheGrandTemple = new Item
+        {
+            Id = 192342,
+            Name = "Incense Torch of the Grand Temple",
+            Quality = ItemQuality.Legendary,
+            Slug = "incense-torch-of-the-grand-temple",
+            ItemType = ItemType.Daibo,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "combatStaff_norm_unique_01",
+            DataUrl = "https://us.battle.net/api/d3/data/item/incense-torch-of-the-grand-temple",
+            Url = "https://us.battle.net/d3/en/item/incense-torch-of-the-grand-temple",
+            RelativeUrl = "/d3/en/item/incense-torch-of-the-grand-temple",
+            IsCrafted = false,
+            LegendaryAffix = "Reduces the Spirit cost of Wave of Light by 40–50%.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Flying Dragon Chance to double your attack speed when attacking.
+        /// </summary>
+        public static Item FlyingDragon = new Item
+        {
+            Id = 197065,
+            Name = "Flying Dragon",
+            Quality = ItemQuality.Legendary,
+            Slug = "flying-dragon",
+            ItemType = ItemType.Daibo,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "combatStaff_norm_unique_02",
+            DataUrl = "https://us.battle.net/api/d3/data/item/flying-dragon",
+            Url = "https://us.battle.net/d3/en/item/flying-dragon",
+            RelativeUrl = "/d3/en/item/flying-dragon",
+            IsCrafted = false,
+            LegendaryAffix = "Chance to double your attack speed when attacking.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Inna's Reach 
+        /// </summary>
+        public static Item InnasReach = new Item
+        {
+            Id = 212208,
+            Name = "Inna's Reach",
+            Quality = ItemQuality.Legendary,
+            Slug = "innas-reach",
+            ItemType = ItemType.Daibo,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "combatStaff_norm_unique_08",
+            DataUrl = "https://us.battle.net/api/d3/data/item/innas-reach",
+            Url = "https://us.battle.net/d3/en/item/innas-reach",
+            RelativeUrl = "/d3/en/item/innas-reach",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Inna's Mantra",
+        };
+
+        /// <summary>
+        /// Rozpedin's Staff 
+        /// </summary>
+        public static Item RozpedinsStaff = new Item
+        {
+            Id = 0,
+            Name = "Rozpedin's Staff",
+            Quality = ItemQuality.Legendary,
+            Slug = "rozpedins-staff",
+            ItemType = ItemType.Daibo,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/rozpedins-staff",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/rozpedins-staff",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/rozpedins-staff",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Lai Yui's Persuader 
+        /// </summary>
+        public static Item LaiYuisPersuader = new Item
+        {
+            Id = 0,
+            Name = "Lai Yui's Persuader",
+            Quality = ItemQuality.Legendary,
+            Slug = "lai-yuis-persuader",
+            ItemType = ItemType.Daibo,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/lai-yuis-persuader",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/lai-yuis-persuader",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/lai-yuis-persuader",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Rozpedin's Force 
+        /// </summary>
+        public static Item RozpedinsForce = new Item
+        {
+            Id = 0,
+            Name = "Rozpedin's Force",
+            Quality = ItemQuality.Legendary,
+            Slug = "rozpedins-force",
+            ItemType = ItemType.Daibo,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/rozpedins-force",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/rozpedins-force",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/rozpedins-force",
+            IsCrafted = true,
+            LegendaryAffix = "",
             SetName = "",
         };
 
@@ -9521,13 +10063,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item InfernalStaffOfHerding = new Item
         {
-            Id = 0,
+            Id = 367201,
             Name = "Infernal Staff of Herding",
             Quality = ItemQuality.Legendary,
             Slug = "infernal-staff-of-herding",
             ItemType = ItemType.Staff,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
+            InternalName = "wizardhat_norm_base_02",
             DataUrl = "https://us.battle.net/api/d3/data/recipe/infernal-staff-of-herding",
             Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/infernal-staff-of-herding",
             RelativeUrl = "/d3/en/artisan/blacksmith/recipe/infernal-staff-of-herding",
@@ -9567,7 +10109,7 @@ namespace Trinity.Reference
             Slug = "autumns-call",
             ItemType = ItemType.Staff,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "Staff_norm_unique_03",
+            InternalName = "staff_norm_unique_03",
             DataUrl = "https://us.battle.net/api/d3/data/item/autumns-call",
             Url = "https://us.battle.net/d3/en/item/autumns-call",
             RelativeUrl = "/d3/en/item/autumns-call",
@@ -9587,7 +10129,7 @@ namespace Trinity.Reference
             Slug = "the-broken-staff",
             ItemType = ItemType.Staff,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "Staff_norm_unique_01",
+            InternalName = "staff_norm_unique_01",
             DataUrl = "https://us.battle.net/api/d3/data/item/the-broken-staff",
             Url = "https://us.battle.net/d3/en/item/the-broken-staff",
             RelativeUrl = "/d3/en/item/the-broken-staff",
@@ -9621,13 +10163,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item TheSmolderingCore = new Item
         {
-            Id = 0,
+            Id = 271774,
             Name = "The Smoldering Core",
             Quality = ItemQuality.Legendary,
             Slug = "the-smoldering-core",
             ItemType = ItemType.Staff,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
+            InternalName = "staff_norm_unique_10",
             DataUrl = "https://us.battle.net/api/d3/data/item/the-smoldering-core",
             Url = "https://us.battle.net/d3/en/item/the-smoldering-core",
             RelativeUrl = "/d3/en/item/the-smoldering-core",
@@ -9641,13 +10183,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item ValtheksRebuke = new Item
         {
-            Id = 0,
+            Id = 271773,
             Name = "Valthek's Rebuke",
             Quality = ItemQuality.Legendary,
             Slug = "valtheks-rebuke",
             ItemType = ItemType.Staff,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
+            InternalName = "staff_norm_unique_09",
             DataUrl = "https://us.battle.net/api/d3/data/item/valtheks-rebuke",
             Url = "https://us.battle.net/d3/en/item/valtheks-rebuke",
             RelativeUrl = "/d3/en/item/valtheks-rebuke",
@@ -9707,7 +10249,7 @@ namespace Trinity.Reference
             Slug = "wormwood",
             ItemType = ItemType.Staff,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "staff_norm_unique_07",
+            InternalName = "Staff_norm_unique_07",
             DataUrl = "https://us.battle.net/api/d3/data/item/wormwood",
             Url = "https://us.battle.net/d3/en/item/wormwood",
             RelativeUrl = "/d3/en/item/wormwood",
@@ -9747,7 +10289,7 @@ namespace Trinity.Reference
             Slug = "the-tormentor",
             ItemType = ItemType.Staff,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "Staff_norm_unique_05",
+            InternalName = "staff_norm_unique_05",
             DataUrl = "https://us.battle.net/api/d3/data/item/the-tormentor",
             Url = "https://us.battle.net/d3/en/item/the-tormentor",
             RelativeUrl = "/d3/en/item/the-tormentor",
@@ -9827,7 +10369,7 @@ namespace Trinity.Reference
             Slug = "blackguard",
             ItemType = ItemType.Sword,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "twohandedsword_norm_unique_10",
+            InternalName = "twoHandedSword_norm_unique_10",
             DataUrl = "https://us.battle.net/api/d3/data/item/blackguard",
             Url = "https://us.battle.net/d3/en/item/blackguard",
             RelativeUrl = "/d3/en/item/blackguard",
@@ -9907,7 +10449,7 @@ namespace Trinity.Reference
             Slug = "the-sultan-of-blinding-sand",
             ItemType = ItemType.Sword,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "twohandedsword_norm_unique_05",
+            InternalName = "twoHandedSword_norm_unique_05",
             DataUrl = "https://us.battle.net/api/d3/data/item/the-sultan-of-blinding-sand",
             Url = "https://us.battle.net/d3/en/item/the-sultan-of-blinding-sand",
             RelativeUrl = "/d3/en/item/the-sultan-of-blinding-sand",
@@ -9947,7 +10489,7 @@ namespace Trinity.Reference
             Slug = "the-grandfather",
             ItemType = ItemType.Sword,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "twoHandedSword_norm_unique_08",
+            InternalName = "twohandedsword_norm_unique_08",
             DataUrl = "https://us.battle.net/api/d3/data/item/the-grandfather",
             Url = "https://us.battle.net/d3/en/item/the-grandfather",
             RelativeUrl = "/d3/en/item/the-grandfather",
@@ -9981,1158 +10523,18 @@ namespace Trinity.Reference
         /// </summary>
         public static Item CamsRebuttal = new Item
         {
-            Id = 0,
+            Id = 271644,
             Name = "Cam's Rebuttal",
             Quality = ItemQuality.Legendary,
             Slug = "cams-rebuttal",
             ItemType = ItemType.Sword,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
+            InternalName = "twohandedsword_norm_unique_12",
             DataUrl = "https://us.battle.net/api/d3/data/item/cams-rebuttal",
             Url = "https://us.battle.net/d3/en/item/cams-rebuttal",
             RelativeUrl = "/d3/en/item/cams-rebuttal",
             IsCrafted = false,
             LegendaryAffix = "Falling Sword can be used again within 4 seconds before the cooldown is triggered.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Monster Hunter 
-        /// </summary>
-        public static Item MonsterHunter = new Item
-        {
-            Id = 115140,
-            Name = "Monster Hunter",
-            Quality = ItemQuality.Legendary,
-            Slug = "monster-hunter",
-            ItemType = ItemType.Sword,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "Sword_norm_unique_01",
-            DataUrl = "https://us.battle.net/api/d3/data/item/monster-hunter",
-            Url = "https://us.battle.net/d3/en/item/monster-hunter",
-            RelativeUrl = "/d3/en/item/monster-hunter",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Wildwood 
-        /// </summary>
-        public static Item Wildwood = new Item
-        {
-            Id = 270978,
-            Name = "Wildwood",
-            Quality = ItemQuality.Legendary,
-            Slug = "wildwood",
-            ItemType = ItemType.Sword,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "sword_norm_unique_11",
-            DataUrl = "https://us.battle.net/api/d3/data/item/wildwood",
-            Url = "https://us.battle.net/d3/en/item/wildwood",
-            RelativeUrl = "/d3/en/item/wildwood",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Born's Searing Spite 
-        /// </summary>
-        public static Item BornsSearingSpite = new Item
-        {
-            Id = 0,
-            Name = "Born's Searing Spite",
-            Quality = ItemQuality.Legendary,
-            Slug = "borns-seething-rage",
-            ItemType = ItemType.Sword,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/borns-seething-rage",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/borns-seething-rage",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/borns-seething-rage",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Born's Defiance",
-        };
-
-        /// <summary>
-        /// Doombringer 
-        /// </summary>
-        public static Item Doombringer = new Item
-        {
-            Id = 185397,
-            Name = "Doombringer",
-            Quality = ItemQuality.Legendary,
-            Slug = "doombringer",
-            ItemType = ItemType.Sword,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "Sword_norm_unique_07",
-            DataUrl = "https://us.battle.net/api/d3/data/item/doombringer",
-            Url = "https://us.battle.net/d3/en/item/doombringer",
-            RelativeUrl = "/d3/en/item/doombringer",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// The Ancient Bonesaber of Zumakalis 
-        /// </summary>
-        public static Item TheAncientBonesaberOfZumakalis = new Item
-        {
-            Id = 194481,
-            Name = "The Ancient Bonesaber of Zumakalis",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-ancient-bonesaber-of-zumakalis",
-            ItemType = ItemType.Sword,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "sword_norm_unique_08",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-ancient-bonesaber-of-zumakalis",
-            Url = "https://us.battle.net/d3/en/item/the-ancient-bonesaber-of-zumakalis",
-            RelativeUrl = "/d3/en/item/the-ancient-bonesaber-of-zumakalis",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Exarian 
-        /// </summary>
-        public static Item Exarian = new Item
-        {
-            Id = 271617,
-            Name = "Exarian",
-            Quality = ItemQuality.Legendary,
-            Slug = "exarian",
-            ItemType = ItemType.Sword,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "sword_norm_unique_13",
-            DataUrl = "https://us.battle.net/api/d3/data/item/exarian",
-            Url = "https://us.battle.net/d3/en/item/exarian",
-            RelativeUrl = "/d3/en/item/exarian",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Fulminator Lightning damage has a chance to turn enemies into lightning rods, causing them to pulse 167–222% weapon damage as Lightning every second to nearby enemies for 6 seconds.
-        /// </summary>
-        public static Item Fulminator = new Item
-        {
-            Id = 271631,
-            Name = "Fulminator",
-            Quality = ItemQuality.Legendary,
-            Slug = "fulminator",
-            ItemType = ItemType.Sword,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "sword_norm_unique_15",
-            DataUrl = "https://us.battle.net/api/d3/data/item/fulminator",
-            Url = "https://us.battle.net/d3/en/item/fulminator",
-            RelativeUrl = "/d3/en/item/fulminator",
-            IsCrafted = false,
-            LegendaryAffix = "Lightning damage has a chance to turn enemies into lightning rods, causing them to pulse 167–222% weapon damage as Lightning every second to nearby enemies for 6 seconds.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Gift of Silaria 
-        /// </summary>
-        public static Item GiftOfSilaria = new Item
-        {
-            Id = 271630,
-            Name = "Gift of Silaria",
-            Quality = ItemQuality.Legendary,
-            Slug = "gift-of-silaria",
-            ItemType = ItemType.Sword,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "sword_norm_unique_14",
-            DataUrl = "https://us.battle.net/api/d3/data/item/gift-of-silaria",
-            Url = "https://us.battle.net/d3/en/item/gift-of-silaria",
-            RelativeUrl = "/d3/en/item/gift-of-silaria",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Rimeheart 10% chance on hit to instantly deal 10000% weapon damage as Cold to enemies that are Frozen.
-        /// </summary>
-        public static Item Rimeheart = new Item
-        {
-            Id = 271636,
-            Name = "Rimeheart",
-            Quality = ItemQuality.Legendary,
-            Slug = "rimeheart",
-            ItemType = ItemType.Sword,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "sword_norm_unique_20",
-            DataUrl = "https://us.battle.net/api/d3/data/item/rimeheart",
-            Url = "https://us.battle.net/d3/en/item/rimeheart",
-            RelativeUrl = "/d3/en/item/rimeheart",
-            IsCrafted = false,
-            LegendaryAffix = "10% chance on hit to instantly deal 10000% weapon damage as Cold to enemies that are Frozen.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Thunderfury, Blessed Blade of the Windseeker Chance on hit to blast your enemy with Lightning, dealing 279–372% weapon damage as Lightning and then jumping to additional nearby enemies. Each enemy hit has their attack speed and movement speed reduced by 30% for 3 seconds. Jumps up to 5 targets.
-        /// </summary>
-        public static Item ThunderfuryBlessedBladeOfTheWindseeker = new Item
-        {
-            Id = 229716,
-            Name = "Thunderfury, Blessed Blade of the Windseeker",
-            Quality = ItemQuality.Legendary,
-            Slug = "thunderfury-blessed-blade-of-the-windseeker",
-            ItemType = ItemType.Sword,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "sword_norm_unique_12",
-            DataUrl = "https://us.battle.net/api/d3/data/item/thunderfury-blessed-blade-of-the-windseeker",
-            Url = "https://us.battle.net/d3/en/item/thunderfury-blessed-blade-of-the-windseeker",
-            RelativeUrl = "/d3/en/item/thunderfury-blessed-blade-of-the-windseeker",
-            IsCrafted = false,
-            LegendaryAffix = "Chance on hit to blast your enemy with Lightning, dealing 279–372% weapon damage as Lightning and then jumping to additional nearby enemies. Each enemy hit has their attack speed and movement speed reduced by 30% for 3 seconds. Jumps up to 5 targets.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Sever Slain enemies rest in pieces.
-        /// </summary>
-        public static Item Sever = new Item
-        {
-            Id = 115141,
-            Name = "Sever",
-            Quality = ItemQuality.Legendary,
-            Slug = "sever",
-            ItemType = ItemType.Sword,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "sword_norm_unique_02",
-            DataUrl = "https://us.battle.net/api/d3/data/item/sever",
-            Url = "https://us.battle.net/d3/en/item/sever",
-            RelativeUrl = "/d3/en/item/sever",
-            IsCrafted = false,
-            LegendaryAffix = "Slain enemies rest in pieces.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Skycutter Chance to summon angelic assistance when attacking.
-        /// </summary>
-        public static Item Skycutter = new Item
-        {
-            Id = 182347,
-            Name = "Skycutter",
-            Quality = ItemQuality.Legendary,
-            Slug = "skycutter",
-            ItemType = ItemType.Sword,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "Sword_norm_unique_04",
-            DataUrl = "https://us.battle.net/api/d3/data/item/skycutter",
-            Url = "https://us.battle.net/d3/en/item/skycutter",
-            RelativeUrl = "/d3/en/item/skycutter",
-            IsCrafted = false,
-            LegendaryAffix = "Chance to summon angelic assistance when attacking.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Azurewrath Undead enemies within 25 yards take 30–40% weapon damage as Holy every second and are sometimes knocked back.
-        /// </summary>
-        public static Item Azurewrath = new Item
-        {
-            Id = 192511,
-            Name = "Azurewrath",
-            Quality = ItemQuality.Legendary,
-            Slug = "azurewrath",
-            ItemType = ItemType.Sword,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "Sword_norm_unique_06",
-            DataUrl = "https://us.battle.net/api/d3/data/item/azurewrath",
-            Url = "https://us.battle.net/d3/en/item/azurewrath",
-            RelativeUrl = "/d3/en/item/azurewrath",
-            IsCrafted = false,
-            LegendaryAffix = "Undead enemies within 25 yards take 30–40% weapon damage as Holy every second and are sometimes knocked back.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Devil Tongue 
-        /// </summary>
-        public static Item DevilTongue = new Item
-        {
-            Id = 189552,
-            Name = "Devil Tongue",
-            Quality = ItemQuality.Legendary,
-            Slug = "devil-tongue",
-            ItemType = ItemType.Sword,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "Sword_norm_unique_05",
-            DataUrl = "https://us.battle.net/api/d3/data/item/devil-tongue",
-            Url = "https://us.battle.net/d3/en/item/devil-tongue",
-            RelativeUrl = "/d3/en/item/devil-tongue",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Griswold's Masterpiece 
-        /// </summary>
-        public static Item GriswoldsMasterpiece = new Item
-        {
-            Id = 0,
-            Name = "Griswold's Masterpiece",
-            Quality = ItemQuality.Legendary,
-            Slug = "griswolds-masterpiece",
-            ItemType = ItemType.Sword,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/griswolds-masterpiece",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/griswolds-masterpiece",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/griswolds-masterpiece",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Shard of Hate Elemental skills have a chance to trigger a powerful attack that deals 200–250% weapon damage: Cold skills trigger Freezing Skull Poison skills trigger Poison Nova Lightning skills trigger Charged Bolt
-        /// </summary>
-        public static Item ShardOfHate = new Item
-        {
-            Id = 376463,
-            Name = "Shard of Hate",
-            Quality = ItemQuality.Legendary,
-            Slug = "shard-of-hate",
-            ItemType = ItemType.Sword,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "sword_norm_promo_02",
-            DataUrl = "https://us.battle.net/api/d3/data/item/shard-of-hate",
-            Url = "https://us.battle.net/d3/en/item/shard-of-hate",
-            RelativeUrl = "/d3/en/item/shard-of-hate",
-            IsCrafted = false,
-            LegendaryAffix = "Elemental skills have a chance to trigger a powerful attack that deals 200–250% weapon damage: Cold skills trigger Freezing Skull Poison skills trigger Poison Nova Lightning skills trigger Charged Bolt",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Little Rogue 
-        /// </summary>
-        public static Item LittleRogue = new Item
-        {
-            Id = 0,
-            Name = "Little Rogue",
-            Quality = ItemQuality.Legendary,
-            Slug = "little-rogue",
-            ItemType = ItemType.Sword,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/little-rogue",
-            Url = "https://us.battle.net/d3/en/item/little-rogue",
-            RelativeUrl = "/d3/en/item/little-rogue",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Istvan's Paired Blades",
-        };
-
-        /// <summary>
-        /// The Slanderer 
-        /// </summary>
-        public static Item TheSlanderer = new Item
-        {
-            Id = 0,
-            Name = "The Slanderer",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-slanderer",
-            ItemType = ItemType.Sword,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-slanderer",
-            Url = "https://us.battle.net/d3/en/item/the-slanderer",
-            RelativeUrl = "/d3/en/item/the-slanderer",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Istvan's Paired Blades",
-        };
-
-        /// <summary>
-        /// Griswold's Perfection 
-        /// </summary>
-        public static Item GriswoldsPerfection = new Item
-        {
-            Id = 0,
-            Name = "Griswold's Perfection",
-            Quality = ItemQuality.Legendary,
-            Slug = "griswolds-perfection",
-            ItemType = ItemType.Sword,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/griswolds-perfection",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/griswolds-perfection",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/griswolds-perfection",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Born's Furious Wrath 
-        /// </summary>
-        public static Item BornsFuriousWrath = new Item
-        {
-            Id = 0,
-            Name = "Born's Furious Wrath",
-            Quality = ItemQuality.Legendary,
-            Slug = "borns-furious-wrath",
-            ItemType = ItemType.Sword,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/borns-furious-wrath",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/borns-furious-wrath",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/borns-furious-wrath",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Born's Command",
-        };
-
-        /// <summary>
-        /// Baleful Remnant Enemies killed while Akarat's Champion is active turn into Phalanx Avatars for 10 seconds.
-        /// </summary>
-        public static Item BalefulRemnant = new Item
-        {
-            Id = 299435,
-            Name = "Baleful Remnant",
-            Quality = ItemQuality.Legendary,
-            Slug = "baleful-remnant",
-            ItemType = ItemType.Flail,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "flail2h_norm_unique_02",
-            DataUrl = "https://us.battle.net/api/d3/data/item/baleful-remnant",
-            Url = "https://us.battle.net/d3/en/item/baleful-remnant",
-            RelativeUrl = "/d3/en/item/baleful-remnant",
-            IsCrafted = false,
-            LegendaryAffix = "Enemies killed while Akarat's Champion is active turn into Phalanx Avatars for 10 seconds.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Fate of the Fell Gain two additional rays of Heaven’s Fury.
-        /// </summary>
-        public static Item FateOfTheFell = new Item
-        {
-            Id = 299436,
-            Name = "Fate of the Fell",
-            Quality = ItemQuality.Legendary,
-            Slug = "fate-of-the-fell",
-            ItemType = ItemType.Flail,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "flail2h_norm_unique_03",
-            DataUrl = "https://us.battle.net/api/d3/data/item/fate-of-the-fell",
-            Url = "https://us.battle.net/d3/en/item/fate-of-the-fell",
-            RelativeUrl = "/d3/en/item/fate-of-the-fell",
-            IsCrafted = false,
-            LegendaryAffix = "Gain two additional rays of Heaven’s Fury.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Golden Flense Sweep Attack restores 3–4 Wrath for each enemy hit.
-        /// </summary>
-        public static Item GoldenFlense = new Item
-        {
-            Id = 0,
-            Name = "Golden Flense",
-            Quality = ItemQuality.Legendary,
-            Slug = "golden-flense",
-            ItemType = ItemType.Flail,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/golden-flense",
-            Url = "https://us.battle.net/d3/en/item/golden-flense",
-            RelativeUrl = "/d3/en/item/golden-flense",
-            IsCrafted = false,
-            LegendaryAffix = "Sweep Attack restores 3–4 Wrath for each enemy hit.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// The Mortal Drama Double the number of Bombardment impacts.
-        /// </summary>
-        public static Item TheMortalDrama = new Item
-        {
-            Id = 299431,
-            Name = "The Mortal Drama",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-mortal-drama",
-            ItemType = ItemType.Flail,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "flail2h_norm_unique_01",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-mortal-drama",
-            Url = "https://us.battle.net/d3/en/item/the-mortal-drama",
-            RelativeUrl = "/d3/en/item/the-mortal-drama",
-            IsCrafted = false,
-            LegendaryAffix = "Double the number of Bombardment impacts.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Uskang 
-        /// </summary>
-        public static Item Uskang = new Item
-        {
-            Id = 175580,
-            Name = "Uskang",
-            Quality = ItemQuality.Legendary,
-            Slug = "uskang",
-            ItemType = ItemType.Bow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "Bow_norm_unique_01",
-            DataUrl = "https://us.battle.net/api/d3/data/item/uskang",
-            Url = "https://us.battle.net/d3/en/item/uskang",
-            RelativeUrl = "/d3/en/item/uskang",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Longshot 
-        /// </summary>
-        public static Item Longshot = new Item
-        {
-            Id = 0,
-            Name = "Longshot",
-            Quality = ItemQuality.Legendary,
-            Slug = "longshot",
-            ItemType = ItemType.Bow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/longshot",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/longshot",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/longshot",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Etrayu 
-        /// </summary>
-        public static Item Etrayu = new Item
-        {
-            Id = 175581,
-            Name = "Etrayu",
-            Quality = ItemQuality.Legendary,
-            Slug = "etrayu",
-            ItemType = ItemType.Bow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "Bow_norm_unique_02",
-            DataUrl = "https://us.battle.net/api/d3/data/item/etrayu",
-            Url = "https://us.battle.net/d3/en/item/etrayu",
-            RelativeUrl = "/d3/en/item/etrayu",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// The Raven's Wing A raven flies to your side.
-        /// </summary>
-        public static Item TheRavensWing = new Item
-        {
-            Id = 221938,
-            Name = "The Raven's Wing",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-ravens-wing",
-            ItemType = ItemType.Bow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "Bow_norm_unique_07",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-ravens-wing",
-            Url = "https://us.battle.net/d3/en/item/the-ravens-wing",
-            RelativeUrl = "/d3/en/item/the-ravens-wing",
-            IsCrafted = false,
-            LegendaryAffix = "A raven flies to your side.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Kridershot Elemental Arrow now generates 3–4 Hatred.
-        /// </summary>
-        public static Item Kridershot = new Item
-        {
-            Id = 0,
-            Name = "Kridershot",
-            Quality = ItemQuality.Legendary,
-            Slug = "kridershot",
-            ItemType = ItemType.Bow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/kridershot",
-            Url = "https://us.battle.net/d3/en/item/kridershot",
-            RelativeUrl = "/d3/en/item/kridershot",
-            IsCrafted = false,
-            LegendaryAffix = "Elemental Arrow now generates 3–4 Hatred.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Cluckeye 25–50% chance to cluck when attacking.
-        /// </summary>
-        public static Item Cluckeye = new Item
-        {
-            Id = 175582,
-            Name = "Cluckeye",
-            Quality = ItemQuality.Legendary,
-            Slug = "cluckeye",
-            ItemType = ItemType.Bow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "Bow_norm_unique_03",
-            DataUrl = "https://us.battle.net/api/d3/data/item/cluckeye",
-            Url = "https://us.battle.net/d3/en/item/cluckeye",
-            RelativeUrl = "/d3/en/item/cluckeye",
-            IsCrafted = false,
-            LegendaryAffix = "25–50% chance to cluck when attacking.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Windforce 
-        /// </summary>
-        public static Item Windforce = new Item
-        {
-            Id = 192602,
-            Name = "Windforce",
-            Quality = ItemQuality.Legendary,
-            Slug = "windforce",
-            ItemType = ItemType.Bow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "Bow_norm_unique_04",
-            DataUrl = "https://us.battle.net/api/d3/data/item/windforce",
-            Url = "https://us.battle.net/d3/en/item/windforce",
-            RelativeUrl = "/d3/en/item/windforce",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Venomhusk 
-        /// </summary>
-        public static Item Venomhusk = new Item
-        {
-            Id = 0,
-            Name = "Venomhusk",
-            Quality = ItemQuality.Legendary,
-            Slug = "venomhusk",
-            ItemType = ItemType.Bow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/venomhusk",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/venomhusk",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/venomhusk",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Leonine Bow of Hashir Bola Shot has a 15–20% chance on explosion to pull in all enemies within 24 yards.
-        /// </summary>
-        public static Item LeonineBowOfHashir = new Item
-        {
-            Id = 0,
-            Name = "Leonine Bow of Hashir",
-            Quality = ItemQuality.Legendary,
-            Slug = "leonine-bow-of-hashir",
-            ItemType = ItemType.Bow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/leonine-bow-of-hashir",
-            Url = "https://us.battle.net/d3/en/item/leonine-bow-of-hashir",
-            RelativeUrl = "/d3/en/item/leonine-bow-of-hashir",
-            IsCrafted = false,
-            LegendaryAffix = "Bola Shot has a 15–20% chance on explosion to pull in all enemies within 24 yards.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Sydyru Crust 
-        /// </summary>
-        public static Item SydyruCrust = new Item
-        {
-            Id = 0,
-            Name = "Sydyru Crust",
-            Quality = ItemQuality.Legendary,
-            Slug = "sydyru-crust",
-            ItemType = ItemType.Bow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/sydyru-crust",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/sydyru-crust",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/sydyru-crust",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Unbound Bolt 
-        /// </summary>
-        public static Item UnboundBolt = new Item
-        {
-            Id = 0,
-            Name = "Unbound Bolt",
-            Quality = ItemQuality.Legendary,
-            Slug = "unbound-bolt",
-            ItemType = ItemType.Bow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/unbound-bolt",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/unbound-bolt",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/unbound-bolt",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Balance 
-        /// </summary>
-        public static Item Balance = new Item
-        {
-            Id = 0,
-            Name = "Balance",
-            Quality = ItemQuality.Legendary,
-            Slug = "balance",
-            ItemType = ItemType.Daibo,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/balance",
-            Url = "https://us.battle.net/d3/en/item/balance",
-            RelativeUrl = "/d3/en/item/balance",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Lai Yui's Taiji 
-        /// </summary>
-        public static Item LaiYuisTaiji = new Item
-        {
-            Id = 0,
-            Name = "Lai Yui's Taiji",
-            Quality = ItemQuality.Legendary,
-            Slug = "lai-yuis-taiji",
-            ItemType = ItemType.Daibo,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/lai-yuis-taiji",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/lai-yuis-taiji",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/lai-yuis-taiji",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// The Flow of Eternity Reduces the cooldown of Seven-Sided Strike by 45–60%.
-        /// </summary>
-        public static Item TheFlowOfEternity = new Item
-        {
-            Id = 0,
-            Name = "The Flow of Eternity",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-flow-of-eternity",
-            ItemType = ItemType.Daibo,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-flow-of-eternity",
-            Url = "https://us.battle.net/d3/en/item/the-flow-of-eternity",
-            RelativeUrl = "/d3/en/item/the-flow-of-eternity",
-            IsCrafted = false,
-            LegendaryAffix = "Reduces the cooldown of Seven-Sided Strike by 45–60%.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// The Paddle Slap!
-        /// </summary>
-        public static Item ThePaddle = new Item
-        {
-            Id = 0,
-            Name = "The Paddle",
-            Quality = ItemQuality.Legendary,
-            Slug = "the-paddle",
-            ItemType = ItemType.Daibo,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/the-paddle",
-            Url = "https://us.battle.net/d3/en/item/the-paddle",
-            RelativeUrl = "/d3/en/item/the-paddle",
-            IsCrafted = false,
-            LegendaryAffix = "Slap!",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Staff of Kyro 
-        /// </summary>
-        public static Item StaffOfKyro = new Item
-        {
-            Id = 0,
-            Name = "Staff of Kyro",
-            Quality = ItemQuality.Legendary,
-            Slug = "staff-of-kyro",
-            ItemType = ItemType.Daibo,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/staff-of-kyro",
-            Url = "https://us.battle.net/d3/en/item/staff-of-kyro",
-            RelativeUrl = "/d3/en/item/staff-of-kyro",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Warstaff of General Quang Tempest Rush gains the effect of the Tailwind rune.
-        /// </summary>
-        public static Item WarstaffOfGeneralQuang = new Item
-        {
-            Id = 0,
-            Name = "Warstaff of General Quang",
-            Quality = ItemQuality.Legendary,
-            Slug = "warstaff-of-general-quang",
-            ItemType = ItemType.Daibo,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/warstaff-of-general-quang",
-            Url = "https://us.battle.net/d3/en/item/warstaff-of-general-quang",
-            RelativeUrl = "/d3/en/item/warstaff-of-general-quang",
-            IsCrafted = false,
-            LegendaryAffix = "Tempest Rush gains the effect of the Tailwind rune.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Incense Torch of the Grand Temple Reduces the Spirit cost of Wave of Light by 40–50%.
-        /// </summary>
-        public static Item IncenseTorchOfTheGrandTemple = new Item
-        {
-            Id = 0,
-            Name = "Incense Torch of the Grand Temple",
-            Quality = ItemQuality.Legendary,
-            Slug = "incense-torch-of-the-grand-temple",
-            ItemType = ItemType.Daibo,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/incense-torch-of-the-grand-temple",
-            Url = "https://us.battle.net/d3/en/item/incense-torch-of-the-grand-temple",
-            RelativeUrl = "/d3/en/item/incense-torch-of-the-grand-temple",
-            IsCrafted = false,
-            LegendaryAffix = "Reduces the Spirit cost of Wave of Light by 40–50%.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Flying Dragon Chance to double your attack speed when attacking.
-        /// </summary>
-        public static Item FlyingDragon = new Item
-        {
-            Id = 0,
-            Name = "Flying Dragon",
-            Quality = ItemQuality.Legendary,
-            Slug = "flying-dragon",
-            ItemType = ItemType.Daibo,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/flying-dragon",
-            Url = "https://us.battle.net/d3/en/item/flying-dragon",
-            RelativeUrl = "/d3/en/item/flying-dragon",
-            IsCrafted = false,
-            LegendaryAffix = "Chance to double your attack speed when attacking.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Inna's Reach 
-        /// </summary>
-        public static Item InnasReach = new Item
-        {
-            Id = 0,
-            Name = "Inna's Reach",
-            Quality = ItemQuality.Legendary,
-            Slug = "innas-reach",
-            ItemType = ItemType.Daibo,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/innas-reach",
-            Url = "https://us.battle.net/d3/en/item/innas-reach",
-            RelativeUrl = "/d3/en/item/innas-reach",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Inna's Mantra",
-        };
-
-        /// <summary>
-        /// Rozpedin's Staff 
-        /// </summary>
-        public static Item RozpedinsStaff = new Item
-        {
-            Id = 0,
-            Name = "Rozpedin's Staff",
-            Quality = ItemQuality.Legendary,
-            Slug = "rozpedins-staff",
-            ItemType = ItemType.Daibo,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/rozpedins-staff",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/rozpedins-staff",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/rozpedins-staff",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Lai Yui's Persuader 
-        /// </summary>
-        public static Item LaiYuisPersuader = new Item
-        {
-            Id = 0,
-            Name = "Lai Yui's Persuader",
-            Quality = ItemQuality.Legendary,
-            Slug = "lai-yuis-persuader",
-            ItemType = ItemType.Daibo,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/lai-yuis-persuader",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/lai-yuis-persuader",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/lai-yuis-persuader",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Rozpedin's Force 
-        /// </summary>
-        public static Item RozpedinsForce = new Item
-        {
-            Id = 0,
-            Name = "Rozpedin's Force",
-            Quality = ItemQuality.Legendary,
-            Slug = "rozpedins-force",
-            ItemType = ItemType.Daibo,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/rozpedins-force",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/rozpedins-force",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/rozpedins-force",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Demon Machine 35–65% chance to shoot explosive bolts when attacking.
-        /// </summary>
-        public static Item DemonMachine = new Item
-        {
-            Id = 222286,
-            Name = "Demon Machine",
-            Quality = ItemQuality.Legendary,
-            Slug = "demon-machine",
-            ItemType = ItemType.Crossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "XBow_norm_unique_07",
-            DataUrl = "https://us.battle.net/api/d3/data/item/demon-machine",
-            Url = "https://us.battle.net/d3/en/item/demon-machine",
-            RelativeUrl = "/d3/en/item/demon-machine",
-            IsCrafted = false,
-            LegendaryAffix = "35–65% chance to shoot explosive bolts when attacking.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Buriza-Do Kyanon Your projectiles pierce 1–2 additional times.
-        /// </summary>
-        public static Item BurizadoKyanon = new Item
-        {
-            Id = 0,
-            Name = "Buriza-Do Kyanon",
-            Quality = ItemQuality.Legendary,
-            Slug = "burizado-kyanon",
-            ItemType = ItemType.Crossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/burizado-kyanon",
-            Url = "https://us.battle.net/d3/en/item/burizado-kyanon",
-            RelativeUrl = "/d3/en/item/burizado-kyanon",
-            IsCrafted = false,
-            LegendaryAffix = "Your projectiles pierce 1–2 additional times.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Bakkan Caster 
-        /// </summary>
-        public static Item BakkanCaster = new Item
-        {
-            Id = 98163,
-            Name = "Bakkan Caster",
-            Quality = ItemQuality.Legendary,
-            Slug = "bakkan-caster",
-            ItemType = ItemType.Crossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "XBow_norm_unique_01",
-            DataUrl = "https://us.battle.net/api/d3/data/item/bakkan-caster",
-            Url = "https://us.battle.net/d3/en/item/bakkan-caster",
-            RelativeUrl = "/d3/en/item/bakkan-caster",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Pus Spitter 25–50% chance to lob an acid blob when attacking.
-        /// </summary>
-        public static Item PusSpitter = new Item
-        {
-            Id = 204874,
-            Name = "Pus Spitter",
-            Quality = ItemQuality.Legendary,
-            Slug = "pus-spitter",
-            ItemType = ItemType.Crossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "XBow_norm_unique_05",
-            DataUrl = "https://us.battle.net/api/d3/data/item/pus-spitter",
-            Url = "https://us.battle.net/d3/en/item/pus-spitter",
-            RelativeUrl = "/d3/en/item/pus-spitter",
-            IsCrafted = false,
-            LegendaryAffix = "25–50% chance to lob an acid blob when attacking.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Starspine 
-        /// </summary>
-        public static Item Starspine = new Item
-        {
-            Id = 0,
-            Name = "Starspine",
-            Quality = ItemQuality.Legendary,
-            Slug = "starspine",
-            ItemType = ItemType.Crossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/starspine",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/starspine",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/starspine",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Hellrack Chance to root enemies to the ground when you hit them.
-        /// </summary>
-        public static Item Hellrack = new Item
-        {
-            Id = 192836,
-            Name = "Hellrack",
-            Quality = ItemQuality.Legendary,
-            Slug = "hellrack",
-            ItemType = ItemType.Crossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "XBow_norm_unique_02",
-            DataUrl = "https://us.battle.net/api/d3/data/item/hellrack",
-            Url = "https://us.battle.net/d3/en/item/hellrack",
-            RelativeUrl = "/d3/en/item/hellrack",
-            IsCrafted = false,
-            LegendaryAffix = "Chance to root enemies to the ground when you hit them.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Manticore 
-        /// </summary>
-        public static Item Manticore = new Item
-        {
-            Id = 221760,
-            Name = "Manticore",
-            Quality = ItemQuality.Legendary,
-            Slug = "manticore",
-            ItemType = ItemType.Crossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "XBow_norm_unique_06",
-            DataUrl = "https://us.battle.net/api/d3/data/item/manticore",
-            Url = "https://us.battle.net/d3/en/item/manticore",
-            RelativeUrl = "/d3/en/item/manticore",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Chanon Bolter Your Spike Traps lure enemies to them. Enemies may be taunted once every 12–16 seconds.
-        /// </summary>
-        public static Item ChanonBolter = new Item
-        {
-            Id = 0,
-            Name = "Chanon Bolter",
-            Quality = ItemQuality.Legendary,
-            Slug = "chanon-bolter",
-            ItemType = ItemType.Crossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/chanon-bolter",
-            Url = "https://us.battle.net/d3/en/item/chanon-bolter",
-            RelativeUrl = "/d3/en/item/chanon-bolter",
-            IsCrafted = false,
-            LegendaryAffix = "Your Spike Traps lure enemies to them. Enemies may be taunted once every 12–16 seconds.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Wojahnni Assaulter Rapid Fire deals 30–40% more damage for every second that you channel. Stacks up to 4 times.
-        /// </summary>
-        public static Item WojahnniAssaulter = new Item
-        {
-            Id = 0,
-            Name = "Wojahnni Assaulter",
-            Quality = ItemQuality.Legendary,
-            Slug = "wojahnni-assaulter",
-            ItemType = ItemType.Crossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/wojahnni-assaulter",
-            Url = "https://us.battle.net/d3/en/item/wojahnni-assaulter",
-            RelativeUrl = "/d3/en/item/wojahnni-assaulter",
-            IsCrafted = false,
-            LegendaryAffix = "Rapid Fire deals 30–40% more damage for every second that you channel. Stacks up to 4 times.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Arcane Barb 
-        /// </summary>
-        public static Item ArcaneBarb = new Item
-        {
-            Id = 0,
-            Name = "Arcane Barb",
-            Quality = ItemQuality.Legendary,
-            Slug = "arcane-barb",
-            ItemType = ItemType.Crossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/arcane-barb",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/arcane-barb",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/arcane-barb",
-            IsCrafted = true,
-            LegendaryAffix = "",
             SetName = "",
         };
 
@@ -11161,13 +10563,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item BastionsRevered = new Item
         {
-            Id = 0,
+            Id = 195690,
             Name = "Bastion's Revered",
             Quality = ItemQuality.Legendary,
             Slug = "bastions-revered",
             ItemType = ItemType.MightyWeapon,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
+            InternalName = "mightyWeapon_2H_norm_unique_03",
             DataUrl = "https://us.battle.net/api/d3/data/item/bastions-revered",
             Url = "https://us.battle.net/d3/en/item/bastions-revered",
             RelativeUrl = "/d3/en/item/bastions-revered",
@@ -11277,17 +10679,857 @@ namespace Trinity.Reference
         };
 
         /// <summary>
+        /// Arthef's Spark of Life Heal for 3–4% of your missing Life when you kill an Undead enemy.
+        /// </summary>
+        public static Item ArthefsSparkOfLife = new Item
+        {
+            Id = 59633,
+            Name = "Arthef's Spark of Life",
+            Quality = ItemQuality.Legendary,
+            Slug = "arthefs-spark-of-life",
+            ItemType = ItemType.Mace,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "twoHandedMace_norm_unique_01",
+            DataUrl = "https://us.battle.net/api/d3/data/item/arthefs-spark-of-life",
+            Url = "https://us.battle.net/d3/en/item/arthefs-spark-of-life",
+            RelativeUrl = "/d3/en/item/arthefs-spark-of-life",
+            IsCrafted = false,
+            LegendaryAffix = "Heal for 3–4% of your missing Life when you kill an Undead enemy.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Crushbane 
+        /// </summary>
+        public static Item Crushbane = new Item
+        {
+            Id = 99227,
+            Name = "Crushbane",
+            Quality = ItemQuality.Legendary,
+            Slug = "crushbane",
+            ItemType = ItemType.Mace,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "twoHandedMace_norm_unique_02",
+            DataUrl = "https://us.battle.net/api/d3/data/item/crushbane",
+            Url = "https://us.battle.net/d3/en/item/crushbane",
+            RelativeUrl = "/d3/en/item/crushbane",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Skywarden Every 60 seconds, gain a random Law for 60 seconds.
+        /// </summary>
+        public static Item Skywarden = new Item
+        {
+            Id = 190840,
+            Name = "Skywarden",
+            Quality = ItemQuality.Legendary,
+            Slug = "skywarden",
+            ItemType = ItemType.Mace,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "twohandedmace_norm_unique_03",
+            DataUrl = "https://us.battle.net/api/d3/data/item/skywarden",
+            Url = "https://us.battle.net/d3/en/item/skywarden",
+            RelativeUrl = "/d3/en/item/skywarden",
+            IsCrafted = false,
+            LegendaryAffix = "Every 60 seconds, gain a random Law for 60 seconds.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Wrath of the Bone King 
+        /// </summary>
+        public static Item WrathOfTheBoneKing = new Item
+        {
+            Id = 191584,
+            Name = "Wrath of the Bone King",
+            Quality = ItemQuality.Legendary,
+            Slug = "wrath-of-the-bone-king",
+            ItemType = ItemType.Mace,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "twoHandedMace_norm_unique_06",
+            DataUrl = "https://us.battle.net/api/d3/data/item/wrath-of-the-bone-king",
+            Url = "https://us.battle.net/d3/en/item/wrath-of-the-bone-king",
+            RelativeUrl = "/d3/en/item/wrath-of-the-bone-king",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// The Furnace Increases damage against elites by 40–50%.
+        /// </summary>
+        public static Item TheFurnace = new Item
+        {
+            Id = 271666,
+            Name = "The Furnace",
+            Quality = ItemQuality.Legendary,
+            Slug = "the-furnace",
+            ItemType = ItemType.Mace,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "twohandedmace_norm_unique_08",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-furnace",
+            Url = "https://us.battle.net/d3/en/item/the-furnace",
+            RelativeUrl = "/d3/en/item/the-furnace",
+            IsCrafted = false,
+            LegendaryAffix = "Increases damage against elites by 40–50%.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Cataclysm 25–50% chance to sunder the ground your enemies walk on when you attack.
+        /// </summary>
+        public static Item Cataclysm = new Item
+        {
+            Id = 0,
+            Name = "Cataclysm",
+            Quality = ItemQuality.Legendary,
+            Slug = "cataclysm",
+            ItemType = ItemType.Mace,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/cataclysm",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/cataclysm",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/cataclysm",
+            IsCrafted = true,
+            LegendaryAffix = "25–50% chance to sunder the ground your enemies walk on when you attack.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Schaefer's Hammer Getting hit has a chance to charge you with Lightning, causing you to deal 190–250% weapon damage as Lightning every second for 5 seconds to nearby enemies.
+        /// </summary>
+        public static Item SchaefersHammer = new Item
+        {
+            Id = 197717,
+            Name = "Schaefer's Hammer",
+            Quality = ItemQuality.Legendary,
+            Slug = "schaefers-hammer",
+            ItemType = ItemType.Mace,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "twoHandedMace_norm_unique_07",
+            DataUrl = "https://us.battle.net/api/d3/data/item/schaefers-hammer",
+            Url = "https://us.battle.net/d3/en/item/schaefers-hammer",
+            RelativeUrl = "/d3/en/item/schaefers-hammer",
+            IsCrafted = false,
+            LegendaryAffix = "Getting hit has a chance to charge you with Lightning, causing you to deal 190–250% weapon damage as Lightning every second for 5 seconds to nearby enemies.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Sledge of Athskeleng 
+        /// </summary>
+        public static Item SledgeOfAthskeleng = new Item
+        {
+            Id = 190866,
+            Name = "Sledge of Athskeleng",
+            Quality = ItemQuality.Legendary,
+            Slug = "sledge-of-athskeleng",
+            ItemType = ItemType.Mace,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "twoHandedMace_norm_unique_04",
+            DataUrl = "https://us.battle.net/api/d3/data/item/sledge-of-athskeleng",
+            Url = "https://us.battle.net/d3/en/item/sledge-of-athskeleng",
+            RelativeUrl = "/d3/en/item/sledge-of-athskeleng",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Sunder 25–50% chance to sunder the ground your enemies walk on when you attack.
+        /// </summary>
+        public static Item Sunder = new Item
+        {
+            Id = 0,
+            Name = "Sunder",
+            Quality = ItemQuality.Legendary,
+            Slug = "sunder",
+            ItemType = ItemType.Mace,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/sunder",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/sunder",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/sunder",
+            IsCrafted = true,
+            LegendaryAffix = "25–50% chance to sunder the ground your enemies walk on when you attack.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Izzuccob 
+        /// </summary>
+        public static Item Izzuccob = new Item
+        {
+            Id = 192467,
+            Name = "Izzuccob",
+            Quality = ItemQuality.Legendary,
+            Slug = "izzuccob",
+            ItemType = ItemType.HandCrossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "handXbow_norm_unique_01",
+            DataUrl = "https://us.battle.net/api/d3/data/item/izzuccob",
+            Url = "https://us.battle.net/d3/en/item/izzuccob",
+            RelativeUrl = "/d3/en/item/izzuccob",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Balefire Caster 
+        /// </summary>
+        public static Item BalefireCaster = new Item
+        {
+            Id = 192528,
+            Name = "Balefire Caster",
+            Quality = ItemQuality.Legendary,
+            Slug = "balefire-caster",
+            ItemType = ItemType.HandCrossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "handxbow_norm_unique_02",
+            DataUrl = "https://us.battle.net/api/d3/data/item/balefire-caster",
+            Url = "https://us.battle.net/d3/en/item/balefire-caster",
+            RelativeUrl = "/d3/en/item/balefire-caster",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// K'mar Tenclip Strafe gains the effect of the Drifting Shadow rune.
+        /// </summary>
+        public static Item KmarTenclip = new Item
+        {
+            Id = 271892,
+            Name = "K'mar Tenclip",
+            Quality = ItemQuality.Legendary,
+            Slug = "kmar-tenclip",
+            ItemType = ItemType.HandCrossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "handxbow_norm_unique_10",
+            DataUrl = "https://us.battle.net/api/d3/data/item/kmar-tenclip",
+            Url = "https://us.battle.net/d3/en/item/kmar-tenclip",
+            RelativeUrl = "/d3/en/item/kmar-tenclip",
+            IsCrafted = false,
+            LegendaryAffix = "Strafe gains the effect of the Drifting Shadow rune.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Deadeye 
+        /// </summary>
+        public static Item Deadeye = new Item
+        {
+            Id = 0,
+            Name = "Deadeye",
+            Quality = ItemQuality.Legendary,
+            Slug = "deadeye",
+            ItemType = ItemType.HandCrossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/deadeye",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/deadeye",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/deadeye",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Dawn 
+        /// </summary>
+        public static Item Dawn = new Item
+        {
+            Id = 196409,
+            Name = "Dawn",
+            Quality = ItemQuality.Legendary,
+            Slug = "dawn",
+            ItemType = ItemType.HandCrossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "handXbow_norm_unique_04",
+            DataUrl = "https://us.battle.net/api/d3/data/item/dawn",
+            Url = "https://us.battle.net/d3/en/item/dawn",
+            RelativeUrl = "/d3/en/item/dawn",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Calamity Enemies you hit become Marked for Death.
+        /// </summary>
+        public static Item Calamity = new Item
+        {
+            Id = 225181,
+            Name = "Calamity",
+            Quality = ItemQuality.Legendary,
+            Slug = "calamity",
+            ItemType = ItemType.HandCrossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "handXbow_norm_unique_08",
+            DataUrl = "https://us.battle.net/api/d3/data/item/calamity",
+            Url = "https://us.battle.net/d3/en/item/calamity",
+            RelativeUrl = "/d3/en/item/calamity",
+            IsCrafted = false,
+            LegendaryAffix = "Enemies you hit become Marked for Death.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Danetta's Revenge Vault gains the effect of the Rattling Roll rune.
+        /// </summary>
+        public static Item DanettasRevenge = new Item
+        {
+            Id = 211749,
+            Name = "Danetta's Revenge",
+            Quality = ItemQuality.Legendary,
+            Slug = "danettas-revenge",
+            ItemType = ItemType.HandCrossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "handXbow_norm_unique_07",
+            DataUrl = "https://us.battle.net/api/d3/data/item/danettas-revenge",
+            Url = "https://us.battle.net/d3/en/item/danettas-revenge",
+            RelativeUrl = "/d3/en/item/danettas-revenge",
+            IsCrafted = false,
+            LegendaryAffix = "Vault gains the effect of the Rattling Roll rune.",
+            SetName = "Danetta's Hatred",
+        };
+
+        /// <summary>
+        /// Danetta's Spite Leave a clone of yourself behind after using Vault.
+        /// </summary>
+        public static Item DanettasSpite = new Item
+        {
+            Id = 211745,
+            Name = "Danetta's Spite",
+            Quality = ItemQuality.Legendary,
+            Slug = "danettas-spite",
+            ItemType = ItemType.HandCrossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "handXbow_norm_unique_06",
+            DataUrl = "https://us.battle.net/api/d3/data/item/danettas-spite",
+            Url = "https://us.battle.net/d3/en/item/danettas-spite",
+            RelativeUrl = "/d3/en/item/danettas-spite",
+            IsCrafted = false,
+            LegendaryAffix = "Leave a clone of yourself behind after using Vault.",
+            SetName = "Danetta's Hatred",
+        };
+
+        /// <summary>
+        /// Natalya's Slayer 
+        /// </summary>
+        public static Item NatalyasSlayer = new Item
+        {
+            Id = 210874,
+            Name = "Natalya's Slayer",
+            Quality = ItemQuality.Legendary,
+            Slug = "natalyas-slayer",
+            ItemType = ItemType.HandCrossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "handXbow_norm_unique_05",
+            DataUrl = "https://us.battle.net/api/d3/data/item/natalyas-slayer",
+            Url = "https://us.battle.net/d3/en/item/natalyas-slayer",
+            RelativeUrl = "/d3/en/item/natalyas-slayer",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "Natalya's Vengeance",
+        };
+
+        /// <summary>
+        /// Hallowed Judgment 
+        /// </summary>
+        public static Item HallowedJudgment = new Item
+        {
+            Id = 0,
+            Name = "Hallowed Judgment",
+            Quality = ItemQuality.Legendary,
+            Slug = "hallowed-avenger",
+            ItemType = ItemType.HandCrossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/hallowed-avenger",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/hallowed-avenger",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/hallowed-avenger",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Hallowed Defenders",
+        };
+
+        /// <summary>
+        /// Blitzbolter 
+        /// </summary>
+        public static Item Blitzbolter = new Item
+        {
+            Id = 195078,
+            Name = "Blitzbolter",
+            Quality = ItemQuality.Legendary,
+            Slug = "blitzbolter",
+            ItemType = ItemType.HandCrossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "handXbow_norm_unique_03",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/blitzbolter",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/blitzbolter",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/blitzbolter",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Hallowed Condemnation 
+        /// </summary>
+        public static Item HallowedCondemnation = new Item
+        {
+            Id = 0,
+            Name = "Hallowed Condemnation",
+            Quality = ItemQuality.Legendary,
+            Slug = "hallowed-condemnation",
+            ItemType = ItemType.HandCrossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/hallowed-condemnation",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/hallowed-condemnation",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/hallowed-condemnation",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "Hallowed Protectors",
+        };
+
+        /// <summary>
+        /// Uskang 
+        /// </summary>
+        public static Item Uskang = new Item
+        {
+            Id = 175580,
+            Name = "Uskang",
+            Quality = ItemQuality.Legendary,
+            Slug = "uskang",
+            ItemType = ItemType.Bow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "bow_norm_unique_01",
+            DataUrl = "https://us.battle.net/api/d3/data/item/uskang",
+            Url = "https://us.battle.net/d3/en/item/uskang",
+            RelativeUrl = "/d3/en/item/uskang",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Longshot 
+        /// </summary>
+        public static Item Longshot = new Item
+        {
+            Id = 0,
+            Name = "Longshot",
+            Quality = ItemQuality.Legendary,
+            Slug = "longshot",
+            ItemType = ItemType.Bow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/longshot",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/longshot",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/longshot",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Etrayu 
+        /// </summary>
+        public static Item Etrayu = new Item
+        {
+            Id = 175581,
+            Name = "Etrayu",
+            Quality = ItemQuality.Legendary,
+            Slug = "etrayu",
+            ItemType = ItemType.Bow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "Bow_norm_unique_02",
+            DataUrl = "https://us.battle.net/api/d3/data/item/etrayu",
+            Url = "https://us.battle.net/d3/en/item/etrayu",
+            RelativeUrl = "/d3/en/item/etrayu",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// The Raven's Wing A raven flies to your side.
+        /// </summary>
+        public static Item TheRavensWing = new Item
+        {
+            Id = 221938,
+            Name = "The Raven's Wing",
+            Quality = ItemQuality.Legendary,
+            Slug = "the-ravens-wing",
+            ItemType = ItemType.Bow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "Bow_norm_unique_07",
+            DataUrl = "https://us.battle.net/api/d3/data/item/the-ravens-wing",
+            Url = "https://us.battle.net/d3/en/item/the-ravens-wing",
+            RelativeUrl = "/d3/en/item/the-ravens-wing",
+            IsCrafted = false,
+            LegendaryAffix = "A raven flies to your side.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Kridershot Elemental Arrow now generates 3–4 Hatred.
+        /// </summary>
+        public static Item Kridershot = new Item
+        {
+            Id = 271875,
+            Name = "Kridershot",
+            Quality = ItemQuality.Legendary,
+            Slug = "kridershot",
+            ItemType = ItemType.Bow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "bow_norm_unique_09",
+            DataUrl = "https://us.battle.net/api/d3/data/item/kridershot",
+            Url = "https://us.battle.net/d3/en/item/kridershot",
+            RelativeUrl = "/d3/en/item/kridershot",
+            IsCrafted = false,
+            LegendaryAffix = "Elemental Arrow now generates 3–4 Hatred.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Cluckeye 25–50% chance to cluck when attacking.
+        /// </summary>
+        public static Item Cluckeye = new Item
+        {
+            Id = 175582,
+            Name = "Cluckeye",
+            Quality = ItemQuality.Legendary,
+            Slug = "cluckeye",
+            ItemType = ItemType.Bow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "Bow_norm_unique_03",
+            DataUrl = "https://us.battle.net/api/d3/data/item/cluckeye",
+            Url = "https://us.battle.net/d3/en/item/cluckeye",
+            RelativeUrl = "/d3/en/item/cluckeye",
+            IsCrafted = false,
+            LegendaryAffix = "25–50% chance to cluck when attacking.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Windforce 
+        /// </summary>
+        public static Item Windforce = new Item
+        {
+            Id = 192602,
+            Name = "Windforce",
+            Quality = ItemQuality.Legendary,
+            Slug = "windforce",
+            ItemType = ItemType.Bow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "bow_norm_unique_04",
+            DataUrl = "https://us.battle.net/api/d3/data/item/windforce",
+            Url = "https://us.battle.net/d3/en/item/windforce",
+            RelativeUrl = "/d3/en/item/windforce",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Venomhusk 
+        /// </summary>
+        public static Item Venomhusk = new Item
+        {
+            Id = 0,
+            Name = "Venomhusk",
+            Quality = ItemQuality.Legendary,
+            Slug = "venomhusk",
+            ItemType = ItemType.Bow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/venomhusk",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/venomhusk",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/venomhusk",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Leonine Bow of Hashir Bola Shot has a 15–20% chance on explosion to pull in all enemies within 24 yards.
+        /// </summary>
+        public static Item LeonineBowOfHashir = new Item
+        {
+            Id = 271882,
+            Name = "Leonine Bow of Hashir",
+            Quality = ItemQuality.Legendary,
+            Slug = "leonine-bow-of-hashir",
+            ItemType = ItemType.Bow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "bow_norm_unique_11",
+            DataUrl = "https://us.battle.net/api/d3/data/item/leonine-bow-of-hashir",
+            Url = "https://us.battle.net/d3/en/item/leonine-bow-of-hashir",
+            RelativeUrl = "/d3/en/item/leonine-bow-of-hashir",
+            IsCrafted = false,
+            LegendaryAffix = "Bola Shot has a 15–20% chance on explosion to pull in all enemies within 24 yards.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Sydyru Crust 
+        /// </summary>
+        public static Item SydyruCrust = new Item
+        {
+            Id = 221893,
+            Name = "Sydyru Crust",
+            Quality = ItemQuality.Legendary,
+            Slug = "sydyru-crust",
+            ItemType = ItemType.Bow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "Bow_norm_unique_06",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/sydyru-crust",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/sydyru-crust",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/sydyru-crust",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Unbound Bolt 
+        /// </summary>
+        public static Item UnboundBolt = new Item
+        {
+            Id = 220654,
+            Name = "Unbound Bolt",
+            Quality = ItemQuality.Legendary,
+            Slug = "unbound-bolt",
+            ItemType = ItemType.Bow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "Bow_norm_unique_05",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/unbound-bolt",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/unbound-bolt",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/unbound-bolt",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Demon Machine 35–65% chance to shoot explosive bolts when attacking.
+        /// </summary>
+        public static Item DemonMachine = new Item
+        {
+            Id = 222286,
+            Name = "Demon Machine",
+            Quality = ItemQuality.Legendary,
+            Slug = "demon-machine",
+            ItemType = ItemType.Crossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "xbow_norm_unique_07",
+            DataUrl = "https://us.battle.net/api/d3/data/item/demon-machine",
+            Url = "https://us.battle.net/d3/en/item/demon-machine",
+            RelativeUrl = "/d3/en/item/demon-machine",
+            IsCrafted = false,
+            LegendaryAffix = "35–65% chance to shoot explosive bolts when attacking.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Buriza-Do Kyanon Your projectiles pierce 1–2 additional times.
+        /// </summary>
+        public static Item BurizadoKyanon = new Item
+        {
+            Id = 0,
+            Name = "Buriza-Do Kyanon",
+            Quality = ItemQuality.Legendary,
+            Slug = "burizado-kyanon",
+            ItemType = ItemType.Crossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/burizado-kyanon",
+            Url = "https://us.battle.net/d3/en/item/burizado-kyanon",
+            RelativeUrl = "/d3/en/item/burizado-kyanon",
+            IsCrafted = false,
+            LegendaryAffix = "Your projectiles pierce 1–2 additional times.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Bakkan Caster 
+        /// </summary>
+        public static Item BakkanCaster = new Item
+        {
+            Id = 98163,
+            Name = "Bakkan Caster",
+            Quality = ItemQuality.Legendary,
+            Slug = "bakkan-caster",
+            ItemType = ItemType.Crossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "xbow_norm_unique_01",
+            DataUrl = "https://us.battle.net/api/d3/data/item/bakkan-caster",
+            Url = "https://us.battle.net/d3/en/item/bakkan-caster",
+            RelativeUrl = "/d3/en/item/bakkan-caster",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Pus Spitter 25–50% chance to lob an acid blob when attacking.
+        /// </summary>
+        public static Item PusSpitter = new Item
+        {
+            Id = 204874,
+            Name = "Pus Spitter",
+            Quality = ItemQuality.Legendary,
+            Slug = "pus-spitter",
+            ItemType = ItemType.Crossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "XBow_norm_unique_05",
+            DataUrl = "https://us.battle.net/api/d3/data/item/pus-spitter",
+            Url = "https://us.battle.net/d3/en/item/pus-spitter",
+            RelativeUrl = "/d3/en/item/pus-spitter",
+            IsCrafted = false,
+            LegendaryAffix = "25–50% chance to lob an acid blob when attacking.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Starspine 
+        /// </summary>
+        public static Item Starspine = new Item
+        {
+            Id = 0,
+            Name = "Starspine",
+            Quality = ItemQuality.Legendary,
+            Slug = "starspine",
+            ItemType = ItemType.Crossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/starspine",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/starspine",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/starspine",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Hellrack Chance to root enemies to the ground when you hit them.
+        /// </summary>
+        public static Item Hellrack = new Item
+        {
+            Id = 192836,
+            Name = "Hellrack",
+            Quality = ItemQuality.Legendary,
+            Slug = "hellrack",
+            ItemType = ItemType.Crossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "XBow_norm_unique_02",
+            DataUrl = "https://us.battle.net/api/d3/data/item/hellrack",
+            Url = "https://us.battle.net/d3/en/item/hellrack",
+            RelativeUrl = "/d3/en/item/hellrack",
+            IsCrafted = false,
+            LegendaryAffix = "Chance to root enemies to the ground when you hit them.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Manticore 
+        /// </summary>
+        public static Item Manticore = new Item
+        {
+            Id = 221760,
+            Name = "Manticore",
+            Quality = ItemQuality.Legendary,
+            Slug = "manticore",
+            ItemType = ItemType.Crossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "XBow_norm_unique_06",
+            DataUrl = "https://us.battle.net/api/d3/data/item/manticore",
+            Url = "https://us.battle.net/d3/en/item/manticore",
+            RelativeUrl = "/d3/en/item/manticore",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Chanon Bolter Your Spike Traps lure enemies to them. Enemies may be taunted once every 12–16 seconds.
+        /// </summary>
+        public static Item ChanonBolter = new Item
+        {
+            Id = 271884,
+            Name = "Chanon Bolter",
+            Quality = ItemQuality.Legendary,
+            Slug = "chanon-bolter",
+            ItemType = ItemType.Crossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "xbow_norm_unique_08",
+            DataUrl = "https://us.battle.net/api/d3/data/item/chanon-bolter",
+            Url = "https://us.battle.net/d3/en/item/chanon-bolter",
+            RelativeUrl = "/d3/en/item/chanon-bolter",
+            IsCrafted = false,
+            LegendaryAffix = "Your Spike Traps lure enemies to them. Enemies may be taunted once every 12–16 seconds.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Wojahnni Assaulter Rapid Fire deals 30–40% more damage for every second that you channel. Stacks up to 4 times.
+        /// </summary>
+        public static Item WojahnniAssaulter = new Item
+        {
+            Id = 271889,
+            Name = "Wojahnni Assaulter",
+            Quality = ItemQuality.Legendary,
+            Slug = "wojahnni-assaulter",
+            ItemType = ItemType.Crossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "xbow_norm_unique_09",
+            DataUrl = "https://us.battle.net/api/d3/data/item/wojahnni-assaulter",
+            Url = "https://us.battle.net/d3/en/item/wojahnni-assaulter",
+            RelativeUrl = "/d3/en/item/wojahnni-assaulter",
+            IsCrafted = false,
+            LegendaryAffix = "Rapid Fire deals 30–40% more damage for every second that you channel. Stacks up to 4 times.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Arcane Barb 
+        /// </summary>
+        public static Item ArcaneBarb = new Item
+        {
+            Id = 194957,
+            Name = "Arcane Barb",
+            Quality = ItemQuality.Legendary,
+            Slug = "arcane-barb",
+            ItemType = ItemType.Crossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "XBow_norm_unique_04",
+            DataUrl = "https://us.battle.net/api/d3/data/recipe/arcane-barb",
+            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/arcane-barb",
+            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/arcane-barb",
+            IsCrafted = true,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
+        /// <summary>
         /// Starfire 
         /// </summary>
         public static Item Starfire = new Item
         {
-            Id = 0,
+            Id = 182074,
             Name = "Starfire",
             Quality = ItemQuality.Legendary,
             Slug = "starfire",
             ItemType = ItemType.Wand,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
+            InternalName = "Wand_norm_unique_04",
             DataUrl = "https://us.battle.net/api/d3/data/item/starfire",
             Url = "https://us.battle.net/d3/en/item/starfire",
             RelativeUrl = "/d3/en/item/starfire",
@@ -11307,7 +11549,7 @@ namespace Trinity.Reference
             Slug = "blackhand-key",
             ItemType = ItemType.Wand,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "Wand_norm_unique_06",
+            InternalName = "wand_norm_unique_06",
             DataUrl = "https://us.battle.net/api/d3/data/item/blackhand-key",
             Url = "https://us.battle.net/d3/en/item/blackhand-key",
             RelativeUrl = "/d3/en/item/blackhand-key",
@@ -11341,13 +11583,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item WandOfWoh = new Item
         {
-            Id = 0,
+            Id = 272086,
             Name = "Wand of Woh",
             Quality = ItemQuality.Legendary,
             Slug = "wand-of-woh",
             ItemType = ItemType.Wand,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
+            InternalName = "wand_norm_unique_06",
             DataUrl = "https://us.battle.net/api/d3/data/item/wand-of-woh",
             Url = "https://us.battle.net/d3/en/item/wand-of-woh",
             RelativeUrl = "/d3/en/item/wand-of-woh",
@@ -11501,13 +11743,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item Atrophy = new Item
         {
-            Id = 0,
+            Id = 182081,
             Name = "Atrophy",
             Quality = ItemQuality.Legendary,
             Slug = "atrophy",
             ItemType = ItemType.Wand,
             BaseType = ItemBaseType.Weapon,
-            InternalName = "",
+            InternalName = "Wand_norm_unique_05",
             DataUrl = "https://us.battle.net/api/d3/data/recipe/atrophy",
             Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/atrophy",
             RelativeUrl = "/d3/en/artisan/blacksmith/recipe/atrophy",
@@ -11531,246 +11773,6 @@ namespace Trinity.Reference
             DataUrl = "https://us.battle.net/api/d3/data/recipe/hallowed-baton",
             Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/hallowed-baton",
             RelativeUrl = "/d3/en/artisan/blacksmith/recipe/hallowed-baton",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Hallowed Protectors",
-        };
-
-        /// <summary>
-        /// Izzuccob 
-        /// </summary>
-        public static Item Izzuccob = new Item
-        {
-            Id = 192467,
-            Name = "Izzuccob",
-            Quality = ItemQuality.Legendary,
-            Slug = "izzuccob",
-            ItemType = ItemType.HandCrossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "handXbow_norm_unique_01",
-            DataUrl = "https://us.battle.net/api/d3/data/item/izzuccob",
-            Url = "https://us.battle.net/d3/en/item/izzuccob",
-            RelativeUrl = "/d3/en/item/izzuccob",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Balefire Caster 
-        /// </summary>
-        public static Item BalefireCaster = new Item
-        {
-            Id = 192528,
-            Name = "Balefire Caster",
-            Quality = ItemQuality.Legendary,
-            Slug = "balefire-caster",
-            ItemType = ItemType.HandCrossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "handXbow_norm_unique_02",
-            DataUrl = "https://us.battle.net/api/d3/data/item/balefire-caster",
-            Url = "https://us.battle.net/d3/en/item/balefire-caster",
-            RelativeUrl = "/d3/en/item/balefire-caster",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// K'mar Tenclip Strafe gains the effect of the Drifting Shadow rune.
-        /// </summary>
-        public static Item KmarTenclip = new Item
-        {
-            Id = 0,
-            Name = "K'mar Tenclip",
-            Quality = ItemQuality.Legendary,
-            Slug = "kmar-tenclip",
-            ItemType = ItemType.HandCrossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/kmar-tenclip",
-            Url = "https://us.battle.net/d3/en/item/kmar-tenclip",
-            RelativeUrl = "/d3/en/item/kmar-tenclip",
-            IsCrafted = false,
-            LegendaryAffix = "Strafe gains the effect of the Drifting Shadow rune.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Deadeye 
-        /// </summary>
-        public static Item Deadeye = new Item
-        {
-            Id = 0,
-            Name = "Deadeye",
-            Quality = ItemQuality.Legendary,
-            Slug = "deadeye",
-            ItemType = ItemType.HandCrossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/deadeye",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/deadeye",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/deadeye",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Dawn 
-        /// </summary>
-        public static Item Dawn = new Item
-        {
-            Id = 196409,
-            Name = "Dawn",
-            Quality = ItemQuality.Legendary,
-            Slug = "dawn",
-            ItemType = ItemType.HandCrossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "handXbow_norm_unique_04",
-            DataUrl = "https://us.battle.net/api/d3/data/item/dawn",
-            Url = "https://us.battle.net/d3/en/item/dawn",
-            RelativeUrl = "/d3/en/item/dawn",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Calamity Enemies you hit become Marked for Death.
-        /// </summary>
-        public static Item Calamity = new Item
-        {
-            Id = 0,
-            Name = "Calamity",
-            Quality = ItemQuality.Legendary,
-            Slug = "calamity",
-            ItemType = ItemType.HandCrossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/calamity",
-            Url = "https://us.battle.net/d3/en/item/calamity",
-            RelativeUrl = "/d3/en/item/calamity",
-            IsCrafted = false,
-            LegendaryAffix = "Enemies you hit become Marked for Death.",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Danetta's Revenge Vault gains the effect of the Rattling Roll rune.
-        /// </summary>
-        public static Item DanettasRevenge = new Item
-        {
-            Id = 211749,
-            Name = "Danetta's Revenge",
-            Quality = ItemQuality.Legendary,
-            Slug = "danettas-revenge",
-            ItemType = ItemType.HandCrossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "handXbow_norm_unique_07",
-            DataUrl = "https://us.battle.net/api/d3/data/item/danettas-revenge",
-            Url = "https://us.battle.net/d3/en/item/danettas-revenge",
-            RelativeUrl = "/d3/en/item/danettas-revenge",
-            IsCrafted = false,
-            LegendaryAffix = "Vault gains the effect of the Rattling Roll rune.",
-            SetName = "Danetta's Hatred",
-        };
-
-        /// <summary>
-        /// Danetta's Spite Leave a clone of yourself behind after using Vault.
-        /// </summary>
-        public static Item DanettasSpite = new Item
-        {
-            Id = 211745,
-            Name = "Danetta's Spite",
-            Quality = ItemQuality.Legendary,
-            Slug = "danettas-spite",
-            ItemType = ItemType.HandCrossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "handXbow_norm_unique_06",
-            DataUrl = "https://us.battle.net/api/d3/data/item/danettas-spite",
-            Url = "https://us.battle.net/d3/en/item/danettas-spite",
-            RelativeUrl = "/d3/en/item/danettas-spite",
-            IsCrafted = false,
-            LegendaryAffix = "Leave a clone of yourself behind after using Vault.",
-            SetName = "Danetta's Hatred",
-        };
-
-        /// <summary>
-        /// Natalya's Slayer 
-        /// </summary>
-        public static Item NatalyasSlayer = new Item
-        {
-            Id = 210874,
-            Name = "Natalya's Slayer",
-            Quality = ItemQuality.Legendary,
-            Slug = "natalyas-slayer",
-            ItemType = ItemType.HandCrossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "handXbow_norm_unique_05",
-            DataUrl = "https://us.battle.net/api/d3/data/item/natalyas-slayer",
-            Url = "https://us.battle.net/d3/en/item/natalyas-slayer",
-            RelativeUrl = "/d3/en/item/natalyas-slayer",
-            IsCrafted = false,
-            LegendaryAffix = "",
-            SetName = "Natalya's Vengeance",
-        };
-
-        /// <summary>
-        /// Hallowed Judgment 
-        /// </summary>
-        public static Item HallowedJudgment = new Item
-        {
-            Id = 0,
-            Name = "Hallowed Judgment",
-            Quality = ItemQuality.Legendary,
-            Slug = "hallowed-avenger",
-            ItemType = ItemType.HandCrossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/hallowed-avenger",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/hallowed-avenger",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/hallowed-avenger",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "Hallowed Defenders",
-        };
-
-        /// <summary>
-        /// Blitzbolter 
-        /// </summary>
-        public static Item Blitzbolter = new Item
-        {
-            Id = 0,
-            Name = "Blitzbolter",
-            Quality = ItemQuality.Legendary,
-            Slug = "blitzbolter",
-            ItemType = ItemType.HandCrossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/blitzbolter",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/blitzbolter",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/blitzbolter",
-            IsCrafted = true,
-            LegendaryAffix = "",
-            SetName = "",
-        };
-
-        /// <summary>
-        /// Hallowed Condemnation 
-        /// </summary>
-        public static Item HallowedCondemnation = new Item
-        {
-            Id = 0,
-            Name = "Hallowed Condemnation",
-            Quality = ItemQuality.Legendary,
-            Slug = "hallowed-condemnation",
-            ItemType = ItemType.HandCrossbow,
-            BaseType = ItemBaseType.Weapon,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/recipe/hallowed-condemnation",
-            Url = "https://us.battle.net/d3/en/artisan/blacksmith/recipe/hallowed-condemnation",
-            RelativeUrl = "/d3/en/artisan/blacksmith/recipe/hallowed-condemnation",
             IsCrafted = true,
             LegendaryAffix = "",
             SetName = "Hallowed Protectors",
