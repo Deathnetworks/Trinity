@@ -515,6 +515,50 @@ namespace Trinity
                                     return AddToCache;
                                 }
                                 break;
+
+                            case 330697:  //Channeling Pylon
+                                if (!Settings.WorldObject.UseChannelingPylon)
+                                {
+                                    AddToCache = false;
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
+                                    return AddToCache;
+                                }
+                                break;
+
+                            case 330696:  //Conduit Pylon
+                                if (!Settings.WorldObject.UseConduitPylon)
+                                {
+                                    AddToCache = false;
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
+                                    return AddToCache;
+                                }
+                                break;
+
+                            case 330698:  //Shield Pylon
+                                if (!Settings.WorldObject.UseShieldPylon)
+                                {
+                                    AddToCache = false;
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
+                                    return AddToCache;
+                                }
+                                break;
+
+                            case 330699:  //Speed Pylon
+                                if (!Settings.WorldObject.UseSpeedPylon)
+                                {
+                                    AddToCache = false;
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
+                                    return AddToCache;
+                                }
+                                break;
+                            case 330695:  //Power Pylon
+                                if (!Settings.WorldObject.UsePowerPylon)
+                                {
+                                    AddToCache = false;
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
+                                    return AddToCache;
+                                }
+                                break;
                         }  //end switch
 
                         // Bag it!

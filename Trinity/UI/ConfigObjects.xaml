@@ -91,7 +91,7 @@
                     ToolTip="Minimum Health Percentage to use Health Shrines"/>
             </Grid>
             <!--Shrine Settings-->
-            <GroupBox Header="Shrines">
+            <GroupBox Header="Shrines and Pylons">
                 <StackPanel>
                     <UniformGrid Margin="50,0,50,0" Columns="2" HorizontalAlignment="Center">
                         <RadioButton GroupName="WorldObjectShrine" Content="Ignore shrines" IsChecked="{Binding Path=WorldObject.UseShrine, Converter={StaticResource boolInverterConverter}}" Margin="5"/>
@@ -109,6 +109,15 @@
                         <CheckBox Margin="2" IsChecked="{Binding Path=WorldObject.UseProtectionShrine}" ToolTip="Enable collection of Protection Shrines">Use Protection</CheckBox>
                         <CheckBox Margin="2" IsChecked="{Binding Path=WorldObject.UseEmpoweredShrine}" ToolTip="Enable collection of Empowered Shrines">Use Empowered</CheckBox>
                         <CheckBox Margin="2" IsChecked="{Binding Path=WorldObject.UseFleetingShrine}" ToolTip="Enable collection of Fleeting Shrines">Use Fleeting</CheckBox>
+                    </UniformGrid>
+                    <UniformGrid Margin="50,0,50,0" Columns="3" HorizontalAlignment="Center">
+                      <CheckBox Margin="2" IsChecked="{Binding Path=WorldObject.UseChannelingPylon}" ToolTip="Enable collection of Channeling Pylons">Use Channeling</CheckBox>
+                      <CheckBox Margin="2" IsChecked="{Binding Path=WorldObject.UseConduitPylon}" ToolTip="Enable collection of Conduit Pylons">Use Conduit</CheckBox>
+                      <CheckBox Margin="2" IsChecked="{Binding Path=WorldObject.UseShieldPylon}" ToolTip="Enable collection of Shield Pylons">Use Shield</CheckBox>
+                    </UniformGrid>
+                    <UniformGrid Margin="50,0,50,0" Columns="2" HorizontalAlignment="Center">
+                      <CheckBox Margin="2" IsChecked="{Binding Path=WorldObject.UseSpeedPylon}" ToolTip="Enable collection of Speed Pylons">Use Speed</CheckBox>
+                      <CheckBox Margin="2" IsChecked="{Binding Path=WorldObject.UsePowerPylon}" ToolTip="Enable collection of Power Pylons">Use Power</CheckBox>
                     </UniformGrid>
                 </StackPanel>
             </GroupBox>
