@@ -7,14 +7,11 @@ using System.Threading;
 using Trinity.Combat;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
-using Trinity.Helpers;
 using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Dungeons;
 using Zeta.Bot.Navigation;
-using Zeta.Bot.Profile;
-using Zeta.Bot.Profile.Common;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals;
@@ -36,10 +33,10 @@ namespace Trinity.DbProvider
             return Trinity.ObjectCache.Any(o => BasicMovementOnlyIDs.Contains(o.ActorSNO) && Vector3.Distance(o.Position, targetpos) <= 50f);
         }
 
-        private static DateTime _lastUsedMoveStop = DateTime.MinValue;
+        private static readonly DateTime LastUsedMoveStop = DateTime.MinValue;
         public void MoveStop()
         {
-            if (DateTime.UtcNow.Subtract(_lastUsedMoveStop).TotalMilliseconds < 250)
+            if (DateTime.UtcNow.Subtract(LastUsedMoveStop).TotalMilliseconds < 250)
                 return;
 
             ZetaDia.Me.UsePower(SNOPower.Walk, ZetaDia.Me.Position, ZetaDia.CurrentWorldDynamicId   );
@@ -483,8 +480,6 @@ namespace Trinity.DbProvider
             // See if we can use abilities like leap etc. for movement out of combat, but not in town
             if (Trinity.Settings.Combat.Misc.AllowOOCMovement && !Trinity.Player.IsInTown && !Trinity.DontMoveMeIAmDoingShit && cancelSpecialMovementAfterStuck)
             {
-                bool bTooMuchZChange = (Math.Abs(MyPosition.Z - vMoveToTarget.Z) >= 4f);
-
                 // Whirlwind for a barb, special context only
                 if (Trinity.Settings.Combat.Barbarian.SprintMode != BarbarianSprintMode.CombatOnly &&
                     Trinity.Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Trinity.ObjectCache.Any(u => u.IsUnit &&
@@ -512,7 +507,7 @@ namespace Trinity.DbProvider
                     return;
                 }
                 // Furious Charge movement for a barb
-                if (Trinity.Settings.Combat.Barbarian.UseChargeOOC && Trinity.Hotbar.Contains(SNOPower.Barbarian_FuriousCharge) && !bTooMuchZChange &&
+                if (Trinity.Settings.Combat.Barbarian.UseChargeOOC && Trinity.Hotbar.Contains(SNOPower.Barbarian_FuriousCharge) &&
                     destinationDistance >= 20f &&
                     PowerManager.CanCast(SNOPower.Barbarian_FuriousCharge) && !ShrinesInArea(vMoveToTarget))
                 {
@@ -532,7 +527,7 @@ namespace Trinity.DbProvider
                 int vaultDelay = TacticalAndDanettas ? 2000 : Trinity.Settings.Combat.DemonHunter.VaultMovementDelay;
 
                 // DemonHunter Vault
-                if (Trinity.Hotbar.Contains(SNOPower.DemonHunter_Vault) && !bTooMuchZChange && Trinity.Settings.Combat.DemonHunter.VaultMode != DemonHunterVaultMode.CombatOnly &&
+                if (Trinity.Hotbar.Contains(SNOPower.DemonHunter_Vault) && Trinity.Settings.Combat.DemonHunter.VaultMode != DemonHunterVaultMode.CombatOnly &&
                     CombatBase.TimeSincePowerUse(SNOPower.DemonHunter_Vault) > vaultDelay &&
                     destinationDistance >= 18f &&
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault) && !ShrinesInArea(vMoveToTarget) &&
@@ -637,7 +632,6 @@ namespace Trinity.DbProvider
                 }
 
 
-                bool hasWormHole = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Teleport && s.RuneIndex == 4);
                 bool hasCalamity = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Teleport && s.RuneIndex == 0);
 
                 // Teleport for a wizard 
@@ -645,7 +639,7 @@ namespace Trinity.DbProvider
                     CombatBase.TimeSincePowerUse(SNOPower.Wizard_Teleport) > 250 &&
                     destinationDistance >= 10f && !ShrinesInArea(vMoveToTarget))
                 {
-                    var maxTeleportRange = 75f;
+                    const float maxTeleportRange = 75f;
 
                     Vector3 vThisTarget = vMoveToTarget;
                     if (destinationDistance > maxTeleportRange)
