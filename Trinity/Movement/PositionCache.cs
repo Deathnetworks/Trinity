@@ -48,7 +48,7 @@ namespace Trinity
         public static void MaintainCache()
         {
             int worldId = ZetaDia.CurrentWorldId;
-            Cache.RemoveWhere(p => DateTime.UtcNow.Subtract(p.RecordedAt).TotalMilliseconds > 1000);
+            Cache.RemoveWhere(p => DateTime.UtcNow.Subtract(p.RecordedAt).TotalMilliseconds > 10000);
             Cache.RemoveWhere(p => p.WorldId != worldId);
         }
 

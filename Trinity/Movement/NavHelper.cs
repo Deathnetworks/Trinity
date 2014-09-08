@@ -360,13 +360,13 @@ namespace Trinity
                             timers[3].Start();
                             double checkRadius = gridSquareRadius;
 
-                            //if (CombatBase.PlayerKiteDistance > 0)
-                            //{
-                            //    checkRadius = gridSquareSize + CombatBase.PlayerKiteDistance;
-                            //}
+                            if (CombatBase.PlayerKiteDistance > 0)
+                            {
+                                checkRadius = gridSquareSize + 10f;
+                            }
 
                             // Any monster standing in this GridPoint
-                            if (CacheData.MonsterObstacles.Any(monster => Vector3.Distance(xyz, monster.Position) + monster.Radius <= checkRadius))
+                            if (CacheData.MonsterObstacles.Any(monster => monster.Position.Distance2D(xyz) - monster.Radius <= checkRadius))
                             {
                                 nodesMonsters++;
                                 continue;
@@ -445,13 +445,34 @@ namespace Trinity
                                 //if (distFromOriginToMonster < distFromPointToOrigin)
                                 //    continue;
 
-                                if (distFromPointToMonster < distFromPointToOrigin)
+                                // No Kite Distance Setting
+                                if (CombatBase.PlayerKiteDistance <= 0)
                                 {
-                                    gridPoint.Weight += distFromPointToOrigin;
+                                    // higher weight closer to monster
+                                    if (distFromPointToMonster < distFromPointToOrigin)
+                                    {
+                                        gridPoint.Weight += distFromPointToOrigin;
+                                    }
+                                    else if (distFromPointToMonster > distFromPointToOrigin)
+                                    {
+                                        gridPoint.Weight -= distFromPointToMonster;
+                                    }
                                 }
-                                else if (distFromPointToMonster > distFromPointToOrigin)
+                                else // Kite Distance is Set
                                 {
-                                    gridPoint.Weight -= distFromPointToMonster;
+                                    // higher weight further from monster
+                                    if (distFromPointToMonster < distFromPointToOrigin)
+                                    {
+                                        gridPoint.Weight -= distFromPointToOrigin;
+                                    }
+                                    else if (distFromPointToMonster > distFromPointToOrigin)
+                                    {
+                                        gridPoint.Weight += distFromPointToMonster;
+                                    }
+                                    if (PositionCache.Cache.Any(cachePoint => gridPoint.Position.Distance2D(cachePoint.Position) <= gridSquareRadius))
+                                    {
+                                        gridPoint.Weight += distFromPointToOrigin; // always <= max distance, 0-150ish
+                                    }
                                 }
                             }
                             timers[7].Stop();

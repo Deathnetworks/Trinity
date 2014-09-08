@@ -1,4 +1,5 @@
 ﻿using System;
+using Trinity.Config.Loot;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Game;
@@ -23,6 +24,24 @@ namespace Trinity
 
         //[1F4E3570] Mouseover: 0x1B876AD677C9080, Name: Root.NormalLayer.stash_dialog_mainPage.button_purchase
         private const ulong stashBuyNewTabButtonHash = 0x1B876AD677C9080;
+
+        private const ulong salvageAllNormalsButton = 0xCE31A05539BE5710;
+        private const ulong salvageAllMagicsButton = 0xD58A34C0A51E3A60;
+        private const ulong salvageAllRaresButton = 0x9AA6E1AD644CF239;
+
+
+        public static UIElement SalvageAllNormalsButton
+        {
+            get { return UIElement.FromHash(salvageAllNormalsButton); }
+        }
+        public static UIElement SalvageAllMagicsButton
+        {
+            get { return UIElement.FromHash(salvageAllMagicsButton); }
+        }
+        public static UIElement SalvageAllRaresButton
+        {
+            get { return UIElement.FromHash(salvageAllRaresButton); }
+        }
 
         public static UIElement GamePotion
         {
@@ -200,6 +219,15 @@ namespace Trinity
             if (ZetaDia.IsInGame && SafeClickElement(ConfirmTimedDungeonOK, "Confirm Timed Dungeon OK Button", true))
                 return;
             if (ZetaDia.IsInGame && SafeClickElement(StashBuyNewTabButton, "Buying new Stash Tab"))
+                return;
+            if (ZetaDia.IsInGame && Trinity.Settings.Loot.TownRun.SalvageWhiteItemOption == SalvageOption.Salvage && !Trinity.Settings.Loot.TownRun.StashWhites &&
+                SafeClickElement(SalvageAllNormalsButton, "Salvaging all Normal Quality Items"))
+                return;
+            if (ZetaDia.IsInGame && Trinity.Settings.Loot.TownRun.SalvageBlueItemOption == SalvageOption.Salvage && !Trinity.Settings.Loot.TownRun.StashBlues &&
+                SafeClickElement(SalvageAllMagicsButton, "Salvaging all Magic Quality Items"))
+                return;
+            if (ZetaDia.IsInGame && Trinity.Settings.Loot.TownRun.SalvageYellowItemOption == SalvageOption.Salvage && Trinity.Settings.Loot.TownRun.ForceSalvageRares &&
+                SafeClickElement(SalvageAllRaresButton, "Salvaging all Rare Quality Items"))
                 return;
             if (ZetaDia.IsInGame && SafeClickElement(TieredRiftRewardContinueButton, "Tiered Rift Reward Continue Button"))
                 return;
