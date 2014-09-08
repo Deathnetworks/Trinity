@@ -30,7 +30,6 @@ namespace Trinity.Config.Combat
         float AvoidPoisonEnchantedHealth { get; set; }
         float AvoidPoisonTreeHealth { get; set; }
         float AvoidShamanFireHealth { get; set; }
-        float AvoidSuccubusStarHealth { get; set; }
         float AvoidThunderstormHealth { get; set; }
         float AvoidWallOfFireHealth { get; set; }
         float AvoidWormholeHealth { get; set; }

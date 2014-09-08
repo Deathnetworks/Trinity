@@ -49,7 +49,6 @@ namespace Trinity.Config.Combat
         private float _AvoidPoisonEnchantedHealth;
         private float _AvoidPoisonTreeHealth;
         private float _AvoidShamanFireHealth;
-        private float _AvoidSuccubusStarHealth;
         private float _AvoidThunderstormHealth;
         private float _AvoidWallOfFireHealth;
         private float _AvoidWormholeHealth;
@@ -849,24 +848,6 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(0f)]
-        public float AvoidSuccubusStarHealth
-        {
-            get
-            {
-                return _AvoidSuccubusStarHealth;
-            }
-            set
-            {
-                if (_AvoidSuccubusStarHealth != value)
-                {
-                    _AvoidSuccubusStarHealth = value;
-                    OnPropertyChanged("AvoidSuccubusStarHealth");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
         [DefaultValue(0.50f)]
         public float AvoidThunderstormHealth
         {
@@ -937,7 +918,6 @@ namespace Trinity.Config.Combat
         [OnDeserializing()]
         internal void OnDeserializingMethod(StreamingContext context)
         {
-            this.AvoidSuccubusStarHealth = 0.7f;
             this.AvoidGrotesqueHealth = 1;
             this.AvoidOrbiterHealth = 1;
             this.AvoidWormholeHealth = 0.50f;

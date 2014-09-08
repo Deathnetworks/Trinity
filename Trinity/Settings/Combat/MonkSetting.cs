@@ -48,7 +48,6 @@ namespace Trinity.Config.Combat
         private float _AvoidPoisonTreeHealth;
         private float _AvoidThunderstormHealth;
         private float _AvoidShamanFireHealth;
-        private float _AvoidSuccubusStarHealth;
         private float _AvoidWallOfFireHealth;
         private float _AvoidWormholeHealth;
         private float _AvoidZoltBubbleHealth;
@@ -865,24 +864,6 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(0f)]
-        public float AvoidSuccubusStarHealth
-        {
-            get
-            {
-                return _AvoidSuccubusStarHealth;
-            }
-            set
-            {
-                if (_AvoidSuccubusStarHealth != value)
-                {
-                    _AvoidSuccubusStarHealth = value;
-                    OnPropertyChanged("AvoidSuccubusStarHealth");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
         [DefaultValue(0.50f)]
         public float AvoidThunderstormHealth
         {
@@ -936,7 +917,6 @@ namespace Trinity.Config.Combat
             this.TR_MinDist = 10;
             this.TargetBasedZigZag = true;
             this.TROption = TempestRushOption.Always;
-            this.AvoidSuccubusStarHealth = 0.7f;
             this.MinCycloneTrashCount = 2;
             this.MinWoLTrashCount = 2;
             this.SpamSweepingWindOnLowHP = false;

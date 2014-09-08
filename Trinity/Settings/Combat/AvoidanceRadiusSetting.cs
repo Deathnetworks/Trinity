@@ -34,7 +34,6 @@ namespace Trinity.Config.Combat
         private int _PoisonTree;
         private int _PoisonEnchanted;
         private int _ShamanFire;
-        private int _SuccubusStar;
         private int _Thunderstorm;
         private int _WallOfFire;
         private int _Wormhole;
@@ -546,24 +545,6 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(10)]
-        public int SuccubusStar
-        {
-            get
-            {
-                return _SuccubusStar;
-            }
-            set
-            {
-                if (_SuccubusStar != value)
-                {
-                    _SuccubusStar = value;
-                    OnPropertyChanged("SuccubusStar");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
         [DefaultValue(5)]
         public int Thunderstorm
         {
@@ -690,7 +671,6 @@ namespace Trinity.Config.Combat
         internal void OnDeserializingMethod(StreamingContext context)
         {
 
-            this.SuccubusStar = 10;
             this.Grotesque = 30;
             this.Wormhole = 15;
             this.Thunderstorm = 15;

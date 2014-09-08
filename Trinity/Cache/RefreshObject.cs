@@ -637,21 +637,14 @@ namespace Trinity
                 case GObjectType.PowerGlobe:
                 case GObjectType.HealthGlobe:
                     {
-                        // Ignore it if it's not in range yet
-                        if (CurrentCacheObject.Distance > CurrentBotLootRange || CurrentCacheObject.Distance > 60f)
-                        {
-                            c_IgnoreSubStep = "GlobeOutOfRange";
-                            AddToCache = false;
-                        }
                         AddToCache = true;
                         break;
                     }
                 // Handle Avoidance Objects
                 case GObjectType.Avoidance:
                     {
-                        AddToCache = RefreshAvoidance(AddToCache);
+                        AddToCache = RefreshAvoidance();
                         if (!AddToCache) { c_IgnoreSubStep = "RefreshAvoidance"; }
-
                         break;
                     }
                 // Handle Other-type Objects
@@ -669,10 +662,9 @@ namespace Trinity
                         break;
                     }
                 // Object switch on type (to seperate shrines, destructibles, barricades etc.)
-                case GObjectType.Unknown:
                 default:
                     {
-                        c_IgnoreSubStep = "Unknown." + c_diaObject.ActorType.ToString();
+                        c_IgnoreSubStep = "Unknown." + c_diaObject.ActorType;
                         AddToCache = false;
                         break;
                     }

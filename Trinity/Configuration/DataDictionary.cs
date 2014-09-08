@@ -353,7 +353,6 @@ namespace Trinity
             123842, // Azmo fireball
             139741, // Zolt Twister
             166686, // Maghda Projectile
-            164829, // Succubus Stars
             185999, // Diablo Expanding Fire
             196526, // Diablo Expanding Fire
             136533, // Diablo Lightning Breath

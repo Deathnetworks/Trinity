@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using Trinity.Cache;
 using Trinity.Combat;
 using Trinity.Combat.Abilities;
@@ -498,7 +499,7 @@ namespace Trinity
                                 catch { }
 
                                 // Don't pickup items if we're doing a TownRun
-                                if (cacheObject.Type == GObjectType.Item &&
+                                if (cacheObject.Type == GObjectType.Item && 
                                     TrinityItemManager.FindValidBackpackLocation(isTwoSquare) == new Vector2(-1, -1))
                                 {
                                     objWeightInfo += "TownRun";
@@ -514,7 +515,7 @@ namespace Trinity
                                 }
 
                                 // Default Weight
-                                cacheObject.Weight = Math.Max((300 - cacheObject.Distance) / 300 * MaxWeight, 100d);
+                                cacheObject.Weight = Math.Max((175 - cacheObject.Distance) / 175 * MaxWeight, 100d);
 
                                 // Give legendaries max weight, always
                                 if (cacheObject.GoldAmount <= 0 && cacheObject.ItemQuality >= ItemQuality.Legendary)
@@ -522,6 +523,10 @@ namespace Trinity
                                     cacheObject.Weight = MaxWeight;
                                 }
 
+                                if (cacheObject.GoldAmount > 0 && cacheObject.Distance < 25f)
+                                {
+                                    cacheObject.Weight += MaxWeight * 0.25;
+                                }
 
                                 // ignore non-legendaries and gold near elites if we're ignoring elites
                                 // not sure how we should safely determine this distance

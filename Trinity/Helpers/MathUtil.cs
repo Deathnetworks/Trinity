@@ -187,6 +187,7 @@ namespace Trinity
             return directions[index].ToUpper();
         }
         #endregion
+
         /// <summary>
         /// Gets the center of a given Navigation Zone
         /// </summary>

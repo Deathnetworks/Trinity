@@ -12,10 +12,8 @@ namespace Trinity
 {
     public partial class Trinity : IPlugin
     {
-        private static bool RefreshAvoidance(bool AddToCache)
+        private static bool RefreshAvoidance()
         {
-            AddToCache = true;
-
             try
             {
                 CurrentCacheObject.Animation = CurrentCacheObject.Object.CommonData.CurrentAnimation;
@@ -187,10 +185,9 @@ namespace Trinity
 
             if (minAvoidanceHealth == 0)
             {
-                AddToCache = false;
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Ignoring Avoidance! Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
                        CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO, minAvoidanceRadius, minAvoidanceHealth, CurrentCacheObject.Distance);
-                return AddToCache;
+                return false;
 
             }
 
@@ -211,23 +208,23 @@ namespace Trinity
                     Rotation = CurrentCacheObject.Rotation
                 });
 
-                bool areaOfEffectInPath = false;
-                var currentPath = Navigator.GetNavigationProviderAs<DefaultNavigationProvider>().CurrentPath;
-                if (Settings.Combat.Misc.AvoidanceNavigation)
-                {
-                    foreach (var point in currentPath)
-                    {
-                        if (CurrentCacheObject.Position.Distance2DSqr(point) <= (minAvoidanceRadius * minAvoidanceRadius))
-                        {
-                            areaOfEffectInPath = true;
-                            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Navigator Pathing through avoidance, setting IsStandingInAvoidance=True");
-                            break;
-                        }
-                    }
-                }
+                //bool areaOfEffectInPath = false;
+                //var currentPath = Navigator.GetNavigationProviderAs<DefaultNavigationProvider>().CurrentPath;
+                //if (Settings.Combat.Misc.AvoidanceNavigation)
+                //{
+                //    foreach (var point in currentPath)
+                //    {
+                //        if (CurrentCacheObject.Position.Distance2DSqr(point) <= (minAvoidanceRadius * minAvoidanceRadius))
+                //        {
+                //            areaOfEffectInPath = true;
+                //            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Navigator Pathing through avoidance, setting IsStandingInAvoidance=True");
+                //            break;
+                //        }
+                //    }
+                //}
 
                 // Is this one under our feet? If so flag it up so we can find an avoidance spot
-                if (CurrentCacheObject.Distance <= minAvoidanceRadius || areaOfEffectInPath)
+                if (CurrentCacheObject.Distance <= minAvoidanceRadius)
                 {
                     _standingInAvoidance = true;
 
@@ -246,7 +243,7 @@ namespace Trinity
                 }
             }
 
-            return AddToCache;
+            return true;
         }
         private static double GetAvoidanceHealth(int actorSNO = -1)
         {
@@ -257,8 +254,7 @@ namespace Trinity
             {
                 if (actorSNO != -1)
                     return AvoidanceManager.GetAvoidanceHealthBySNO(CurrentCacheObject.ActorSNO, 1);
-                else
-                    return AvoidanceManager.GetAvoidanceHealthBySNO(actorSNO, 1);
+                return AvoidanceManager.GetAvoidanceHealthBySNO(actorSNO, 1);
             }
             catch (Exception ex)
             {

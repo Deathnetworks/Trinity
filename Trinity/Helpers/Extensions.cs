@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using Buddy.Auth.Math;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
 using Zeta.Game.Internals.Actors;
@@ -116,11 +117,11 @@ namespace Trinity.Helpers
 
             return item.Level;
         }
-
         public static double GetNavCellSize(this NavCell cell)
         {
             var diff = cell.Max.ToVector2() - cell.Min.ToVector2();
             return diff.X * diff.Y;
         }
+
     }
 }

@@ -34,7 +34,6 @@ namespace Trinity
         PoisonEnchanted,
         PoisonTree,
         ShamanFire,
-        SuccubusStar,
         Thunderstorm,
         Wormhole,
         ZoltBubble,

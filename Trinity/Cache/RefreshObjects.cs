@@ -146,9 +146,6 @@ namespace Trinity
                     }
                 }
 
-                /* Poison Experimental Avoidance */
-
-
 
 
                 // Reduce ignore-for-loops counter
@@ -462,14 +459,14 @@ namespace Trinity
                 {
                     try
                     {
-                        bool AddToCache = false;
+                        bool addToCache;
 
                         if (!Settings.Advanced.LogCategories.HasFlag(LogCategory.CacheManagement))
                         {
                             /*
                              *  Main Cache Function
                              */
-                            AddToCache = CacheDiaObject(currentObject);
+                            CacheDiaObject(currentObject);
                         }
                         else
                         {
@@ -480,7 +477,7 @@ namespace Trinity
                             /*
                              *  Main Cache Function
                              */
-                            AddToCache = CacheDiaObject(currentObject);
+                            addToCache = CacheDiaObject(currentObject);
 
                             if (t1.IsRunning)
                                 t1.Stop();
@@ -522,8 +519,8 @@ namespace Trinity
                                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                                     "[{0:0000.00}ms] {1} {2} Type: {3} ({4}/{5}) Name={6} ({7}) {8} {9} Dist2Mid={10:0} Dist2Rad={11:0} ZDiff={12:0} Radius={13:0} RAGuid={14} {15}",
                                     duration,
-                                    (AddToCache ? "Added " : "Ignored"),
-                                    (!AddToCache ? ("By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
+                                    (addToCache ? "Added " : "Ignored"),
+                                    (!addToCache ? ("By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
                                     CurrentCacheObject.ActorType,
                                     CurrentCacheObject.GizmoType != GizmoType.None ? CurrentCacheObject.GizmoType.ToString() : "",
                                     CurrentCacheObject.Type,
@@ -551,9 +548,10 @@ namespace Trinity
                         }
 
                         string gizmoType = "";
-                        if (currentObject is DiaGizmo)
+                        var giz = currentObject as DiaGizmo;
+                        if (giz != null)
                         {
-                            gizmoType = "GizmoType: " + ((DiaGizmo)currentObject).CommonData.ActorInfo.GizmoType.ToString();
+                            gizmoType = "GizmoType: " + giz.CommonData.ActorInfo.GizmoType.ToString();
                         }
                         Logger.Log(ll, lc, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0} {4} {5}",
                                 currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance, gizmoType, ex.Message);
@@ -730,6 +728,7 @@ namespace Trinity
         private static List<DiaObject> ReadDebugActorsFromMemory()
         {
             return (from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
+                    where o.IsValid
                     orderby o.Distance
                     select o).ToList();
         }
@@ -737,6 +736,7 @@ namespace Trinity
         private static IEnumerable<DiaObject> ReadActorsFromMemory()
         {
             return from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
+                   where o.IsValid
                    select o;
         }
 
