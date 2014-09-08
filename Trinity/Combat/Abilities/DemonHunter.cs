@@ -388,25 +388,25 @@ namespace Trinity
         private static TrinityPower GetDemonHunterDestroyPower()
         {
             if (Hotbar.Contains(SNOPower.DemonHunter_HungeringArrow))
-                return new TrinityPower(SNOPower.DemonHunter_HungeringArrow, 40f, CurrentTarget.ACDGuid);
+                return new TrinityPower(SNOPower.DemonHunter_HungeringArrow, 10f, CurrentTarget.ACDGuid);
 
             if (Hotbar.Contains(SNOPower.X1_DemonHunter_EntanglingShot))
-                return new TrinityPower(SNOPower.X1_DemonHunter_EntanglingShot, 40f, CurrentTarget.ACDGuid);
+                return new TrinityPower(SNOPower.X1_DemonHunter_EntanglingShot, 10f, CurrentTarget.ACDGuid);
 
             if (Hotbar.Contains(SNOPower.DemonHunter_Bolas))
-                return new TrinityPower(SNOPower.DemonHunter_Bolas, 40f, CurrentTarget.ACDGuid);
+                return new TrinityPower(SNOPower.DemonHunter_Bolas, 10f, CurrentTarget.ACDGuid);
 
             if (Hotbar.Contains(SNOPower.DemonHunter_Grenades))
-                return new TrinityPower(SNOPower.DemonHunter_Grenades, 15f, CurrentTarget.ACDGuid);
+                return new TrinityPower(SNOPower.DemonHunter_Grenades, 10f, CurrentTarget.ACDGuid);
 
             if (Hotbar.Contains(SNOPower.DemonHunter_ElementalArrow) && Player.PrimaryResource >= 10)
-                return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 40f, CurrentTarget.ACDGuid);
+                return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 10f, CurrentTarget.ACDGuid);
 
             if (Hotbar.Contains(SNOPower.X1_DemonHunter_EvasiveFire) && Player.PrimaryResource >= 10)
-                return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, 40f, CurrentTarget.ACDGuid);
+                return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, 10f, CurrentTarget.ACDGuid);
 
             if (Hotbar.Contains(SNOPower.DemonHunter_RapidFire) && Player.PrimaryResource >= 10)
-                return new TrinityPower(SNOPower.DemonHunter_RapidFire, 40f, CurrentTarget.Position);
+                return new TrinityPower(SNOPower.DemonHunter_RapidFire, 10f, CurrentTarget.Position);
 
             if (Hotbar.Contains(SNOPower.DemonHunter_Chakram) && Player.PrimaryResource >= 20)
                 return new TrinityPower(SNOPower.DemonHunter_Chakram, 0f, CurrentTarget.ACDGuid);

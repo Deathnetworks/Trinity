@@ -5,12 +5,15 @@ using System.Drawing;
 using System.Linq;
 using Trinity.Combat.Abilities;
 using Trinity.DbProvider;
+using Trinity.Helpers;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Game;
+using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
+using Zeta.Game.Internals.SNO;
 using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
@@ -184,6 +187,42 @@ namespace Trinity
             return vBestLocation;
         }
 
+        internal static Vector3 NavCellSafeZone(Vector3 origin, bool shouldKite = false, bool isStuck = false, IEnumerable<TrinityCacheObject> monsterList = null, bool avoidDeath = false)
+        {
+            foreach (Scene scene in ZetaDia.Scenes.GetScenes())
+            {
+                if (!scene.IsValid)
+                    continue;
+                if (!scene.SceneInfo.IsValid)
+                    continue;
+                if (!scene.Mesh.Zone.IsValid)
+                    continue;
+                if (!scene.Mesh.Zone.NavZoneDef.IsValid)
+                    continue;
+
+                NavZone navZone = scene.Mesh.Zone;
+                NavZoneDef zoneDef = navZone.NavZoneDef;
+
+                Vector3 zoneCenter = MathUtil.GetNavZoneCenter(navZone);
+
+                if (zoneCenter.Distance2DSqr(Trinity.Player.Position) > (300 * 300))
+                    continue;
+
+                List<NavCell> navCells = zoneDef.NavCells
+                    .Where(c => c.IsValid && c.Flags.HasFlag(NavCellFlags.AllowWalk))
+                    .OrderByDescending(c => c.GetNavCellSize())
+                    .ToList();
+                if (!navCells.Any())
+                    continue;
+
+
+
+                //NavCell bestCell = navCells.OrderBy(c => MathUtil.GetNavCellCenter(c.Min, c.Max, navZone).Distance2D(zoneCenter)).FirstOrDefault();
+            }
+
+            return Trinity.Player.Position;
+        }
+
         // thanks to Main for the super fast can-stand-at code
         internal static Vector3 MainFindSafeZone(Vector3 origin, bool shouldKite = false, bool isStuck = false, IEnumerable<TrinityCacheObject> monsterList = null, bool avoidDeath = false)
         {
@@ -326,18 +365,18 @@ namespace Trinity
                                 continue;
                             }
 
-                            if (!hasEmergencyTeleportUp)
-                            {
-                                // Any monsters blocking in a straight line between origin and this GridPoint
-                                foreach (CacheObstacleObject monster in CacheData.MonsterObstacles.Where(m =>
-                                    MathEx.IntersectsPath(new Vector3(m.Position.X, m.Position.Y, 0), m.Radius, new Vector3(origin.X, origin.Y, 0), new Vector3(gridPoint.Position.X, gridPoint.Position.Y, 0))
-                                    ))
-                                {
+                            //if (!hasEmergencyTeleportUp)
+                            //{
+                            //    // Any monsters blocking in a straight line between origin and this GridPoint
+                            //    foreach (CacheObstacleObject monster in CacheData.MonsterObstacles.Where(m =>
+                            //        MathEx.IntersectsPath(new Vector3(m.Position.X, m.Position.Y, 0), m.Radius, new Vector3(origin.X, origin.Y, 0), new Vector3(gridPoint.Position.X, gridPoint.Position.Y, 0))
+                            //        ))
+                            //    {
 
-                                    nodesMonsters++;
-                                    continue;
-                                }
-                            }
+                            //        nodesMonsters++;
+                            //        continue;
+                            //    }
+                            //}
                             timers[3].Stop();
 
                         }

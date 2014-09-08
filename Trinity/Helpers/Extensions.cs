@@ -2,6 +2,7 @@
 using Trinity.Config.Combat;
 using Trinity.Technicals;
 using Zeta.Game.Internals.Actors;
+using Zeta.Game.Internals.SNO;
 
 namespace Trinity.Helpers
 {
@@ -80,7 +81,7 @@ namespace Trinity.Helpers
                 case "{c:ffffffff}": // White
                     qualityResult = ItemQuality.Normal;
                     break;
-                    // got this off a "lore book" - not sure what it actually equates to
+                // got this off a "lore book" - not sure what it actually equates to
                 case "{c:ff99bbff}": // Gem Blue
                     qualityResult = ItemQuality.Normal;
                     break;
@@ -114,6 +115,12 @@ namespace Trinity.Helpers
                 return 68;
 
             return item.Level;
+        }
+
+        public static double GetNavCellSize(this NavCell cell)
+        {
+            var diff = cell.Max.ToVector2() - cell.Min.ToVector2();
+            return diff.X * diff.Y;
         }
     }
 }

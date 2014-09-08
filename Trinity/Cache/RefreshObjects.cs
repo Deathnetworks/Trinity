@@ -11,6 +11,7 @@ using Zeta.Bot;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Game;
+using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 using Logger = Trinity.Technicals.Logger;
@@ -44,6 +45,9 @@ namespace Trinity
                 }
                 LastRefreshedCache = DateTime.UtcNow;
 
+                /*
+                 *  Refresh the Cache
+                 */
                 using (new PerformanceLogger("RefreshDiaObjectCache.UpdateBlock"))
                 {
                     CacheData.Clear();
@@ -66,6 +70,11 @@ namespace Trinity
 
                 }
 
+                /*
+                 * Add Legendary & Set Minimap Markers to ObjectCache
+                 */
+                RefreshCacheMarkers();
+
                 // Add Team HotSpots to the cache
                 ObjectCache.AddRange(GroupHotSpots.GetCacheObjectHotSpots());
 
@@ -81,7 +90,7 @@ namespace Trinity
                             {
                                 Vector3 fireChainSpot = MathEx.CalculatePointFrom(unit1.Position, unit2.Position, i);
 
-                                if (Trinity.Player.Position.Distance2D(fireChainSpot) <= fireChainSize)
+                                if (Player.Position.Distance2D(fireChainSpot) <= fireChainSize)
                                 {
                                     Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Avoiding Fire Chains!");
                                     _standingInAvoidance = true;
@@ -371,6 +380,65 @@ namespace Trinity
                 // We have a target and the cached was refreshed
                 Events.OnCacheUpdatedHandler.Invoke();
                 return true;
+            }
+        }
+
+        /// <summary>
+        /// Adds Legendary & Set Minimap Markers to ObjectCache
+        /// </summary>
+        private static void RefreshCacheMarkers()
+        {
+            const int setItemMarkerTexture = 404424;
+            const int legendaryItemMarkerTexture = 275968;
+
+            foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsValid && (m.MinimapTexture == setItemMarkerTexture || m.MinimapTexture == legendaryItemMarkerTexture)))
+            {
+                ObjectCache.Add(new TrinityCacheObject()
+                {
+                    Position = marker.Position,
+                    InternalName = (marker.MinimapTexture == setItemMarkerTexture ? "Set Item" : "Legendary Item") + " Minimap Marker",
+                    Distance = marker.Position.Distance(Player.Position),
+                    ActorType = ActorType.Item,
+                    Type = GObjectType.Item,
+                    Radius = 2f,
+                    Weight = 20000
+                });
+            }
+
+            // Add Rift Guardian POI's or Markers to ObjectCache
+            const int riftGuardianMarkerTexture = 81058;
+            bool isRiftGuardianQuestStep = ZetaDia.CurrentQuest.QuestSNO == 337492 && ZetaDia.CurrentQuest.StepId == 16;
+            Func<MinimapMarker, bool> riftGuardianMarkerFunc = m => m.IsValid && ((m.IsPointOfInterest && isRiftGuardianQuestStep) || m.MinimapTexture == riftGuardianMarkerTexture);
+
+            foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(riftGuardianMarkerFunc))
+            {
+                ObjectCache.Add(new TrinityCacheObject()
+                {
+                    Position = marker.Position,
+                    InternalName = "Rift Guardian",
+                    Distance = marker.Position.Distance(Player.Position),
+                    ActorType = ActorType.Monster,
+                    Type = GObjectType.Unit,
+                    Radius = 10f,
+                    Weight = 5000,
+                });
+            }
+
+            if (ZetaDia.CurrentQuest.QuestSNO == 337492 && ZetaDia.CurrentQuest.StepId == 16) // X1_LR_DungeonFinder
+            {
+                foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsPointOfInterest))
+                {
+                    ObjectCache.Add(new TrinityCacheObject()
+                    {
+                        Position = marker.Position,
+                        InternalName = "Rift Guardian",
+                        Distance = marker.Position.Distance(Player.Position),
+                        ActorType = ActorType.Monster,
+                        Type = GObjectType.Unit,
+                        Radius = 10f,
+                        Weight = 5000,
+                    });
+                }
             }
         }
 
@@ -676,7 +744,7 @@ namespace Trinity
         {
 
             // See if we should wait for [playersetting] milliseconds for possible loot drops before continuing run
-            if (CurrentTarget == null && 
+            if (CurrentTarget == null &&
                 (DateTime.UtcNow.Subtract(lastHadUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill ||
                 DateTime.UtcNow.Subtract(lastHadEliteUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill ||
                 DateTime.UtcNow.Subtract(lastHadBossUnitInSights).TotalMilliseconds <= 3000 ||

@@ -134,6 +134,9 @@ namespace Trinity.Items
             if (DataDictionary.VanityItems.Any(i => item.InternalName.StartsWith(i)))
                 return false;
 
+            if (item.ItemType == ItemType.KeystoneFragment && item.TieredLootRunKeyLevel >= 0)
+                return false;
+
             if (Trinity.Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy)
             {
                 return Current.ShouldStashItem(item);
@@ -221,8 +224,8 @@ namespace Trinity.Items
             if (tItemType == GItemType.TieredLootrunKey)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep Tiered Rift Keys)", cItem.RealName, cItem.InternalName, tItemType);
-                return true;
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (ignoring Tiered Rift Keys)", cItem.RealName, cItem.InternalName, tItemType);
+                return false;
             }
 
             if (Trinity.Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
@@ -349,6 +352,10 @@ namespace Trinity.Items
             if (DataDictionary.VanityItems.Any(i => item.InternalName.StartsWith(i)))
                 return false;
 
+            if (item.ItemType == ItemType.KeystoneFragment && item.TieredLootRunKeyLevel >= 0)
+                return false;
+
+
             GItemType trinityItemType = Trinity.DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
             GItemBaseType trinityItemBaseType = Trinity.DetermineBaseType(trinityItemType);
 
@@ -395,6 +402,9 @@ namespace Trinity.Items
 
             // Vanity Items
             if (DataDictionary.VanityItems.Any(i => item.InternalName.StartsWith(i)))
+                return false;
+
+            if (item.ItemType == ItemType.KeystoneFragment && item.TieredLootRunKeyLevel >= 0)
                 return false;
 
             switch (cItem.TrinityItemBaseType)
