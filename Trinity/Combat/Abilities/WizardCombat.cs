@@ -209,7 +209,7 @@ namespace Trinity.Combat.Abilities
 
             // Explosive Blast
             //We should check if Wand of Woh is equipped to define the best routine
-            if (Legendary.WandofWoh.IsEquipped)
+            if (Legendary.WandOfWoh.IsEquipped)
             {
                 if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_ExplosiveBlast, CanCastFlags.NoTimer) && !Player.IsInTown)
                 {

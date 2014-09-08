@@ -14,12 +14,12 @@ namespace Trinity.Reference
             Name = "Raiment of a Thousand Storms",
             Items = new List<Item>
             {
-                Legendary.MaskoftheSearingSky,
-                Legendary.ScalesoftheDancingSerpent,
-                Legendary.MantleoftheUpsideDownSinners,
-                Legendary.HeartoftheCrashingWave,
-                Legendary.FistsofThunder,
-                Legendary.EightDemonBoots
+                Legendary.MaskOfTheSearingSky,
+                Legendary.ScalesOfTheDancingSerpent,
+                Legendary.MantleOfTheUpsidedownSinners,
+                Legendary.HeartOfTheCrashingWave,
+                Legendary.FistsOfThunder,
+                Legendary.EightdemonBoots
             },
             FirstBonusItemCount = 2,
             SecondBonusItemCount = 4,
@@ -164,7 +164,7 @@ namespace Trinity.Reference
             {
                 Legendary.ZunimassasMarrow,
                 Legendary.ZunimassasPox,
-                Legendary.ZunimassasStringofSkulls,
+                Legendary.ZunimassasStringOfSkulls,
                 Legendary.ZunimassasTrail,
                 Legendary.ZunimassasVision
             },
@@ -194,7 +194,7 @@ namespace Trinity.Reference
             Name = "Legacy of Nightmares",
             Items = new List<Item>
             {
-                Legendary.LitanyoftheUndaunted,  
+                Legendary.LitanyOfTheUndaunted,  
                 Legendary.TheWailingHost
             },
             FirstBonusItemCount = 2
@@ -216,8 +216,8 @@ namespace Trinity.Reference
             Name = "Bul-Kathos's Oath",
             Items = new List<Item>
             {
-                Legendary.BulKathossWarriorBlood,
-                Legendary.BulKathossSolemnVow
+                Legendary.BulkathossWarriorBlood,
+                Legendary.BulkathossSolemnVow
             },
             FirstBonusItemCount = 2
         };
@@ -341,7 +341,7 @@ namespace Trinity.Reference
                 Legendary.HelltoothGauntlets,
                 Legendary.HelltoothLegGuards,
                 Legendary.HelltoothGreaves,
-                Legendary.MaskofJeramSetHelm
+                Legendary.HelltoothMask
             },
             FirstBonusItemCount = 2,
             SecondBonusItemCount = 4,
@@ -371,12 +371,12 @@ namespace Trinity.Reference
             Name = "Armor of Akkhan",
             Items = new List<Item>
             {
-                Legendary.CuissesofAkkhan,
-                Legendary.GauntletsofAkkhan,
-                Legendary.HelmofAkkhan,
-                Legendary.PauldronsofAkkhan,
-                Legendary.SabatonsofAkkhan,    
-                Legendary.BreastplateofAkkhan    
+                Legendary.CuissesOfAkkhan,
+                Legendary.GauntletsOfAkkhan,
+                Legendary.HelmOfAkkhan,
+                Legendary.PauldronsOfAkkhan,
+                Legendary.SabatonsOfAkkhan,    
+                Legendary.BreastplateOfAkkhan    
             },
             FirstBonusItemCount = 2,
             SecondBonusItemCount = 4,
@@ -406,7 +406,7 @@ namespace Trinity.Reference
             {
                 Legendary.TalRashasAllegiance,
                 Legendary.TalRashasBrace,
-                Legendary.TalRashasGuiseofWisdom,
+                Legendary.TalRashasGuiseOfWisdom,
                 Legendary.TalRashasRelentlessPursuit,
                 Legendary.TalRashasUnwaveringGlare
             },
@@ -426,6 +426,39 @@ namespace Trinity.Reference
             FirstBonusItemCount = 2,
         };
 
+        public static Set RolandsLegacy = new Set
+        {
+            Name = "Roland's Legacy",
+            Items = new List<Item>
+            {
+                Legendary.RolandsBearing,
+                Legendary.RolandsDetermination,
+                Legendary.RolandsGrasp,
+                Legendary.RolandsMantle,
+                Legendary.RolandsStride,
+                Legendary.RolandsVisage
+            },
+            FirstBonusItemCount = 2,
+            SecondBonusItemCount = 4,
+            ThirdBonusItemCount = 6
+        };
+
+        public static Set ImmortalKingsCall = new Set
+        {
+            Name = "Immortal King's Call",
+            Items = new List<Item>
+            {
+                Legendary.ImmortalKingsBoulderBreaker,
+                Legendary.ImmortalKingsEternalReign,
+                Legendary.ImmortalKingsIrons,
+                Legendary.ImmortalKingsStride,
+                Legendary.ImmortalKingsTribalBinding,
+                Legendary.ImmortalKingsTriumph,
+            },
+            FirstBonusItemCount = 2,
+            SecondBonusItemCount = 3,
+            ThirdBonusItemCount = 4
+        };
 
         public static Set MonkeyKingsGarb = new Set
         {
@@ -446,7 +479,7 @@ namespace Trinity.Reference
             Name = "Shenlong's Spirit",
             Items = new List<Item>
             {
-                Legendary.ShenlongsFistofLegend,  
+                Legendary.ShenlongsFistOfLegend,  
                 Legendary.ShenlongsRelentlessAssault
             },
             FirstBonusItemCount = 2
