@@ -124,7 +124,7 @@ namespace Trinity
                 case AvoidanceType.MoltenBall:
                 case AvoidanceType.ShamanFire:
 
-                    if (Legendary.TheStarofAzkaranth.IsEquipped)
+                    if (Legendary.TheStarOfAzkaranth.IsEquipped)
                     {
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because TheStarofAzkaranth is equipped", avoidanceType);
                         minAvoidanceHealth = 0;
@@ -136,7 +136,7 @@ namespace Trinity
                 case AvoidanceType.IceTrail:
 
                     // Ignore if both items are equipped
-                    if (Legendary.TalismanofAranoch.IsEquipped)
+                    if (Legendary.TalismanOfAranoch.IsEquipped)
                     {
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because TalismanofAranoch is equipped", avoidanceType);
                         minAvoidanceHealth = 0;

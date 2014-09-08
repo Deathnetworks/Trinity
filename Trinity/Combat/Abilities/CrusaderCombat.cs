@@ -117,7 +117,7 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // HeavensFury
-                bool isHolyShotgun = (Legendary.FateoftheFell.IsEquipped && Sets.ArmorOfAkkhan.IsThirdBonusActive);
+                bool isHolyShotgun = (Legendary.FateOfTheFell.IsEquipped && Sets.ArmorOfAkkhan.IsThirdBonusActive);
                 if (!isHolyShotgun)
                 {
                     if (CanCastHeavensFury(isHolyShotgun))

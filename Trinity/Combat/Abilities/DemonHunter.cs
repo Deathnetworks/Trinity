@@ -359,13 +359,13 @@ namespace Trinity
             //Hexing Pants Mod
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CurrentTarget != null)
             {
-                if (Legendary.HexingPantsofMrYan.IsEquipped && CurrentTarget.IsUnit &&
+                if (Legendary.HexingPantsOfMrYan.IsEquipped && CurrentTarget.IsUnit &&
                 CurrentTarget.RadiusDistance > 10f)
                 {
                     return new TrinityPower(SNOPower.Walk, 10f, CurrentTarget.Position);
                 }
 
-                if (Legendary.HexingPantsofMrYan.IsEquipped && CurrentTarget.IsUnit &&
+                if (Legendary.HexingPantsOfMrYan.IsEquipped && CurrentTarget.IsUnit &&
                 CurrentTarget.RadiusDistance < 10f)
                 {
                     Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, -10f);

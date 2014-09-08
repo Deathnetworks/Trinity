@@ -592,14 +592,14 @@ namespace Trinity.Combat.Abilities
                 }
 				
 				//Hexing Pants Mod
-				if(Legendary.HexingPantsofMrYan.IsEquipped && CurrentTarget.IsUnit && 
+                if (Legendary.HexingPantsOfMrYan.IsEquipped && CurrentTarget.IsUnit && 
 				//!CanCast(SNOPower.Witchdoctor_Piranhas) && 
 				CurrentTarget.RadiusDistance > 10f)			
 				{
 					return new TrinityPower(SNOPower.Walk, 10f, CurrentTarget.Position);
 				}
-				
-				if(Legendary.HexingPantsofMrYan.IsEquipped && CurrentTarget.IsUnit && 
+
+                if (Legendary.HexingPantsOfMrYan.IsEquipped && CurrentTarget.IsUnit && 
 				//!CanCast(SNOPower.Witchdoctor_Piranhas) && 
 				CurrentTarget.RadiusDistance < 10f)			
 				{

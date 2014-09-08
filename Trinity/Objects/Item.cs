@@ -11,7 +11,24 @@ namespace Trinity.Objects
     {
         public int Id { get; set; }
         public string Name { get; set; }
+
         public ItemType ItemType { get; set; }
+        public ItemQuality Quality { get; set; }
+        public ItemBaseType BaseType { get; set; }
+
+        public string Slug { get; set; }
+        public string InternalName { get; set; }
+        public string RelativeUrl { get; set; }
+        public string DataUrl { get; set; }
+        public string Url { get; set; }
+        public string LegendaryAffix { get; set; }
+        public string SetName { get; set; }
+        public bool IsCrafted { get; set; }
+
+        public Item()
+        {
+            
+        }
 
         public Item(int actorId, string name = "", ItemType itemType = ItemType.Unknown)
         {
