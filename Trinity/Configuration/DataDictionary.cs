@@ -670,6 +670,13 @@ namespace Trinity
 
         };
 
+        public static HashSet<int> HighPriorityInteractables { get { return highPriorityInteractables; } }
+        private static readonly HashSet<int> highPriorityInteractables = new HashSet<int>
+        {
+            56686, // a3dun_Keep_Bridge_Switch 
+            211999, // a3dun_Keep_Bridge_Switch_B 
+        };
+
         public static Dictionary<int, int> InteractEndAnimations { get { return interactEndAnimations; } }
         private static readonly Dictionary<int, int> interactEndAnimations = new Dictionary<int, int>()
         {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using Trinity.Config;
+using Trinity.Coroutines;
 using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -50,12 +51,15 @@ namespace Trinity.Helpers
 
                 Logger.Log("Inserting GoldInactivity into BotBehavior");
                 TreeHooks.Instance.InsertHook("BotBehavior", 0, _goldInactiveComposite);
+
+                StoreAndReplaceHook("Death", DeathBehavior.OnDeathBehavior());
             }
             else
             {
                 ReplaceHookWithOriginal("Combat");
                 ReplaceHookWithOriginal("VendorRun");
                 ReplaceHookWithOriginal("Loot");
+                ReplaceHookWithOriginal("Death");
 
                 Logger.Log("Removing GoldInactivity from BotBehavior");
                 TreeHooks.Instance.RemoveHook("BotBehavior", _goldInactiveComposite);

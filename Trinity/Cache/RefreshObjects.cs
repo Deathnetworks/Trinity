@@ -728,7 +728,7 @@ namespace Trinity
         private static List<DiaObject> ReadDebugActorsFromMemory()
         {
             return (from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
-                    where o.IsValid
+                    where o.IsValid && o.CommonData != null && o.CommonData.IsValid
                     orderby o.Distance
                     select o).ToList();
         }
@@ -736,7 +736,7 @@ namespace Trinity
         private static IEnumerable<DiaObject> ReadActorsFromMemory()
         {
             return from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
-                   where o.IsValid
+                   where o.IsValid && o.CommonData != null && o.CommonData.IsValid
                    select o;
         }
 

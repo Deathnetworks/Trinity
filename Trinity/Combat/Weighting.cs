@@ -994,6 +994,12 @@ namespace Trinity
                                 // Weight Interactable Specials
                                 cacheObject.Weight = (300d - cacheObject.Distance) / 300d * 1000d;
 
+                                if (DataDictionary.HighPriorityInteractables.Contains(cacheObject.ActorSNO) && cacheObject.RadiusDistance <= 30f)
+                                {
+                                    cacheObject.Weight = MaxWeight;
+                                    break;
+                                }
+
                                 // Very close interactables get a weight increase
                                 if (cacheObject.Distance <= 8f)
                                     cacheObject.Weight += 1000d;
