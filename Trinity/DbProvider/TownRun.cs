@@ -105,14 +105,17 @@ namespace Trinity
                         return false;
                     }
 
-                    int[] greaterRiftQuestSteps = { 13, 16 ,34 };
-                    const int riftQuest = 337492;
-                    if (ZetaDia.CurrentQuest.QuestSNO == riftQuest && greaterRiftQuestSteps.Contains(ZetaDia.CurrentQuest.StepId))
-                    {
-                        // In a greater rift, we cannot townrun
-                        Trinity.IsReadyToTownRun = false;
+                    //int[] greaterRiftQuestSteps = { 13, 16, 34 };
+                    //const int riftQuest = 337492;
+                    //if (ZetaDia.CurrentQuest.QuestSNO == riftQuest && greaterRiftQuestSteps.Contains(ZetaDia.CurrentQuest.StepId))
+                    //{
+                    //    // In a greater rift, we cannot townrun
+                    //    return false;
+                    //}
+
+                    bool participatingInTieredLootRun = ZetaDia.Me.CommonData.GetAttribute<int>(ActorAttributeType.ParticipatingInTieredLootRun) > 0;
+                    if (participatingInTieredLootRun)
                         return false;
-                    }
 
                     // Check if we should be forcing a town-run
                     if (!Trinity.Player.IsInTown && Trinity.ForceVendorRunASAP || BrainBehavior.IsVendoring)
