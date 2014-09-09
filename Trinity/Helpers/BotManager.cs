@@ -52,14 +52,14 @@ namespace Trinity.Helpers
                 Logger.Log("Inserting GoldInactivity into BotBehavior");
                 TreeHooks.Instance.InsertHook("BotBehavior", 0, _goldInactiveComposite);
 
-                StoreAndReplaceHook("Death", DeathBehavior.OnDeathBehavior());
+                //StoreAndReplaceHook("Death", DeathBehavior.OnDeathBehavior());
             }
             else
             {
                 ReplaceHookWithOriginal("Combat");
                 ReplaceHookWithOriginal("VendorRun");
                 ReplaceHookWithOriginal("Loot");
-                ReplaceHookWithOriginal("Death");
+                //ReplaceHookWithOriginal("Death");
 
                 Logger.Log("Removing GoldInactivity from BotBehavior");
                 TreeHooks.Instance.RemoveHook("BotBehavior", _goldInactiveComposite);

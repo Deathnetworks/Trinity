@@ -35,7 +35,7 @@ namespace Trinity.Coroutines
                 await Coroutine.Sleep(10000);
             }
 
-            if (GameUI.IsElementVisible(GameUI.ReviveAtCorpseButton) && GameUI.ReviveAtCorpseButton.IsEnabled)
+            if (GameUI.IsElementVisible(GameUI.ReviveAtCorpseButton) && GameUI.ReviveAtCorpseButton.IsEnabled && ZetaDia.Me.CorpseResurrectionCharges > 0)
             {
                 await Coroutine.Sleep(500);
                 GameUI.SafeClickElement(GameUI.ReviveAtCorpseButton);
