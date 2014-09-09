@@ -250,15 +250,15 @@ namespace Trinity
                 return;
             if (ZetaDia.IsInGame && SafeClickElement(StashBuyNewTabButton, "Buying new Stash Tab"))
                 return;
-            if (ZetaDia.IsInGame && Trinity.Settings.Loot.TownRun.SalvageWhiteItemOption == SalvageOption.Salvage && !Trinity.Settings.Loot.TownRun.StashWhites &&
-                SafeClickElement(SalvageAllNormalsButton, "Salvaging all Normal Quality Items"))
-                return;
-            if (ZetaDia.IsInGame && Trinity.Settings.Loot.TownRun.SalvageBlueItemOption == SalvageOption.Salvage && !Trinity.Settings.Loot.TownRun.StashBlues &&
-                SafeClickElement(SalvageAllMagicsButton, "Salvaging all Magic Quality Items"))
-                return;
-            if (ZetaDia.IsInGame && Trinity.Settings.Loot.TownRun.SalvageYellowItemOption == SalvageOption.Salvage && Trinity.Settings.Loot.TownRun.ForceSalvageRares &&
-                SafeClickElement(SalvageAllRaresButton, "Salvaging all Rare Quality Items"))
-                return;
+            //if (ZetaDia.IsInGame && Trinity.Settings.Loot.TownRun.SalvageWhiteItemOption == SalvageOption.Salvage && !Trinity.Settings.Loot.TownRun.StashWhites &&
+            //    SafeClickElement(SalvageAllNormalsButton, "Salvaging all Normal Quality Items"))
+            //    return;
+            //if (ZetaDia.IsInGame && Trinity.Settings.Loot.TownRun.SalvageBlueItemOption == SalvageOption.Salvage && !Trinity.Settings.Loot.TownRun.StashBlues &&
+            //    SafeClickElement(SalvageAllMagicsButton, "Salvaging all Magic Quality Items"))
+            //    return;
+            //if (ZetaDia.IsInGame && Trinity.Settings.Loot.TownRun.SalvageYellowItemOption == SalvageOption.Salvage && Trinity.Settings.Loot.TownRun.ForceSalvageRares &&
+            //    SafeClickElement(SalvageAllRaresButton, "Salvaging all Rare Quality Items"))
+            //    return;
             if (ZetaDia.IsInGame && SafeClickElement(TieredRiftRewardContinueButton, "Tiered Rift Reward Continue Button"))
                 return;
 
