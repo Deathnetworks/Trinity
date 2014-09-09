@@ -28,26 +28,32 @@ namespace Trinity
         private const ulong salvageAllNormalsButton = 0xCE31A05539BE5710;
         private const ulong salvageAllMagicsButton = 0xD58A34C0A51E3A60;
         private const ulong salvageAllRaresButton = 0x9AA6E1AD644CF239;
-        //[1FD24D10] Mouseover: 0xE3CBD66296A39588, Name: Root.NormalLayer.deathmenu_dialog.dialog_main.button_revive_at_corpse
         private const ulong reviveAtCorpseHash = 0xE3CBD66296A39588;
-        //[1FD25C70] Mouseover: 0xBFAAF48BA9316742, Name: Root.NormalLayer.deathmenu_dialog.dialog_main.button_revive_at_checkpoint
         private const ulong reviveAtCheckpointHash = 0xBFAAF48BA9316742;
-        //[1FD26BD0] Mouseover: 0x7A2AF9C0F3045ADA, Name: Root.NormalLayer.deathmenu_dialog.dialog_main.button_revive_in_town
         private const ulong reviveInTownHash = 0x7A2AF9C0F3045ADA;
 
+        //[1DDA2480] Mouseover: 0x42E152B771A6BCC1, Name: Root.NormalLayer.rift_join_party_main.stack.wrapper.Accept
+        //[1FCC8E70] Mouseover: 0x42E152B771A6BCC1, Name: Root.NormalLayer.rift_join_party_main.stack.wrapper.Accept
+        public static UIElement JoinRiftButton
+        {
+            get { return UIElement.FromHash(0x42E152B771A6BCC1); }
+        }
+        //[1FD24D10] Mouseover: 0xE3CBD66296A39588, Name: Root.NormalLayer.deathmenu_dialog.dialog_main.button_revive_at_corpse
         public static UIElement ReviveAtCorpseButton
         {
-            get { return UIElement.FromHash(reviveAtCorpseHash); }
+            get { return UIElement.FromHash(0xE3CBD66296A39588); }
         }
 
+        //[1FD25C70] Mouseover: 0xBFAAF48BA9316742, Name: Root.NormalLayer.deathmenu_dialog.dialog_main.button_revive_at_checkpoint
         public static UIElement ReviveAtCheckpointButton
         {
-            get { return UIElement.FromHash(reviveAtCheckpointHash); }
+            get { return UIElement.FromHash(0xBFAAF48BA9316742); }
         }
 
+        //[1FD26BD0] Mouseover: 0x7A2AF9C0F3045ADA, Name: Root.NormalLayer.deathmenu_dialog.dialog_main.button_revive_in_town
         public static UIElement ReviveInTownButton
         {
-            get { return UIElement.FromHash(reviveInTownHash); }
+            get { return UIElement.FromHash(0x7A2AF9C0F3045ADA); }
         }
 
         public static UIElement SalvageAllNormalsButton
@@ -206,6 +212,8 @@ namespace Trinity
             if (ZetaDia.IsLoadingWorld)
                 return;
 
+            // These buttons should be clicked with no delay
+
             if (ZetaDia.IsInGame && SafeClickElement(BountyRewardDialog, "Bounty Reward Dialog"))
                 return;
             if (ZetaDia.IsInGame && SafeClickElement(ConversationSkipButton, "Conversation Button"))
@@ -217,6 +225,8 @@ namespace Trinity
             if (ZetaDia.IsInGame && SafeClickElement(TalktoInteractButton1, "Conversation Button"))
                 return;
             if (DateTime.UtcNow.Subtract(_lastCheckedUiButtons).TotalMilliseconds <= 500)
+                return;
+            if (ZetaDia.IsInGame && SafeClickElement(JoinRiftButton, "Join Rift Accept Button", true))
                 return;
 
             _lastCheckedUiButtons = DateTime.UtcNow;

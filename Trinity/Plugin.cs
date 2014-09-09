@@ -28,7 +28,7 @@ namespace Trinity
         {
             get
             {
-                return new Version(2, 1, 5);
+                return new Version(2, 1, 7);
             }
         }
 

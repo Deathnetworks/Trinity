@@ -230,7 +230,11 @@ namespace Trinity.ItemRules.Core
             bool value = (bool)obj;
             int i = 1;
             while (this.GetValue(tree, TokenType.OrExpr, i) != null)
-                value &= (bool)this.GetValue(tree, TokenType.OrExpr, i++);
+            {
+                var val = GetValue(tree, TokenType.OrExpr, i++);
+                if (val is bool)
+                    value &= (bool)val;
+            }
             return value;
             //return obj;
         }
@@ -245,7 +249,11 @@ namespace Trinity.ItemRules.Core
             bool value = (bool)obj;
             int i = 1;
             while (this.GetValue(tree, TokenType.AndExpr, i) != null)
-                value |= (bool)this.GetValue(tree, TokenType.AndExpr, i++);
+            {
+                var unboxVal = GetValue(tree, TokenType.AndExpr, i++);
+                if (unboxVal is bool)
+                    value |= (bool)unboxVal;
+            }
             return value;
         }
 

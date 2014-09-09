@@ -105,14 +105,13 @@ namespace Trinity
                         return false;
                     }
 
-                    int[] greaterRiftQuestSteps = { 13, 16 ,34 };
-                    const int riftQuest = 337492;
-                    if (ZetaDia.CurrentQuest.QuestSNO == riftQuest && greaterRiftQuestSteps.Contains(ZetaDia.CurrentQuest.StepId))
-                    {
-                        // In a greater rift, we cannot townrun
-                        Trinity.IsReadyToTownRun = false;
-                        return false;
-                    }
+                    //int[] greaterRiftQuestSteps = { 13, 16, 34 };
+                    //const int riftQuest = 337492;
+                    //if (ZetaDia.CurrentQuest.QuestSNO == riftQuest && greaterRiftQuestSteps.Contains(ZetaDia.CurrentQuest.StepId))
+                    //{
+                    //    // In a greater rift, we cannot townrun
+                    //    return false;
+                    //}
 
                     // Check if we should be forcing a town-run
                     if (!Trinity.Player.IsInTown && Trinity.ForceVendorRunASAP || BrainBehavior.IsVendoring)
@@ -134,21 +133,23 @@ namespace Trinity
                         LastCheckBackpackDurability = DateTime.UtcNow;
 
                         // Check for no space in backpack
-                        Vector2 validLocation = TrinityItemManager.FindValidBackpackLocation(true);
-                        if (validLocation.X < 0 || validLocation.Y < 0)
+                        if (!Trinity.Player.ParticipatingInTieredLootRun)
                         {
-                            Logger.Log("No more space to pickup a 2-slot item, now running town-run routine. (TownRun)");
-                            if (!LastTownRunCheckResult)
+                            Vector2 validLocation = TrinityItemManager.FindValidBackpackLocation(true);
+                            if (validLocation.X < 0 || validLocation.Y < 0)
                             {
-                                LastTownRunCheckResult = true;
+                                Logger.Log("No more space to pickup a 2-slot item, now running town-run routine. (TownRun)");
+                                if (!LastTownRunCheckResult)
+                                {
+                                    LastTownRunCheckResult = true;
+                                }
+                                Trinity.IsReadyToTownRun = true;
+
+                                Trinity.ForceVendorRunASAP = true;
+                                // Record the first position when we run out of bag space, so we can return later
+                                SetPreTownRunPosition();
                             }
-                            Trinity.IsReadyToTownRun = true;
-
-                            Trinity.ForceVendorRunASAP = true;
-                            // Record the first position when we run out of bag space, so we can return later
-                            SetPreTownRunPosition();
                         }
-
                         if (ZetaDia.Me.IsValid)
                         {
                             var equippedItems = ZetaDia.Me.Inventory.Equipped.Where(i => i.DurabilityCurrent != i.DurabilityMax).ToList();

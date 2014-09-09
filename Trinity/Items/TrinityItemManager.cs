@@ -42,6 +42,10 @@ namespace Trinity.Items
 
         public override bool EvaluateItem(ACDItem item, ItemEvaluationType evaluationType)
         {
+            // Salvage/Sell/Stashing is disabled during greater rifts
+            if (Trinity.Player.ParticipatingInTieredLootRun)
+                return false;
+
             if (Trinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy)
             {
                 Current.EvaluateItem(item, evaluationType);
@@ -63,6 +67,10 @@ namespace Trinity.Items
 
         public override bool ShouldSalvageItem(ACDItem item)
         {
+            // Salvage/Sell/Stashing is disabled during greater rifts
+            if (Trinity.Player.ParticipatingInTieredLootRun)
+                return false;
+
             bool action = ShouldSalvageItem(item, ItemEvaluationType.Salvage);
             if (action)
                 ItemStashSellAppender.Instance.AppendItem(CachedACDItem.GetCachedItem(item), "Salvage");
@@ -89,6 +97,10 @@ namespace Trinity.Items
 
         public override bool ShouldSellItem(ACDItem item)
         {
+            // Salvage/Sell/Stashing is disabled during greater rifts
+            if (Trinity.Player.ParticipatingInTieredLootRun)
+                return false;
+
             bool action = ShouldSellItem(item, ItemEvaluationType.Sell);
             if (action)
                 ItemStashSellAppender.Instance.AppendItem(CachedACDItem.GetCachedItem(item), "Sell");
@@ -117,6 +129,10 @@ namespace Trinity.Items
 
         public override bool ShouldStashItem(ACDItem item)
         {
+            // Salvage/Sell/Stashing is disabled during greater rifts
+            if (Trinity.Player.ParticipatingInTieredLootRun)
+                return false;
+
             bool action = ShouldStashItem(item, ItemEvaluationType.Keep);
             if (action)
                 ItemStashSellAppender.Instance.AppendItem(CachedACDItem.GetCachedItem(item), "Stash");
@@ -134,7 +150,11 @@ namespace Trinity.Items
             if (DataDictionary.VanityItems.Any(i => item.InternalName.StartsWith(i)))
                 return false;
 
-            if (item.ItemType == ItemType.KeystoneFragment && item.TieredLootRunKeyLevel >= 0)
+            if (Trinity.Settings.Loot.TownRun.KeepTieredLootRunKeysInBackpack && item.ItemType == ItemType.KeystoneFragment && item.TieredLootRunKeyLevel >= 1)
+                return false;
+            if (Trinity.Settings.Loot.TownRun.KeepTrialLootRunKeysInBackpack && item.ItemType == ItemType.KeystoneFragment && item.TieredLootRunKeyLevel == 0)
+                return false;
+            if (Trinity.Settings.Loot.TownRun.KeepRiftKeysInBackpack && item.ItemType == ItemType.KeystoneFragment && item.TieredLootRunKeyLevel <= -1)
                 return false;
 
             if (Trinity.Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy)

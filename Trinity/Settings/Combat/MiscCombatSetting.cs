@@ -33,6 +33,7 @@ namespace Trinity.Config.Combat
         private bool _ForceKillSummoners;
         private bool _ProfileTagOverride;
         private bool _AvoidAoEOutOfCombat;
+        private bool _FleeInGhostMode;
         #endregion Fields
 
         #region Events
@@ -532,6 +533,24 @@ namespace Trinity.Config.Combat
             }
         }
 
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool FleeInGhostMode
+        {
+            get
+            {
+                return _FleeInGhostMode;
+            }
+            set
+            {
+                if (_FleeInGhostMode != value)
+                {
+                    _FleeInGhostMode = value;
+                    OnPropertyChanged("FleeInGhostMode");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -583,6 +602,7 @@ namespace Trinity.Config.Combat
             ForceKillElitesHealth = 0;
             ForceKillSummoners = true;
             AvoidAoEOutOfCombat = true;
+            FleeInGhostMode = true;
         }
         #endregion Methods
     }

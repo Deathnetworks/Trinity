@@ -74,6 +74,8 @@ namespace Trinity
         public bool HasEventInspectionTask { get; set; }
         public EquippedItemCache EquippedItemCache { get { return EquippedItemCache.Instance; } }
 
+        public bool ParticipatingInTieredLootRun { get; set; }
+
         public PlayerInfoCache()
         {
             LastUpdated = DateTime.MinValue;
@@ -210,6 +212,9 @@ namespace Trinity
                     Player.GameDifficulty = ZetaDia.Service.Hero.CurrentDifficulty;
 
                     Player.EquippedItemCache.Update();
+
+                    Player.ParticipatingInTieredLootRun = ZetaDia.Me.CommonData.GetAttribute<int>(ActorAttributeType.ParticipatingInTieredLootRun) > 0;
+
 
                     if (Player.CurrentHealthPct > 0)
                         Player.IsGhosted = ZetaDia.Me.CommonData.GetAttribute<int>(ActorAttributeType.Ghosted) > 0;
