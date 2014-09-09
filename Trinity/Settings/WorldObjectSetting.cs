@@ -570,6 +570,12 @@ namespace Trinity.Config
             OpenRareChests = true;
             OpenContainerDelay = 500;
             EnableBountyEvents = true;
+            UseChannelingPylon = true;
+            UseConduitPylon = true;
+            UsePowerPylon = true;
+            UseShieldPylon = true;
+            UseSpeedPylon = true;
+
         }
         #endregion Methods
     }
