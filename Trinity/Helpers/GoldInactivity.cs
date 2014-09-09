@@ -36,6 +36,9 @@ namespace Trinity.Helpers
         /// <returns></returns>
         internal bool GoldInactive()
         {
+            if (Trinity.Player.ParticipatingInTieredLootRun)
+                return false;
+
             if (Trinity.Settings.Advanced.DisableAllMovement)
                 return false;
 
