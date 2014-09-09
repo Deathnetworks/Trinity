@@ -113,10 +113,6 @@ namespace Trinity
                     //    return false;
                     //}
 
-                    bool participatingInTieredLootRun = ZetaDia.Me.CommonData.GetAttribute<int>(ActorAttributeType.ParticipatingInTieredLootRun) > 0;
-                    if (participatingInTieredLootRun)
-                        return false;
-
                     // Check if we should be forcing a town-run
                     if (!Trinity.Player.IsInTown && Trinity.ForceVendorRunASAP || BrainBehavior.IsVendoring)
                     {
@@ -137,21 +133,23 @@ namespace Trinity
                         LastCheckBackpackDurability = DateTime.UtcNow;
 
                         // Check for no space in backpack
-                        Vector2 validLocation = TrinityItemManager.FindValidBackpackLocation(true);
-                        if (validLocation.X < 0 || validLocation.Y < 0)
+                        if (!Trinity.Player.ParticipatingInTieredLootRun)
                         {
-                            Logger.Log("No more space to pickup a 2-slot item, now running town-run routine. (TownRun)");
-                            if (!LastTownRunCheckResult)
+                            Vector2 validLocation = TrinityItemManager.FindValidBackpackLocation(true);
+                            if (validLocation.X < 0 || validLocation.Y < 0)
                             {
-                                LastTownRunCheckResult = true;
+                                Logger.Log("No more space to pickup a 2-slot item, now running town-run routine. (TownRun)");
+                                if (!LastTownRunCheckResult)
+                                {
+                                    LastTownRunCheckResult = true;
+                                }
+                                Trinity.IsReadyToTownRun = true;
+
+                                Trinity.ForceVendorRunASAP = true;
+                                // Record the first position when we run out of bag space, so we can return later
+                                SetPreTownRunPosition();
                             }
-                            Trinity.IsReadyToTownRun = true;
-
-                            Trinity.ForceVendorRunASAP = true;
-                            // Record the first position when we run out of bag space, so we can return later
-                            SetPreTownRunPosition();
                         }
-
                         if (ZetaDia.Me.IsValid)
                         {
                             var equippedItems = ZetaDia.Me.Inventory.Equipped.Where(i => i.DurabilityCurrent != i.DurabilityMax).ToList();

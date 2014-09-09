@@ -3,7 +3,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ut="clr-namespace:Trinity.UIComponents"
-             mc:Ignorable="d"  Foreground="{DynamicResource TextBrush}"
+             mc:Ignorable="d"  Foreground="{DynamicResource TextBrush}" Background="LightGray"
              d:DesignHeight="600" d:DesignWidth="450">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -179,7 +179,7 @@
                             <CheckBox IsChecked="{Binding Path=Misc.CollectHealthGlobe}">Attempt to collect health globes</CheckBox>
                             <CheckBox IsChecked="{Binding Path=Misc.UseNavMeshTargeting}" ToolTip="Recommended ON, May increase CPU/Memory usage">Use NavMesh to prevent stucks</CheckBox>
                             <CheckBox IsChecked="{Binding Path=Misc.HiPriorityHG}">Give higher priority to health globes</CheckBox>
-                          
+                            <CheckBox IsChecked="{Binding Path=Misc.FleeInGhostMode}">Flee In Ghost Mode</CheckBox>
                         </UniformGrid>
                     </StackPanel>
                 </GroupBox>

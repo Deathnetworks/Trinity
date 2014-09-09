@@ -23,6 +23,9 @@ namespace Trinity.Config.Loot
         private bool _ForceSalvageRares;
         private bool _KeepLegendaryUnid;
         private bool _SellExtraPotions;
+        private bool _KeepTrialLootRunKeysInBackpack;
+        private bool _KeepTieredLootRunKeysInBackpack;
+        private bool _KeepRiftKeysInBackPack;
         #endregion Fields
 
         #region Events
@@ -308,6 +311,57 @@ namespace Trinity.Config.Loot
                 {
                     _SellExtraPotions = value;
                     OnPropertyChanged("SellExtraPotions");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool KeepTrialLootRunKeysInBackpack
+        {
+            get
+            {
+                return _KeepTrialLootRunKeysInBackpack;
+            }
+            set
+            {
+                if (_KeepTrialLootRunKeysInBackpack != value)
+                {
+                    _KeepTrialLootRunKeysInBackpack = value;
+                    OnPropertyChanged("KeepTrialLootRunKeysInBackpack");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool KeepTieredLootRunKeysInBackpack
+        {
+            get
+            {
+                return _KeepTieredLootRunKeysInBackpack;
+            }
+            set
+            {
+                if (_KeepTieredLootRunKeysInBackpack != value)
+                {
+                    _KeepTieredLootRunKeysInBackpack = value;
+                    OnPropertyChanged("KeepTieredLootRunKeysInBackpack");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool KeepRiftKeysInBackpack
+        {
+            get
+            {
+                return _KeepRiftKeysInBackPack;
+            }
+            set
+            {
+                if (_KeepRiftKeysInBackPack != value)
+                {
+                    _KeepRiftKeysInBackPack = value;
+                    OnPropertyChanged("KeepRiftKeysInBackpack");
                 }
             }
         }

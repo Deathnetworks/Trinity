@@ -37,6 +37,11 @@
                         <CheckBox ToolTip="Trash all Rares" IsChecked="{Binding Path=TownRun.ForceSalvageRares}" HorizontalAlignment="Left" Content="Sell/Salvage All Rares" />
                         <CheckBox ToolTip="Keep Legendaries Unidentified" IsChecked="{Binding Path=TownRun.KeepLegendaryUnid}" HorizontalAlignment="Left" Content="Keep Legendaries Unidentified" />
                     </UniformGrid>
+                    <UniformGrid Columns="1" HorizontalAlignment="Center">
+                        <CheckBox Content="Keep Rift Keys in Backpack" IsChecked="{Binding Path=TownRun.KeepRiftKeysInBackpack}" />
+                        <CheckBox Content="Keep Trial Greater Rift Keys in Backpack" IsChecked="{Binding Path=TownRun.KeepTrialLootRunKeysInBackpack}" />
+                        <CheckBox Content="Keep Greater Rift Keys in Backpack" IsChecked="{Binding Path=TownRun.KeepTieredLootRunKeysInBackpack}" />
+                    </UniformGrid>
                 </StackPanel>
             </GroupBox>
             <GroupBox Grid.Row="1" Header="Free Bag Slots for Town Run">

@@ -157,7 +157,7 @@ namespace Trinity
 
                 using (new PerformanceLogger("RefreshDiaObjectCache.AvoidanceCheck"))
                 {
-                    if (Player.IsGhosted)
+                    if (Settings.Combat.Misc.FleeInGhostMode && Player.IsGhosted)
                         _standingInAvoidance = true;
 
                     // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
@@ -421,7 +421,8 @@ namespace Trinity
                 });
             }
 
-            if (ZetaDia.CurrentQuest.QuestSNO == 337492 && ZetaDia.CurrentQuest.StepId == 16) // X1_LR_DungeonFinder
+            bool isInRift = ZetaDia.CurrentQuest.QuestSNO == 337492 && ZetaDia.CurrentQuest.StepId == 16;
+            if (isInRift || Player.ParticipatingInTieredLootRun) // X1_LR_DungeonFinder
             {
                 foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsPointOfInterest))
                 {
