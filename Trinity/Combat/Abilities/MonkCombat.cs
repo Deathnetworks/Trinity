@@ -52,11 +52,11 @@ namespace Trinity.Combat.Abilities
             {
                 return new TrinityPower(SNOPower.X1_Monk_MysticAlly_v2, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 2, 2);
             }
-            else if (CombatBase.CanCast(SNOPower.X1_Monk_MysticAlly_v2) && Runes.Monk.AirAlly.IsActive && Player.PrimaryResourcePct >= 0.10)
+            else if (CombatBase.CanCast(SNOPower.X1_Monk_MysticAlly_v2) && Runes.Monk.AirAlly.IsActive && Player.PrimaryResourcePct <= 0.10)
             {
                 return new TrinityPower(SNOPower.X1_Monk_MysticAlly_v2, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 2, 2);
             }
-            else if (CombatBase.CanCast(SNOPower.X1_Monk_MysticAlly_v2) && Runes.Monk.EnduringAlly.IsActive && Player.CurrentHealthPct >= 0.4)
+            else if (CombatBase.CanCast(SNOPower.X1_Monk_MysticAlly_v2) && Runes.Monk.EnduringAlly.IsActive && Player.CurrentHealthPct <= 0.4)
             {
                 return new TrinityPower(SNOPower.X1_Monk_MysticAlly_v2, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 2, 2);
             }
