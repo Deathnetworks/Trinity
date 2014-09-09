@@ -47,7 +47,16 @@ namespace Trinity.Combat.Abilities
             }
 
             // Mystic ally
-            if (CombatBase.CanCast(SNOPower.X1_Monk_MysticAlly_v2) && TargetUtil.EliteOrTrashInRange(30f))
+            if (CombatBase.CanCast(SNOPower.X1_Monk_MysticAlly_v2) && TargetUtil.EliteOrTrashInRange(30f)
+                && (!Runes.Monk.AirAlly.IsActive | !Runes.Monk.EnduringAlly.IsActive))
+            {
+                return new TrinityPower(SNOPower.X1_Monk_MysticAlly_v2, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 2, 2);
+            }
+            else if (CombatBase.CanCast(SNOPower.X1_Monk_MysticAlly_v2) && Runes.Monk.AirAlly.IsActive && Player.PrimaryResourcePct >= 0.10)
+            {
+                return new TrinityPower(SNOPower.X1_Monk_MysticAlly_v2, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 2, 2);
+            }
+            else if (CombatBase.CanCast(SNOPower.X1_Monk_MysticAlly_v2) && Runes.Monk.EnduringAlly.IsActive && Player.CurrentHealthPct >= 0.4)
             {
                 return new TrinityPower(SNOPower.X1_Monk_MysticAlly_v2, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 2, 2);
             }
@@ -197,7 +206,7 @@ namespace Trinity.Combat.Abilities
             
             var cycloneStrikeRange = Runes.Monk.Implosion.IsActive ? 34f : 24f;
             var cycloneStrikeSpirit = Runes.Monk.EyeOfTheStorm.IsActive ? 30 : 50;
-
+            
             // Cyclone Strike
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Monk_CycloneStrike) &&
                 (
