@@ -103,8 +103,6 @@ namespace Trinity
                     return Trinity.Settings.Combat.AvoidanceRadius.PoisonTree;
                 case AvoidanceType.PoisonEnchanted:
                     return Trinity.Settings.Combat.AvoidanceRadius.PoisonEnchanted;
-                case AvoidanceType.SuccubusStar:
-                    return Trinity.Settings.Combat.AvoidanceRadius.SuccubusStar;
                 case AvoidanceType.ShamanFire:
                     return Trinity.Settings.Combat.AvoidanceRadius.ShamanFire;
                 case AvoidanceType.Thunderstorm:
@@ -231,8 +229,6 @@ namespace Trinity
                         return avoidanceHealth.AvoidPoisonTreeHealth;
                     case AvoidanceType.ShamanFire:
                         return avoidanceHealth.AvoidShamanFireHealth;
-                    case AvoidanceType.SuccubusStar:
-                        return avoidanceHealth.AvoidSuccubusStarHealth;
                     case AvoidanceType.Thunderstorm:
                         return avoidanceHealth.AvoidThunderstormHealth;
                     case AvoidanceType.Wormhole:

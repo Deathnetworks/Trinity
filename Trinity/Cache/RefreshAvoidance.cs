@@ -12,10 +12,8 @@ namespace Trinity
 {
     public partial class Trinity : IPlugin
     {
-        private static bool RefreshAvoidance(bool AddToCache)
+        private static bool RefreshAvoidance()
         {
-            AddToCache = true;
-            
             try
             {
                 CurrentCacheObject.Animation = CurrentCacheObject.Object.CommonData.CurrentAnimation;
@@ -36,7 +34,7 @@ namespace Trinity
             double minAvoidanceRadius = GetAvoidanceRadius(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
 
             // Are we allowed to path around avoidance?
-            if (Settings.Combat.Misc.AvoidanceNavigation)
+            //if (Settings.Combat.Misc.AvoidanceNavigation)
             {
                 MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, (float)minAvoidanceRadius);
             }
@@ -45,7 +43,7 @@ namespace Trinity
 
             // Beast Charge should set aoe position as players current position!
             if (avoidanceType == AvoidanceType.BeastCharge)
-                CurrentCacheObject.Position = Trinity.Player.Position;
+                CurrentCacheObject.Position = Player.Position;
 
             // Monks with Serenity up ignore all AOE's
             if (Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_Serenity) && GetHasBuff(SNOPower.Monk_Serenity))
@@ -111,7 +109,7 @@ namespace Trinity
                     {
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because MarasKaleidoscope is equipped", avoidanceType);
                         minAvoidanceHealth = 0;
-                    }                        
+                    }
                     break;
 
                 case AvoidanceType.AzmoFireball:
@@ -124,19 +122,19 @@ namespace Trinity
                 case AvoidanceType.MoltenBall:
                 case AvoidanceType.ShamanFire:
 
-                    if (Legendary.TheStarofAzkaranth.IsEquipped)
+                    if (Legendary.TheStarOfAzkaranth.IsEquipped)
                     {
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because TheStarofAzkaranth is equipped", avoidanceType);
                         minAvoidanceHealth = 0;
                     }
                     break;
-                    
+
                 case AvoidanceType.FrozenPulse:
                 case AvoidanceType.IceBall:
                 case AvoidanceType.IceTrail:
 
                     // Ignore if both items are equipped
-                    if (Legendary.TalismanofAranoch.IsEquipped)
+                    if (Legendary.TalismanOfAranoch.IsEquipped)
                     {
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because TalismanofAranoch is equipped", avoidanceType);
                         minAvoidanceHealth = 0;
@@ -149,8 +147,8 @@ namespace Trinity
                     if (Legendary.XephirianAmulet.IsEquipped)
                     {
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because XephirianAmulet is equipped", avoidanceType);
-                        minAvoidanceHealth = 0; 
-                    }                        
+                        minAvoidanceHealth = 0;
+                    }
                     break;
 
                 case AvoidanceType.Arcane:
@@ -160,7 +158,7 @@ namespace Trinity
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because CountessJuliasCameo is equipped", avoidanceType);
                         minAvoidanceHealth = 0;
                     }
-                    break;                   
+                    break;
             }
 
             // Set based immunity
@@ -180,21 +178,18 @@ namespace Trinity
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because BlackthornesBattlegear is equipped", avoidanceType);
                     minAvoidanceHealth = 0;
                 }
-                    
+
             }
 
 
 
             if (minAvoidanceHealth == 0)
             {
-                AddToCache = false;
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Ignoring Avoidance! Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
                        CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO, minAvoidanceRadius, minAvoidanceHealth, CurrentCacheObject.Distance);
-                return AddToCache;
+                return false;
 
             }
-
-
 
 
 
@@ -212,6 +207,21 @@ namespace Trinity
                     ObjectType = GObjectType.Avoidance,
                     Rotation = CurrentCacheObject.Rotation
                 });
+
+                //bool areaOfEffectInPath = false;
+                //var currentPath = Navigator.GetNavigationProviderAs<DefaultNavigationProvider>().CurrentPath;
+                //if (Settings.Combat.Misc.AvoidanceNavigation)
+                //{
+                //    foreach (var point in currentPath)
+                //    {
+                //        if (CurrentCacheObject.Position.Distance2DSqr(point) <= (minAvoidanceRadius * minAvoidanceRadius))
+                //        {
+                //            areaOfEffectInPath = true;
+                //            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Navigator Pathing through avoidance, setting IsStandingInAvoidance=True");
+                //            break;
+                //        }
+                //    }
+                //}
 
                 // Is this one under our feet? If so flag it up so we can find an avoidance spot
                 if (CurrentCacheObject.Distance <= minAvoidanceRadius)
@@ -233,7 +243,7 @@ namespace Trinity
                 }
             }
 
-            return AddToCache;
+            return true;
         }
         private static double GetAvoidanceHealth(int actorSNO = -1)
         {
@@ -244,8 +254,7 @@ namespace Trinity
             {
                 if (actorSNO != -1)
                     return AvoidanceManager.GetAvoidanceHealthBySNO(CurrentCacheObject.ActorSNO, 1);
-                else
-                    return AvoidanceManager.GetAvoidanceHealthBySNO(actorSNO, 1);
+                return AvoidanceManager.GetAvoidanceHealthBySNO(actorSNO, 1);
             }
             catch (Exception ex)
             {

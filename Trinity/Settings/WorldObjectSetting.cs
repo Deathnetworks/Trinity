@@ -17,6 +17,11 @@ namespace Trinity.Config
         private bool _UseProtectionShrine;
         private bool _UseEmpoweredShrine;
         private bool _UseEnlightenedShrine;
+        private bool _UseChannelingPylon;
+        private bool _UseConduitPylon;
+        private bool _UseShieldPylon;
+        private bool _UseSpeedPylon;
+        private bool _UsePowerPylon;
         private bool _UseFleetingShrine;
         private bool _HiPriorityShrines;
         private bool _OpenAnyContainer;
@@ -208,6 +213,96 @@ namespace Trinity.Config
                 {
                     _UseFleetingShrine = value;
                     OnPropertyChanged("UseFleetingShrine");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool UseChannelingPylon
+        {
+            get
+            {
+                return _UseChannelingPylon;
+            }
+            set
+            {
+                if (_UseChannelingPylon != value)
+                {
+                    _UseChannelingPylon = value;
+                    OnPropertyChanged("UseChannelingPylon");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool UseConduitPylon
+        {
+            get
+            {
+                return _UseConduitPylon;
+            }
+            set
+            {
+                if (_UseConduitPylon != value)
+                {
+                    _UseConduitPylon = value;
+                    OnPropertyChanged("UseConduitPylon");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool UseShieldPylon
+        {
+            get
+            {
+                return _UseShieldPylon;
+            }
+            set
+            {
+                if (_UseShieldPylon != value)
+                {
+                    _UseShieldPylon = value;
+                    OnPropertyChanged("UseShieldPylon");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool UseSpeedPylon
+        {
+            get
+            {
+                return _UseSpeedPylon;
+            }
+            set
+            {
+                if (_UseSpeedPylon != value)
+                {
+                    _UseSpeedPylon = value;
+                    OnPropertyChanged("UseSpeedPylon");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool UsePowerPylon
+        {
+            get
+            {
+                return _UsePowerPylon;
+            }
+            set
+            {
+                if (_UsePowerPylon != value)
+                {
+                    _UsePowerPylon = value;
+                    OnPropertyChanged("UsePowerPylon");
                 }
             }
         }

@@ -179,10 +179,17 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
+                bool isJailerOrFrozen = Trinity.ObjectCache.Any(o => o.IsEliteRareUnique &&
+                          o.MonsterAffixes.HasFlag(MonsterAffixes.Frozen | MonsterAffixes.Jailer));
                 return
                     !UseOOCBuff &&
                     CanCast(SNOPower.Barbarian_IgnorePain) &&
-                    Player.CurrentHealthPct <= V.F("Barbarian.IgnorePain.MinHealth");
+                    (Player.CurrentHealthPct <= V.F("Barbarian.IgnorePain.MinHealth") ||
+                    (Sets.TheLegacyOfRaekor.IsFullyEquipped && Player.CurrentHealthPct <= V.F("Barbarian.FuryDumpRaekor.MinHealth") &&
+                    (Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")
+                    && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
+                    Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")) ||
+                    isJailerOrFrozen);
             }
         }
         public static bool ShouldWaitForCallOfTheAncients
@@ -249,6 +256,7 @@ namespace Trinity.Combat.Abilities
 
                 bool anyTime = (Settings.Combat.Barbarian.WOTBMode == BarbarianWOTBMode.WhenReady && !Player.IsInTown);
                 bool hasBuff = GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
+                bool hasInfiniteCasting = GetHasBuff(SNOPower.Pages_Buff_Infinite_Casting);
                 bool canCast = CanCast(SNOPower.Barbarian_WrathOfTheBerserker, CanCastFlags.NoTimer);
 
                 bool emergencyHealth = Player.CurrentHealthPct <= V.F("Barbarian.WOTB.EmergencyHealth");
@@ -259,7 +267,7 @@ namespace Trinity.Combat.Abilities
                     // Don't still have the buff
                     !hasBuff &&
                     canCast &&
-                    (WOTBGoblins || WOTBIgnoreElites || WOTBElitesPresent || anyTime || emergencyHealth);
+                    (WOTBGoblins || WOTBIgnoreElites || WOTBElitesPresent || anyTime || emergencyHealth || hasInfiniteCasting);
 
                 return result;
             }
@@ -331,7 +339,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                double minFury = 50f;                
+                double minFury = 50f;
                 bool hasCaveIn = HotbarSkills.AssignedSkills.Any(p => p.Power == SNOPower.Barbarian_Earthquake && p.RuneIndex == 4);
                 float range = hasCaveIn ? 24f : 14f;
 
@@ -352,9 +360,9 @@ namespace Trinity.Combat.Abilities
             {
                 return !UseOOCBuff && !Player.IsIncapacitated && CanCast(SNOPower.Barbarian_BattleRage, CanCastFlags.NoTimer) &&
                     (
-                        !GetHasBuff(SNOPower.Barbarian_BattleRage) ||
-                        (Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin") && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
-                        Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")
+                        !GetHasBuff(SNOPower.Barbarian_BattleRage) || (Player.CurrentHealthPct <= V.F("Barbarian.FuryDumpRaekor.MinHealth") &&
+                        ((Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin") && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
+                        Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")))
                     ) &&
                     Player.PrimaryResource >= V.F("Barbarian.BattleRage.MinFury");
             }
@@ -449,10 +457,8 @@ namespace Trinity.Combat.Abilities
 
                 bool currentEliteTargetInRange = CurrentTarget.RadiusDistance > 7f && CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 35f;
 
-                return
-                    !UseOOCBuff &&
-                    CanCast(SNOPower.Barbarian_FuriousCharge, CanCastFlags.NoTimer) &&
-                    (currentEliteTargetInRange || unitsInFrontOfBestTarget >= 3);
+                return CanCast(SNOPower.Barbarian_FuriousCharge, CanCastFlags.NoTimer) &&
+                    (currentEliteTargetInRange || unitsInFrontOfBestTarget >= 3 || Sets.TheLegacyOfRaekor.IsFullyEquipped);
 
             }
         }
@@ -466,7 +472,7 @@ namespace Trinity.Combat.Abilities
                 if (Legendary.LutSocks.IsEquipped) // This will now cast whenever leap is available and an enemy is around. Disable Leap OOC option. The last line will prevent you from leaping on destructibles
                 {
                     return leapresult && TargetUtil.AnyMobsInRange(15f, 1);
-                }   
+                }
                 else
                 {
                     return leapresult && (TargetUtil.ClusterExists(15f, 35f, V.I("Barbarian.Leap.TrashCount")) || CurrentTarget.IsBossOrEliteRareUnique);
@@ -773,7 +779,7 @@ namespace Trinity.Combat.Abilities
                 var bestAoEUnit = TargetUtil.GetBestPierceTarget(35f);
 
                 if (Runes.Barbarian.BoulderToss.IsActive)
-                    bestAoEUnit = TargetUtil.GetBestClusterUnit(9f);                
+                    bestAoEUnit = TargetUtil.GetBestClusterUnit(9f);
 
                 return new TrinityPower(SNOPower.X1_Barbarian_AncientSpear, V.F("Barbarian.AncientSpear.UseRange"), bestAoEUnit.ACDGuid);
             }

@@ -27,7 +27,7 @@
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
-                <ColumnDefinition Width="35"/>
+                <ColumnDefinition Width="50"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition />
@@ -58,8 +58,7 @@
             <TextBox Grid.Column="1" Grid.Row="1"
                         Text="{Binding Value, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource intToStringConverter}}"                     
                         HorizontalAlignment="Stretch" 
-                        Margin="0,2,2,2" 
-                        TextAlignment="Center" 
+                        Margin="0,2,2,2" TextAlignment="Center" 
                         IsReadOnly="True"/>
         </Grid>
     </ControlTemplate>

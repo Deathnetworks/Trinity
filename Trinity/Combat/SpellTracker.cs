@@ -188,8 +188,8 @@ namespace Trinity
 
             TrackedSpells.Add(new TrackedSpell(SNOPower.DemonHunter_MarkedForDeath, -999, 10f));
 
-
             // Demon Hunter
+            TrackedSpells.Add(new TrackedSpell(SNOPower.DemonHunter_MarkedForDeath, -99, 30000f));
             // TBD
         }
 

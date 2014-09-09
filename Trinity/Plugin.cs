@@ -28,7 +28,7 @@ namespace Trinity
         {
             get
             {
-                return new Version(2, 1, 4);
+                return new Version(2, 1, 5);
             }
         }
 
@@ -146,9 +146,9 @@ namespace Trinity
                 }
                 else
                 {
-                    PluginCheck.Start();
-
                     _isPluginEnabled = true;
+
+                    PluginCheck.Start();
 
                     // Settings are available after this... 
                     LoadConfiguration();

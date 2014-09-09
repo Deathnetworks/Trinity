@@ -82,7 +82,8 @@
             <UniformGrid Columns="2">
                 <CheckBox Margin="2" IsChecked="{Binding Path=WD.ZeroDogs}" ToolTip="Spam Sacrifice">Zero Dogs/Spam Sacrifice</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=WD.UseFetishArmyOffCooldown}" ToolTip="Spam Sacrifice">Use Fetish Army Off Cooldown</CheckBox>
-                <CheckBox Margin="2" IsChecked="{Binding Path=WD.UseBigBadVoodooOffCooldown}" ToolTip="Spam Big Bad Voodo">Use Big Bad Voodoo Off Cooldown</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=WD.SpamHorrify}" ToolTip="Spam Horrify if it's ready">Spam Horrify</CheckBox>
+				        <CheckBox Margin="2" IsChecked="{Binding Path=WD.UseBigBadVoodooOffCooldown}" ToolTip="Spam Big Bad Voodo">Use Big Bad Voodoo Off Cooldown</CheckBox>
             </UniformGrid>
         </Grid>
 

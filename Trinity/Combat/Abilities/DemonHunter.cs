@@ -11,7 +11,7 @@ using Zeta.Game.Internals.Actors;
 
 namespace Trinity
 {
-    public partial class Trinity : IPlugin
+    public partial class Trinity
     {
         private static TrinityPower GetDemonHunterPower(bool IsCurrentlyAvoiding, bool UseOOCBuff, bool UseDestructiblePower)
         {
@@ -26,20 +26,19 @@ namespace Trinity
             //Kridershot InternalName=x1_bow_norm_unique_09-137 GameBalanceID=1999595351 ItemLink: {c:ffff8000}Kridershot{/c}
             bool hasKridershot = ZetaDia.Me.Inventory.Equipped.Any(i => i.GameBalanceId == 1999595351);
 
-            bool hasPunishment = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Preparation && s.RuneIndex == 0);
+            bool hasPunishment = Runes.DemonHunter.Punishment.IsActive;
 
             // Spam Shadow Power
             if (Settings.Combat.DemonHunter.SpamShadowPower && CombatBase.CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
                 (!GetHasBuff(SNOPower.DemonHunter_ShadowPower) || Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit) && // if we don't have the buff or our health is low
                 ((!hasPunishment && Player.SecondaryResource >= 14) || (hasPunishment && Player.SecondaryResource >= 39)) && // Save some Discipline for Preparation
                 (Settings.Combat.DemonHunter.SpamShadowPower && Player.SecondaryResource >= 28)) // When spamming Shadow Power, save some Discipline for emergencies
-                
             {
                 return new TrinityPower(SNOPower.DemonHunter_ShadowPower);
             }
 
             // NotSpam Shadow Power
-            if(!UseOOCBuff && !Settings.Combat.DemonHunter.SpamShadowPower && CombatBase.CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
+            if (!UseOOCBuff && !Settings.Combat.DemonHunter.SpamShadowPower && CombatBase.CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
                 (!GetHasBuff(SNOPower.DemonHunter_ShadowPower) || Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit) && // if we don't have the buff or our health is low
                 ((!hasPunishment && Player.SecondaryResource >= 14) || (hasPunishment && Player.SecondaryResource >= 39)) && // Save some Discipline for Preparation
                 (Player.CurrentHealthPct < 1f || Player.IsRooted || TargetUtil.AnyMobsInRange(15)))
@@ -48,8 +47,8 @@ namespace Trinity
             }
 
             // Vengeance
-            if (!IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.X1_DemonHunter_Vengeance, CombatBase.CanCastFlags.NoTimer) && 
-                ((!Settings.Combat.DemonHunter.VengeanceElitesOnly && TargetUtil.AnyMobsInRange(60, 6)) || TargetUtil.IsEliteTargetInRange(60f) ))
+            if (!IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.X1_DemonHunter_Vengeance, CombatBase.CanCastFlags.NoTimer) &&
+                ((!Settings.Combat.DemonHunter.VengeanceElitesOnly && TargetUtil.AnyMobsInRange(60, 6)) || TargetUtil.IsEliteTargetInRange(60f)))
             {
                 return new TrinityPower(SNOPower.X1_DemonHunter_Vengeance);
             }
@@ -66,19 +65,12 @@ namespace Trinity
             }
 
             // Sentry Turret
-            int sentryCoolDown = SpellHistory.SpellUseCountInTime(SNOPower.DemonHunter_Sentry, TimeSpan.FromSeconds(24)) >= 4 ? 12 : 6;
-            bool hasBombadiersRucksack = Legendary.BombadiersRucksack.IsEquipped;
-            int maxSentries = hasBombadiersRucksack ? 4 : 2;
-            bool hasM6 = Sets.EmbodimentOfTheMarauder.IsThirdBonusActive;
-            bool sentryCheck = (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.DemonHunter_Sentry, CombatBase.CanCastFlags.NoTimer) &&
-                (TargetUtil.AnyElitesInRange(50) || TargetUtil.AnyMobsInRange(50) || TargetUtil.IsEliteTargetInRange(50)) &&
-                Player.PrimaryResource >= 30 && Trinity.PlayerOwnedDHSentryCount < maxSentries &&
-                (SpellHistory.TimeSinceUse(SNOPower.DemonHunter_Sentry) > TimeSpan.FromSeconds(sentryCoolDown) || SpellHistory.DistanceFromLastUsePosition(SNOPower.DemonHunter_Sentry) > 7.5));
-
-                if (hasM6 && sentryCheck || !hasM6 && sentryCheck && (TargetUtil.AnyMobsInRange(55f, 1)))
-                {
-                    return new TrinityPower(SNOPower.DemonHunter_Sentry, 65f, TargetUtil.GetBestClusterPoint());
-                }
+            if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.DemonHunter_Sentry, CombatBase.CanCastFlags.NoTimer) &&
+               TargetUtil.AnyMobsInRange(65) &&
+               Player.PrimaryResource >= 30)
+            {
+                return new TrinityPower(SNOPower.DemonHunter_Sentry, 65f, TargetUtil.GetBestClusterPoint(35f, 65f, false));
+            }
 
             // Caltrops
             if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.DemonHunter_Caltrops) &&
@@ -87,20 +79,7 @@ namespace Trinity
                 return new TrinityPower(SNOPower.DemonHunter_Caltrops, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1);
             }
 
-
-            // Preperation: restore 30 disc / 45 sec cd
-            // Invigoration = 1 : passive + 15 disc / 45 sec cd
-            // Punishment   = 0 : Cost: 25 disc, restore 75 hatred / NO COOLDOWN
-            // Battle Scars = 3 : instantly restore 40% health + restore 30 disc / 45 sec cd
-            // Focused Mind = 2 : restore 45 disc over 15 sec / 45 sec cd
-            // Backup plan  = 4 : 30% chance Prep has no cooldown (remove cast timer)
-
-            // Restore 75 hatred for 25 disc - NO COOLDOWN!
-            //bool hasPunishment = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Preparation && s.RuneIndex == 0);
-            bool hasInvigoration = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Preparation && s.RuneIndex == 1);
-            bool hasBattleScars = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Preparation && s.RuneIndex == 3);
-            bool hasFocusedMind = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Preparation && s.RuneIndex == 2);
-            bool hasBackupPlan = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Preparation && s.RuneIndex == 4);
+            bool hasBattleScars = Runes.DemonHunter.BattleScars.IsActive;
 
             float preperationTriggerRange = V.F("DemonHunter.PreperationTriggerRange");
             if (((!UseOOCBuff && !Player.IsIncapacitated &&
@@ -188,29 +167,25 @@ namespace Trinity
             }
 
             // Marked for Death
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_MarkedForDeath) &&
-                Player.SecondaryResource >= 3 &&
-                (TargetUtil.AnyElitesInRange(40) || TargetUtil.AnyMobsInRange(40, 3) ||
-
-                ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) &&
-                CurrentTarget.Radius <= 40 && CurrentTarget.RadiusDistance <= 40f)))
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_MarkedForDeath, CombatBase.CanCastFlags.NoTimer) &&
+                Player.SecondaryResource >= 3 && !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.DemonHunter_MarkedForDeath))
             {
-                return new TrinityPower(SNOPower.DemonHunter_MarkedForDeath, 40f, Vector3.Zero, CurrentWorldDynamicId, CurrentTarget.ACDGuid, 1, 1);
+                return new TrinityPower(SNOPower.DemonHunter_MarkedForDeath, 40f, CurrentTarget.ACDGuid);
             }
 
             // Vault
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_Vault) && !Player.IsRooted && !Player.IsIncapacitated &&
                 Settings.Combat.DemonHunter.VaultMode != Config.Combat.DemonHunterVaultMode.MovementOnly &&
-                (TargetUtil.AnyMobsInRange(7f,6) || Player.CurrentHealthPct <= 0.7) &&
+                (TargetUtil.AnyMobsInRange(7f, 6) || Player.CurrentHealthPct <= 0.7) &&
                 // if we have ShadowPower and Disicpline is >= 16
                 // or if we don't have ShadoWpower and Discipline is >= 22
                 (Player.SecondaryResource >= (Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) ? 22 : 16)) &&
-                    TimeSinceUse(SNOPower.DemonHunter_Vault) >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay)
+                    TimeSinceUse(SNOPower.DemonHunter_Vault) >= Settings.Combat.DemonHunter.VaultMovementDelay)
             {
                 //Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, -15f);
                 // Lets find a smarter Vault position instead of just "backwards"
                 //Vector3 vNewTarget = NavHelper.FindSafeZone(Trinity.Player.Position, true, false, null, false);
-                Vector3 vNewTarget = NavHelper.MainFindSafeZone(Trinity.Player.Position, true, false, null, false);
+                Vector3 vNewTarget = NavHelper.MainFindSafeZone(Player.Position, true);
 
                 return new TrinityPower(SNOPower.DemonHunter_Vault, 20f, vNewTarget, CurrentWorldDynamicId, -1, 1, 2);
             }
@@ -219,7 +194,7 @@ namespace Trinity
             if (!UseOOCBuff && CombatBase.CanCast(SNOPower.DemonHunter_RainOfVengeance) && !Player.IsIncapacitated &&
                 (TargetUtil.ClusterExists(45f, 3) || TargetUtil.EliteOrTrashInRange(45f)))
             {
-                var bestClusterPoint = TargetUtil.GetBestClusterPoint(45f, 65f, false, true);
+                var bestClusterPoint = TargetUtil.GetBestClusterPoint(45f, 65f, false);
 
                 return new TrinityPower(SNOPower.DemonHunter_RainOfVengeance, 0f, bestClusterPoint, CurrentWorldDynamicId, -1, 1, 1);
             }
@@ -251,8 +226,8 @@ namespace Trinity
                 !Player.IsIncapacitated && !Player.IsRooted && Player.PrimaryResource >= Settings.Combat.DemonHunter.StrafeMinHatred)
             {
                 bool shouldGetNewZigZag =
-                    (DateTime.UtcNow.Subtract(Trinity.LastChangedZigZag).TotalMilliseconds >= V.I("Barbarian.Whirlwind.ZigZagMaxTime") ||
-                    CurrentTarget.ACDGuid != Trinity.LastZigZagUnitAcdGuid ||
+                    (DateTime.UtcNow.Subtract(LastChangedZigZag).TotalMilliseconds >= V.I("Barbarian.Whirlwind.ZigZagMaxTime") ||
+                    CurrentTarget.ACDGuid != LastZigZagUnitAcdGuid ||
                     CombatBase.ZigZagPosition.Distance2D(Player.Position) <= 5f);
 
                 if (shouldGetNewZigZag)
@@ -261,8 +236,8 @@ namespace Trinity
 
                     CombatBase.ZigZagPosition = TargetUtil.GetZigZagTarget(CurrentTarget.Position, wwdist);
 
-                    Trinity.LastZigZagUnitAcdGuid = CurrentTarget.ACDGuid;
-                    Trinity.LastChangedZigZag = DateTime.UtcNow;
+                    LastZigZagUnitAcdGuid = CurrentTarget.ACDGuid;
+                    LastChangedZigZag = DateTime.UtcNow;
                 }
 
                 int postCastTickDelay = TrinityPower.MillisecondsToTickDelay(250);
@@ -288,19 +263,6 @@ namespace Trinity
                 return new TrinityPower(SNOPower.DemonHunter_SpikeTrap, 35f, vNewTarget, CurrentWorldDynamicId, -1, 1, 1);
             }
 
-            //skillDict.Add("ElementalArrow", SNOPower.DemonHunter_ElementalArrow);
-            //runeDict.Add("BallLightning", 1);
-            //runeDict.Add("FrostArrow", 0);
-            //runeDict.Add("ScreamingSkull", 2);
-            //runeDict.Add("LightningBolts", 4);
-            //runeDict.Add("NetherTentacles", 3);
-
-            var hasBallLightning = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_ElementalArrow && s.RuneIndex == 1);
-            var hasFrostArrow = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_ElementalArrow && s.RuneIndex == 0);
-            var hasScreamingSkull = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_ElementalArrow && s.RuneIndex == 2);
-            var hasLightningBolts = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_ElementalArrow && s.RuneIndex == 4);
-            var hasNetherTentacles = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_ElementalArrow && s.RuneIndex == 3);
-
             // Elemental Arrow
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_ElementalArrow) &&
                 SNOPowerUseTimer(SNOPower.DemonHunter_ElementalArrow) && !Player.IsIncapacitated &&
@@ -309,18 +271,9 @@ namespace Trinity
                 return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 65f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1);
             }
 
-            //skillDict.Add("Chakram", SNOPower.DemonHunter_Chakram);
-            //runeDict.Add("TwinChakrams", 0);
-            //runeDict.Add("Serpentine", 2);
-            //runeDict.Add("RazorDisk", 3);
-            //runeDict.Add("Boomerang", 1);
-            //runeDict.Add("ShurikenCloud", 4);
-
-            bool hasShurikenCloud = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Chakram && s.RuneIndex == 4);
-
             // Chakram normal attack
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Chakram) && !Player.IsIncapacitated &&
-                !hasShurikenCloud &&
+                !Runes.DemonHunter.ShurikenCloud.IsActive &&
                 ((Player.PrimaryResource >= 10 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 return new TrinityPower(SNOPower.DemonHunter_Chakram, 50f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1);
@@ -328,14 +281,14 @@ namespace Trinity
 
             // Chakram:Shuriken Cloud
             if (!Player.IsInTown && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Chakram) && !Player.IsIncapacitated &&
-                hasShurikenCloud && TimeSinceUse(SNOPower.DemonHunter_Chakram) >= 110000 &&
+                Runes.DemonHunter.ShurikenCloud.IsActive && TimeSinceUse(SNOPower.DemonHunter_Chakram) >= 110000 &&
                 ((Player.PrimaryResource >= 10 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 return new TrinityPower(SNOPower.DemonHunter_Chakram, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 2, 2);
             }
 
             // Rapid Fire
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_RapidFire, CombatBase.CanCastFlags.NoTimer) && 
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_RapidFire, CombatBase.CanCastFlags.NoTimer) &&
                 !Player.IsIncapacitated && Player.PrimaryResource >= 16 &&
                 (Player.PrimaryResource >= Settings.Combat.DemonHunter.RapidFireMinHatred || CombatBase.LastPowerUsed == SNOPower.DemonHunter_RapidFire))
             {
@@ -349,8 +302,8 @@ namespace Trinity
             }
 
             // Impale
-            bool impalecheck = !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Impale) && !Player.IsIncapacitated &&
-                (!TargetUtil.AnyMobsInRange(12, 4));
+            bool hasM6 = Sets.EmbodimentOfTheMarauder.IsThirdBonusActive;
+            bool impalecheck = !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Impale) && !Player.IsIncapacitated && (!TargetUtil.AnyMobsInRange(12, 4));
             if (!hasM6)
             {
                 if (impalecheck &&
@@ -406,13 +359,13 @@ namespace Trinity
             //Hexing Pants Mod
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CurrentTarget != null)
             {
-                if (Legendary.HexingPantsofMrYan.IsEquipped && CurrentTarget.IsUnit &&
+                if (Legendary.HexingPantsOfMrYan.IsEquipped && CurrentTarget.IsUnit &&
                 CurrentTarget.RadiusDistance > 10f)
                 {
                     return new TrinityPower(SNOPower.Walk, 10f, CurrentTarget.Position);
                 }
 
-                if (Legendary.HexingPantsofMrYan.IsEquipped && CurrentTarget.IsUnit &&
+                if (Legendary.HexingPantsOfMrYan.IsEquipped && CurrentTarget.IsUnit &&
                 CurrentTarget.RadiusDistance < 10f)
                 {
                     Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, -10f);
@@ -435,25 +388,25 @@ namespace Trinity
         private static TrinityPower GetDemonHunterDestroyPower()
         {
             if (Hotbar.Contains(SNOPower.DemonHunter_HungeringArrow))
-                return new TrinityPower(SNOPower.DemonHunter_HungeringArrow, 40f, CurrentTarget.ACDGuid);
+                return new TrinityPower(SNOPower.DemonHunter_HungeringArrow, 10f, CurrentTarget.ACDGuid);
 
             if (Hotbar.Contains(SNOPower.X1_DemonHunter_EntanglingShot))
-                return new TrinityPower(SNOPower.X1_DemonHunter_EntanglingShot, 40f, CurrentTarget.ACDGuid);
+                return new TrinityPower(SNOPower.X1_DemonHunter_EntanglingShot, 10f, CurrentTarget.ACDGuid);
 
             if (Hotbar.Contains(SNOPower.DemonHunter_Bolas))
-                return new TrinityPower(SNOPower.DemonHunter_Bolas, 40f, CurrentTarget.ACDGuid);
+                return new TrinityPower(SNOPower.DemonHunter_Bolas, 10f, CurrentTarget.ACDGuid);
 
             if (Hotbar.Contains(SNOPower.DemonHunter_Grenades))
-                return new TrinityPower(SNOPower.DemonHunter_Grenades, 15f, CurrentTarget.ACDGuid);
+                return new TrinityPower(SNOPower.DemonHunter_Grenades, 10f, CurrentTarget.ACDGuid);
 
             if (Hotbar.Contains(SNOPower.DemonHunter_ElementalArrow) && Player.PrimaryResource >= 10)
-                return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 40f, CurrentTarget.ACDGuid);
+                return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 10f, CurrentTarget.ACDGuid);
 
             if (Hotbar.Contains(SNOPower.X1_DemonHunter_EvasiveFire) && Player.PrimaryResource >= 10)
-                return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, 40f, CurrentTarget.ACDGuid);
+                return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, 10f, CurrentTarget.ACDGuid);
 
             if (Hotbar.Contains(SNOPower.DemonHunter_RapidFire) && Player.PrimaryResource >= 10)
-                return new TrinityPower(SNOPower.DemonHunter_RapidFire, 40f, CurrentTarget.Position);
+                return new TrinityPower(SNOPower.DemonHunter_RapidFire, 10f, CurrentTarget.Position);
 
             if (Hotbar.Contains(SNOPower.DemonHunter_Chakram) && Player.PrimaryResource >= 20)
                 return new TrinityPower(SNOPower.DemonHunter_Chakram, 0f, CurrentTarget.ACDGuid);

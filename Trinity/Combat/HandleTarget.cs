@@ -1281,7 +1281,7 @@ namespace Trinity
                 statusText.Append(CombatBase.CurrentPower.SNOPower);
             }
             statusText.Append(" Speed=");
-            statusText.Append(ZetaDia.Me.Movement.SpeedXY.ToString("0"));
+            statusText.Append(ZetaDia.Me.Movement.SpeedXY.ToString("0.00"));
             statusText.Append(" SNO=");
             statusText.Append(CurrentTarget.ActorSNO.ToString(CultureInfo.InvariantCulture));
             statusText.Append(" Elite=");

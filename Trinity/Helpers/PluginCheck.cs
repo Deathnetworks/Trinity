@@ -2,12 +2,9 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
 using Trinity.Technicals;
 using Zeta.Bot;
 
@@ -15,7 +12,7 @@ namespace Trinity.Helpers
 {
     public class PluginCheck
     {
-        private static Thread PluginCheckWatcher;
+        private static Thread _pluginCheckWatcher;
 
         /// <summary>
         /// Starts the watcher thread
@@ -27,14 +24,14 @@ namespace Trinity.Helpers
             if (PassedAllChecks)
                 return;
 
-            if (PluginCheckWatcher == null)
+            if (_pluginCheckWatcher == null)
             {
-                PluginCheckWatcher = new Thread(PluginChecker)
+                _pluginCheckWatcher = new Thread(PluginChecker)
                 {
                     Name = "Trinity PluginCheck",
                     IsBackground = true
                 };
-                PluginCheckWatcher.Start();
+                _pluginCheckWatcher.Start();
                 Logger.LogDebug("Plugin Check Watcher thread started");
 
                 var v = Encoding.UTF8.GetString(Convert.FromBase64String(ZetaCacheHelper.Validator));
@@ -51,24 +48,23 @@ namespace Trinity.Helpers
         /// </summary>
         public static void Shutdown()
         {
-            if (PluginCheckWatcher != null)
+            if (_pluginCheckWatcher != null)
             {
-                if (PluginCheckWatcher.IsAlive)
-                    PluginCheckWatcher.Abort();
-                PluginCheckWatcher = null;
+                if (_pluginCheckWatcher.IsAlive)
+                    _pluginCheckWatcher.Abort();
+                _pluginCheckWatcher = null;
             }
         }
 
-        private static bool passedAllChecks = false;
+        static PluginCheck()
+        {
+            PassedAllChecks = false;
+        }
 
         /// <summary>
         /// Whether or not we have passed all checks - set by PluginChecker()
         /// </summary>
-        public static bool PassedAllChecks
-        {
-            get { return PluginCheck.passedAllChecks; }
-            private set { PluginCheck.passedAllChecks = value; }
-        }
+        public static bool PassedAllChecks { get; private set; }
 
         /// <summary>
         /// Used to check and fix the status of the Plugin (Enabled/Disabled) and the Combat Routine (and routine version)
@@ -153,7 +149,7 @@ namespace Trinity.Helpers
                 return;
             }
 
-            System.Windows.Application.Current.Dispatcher.BeginInvoke((System.Action)(() =>
+            Application.Current.Dispatcher.BeginInvoke((Action)(() =>
                 {
                     Logger.LogNormal("Stopping bot to select latest routine");
                     BotMain.Stop();

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using Trinity.Cache;
 using Trinity.Combat;
 using Trinity.Combat.Abilities;
@@ -498,7 +499,7 @@ namespace Trinity
                                 catch { }
 
                                 // Don't pickup items if we're doing a TownRun
-                                if (cacheObject.Type == GObjectType.Item &&
+                                if (cacheObject.Type == GObjectType.Item && 
                                     TrinityItemManager.FindValidBackpackLocation(isTwoSquare) == new Vector2(-1, -1))
                                 {
                                     objWeightInfo += "TownRun";
@@ -514,7 +515,7 @@ namespace Trinity
                                 }
 
                                 // Default Weight
-                                cacheObject.Weight = Math.Max((300 - cacheObject.Distance) / 300 * MaxWeight, 100d);
+                                cacheObject.Weight = Math.Max((175 - cacheObject.Distance) / 175 * MaxWeight, 100d);
 
                                 // Give legendaries max weight, always
                                 if (cacheObject.GoldAmount <= 0 && cacheObject.ItemQuality >= ItemQuality.Legendary)
@@ -522,6 +523,10 @@ namespace Trinity
                                     cacheObject.Weight = MaxWeight;
                                 }
 
+                                if (cacheObject.GoldAmount > 0 && cacheObject.Distance < 25f)
+                                {
+                                    cacheObject.Weight += MaxWeight * 0.25;
+                                }
 
                                 // ignore non-legendaries and gold near elites if we're ignoring elites
                                 // not sure how we should safely determine this distance
@@ -707,7 +712,7 @@ namespace Trinity
                                 {
                                     // Ok we have globes enabled, and our health is low
                                     if (HiPriorityHealthGlobes)
-                                    {                                        
+                                    {
                                         cacheObject.Weight = MaxWeight;
                                     }
                                     else
@@ -833,13 +838,12 @@ namespace Trinity
                         case GObjectType.Shrine:
                             {
                                 float maxRange = Player.IsInRift ? 300f : 75f;
-                                double maxWeight = Player.IsInRift ? 15000d : 100d;
+                                double maxWeight = Player.IsInRift ? MaxWeight * 0.75d : 100d;
 
                                 // Weight Shrines
-
                                 if (Settings.WorldObject.HiPriorityShrines)
                                 {
-                                    cacheObject.Weight = MaxWeight;
+                                    cacheObject.Weight = MaxWeight * 0.75;
                                 }
                                 else
                                     cacheObject.Weight = Math.Max(((maxRange - cacheObject.RadiusDistance) / maxRange * 15000d), 100d);
@@ -848,7 +852,8 @@ namespace Trinity
                                 if (cacheObject.Distance <= 30f)
                                     cacheObject.Weight += 10000d;
 
-                                if (cacheObject.Weight > 0)
+                                // Disable safety checks for Rift Pylons
+                                if (!Player.IsInRift && cacheObject.Weight > 0)
                                 {
                                     // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                     if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.Distance <= 25f)
@@ -989,6 +994,12 @@ namespace Trinity
                                 // Weight Interactable Specials
                                 cacheObject.Weight = (300d - cacheObject.Distance) / 300d * 1000d;
 
+                                if (DataDictionary.HighPriorityInteractables.Contains(cacheObject.ActorSNO) && cacheObject.RadiusDistance <= 30f)
+                                {
+                                    cacheObject.Weight = MaxWeight;
+                                    break;
+                                }
+
                                 // Very close interactables get a weight increase
                                 if (cacheObject.Distance <= 8f)
                                     cacheObject.Weight += 1000d;
@@ -1070,13 +1081,12 @@ namespace Trinity
                     }
 
                     // Force the character to stay where it is if there is nothing available that is out of avoidance stuff and we aren't already in avoidance stuff
-                    if (cacheObject.Weight == 1 && !_standingInAvoidance && ObjectCache.Any(o => o.Type == GObjectType.Avoidance))
+                    if (cacheObject.Weight == 1 && !_standingInAvoidance && ObjectCache.Any(o => cacheObject.Position.Distance2D(o.Position) <= o.Radius && o.Type == GObjectType.Avoidance))
                     {
                         cacheObject.Weight = 0;
                         _shouldStayPutDuringAvoidance = true;
                         objWeightInfo += "StayPutAoE ";
                     }
-
 
                     // Prevent current target dynamic ranged weighting flip-flop 
                     if (LastTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight <= 1 && !navBlocking)

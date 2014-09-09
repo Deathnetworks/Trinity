@@ -7,6 +7,9 @@ if (!String.prototype.contains) {
     };
 }
 
+function toTitleCase(str) {
+    return str.replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
+}
 
 matchString = 'best';
 // If the match string is coming from user input you could do
@@ -79,6 +82,10 @@ function getMatches(string, regex, element) {
 
 Handlebars.registerHelper('tolower', function (options) {
     return options.fn(this).toLowerCase();
+});
+
+Handlebars.registerHelper('Bool', function (options) {
+    return (options.fn(this) == null || options.fn(this) == false || options.fn(this) == "false") ? "false" : "true";
 });
 
 // Convert a friendly name into something we can use as a class/property name

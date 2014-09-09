@@ -235,35 +235,6 @@ namespace Trinity
                         Player.InActiveEvent = ZetaDia.ActInfo.ActiveQuests.Any(q => DataDictionary.EventQuests.Contains(q.QuestSNO) && q.QuestStep != 13);
                         Player.HasEventInspectionTask = ZetaDia.ActInfo.ActiveQuests.Any(q => DataDictionary.EventQuests.Contains(q.QuestSNO) && q.QuestStep == 13);
 
-                        //if (ZetaDia.ActInfo.ActiveBounty != null)
-                        //{
-                        //    var ab = ZetaDia.ActInfo.ActiveBounty;
-                        //    Player.ActiveBounty = new TrinityBountyInfo()
-                        //    {
-                        //        Act = ab.Act,
-                        //        Quest = ab.Quest,
-                        //        State = ab.State,
-                        //        // Uncomment these after a while
-                        //        //LevelAreas = ab.LevelAreas.ToList(),
-                        //        //StartingLevelArea = ab.StartingLevelArea,
-                        //        Info = new TrinityQuestInfo()
-                        //        {
-                        //            Quest = ab.Info.Quest,
-                        //            State = ab.Info.State,
-                        //            QuestType = ab.Info.QuestType,
-                        //            QuestSNO = ab.Info.QuestSNO,
-                        //            BonusCount = ab.Info.BonusCount,
-                        //            KillCount = ab.Info.KillCount,
-                        //            // LevelArea = ab.Info.LevelArea,
-
-                        //            QuestInfo = ab.Info,
-                        //        },
-                        //        BountyInfo = ab
-                        //    };
-
-                        //}
-                        //else
-                        //    Player.ActiveBounty = null;
                     }
 
                     // Refresh player buffs (to check for archon)
@@ -283,9 +254,22 @@ namespace Trinity
         {
             using (new PerformanceLogger("RefreshBuffs"))
             {
+                var oldBuffs = Trinity.PlayerBuffs.Keys.Cast<SNOPower>().ToList();
 
                 Trinity.PlayerBuffs = new Dictionary<int, int>();
                 Trinity.listCachedBuffs = ZetaDia.Me.GetAllBuffs().ToList();
+
+                // This contains only NEW buffs, e.g. buffs which we didn't have the last tick
+                var newBuffs = Trinity.listCachedBuffs.Select(b => b.SNOId).Cast<SNOPower>().ToList().Except(oldBuffs);
+
+                if (newBuffs.Contains(SNOPower.Pages_Buff_Infinite_Casting))
+                {
+                    foreach (var power in CacheData.AbilityLastUsed.Keys.ToList())
+                    {
+                        CacheData.AbilityLastUsed[power] = DateTime.MinValue;
+                    }
+                }
+
                 // Special flag for detecting the activation and de-activation of archon
                 bool archonBuff = false;
                 int stackCount;
@@ -295,7 +279,7 @@ namespace Trinity
                 // Store how many stacks of each buff we have
                 foreach (Buff buff in Trinity.listCachedBuffs)
                 {
-                    buffList += " " + buff.InternalName + " (SNO: " + buff.SNOId + " stack: " + buff.StackCount.ToString() + ")";
+                    buffList += " " + buff.InternalName + " (SNO: " + buff.SNOId + " stack: " + buff.StackCount + ")";
 
                     // Store the stack count of this buff
                     if (!Trinity.PlayerBuffs.TryGetValue(buff.SNOId, out stackCount))

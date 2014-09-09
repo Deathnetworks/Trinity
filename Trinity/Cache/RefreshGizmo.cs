@@ -210,9 +210,8 @@ namespace Trinity
 
                         if (c_diaObject is DiaGizmo && ((DiaGizmo)c_diaObject).HasBeenOperated)
                         {
-                            AddToCache = false;
                             c_IgnoreSubStep = "Door has been operated";
-                            return AddToCache;
+                            return false;
                         }
 
                         try
@@ -230,9 +229,8 @@ namespace Trinity
                         if (gizmoUsed)
                         {
                             Blacklist3Seconds.Add(CurrentCacheObject.RActorGuid);
-                            AddToCache = false;
                             c_IgnoreSubStep = "Door is Open or Opening";
-                            return AddToCache;
+                            return false;
                         }
 
                         try
@@ -240,16 +238,14 @@ namespace Trinity
                             int gizmoState = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.GizmoState);
                             if (gizmoState == 1)
                             {
-                                AddToCache = false;
                                 c_IgnoreSubStep = "GizmoState=1";
-                                return AddToCache;
+                                return false;
                             }
                         }
                         catch
                         {
-                            AddToCache = false;
                             c_IgnoreSubStep = "GizmoStateException";
-                            return AddToCache;
+                            return false;
                         }
 
                         if (untargetable)
@@ -264,9 +260,8 @@ namespace Trinity
                                 ObjectType = CurrentCacheObject.Type,
                             });
 
-                            AddToCache = false;
                             c_IgnoreSubStep = "Untargetable";
-                            return AddToCache;
+                            return false;
                         }
 
 
@@ -291,15 +286,14 @@ namespace Trinity
                                         });
 
                                         Blacklist3Seconds.Add(CurrentCacheObject.RActorGuid);
-                                        AddToCache = false;
                                         c_IgnoreSubStep = "DoorDisabledbyScript";
-                                        return AddToCache;
+                                        return false;
                                     }
                                 }
                                 else
                                 {
-                                    AddToCache = false;
                                     c_IgnoreSubStep = "InvalidCastToDoor";
+                                    return false;
                                 }
                             }
 
@@ -313,7 +307,7 @@ namespace Trinity
                         
                         if (untargetable)
                         {
-                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
+                            MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                             {
                                 ActorSNO = CurrentCacheObject.ActorSNO,
@@ -323,9 +317,8 @@ namespace Trinity
                                 ObjectType = CurrentCacheObject.Type,
                             });
 
-                            AddToCache = false;
                             c_IgnoreSubStep = "Untargetable";
-                            return AddToCache;
+                            return false;
                         }
 
 
@@ -334,17 +327,15 @@ namespace Trinity
                         {
                             if (endAnimation == (int)CurrentCacheObject.Gizmo.CommonData.CurrentAnimation)
                             {
-                                AddToCache = false;
                                 c_IgnoreSubStep = "EndAnimation";
-                                return AddToCache;
+                                return false;
                             }
                         }
 
-                        if (CurrentCacheObject.Gizmo != null && CurrentCacheObject.Gizmo is GizmoLootContainer && CurrentCacheObject.Gizmo.HasBeenOperated)
+                        if (CurrentCacheObject.Gizmo.HasBeenOperated)
                         {
-                            AddToCache = false;
                             c_IgnoreSubStep = "GizmoHasBeenOperated";
-                            return AddToCache;
+                            return false;
                         }
 
                         CurrentCacheObject.Radius = c_diaObject.CollisionSphere.Radius;
@@ -509,6 +500,50 @@ namespace Trinity
 
                             case 260331:  //Fleeting Shrine
                                 if (!Settings.WorldObject.UseFleetingShrine)
+                                {
+                                    AddToCache = false;
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
+                                    return AddToCache;
+                                }
+                                break;
+
+                            case 330697:  //Channeling Pylon
+                                if (!Settings.WorldObject.UseChannelingPylon)
+                                {
+                                    AddToCache = false;
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
+                                    return AddToCache;
+                                }
+                                break;
+
+                            case 330696:  //Conduit Pylon
+                                if (!Settings.WorldObject.UseConduitPylon)
+                                {
+                                    AddToCache = false;
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
+                                    return AddToCache;
+                                }
+                                break;
+
+                            case 330698:  //Shield Pylon
+                                if (!Settings.WorldObject.UseShieldPylon)
+                                {
+                                    AddToCache = false;
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
+                                    return AddToCache;
+                                }
+                                break;
+
+                            case 330699:  //Speed Pylon
+                                if (!Settings.WorldObject.UseSpeedPylon)
+                                {
+                                    AddToCache = false;
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
+                                    return AddToCache;
+                                }
+                                break;
+                            case 330695:  //Power Pylon
+                                if (!Settings.WorldObject.UsePowerPylon)
                                 {
                                     AddToCache = false;
                                     c_IgnoreSubStep = "IgnoreShrineOption";

@@ -463,7 +463,14 @@ namespace Trinity.Combat.Abilities
 
         public static double GetSNOPowerUseDelay(SNOPower power)
         {
-            return V.D("SpellDelay." + power.ToString());
+            double delay = V.D("SpellDelay." + power);
+
+            if (GetHasBuff(SNOPower.Pages_Buff_Infinite_Casting))
+            {
+                delay = delay * 0.25d;
+            }
+
+            return delay;
         }
 
         /// <summary>

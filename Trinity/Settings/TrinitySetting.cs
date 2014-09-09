@@ -144,7 +144,6 @@ namespace Trinity.Config
             }
         }
 
-        [DataMember(IsRequired = false)]
         [IgnoreDataMember]
         internal string BattleTagSettingsFile
         {
@@ -152,10 +151,8 @@ namespace Trinity.Config
             {                
                 return Path.Combine(FileManager.SpecificSettingsPath, "Trinity.xml");
             }
-            private set { }
         }
 
-        [DataMember(IsRequired = false)]
         [IgnoreDataMember]
         internal string OldBattleTagSettingsFile
         {
@@ -163,9 +160,8 @@ namespace Trinity.Config
             {
                 return Path.Combine(FileManager.SpecificSettingsPath, "GilesTrinity.xml");
             }
-            private set { }
         }
-        [DataMember(IsRequired = false)]
+
         [IgnoreDataMember]
         internal string GlobalSettingsFile
         {
@@ -173,7 +169,6 @@ namespace Trinity.Config
             {
                 return Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", "Trinity.xml");
             }
-            private set { }
         }
 
         #endregion Properties

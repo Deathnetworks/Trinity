@@ -281,8 +281,9 @@ namespace Trinity
             221225, // Arcane 2
             5482,   // Poison Tree
             6578,   // Poison Tree
-            4803,   // Molten Core
-            4804,   // Molten Core 
+            4803,   // monsterAffix_Molten_deathStart_Proxy
+            4804,   // monsterAffix_Molten_deathExplosion_Proxy 
+            4806,   // monsterAffix_Electrified_deathExplosion_proxy
             224225, // Molten Core 2
             247987, // Molten Core 2
             95868,  // Molten Trail
@@ -352,7 +353,6 @@ namespace Trinity
             123842, // Azmo fireball
             139741, // Zolt Twister
             166686, // Maghda Projectile
-            164829, // Succubus Stars
             185999, // Diablo Expanding Fire
             196526, // Diablo Expanding Fire
             136533, // Diablo Lightning Breath
@@ -668,6 +668,13 @@ namespace Trinity
 
             354407, // X1_Angel_Common_Event_GreatWeapon
 
+        };
+
+        public static HashSet<int> HighPriorityInteractables { get { return highPriorityInteractables; } }
+        private static readonly HashSet<int> highPriorityInteractables = new HashSet<int>
+        {
+            56686, // a3dun_Keep_Bridge_Switch 
+            211999, // a3dun_Keep_Bridge_Switch_B 
         };
 
         public static Dictionary<int, int> InteractEndAnimations { get { return interactEndAnimations; } }
@@ -1023,16 +1030,16 @@ namespace Trinity
         {
             { Legendary.HarringtonWaistguard, SNOPower.ItemPassive_Unique_Ring_685_x1 },
             { Legendary.PoxFaulds, SNOPower.itemPassive_Unique_Pants_007_x1 },
-            { Legendary.RechelsRingofLarceny, SNOPower.ItemPassive_Unique_Ring_508_x1 },
-            { Legendary.BottomlessPotionofKulleAid, SNOPower.X1_Legendary_Potion_06 },
-            { Legendary.PridesFall, SNOPower.ItemPassive_Unique_Helm_017_x1 },
+            { Legendary.RechelsRingOfLarceny, SNOPower.ItemPassive_Unique_Ring_508_x1 },
+            //{ Legendary.BottomlessPotionofKulleAid, SNOPower.X1_Legendary_Potion_06 },
+            //{ Legendary.PridesFall, SNOPower.ItemPassive_Unique_Helm_017_x1 },
             { Legendary.KekegisUnbreakableSpirit, SNOPower.ItemPassive_Unique_Ring_569_x1 },
         };
 
         public readonly static Dictionary<Item, string> MinionInternalNameTokenByItem = new Dictionary<Item, string>
         {
             { Legendary.Maximus, "DemonChains_ItemPassive" },
-            { Legendary.HauntofVaxo, "_shadowClone_" }
+            { Legendary.HauntOfVaxo, "_shadowClone_" }
         };
 
         public readonly static Dictionary<Skill, Set> AllRuneSetsBySkill = new Dictionary<Skill, Set>

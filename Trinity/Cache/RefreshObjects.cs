@@ -11,6 +11,7 @@ using Zeta.Bot;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Game;
+using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 using Logger = Trinity.Technicals.Logger;
@@ -44,6 +45,9 @@ namespace Trinity
                 }
                 LastRefreshedCache = DateTime.UtcNow;
 
+                /*
+                 *  Refresh the Cache
+                 */
                 using (new PerformanceLogger("RefreshDiaObjectCache.UpdateBlock"))
                 {
                     CacheData.Clear();
@@ -66,6 +70,11 @@ namespace Trinity
 
                 }
 
+                /*
+                 * Add Legendary & Set Minimap Markers to ObjectCache
+                 */
+                RefreshCacheMarkers();
+
                 // Add Team HotSpots to the cache
                 ObjectCache.AddRange(GroupHotSpots.GetCacheObjectHotSpots());
 
@@ -81,7 +90,7 @@ namespace Trinity
                             {
                                 Vector3 fireChainSpot = MathEx.CalculatePointFrom(unit1.Position, unit2.Position, i);
 
-                                if (Trinity.Player.Position.Distance2D(fireChainSpot) <= fireChainSize)
+                                if (Player.Position.Distance2D(fireChainSpot) <= fireChainSize)
                                 {
                                     Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Avoiding Fire Chains!");
                                     _standingInAvoidance = true;
@@ -136,9 +145,6 @@ namespace Trinity
                                     .Max(aoe => aoe.Position.Distance2D(Trinity.Player.Position)));
                     }
                 }
-
-                /* Poison Experimental Avoidance */
-
 
 
 
@@ -374,6 +380,65 @@ namespace Trinity
             }
         }
 
+        /// <summary>
+        /// Adds Legendary & Set Minimap Markers to ObjectCache
+        /// </summary>
+        private static void RefreshCacheMarkers()
+        {
+            const int setItemMarkerTexture = 404424;
+            const int legendaryItemMarkerTexture = 275968;
+
+            foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsValid && (m.MinimapTexture == setItemMarkerTexture || m.MinimapTexture == legendaryItemMarkerTexture)))
+            {
+                ObjectCache.Add(new TrinityCacheObject()
+                {
+                    Position = marker.Position,
+                    InternalName = (marker.MinimapTexture == setItemMarkerTexture ? "Set Item" : "Legendary Item") + " Minimap Marker",
+                    Distance = marker.Position.Distance(Player.Position),
+                    ActorType = ActorType.Item,
+                    Type = GObjectType.Item,
+                    Radius = 2f,
+                    Weight = 20000
+                });
+            }
+
+            // Add Rift Guardian POI's or Markers to ObjectCache
+            const int riftGuardianMarkerTexture = 81058;
+            bool isRiftGuardianQuestStep = ZetaDia.CurrentQuest.QuestSNO == 337492 && ZetaDia.CurrentQuest.StepId == 16;
+            Func<MinimapMarker, bool> riftGuardianMarkerFunc = m => m.IsValid && ((m.IsPointOfInterest && isRiftGuardianQuestStep) || m.MinimapTexture == riftGuardianMarkerTexture);
+
+            foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(riftGuardianMarkerFunc))
+            {
+                ObjectCache.Add(new TrinityCacheObject()
+                {
+                    Position = marker.Position,
+                    InternalName = "Rift Guardian",
+                    Distance = marker.Position.Distance(Player.Position),
+                    ActorType = ActorType.Monster,
+                    Type = GObjectType.Unit,
+                    Radius = 10f,
+                    Weight = 5000,
+                });
+            }
+
+            if (ZetaDia.CurrentQuest.QuestSNO == 337492 && ZetaDia.CurrentQuest.StepId == 16) // X1_LR_DungeonFinder
+            {
+                foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsPointOfInterest))
+                {
+                    ObjectCache.Add(new TrinityCacheObject()
+                    {
+                        Position = marker.Position,
+                        InternalName = "Rift Guardian",
+                        Distance = marker.Position.Distance(Player.Position),
+                        ActorType = ActorType.Monster,
+                        Type = GObjectType.Unit,
+                        Radius = 10f,
+                        Weight = 5000,
+                    });
+                }
+            }
+        }
+
         private static void RefreshCacheMainLoop()
         {
             using (new PerformanceLogger("CacheManagement.RefreshCacheMainLoop"))
@@ -394,14 +459,14 @@ namespace Trinity
                 {
                     try
                     {
-                        bool AddToCache = false;
+                        bool addToCache;
 
                         if (!Settings.Advanced.LogCategories.HasFlag(LogCategory.CacheManagement))
                         {
                             /*
                              *  Main Cache Function
                              */
-                            AddToCache = CacheDiaObject(currentObject);
+                            CacheDiaObject(currentObject);
                         }
                         else
                         {
@@ -412,7 +477,7 @@ namespace Trinity
                             /*
                              *  Main Cache Function
                              */
-                            AddToCache = CacheDiaObject(currentObject);
+                            addToCache = CacheDiaObject(currentObject);
 
                             if (t1.IsRunning)
                                 t1.Stop();
@@ -454,8 +519,8 @@ namespace Trinity
                                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                                     "[{0:0000.00}ms] {1} {2} Type: {3} ({4}/{5}) Name={6} ({7}) {8} {9} Dist2Mid={10:0} Dist2Rad={11:0} ZDiff={12:0} Radius={13:0} RAGuid={14} {15}",
                                     duration,
-                                    (AddToCache ? "Added " : "Ignored"),
-                                    (!AddToCache ? ("By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
+                                    (addToCache ? "Added " : "Ignored"),
+                                    (!addToCache ? ("By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
                                     CurrentCacheObject.ActorType,
                                     CurrentCacheObject.GizmoType != GizmoType.None ? CurrentCacheObject.GizmoType.ToString() : "",
                                     CurrentCacheObject.Type,
@@ -483,9 +548,10 @@ namespace Trinity
                         }
 
                         string gizmoType = "";
-                        if (currentObject is DiaGizmo)
+                        var giz = currentObject as DiaGizmo;
+                        if (giz != null)
                         {
-                            gizmoType = "GizmoType: " + ((DiaGizmo)currentObject).CommonData.ActorInfo.GizmoType.ToString();
+                            gizmoType = "GizmoType: " + giz.CommonData.ActorInfo.GizmoType.ToString();
                         }
                         Logger.Log(ll, lc, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0} {4} {5}",
                                 currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance, gizmoType, ex.Message);
@@ -662,6 +728,7 @@ namespace Trinity
         private static List<DiaObject> ReadDebugActorsFromMemory()
         {
             return (from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
+                    where o.IsValid && o.CommonData != null && o.CommonData.IsValid
                     orderby o.Distance
                     select o).ToList();
         }
@@ -669,6 +736,7 @@ namespace Trinity
         private static IEnumerable<DiaObject> ReadActorsFromMemory()
         {
             return from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
+                   where o.IsValid && o.CommonData != null && o.CommonData.IsValid
                    select o;
         }
 
@@ -676,7 +744,7 @@ namespace Trinity
         {
 
             // See if we should wait for [playersetting] milliseconds for possible loot drops before continuing run
-            if (CurrentTarget == null && 
+            if (CurrentTarget == null &&
                 (DateTime.UtcNow.Subtract(lastHadUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill ||
                 DateTime.UtcNow.Subtract(lastHadEliteUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill ||
                 DateTime.UtcNow.Subtract(lastHadBossUnitInSights).TotalMilliseconds <= 3000 ||

@@ -337,6 +337,8 @@ namespace Trinity
             name = name.ToLower();
             if (name.StartsWith("x1_"))
                 name = name.Substring(3, name.Length - 3);
+            if (name.StartsWith("p1_"))
+                name = name.Substring(3, name.Length - 3);
             if (name.StartsWith("a1_")) return GItemType.SpecialItem;
             if (name.StartsWith("amethyst")) return GItemType.Amethyst;
             if (name.StartsWith("amulet_")) return GItemType.Amulet;

@@ -92,9 +92,6 @@
 
     <Entry SNO="185924" Type="ZoltBubble" />
     <Entry SNO="139741" Type="ZoltTwister" />
-
-
-    <Entry SNO="164829" Type="SuccubusStar"/>
   </Dictionary>
   <Dictionary Name="AvoidanceProjectileSNO">
     <Entry SNO="343539" Type="Orbiter" />
@@ -108,7 +105,6 @@
     <Entry SNO="123842" Type="AzmoFireball"/>
     <Entry SNO="139741" Type="ZoltTwister"/>
     <Entry SNO="166686" Type="MagdhaProjectile"/>
-    <Entry SNO="164829" Type="SuccubusStar"/>
     <Entry SNO="185999" Type="DiabloFire"/>
     <Entry SNO="196526" Type="DiabloFire"/>
     <Entry SNO="136533" Type="DiabloLightning"/>
