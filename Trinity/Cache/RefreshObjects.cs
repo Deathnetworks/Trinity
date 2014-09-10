@@ -550,7 +550,7 @@ namespace Trinity
 
                         string gizmoType = "";
                         var giz = currentObject as DiaGizmo;
-                        if (giz != null)
+                        if (giz != null && giz.CommonData.IsValid)
                         {
                             gizmoType = "GizmoType: " + giz.CommonData.ActorInfo.GizmoType.ToString();
                         }

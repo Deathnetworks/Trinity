@@ -103,7 +103,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item MaskOfJeram = new Item
         {
-            Id = 0,
+            Id = 299443,
             Name = "Mask of Jeram",
             Quality = ItemQuality.Legendary,
             Slug = "mask-of-jeram",
@@ -1763,7 +1763,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item ZunimassasMarrow = new Item
         {
-            Id = 0,
+            Id = 205615,
             Name = "Zunimassa's Marrow",
             Quality = ItemQuality.Legendary,
             Slug = "zunimassas-marrow",
@@ -3123,7 +3123,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item GauntletsOfAkkhan = new Item
         {
-            Id = 0,
+            Id = 358798,
             Name = "Gauntlets of Akkhan",
             Quality = ItemQuality.Legendary,
             Slug = "gauntlets-of-akkhan",
@@ -3903,7 +3903,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HellcatWaistguard = new Item
         {
-            Id = 0,
+            Id = 193668,
             Name = "Hellcat Waistguard",
             Quality = ItemQuality.Legendary,
             Slug = "hellcat-waistguard",
@@ -4023,7 +4023,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item JangsEnvelopment = new Item
         {
-            Id = 0,
+            Id = 298130,
             Name = "Jang's Envelopment",
             Quality = ItemQuality.Legendary,
             Slug = "jangs-envelopment",
@@ -4283,7 +4283,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item TalismanOfAranoch = new Item
         {
-            Id = 0,
+            Id = 197821,
             Name = "Talisman of Aranoch",
             Quality = ItemQuality.Legendary,
             Slug = "talisman-of-aranoch",
@@ -4483,7 +4483,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item MarasKaleidoscope = new Item
         {
-            Id = 0,
+            Id = 197824,
             Name = "Mara's Kaleidoscope",
             Quality = ItemQuality.Legendary,
             Slug = "maras-kaleidoscope",
@@ -4803,7 +4803,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item ZunimassasStringOfSkulls = new Item
         {
-            Id = 0,
+            Id = 216525,
             Name = "Zunimassa's String of Skulls",
             Quality = ItemQuality.Legendary,
             Slug = "zunimassas-string-of-skulls",
@@ -5903,7 +5903,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item StoneOfJordan = new Item
         {
-            Id = 0,
+            Id = 212582,
             Name = "Stone of Jordan",
             Quality = ItemQuality.Legendary,
             Slug = "stone-of-jordan",
@@ -8923,7 +8923,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item Wildwood = new Item
         {
-            Id = 0,
+            Id = 270978,
             Name = "Wildwood",
             Quality = ItemQuality.Legendary,
             Slug = "wildwood",
@@ -9383,7 +9383,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item BulkathossSolemnVow = new Item
         {
-            Id = 0,
+            Id = 208771,
             Name = "Bul-Kathos's Solemn Vow",
             Quality = ItemQuality.Legendary,
             Slug = "bulkathoss-solemn-vow",
@@ -9403,7 +9403,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item BulkathossWarriorBlood = new Item
         {
-            Id = 0,
+            Id = 208775,
             Name = "Bul-Kathos's Warrior Blood",
             Quality = ItemQuality.Legendary,
             Slug = "bulkathoss-warrior-blood",
@@ -10303,7 +10303,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item MarkOfTheMagi = new Item
         {
-            Id = 0,
+            Id = 59612,
             Name = "Mark of The Magi",
             Quality = ItemQuality.Legendary,
             Slug = "mark-of-the-magi",

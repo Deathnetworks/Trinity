@@ -244,8 +244,8 @@ namespace Trinity
         /// <summary>
         /// This list is used when an actor has an attribute BuffVisualEffect=1, e.g. fire floors in The Butcher arena
         /// </summary>
-        public static HashSet<int> AvoidanceBuffs { get { return avoidanceBuffs; } }
-        private static readonly HashSet<int> avoidanceBuffs = new HashSet<int>
+        public static HashSet<int> ButcherFloorPanels { get { return butcherFloorPanels; } }
+        private static readonly HashSet<int> butcherFloorPanels = new HashSet<int>
         {
             // Butcher Floor Panels
             201454, 201464, 201426, 201438, 200969, 201423, 201242,

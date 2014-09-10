@@ -24,7 +24,7 @@ namespace Trinity
             MinEnergyReserve = 25;
 
             //Kridershot InternalName=x1_bow_norm_unique_09-137 GameBalanceID=1999595351 ItemLink: {c:ffff8000}Kridershot{/c}
-            bool hasKridershot = ZetaDia.Me.Inventory.Equipped.Any(i => i.GameBalanceId == 1999595351);
+            bool hasKridershot = Legendary.Kridershot.IsEquipped;
 
             bool hasPunishment = Runes.DemonHunter.Punishment.IsActive;
 
@@ -168,7 +168,7 @@ namespace Trinity
 
             // Marked for Death
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_MarkedForDeath, CombatBase.CanCastFlags.NoTimer) &&
-                Player.SecondaryResource >= 3 && !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.DemonHunter_MarkedForDeath))
+                Player.SecondaryResource >= 3 && !CurrentTarget.HasDebuff(SNOPower.DemonHunter_MarkedForDeath) && !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.DemonHunter_MarkedForDeath))
             {
                 return new TrinityPower(SNOPower.DemonHunter_MarkedForDeath, 40f, CurrentTarget.ACDGuid);
             }
@@ -264,8 +264,7 @@ namespace Trinity
             }
 
             // Elemental Arrow
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_ElementalArrow) &&
-                SNOPowerUseTimer(SNOPower.DemonHunter_ElementalArrow) && !Player.IsIncapacitated &&
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_ElementalArrow) && !Player.IsIncapacitated &&
                 ((Player.PrimaryResource >= 10 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve || hasKridershot))
             {
                 return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 65f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1);

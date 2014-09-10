@@ -12,7 +12,7 @@ namespace Trinity.Cache
 
         internal static bool IsAvoidanceSNO(int actorSNO)
         {
-            return DataDictionary.Avoidances.Contains(actorSNO) || DataDictionary.AvoidanceBuffs.Contains(actorSNO) || DataDictionary.AvoidanceProjectiles.Contains(actorSNO);
+            return DataDictionary.Avoidances.Contains(actorSNO) || DataDictionary.ButcherFloorPanels.Contains(actorSNO) || DataDictionary.AvoidanceProjectiles.Contains(actorSNO);
         }
 
         internal static float GetZDiff(Vector3 Position)

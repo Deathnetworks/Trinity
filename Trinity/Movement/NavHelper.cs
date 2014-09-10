@@ -895,11 +895,7 @@ namespace Trinity
 
         internal static Vector3 SimpleUnstucker()
         {
-            // Clear caches just in case
-
-
             var myPos = Trinity.Player.Position;
-            var navigationPos = PlayerMover.LastMoveToTarget;
             float rotation = (float)Trinity.Player.Rotation;
 
             const double totalPoints = 3 * Math.PI / 2;
@@ -922,16 +918,21 @@ namespace Trinity
                     float newDirection = (float)(rotation + r);
                     Vector3 newPos = MathEx.GetPointAt(myPos, d, newDirection);
 
-                    // If this hits a navigation wall, skip it
-                    if (Navigator.Raycast(myPos, newPos))
+                    if (!MainGridProvider.CanStandAt(MainGridProvider.WorldToGrid(newPos.ToVector2())))
                     {
-                        raycastFail++;
                         continue;
                     }
+
                     // If this hits a known navigation obstacle, skip it
                     if (CacheData.NavigationObstacles.Any(o => MathEx.IntersectsPath(o.Position, o.Radius, myPos, newPos)))
                     {
                         navigationObstacleFail++;
+                        continue;
+                    }
+                    // If this hits a navigation wall, skip it
+                    if (Navigator.Raycast(myPos, newPos))
+                    {
+                        raycastFail++;
                         continue;
                     }
                     // use distance as weight
