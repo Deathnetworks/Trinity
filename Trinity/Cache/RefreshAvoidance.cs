@@ -208,21 +208,6 @@ namespace Trinity
                     Rotation = CurrentCacheObject.Rotation
                 });
 
-                //bool areaOfEffectInPath = false;
-                //var currentPath = Navigator.GetNavigationProviderAs<DefaultNavigationProvider>().CurrentPath;
-                //if (Settings.Combat.Misc.AvoidanceNavigation)
-                //{
-                //    foreach (var point in currentPath)
-                //    {
-                //        if (CurrentCacheObject.Position.Distance2DSqr(point) <= (minAvoidanceRadius * minAvoidanceRadius))
-                //        {
-                //            areaOfEffectInPath = true;
-                //            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Navigator Pathing through avoidance, setting IsStandingInAvoidance=True");
-                //            break;
-                //        }
-                //    }
-                //}
-
                 // Is this one under our feet? If so flag it up so we can find an avoidance spot
                 if (CurrentCacheObject.Distance <= minAvoidanceRadius)
                 {

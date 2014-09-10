@@ -409,7 +409,7 @@ namespace Trinity
             {
                 // See if it's an avoidance first from the SNO
                 bool isAvoidanceSNO = (DataDictionary.Avoidances.Contains(CurrentCacheObject.ActorSNO) ||
-                    DataDictionary.AvoidanceBuffs.Contains(CurrentCacheObject.ActorSNO) ||
+                    DataDictionary.ButcherFloorPanels.Contains(CurrentCacheObject.ActorSNO) ||
                     DataDictionary.AvoidanceProjectiles.Contains(CurrentCacheObject.ActorSNO));
 
                 // We're avoiding AoE and this is an AoE
@@ -418,12 +418,12 @@ namespace Trinity
                     using (new PerformanceLogger("RefreshCachedType.0"))
                     {
                         // Checking for BuffVisualEffect - for Butcher, maybe useful other places?
-                        if (DataDictionary.AvoidanceBuffs.Contains(CurrentCacheObject.ActorSNO))
+                        if (DataDictionary.ButcherFloorPanels.Contains(CurrentCacheObject.ActorSNO))
                         {
                             bool hasBuff = false;
                             try
                             {
-                                hasBuff = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.BuffVisualEffect) > 0;
+                                hasBuff = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.HasLookOverride) > 0;
                             }
                             catch
                             {
@@ -909,7 +909,7 @@ namespace Trinity
 
         private static bool RefreshStepCheckBlacklists(bool AddToCache)
         {
-            if (!DataDictionary.Avoidances.Contains(CurrentCacheObject.ActorSNO) && !DataDictionary.AvoidanceBuffs.Contains(CurrentCacheObject.ActorSNO) && !CurrentCacheObject.IsBountyObjective && !CurrentCacheObject.IsQuestMonster)
+            if (!DataDictionary.Avoidances.Contains(CurrentCacheObject.ActorSNO) && !DataDictionary.ButcherFloorPanels.Contains(CurrentCacheObject.ActorSNO) && !CurrentCacheObject.IsBountyObjective && !CurrentCacheObject.IsQuestMonster)
             {
                 // See if it's something we should always ignore like ravens etc.
                 if (!c_IsObstacle && DataDictionary.BlackListIds.Contains(CurrentCacheObject.ActorSNO))
