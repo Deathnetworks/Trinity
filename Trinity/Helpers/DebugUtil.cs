@@ -57,7 +57,7 @@ namespace Trinity.Helpers
             if (DateTime.UtcNow.Subtract(_lastCacheClear) > TimeSpan.FromSeconds(60))
             {
                 if(_seenAnimationCache.Any())
-                    _seenAnimationCache = _seenUnknownCache.Where(p => p.Value > age).ToDictionary(p => p.Key, p => p.Value);
+                    _seenAnimationCache = _seenAnimationCache.Where(p => p.Value > age).ToDictionary(p => p.Key, p => p.Value);
 
                 if(_seenUnknownCache.Any())
                     _seenUnknownCache = _seenUnknownCache.Where(p => p.Value > age).ToDictionary(p => p.Key, p => p.Value);

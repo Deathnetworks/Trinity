@@ -535,21 +535,5 @@ namespace Trinity
             return true;
         }
 
-        //public class DebugUtil
-        //{
-        //    HashSet<string> _animationCache = new HashSet<string>();
-
-        //    public static void LogAnimation()
-        //    {
-        //        //if (!CurrentCacheObject.IsBoss)
-        //        //{
-        //        //if(_animationCache.Contains())
-        //            //var id = CurrentCacheObject.CommonData.AnimationInfo
-        //            var state = CurrentCacheObject.CommonData.AnimationState;
-        //            var name = CurrentCacheObject.CommonData.CurrentAnimation;
-        //            Logger.Log(LogCategory.Animation, "New Animation: {0} State={1}", name, state);
-        //        //}                
-        //    }
-        //}
     }
 }
