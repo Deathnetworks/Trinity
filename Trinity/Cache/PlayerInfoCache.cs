@@ -131,6 +131,21 @@ namespace Trinity
             public int SceneId { get; set; }
         }
 
+        public bool IsRanged
+        {
+            get
+            {
+                switch (ActorClass)
+                {
+                    case ActorClass.Witchdoctor:
+                    case ActorClass.Wizard:
+                    case ActorClass.DemonHunter:
+                        return true;
+                }
+                return false;
+            }
+        }
+
         /// <summary>
         /// Update the cached data on the player information, including buffs if needed
         /// </summary>
@@ -274,6 +289,8 @@ namespace Trinity
                         CacheData.AbilityLastUsed[power] = DateTime.MinValue;
                     }
                 }
+                
+                
 
                 // Special flag for detecting the activation and de-activation of archon
                 bool archonBuff = false;

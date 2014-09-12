@@ -37,6 +37,8 @@ namespace Trinity
         Thunderstorm,
         Wormhole,
         ZoltBubble,
-        ZoltTwister
+        ZoltTwister,
+        RimeCold,
+        MorluMeteor
     }
 }

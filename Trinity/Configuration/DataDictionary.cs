@@ -190,11 +190,14 @@ namespace Trinity
 
         };
 
+
         public static HashSet<int> ForceTownPortalLevelAreaIds { get { return DataDictionary.forceTownPortalLevelAreaIds; } }
         private static readonly HashSet<int> forceTownPortalLevelAreaIds = new HashSet<int>
         {
             55313, // Act 2 Caldeum Bazaar
         };
+
+        
 
         /// <summary>
         /// Contains the list of Boss Level Area ID's
@@ -257,19 +260,93 @@ namespace Trinity
         public static HashSet<DoubleInt> AvoidanceAnimations { get { return DataDictionary.avoidanceAnimations; } }
         private static readonly HashSet<DoubleInt> avoidanceAnimations = new HashSet<DoubleInt>
         {
-            new DoubleInt(3847, (int)SNOAnim.Stitch_Suicide_Bomb), // Corpulent_A: Stitch_Suicide_Bomb
-            new DoubleInt(3337, (int)SNOAnim.Beast_start_charge_02), // A1 Savage Beast Charge - needs special handling!
-            new DoubleInt(3337, (int)SNOAnim.Beast_charge_02), // A1 Savage Beast Charge - needs special handling!
-            new DoubleInt(3337, (int)SNOAnim.Beast_charge_04), // A1 Savage Beast Charge - needs special handling!
+            // Fat guys that explode into worms
+            // Stitch_Suicide_Bomb State=Transform By: Corpulent_C (3849)
+            new DoubleInt((int)SNOActor.Corpulent_A, (int)SNOAnim.Stitch_Suicide_Bomb),
+            new DoubleInt((int)SNOActor.Corpulent_A_Unique_01, (int)SNOAnim.Stitch_Suicide_Bomb),
+            new DoubleInt((int)SNOActor.Corpulent_A_Unique_02, (int)SNOAnim.Stitch_Suicide_Bomb), 
+            new DoubleInt((int)SNOActor.Corpulent_A_Unique_03, (int)SNOAnim.Stitch_Suicide_Bomb), 
+            new DoubleInt((int)SNOActor.Corpulent_B, (int)SNOAnim.Stitch_Suicide_Bomb), 
+            new DoubleInt((int)SNOActor.Corpulent_B_Unique_01, (int)SNOAnim.Stitch_Suicide_Bomb), 
+            new DoubleInt((int)SNOActor.Corpulent_C, (int)SNOAnim.Stitch_Suicide_Bomb), 
+            new DoubleInt((int)SNOActor.Corpulent_D_CultistSurvivor_Unique, (int)SNOAnim.Stitch_Suicide_Bomb),             
+            new DoubleInt((int)SNOActor.Corpulent_C_OasisAmbush_Unique, (int)SNOAnim.Stitch_Suicide_Bomb),  
+            new DoubleInt((int)SNOActor.Corpulent_D_Unique_Spec_01, (int)SNOAnim.Stitch_Suicide_Bomb), 
+
+            // Beast Charge
+            new DoubleInt((int)SNOActor.Beast_A, (int)SNOAnim.Beast_start_charge_02),
+            new DoubleInt((int)SNOActor.Beast_A, (int)SNOAnim.Beast_charge_02),
+            new DoubleInt((int)SNOActor.Beast_A, (int)SNOAnim.Beast_charge_04),
+            new DoubleInt((int)SNOActor.Beast_B, (int)SNOAnim.Beast_start_charge_02),
+            new DoubleInt((int)SNOActor.Beast_B, (int)SNOAnim.Beast_charge_02),
+            new DoubleInt((int)SNOActor.Beast_B, (int)SNOAnim.Beast_charge_04),
+            new DoubleInt((int)SNOActor.Beast_C, (int)SNOAnim.Beast_start_charge_02),
+            new DoubleInt((int)SNOActor.Beast_C, (int)SNOAnim.Beast_charge_02),
+            new DoubleInt((int)SNOActor.Beast_C, (int)SNOAnim.Beast_charge_04),
+            new DoubleInt((int)SNOActor.Beast_D, (int)SNOAnim.Beast_start_charge_02),
+            new DoubleInt((int)SNOActor.Beast_D, (int)SNOAnim.Beast_charge_02),
+            new DoubleInt((int)SNOActor.Beast_D, (int)SNOAnim.Beast_charge_04),
+
             new DoubleInt(330824, (int)SNOAnim.x1_Urzael_attack_06), // Urzael flame 
             new DoubleInt(330824, 348109), // Urzael Cannonball Aim
             new DoubleInt(330824, 344952), // Urzael Flying
+
+            // Nobody wants to get hit by a mallet demon
             new DoubleInt(343767, (int)SNOAnim.malletDemon_attack_01), // X1_LR_Boss_MalletDemon
             new DoubleInt(106709, (int)SNOAnim.malletDemon_attack_01), // MalletDemon_A
             new DoubleInt(219736, (int)SNOAnim.malletDemon_attack_01), // MalletDemon_A_Unique_01  
             new DoubleInt(219751, (int)SNOAnim.malletDemon_attack_01), // MalletDemon_A_Unique_02 
+
+            // These guys cast meteors Meteors
+            // morluSpellcaster_attack_AOE_01 State=Transform By: morluSpellcaster_A (4760)
+            //new DoubleInt((int)SNOActor.morluSpellcaster_A, (int)SNOAnim.morluSpellcaster_attack_AOE_01),             
+            //new DoubleInt((int)SNOActor.morluSpellcaster_B, (int)SNOAnim.morluSpellcaster_attack_AOE_01),          
+            //new DoubleInt((int)SNOActor.morluSpellcaster_D, (int)SNOAnim.morluSpellcaster_attack_AOE_01), 
+            //new DoubleInt((int)SNOActor.X1_LR_Boss_morluSpellcaster_Fire, (int)SNOAnim.morluSpellcaster_attack_AOE_01),
+
+            // Spinny AOE Attack
+            new DoubleInt((int)SNOActor.x1_LR_DeathMaiden_A, (int)SNOAnim.x1_deathMaiden_attack_special_360_01),
+
+            new DoubleInt((int)SNOActor.x1_portalGuardianMinion_Melee_A, (int)SNOAnim.x1_portalGuardianMinion_attack_charge_01), // x1_portalGuardianMinion_Melee_A (279052)
+            new DoubleInt((int)SNOActor.X1_BigRed_Chronodemon_Burned_A, (int)SNOAnim.X1_BigRed_attack_02), // X1_BigRed_Chronodemon_Burned_A (326670)
+            
+            // Angels with those big clubs with a dashing attack
+            // Angel_Corrupt_attack_dash_in State=Transform By: Angel_Corrupt_A (106711)
+            new DoubleInt((int)SNOActor.Angel_Corrupt_A, (int)SNOAnim.Angel_Corrupt_attack_dash_in), 
+            new DoubleInt((int)SNOActor.Angel_Corrupt_A, (int)SNOAnim.Angel_Corrupt_attack_dash_middle), 
+            new DoubleInt((int)SNOActor.Angel_Corrupt_A, (int)SNOAnim.Angel_Corrupt_attack_dash_out), 
+
+            // Big guys with blades on their arms who jump accross the screen and stun you
+            // x1_westmarchBrute_attack_02_out State=Attacking By: x1_westmarchBrute_A (258678)
+            new DoubleInt((int)SNOActor.x1_westmarchBrute_A, (int)SNOAnim.x1_westmarchBrute_attack_02_in), 
+            new DoubleInt((int)SNOActor.x1_westmarchBrute_A, (int)SNOAnim.x1_westmarchBrute_attack_02_mid), 
+            new DoubleInt((int)SNOActor.x1_westmarchBrute_A, (int)SNOAnim.x1_westmarchBrute_attack_02_out),   
+           
+            // snakeMan_melee_generic_cast_01 State=Transform By: X1_LR_Boss_Snakeman_Melee_Belial (360281)
+            new DoubleInt((int)SNOActor.X1_LR_Boss_Snakeman_Melee_Belial, (int)SNOAnim.snakeMan_melee_generic_cast_01),   
        };
 
+
+        /// <summary>
+        /// This list is used for animations where the avoidance point should be the player's current location
+        /// </summary>
+        public static HashSet<int> AvoidAnimationAtPlayer { get { return avoidAnimationAtPlayer; } }
+        private static readonly HashSet<int> avoidAnimationAtPlayer = new HashSet<int>
+        {
+            (int)SNOAnim.Beast_start_charge_02, // A1 Savage Beast Charge - needs special handling!
+            (int)SNOAnim.Beast_charge_02, // A1 Savage Beast Charge - needs special handling!
+            (int)SNOAnim.Beast_charge_04, // A1 Savage Beast Charge - needs special handling!
+            (int)SNOAnim.morluSpellcaster_attack_AOE_01, //morluSpellcaster_D
+            (int)SNOAnim.X1_LR_Boss_morluSpellcaster_generic_cast, //morluSpellcaster_D
+            (int)SNOAnim.snakeMan_melee_generic_cast_01, //X1_LR_Boss_Snakeman_Melee_Belial (360281)
+       };
+
+        public static Dictionary<int, float> DefaultAvoidanceAnimationCustomRadius { get { return defaultAvoidanceAnimationCustomRadius; } }
+        private static readonly Dictionary<int, float> defaultAvoidanceAnimationCustomRadius = new Dictionary<int, float>()
+        {
+            {(int)SNOAnim.morluSpellcaster_attack_AOE_01, 20f },
+            {(int)SNOAnim.x1_deathMaiden_attack_special_360_01, 15f},
+        };
 
         /// <summary>
         /// A list of all the SNO's to avoid - you could add
@@ -372,7 +449,7 @@ namespace Trinity
             335505, // x1_malthael_drainSoul_ghost
             325136, // x1_Malthael_DeathFogMonster
             340512, // x1_Malthael_Mephisto_LightningObject
-
+            3528, //[2047F7CC] Type: Projectile Name: Butcher_hook-737821 ActorSNO: 3528, Distance: 45.17828
       };
 
         /// <summary>
@@ -385,6 +462,7 @@ namespace Trinity
             6578,   // Poison Tree
             316389, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_projectile (316389)
             340319, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_bomb_start (340319)
+            159369, //MorluSpellcaster_Meteor_Pending-178011 (159369)
         };
 
         /// <summary>
@@ -401,6 +479,7 @@ namespace Trinity
             {4804, TimeSpan.FromSeconds(10)}, // Molten Core
             {224225, TimeSpan.FromSeconds(10)}, // Molten Core
             {247987, TimeSpan.FromSeconds(10)}, // Molten Core
+            {159369, TimeSpan.FromSeconds(3)}, // Morlu Meteor
         };
 
         public static Dictionary<int, float> DefaultAvoidanceCustomRadius { get { return defaultAvoidanceCustomRadius; } }
@@ -425,6 +504,16 @@ namespace Trinity
             {106709, 35f }, // Mallet Demons
             {219736, 35f }, // Mallet Demons
             {219751, 35f }, // Mallet Demons
+
+            {363356, 20f }, //RimeCold
+            {359703, 20f }, //RimeCold
+            {159369, 20f }, //MorluMeteor
+        };
+
+        public static HashSet<int> DangerousMeleeRangeMonsters { get { return dangerousMeleeRangeMonsters; } }
+        private static readonly HashSet<int> dangerousMeleeRangeMonsters = new HashSet<int>()
+        {
+            360636, //X1_LR_Boss_TerrorDemon_A (360636)
         };
 
         /*

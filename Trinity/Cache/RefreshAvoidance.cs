@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Trinity.Helpers;
 using Trinity.Objects;
 using Trinity.Reference;
 using Trinity.Technicals;
@@ -25,7 +26,8 @@ namespace Trinity
             }
 
             float customRadius;
-            if (DataDictionary.DefaultAvoidanceCustomRadius.TryGetValue(CurrentCacheObject.ActorSNO, out customRadius))
+            if (DataDictionary.DefaultAvoidanceCustomRadius.TryGetValue(CurrentCacheObject.ActorSNO, out customRadius)||
+                DataDictionary.DefaultAvoidanceAnimationCustomRadius.TryGetValue((int)CurrentCacheObject.Animation, out customRadius))
             {
                 CurrentCacheObject.Radius = customRadius;
             }
@@ -42,8 +44,11 @@ namespace Trinity
             AvoidanceType avoidanceType = AvoidanceManager.GetAvoidanceType(CurrentCacheObject.ActorSNO);
 
             // Beast Charge should set aoe position as players current position!
-            if (avoidanceType == AvoidanceType.BeastCharge)
+            var avoidAtPlayerPosition = DataDictionary.AvoidAnimationAtPlayer.Contains((int) CurrentCacheObject.Animation);
+            if (avoidAtPlayerPosition)
+            {
                 CurrentCacheObject.Position = Player.Position;
+            }
 
             // Monks with Serenity up ignore all AOE's
             if (Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_Serenity) && GetHasBuff(SNOPower.Monk_Serenity))
@@ -191,7 +196,16 @@ namespace Trinity
 
             }
 
+            if (_lastAvoidance != avoidanceType)
+            {
+                Logger.Log(LogCategory.Avoidance, "> {0} Distance={1} {2}! {3} ({4})", 
+                    (avoidanceType == AvoidanceType.None) ? CurrentCacheObject.Animation.ToString() : avoidanceType.ToString(), 
+                    CurrentCacheObject.Distance, 
+                    minAvoidanceHealth >= Player.CurrentHealthPct ? "Avoiding" : "Ignoring", 
+                    CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
 
+                _lastAvoidance = avoidanceType;
+            }
 
             // Add it to the list of known avoidance objects, *IF* our health is lower than this avoidance health limit
             if (minAvoidanceHealth >= Player.CurrentHealthPct)
@@ -230,6 +244,9 @@ namespace Trinity
 
             return true;
         }
+
+        private static AvoidanceType _lastAvoidance;
+
         private static double GetAvoidanceHealth(int actorSNO = -1)
         {
             // snag our SNO from cache variable if not provided

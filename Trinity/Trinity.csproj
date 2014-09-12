@@ -117,6 +117,7 @@
     <Compile Include="Helpers\Bounties\Extensions.cs" />
     <Compile Include="Helpers\CloneExtension.cs" />
     <Compile Include="Helpers\Composites.cs" />
+    <Compile Include="Helpers\DebugUtil.cs" />
     <Compile Include="Helpers\DoubleInt.cs" />
     <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\FieldCollection.cs" />

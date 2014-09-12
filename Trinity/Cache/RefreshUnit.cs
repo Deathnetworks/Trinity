@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Trinity.Combat;
+using Trinity.Helpers;
 using Trinity.Technicals;
 using Zeta.Bot.Logic;
 using Zeta.Game;
@@ -172,6 +174,8 @@ namespace Trinity
                 }
             }
 
+    
+
             // Only set treasure goblins to true *IF* they haven't disabled goblins! Then check the SNO in the goblin hash list!
             c_unit_IsTreasureGoblin = false;
             // Flag this as a treasure goblin *OR* ignore this object altogether if treasure goblins are set to ignore
@@ -209,6 +213,8 @@ namespace Trinity
             }
 
             RefreshMonsterHealth();
+
+            DebugUtil.LogAnimation(CurrentCacheObject);
 
             // Unit is already dead
             if (c_HitPoints <= 0d && !CurrentCacheObject.IsBoss)
@@ -529,5 +535,21 @@ namespace Trinity
             return true;
         }
 
+        //public class DebugUtil
+        //{
+        //    HashSet<string> _animationCache = new HashSet<string>();
+
+        //    public static void LogAnimation()
+        //    {
+        //        //if (!CurrentCacheObject.IsBoss)
+        //        //{
+        //        //if(_animationCache.Contains())
+        //            //var id = CurrentCacheObject.CommonData.AnimationInfo
+        //            var state = CurrentCacheObject.CommonData.AnimationState;
+        //            var name = CurrentCacheObject.CommonData.CurrentAnimation;
+        //            Logger.Log(LogCategory.Animation, "New Animation: {0} State={1}", name, state);
+        //        //}                
+        //    }
+        //}
     }
 }
