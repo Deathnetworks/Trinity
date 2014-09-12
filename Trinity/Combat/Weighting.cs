@@ -107,6 +107,8 @@ namespace Trinity
                         DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds > 500) ||
                         HealthGlobeEmergency || GetHiPriorityShrine;
 
+                bool shouldIgnoreBosses = HealthGlobeEmergency || GetHiPriorityShrine;
+
                 foreach (TrinityCacheObject cacheObject in ObjectCache.OrderBy(c => c.Distance))
                 {
                     bool elitesInRangeOfUnit = !CombatBase.IgnoringElites &&
@@ -174,7 +176,8 @@ namespace Trinity
                                 if (cacheObject.IsEliteRareUnique)
                                 {
                                     // Ignore elite option, except if trying to town portal
-                                    if (!cacheObject.IsBoss && !cacheObject.IsBountyObjective && shouldIgnoreElites && cacheObject.IsEliteRareUnique && !isInHotSpot &&
+                                    if ((!cacheObject.IsBoss || shouldIgnoreBosses) && !cacheObject.IsBountyObjective &&
+                                        shouldIgnoreElites && cacheObject.IsEliteRareUnique && !isInHotSpot &&
                                         !(cacheObject.HitPointsPct <= (Settings.Combat.Misc.ForceKillElitesHealth / 100)))
                                     {
                                         objWeightInfo = "Ignoring ";
