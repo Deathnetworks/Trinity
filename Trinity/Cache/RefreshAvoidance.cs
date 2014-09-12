@@ -196,16 +196,16 @@ namespace Trinity
 
             }
 
-            if (_lastAvoidance != avoidanceType)
-            {
+            //if (_lastAvoidance != CurrentCacheObject.ActorSNO)
+            //{
                 Logger.Log(LogCategory.Avoidance, "> {0} Distance={1} {2}! {3} ({4})", 
                     (avoidanceType == AvoidanceType.None) ? CurrentCacheObject.Animation.ToString() : avoidanceType.ToString(), 
                     CurrentCacheObject.Distance, 
                     minAvoidanceHealth >= Player.CurrentHealthPct ? "Avoiding" : "Ignoring", 
                     CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
 
-                _lastAvoidance = avoidanceType;
-            }
+            //    _lastAvoidance = CurrentCacheObject.ActorSNO;
+            //}
 
             // Add it to the list of known avoidance objects, *IF* our health is lower than this avoidance health limit
             if (minAvoidanceHealth >= Player.CurrentHealthPct)
@@ -245,7 +245,7 @@ namespace Trinity
             return true;
         }
 
-        private static AvoidanceType _lastAvoidance;
+        private static int _lastAvoidance;
 
         private static double GetAvoidanceHealth(int actorSNO = -1)
         {

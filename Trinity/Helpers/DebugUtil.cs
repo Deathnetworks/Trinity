@@ -15,7 +15,7 @@ namespace Trinity.Helpers
         private static DateTime _lastCacheClear = DateTime.MinValue;    
 
         private static Dictionary<string, DateTime> _seenAnimationCache = new Dictionary<string, DateTime>();
-        private static Dictionary<string, DateTime> _seenUnknownCache = new Dictionary<string, DateTime>();
+        private static Dictionary<int, DateTime> _seenUnknownCache = new Dictionary<int, DateTime>();
     
 
         public static void LogAnimation(TrinityCacheObject cacheObject)
@@ -42,10 +42,12 @@ namespace Trinity.Helpers
                 return;
 
             // Log Object
-            if (!_seenUnknownCache.ContainsKey(diaObject.Name))
+            if (!_seenUnknownCache.ContainsKey(diaObject.ActorSNO))
             {
-                Logger.Log(LogCategory.UnknownObjects, "{0} ({1})", diaObject.Name, diaObject.ActorSNO);
-                _seenUnknownCache.Add(diaObject.Name, DateTime.UtcNow);
+           
+
+                Logger.Log(LogCategory.UnknownObjects, "{0} ({1}) Type={2}", diaObject.Name, diaObject.ActorSNO, diaObject.ActorType);
+                _seenUnknownCache.Add(diaObject.ActorSNO, DateTime.UtcNow);
             }
 
             CacheMaintenance();
@@ -54,13 +56,13 @@ namespace Trinity.Helpers
         private static void CacheMaintenance()
         {
             var age = DateTime.UtcNow.Subtract(TimeSpan.FromSeconds(15));
-            if (DateTime.UtcNow.Subtract(_lastCacheClear) > TimeSpan.FromSeconds(60))
+            if (DateTime.UtcNow.Subtract(_lastCacheClear) > TimeSpan.FromSeconds(15))
             {
                 if(_seenAnimationCache.Any())
-                    _seenAnimationCache = _seenAnimationCache.Where(p => p.Value > age).ToDictionary(p => p.Key, p => p.Value);
+                    _seenAnimationCache = _seenAnimationCache.Where(p => p.Value < age).ToDictionary(p => p.Key, p => p.Value);
 
                 if(_seenUnknownCache.Any())
-                    _seenUnknownCache = _seenUnknownCache.Where(p => p.Value > age).ToDictionary(p => p.Key, p => p.Value);
+                    _seenUnknownCache = _seenUnknownCache.Where(p => p.Value < age).ToDictionary(p => p.Key, p => p.Value);
                 
             }   
             _lastCacheClear = DateTime.UtcNow;

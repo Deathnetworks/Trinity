@@ -323,7 +323,21 @@ namespace Trinity
             new DoubleInt((int)SNOActor.x1_westmarchBrute_A, (int)SNOAnim.x1_westmarchBrute_attack_02_out),   
            
             // snakeMan_melee_generic_cast_01 State=Transform By: X1_LR_Boss_Snakeman_Melee_Belial (360281)
-            new DoubleInt((int)SNOActor.X1_LR_Boss_Snakeman_Melee_Belial, (int)SNOAnim.snakeMan_melee_generic_cast_01),   
+            new DoubleInt((int)SNOActor.X1_LR_Boss_Snakeman_Melee_Belial, (int)SNOAnim.snakeMan_melee_generic_cast_01),  
+ 
+            //x1_Squigglet_Generic_Cast State=Transform By: X1_LR_Boss_Squigglet (353535)
+            new DoubleInt((int)SNOActor.X1_LR_Boss_Squigglet, (int)SNOAnim.x1_Squigglet_Generic_Cast),
+
+            //] Triune_Berserker_specialAttack_loop_01 State=TakingDamage By: Triune_Berserker_A (6052)
+            new DoubleInt((int)SNOActor.Triune_Berserker_A, (int)SNOAnim.Triune_Berserker_specialAttack_01),
+            new DoubleInt((int)SNOActor.Triune_Berserker_A, (int)SNOAnim.Triune_Berserker_specialAttack_loop_01),
+            new DoubleInt((int)SNOActor.Triune_Berserker_B, (int)SNOAnim.Triune_Berserker_specialAttack_01),
+            new DoubleInt((int)SNOActor.Triune_Berserker_B, (int)SNOAnim.Triune_Berserker_specialAttack_loop_01),
+            new DoubleInt((int)SNOActor.Triune_Berserker_C, (int)SNOAnim.Triune_Berserker_specialAttack_01),
+            new DoubleInt((int)SNOActor.Triune_Berserker_C, (int)SNOAnim.Triune_Berserker_specialAttack_loop_01),
+            new DoubleInt((int)SNOActor.Triune_Berserker_D, (int)SNOAnim.Triune_Berserker_specialAttack_01),
+            new DoubleInt((int)SNOActor.Triune_Berserker_D, (int)SNOAnim.Triune_Berserker_specialAttack_loop_01),
+  
        };
 
 
@@ -346,6 +360,7 @@ namespace Trinity
         {
             {(int)SNOAnim.morluSpellcaster_attack_AOE_01, 20f },
             {(int)SNOAnim.x1_deathMaiden_attack_special_360_01, 15f},
+            {(int)SNOAnim.x1_Squigglet_Generic_Cast, 40f}, // Rift Boss Slime AOE
         };
 
         /// <summary>
@@ -416,6 +431,11 @@ namespace Trinity
             340512, // x1_Malthael_Mephisto_LightningObject
 
             359693, //Server Prop X1_Unique_Monster_Generic_AOE_DOT_Fire_10foot-24594 (359693)
+
+            359703, // X1_Unique_Monster_Generic_AOE_DOT_Cold_10foot-183301 (359703) Type=ServerProp
+            363356, // X1_Unique_Monster_Generic_AOE_DOT_Cold_20foot-183239 (363356) Type=ServerProp
+            360046, // X1_Unique_Monster_Generic_AOE_DOT_Poison_10foot-223788 (360046) Type=ServerProp
+
         };
 
         /// <summary>
@@ -450,6 +470,9 @@ namespace Trinity
             325136, // x1_Malthael_DeathFogMonster
             340512, // x1_Malthael_Mephisto_LightningObject
             3528, //[2047F7CC] Type: Projectile Name: Butcher_hook-737821 ActorSNO: 3528, Distance: 45.17828
+
+            4394, //g_ChargedBolt_Projectile-200915 (4394) Type=Projectile
+            368392, // x1_Cesspool_Slime_Posion_Attack_Projectile-222254 (368392) Type=Projectile
       };
 
         /// <summary>
