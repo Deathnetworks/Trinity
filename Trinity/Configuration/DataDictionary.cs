@@ -215,6 +215,7 @@ namespace Trinity
         private static readonly HashSet<int> straightLinePathingLevelAreaIds = new HashSet<int>
         {
             60757, // Belial's chambers
+            405915, // p1_TieredRift_Challenge
 
         };
 
@@ -1064,6 +1065,14 @@ namespace Trinity
 
         };
 
+        /// <summary>
+        /// A list of LevelAreaId's that the bot should always ignore Line of Sight
+        /// </summary>
+        public static HashSet<int> NeverRaycastLevelAreaIds { get { return neverRaycastLevelAreaIds; } }
+        private static readonly HashSet<int> neverRaycastLevelAreaIds = new HashSet<int>()
+        {
+            405915, // p1_TieredRift_Challenge 
+        };
 
 
         public static HashSet<int> AlwaysRaycastWorlds { get { return DataDictionary.alwaysRaycastWorlds; } }

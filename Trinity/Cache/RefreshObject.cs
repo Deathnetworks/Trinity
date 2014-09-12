@@ -689,6 +689,10 @@ namespace Trinity
                 if (CurrentCacheObject.Type == GObjectType.Item || CurrentCacheObject.Type == GObjectType.Gold)
                     return true;
 
+                // No need for raycasting in certain level areas (rift trial for example)
+                if (DataDictionary.NeverRaycastLevelAreaIds.Contains(Player.LevelAreaId))
+                    return true;
+
                 if (!DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
                 {
                     // Bounty Objectives should always be on the weight list
