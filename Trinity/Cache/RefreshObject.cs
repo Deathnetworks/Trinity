@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Trinity.Cache;
+using Trinity.Helpers;
 using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -390,27 +391,29 @@ namespace Trinity
                 return AddToCache;
             }
 
-            try
-            {
-                // Check if it's a unit with an animation we should avoid. We need to recheck this every time.
-                if (CurrentCacheObject.Unit != null && CurrentCacheObject.CommonData != null &&
-                    Settings.Combat.Misc.AvoidAOE && DataDictionary.AvoidanceAnimations.Contains(new DoubleInt(CurrentCacheObject.ActorSNO, (int)CurrentCacheObject.CommonData.CurrentAnimation)))
-                {
-                    // The ActorSNO and Animation match a known pair, avoid this!
-                    // Example: "Grotesque" death animation
-                    AddToCache = true;
-                    CurrentCacheObject.Type = GObjectType.Avoidance;
-                }
-            }
-            catch { }
-
             // Either get the cached object type, or calculate it fresh
             if (!c_IsObstacle)
             {
                 // See if it's an avoidance first from the SNO
                 bool isAvoidanceSNO = (DataDictionary.Avoidances.Contains(CurrentCacheObject.ActorSNO) ||
                     DataDictionary.ButcherFloorPanels.Contains(CurrentCacheObject.ActorSNO) ||
-                    DataDictionary.AvoidanceProjectiles.Contains(CurrentCacheObject.ActorSNO));
+                    DataDictionary.AvoidanceProjectiles.Contains(CurrentCacheObject.ActorSNO)) ||
+                    (Player.IsRanged && DataDictionary.DangerousMeleeRangeMonsters.Contains(CurrentCacheObject.ActorSNO));
+
+                try
+                {
+                    // Check if it's a unit with an animation we should avoid. We need to recheck this every time.
+                    if (CurrentCacheObject.Unit != null && CurrentCacheObject.CommonData != null &&
+                        Settings.Combat.Misc.AvoidAOE && DataDictionary.AvoidanceAnimations.Contains(new DoubleInt(CurrentCacheObject.ActorSNO, (int)CurrentCacheObject.CommonData.CurrentAnimation)))
+                    {
+                        // The ActorSNO and Animation match a known pair, avoid this!
+                        // Example: "Grotesque" death animation
+                        AddToCache = true;
+                        CurrentCacheObject.Type = GObjectType.Avoidance;
+                        isAvoidanceSNO = true;
+                    }
+                }
+                catch { }
 
                 // We're avoiding AoE and this is an AoE
                 if (Settings.Combat.Misc.AvoidAOE && isAvoidanceSNO)
@@ -663,7 +666,8 @@ namespace Trinity
                     }
                 // Object switch on type (to seperate shrines, destructibles, barricades etc.)
                 default:
-                    {
+                {
+                        DebugUtil.LogUnknown(c_diaObject);
                         c_IgnoreSubStep = "Unknown." + c_diaObject.ActorType;
                         AddToCache = false;
                         break;
@@ -683,6 +687,10 @@ namespace Trinity
             try
             {
                 if (CurrentCacheObject.Type == GObjectType.Item || CurrentCacheObject.Type == GObjectType.Gold)
+                    return true;
+
+                // No need for raycasting in certain level areas (rift trial for example)
+                if (DataDictionary.NeverRaycastLevelAreaIds.Contains(Player.LevelAreaId))
                     return true;
 
                 if (!DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
