@@ -455,6 +455,9 @@ namespace Trinity
                         Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "+  Score:       {0:0}", itemValue);
                         Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "+  Attributes: {0}", ValueItemStatString);
                         Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+");
+
+                        if (acdItem.RealName.ToLower() == "ramalandi's gift")
+                            NotificationManager.AddNotificationToQueue(acdItem.RealName, ZetaDia.Service.Hero.Name + " new item!", ProwlNotificationPriority.Emergency);
                     }
                     else
                     {
