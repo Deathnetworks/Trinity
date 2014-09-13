@@ -136,6 +136,13 @@ namespace Trinity
                     return true;
                 }
 
+                // Treat all globes as a yes
+                if (c_item_GItemType == GItemType.ProgressionGlobe)
+                {
+                    CurrentCacheObject.Type = GObjectType.ProgressionGlobe;
+                    return true;
+                }
+
                 // Item stats
                 logNewItem = RefreshItemStats(itemBaseType);
 
@@ -175,7 +182,7 @@ namespace Trinity
                 if (!AddToCache && c_IgnoreSubStep == String.Empty)
                     c_IgnoreSubStep = "NoMatchingRule";
 
-                if (Settings.Advanced.LogDroppedItems && logNewItem && c_item_GItemType != GItemType.HealthGlobe && c_item_GItemType != GItemType.HealthPotion && c_item_GItemType != GItemType.PowerGlobe)
+                if (Settings.Advanced.LogDroppedItems && logNewItem && c_item_GItemType != GItemType.HealthGlobe && c_item_GItemType != GItemType.HealthPotion && c_item_GItemType != GItemType.PowerGlobe && c_item_GItemType != GItemType.ProgressionGlobe)
                     //LogDroppedItem();
                     ItemDroppedAppender.Instance.AppendDroppedItem(pickupItem);
 
