@@ -21,6 +21,10 @@ namespace Trinity.Combat.Abilities
 
             if (UseOOCBuff)
             {
+                // Call of The Ancients
+                if (IsNull(power) && CanUseCallOfTheAncients && Sets.ImmortalKingsCall.IsFullyEquipped)
+                    power = PowerCallOfTheAncients;
+
                 // Sprint OOC
                 if (IsNull(power) && CanUseSprintOOC)
                     power = PowerSprint;
