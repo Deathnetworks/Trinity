@@ -24,6 +24,7 @@ namespace Trinity.Helpers
         private static readonly Dictionary<string, Composite> OriginalHooks = new Dictionary<string, Composite>();
 
         private static Composite _goldInactiveComposite;
+        private static Composite _xpInactiveComposite;
 
         /// <summary>
         /// This will replace the main BehaviorTree hooks for Combat, Vendoring, and Looting.
@@ -48,6 +49,9 @@ namespace Trinity.Helpers
 
                 if (_goldInactiveComposite == null)
                     _goldInactiveComposite = GoldInactivity.CreateGoldInactiveLeaveGame();
+
+                if (_xpInactiveComposite == null)
+                    _xpInactiveComposite = XpInactivity.CreateXpInactiveLeaveGame();
 
                 Logger.Log("Inserting GoldInactivity into BotBehavior");
                 TreeHooks.Instance.InsertHook("BotBehavior", 0, _goldInactiveComposite);
