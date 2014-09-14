@@ -34,7 +34,7 @@ namespace Trinity.Helpers
             if (Trinity.IsPluginEnabled)
             {
                 // This is the do-all-be-all god-head all encompasing piece of trinity
-                StoreAndReplaceHook("Combat", new Decorator(Trinity.TargetCheck, Trinity.HandleTargetAction()));
+                StoreAndReplaceHook("Combat", new Decorator(Trinity.TargetCheck, new ActionRunCoroutine(ret => Trinity.HandleTargetTask())));
 
                 // We still want the main VendorRun logic, we're just going to take control of *when* this logic kicks in
                 var vendorDecorator = TreeHooks.Instance.Hooks["VendorRun"][0] as Decorator;

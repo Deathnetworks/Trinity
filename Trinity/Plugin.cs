@@ -12,7 +12,6 @@ using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Navigation;
-using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Game;
 using Logger = Trinity.Technicals.Logger;
@@ -28,7 +27,7 @@ namespace Trinity
         {
             get
             {
-                return new Version(2, 1, 9);
+                return new Version(2, 1, 11);
             }
         }
 

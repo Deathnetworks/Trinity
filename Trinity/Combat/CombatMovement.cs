@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Buddy.Coroutines;
 using Trinity.Combat.Abilities;
 using Trinity.DbProvider;
 using Trinity.Objects;
@@ -97,7 +99,7 @@ namespace Trinity.Combat
         private Queue<CombatMovement> InternalQueue { get; set; }
         private CombatMovement CurrentMovement { get; set; }
         private List<CombatMovement> Blacklist { get; set; }
-        private CombatMovementStatus Status { get; set; } 
+        private CombatMovementStatus Status { get; set; }
         private bool _isBlocked;
 
         public CombatMovementManager()
@@ -110,9 +112,9 @@ namespace Trinity.Combat
             Status = new CombatMovementStatus();
         }
 
-        public RunStatus Execute()
+        public async Task<bool> Execute()
         {
-            if (!IsQueuedMovement) return RunStatus.Failure;
+            if (!IsQueuedMovement) return false;
 
             if (CurrentMovement == null)
                 CurrentMovement = InternalQueue.Dequeue();
@@ -126,56 +128,59 @@ namespace Trinity.Combat
             Status.LastPosition = ZetaDia.Me.Position;
             CurrentMovement.Status = Status;
 
-            if (CurrentMovement.StopCondition != null && 
+            if (CurrentMovement.StopCondition != null &&
                 CurrentMovement.StopCondition.Invoke(CurrentMovement))
             {
                 FailedHandler("StopWhen");
-                return RunStatus.Failure;                
+                return false;
             }
 
             if (IsBlocked)
             {
                 FailedHandler("Blocked");
-                return RunStatus.Failure;
+                return false;
             }
 
             if (Status.DistanceToObjective < CurrentMovement.AcceptableDistance)
             {
                 SuccessHandler("AcceptableDistance");
-                return RunStatus.Success;
+                return true;
             }
 
             if (HasRecentlyFailed(CurrentMovement))
             {
                 FailedHandler("RecentlyFailed");
-                return RunStatus.Failure;
+                return false;
             }
 
             if (Status.DistanceToObjective > 100)
             {
                 FailedHandler("MaxDistance");
-                return RunStatus.Failure;
+                return false;
             }
 
             switch (Status.LastStatus)
             {
                 case MoveResult.ReachedDestination:
                     SuccessHandler();
-                    return RunStatus.Success;
+                    return true;
                 case MoveResult.PathGenerationFailed:
                 case MoveResult.Moved:
                     MovedHandler();
-                    return RunStatus.Running;
+                    await Coroutine.Yield();
+                    return true;
                 case MoveResult.Failed:
                     FailedHandler("Navigation");
-                    return RunStatus.Failure;
-                default: return RunStatus.Running;
+                    return false;
+                default:
+                    await Coroutine.Yield();
+                    return true;
             }
 
         }
 
         private bool IsBlocked
-        {           
+        {
             get
             {
                 if (Status.ChangeInDistance < DistanceChangeLimit && !_isBlocked)
@@ -185,8 +190,8 @@ namespace Trinity.Combat
                 }
 
                 if (Status.ChangeInDistance >= DistanceChangeLimit && _isBlocked)
-                     _isBlocked = false;
- 
+                    _isBlocked = false;
+
                 if (_isBlocked && TimeSinceBlocked >= TimeToConsiderBlocked)
                 {
                     _isBlocked = false;
@@ -203,7 +208,7 @@ namespace Trinity.Combat
             if (CurrentMovement.Verbose)
             {
                 var location = (!string.IsNullOrEmpty(reason) ? "(" + reason + ")" : reason);
-                LogLocation("Arrived at " + location, CurrentMovement);                
+                LogLocation("Arrived at " + location, CurrentMovement);
             }
             FinishedHandler();
         }
@@ -216,7 +221,7 @@ namespace Trinity.Combat
 
         public void FinishedHandler()
         {
-            if(CurrentMovement.OnFinished != null)
+            if (CurrentMovement.OnFinished != null)
                 CurrentMovement.OnFinished.Invoke(CurrentMovement);
 
             CurrentMovement = null;
@@ -256,8 +261,8 @@ namespace Trinity.Combat
                 movement.StartPosition = ZetaDia.Me.Position;
                 movement.LastUsed = DateTime.UtcNow;
                 LogLocation("Queueing", movement);
-                InternalQueue.Enqueue(movement);                
-            }            
+                InternalQueue.Enqueue(movement);
+            }
         }
 
         public bool IsQueuedMovement
@@ -273,7 +278,7 @@ namespace Trinity.Combat
             return RecentlyFailed.Any(m => m.Name == movement.Name);
         }
 
-        public List<CombatMovement> RecentlyFailed 
+        public List<CombatMovement> RecentlyFailed
         {
             get
             {
@@ -281,9 +286,9 @@ namespace Trinity.Combat
                 return Blacklist;
             }
         }
-    
+
         public DateTime BlockedSince = DateTime.MinValue;
-        public double TimeSinceBlocked { get { return DateTime.UtcNow.Subtract(BlockedSince).TotalMilliseconds;  } }
+        public double TimeSinceBlocked { get { return DateTime.UtcNow.Subtract(BlockedSince).TotalMilliseconds; } }
 
 
     }

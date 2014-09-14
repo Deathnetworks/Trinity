@@ -34,15 +34,39 @@ namespace Trinity
         /// and the result is we will have a new target for the Target Handler. Returns true if the cache was refreshed.
         /// </summary>
         /// <returns>True if the cache was updated</returns>
-        public static bool RefreshDiaObjectCache(bool forceUpdate = false)
+        public static bool RefreshDiaObjectCache()
         {
+            if (ZetaDia.Service.Hero == null)
+            {
+                Logger.LogError("Hero is null!");
+                return false;
+            }
+
+            if (!ZetaDia.Service.Hero.IsValid)
+            {
+                Logger.LogError("Hero is invalid!");
+                return false;
+            }
+            
+            if (!ZetaDia.IsInGame)
+                return false;
+
+            if (ZetaDia.IsLoadingWorld)
+                return false;
+
+            if (!ZetaDia.Me.IsValid)
+                return false;
+            if (!ZetaDia.Me.CommonData.IsValid)
+                return false;
+
+
             using (new PerformanceLogger("RefreshDiaObjectCache"))
             {
-                if (DateTime.UtcNow.Subtract(LastRefreshedCache).TotalMilliseconds < Settings.Advanced.CacheRefreshRate && !forceUpdate)
-                {
-                    if (!UpdateCurrentTarget())
-                        return false;
-                }
+                //if (DateTime.UtcNow.Subtract(LastRefreshedCache).TotalMilliseconds < Settings.Advanced.CacheRefreshRate && !forceUpdate)
+                //{
+                //    if (!UpdateCurrentTarget())
+                //        return false;
+                //}
                 LastRefreshedCache = DateTime.UtcNow;
 
                 /*
@@ -577,19 +601,11 @@ namespace Trinity
                     try
                     {
                         DiaUnit unit = CurrentTarget.Unit;
-                        //if (unit.HitpointsCurrent <= 0d)
-                        //{
-                        //    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget is dead, setting null");
-                        //    CurrentTarget = null;
-                        //    forceUpdate = true;
-                        //}
-                        //else
-                        //{
+
                         CurrentTarget.Position = unit.Position;
                         CurrentTarget.HitPointsPct = unit.HitpointsCurrentPct;
                         CurrentTarget.HitPoints = unit.HitpointsCurrent;
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Updated CurrentTarget HitPoints={0:0.00} & Position={1}", CurrentTarget.HitPointsPct, CurrentTarget.Position);
-                        //}
                     }
                     catch (Exception)
                     {
@@ -628,6 +644,7 @@ namespace Trinity
                 // store last target GUID
                 LastTargetRactorGUID = CurrentTarget != null ? CurrentTarget.RActorGuid : -1;
                 LastTargetACDGuid = CurrentTarget != null ? CurrentTarget.ACDGuid : -1;
+
                 //reset current target
                 CurrentTarget = null;
                 // Reset all variables for target-weight finding

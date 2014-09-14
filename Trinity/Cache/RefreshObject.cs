@@ -61,40 +61,51 @@ namespace Trinity
         private static bool CacheDiaObject(DiaObject freshObject)
         {
             if (!freshObject.IsValid)
+            {
+                c_IgnoreReason = "InvalidRActor";
                 return false;
+            }
+            if (freshObject.CommonData == null)
+            {
+                c_IgnoreReason = "ACDNull";
+                return false;
+            }
+            if (!freshObject.CommonData.IsValid)
+            {
+                c_IgnoreReason = "InvalidACD";
+                return false;
+            }
 
             /*
              *  Initialize Variables
              */
             bool AddToCache;
 
-            RefreshStepInit(out AddToCache);
+            RefreshStepInit();
             /*
              *  Get primary reference objects and keys
              */
             c_diaObject = freshObject;
 
-            // Ractor GUID
-            CurrentCacheObject.RActorGuid = freshObject.RActorGuid;
-            // Check to see if we've already looked at this GUID
-            CurrentCacheObject.RActorGuid = freshObject.RActorGuid;
-            CurrentCacheObject.ACDGuid = freshObject.ACDGuid;
-
-            // Get Name
-            CurrentCacheObject.InternalName = nameNumberTrimRegex.Replace(freshObject.Name, "");
-            CurrentCacheObject.InternalName = nameNumberTrimRegex.Replace(freshObject.Name, "");
-
-            CurrentCacheObject.ActorSNO = freshObject.ActorSNO;
-            CurrentCacheObject.ActorType = freshObject.ActorType;
-            CurrentCacheObject.ACDGuid = freshObject.ACDGuid;
-            if (CurrentCacheObject.CommonData == null)
+            try
             {
-                c_IgnoreReason = "ACDNull";
-                return false;
+                // Ractor GUID
+                CurrentCacheObject.RActorGuid = freshObject.RActorGuid;
+                // Check to see if we've already looked at this GUID
+                CurrentCacheObject.ACDGuid = freshObject.ACDGuid;
+
+                // Get Name
+                CurrentCacheObject.InternalName = nameNumberTrimRegex.Replace(freshObject.Name, "");
+                CurrentCacheObject.InternalName = nameNumberTrimRegex.Replace(freshObject.Name, "");
+
+                CurrentCacheObject.ActorSNO = freshObject.ActorSNO;
+                CurrentCacheObject.ActorType = freshObject.ActorType;
+                CurrentCacheObject.ACDGuid = freshObject.ACDGuid;
             }
-            if (!CurrentCacheObject.CommonData.IsValid)
+            catch (Exception ex)
             {
-                c_IgnoreReason = "ACDInvalid";
+                c_IgnoreReason = "Error reading IDs";
+                return false;
             }
 
             CurrentCacheObject.LastSeenTime = DateTime.UtcNow;
@@ -307,10 +318,9 @@ namespace Trinity
         /// <summary>
         /// Initializes variable set for single object refresh
         /// </summary>
-        private static void RefreshStepInit(out bool AddTocache)
+        private static void RefreshStepInit()
         {
             CurrentCacheObject = new TrinityCacheObject();
-            AddTocache = true;
             // Start this object as off as unknown type
             CurrentCacheObject.Type = GObjectType.Unknown;
 
@@ -598,7 +608,7 @@ namespace Trinity
                             c_IgnoreSubStep = "CombatDisabled";
                             break;
                         }
-                        
+
                         AddToCache = RefreshUnit();
                         break;
                     }
@@ -666,7 +676,7 @@ namespace Trinity
                     }
                 // Object switch on type (to seperate shrines, destructibles, barricades etc.)
                 default:
-                {
+                    {
                         DebugUtil.LogUnknown(c_diaObject);
                         c_IgnoreSubStep = "Unknown." + c_diaObject.ActorType;
                         AddToCache = false;
