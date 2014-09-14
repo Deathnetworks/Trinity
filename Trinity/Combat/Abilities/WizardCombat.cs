@@ -101,13 +101,16 @@ namespace Trinity.Combat.Abilities
             {
                 power = GetArchonPower();
             }
-
-            // Offensive Teleport: Calamity
-            if (CanCast(SNOPower.Wizard_Teleport, CanCastFlags.NoTimer) && Runes.Wizard.Calamity.IsActive)
-            {
-                var bestClusterPoint = TargetUtil.GetBestClusterPoint(5f, 10f);
-                return new TrinityPower(SNOPower.Wizard_Teleport, 55f, bestClusterPoint);
-            }
+            
+            if (TargetUtil.AnyMobsInRange(25f, 3) || TargetUtil.IsEliteTargetInRange(70f))
+                {
+                    // Offensive Teleport: Calamity
+                    if (CombatBase.CanCast(SNOPower.Wizard_Teleport, CombatBase.CanCastFlags.NoTimer) && Runes.Wizard.Calamity.IsActive)
+                    {
+                        var bestClusterPoint = TargetUtil.GetBestClusterPoint(5f, 10f);
+                        return new TrinityPower(SNOPower.Wizard_Teleport, 55f, bestClusterPoint);
+                    }
+                }
 
             // Defensive Teleport: SafePassage
             if (CanCast(SNOPower.Wizard_Teleport) && Runes.Wizard.SafePassage.IsActive &&
