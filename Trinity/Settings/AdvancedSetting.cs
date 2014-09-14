@@ -18,7 +18,8 @@ namespace Trinity.Config
         private bool _DebugInStatusBar;
         private LogCategory _LogCategories;
         private bool _GoldInactivityEnabled;
-        private int _GoldInactivityTimer;
+        private bool _XpInactivityEnabled;
+        private int _InactivityTimer;
         private bool _LogDroppedItems;
         private bool _OutputReports;
         private bool _ItemRulesLogs;
@@ -135,19 +136,37 @@ namespace Trinity.Config
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(600)]
-        public int GoldInactivityTimer
+        [DefaultValue(false)]
+        public bool XpInactivityEnabled
         {
             get
             {
-                return _GoldInactivityTimer;
+                return _XpInactivityEnabled;
             }
             set
             {
-                if (_GoldInactivityTimer != value)
+                if (_XpInactivityEnabled != value)
                 {
-                    _GoldInactivityTimer = value;
-                    OnPropertyChanged("GoldInactivityTimer");
+                    _XpInactivityEnabled = value;
+                    OnPropertyChanged("XpInactivityEnabled");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(600)]
+        public int InactivityTimer
+        {
+            get
+            {
+                return _InactivityTimer;
+            }
+            set
+            {
+                if (_InactivityTimer != value)
+                {
+                    _InactivityTimer = value;
+                    OnPropertyChanged("InactivityTimer");
                 }
             }
         }

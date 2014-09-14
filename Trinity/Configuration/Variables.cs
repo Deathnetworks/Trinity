@@ -58,7 +58,7 @@ namespace Trinity
         /// This object is used for the main handling - the "current target" etc. as selected by the target-selecter, whether it be a unit, an item, a shrine, anything. 
         /// It's cached data using my own class, so I never need to hit D3 memory to "re-check" the data or to call an interact request or anything
         /// </summary>
-        internal static TrinityCacheObject CurrentTarget = null;
+        internal static TrinityCacheObject CurrentTarget { get; set; }
 
         /// <summary>
         /// A flag to indicate whether we have a new target from the overlord (decorator) or not, in which case don't refresh targets again this first loop

@@ -141,7 +141,7 @@ namespace Trinity
                     // Pop a potion when necessary
                     if (Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit)
                     {
-                        Trinity.UsePotionIfNeeded();
+                        Trinity.UsePotionIfNeededTask();
                     }
                 }
                 _statusText = "[Trinity] No more targets - DemonBuddy/profile management is now in control";

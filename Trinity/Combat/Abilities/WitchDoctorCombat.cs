@@ -39,8 +39,7 @@ namespace Trinity.Combat.Abilities
         public static TrinityPower GetPower()
         {
             TrinityPower power = null;
-
-
+			
 
             // Combat Avoidance Spells
             if (!UseOOCBuff && IsCurrentlyAvoiding)
@@ -61,6 +60,7 @@ namespace Trinity.Combat.Abilities
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CurrentTarget != null)
             {
 
+				
                 bool hasGraveInjustice = HotbarSkills.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice);
 
                 bool hasAngryChicken = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Hex && s.RuneIndex == 1);
@@ -73,12 +73,19 @@ namespace Trinity.Combat.Abilities
                 if (hasGraveInjustice && !CurrentTarget.IsStandingInAvoidance && Player.CurrentHealthPct > 0.25)
                     rangedAttackMaxRange = Math.Min(Player.GoldPickupRadius + 8f, 30f);
 
-                // Set basic attack range, depending on whether or not we have Bears
+                // Set basic attack range, depending on whether or not we have Bears and whether or not we are a tik tank
                 float basicAttackRange = 35f;
                 if (hasGraveInjustice)
                     basicAttackRange = rangedAttackMaxRange;
                 else if (Hotbar.Contains(SNOPower.Witchdoctor_ZombieCharger) && Player.PrimaryResource >= 150)
                     basicAttackRange = 30f;
+				else if (Legendary.TiklandianVisage.IsEquipped && !TikHorrifyCriteria(Enemies.BestLargeCluster))
+					basicAttackRange = 25f;	
+				else if (Legendary.TiklandianVisage.IsEquipped)
+					basicAttackRange = 1f;
+					
+					
+			
 
                 // Summon Pets  -----------------------------------------------------------------------
 
@@ -171,6 +178,40 @@ namespace Trinity.Combat.Abilities
                 bool hasVengefulSpirit = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SoulHarvest && s.RuneIndex == 4);
                 bool hasSwallowYourSoul = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SoulHarvest && s.RuneIndex == 3);
 
+
+				
+				//START Tiklandian Visage ----------------------------------------------------------------------
+				
+				
+				if (Legendary.TiklandianVisage.IsEquipped)
+                {
+					
+					
+                    // Piranhas
+                    if (CanCast(SNOPower.Witchdoctor_Piranhas) && Player.PrimaryResource >= 250 &&
+                        (TargetUtil.ClusterExists(15f, 45f) || TargetUtil.AnyElitesInRange(45f)) &&
+                        LastPowerUsed != SNOPower.Witchdoctor_Piranhas &&
+                        Player.PrimaryResource >= 250)
+                    {
+                        return new TrinityPower(SNOPower.Witchdoctor_Piranhas, 25f, Enemies.BestCluster.Position);
+                    }
+					
+					//Cast Horrify before we go into the fray
+					if (CanCast(SNOPower.Witchdoctor_Horrify))
+					{
+						return new TrinityPower(SNOPower.Witchdoctor_Horrify);
+					}
+
+                    // Should we move to cluster for harvest
+                    if (TikHorrifyCriteria(Enemies.BestLargeCluster))
+                    {
+                        //LogTargetArea("--- Found a good harvest location...", Enemies.BestLargeCluster);
+                        MoveToHorrifyPoint(Enemies.BestLargeCluster);
+                    }
+
+				}
+
+                // END Tiklandian Visage ----------------------------------------------------------------------   
 
                 // START Jade Harvester -----------------------------------------------------------------------
 
@@ -372,6 +413,7 @@ namespace Trinity.Combat.Abilities
                 //runeDict.Add("FrighteningAspect", 0);
                 //runeDict.Add("RuthlessTerror", 3);
 
+				
                 bool hasPhobia = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 2);
                 bool hasStalker = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 4);
                 bool hasFaceOfDeath = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 1);
@@ -612,8 +654,15 @@ namespace Trinity.Combat.Abilities
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
                 }
-
-                bool hasStalker = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 4);
+				
+				
+				//Spam fear at all times if Tiklandian Visage is ewquipped and fear spam is selected to keep fear buff active
+				if (CanCast(SNOPower.Witchdoctor_Horrify) && Settings.Combat.WitchDoctor.SpamHorrify && Legendary.TiklandianVisage.IsEquipped)
+                {
+					return new TrinityPower(SNOPower.Witchdoctor_Horrify);
+                }
+				
+				bool hasStalker = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 4);
                 // Horrify Buff When not in combat for movement speed -- Stalker
                 if (CanCast(SNOPower.Witchdoctor_Horrify) && hasStalker)
                 {
@@ -664,6 +713,12 @@ namespace Trinity.Combat.Abilities
 
             // AND at least 2 Elites, a boss or more than 5 units or 80% of the nearby units are within this area
             (area.EliteCount >= 2 || area.BossCount > 0 || area.UnitCount >= 5 || area.UnitCount >= (float)Enemies.Nearby.UnitCount * 0.80);
+			
+		private static readonly Func<TargetArea, bool> TikHorrifyCriteria = area =>
+
+			//at least 2 Elites, a boss or more than 5 units or 80% of the nearby units are within this area
+            (area.EliteCount >= 2 || area.UnitCount >= 5 || area.UnitCount >= (float)Enemies.Nearby.UnitCount * 0.80);
+		
 
 
         private static readonly Action<string, TargetArea> LogTargetArea = (message, area) =>
@@ -699,6 +754,25 @@ namespace Trinity.Combat.Abilities
                         Skills.WitchDoctor.SoulHarvest.Cast();                        
                     }
                 }
+            });
+        }
+		
+		private static void MoveToHorrifyPoint(TargetArea area)
+        {
+            CombatMovement.Queue(new CombatMovement
+            {
+                Name = "Horrify Epicenter Bitches",
+                Destination = area.Position,
+                AcceptableDistance = 8f,
+                Verbose = false,
+                OnUpdate = m =>
+                {
+                    // Only change destination if the new target is way better
+                    if (TikHorrifyCriteria(Enemies.BestLargeCluster) &&
+                        Enemies.BestLargeCluster.Position.Distance(m.Destination) > 15f)
+                        m.Destination = Enemies.BestLargeCluster.Position;
+                },
+	
             });
         }
 

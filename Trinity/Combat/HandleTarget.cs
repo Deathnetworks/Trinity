@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using Buddy.Coroutines;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.DbProvider;
-using Trinity.Helpers;
 using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -16,8 +17,6 @@ using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 using Zeta.TreeSharp;
-using Action = Zeta.TreeSharp.Action;
-using Decorator = Zeta.TreeSharp.Decorator;
 using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
@@ -33,25 +32,12 @@ namespace Trinity
             get { return ZetaDia.Me; }
         }
 
-        /// <summary>
-        /// Decorator for main Action delegate, also handles bot pausing
-        /// </summary>
-        /// <returns></returns>
-        internal static Composite HandleTargetAction()
+        internal static async Task<bool> HandleTargetTask()
         {
-            return new PrioritySelector(
-                new Decorator(ret => ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && !MainBotPaused,
-                    new Action(ctx => HandleTarget())
-                ),
-                new Decorator(ret => ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && MainBotPaused,
-                    new Action(ret => PausedAction())
-                )
-            );
-        }
+            if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && ZetaDia.Me.IsValid && ZetaDia.Me.CommonData.IsValid)
+                return await HandleTarget();
 
-        private static RunStatus PausedAction()
-        {
-            return MainBotPaused ? RunStatus.Running : RunStatus.Success;
+            return false;
         }
 
         /// <summary>
@@ -122,9 +108,8 @@ namespace Trinity
         /// Handles all aspects of moving to and attacking the current target
         /// </summary>
         /// <returns></returns>
-        private static RunStatus HandleTarget()
+        private static async Task<bool> HandleTarget()
         {
-            HandlerRunStatus runStatus = HandlerRunStatus.NotFinished;
             using (new PerformanceLogger("HandleTarget"))
             {
                 try
@@ -132,14 +117,12 @@ namespace Trinity
                     if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
                     {
                         Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "No longer in game world", true);
-                        runStatus = HandlerRunStatus.TreeFailure;
-                        return GetTreeSharpRunStatus(runStatus);
+                        return false;
                     }
                     if (ZetaDia.Me.IsDead)
                     {
                         Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Player is dead", true);
-                        runStatus = HandlerRunStatus.TreeFailure;
-                        return GetTreeSharpRunStatus(runStatus);
+                        return false;
                     }
 
                     // Make sure we reset unstucker stuff here
@@ -158,18 +141,12 @@ namespace Trinity
                         CombatBase.CurrentPower = AbilitySelector();
 
                     // Time based wait delay for certain powers with animations
-                    if (_isWaitingAfterPower && CombatBase.CurrentPower.ShouldWaitAfterUse)
+                    while (_isWaitingAfterPower && CombatBase.CurrentPower.ShouldWaitAfterUse)
                     {
-                        runStatus = HandlerRunStatus.TreeRunning;
-                    }
-                    else
-                    {
-                        _isWaitingAfterPower = false;
+                        await Coroutine.Yield();
                     }
 
-                    //check if we are returning to the tree
-                    if (runStatus != HandlerRunStatus.NotFinished)
-                        return GetTreeSharpRunStatus(runStatus);
+                    _isWaitingAfterPower = false;
 
                     // See if we have been "newly rooted", to force target updates
                     if (Player.IsRooted && !wasRootedLastTick)
@@ -186,30 +163,25 @@ namespace Trinity
 
                     MonkCombat.Monk_MaintainTempestRush();
 
-                    CheckStaleCache();
+                    // Refresh the object Cache
+                    RefreshDiaObjectCache();
+
+                    //CheckStaleCache();
                     using (new PerformanceLogger("HandleTarget.CheckForNewTarget"))
                     {
                         // So, after all that, do we actually want a new target list?
                         if (!_isWholeNewTarget && !_isWaitingForPower && !_isWaitingForPotion)
                         {
-                            // If we *DO* want a new target list, do this... 
-                            if (_staleCache)
-                            {
-                                // Now call the function that refreshes targets
-                                RefreshDiaObjectCache();
+                            // Now call the function that refreshes targets
+                            // RefreshDiaObjectCache();
 
-                                // No target, return success
-                                if (CurrentTarget == null)
-                                {
-                                    runStatus = HandlerRunStatus.TreeSuccess;
-                                }
-                                else
-                                {
-                                    // Make sure we start trying to move again should we need to!
-                                    IsAlreadyMoving = false;
-                                    lastMovementCommand = DateTime.MinValue;
-                                    _shouldPickNewAbilities = true;
-                                }
+                            // No target, return success
+                            if (CurrentTarget != null)
+                            {
+                                // Make sure we start trying to move again should we need to!
+                                IsAlreadyMoving = false;
+                                lastMovementCommand = DateTime.MinValue;
+                                _shouldPickNewAbilities = true;
                             }
 
                             UpdateCurrentTarget();
@@ -218,49 +190,38 @@ namespace Trinity
 
                     if (CombatBase.CombatMovement.IsQueuedMovement & CombatBase.IsCombatAllowed)
                     {
-                        return CombatBase.CombatMovement.Execute();
+                        await CombatBase.CombatMovement.Execute();
+                        return true;
                     }
 
-                    if (CurrentTarget == null && (ForceVendorRunASAP || IsReadyToTownRun) && !Zeta.Bot.Logic.BrainBehavior.IsVendoring && TownRun.TownRunTimerRunning())
+                    while (CurrentTarget == null && (ForceVendorRunASAP || IsReadyToTownRun) && !Zeta.Bot.Logic.BrainBehavior.IsVendoring && TownRun.TownRunTimerRunning())
                     {
                         Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "CurrentTarget is null but we are ready to to Town Run, waiting... ");
-                        runStatus = HandlerRunStatus.TreeRunning;
+                        await Coroutine.Yield();
                     }
 
-                    //check if we are returning to the tree
-                    if (runStatus != HandlerRunStatus.NotFinished)
-                        return GetTreeSharpRunStatus(runStatus);
-
-                    if (CurrentTarget == null && TownRun.IsTryingToTownPortal() && TownRun.TownRunTimerRunning())
+                    while (CurrentTarget == null && TownRun.IsTryingToTownPortal() && TownRun.TownRunTimerRunning())
                     {
                         Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "Waiting for town run... ");
-                        runStatus = HandlerRunStatus.TreeRunning;
+                        await Coroutine.Yield();
                     }
-                    else if (CurrentTarget == null && TownRun.IsTryingToTownPortal() && TownRun.TownRunTimerFinished())
+
+                    if (CurrentTarget == null && TownRun.IsTryingToTownPortal() && TownRun.TownRunTimerFinished())
                     {
                         Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "Town Run Ready!");
-                        runStatus = HandlerRunStatus.TreeSuccess;
+                        return true;
                     }
-                    //check if we are returning to the tree
-                    if (runStatus != HandlerRunStatus.NotFinished)
-                        return GetTreeSharpRunStatus(runStatus);
+
 
                     if (CurrentTarget == null)
                     {
                         Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "CurrentTarget set as null in refresh! Error 2");
-                        runStatus = HandlerRunStatus.TreeFailure;
+                        return false;
                     }
 
-                    //check if we are returning to the tree
-                    if (runStatus != HandlerRunStatus.NotFinished)
-                        return GetTreeSharpRunStatus(runStatus);
-
                     // Handle Target stuck / timeout
-                    runStatus = HandleTargetTimeout(runStatus);
-
-                    //check if we are returning to the tree
-                    if (runStatus != HandlerRunStatus.NotFinished)
-                        return GetTreeSharpRunStatus(runStatus);
+                    if (await HandleTargetTimeoutTask())
+                        return true;
 
                     // This variable just prevents an instant 2-target update after coming here from the main decorator function above
                     _isWholeNewTarget = false;
@@ -269,13 +230,9 @@ namespace Trinity
 
                     // Pop a potion when necessary
 
-                    UsePotionIfNeeded();
+                    if (await UsePotionIfNeededTask())
+                        return true;
 
-                    //check if we are returning to the tree
-                    if (runStatus != HandlerRunStatus.NotFinished)
-                        return GetTreeSharpRunStatus(runStatus);
-
-                    // If we just looped waiting for a potion, use it
 
                     using (new PerformanceLogger("HandleTarget.CheckAvoidanceBuffs"))
                     {
@@ -388,11 +345,9 @@ namespace Trinity
                             UpdateStatusTextTarget(true);
 
                             HandleObjectInRange();
-                            runStatus = HandlerRunStatus.TreeRunning;
+                            return true;
                         }
-                        //check if we are returning to the tree
-                        if (runStatus != HandlerRunStatus.NotFinished)
-                            return GetTreeSharpRunStatus(runStatus);
+
                     }
 
 
@@ -405,18 +360,13 @@ namespace Trinity
                     // Are we currently incapacitated? If so then wait...
                     if (Player.IsIncapacitated || Player.IsRooted)
                     {
-                        runStatus = HandlerRunStatus.TreeRunning;
                         Logger.Log(LogCategory.Behavior, "Player is rooted or incapacitated!");
-                        return GetTreeSharpRunStatus(runStatus);
+                        return true;
                     }
 
                     // Check to see if we're stuck in moving to the target
-                    runStatus = HandleTargetDistanceCheck(runStatus);
-
-                    //check if we are returning to the tree
-                    if (runStatus != HandlerRunStatus.NotFinished)
-                        return GetTreeSharpRunStatus(runStatus);
-
+                    if (await HandleTargetDistanceCheck())
+                        return true;
 
                     // Update the last distance stored
                     LastDistanceFromTarget = TargetCurrentDistance;
@@ -430,10 +380,7 @@ namespace Trinity
                     // See if we want to ACTUALLY move, or are just waiting for the last move command...
                     if (!ForceNewMovement && IsAlreadyMoving && CurrentDestination == LastMoveToTarget && DateTime.UtcNow.Subtract(lastMovementCommand).TotalMilliseconds <= 100)
                     {
-                        runStatus = HandlerRunStatus.TreeRunning;
-                        //check if we are returning to the tree
-                        if (runStatus != HandlerRunStatus.NotFinished)
-                            return GetTreeSharpRunStatus(runStatus);
+                        return true;
                     }
                     using (new PerformanceLogger("HandleTarget.SpecialMovement"))
                     {
@@ -451,9 +398,9 @@ namespace Trinity
                         if ((CurrentTarget.Type == GObjectType.Avoidance ||
                             CurrentTarget.Type == GObjectType.HealthGlobe ||
                             CurrentTarget.Type == GObjectType.PowerGlobe ||
-							(CurrentTarget.Type == GObjectType.Gold && CombatBase.CanCast(SNOPower.DemonHunter_Vault)) ||
-							((CurrentTarget.Type == GObjectType.Container || CurrentTarget.Type == GObjectType.Item) && 
-							CurrentTarget.Distance > 18f && CombatBase.CanCast(SNOPower.DemonHunter_Vault)) ||
+                            (CurrentTarget.Type == GObjectType.Gold && CombatBase.CanCast(SNOPower.DemonHunter_Vault)) ||
+                            ((CurrentTarget.Type == GObjectType.Container || CurrentTarget.Type == GObjectType.Item) &&
+                            CurrentTarget.Distance > 18f && CombatBase.CanCast(SNOPower.DemonHunter_Vault)) ||
                             Monk_SpecialMovement ||
                             (CurrentTarget.Type == GObjectType.Backtrack && Settings.Combat.Misc.AllowOOCMovement))
                             && NavHelper.CanRayCast(Player.Position, CurrentDestination)
@@ -473,10 +420,8 @@ namespace Trinity
                                     // Reset total body-block count, since we should have moved
                                     if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                                         _timesBlockedMoving = 0;
-                                    runStatus = HandlerRunStatus.TreeRunning;
-                                    //check if we are returning to the tree
-                                    if (runStatus != HandlerRunStatus.NotFinished)
-                                        return GetTreeSharpRunStatus(runStatus);
+
+                                    return true;
                                 }
                                 // Tempest rush for a monk
                                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Monk_TempestRush) && Player.PrimaryResource >= Settings.Combat.Monk.TR_MinSpirit &&
@@ -493,10 +438,7 @@ namespace Trinity
                                     // Reset total body-block count, since we should have moved
                                     if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                                         _timesBlockedMoving = 0;
-                                    runStatus = HandlerRunStatus.TreeRunning;
-                                    //check if we are returning to the tree
-                                    if (runStatus != HandlerRunStatus.NotFinished)
-                                        return GetTreeSharpRunStatus(runStatus);
+                                    return true;
                                 }
                                 // Strafe for a Demon Hunter
                                 if (Attackable_SpecialMovement && !bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Strafe) && Player.PrimaryResource >= 15)
@@ -507,10 +449,7 @@ namespace Trinity
                                     // Reset total body-block count, since we should have moved
                                     if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                                         _timesBlockedMoving = 0;
-                                    runStatus = HandlerRunStatus.TreeRunning;
-                                    //check if we are returning to the tree
-                                    if (runStatus != HandlerRunStatus.NotFinished)
-                                        return GetTreeSharpRunStatus(runStatus);
+                                    return true;
                                 }
                             }
                             if (bFoundSpecialMovement)
@@ -520,10 +459,7 @@ namespace Trinity
                                 // Reset total body-block count, since we should have moved
                                 if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                                     _timesBlockedMoving = 0;
-                                runStatus = HandlerRunStatus.TreeRunning;
-                                //check if we are returning to the tree
-                                if (runStatus != HandlerRunStatus.NotFinished)
-                                    return GetTreeSharpRunStatus(runStatus);
+                                return true;
                             }
                         }
                     }
@@ -557,23 +493,18 @@ namespace Trinity
                         if ((!_forceCloseRangeTarget || DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds > ForceCloseRangeForMilliseconds) &&
                             DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                             _timesBlockedMoving = 0;
-                        runStatus = HandlerRunStatus.TreeRunning;
-                        //check if we are returning to the tree
-                        if (runStatus != HandlerRunStatus.NotFinished)
-                            return GetTreeSharpRunStatus(runStatus);
+                        return true;
                     }
                 }
                 catch (Exception ex)
                 {
                     Logger.LogError("Error in HandleTarget: {0}", ex.Message);
-                    runStatus = HandlerRunStatus.TreeFailure;
-                    return GetTreeSharpRunStatus(runStatus);
+                    return false;
                 }
 
                 HandleTargetBasicMovement(ForceNewMovement);
 
-                runStatus = HandlerRunStatus.TreeRunning;
-                return GetTreeSharpRunStatus(runStatus);
+                return true;
             }
         }
 
@@ -828,7 +759,7 @@ namespace Trinity
             }
         }
 
-        private static HandlerRunStatus HandleTargetDistanceCheck(HandlerRunStatus runStatus)
+        private static async Task<bool> HandleTargetDistanceCheck()
         {
             using (new PerformanceLogger("HandleTarget.DistanceEqualCheck"))
             {
@@ -858,7 +789,7 @@ namespace Trinity
                             }
                         }
                         // Reset the emergency loop counter and return success
-                        runStatus = HandlerRunStatus.TreeRunning;
+                        return true;
                     }
                     // Been 250 milliseconds of non-movement?
                 }
@@ -868,7 +799,7 @@ namespace Trinity
                     _lastMovedDuringCombat = DateTime.UtcNow;
                 }
             }
-            return runStatus;
+            return false;
         }
 
         /// <summary>
@@ -876,7 +807,7 @@ namespace Trinity
         /// </summary>
         /// <param name="runStatus"></param>
         /// <returns></returns>
-        private static HandlerRunStatus HandleTargetTimeout(HandlerRunStatus runStatus)
+        private static async Task<bool> HandleTargetTimeoutTask()
         {
             using (new PerformanceLogger("HandleTarget.TargetTimeout"))
             {
@@ -888,15 +819,15 @@ namespace Trinity
 
                 // don't timeout on avoidance
                 if (CurrentTarget.Type == GObjectType.Avoidance)
-                    return HandlerRunStatus.NotFinished;
+                    return false;
 
                 // don't timeout on legendary items
                 if (CurrentTarget.Type == GObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary)
-                    return HandlerRunStatus.NotFinished;
+                    return false;
 
                 // don't timeout if we're actively moving
                 if (PlayerMover.GetMovementSpeed() > 1)
-                    return HandlerRunStatus.NotFinished;
+                    return false;
 
                 if (CurrentTargetIsNonUnit() && GetSecondsSinceTargetUpdate() > 6)
                     shouldTryBlacklist = true;
@@ -965,23 +896,21 @@ namespace Trinity
                             Blacklist15Seconds.Add(CurrentTarget.RActorGuid);
                             Blacklist15LastClear = DateTime.UtcNow;
                             CurrentTarget = null;
-                            runStatus = HandlerRunStatus.TreeSuccess;
+                            return true;
                         }
-                        else if (CurrentTarget.Type == GObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary)
+                        if (CurrentTarget.Type == GObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary)
                         {
                             // Don't blacklist legendaries!!
-                            runStatus = HandlerRunStatus.TreeSuccess;
+                            return true;
                         }
-                        else
-                        {
-                            Blacklist90Seconds.Add(CurrentTarget.RActorGuid);
-                            Blacklist90LastClear = DateTime.UtcNow;
-                            CurrentTarget = null;
-                            runStatus = HandlerRunStatus.TreeSuccess;
-                        }
+
+                        Blacklist90Seconds.Add(CurrentTarget.RActorGuid);
+                        Blacklist90LastClear = DateTime.UtcNow;
+                        CurrentTarget = null;
+                        return true;
                     }
                 }
-                return runStatus;
+                return false;
             }
         }
 
@@ -1028,7 +957,7 @@ namespace Trinity
         /// <summary>
         /// Will check <see cref=" _isWaitingForPotion"/> and Use a Potion if needed
         /// </summary>
-        private static void UsePotionIfNeeded()
+        private static async Task<bool> UsePotionIfNeededTask()
         {
             using (new PerformanceLogger("HandleTarget.UseHealthPotionIfNeeded"))
             {
@@ -1036,32 +965,33 @@ namespace Trinity
                     Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit)
                 {
                     var legendaryPotions = ZetaDia.Me.Inventory.Backpack.Where(i => i.InternalName.ToLower()
-                        .Contains("healthpotion_legendary_"));
+                        .Contains("healthpotion_legendary_")).ToList();
 
                     var regularPotions = ZetaDia.Me.Inventory.Backpack.Where(i => i.InternalName.ToLower()
-                        .Contains("healthpotion_") && !i.InternalName.ToLower().Contains("legendary"));
+                        .Contains("healthpotion_") && !i.InternalName.ToLower().Contains("legendary")).ToList();
 
 
-                    int dynamicId = 0;
+                    int dynamicId;
                     if (legendaryPotions.Any())
                     {
                         Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Legendary Potion", 0);
                         dynamicId = legendaryPotions.FirstOrDefault().DynamicId;
                         ZetaDia.Me.Inventory.UseItem(dynamicId);
                         SpellHistory.RecordSpell(new TrinityPower(SNOPower.DrinkHealthPotion));
+                        return true;
                     }
-                    else if (regularPotions.Any())
+                    if (regularPotions.Any())
                     {
                         Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Potion", 0);
                         dynamicId = regularPotions.FirstOrDefault().DynamicId;
                         ZetaDia.Me.Inventory.UseItem(dynamicId);
                         SpellHistory.RecordSpell(new TrinityPower(SNOPower.DrinkHealthPotion));
+                        return true;
                     }
-                    else
-                    {
-                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "No Available potions!", 0);
-                    }
+
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "No Available potions!", 0);
                 }
+                return false;
             }
         }
 

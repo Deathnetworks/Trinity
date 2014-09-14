@@ -84,7 +84,7 @@ namespace Trinity.Helpers
                 }
 
                 int goldUnchangedSeconds = Convert.ToInt32(DateTime.UtcNow.Subtract(_lastFoundGold).TotalSeconds);
-                if (goldUnchangedSeconds >= Trinity.Settings.Advanced.GoldInactivityTimer)
+                if (goldUnchangedSeconds >= Trinity.Settings.Advanced.InactivityTimer)
                 {
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Gold inactivity after {0}s. Sending abort.", goldUnchangedSeconds);
                     _lastFoundGold = DateTime.UtcNow;
