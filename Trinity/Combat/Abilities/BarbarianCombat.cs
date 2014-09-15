@@ -189,9 +189,10 @@ namespace Trinity.Combat.Abilities
                     !UseOOCBuff &&
                     CanCast(SNOPower.Barbarian_IgnorePain) &&
                     (Player.CurrentHealthPct <= V.F("Barbarian.IgnorePain.MinHealth") ||
-                    (Sets.TheLegacyOfRaekor.IsFullyEquipped && Player.CurrentHealthPct <= V.F("Barbarian.FuryDumpRaekor.MinHealth") &&
-                    (Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")
-                    && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
+                    (Sets.TheLegacyOfRaekor.IsFullyEquipped && (Player.CurrentHealthPct <= V.F("Barbarian.FuryDumpRaekor.MinHealth")
+                    || CurrentTarget.IsBossOrEliteRareUnique ||
+                    Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin"))
+                    && (GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
                     Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")) ||
                     isJailerOrFrozen);
             }

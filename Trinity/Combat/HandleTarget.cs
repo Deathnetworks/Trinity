@@ -398,9 +398,10 @@ namespace Trinity
                         if ((CurrentTarget.Type == GObjectType.Avoidance ||
                             CurrentTarget.Type == GObjectType.HealthGlobe ||
                             CurrentTarget.Type == GObjectType.PowerGlobe ||
-                            (CurrentTarget.Type == GObjectType.Gold && CombatBase.CanCast(SNOPower.DemonHunter_Vault)) ||
-                            ((CurrentTarget.Type == GObjectType.Container || CurrentTarget.Type == GObjectType.Item) &&
-                            CurrentTarget.Distance > 18f && CombatBase.CanCast(SNOPower.DemonHunter_Vault)) ||
+                            CurrentTarget.Type == GObjectType.ProgressionGlobe ||
+							(CurrentTarget.Type == GObjectType.Gold && CombatBase.CanCast(SNOPower.DemonHunter_Vault)) ||
+							((CurrentTarget.Type == GObjectType.Container || CurrentTarget.Type == GObjectType.Item) && 
+							CurrentTarget.Distance > 18f && CombatBase.CanCast(SNOPower.DemonHunter_Vault)) ||
                             Monk_SpecialMovement ||
                             (CurrentTarget.Type == GObjectType.Backtrack && Settings.Combat.Misc.AllowOOCMovement))
                             && NavHelper.CanRayCast(Player.Position, CurrentDestination)
@@ -568,6 +569,7 @@ namespace Trinity
                 case GObjectType.Gold:
                 case GObjectType.HealthGlobe:
                 case GObjectType.PowerGlobe:
+                case GObjectType.ProgressionGlobe:
                     {
                         int interactAttempts;
                         // Count how many times we've tried interacting
@@ -1181,6 +1183,7 @@ namespace Trinity
                     case GObjectType.Gold:
                     case GObjectType.PowerGlobe:
                     case GObjectType.HealthGlobe:
+                    case GObjectType.ProgressionGlobe:
                         action = "Pickup ";
                         break;
                     case GObjectType.Backtrack:
@@ -1355,6 +1358,7 @@ namespace Trinity
                     // * Globes - need to get within pickup radius only
                     case GObjectType.PowerGlobe:
                     case GObjectType.HealthGlobe:
+                    case GObjectType.ProgressionGlobe:
                         {
                             TargetRangeRequired = 2f;
                             TargetCurrentDistance = CurrentTarget.Distance;

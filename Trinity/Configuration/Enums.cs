@@ -45,6 +45,7 @@
         Mojo,
         Orb,
         PowerGlobe,
+        ProgressionGlobe,
         Quiver,
         Ring,
         Ruby,
@@ -89,6 +90,7 @@
         Gem,
         HealthGlobe,
         PowerGlobe,
+        ProgressionGlobe,
     }
 
     /// <summary>
@@ -113,6 +115,7 @@
         MarkerLocation,
         Player,
         PowerGlobe,
+        ProgressionGlobe,
         Proxy,
         SavePoint,
         ServerProp,
