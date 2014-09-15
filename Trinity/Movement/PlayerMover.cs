@@ -636,8 +636,8 @@ namespace Trinity.DbProvider
 
                 // Teleport for a wizard 
                  if (CombatBase.CanCast(SNOPower.Wizard_Teleport, CombatBase.CanCastFlags.NoTimer) &&
-                    CombatBase.TimeSincePowerUse(SNOPower.Wizard_Teleport) > 1350 &&
-                    destinationDistance >= 15f && !ShrinesInArea(vMoveToTarget))
+                    CombatBase.TimeSincePowerUse(SNOPower.Wizard_Teleport) > 1150 &&
+                    destinationDistance >= 20f && !ShrinesInArea(vMoveToTarget))
                 {
                     const float maxTeleportRange = 75f;
 

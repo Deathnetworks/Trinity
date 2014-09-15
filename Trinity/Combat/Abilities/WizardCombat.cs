@@ -102,7 +102,7 @@ namespace Trinity.Combat.Abilities
                 power = GetArchonPower();
             }
             
-            if (TargetUtil.AnyMobsInRange(25f, 3) || TargetUtil.IsEliteTargetInRange(70f))
+            if (TargetUtil.AnyMobsInRange(25f, 3) || TargetUtil.IsEliteTargetInRange(70f) || CurrentTarget.IsBossOrEliteRareUnique)
                 {
                     // Offensive Teleport: Calamity
                     if (CombatBase.CanCast(SNOPower.Wizard_Teleport, CombatBase.CanCastFlags.NoTimer) && Runes.Wizard.Calamity.IsActive)
