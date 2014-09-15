@@ -61,6 +61,9 @@ namespace Trinity.Combat.Abilities
             if (Sets.EmbodimentOfTheMarauder.IsFullyEquipped)
                 MinEnergyReserve = 70;
 
+            if (Player.PrimaryResource < MinEnergyReserve)
+                IsWaitingForSpecial = true;
+
             // NotSpam Shadow Power
             if (!Settings.Combat.DemonHunter.SpamShadowPower && CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
                 (!GetHasBuff(SNOPower.DemonHunter_ShadowPower) || Player.CurrentHealthPct <= Trinity.PlayerEmergencyHealthPotionLimit) && // if we don't have the buff or our health is low
@@ -73,10 +76,9 @@ namespace Trinity.Combat.Abilities
 
             // Sentry Turret
             if (!Player.IsIncapacitated && CanCast(SNOPower.DemonHunter_Sentry, CanCastFlags.NoTimer) &&
-               TargetUtil.AnyMobsInRange(65) &&
-               Player.PrimaryResource >= 30)
+               TargetUtil.AnyMobsInRange(65) && Player.PrimaryResource >= 30)
             {
-                return new TrinityPower(SNOPower.DemonHunter_Sentry, 65f, TargetUtil.GetBestClusterPoint(35f, 65f, false));
+                return new TrinityPower(SNOPower.DemonHunter_Sentry, 75f, TargetUtil.GetBestClusterPoint(35f, 75f, false));
             }
 
             // Caltrops
@@ -203,7 +205,7 @@ namespace Trinity.Combat.Abilities
 
             // Multi Shot
             if (CanCast(SNOPower.DemonHunter_Multishot) && !Player.IsIncapacitated &&
-                ((Player.PrimaryResource >= 30) || Player.PrimaryResource > MinEnergyReserve) &&
+                ((Player.PrimaryResource >= 30 && !IsWaitingForSpecial) || Player.PrimaryResource > MinEnergyReserve) &&
                 (TargetUtil.AnyMobsInRange(40, 2) || CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.IsTreasureGoblin))
             {
                 return new TrinityPower(SNOPower.DemonHunter_Multishot, 30f, CurrentTarget.Position);
@@ -258,7 +260,7 @@ namespace Trinity.Combat.Abilities
 
             // Elemental Arrow
             if (CanCast(SNOPower.DemonHunter_ElementalArrow) && !Player.IsIncapacitated &&
-                ((Player.PrimaryResource >= 10 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve || Legendary.Kridershot.IsEquipped))
+                ((Player.PrimaryResource >= 10 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve || Legendary.Kridershot.IsEquipped))
             {
                 return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 65f, CurrentTarget.ACDGuid);
             }
@@ -362,7 +364,9 @@ namespace Trinity.Combat.Abilities
             // M6 fully equipped but no hated spender flee/kite
             if (Sets.EmbodimentOfTheMarauder.IsFullyEquipped)
             {
-                return new TrinityPower(SNOPower.Walk, 2f, NavHelper.FindSafeZone(false, 0, CurrentTarget != null ? CurrentTarget.Position : Trinity.Player.Position, true));
+                if (Trinity.ObjectCache.Any(u => u.Type == GObjectType.Unit && u.Weight > 0 && u.RadiusDistance < 15f))
+                    return new TrinityPower(SNOPower.Walk, 2f, NavHelper.FindSafeZone(false, 0, CurrentTarget != null ? CurrentTarget.Position : Trinity.Player.Position, true));
+                return new TrinityPower(SNOPower.Walk, 2f, Trinity.Player.Position);
             }
 
             return null;
