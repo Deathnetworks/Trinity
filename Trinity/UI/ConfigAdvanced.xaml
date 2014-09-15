@@ -95,6 +95,7 @@
                 </GroupBox>
 
                 <!--Cache Refresh Rate-->
+                <!--
                 <GroupBox Header="Cache">
                     <StackPanel>
                         <TextBlock Text="Cache Refresh Rate (Default 300) - use with caution!" FontWeight="Bold" TextAlignment="Center" Margin="2"/>
@@ -110,6 +111,7 @@
                         ToolTip="Default 100. Increase value to decrease CPU usage."/>
                     </StackPanel>
                 </GroupBox>
+                -->
             </StackPanel>
             <WrapPanel VerticalAlignment="Bottom" HorizontalAlignment="Center" DockPanel.Dock="Bottom">
                 <!--Reset Button-->

@@ -273,12 +273,13 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.DemonHunter_Chakram, 50f, CurrentTarget.ACDGuid);
             }
 
+            // Rapid Fire
             if (CanCast(SNOPower.DemonHunter_RapidFire, CanCastFlags.NoTimer) &&
-                        !Player.IsIncapacitated && Player.PrimaryResource >= 16 &&
-                        (Player.PrimaryResource >= Settings.Combat.DemonHunter.RapidFireMinHatred || LastPowerUsed == SNOPower.DemonHunter_RapidFire))
+                !Player.IsIncapacitated && ((Player.PrimaryResource >= 16 && !IsWaitingForSpecial) || (Player.PrimaryResource > MinEnergyReserve)) &&
+                (Player.PrimaryResource >= Settings.Combat.DemonHunter.RapidFireMinHatred || LastPowerUsed == SNOPower.DemonHunter_RapidFire))
             {
                 // Players with grenades *AND* rapid fire should spam grenades at close-range instead
-                if (Hotbar.Contains(SNOPower.DemonHunter_Grenades) && CurrentTarget.RadiusDistance <= 18f)
+                if (CanCast(SNOPower.DemonHunter_Grenades) && CurrentTarget.RadiusDistance <= 18f)
                 {
                     return new TrinityPower(SNOPower.DemonHunter_Grenades, 18f, CurrentTarget.ACDGuid);
                 }
@@ -287,24 +288,11 @@ namespace Trinity.Combat.Abilities
             }
 
             // Impale
-            bool impalecheck = Hotbar.Contains(SNOPower.DemonHunter_Impale) && !Player.IsIncapacitated && (!TargetUtil.AnyMobsInRange(12, 4));
-            if (!Sets.EmbodimentOfTheMarauder.IsFullyEquipped)
+            if (CanCast(SNOPower.DemonHunter_Impale) && !TargetUtil.AnyMobsInRange(12, 4) &&
+                ((Player.PrimaryResource >= 25 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve) &&
+                CurrentTarget.RadiusDistance <= 75f)
             {
-                if (impalecheck &&
-                    ((Player.PrimaryResource >= 25 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve) &&
-                    CurrentTarget.RadiusDistance <= 50f)
-                {
-                    return new TrinityPower(SNOPower.DemonHunter_Impale, 50f, CurrentTarget.ACDGuid);
-                }
-            }
-            //We don't want to spam Impale if we have M6 equipped
-            else
-            {
-                if (impalecheck && ((Player.PrimaryResource >= 75 && !Player.WaitingForReserveEnergy)) &&
-                CurrentTarget.RadiusDistance <= 50f)
-                {
-                    return new TrinityPower(SNOPower.DemonHunter_Impale, 50f, CurrentTarget.ACDGuid);
-                }
+                return new TrinityPower(SNOPower.DemonHunter_Impale, 75f, CurrentTarget.ACDGuid);
             }
 
             // Evasive Fire
