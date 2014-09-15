@@ -929,7 +929,7 @@ namespace Trinity
                     {
                         // Pick a suitable ability
                         if (CurrentTarget != null)
-                            CombatBase.CurrentPower = AbilitySelector(false, false, false);
+                            CombatBase.CurrentPower = AbilitySelector();
                         if (CombatBase.CurrentPower.SNOPower == SNOPower.None && !Player.IsIncapacitated)
                         {
                             NoAbilitiesAvailableInARow++;
@@ -1481,12 +1481,6 @@ namespace Trinity
                         _isWaitingAfterPower = true;
                     }
                 }
-                //else
-                //{
-                //    PowerManager.CanCastFlags failFlags;
-                //    PowerManager.CanCast(CombatBase.CurrentPower.SNOPower, out failFlags);
-                //    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "UsePower FAILED {0} ({1}) at {2} on {3} dist={4}", CombatBase.CurrentPower.SNOPower, failFlags, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetACDGUID, dist);
-                //}
 
                 _shouldPickNewAbilities = true;
 

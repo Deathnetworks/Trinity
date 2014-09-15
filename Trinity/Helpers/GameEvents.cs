@@ -70,6 +70,8 @@ namespace Trinity
             UsedProfileManager.SetProfileInWindowTitle();
 
             BotManager.ReplaceTreeHooks();
+            TreeHooks.Instance.OnHooksCleared += BotManager.InstanceOnOnHooksCleared;
+
 
             PlayerMover.TimeLastRecordedPosition = DateTime.UtcNow;
             PlayerMover.LastRestartedGame = DateTime.UtcNow;

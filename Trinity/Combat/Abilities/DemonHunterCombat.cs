@@ -62,7 +62,13 @@ namespace Trinity.Combat.Abilities
                 MinEnergyReserve = 70;
 
             if (Player.PrimaryResource < MinEnergyReserve)
-                IsWaitingForSpecial = true;
+            {
+                Player.WaitingForReserveEnergy = IsWaitingForSpecial = true;
+            }
+            else
+            {
+                Player.WaitingForReserveEnergy = IsWaitingForSpecial = false;
+            }
 
             // NotSpam Shadow Power
             if (!Settings.Combat.DemonHunter.SpamShadowPower && CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
@@ -268,7 +274,7 @@ namespace Trinity.Combat.Abilities
             // Chakram normal attack
             if (Hotbar.Contains(SNOPower.DemonHunter_Chakram) && !Player.IsIncapacitated &&
                 !Runes.DemonHunter.ShurikenCloud.IsActive &&
-                ((Player.PrimaryResource >= 10 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
+                ((Player.PrimaryResource >= 10 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 return new TrinityPower(SNOPower.DemonHunter_Chakram, 50f, CurrentTarget.ACDGuid);
             }

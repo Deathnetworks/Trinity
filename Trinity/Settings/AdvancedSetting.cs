@@ -386,10 +386,11 @@ namespace Trinity.Config
         [OnDeserializing()]
         internal void OnDeserializingMethod(StreamingContext context)
         {
-            this._CacheRefreshRate = 100;
-            this._OutputReports = true;
-            this._ItemRulesLogs = true;
-            this._LogDroppedItems = true;
+            CacheRefreshRate = 100;
+            OutputReports = true;
+            ItemRulesLogs = true;
+            LogDroppedItems = true;
+            InactivityTimer = 600;
         }
         #endregion Methods
     }
