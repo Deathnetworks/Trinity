@@ -601,6 +601,7 @@ namespace Trinity.Combat.Abilities
                     case GObjectType.Destructible:
                     case GObjectType.HealthGlobe:
                     case GObjectType.PowerGlobe:
+                    case GObjectType.ProgressionGlobe:
                         {
                             if (Settings.Combat.Monk.TROption == TempestRushOption.TrashOnly &&
                                 (TargetUtil.AnyElitesInRange(40f) || CurrentTarget.IsBossOrEliteRareUnique))
