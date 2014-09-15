@@ -90,7 +90,7 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.X1_Crusader_Consecration);
                 }
                 // Akarats when off Cooldown
-                if (CrusaderSettings.UseAkaratsOffCooldown && CanCast(SNOPower.X1_Crusader_AkaratsChampion))
+                if (CrusaderSettings.SpamAkarats && CanCast(SNOPower.X1_Crusader_AkaratsChampion))
                 {
                     return new TrinityPower(SNOPower.X1_Crusader_AkaratsChampion);
                 }
@@ -164,7 +164,10 @@ namespace Trinity.Combat.Abilities
                 if (CanCastFistOfHeavens())
                 {
                     float range = Settings.Combat.Crusader.FistOfHeavensDist;
-                    return new TrinityPower(SNOPower.X1_Crusader_FistOfTheHeavens, range, TargetUtil.GetBestClusterUnit(8f).Position);
+                    float clusterRange = 8f;
+                    if (Runes.Crusader.DivineWell.IsActive)
+                        clusterRange = 18f;
+                    return new TrinityPower(SNOPower.X1_Crusader_FistOfTheHeavens, range, TargetUtil.GetBestClusterUnit(clusterRange).Position);
                 }
 
                 // Blessed Hammer
@@ -283,8 +286,7 @@ namespace Trinity.Combat.Abilities
 
         private static bool CanCastFistOfHeavens()
         {
-            return CanCast(SNOPower.X1_Crusader_FistOfTheHeavens) &&
-                (TargetUtil.ClusterExists(8f, 8f) || TargetUtil.EliteOrTrashInRange(8f) || Player.PrimaryResourcePct > 0.5);
+            return CanCast(SNOPower.X1_Crusader_FistOfTheHeavens, CanCastFlags.NoTimer);
         }
 
         private static bool CanCastBlessedHammer()

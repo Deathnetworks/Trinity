@@ -96,11 +96,11 @@
     <Compile Include="Combat\Abilities\BarbarianCombat.cs" />
     <Compile Include="Combat\Abilities\CombatBase.cs" />
     <Compile Include="Combat\Abilities\CrusaderCombat.cs" />
+    <Compile Include="Combat\Abilities\DemonHunterCombat.cs" />
     <Compile Include="Combat\Abilities\MonkCombat.cs" />
     <Compile Include="Combat\Abilities\SpellHistory.cs" />
     <Compile Include="Combat\Abilities\SpellHistoryItem.cs" />
     <Compile Include="Combat\Abilities\WitchDoctorCombat.cs" />
-    <Compile Include="Combat\Abilities\DemonHunter.cs" />
     <Compile Include="Combat\Abilities\WizardCombat.cs" />
     <Compile Include="Combat\AvoidanceManager.cs" />
     <Compile Include="Combat\AvoidanceType.cs" />

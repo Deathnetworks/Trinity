@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Trinity.Cache;
 using Trinity.Reference;
 using Zeta.Common;
-using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 
 namespace Trinity.Combat.Abilities
@@ -26,8 +24,6 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         internal static TrinityPower GetPower()
         {
-            TrinityPower power = null;
-
             // Buffs
             if (UseOOCBuff)
             {
@@ -54,8 +50,6 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         private static TrinityPower GetCombatAvoidancePower()
         {
-            TrinityPower power = null;
-
             // Defensive Teleport: SafePassage
             if (CanCast(SNOPower.Wizard_Teleport) && Runes.Wizard.SafePassage.IsActive &&
 
@@ -87,7 +81,7 @@ namespace Trinity.Combat.Abilities
             }
 
 
-            return power;
+            return null;
         }
 
         /// <summary>
@@ -150,8 +144,7 @@ namespace Trinity.Combat.Abilities
             {
                 if (TargetUtil.AnyMobsInRange(20f))
                     return new TrinityPower(SNOPower.Wizard_SlowTime); // cast of Self
-                else
-                    return new TrinityPower(SNOPower.Wizard_SlowTime, 55f, TargetUtil.GetBestClusterUnit(20f).Position);
+                return new TrinityPower(SNOPower.Wizard_SlowTime, 55f, TargetUtil.GetBestClusterUnit(20f).Position);
             }
 
             // Mirror Image  @ half health or 5+ monsters or rooted/incapacitated or last elite left @25% health
@@ -165,12 +158,13 @@ namespace Trinity.Combat.Abilities
             // Hydra
             if (CanCast(SNOPower.Wizard_Hydra, CanCastFlags.NoTimer))
             {
+                // ReSharper disable once InconsistentNaming
                 var _14s = TimeSpan.FromSeconds(14);
                 const float maxHydraDistance = 30f;
                 const float maxHydraDistSqr = maxHydraDistance * maxHydraDistance;
 
                 // This will check if We have the "Serpent Sparker" wand, and attempt to cast a 2nd hydra immediately after the first
-                
+
                 bool serpentSparkerRecast1 = Legendary.SerpentsSparker.IsEquipped && LastPowerUsed == SNOPower.Wizard_Hydra &&
                     SpellHistory.SpellUseCountInTime(SNOPower.Wizard_Hydra, TimeSpan.FromSeconds(2)) < 2;
 
@@ -201,7 +195,8 @@ namespace Trinity.Combat.Abilities
                 Trinity.ShouldRefreshHotbarAbilities = true;
                 return new TrinityPower(SNOPower.Wizard_Archon, 5, 5);
             }
-            else if (Hotbar.Contains(SNOPower.Wizard_Archon))
+
+            if (Hotbar.Contains(SNOPower.Wizard_Archon))
             {
                 Player.WaitingForReserveEnergy = true;
 
@@ -348,8 +343,6 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         private static TrinityPower GetBuffPower()
         {
-            TrinityPower power = null;
-
             // Illusionist speed boost
             if (Passives.Wizard.Illusionist.IsActive)
             {
@@ -415,7 +408,7 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.Wizard_MirrorImage);
             }
 
-            return power;
+            return null;
         }
 
         /// <summary>

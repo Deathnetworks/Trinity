@@ -793,8 +793,8 @@ namespace Trinity.Combat.Abilities
             get
             {
                 bool shouldGetNewZigZag =
-                    (DateTime.UtcNow.Subtract(Trinity.LastChangedZigZag).TotalMilliseconds >= V.I("Barbarian.Whirlwind.ZigZagMaxTime") ||
-                    CurrentTarget.ACDGuid != Trinity.LastZigZagUnitAcdGuid ||
+                    (DateTime.UtcNow.Subtract(LastChangedZigZag).TotalMilliseconds >= V.I("Barbarian.Whirlwind.ZigZagMaxTime") ||
+                    CurrentTarget.ACDGuid != LastZigZagUnitAcdGuid ||
                     ZigZagPosition.Distance2D(Player.Position) <= 5f);
                 bool hasRLTW = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_Sprint && s.RuneIndex == 2);
 
@@ -813,8 +813,8 @@ namespace Trinity.Combat.Abilities
                         return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), ZigZagPosition, Trinity.CurrentWorldDynamicId, -1, 0, 1);
                     }
 
-                    Trinity.LastZigZagUnitAcdGuid = CurrentTarget.ACDGuid;
-                    Trinity.LastChangedZigZag = DateTime.UtcNow;
+                    LastZigZagUnitAcdGuid = CurrentTarget.ACDGuid;
+                    LastChangedZigZag = DateTime.UtcNow;
                 }
                 return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), ZigZagPosition, Trinity.CurrentWorldDynamicId, -1, 0, 1);
             }

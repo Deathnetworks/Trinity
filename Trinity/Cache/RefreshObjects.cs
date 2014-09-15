@@ -47,7 +47,7 @@ namespace Trinity
                 Logger.LogError("Hero is invalid!");
                 return false;
             }
-            
+
             if (!ZetaDia.IsInGame)
                 return false;
 
@@ -426,27 +426,31 @@ namespace Trinity
                 });
             }
 
-            // Add Rift Guardian POI's or Markers to ObjectCache
-            const int riftGuardianMarkerTexture = 81058;
-            bool isRiftGuardianQuestStep = ZetaDia.CurrentQuest.QuestSNO == 337492 && ZetaDia.CurrentQuest.StepId == 16;
-            Func<MinimapMarker, bool> riftGuardianMarkerFunc = m => m.IsValid && ((m.IsPointOfInterest && isRiftGuardianQuestStep) || m.MinimapTexture == riftGuardianMarkerTexture);
 
-            foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(riftGuardianMarkerFunc))
+            bool isRiftGuardianQuestStep = ZetaDia.CurrentQuest.QuestSNO == 337492 && ZetaDia.CurrentQuest.StepId == 16;
+
+            if (isRiftGuardianQuestStep)
             {
-                ObjectCache.Add(new TrinityCacheObject()
+                // Add Rift Guardian POI's or Markers to ObjectCache
+                const int riftGuardianMarkerTexture = 81058;
+                Func<MinimapMarker, bool> riftGuardianMarkerFunc = m => m.IsValid && (m.IsPointOfInterest || m.MinimapTexture == riftGuardianMarkerTexture);
+
+                foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(riftGuardianMarkerFunc))
                 {
-                    Position = marker.Position,
-                    InternalName = "Rift Guardian",
-                    Distance = marker.Position.Distance(Player.Position),
-                    ActorType = ActorType.Monster,
-                    Type = GObjectType.Unit,
-                    Radius = 10f,
-                    Weight = 5000,
-                });
+                    ObjectCache.Add(new TrinityCacheObject()
+                    {
+                        Position = marker.Position,
+                        InternalName = "Rift Guardian",
+                        Distance = marker.Position.Distance(Player.Position),
+                        ActorType = ActorType.Monster,
+                        Type = GObjectType.Unit,
+                        Radius = 10f,
+                        Weight = 5000,
+                    });
+                }
             }
 
-            bool isInRift = ZetaDia.CurrentQuest.QuestSNO == 337492 && ZetaDia.CurrentQuest.StepId == 16;
-            if (isInRift || Player.ParticipatingInTieredLootRun) // X1_LR_DungeonFinder
+            if (isRiftGuardianQuestStep || Player.ParticipatingInTieredLootRun) // X1_LR_DungeonFinder
             {
                 foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsPointOfInterest))
                 {

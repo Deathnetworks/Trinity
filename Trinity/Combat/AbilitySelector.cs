@@ -111,7 +111,7 @@ namespace Trinity
                             break;
                         // Demon Hunters
                         case ActorClass.DemonHunter:
-                            power = GetDemonHunterPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
+                            power = DemonHunterCombat.GetPower();
                             break;
                     }
                 }
