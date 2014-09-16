@@ -734,7 +734,8 @@ namespace Trinity
                             break;
                         }
 
-                        if (!DataDictionary.ForceDestructibles.Contains(CurrentCacheObject.ActorSNO) && Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.ForceIgnore)
+                        if ((!DataDictionary.ForceDestructibles.Contains(CurrentCacheObject.ActorSNO) || !DataDictionary.GoblinDestructibles.Contains(CurrentCacheObject.ActorSNO))
+                            && Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.ForceIgnore)
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "ForceIgnoreDestructibles";

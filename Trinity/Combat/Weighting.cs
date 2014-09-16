@@ -966,6 +966,13 @@ namespace Trinity
                                     break;
                                 }
 
+                                if (DataDictionary.GoblinDestructibles.Contains(cacheObject.ActorSNO))
+                                {
+                                    objWeightInfo += "ForceDestructibles";
+                                    cacheObject.Weight = MaxWeight;
+                                    break;
+                                }
+
                                 // Not Stuck, skip!
                                 if (Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.OnlyIfStuck &&
                                     cacheObject.RadiusDistance > 0 &&
