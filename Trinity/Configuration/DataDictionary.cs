@@ -861,6 +861,16 @@ namespace Trinity
             225252, // Shamanic Ward - Revenge of Gharbad bounty
 
             331397, // x1_westm_Graveyard_Floor_Sarcophagus_Undead_Husband_Event
+
+            // Greed's Domain Gold Objects
+            392606, // p1_Tgoblin_Vase_C
+            392605, // p1_Tgoblin_Vase_C - Alt
+            391765, // p1_Tgoblin_Vase_A
+            391763, // p1_Tgoblin_Vase_A - Alt
+            383315, // p1_Tgoblin_Gold_Pile_A
+            390498, // p1_Tgoblin_Gold_Pile_A - Alt
+            386269, // p1_Tgoblin_Gold_Pile_C
+            386274, // p1_Tgoblin_Gold_Pile_C - Alt
         };
 
         /// <summary>
