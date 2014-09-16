@@ -24,6 +24,8 @@ namespace Trinity.Config
         private bool _OutputReports;
         private bool _ItemRulesLogs;
         private bool _ShowBattleTag;
+        private bool _ShowHeroName;
+        private bool _ShowHeroClass;
         private bool _DisableAllMovement;
         #endregion Fields
 
@@ -328,6 +330,42 @@ namespace Trinity.Config
                 {
                     _ShowBattleTag = value;
                     OnPropertyChanged("ShowBattleTag");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool ShowHeroName
+        {
+            get
+            {
+                return _ShowHeroName;
+            }
+            set
+            {
+                if (_ShowHeroName != value)
+                {
+                    _ShowHeroName = value;
+                    OnPropertyChanged("ShowHeroName");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool ShowHeroClass
+        {
+            get
+            {
+                return _ShowHeroClass;
+            }
+            set
+            {
+                if (_ShowHeroClass != value)
+                {
+                    _ShowHeroClass = value;
+                    OnPropertyChanged("ShowHeroClass");
                 }
             }
         }

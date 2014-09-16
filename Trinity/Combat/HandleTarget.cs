@@ -58,23 +58,10 @@ namespace Trinity
         /// </summary>
         /// <param name="rs"></param>
         /// <returns></returns>
-        private static RunStatus GetTreeSharpRunStatus(HandlerRunStatus rs)
+        private static bool GetTaskResult(bool result)
         {
             MonkCombat.Monk_MaintainTempestRush();
 
-            RunStatus treeRunStatus;
-
-            switch (rs)
-            {
-                case HandlerRunStatus.TreeFailure:
-                    treeRunStatus = RunStatus.Failure; break;
-                case HandlerRunStatus.TreeRunning:
-                    treeRunStatus = RunStatus.Running; break;
-                case HandlerRunStatus.TreeSuccess:
-                    treeRunStatus = RunStatus.Success; break;
-                default:
-                    throw new ApplicationException("Unable to return Non-TreeSharp RunStatus");
-            }
             string extras = "";
             if (_isWaitingForPower)
                 extras += " IsWaitingForPower";
@@ -99,8 +86,8 @@ namespace Trinity
             if (CombatBase.CurrentPower != null && (CombatBase.CurrentPower.ShouldWaitBeforeUse || CombatBase.CurrentPower.ShouldWaitAfterUse))
                 extras += " " + CombatBase.CurrentPower;
 
-            Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Handle Target returning {0} to tree" + extras, treeRunStatus);
-            return treeRunStatus;
+            Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Handle Target returning {0} to tree" + extras, result);
+            return result;
 
         }
 
@@ -117,12 +104,12 @@ namespace Trinity
                     if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
                     {
                         Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "No longer in game world", true);
-                        return false;
+                        return GetTaskResult(false);
                     }
                     if (ZetaDia.Me.IsDead)
                     {
                         Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Player is dead", true);
-                        return false;
+                        return GetTaskResult(false);
                     }
 
                     // Make sure we reset unstucker stuff here
@@ -191,7 +178,7 @@ namespace Trinity
                     if (CombatBase.CombatMovement.IsQueuedMovement & CombatBase.IsCombatAllowed)
                     {
                         await CombatBase.CombatMovement.Execute();
-                        return true;
+                        return GetTaskResult(true);
                     }
 
                     while (CurrentTarget == null && (ForceVendorRunASAP || IsReadyToTownRun) && !Zeta.Bot.Logic.BrainBehavior.IsVendoring && TownRun.TownRunTimerRunning())
@@ -209,19 +196,19 @@ namespace Trinity
                     if (CurrentTarget == null && TownRun.IsTryingToTownPortal() && TownRun.TownRunTimerFinished())
                     {
                         Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "Town Run Ready!");
-                        return true;
+                        return GetTaskResult(true);
                     }
 
 
                     if (CurrentTarget == null)
                     {
                         Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "CurrentTarget set as null in refresh! Error 2");
-                        return false;
+                        return GetTaskResult(true);
                     }
 
                     // Handle Target stuck / timeout
                     if (await HandleTargetTimeoutTask())
-                        return true;
+                        return GetTaskResult(true);
 
                     // This variable just prevents an instant 2-target update after coming here from the main decorator function above
                     _isWholeNewTarget = false;
@@ -231,7 +218,7 @@ namespace Trinity
                     // Pop a potion when necessary
 
                     if (await UsePotionIfNeededTask())
-                        return true;
+                        return GetTaskResult(true);
 
 
                     using (new PerformanceLogger("HandleTarget.CheckAvoidanceBuffs"))
@@ -345,7 +332,7 @@ namespace Trinity
                             UpdateStatusTextTarget(true);
 
                             HandleObjectInRange();
-                            return true;
+                            return GetTaskResult(true);
                         }
 
                     }
@@ -361,12 +348,12 @@ namespace Trinity
                     if (Player.IsIncapacitated || Player.IsRooted)
                     {
                         Logger.Log(LogCategory.Behavior, "Player is rooted or incapacitated!");
-                        return true;
+                        return GetTaskResult(true);
                     }
 
                     // Check to see if we're stuck in moving to the target
-                    if (await HandleTargetDistanceCheck())
-                        return true;
+                    if (HandleTargetDistanceCheck())
+                        return GetTaskResult(true);
 
                     // Update the last distance stored
                     LastDistanceFromTarget = TargetCurrentDistance;
@@ -380,7 +367,7 @@ namespace Trinity
                     // See if we want to ACTUALLY move, or are just waiting for the last move command...
                     if (!ForceNewMovement && IsAlreadyMoving && CurrentDestination == LastMoveToTarget && DateTime.UtcNow.Subtract(lastMovementCommand).TotalMilliseconds <= 100)
                     {
-                        return true;
+                        return GetTaskResult(true);
                     }
                     using (new PerformanceLogger("HandleTarget.SpecialMovement"))
                     {
@@ -422,7 +409,7 @@ namespace Trinity
                                     if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                                         _timesBlockedMoving = 0;
 
-                                    return true;
+                                    return GetTaskResult(true);
                                 }
                                 // Tempest rush for a monk
                                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Monk_TempestRush) && Player.PrimaryResource >= Settings.Combat.Monk.TR_MinSpirit &&
@@ -439,7 +426,7 @@ namespace Trinity
                                     // Reset total body-block count, since we should have moved
                                     if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                                         _timesBlockedMoving = 0;
-                                    return true;
+                                    return GetTaskResult(true);
                                 }
                                 // Strafe for a Demon Hunter
                                 if (Attackable_SpecialMovement && !bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Strafe) && Player.PrimaryResource >= 15)
@@ -450,7 +437,7 @@ namespace Trinity
                                     // Reset total body-block count, since we should have moved
                                     if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                                         _timesBlockedMoving = 0;
-                                    return true;
+                                    return GetTaskResult(true);
                                 }
                             }
                             if (bFoundSpecialMovement)
@@ -460,7 +447,7 @@ namespace Trinity
                                 // Reset total body-block count, since we should have moved
                                 if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                                     _timesBlockedMoving = 0;
-                                return true;
+                                return GetTaskResult(true);
                             }
                         }
                     }
@@ -494,18 +481,18 @@ namespace Trinity
                         if ((!_forceCloseRangeTarget || DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds > ForceCloseRangeForMilliseconds) &&
                             DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                             _timesBlockedMoving = 0;
-                        return true;
+                        return GetTaskResult(true);
                     }
                 }
                 catch (Exception ex)
                 {
                     Logger.LogError("Error in HandleTarget: {0}", ex.Message);
-                    return false;
+                    return GetTaskResult(true);
                 }
 
                 HandleTargetBasicMovement(ForceNewMovement);
 
-                return true;
+                return GetTaskResult(true);
             }
         }
 
@@ -761,7 +748,7 @@ namespace Trinity
             }
         }
 
-        private static async Task<bool> HandleTargetDistanceCheck()
+        private static bool HandleTargetDistanceCheck()
         {
             using (new PerformanceLogger("HandleTarget.DistanceEqualCheck"))
             {
@@ -769,7 +756,7 @@ namespace Trinity
                 if (Math.Abs(TargetCurrentDistance - LastDistanceFromTarget) < 5f && PlayerMover.GetMovementSpeed() < 1)
                 {
                     ForceNewMovement = true;
-                    if (DateTime.UtcNow.Subtract(_lastMovedDuringCombat).TotalMilliseconds >= 500)
+                    if (DateTime.UtcNow.Subtract(_lastMovedDuringCombat).TotalMilliseconds >= 250)
                     {
                         _lastMovedDuringCombat = DateTime.UtcNow;
                         // We've been stuck at least 250 ms, let's go and pick new targets etc.
@@ -779,21 +766,9 @@ namespace Trinity
                         // And tell Trinity to get a new target
                         _forceTargetUpdate = true;
 
-                        // If we were backtracking and failed, remove the current backtrack and try and move to the next
-                        if (CurrentTarget.Type == GObjectType.Backtrack && _timesBlockedMoving >= 2)
-                        {
-                            BacktrackList.Remove(TotalBacktracks);
-                            TotalBacktracks--;
-                            if (TotalBacktracks <= 1)
-                            {
-                                TotalBacktracks = 0;
-                                BacktrackList = new SortedList<int, Vector3>();
-                            }
-                        }
                         // Reset the emergency loop counter and return success
                         return true;
                     }
-                    // Been 250 milliseconds of non-movement?
                 }
                 else
                 {
@@ -898,18 +873,18 @@ namespace Trinity
                             Blacklist15Seconds.Add(CurrentTarget.RActorGuid);
                             Blacklist15LastClear = DateTime.UtcNow;
                             CurrentTarget = null;
-                            return true;
+                            return GetTaskResult(true);
                         }
                         if (CurrentTarget.Type == GObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary)
                         {
                             // Don't blacklist legendaries!!
-                            return true;
+                            return GetTaskResult(true);
                         }
 
                         Blacklist90Seconds.Add(CurrentTarget.RActorGuid);
                         Blacklist90LastClear = DateTime.UtcNow;
                         CurrentTarget = null;
-                        return true;
+                        return GetTaskResult(true);
                     }
                 }
                 return false;
@@ -980,7 +955,7 @@ namespace Trinity
                         dynamicId = legendaryPotions.FirstOrDefault().DynamicId;
                         ZetaDia.Me.Inventory.UseItem(dynamicId);
                         SpellHistory.RecordSpell(new TrinityPower(SNOPower.DrinkHealthPotion));
-                        return true;
+                        return GetTaskResult(true);
                     }
                     if (regularPotions.Any())
                     {
@@ -988,7 +963,7 @@ namespace Trinity
                         dynamicId = regularPotions.FirstOrDefault().DynamicId;
                         ZetaDia.Me.Inventory.UseItem(dynamicId);
                         SpellHistory.RecordSpell(new TrinityPower(SNOPower.DrinkHealthPotion));
-                        return true;
+                        return GetTaskResult(true);
                     }
 
                     Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "No Available potions!", 0);
