@@ -649,6 +649,7 @@ namespace Trinity
                     }
                 case GObjectType.PowerGlobe:
                 case GObjectType.HealthGlobe:
+                case GObjectType.ProgressionGlobe:
                     {
                         AddToCache = true;
                         break;

@@ -178,6 +178,8 @@ namespace Trinity
                     break;
                 case GItemBaseType.HealthGlobe:
                     return true;
+                case GItemBaseType.ProgressionGlobe:
+                    return true;
                 case GItemBaseType.Unknown:
                     return false;
                 default:
@@ -400,6 +402,7 @@ namespace Trinity
             if (name.StartsWith("wizardhat_")) return GItemType.WizardHat;
             if (name.StartsWith("xbow_")) return GItemType.TwoHandCrossbow;
             if (name == "console_powerglobe") return GItemType.PowerGlobe;
+            if (name.StartsWith("tiered_rifts_Orb")) return GItemType.ProgressionGlobe;
             if (name.StartsWith("consumable_add_sockets")) return GItemType.ConsumableAddSockets; // Ramaladni's Gift
             if (name.StartsWith("tieredlootrunkey_")) return GItemType.TieredLootrunKey;
 
@@ -545,6 +548,10 @@ namespace Trinity
             else if (itemType == GItemType.PowerGlobe)
             {
                 itemBaseType = GItemBaseType.PowerGlobe;
+            }
+            else if (itemType == GItemType.ProgressionGlobe)
+            {
+                itemBaseType = GItemBaseType.ProgressionGlobe;
             }
             return itemBaseType;
         }

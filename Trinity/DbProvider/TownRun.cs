@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Navigation;
 using Trinity.Config.Loot;
 using Trinity.Items;
 using Trinity.Notifications;
@@ -18,7 +17,6 @@ using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using Zeta.TreeSharp;
-using Action = Zeta.TreeSharp.Action;
 using Logger = Trinity.Technicals.Logger;
 using NotificationManager = Trinity.Notifications.NotificationManager;
 

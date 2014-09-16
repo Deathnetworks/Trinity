@@ -658,6 +658,34 @@ namespace Trinity
 
                                 break;
                             }
+                        case GObjectType.ProgressionGlobe:
+                            {
+                                if (!TownRun.IsTryingToTownPortal())
+                                {
+                                    cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * MaxWeight;
+                                }
+
+                                // Point-blank items get a weight increase 
+                                if (cacheObject.GoldAmount <= 0 && cacheObject.Distance <= 12f)
+                                    cacheObject.Weight += 1000d;
+
+                                // If there's a monster in the path-line to the item, reduce the weight to 1
+                                if (CacheData.MonsterObstacles.Any(cp => MathUtil.IntersectsPath(cp.Position, cp.Radius * 1.2f, Player.Position, cacheObject.Position)))
+                                    cacheObject.Weight = 1;
+
+                                // See if there's any AOE avoidance in that spot or inbetween us, if so reduce the weight to 1
+                                if (CacheData.TimeBoundAvoidance.Any(a => MathUtil.IntersectsPath(a.Position, a.Radius + 5f, Player.Position, cacheObject.Position)))
+                                    cacheObject.Weight = 1;
+
+                                if (navBlocking)
+                                {
+                                    objWeightInfo += " NavBlocking";
+                                    cacheObject.Weight = 0;
+                                    break;
+                                }
+
+                                break;
+                            }
                         case GObjectType.HealthGlobe:
                             {
                                 if (navBlocking)

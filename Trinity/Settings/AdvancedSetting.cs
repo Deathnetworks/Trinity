@@ -24,6 +24,8 @@ namespace Trinity.Config
         private bool _OutputReports;
         private bool _ItemRulesLogs;
         private bool _ShowBattleTag;
+        private bool _ShowHeroName;
+        private bool _ShowHeroClass;
         private bool _DisableAllMovement;
         #endregion Fields
 
@@ -334,6 +336,42 @@ namespace Trinity.Config
 
         [DataMember(IsRequired = false)]
         [DefaultValue(false)]
+        public bool ShowHeroName
+        {
+            get
+            {
+                return _ShowHeroName;
+            }
+            set
+            {
+                if (_ShowHeroName != value)
+                {
+                    _ShowHeroName = value;
+                    OnPropertyChanged("ShowHeroName");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool ShowHeroClass
+        {
+            get
+            {
+                return _ShowHeroClass;
+            }
+            set
+            {
+                if (_ShowHeroClass != value)
+                {
+                    _ShowHeroClass = value;
+                    OnPropertyChanged("ShowHeroClass");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
         public bool DisableAllMovement
         {
             get
@@ -386,10 +424,11 @@ namespace Trinity.Config
         [OnDeserializing()]
         internal void OnDeserializingMethod(StreamingContext context)
         {
-            this._CacheRefreshRate = 100;
-            this._OutputReports = true;
-            this._ItemRulesLogs = true;
-            this._LogDroppedItems = true;
+            CacheRefreshRate = 100;
+            OutputReports = true;
+            ItemRulesLogs = true;
+            LogDroppedItems = true;
+            InactivityTimer = 600;
         }
         #endregion Methods
     }

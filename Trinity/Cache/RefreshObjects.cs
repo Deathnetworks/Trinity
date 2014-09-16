@@ -47,7 +47,7 @@ namespace Trinity
                 Logger.LogError("Hero is invalid!");
                 return false;
             }
-            
+
             if (!ZetaDia.IsInGame)
                 return false;
 
@@ -171,7 +171,6 @@ namespace Trinity
                 }
 
 
-
                 // Reduce ignore-for-loops counter
                 if (_ignoreTargetForLoops > 0)
                     _ignoreTargetForLoops--;
@@ -188,25 +187,25 @@ namespace Trinity
                     if (_standingInAvoidance && (!AnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
                         DateTime.UtcNow.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= cancelledEmergencyMoveForMilliseconds)
                     {
-                        Vector3 vAnySafePoint = NavHelper.FindSafeZone(false, 1, Player.Position, true, null, true);
+                        Vector3 safePosition = NavHelper.FindSafeZone(false, 1, Player.Position, true, null, true);
 
                         // Ignore avoidance stuff if we're incapacitated or didn't find a safe spot we could reach
-                        if (vAnySafePoint != Vector3.Zero)
+                        if (safePosition != Vector3.Zero)
                         {
                             if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                             {
                                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting Avoidance: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}",
-                                    vAnySafePoint, vAnySafePoint.Distance(Me.Position), MathUtil.GetHeading(MathUtil.FindDirectionDegree(Me.Position, vAnySafePoint)),
+                                    safePosition, safePosition.Distance(Me.Position), MathUtil.GetHeading(MathUtil.FindDirectionDegree(Me.Position, safePosition)),
                                     Player.CurrentHealthPct, CombatBase.PlayerKiteDistance);
                             }
 
                             hasFoundSafePoint = true;
                             CurrentTarget = new TrinityCacheObject()
                                 {
-                                    Position = vAnySafePoint,
+                                    Position = safePosition,
                                     Type = GObjectType.Avoidance,
                                     Weight = 20000,
-                                    Distance = Vector3.Distance(Player.Position, vAnySafePoint),
+                                    Distance = Vector3.Distance(Player.Position, safePosition),
                                     Radius = 2f,
                                     InternalName = "SafePoint"
                                 }; ;
@@ -344,7 +343,6 @@ namespace Trinity
                         return true;
                     }
 
-
                     if (CurrentTarget.IsUnit)
                         lastHadUnitInSights = DateTime.UtcNow;
 
@@ -426,27 +424,31 @@ namespace Trinity
                 });
             }
 
-            // Add Rift Guardian POI's or Markers to ObjectCache
-            const int riftGuardianMarkerTexture = 81058;
-            bool isRiftGuardianQuestStep = ZetaDia.CurrentQuest.QuestSNO == 337492 && ZetaDia.CurrentQuest.StepId == 16;
-            Func<MinimapMarker, bool> riftGuardianMarkerFunc = m => m.IsValid && ((m.IsPointOfInterest && isRiftGuardianQuestStep) || m.MinimapTexture == riftGuardianMarkerTexture);
 
-            foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(riftGuardianMarkerFunc))
+            bool isRiftGuardianQuestStep = ZetaDia.CurrentQuest.QuestSNO == 337492 && ZetaDia.CurrentQuest.StepId == 16;
+
+            if (isRiftGuardianQuestStep)
             {
-                ObjectCache.Add(new TrinityCacheObject()
+                // Add Rift Guardian POI's or Markers to ObjectCache
+                const int riftGuardianMarkerTexture = 81058;
+                Func<MinimapMarker, bool> riftGuardianMarkerFunc = m => m.IsValid && (m.IsPointOfInterest || m.MinimapTexture == riftGuardianMarkerTexture);
+
+                foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(riftGuardianMarkerFunc))
                 {
-                    Position = marker.Position,
-                    InternalName = "Rift Guardian",
-                    Distance = marker.Position.Distance(Player.Position),
-                    ActorType = ActorType.Monster,
-                    Type = GObjectType.Unit,
-                    Radius = 10f,
-                    Weight = 5000,
-                });
+                    ObjectCache.Add(new TrinityCacheObject()
+                    {
+                        Position = marker.Position,
+                        InternalName = "Rift Guardian",
+                        Distance = marker.Position.Distance(Player.Position),
+                        ActorType = ActorType.Monster,
+                        Type = GObjectType.Unit,
+                        Radius = 10f,
+                        Weight = 5000,
+                    });
+                }
             }
 
-            bool isInRift = ZetaDia.CurrentQuest.QuestSNO == 337492 && ZetaDia.CurrentQuest.StepId == 16;
-            if (isInRift || Player.ParticipatingInTieredLootRun) // X1_LR_DungeonFinder
+            if (isRiftGuardianQuestStep || Player.ParticipatingInTieredLootRun) // X1_LR_DungeonFinder
             {
                 foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsPointOfInterest))
                 {

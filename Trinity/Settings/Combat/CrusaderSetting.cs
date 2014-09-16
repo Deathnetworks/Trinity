@@ -7,7 +7,8 @@ namespace Trinity.Config.Combat
     public class CrusaderSetting : ITrinitySetting<CrusaderSetting>, IAvoidanceHealth, INotifyPropertyChanged
     {
         #region Fields
-        private bool _UseAkaratsOnCooldown;
+        private bool _spamPhalanx;
+        private bool _SpamAkarats;
         private int _TauntAoECount;
         private int _SweepAttackAoECount;
         private int _JudgmentAoECount;
@@ -81,18 +82,36 @@ namespace Trinity.Config.Combat
 
         [DataMember(IsRequired = false)]
         [DefaultValue(false)]
-        public bool UseAkaratsOffCooldown
+        public bool SpamPhalanx
         {
             get
             {
-                return _UseAkaratsOnCooldown;
+                return _spamPhalanx;
             }
             set
             {
-                if (_UseAkaratsOnCooldown != value)
+                if (_spamPhalanx != value)
                 {
-                    _UseAkaratsOnCooldown = value;
-                    OnPropertyChanged("UseAkaratsOnCooldown");
+                    _spamPhalanx = value;
+                    OnPropertyChanged("SpamPhalanx");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool SpamAkarats
+        {
+            get
+            {
+                return _SpamAkarats;
+            }
+            set
+            {
+                if (_SpamAkarats != value)
+                {
+                    _SpamAkarats = value;
+                    OnPropertyChanged("SpamAkarats");
                 }
             }
         }

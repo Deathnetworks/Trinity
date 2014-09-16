@@ -1,13 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Trinity.Cache;
 using Trinity.Helpers;
 using Trinity.Objects;
-using Zeta.Common;
-using Zeta.Game;
 using Zeta.Game.Internals.Actors;
-using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.Reference
 {
@@ -5163,7 +5159,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item MaraudersEncasement = new Item
         {
-            Id = 0,
+            Id = 336993,
             Name = "Marauder's Encasement",
             Quality = ItemQuality.Legendary,
             Slug = "marauders-encasement",
@@ -5303,7 +5299,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item SkelonsDeceit = new Item
         {
-            Id = 0,
+            Id = 222476,
             Name = "Skelon's Deceit",
             Quality = ItemQuality.Legendary,
             Slug = "skelons-deceit",
@@ -5343,7 +5339,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item CainsHabit = new Item
         {
-            Id = 0,
+            Id = 197218,
             Name = "Cain's Habit",
             Quality = ItemQuality.Legendary,
             Slug = "cains-habit",
@@ -5363,7 +5359,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item CaptainCrimsonsThrust = new Item
         {
-            Id = 0,
+            Id = 197214,
             Name = "Captain Crimson's Thrust",
             Quality = ItemQuality.Legendary,
             Slug = "captain-crimsons-thrust",
@@ -5403,7 +5399,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HellfireRingStrength = new Item
         {
-            Id = 0,
+            Id = 260327,
             Name = "Hellfire Ring Strength",
             Quality = ItemQuality.Legendary,
             Slug = "hellfire-ring-of-strength",
@@ -5423,7 +5419,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HellfireRingIntelligence = new Item
         {
-            Id = 0,
+            Id = 260327,
             Name = "Hellfire Ring Intelligence",
             Quality = ItemQuality.Legendary,
             Slug = "hellfire-ring-of-intelligence",
@@ -5443,7 +5439,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HellfireRingVitality = new Item
         {
-            Id = 0,
+            Id = 260327,
             Name = "Hellfire Ring Vitality",
             Quality = ItemQuality.Legendary,
             Slug = "hellfire-ring-of-vitality",
@@ -5463,7 +5459,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HellfireRingDexterity = new Item
         {
-            Id = 0,
+            Id = 260327,
             Name = "Hellfire Ring Dexterity",
             Quality = ItemQuality.Legendary,
             Slug = "hellfire-ring-of-dexterity",
@@ -5703,7 +5699,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item TheTallMansFinger = new Item
         {
-            Id = 0,
+            Id = 298088,
             Name = "The Tall Man's Finger",
             Quality = ItemQuality.Legendary,
             Slug = "the-tall-mans-finger",
@@ -5743,7 +5739,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item BulkathossWeddingBand = new Item
         {
-            Id = 0,
+            Id = 212603,
             Name = "Bul-Kathos's Wedding Band",
             Quality = ItemQuality.Legendary,
             Slug = "bulkathoss-wedding-band",
@@ -5923,7 +5919,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item Unity = new Item
         {
-            Id = 0,
+            Id = 212581,
             Name = "Unity",
             Quality = ItemQuality.Legendary,
             Slug = "unity",
@@ -6123,7 +6119,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item CainsSandals = new Item
         {
-            Id = 0,
+            Id = 197225,
             Name = "Cain's Sandals",
             Quality = ItemQuality.Legendary,
             Slug = "cains-slippers",
@@ -6163,7 +6159,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item CaptainCrimsonsWhalers = new Item
         {
-            Id = 0,
+            Id = 197221,
             Name = "Captain Crimson's Whalers",
             Quality = ItemQuality.Legendary,
             Slug = "captain-crimsons-deck-boots",
@@ -6223,7 +6219,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item LostBoys = new Item
         {
-            Id = 0,
+            Id = 205621,
             Name = "Lost Boys",
             Quality = ItemQuality.Legendary,
             Slug = "lost-boys",
@@ -6263,7 +6259,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item IceClimbers = new Item
         {
-            Id = 0,
+            Id = 222464,
             Name = "Ice Climbers",
             Quality = ItemQuality.Legendary,
             Slug = "ice-climbers",
@@ -6383,7 +6379,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item EightdemonBoots = new Item
         {
-            Id = 0,
+            Id = 338031,
             Name = "Eight-Demon Boots",
             Quality = ItemQuality.Legendary,
             Slug = "eightdemon-boots",
@@ -6623,7 +6619,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item CainsTravelers = new Item
         {
-            Id = 0,
+            Id = 197225,
             Name = "Cain's Travelers",
             Quality = ItemQuality.Legendary,
             Slug = "cains-travelers",
@@ -6803,7 +6799,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item FrydehrsWrath = new Item
         {
-            Id = 0,
+            Id = 405429,
             Name = "Frydehr’s Wrath",
             Quality = ItemQuality.Legendary,
             Slug = "frydehrs-wrath",
@@ -6823,7 +6819,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item UnrelentingPhalanx = new Item
         {
-            Id = 0,
+            Id = 405514,
             Name = "Unrelenting Phalanx",
             Quality = ItemQuality.Legendary,
             Slug = "unrelenting-phalanx",
@@ -7063,7 +7059,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item WallOfMan = new Item
         {
-            Id = 0,
+            Id = 152667,
             Name = "Wall of Man",
             Quality = ItemQuality.Legendary,
             Slug = "wall-of-man",
@@ -7383,7 +7379,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item SpinesOfSeethingHatred = new Item
         {
-            Id = 0,
+            Id = 197628,
             Name = "Spines of Seething Hatred",
             Quality = ItemQuality.Legendary,
             Slug = "spines-of-seething-hatred",
@@ -7463,7 +7459,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item MeticulousBolts = new Item
         {
-            Id = 0,
+            Id = 197624,
             Name = "Meticulous Bolts",
             Quality = ItemQuality.Legendary,
             Slug = "meticulous-bolts",
@@ -7663,7 +7659,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HallowedStorm = new Item
         {
-            Id = 0,
+            Id = 223461,
             Name = "Hallowed Storm",
             Quality = ItemQuality.Legendary,
             Slug = "hallowed-divide",
@@ -7703,7 +7699,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HallowedBreach = new Item
         {
-            Id = 0,
+            Id = 223461,
             Name = "Hallowed Breach",
             Quality = ItemQuality.Legendary,
             Slug = "hallowed-breach",
@@ -8063,7 +8059,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HallowedHand = new Item
         {
-            Id = 0,
+            Id = 223526,
             Name = "Hallowed Hand",
             Quality = ItemQuality.Legendary,
             Slug = "hallowed-touch",
@@ -8103,7 +8099,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item DemonClaw = new Item
         {
-            Id = 0,
+            Id = 193459,
             Name = "Demon Claw",
             Quality = ItemQuality.Legendary,
             Slug = "demon-claw",
@@ -8123,7 +8119,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HallowedHold = new Item
         {
-            Id = 0,
+            Id = 223526,
             Name = "Hallowed Hold",
             Quality = ItemQuality.Legendary,
             Slug = "hallowed-hold",
@@ -8243,7 +8239,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item BloodmagicEdge = new Item
         {
-            Id = 0,
+            Id = 195655,
             Name = "Blood-Magic Edge",
             Quality = ItemQuality.Legendary,
             Slug = "bloodmagic-edge",
@@ -8303,7 +8299,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item RhenhoFlayer = new Item
         {
-            Id = 0,
+            Id = 271745,
             Name = "Rhen'ho Flayer",
             Quality = ItemQuality.Legendary,
             Slug = "rhenho-flayer",
@@ -8703,7 +8699,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item SunKeeper = new Item
         {
-            Id = 0,
+            Id = 188173,
             Name = "Sun Keeper",
             Quality = ItemQuality.Legendary,
             Slug = "sun-keeper",

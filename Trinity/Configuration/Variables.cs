@@ -315,8 +315,6 @@ namespace Trinity
 
         internal static DateTime SweepWindSpam = DateTime.MinValue;
 
-        // Unique ID of mob last targetting when using whirlwind
-        internal static int LastZigZagUnitAcdGuid = 0;
         private static bool IsAlreadyMoving = false;
         private static Vector3 LastMoveToTarget;
         private static float LastDistanceFromTarget;
@@ -337,9 +335,6 @@ namespace Trinity
         internal static DateTime lastShiftedPosition = DateTime.MinValue;
         internal static int ShiftPositionFor = 0;
         internal static Vector3 CurrentDestination;
-        //internal static Vector3 ZigZagPosition;
-        internal static DateTime LastChangedZigZag = DateTime.MinValue;
-        internal static Vector3 PositionLastZigZagCheck = Vector3.Zero;
         public static int CurrentWorldDynamicId = -1;
         public static int CurrentWorldId = -1; // worldId from profiles, used in persistent stats
 

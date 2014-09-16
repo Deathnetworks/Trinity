@@ -23,6 +23,10 @@ namespace Trinity.Combat.Abilities
         private static KiteMode _playerKiteMode = KiteMode.Never;
 
         public static CombatMovementManager CombatMovement = new CombatMovementManager();
+        internal static DateTime LastChangedZigZag { get; set; }
+        internal static Vector3 PositionLastZigZagCheck { get; set; }
+        // Unique ID of mob last targetting when using whirlwind/strafe
+        internal static int LastZigZagUnitAcdGuid { get; set; }
 
         public enum CanCastFlags
         {
@@ -387,8 +391,8 @@ namespace Trinity.Combat.Abilities
             if (!hasPower)
                 return false;
 
-            // Skip this or Barb, Crusader, WD
-            if (Player.ActorClass == ActorClass.Wizard || Player.ActorClass == ActorClass.DemonHunter || Player.ActorClass == ActorClass.Monk)
+            // Skip this for Barb, Crusader, WD
+            if (Player.ActorClass == ActorClass.Wizard || Player.ActorClass == ActorClass.DemonHunter)
             {
                 bool timer = flags.HasFlag(CanCastFlags.NoTimer) || SNOPowerUseTimer(power);
 

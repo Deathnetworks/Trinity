@@ -24,163 +24,170 @@
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
                 <StackPanel>
+                    <!-- Boolean Options -->
+                    <UniformGrid>
+                        <CheckBox IsChecked="{Binding Path=Crusader.SteedChargeOOC}" ToolTip="Use Steed Charge OOC" Content="Use Steed Charge OOC" />
+                        <CheckBox IsChecked="{Binding Path=Crusader.SpamAkarats}" Content="Use Akarats off CD" />
+                        <CheckBox IsChecked="{Binding Path=Crusader.SpamPhalanx}" Content="Use Phalanx off CD" />
+                    </UniformGrid>
+
                     <!--Emergency Health-->
-                    <Grid Grid.Row="0" Margin="2">
+                    <Grid Margin="2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="2*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Potion %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
                         <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                    Interval="500" Maximum="99" Minimum="0" 
-                    SmallChange="1" LargeChange="5"
-                    TickPlacement="None" 
-                    Value="{Binding Path=Crusader.PotionLevel, Converter={StaticResource percentConverter}}" 
-                    HorizontalAlignment="Stretch" Margin="2"/>
+                                Interval="500" Maximum="99" Minimum="0" 
+                                SmallChange="1" LargeChange="5"
+                                TickPlacement="None" 
+                                Value="{Binding Path=Crusader.PotionLevel, Converter={StaticResource percentConverter}}" 
+                                HorizontalAlignment="Stretch" Margin="2"/>
                     </Grid>
 
-                    <Grid Grid.Row="1" Margin="2">
-                      <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                      </Grid.ColumnDefinitions>
-                      <TextBlock Text="Globe Health %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
-                      <Slider Grid.Column="1" Template="{DynamicResource Slider}"
+                    <Grid Margin="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Globe Health %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+                        <Slider Grid.Column="1" Template="{DynamicResource Slider}"
                               Interval="500" Maximum="100" Minimum="0"
                               SmallChange="1" LargeChange="5"
                               TickPlacement="None"
                               Value="{Binding Path=Crusader.HealthGlobeLevel, Converter={StaticResource percentConverter}}"
                               HorizontalAlignment="Stretch" Margin="2"/>
-                      <TextBlock Grid.Column="2" Text="Globe Resource %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
-                      <Slider Grid.Column="3" Template="{DynamicResource Slider}"
+                        <TextBlock Grid.Column="2" Text="Globe Resource %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+                        <Slider Grid.Column="3" Template="{DynamicResource Slider}"
                               Interval="500" Maximum="100" Minimum="0"
                               SmallChange="1" LargeChange="5"
                               TickPlacement="None"
                               Value="{Binding Path=Crusader.HealthGlobeLevelResource, Converter={StaticResource percentConverter}}"
                               HorizontalAlignment="Stretch" Margin="2"
                               ToolTip="Only applies when Reaper's Wraps are equipped"/>
-                      </Grid>
+                    </Grid>
 
                     <!--SweepAttackAoECount-->
-                    <Grid Grid.Row="2">
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Sweep Attack AoE Count" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
                         <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                Interval="1" Maximum="10" Minimum="1"
-                SmallChange="1" LargeChange="10"
-                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
-                Value="{Binding Path=Crusader.SweepAttackAoECount}" 
-                HorizontalAlignment="Stretch" Margin="2,0"/>
+                                Interval="1" Maximum="10" Minimum="1"
+                                SmallChange="1" LargeChange="10"
+                                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
+                                Value="{Binding Path=Crusader.SweepAttackAoECount}" 
+                                HorizontalAlignment="Stretch" Margin="2,0"/>
                     </Grid>
 
                     <!--JudgmentAoECount-->
-                    <Grid Grid.Row="3">
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Judgement AoE Count" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
                         <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                Interval="1" Maximum="10" Minimum="1"
-                SmallChange="1" LargeChange="10"
-                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
-                Value="{Binding Path=Crusader.JudgmentAoECount}" 
-                HorizontalAlignment="Stretch" Margin="2,0"/>
+                                Interval="1" Maximum="10" Minimum="1"
+                                SmallChange="1" LargeChange="10"
+                                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
+                                Value="{Binding Path=Crusader.JudgmentAoECount}" 
+                                HorizontalAlignment="Stretch" Margin="2,0"/>
                     </Grid>
 
                     <!--ShieldGlareAoECount-->
-                    <Grid Grid.Row="4">
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Shield Glare AoE Count" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
                         <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                Interval="1" Maximum="10" Minimum="1"
-                SmallChange="1" LargeChange="10"
-                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
-                Value="{Binding Path=Crusader.ShieldGlareAoECount}" 
-                HorizontalAlignment="Stretch" Margin="2,0"/>
+                                Interval="1" Maximum="10" Minimum="1"
+                                SmallChange="1" LargeChange="10"
+                                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
+                                Value="{Binding Path=Crusader.ShieldGlareAoECount}" 
+                                HorizontalAlignment="Stretch" Margin="2,0"/>
                     </Grid>
 
                     <!--IronSkinHpPct-->
-                    <Grid Grid.Row="5">
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Iron Skin Health Pct" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
                         <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                Interval="1" Maximum="99" Minimum="0"
-                SmallChange="1" LargeChange="10"
-                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
-                Value="{Binding Path=Crusader.IronSkinHpPct, Converter={StaticResource percentConverter}}" 
-                HorizontalAlignment="Stretch" Margin="2,0"/>
+                                Interval="1" Maximum="99" Minimum="0"
+                                SmallChange="1" LargeChange="10"
+                                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
+                                Value="{Binding Path=Crusader.IronSkinHpPct, Converter={StaticResource percentConverter}}" 
+                                HorizontalAlignment="Stretch" Margin="2,0"/>
                     </Grid>
 
                     <!--ConsecrationHpPct-->
-                    <Grid Grid.Row="6">
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Consecration Health Pct" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
                         <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                Interval="1" Maximum="99" Minimum="0"
-                SmallChange="1" LargeChange="10"
-                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
-                Value="{Binding Path=Crusader.ConsecrationHpPct, Converter={StaticResource percentConverter}}" 
-                HorizontalAlignment="Stretch" Margin="2,0"/>
+                                Interval="1" Maximum="99" Minimum="0"
+                                SmallChange="1" LargeChange="10"
+                                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
+                                Value="{Binding Path=Crusader.ConsecrationHpPct, Converter={StaticResource percentConverter}}" 
+                                HorizontalAlignment="Stretch" Margin="2,0"/>
                     </Grid>
 
                     <!--LawsOfHopeHpPct-->
-                    <Grid Grid.Row="7">
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Laws of Hope Health Pct" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
                         <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                Interval="1" Maximum="99" Minimum="0"
-                SmallChange="1" LargeChange="10"
-                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
-                Value="{Binding Path=Crusader.LawsOfHopeHpPct, Converter={StaticResource percentConverter}}" 
-                HorizontalAlignment="Stretch" Margin="2,0"/>
+                                Interval="1" Maximum="99" Minimum="0"
+                                SmallChange="1" LargeChange="10"
+                                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
+                                Value="{Binding Path=Crusader.LawsOfHopeHpPct, Converter={StaticResource percentConverter}}" 
+                                HorizontalAlignment="Stretch" Margin="2,0"/>
                     </Grid>
 
                     <!--LawsOfJusticeHpPct-->
-                    <Grid Grid.Row="8">
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Laws of Justice Health Pct" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
                         <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                Interval="1" Maximum="99" Minimum="0"
-                SmallChange="1" LargeChange="10"
-                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
-                Value="{Binding Path=Crusader.LawsOfJusticeHpPct, Converter={StaticResource percentConverter}}" 
-                HorizontalAlignment="Stretch" Margin="2,0"/>
+                                Interval="1" Maximum="99" Minimum="0"
+                                SmallChange="1" LargeChange="10"
+                                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
+                                Value="{Binding Path=Crusader.LawsOfJusticeHpPct, Converter={StaticResource percentConverter}}" 
+                                HorizontalAlignment="Stretch" Margin="2,0"/>
                     </Grid>
 
                     <!--BombardmentAoECount-->
-                    <Grid Grid.Row="9">
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Bombardment AoE Count" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
                         <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                Interval="1" Maximum="10" Minimum="1"
-                SmallChange="1" LargeChange="10"
-                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
-                Value="{Binding Path=Crusader.BombardmentAoECount}" 
-                HorizontalAlignment="Stretch" Margin="2,0"/>
+                                Interval="1" Maximum="10" Minimum="1"
+                                SmallChange="1" LargeChange="10"
+                                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
+                                Value="{Binding Path=Crusader.BombardmentAoECount}" 
+                                HorizontalAlignment="Stretch" Margin="2,0"/>
                     </Grid>
 
                     <!--FallingSwordAoECount-->
@@ -191,11 +198,11 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Falling Sword AoE Count" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
                         <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                Interval="1" Maximum="10" Minimum="1"
-                SmallChange="1" LargeChange="10"
-                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
-                Value="{Binding Path=Crusader.FallingSwordAoECount}" 
-                HorizontalAlignment="Stretch" Margin="2,0"/>
+                            Interval="1" Maximum="10" Minimum="1"
+                            SmallChange="1" LargeChange="10"
+                            TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
+                            Value="{Binding Path=Crusader.FallingSwordAoECount}" 
+                            HorizontalAlignment="Stretch" Margin="2,0"/>
                     </Grid>
 
                     <!--HeavensFuryAoECount-->
@@ -206,11 +213,11 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Heavens Fury AoE Count" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
                         <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                Interval="1" Maximum="10" Minimum="1"
-                SmallChange="1" LargeChange="10"
-                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
-                Value="{Binding Path=Crusader.HeavensFuryAoECount}" 
-                HorizontalAlignment="Stretch" Margin="2,0"/>
+                            Interval="1" Maximum="10" Minimum="1"
+                            SmallChange="1" LargeChange="10"
+                            TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
+                            Value="{Binding Path=Crusader.HeavensFuryAoECount}" 
+                            HorizontalAlignment="Stretch" Margin="2,0"/>
                     </Grid>
 
                     <!--CondemnAoECount-->
@@ -221,11 +228,11 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Condemn AoE Count" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
                         <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                Interval="1" Maximum="10" Minimum="1"
-                SmallChange="1" LargeChange="10"
-                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
-                Value="{Binding Path=Crusader.CondemnAoECount}" 
-                HorizontalAlignment="Stretch" Margin="2,0"/>
+                            Interval="1" Maximum="10" Minimum="1"
+                            SmallChange="1" LargeChange="10"
+                            TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
+                            Value="{Binding Path=Crusader.CondemnAoECount}" 
+                            HorizontalAlignment="Stretch" Margin="2,0"/>
                     </Grid>
                     <!--ProvokeAoEcount-->
                     <Grid Grid.Row="12">
@@ -235,11 +242,11 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Provoke AoE Count" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
                         <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                Interval="1" Maximum="10" Minimum="1"
-                SmallChange="1" LargeChange="10"
-                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
-                Value="{Binding Path=Crusader.ProvokeAoEcount}" 
-                HorizontalAlignment="Stretch" Margin="2,0"/>
+                            Interval="1" Maximum="10" Minimum="1"
+                            SmallChange="1" LargeChange="10"
+                            TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
+                            Value="{Binding Path=Crusader.ProvokeAoEcount}" 
+                            HorizontalAlignment="Stretch" Margin="2,0"/>
                     </Grid>
 
                     <!--SteedChargeMinRange-->
@@ -250,33 +257,28 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Steed Charge Min Range" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
                         <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                Interval="1" Maximum="50" Minimum="1"
-                SmallChange="1" LargeChange="10"
-                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
-                Value="{Binding Path=Crusader.SteedChargeMinRange}" 
-                HorizontalAlignment="Stretch" Margin="2,0"/>
+                            Interval="1" Maximum="50" Minimum="1"
+                            SmallChange="1" LargeChange="10"
+                            TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
+                            Value="{Binding Path=Crusader.SteedChargeMinRange}" 
+                            HorizontalAlignment="Stretch" Margin="2,0"/>
                     </Grid>
 
-                  <!--FistOfHeavensDist-->
-                  <Grid Grid.Row="14">
-                    <Grid.ColumnDefinitions>
-                      <ColumnDefinition Width="*"/>
-                      <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Fist of Heavens Distance" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
-                    <Slider Grid.Column="1" Template="{DynamicResource Slider}"
-            Interval="1" Maximum="80" Minimum="5"
-            SmallChange="1" LargeChange="10"
-            TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
-            Value="{Binding Path=Crusader.FistOfHeavensDist}"
-            HorizontalAlignment="Stretch" Margin="2,0"/>
-                  </Grid>
-                  
-                    <!-- Boolean Options -->
-                    <UniformGrid>
-                        <CheckBox IsChecked="{Binding Path=Crusader.SteedChargeOOC}" ToolTip="Use Steed Charge OOC" Content="Use Steed Charge OOC" />
-                        <CheckBox IsChecked="{Binding Path=Crusader.UseAkaratsOffCooldown}" Content="Use Akarats off CD" />
-                    </UniformGrid>
+                    <!--FistOfHeavensDist-->
+                    <Grid Grid.Row="14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Fist of Heavens Distance" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+                        <Slider Grid.Column="1" Template="{DynamicResource Slider}"
+                        Interval="1" Maximum="80" Minimum="5"
+                        SmallChange="1" LargeChange="10"
+                        TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
+                        Value="{Binding Path=Crusader.FistOfHeavensDist}"
+                        HorizontalAlignment="Stretch" Margin="2,0"/>
+                    </Grid>
+
                 </StackPanel>
             </Grid>
 

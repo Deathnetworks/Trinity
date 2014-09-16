@@ -21,6 +21,10 @@ namespace Trinity.Combat.Abilities
 
             if (UseOOCBuff)
             {
+                // Call of The Ancients
+                if (IsNull(power) && CanUseCallOfTheAncients && Sets.ImmortalKingsCall.IsFullyEquipped)
+                    power = PowerCallOfTheAncients;
+
                 // Sprint OOC
                 if (IsNull(power) && CanUseSprintOOC)
                     power = PowerSprint;
@@ -185,9 +189,10 @@ namespace Trinity.Combat.Abilities
                     !UseOOCBuff &&
                     CanCast(SNOPower.Barbarian_IgnorePain) &&
                     (Player.CurrentHealthPct <= V.F("Barbarian.IgnorePain.MinHealth") ||
-                    (Sets.TheLegacyOfRaekor.IsFullyEquipped && Player.CurrentHealthPct <= V.F("Barbarian.FuryDumpRaekor.MinHealth") &&
-                    (Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")
-                    && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
+                    (Sets.TheLegacyOfRaekor.IsFullyEquipped && (Player.CurrentHealthPct <= V.F("Barbarian.FuryDumpRaekor.MinHealth")
+                    || CurrentTarget.IsBossOrEliteRareUnique ||
+                    Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin"))
+                    && (GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
                     Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")) ||
                     isJailerOrFrozen);
             }
@@ -789,8 +794,8 @@ namespace Trinity.Combat.Abilities
             get
             {
                 bool shouldGetNewZigZag =
-                    (DateTime.UtcNow.Subtract(Trinity.LastChangedZigZag).TotalMilliseconds >= V.I("Barbarian.Whirlwind.ZigZagMaxTime") ||
-                    CurrentTarget.ACDGuid != Trinity.LastZigZagUnitAcdGuid ||
+                    (DateTime.UtcNow.Subtract(LastChangedZigZag).TotalMilliseconds >= V.I("Barbarian.Whirlwind.ZigZagMaxTime") ||
+                    CurrentTarget.ACDGuid != LastZigZagUnitAcdGuid ||
                     ZigZagPosition.Distance2D(Player.Position) <= 5f);
                 bool hasRLTW = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_Sprint && s.RuneIndex == 2);
 
@@ -809,8 +814,8 @@ namespace Trinity.Combat.Abilities
                         return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), ZigZagPosition, Trinity.CurrentWorldDynamicId, -1, 0, 1);
                     }
 
-                    Trinity.LastZigZagUnitAcdGuid = CurrentTarget.ACDGuid;
-                    Trinity.LastChangedZigZag = DateTime.UtcNow;
+                    LastZigZagUnitAcdGuid = CurrentTarget.ACDGuid;
+                    LastChangedZigZag = DateTime.UtcNow;
                 }
                 return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), ZigZagPosition, Trinity.CurrentWorldDynamicId, -1, 0, 1);
             }

@@ -32,6 +32,8 @@
                 <GroupBox Header="Misc Settings">
                     <UniformGrid Columns="2">
                         <CheckBox IsChecked="{Binding Advanced.ShowBattleTag}" Content="Show BattleTag in Title bar"/>
+                        <CheckBox IsChecked="{Binding Advanced.ShowHeroName}" Content="Show Hero Name in Title bar"/>
+                        <CheckBox IsChecked="{Binding Advanced.ShowHeroClass}" Content="Show Hero Class in Title bar"/>
                         <CheckBox IsChecked="{Binding Advanced.LazyRaiderClickToPause}" Content="Lazy Raider Click to Pause"/>
                         <CheckBox IsChecked="{Binding Advanced.DisableAllMovement}" Content="Disable All Movement"/>
                     </UniformGrid>
@@ -95,6 +97,7 @@
                 </GroupBox>
 
                 <!--Cache Refresh Rate-->
+                <!--
                 <GroupBox Header="Cache">
                     <StackPanel>
                         <TextBlock Text="Cache Refresh Rate (Default 300) - use with caution!" FontWeight="Bold" TextAlignment="Center" Margin="2"/>
@@ -110,6 +113,7 @@
                         ToolTip="Default 100. Increase value to decrease CPU usage."/>
                     </StackPanel>
                 </GroupBox>
+                -->
             </StackPanel>
             <WrapPanel VerticalAlignment="Bottom" HorizontalAlignment="Center" DockPanel.Dock="Bottom">
                 <!--Reset Button-->

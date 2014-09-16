@@ -823,6 +823,7 @@ namespace Trinity.ItemRules
             itemDic.Add("[UNIDENT]", item.IsUnidentified);
             itemDic.Add("[INTNAME]", item.InternalName);
             itemDic.Add("[ITEMID]", item.GameBalanceId.ToString());
+            itemDic.Add("[SNO]", item.ActorSNO);
 
             // if there are no stats return
             //if (item.Stats == null) return;

@@ -27,7 +27,7 @@ namespace Trinity
         {
             get
             {
-                return new Version(2, 1, 11);
+                return new Version(2, 1, 12);
             }
         }
 
@@ -61,24 +61,6 @@ namespace Trinity
             {
                 try
                 {
-                    // At Login screen, derp!
-                    var loginSubmitButton = Zeta.Game.Internals.UIElement.FromName("Root.NormalLayer.BattleNetLogin_main.LayoutRoot.LoginContainer.SubmitButton");
-                    if (loginSubmitButton != null && loginSubmitButton.IsValid && loginSubmitButton.IsVisible && BotMain.IsRunning)
-                    {
-                        new Thread(() =>
-                        {
-                            BotMain.Stop();
-                            Thread.Sleep(1000);
-                            BotMain.Start();
-                        })
-                        {
-                            IsBackground = true,
-                            Name = "LoginScreenBouncer",
-                        }.Start();
-
-                        return;
-                    }
-
                     if (ZetaDia.Me == null)
                         return;
 
@@ -322,8 +304,27 @@ namespace Trinity
                 catch
                 { }
             }
+            string heroName = "";
+            if (Settings.Advanced.ShowHeroName)
+            {
+                try
+                {
+                    heroName = "- " + ZetaDia.Service.Hero.Name;
+                }
+                catch { }
+            }
+            string heroClass = "";
+            if (Settings.Advanced.ShowHeroClass)
+            {
+                try
+                {
+                    heroClass = "- " + ZetaDia.Service.Hero.Class;
+                }
+                catch { }
+            }
 
-            string windowTitle = "DB " + battleTagName + "- PID:" + System.Diagnostics.Process.GetCurrentProcess().Id;
+
+            string windowTitle = "DB " + battleTagName + heroName + heroClass + "- PID:" + System.Diagnostics.Process.GetCurrentProcess().Id;
 
             if (profileName.Trim() != String.Empty)
             {
