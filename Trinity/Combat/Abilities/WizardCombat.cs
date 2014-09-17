@@ -38,7 +38,7 @@ namespace Trinity.Combat.Abilities
             if (CurrentTarget != null)
             {
                 return GetCombatPower();
-            }
+            }     
 
             // Default attacks
             return DefaultPower;
@@ -409,6 +409,14 @@ namespace Trinity.Combat.Abilities
                 (Player.CurrentHealthPct <= Trinity.PlayerEmergencyHealthPotionLimit || TargetUtil.AnyMobsInRange(30, 4) || Player.IsIncapacitated || Player.IsRooted))
             {
                 return new TrinityPower(SNOPower.Wizard_MirrorImage);
+            }
+            
+            if (Legendary.WandOfWoh.IsEquipped)
+            {
+                if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_ExplosiveBlast, CanCastFlags.NoTimer) && !Player.IsInTown)
+                {
+                    return new TrinityPower(SNOPower.Wizard_ExplosiveBlast, 10f);
+                }
             }
 
             return null;
