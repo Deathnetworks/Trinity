@@ -68,7 +68,7 @@ namespace Trinity.Combat.Abilities
                 power = PowerWrathOfTheBerserker;
 
             // Call of the Ancients
-            if (IsNull(power) && CanUseCallOfTheAncients)
+            if (IsNull(power) && !UseOOCBuff && CanUseCallOfTheAncients)
                 power = PowerCallOfTheAncients;
 
             // Leap with Earth Set.
@@ -183,8 +183,6 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                bool isJailerOrFrozen = Trinity.ObjectCache.Any(o => o.IsEliteRareUnique &&
-                          o.MonsterAffixes.HasFlag(MonsterAffixes.Frozen | MonsterAffixes.Jailer));
                 return
                     !UseOOCBuff &&
                     CanCast(SNOPower.Barbarian_IgnorePain) &&
@@ -193,8 +191,7 @@ namespace Trinity.Combat.Abilities
                     || CurrentTarget.IsBossOrEliteRareUnique ||
                     Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin"))
                     && (GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
-                    Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")) ||
-                    isJailerOrFrozen);
+                    Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")));
             }
         }
         public static bool ShouldWaitForCallOfTheAncients
@@ -216,12 +213,11 @@ namespace Trinity.Combat.Abilities
             get
             {
                 return
-                    !UseOOCBuff &&
                     !IsCurrentlyAvoiding &&
                     CanCast(SNOPower.Barbarian_CallOfTheAncients) &&
                     !Player.IsIncapacitated &&
-	                !GetHasBuff(SNOPower.Barbarian_CallOfTheAncients) &&
-                    (TargetUtil.EliteOrTrashInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange")) ||
+                    !GetHasBuff(SNOPower.Barbarian_CallOfTheAncients) && (Sets.ImmortalKingsCall.IsFullyEquipped || 
+                    TargetUtil.EliteOrTrashInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange")) ||
                     TargetUtil.AnyMobsInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange"), 3) || TargetUtil.AnyElitesInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange")));
             }
         }
