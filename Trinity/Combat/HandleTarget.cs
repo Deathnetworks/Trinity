@@ -907,7 +907,7 @@ namespace Trinity
                         // Pick a suitable ability
                         if (CurrentTarget != null)
                             CombatBase.CurrentPower = AbilitySelector();
-                        if (CombatBase.CurrentPower.SNOPower == SNOPower.None && !Player.IsIncapacitated)
+                        if (Player.IsInCombat && CombatBase.CurrentPower.SNOPower == SNOPower.None && !Player.IsIncapacitated)
                         {
                             NoAbilitiesAvailableInARow++;
                             if (DateTime.UtcNow.Subtract(lastRemindedAboutAbilities).TotalSeconds > 60 && NoAbilitiesAvailableInARow >= 4)

@@ -5,6 +5,7 @@ using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using System.Linq;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.Combat.Abilities
 {
@@ -22,10 +23,13 @@ namespace Trinity.Combat.Abilities
                 return GetDemonHunterDestroyPower();
 
             // Buffs
-            if (UseOOCBuff)
+            if ((Player.IsInCombat || UseOOCBuff) && !IsCurrentlyAvoiding)
             {
-                return GetBuffPower();
+                var power = GetBuffPower();
+                if (power != null && power.SNOPower != SNOPower.None)
+                    return power;
             }
+
             // In Combat, Avoiding
             if (IsCurrentlyAvoiding)
             {
@@ -371,6 +375,13 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         private static TrinityPower GetBuffPower()
         {
+            // Vengeance
+            if (CanCast(SNOPower.X1_DemonHunter_Vengeance, CanCastFlags.NoTimer) &&
+                ((!Settings.Combat.DemonHunter.VengeanceElitesOnly && TargetUtil.AnyMobsInRange(60, 6)) || TargetUtil.IsEliteTargetInRange(80f)))
+            {
+                return new TrinityPower(SNOPower.X1_DemonHunter_Vengeance);
+            }
+
             // Spam Shadow Power
             if (Settings.Combat.DemonHunter.SpamShadowPower && CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
                 (!GetHasBuff(SNOPower.DemonHunter_ShadowPower) || Player.CurrentHealthPct <= Trinity.PlayerEmergencyHealthPotionLimit) && // if we don't have the buff or our health is low
@@ -385,13 +396,6 @@ namespace Trinity.Combat.Abilities
                 !GetHasBuff(SNOPower.DemonHunter_ShadowPower) && Player.SecondaryResource >= 14)
             {
                 return new TrinityPower(SNOPower.DemonHunter_SmokeScreen);
-            }
-
-            // Vengeance
-            if (CanCast(SNOPower.X1_DemonHunter_Vengeance, CanCastFlags.NoTimer) &&
-                ((!Settings.Combat.DemonHunter.VengeanceElitesOnly && TargetUtil.AnyMobsInRange(60, 6)) || TargetUtil.IsEliteTargetInRange(60f)))
-            {
-                return new TrinityPower(SNOPower.X1_DemonHunter_Vengeance);
             }
 
             // Chakram:Shuriken Cloud

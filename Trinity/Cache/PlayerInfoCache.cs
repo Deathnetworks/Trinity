@@ -146,6 +146,11 @@ namespace Trinity
             }
         }
 
+        public bool IsInCombat
+        {
+            get { return (ZetaDia.Me.IsValid) && ZetaDia.Me.IsInCombat; }
+        }
+
         /// <summary>
         /// Update the cached data on the player information, including buffs if needed
         /// </summary>
