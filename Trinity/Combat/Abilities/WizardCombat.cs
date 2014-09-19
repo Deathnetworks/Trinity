@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Trinity.Reference;
+using Zeta.Bot;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
 using Logger = Trinity.Technicals.Logger;
@@ -26,12 +27,9 @@ namespace Trinity.Combat.Abilities
         internal static TrinityPower GetPower()
         {
             // Buffs
-            if ((Player.IsInCombat || UseOOCBuff) && !IsCurrentlyAvoiding)
-            {
-                var power = GetBuffPower();
-                if (power != null && power.SNOPower != SNOPower.None)
-                    return power;
-            }
+            var power = GetBuffPower();
+            if (power != null && power.SNOPower != SNOPower.None)
+                return power;
 
             // In Combat, Avoiding
             if (IsCurrentlyAvoiding)
@@ -203,7 +201,6 @@ namespace Trinity.Combat.Abilities
             if (Hotbar.Contains(SNOPower.Wizard_Archon))
             {
                 Player.WaitingForReserveEnergy = true;
-
             }
 
             // Explosive Blast
@@ -293,7 +290,8 @@ namespace Trinity.Combat.Abilities
             }
 
             // Ray of Frost
-            if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_RayOfFrost) && !Player.WaitingForReserveEnergy)
+            if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_RayOfFrost) && 
+                (!Player.WaitingForReserveEnergy || (Player.PrimaryResource > MinEnergyReserve)))
             {
                 float range = 50f;
                 if (Runes.Wizard.SleetStorm.IsActive)
