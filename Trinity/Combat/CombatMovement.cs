@@ -112,9 +112,9 @@ namespace Trinity.Combat
             Status = new CombatMovementStatus();
         }
 
-        public async Task<bool> Execute()
+        public RunStatus Execute()
         {
-            if (!IsQueuedMovement) return false;
+            if (!IsQueuedMovement) return RunStatus.Failure;
 
             if (CurrentMovement == null)
                 CurrentMovement = InternalQueue.Dequeue();
@@ -132,49 +132,47 @@ namespace Trinity.Combat
                 CurrentMovement.StopCondition.Invoke(CurrentMovement))
             {
                 FailedHandler("StopWhen");
-                return false;
+                return RunStatus.Failure;
             }
 
             if (IsBlocked)
             {
                 FailedHandler("Blocked");
-                return false;
+                return RunStatus.Failure;
             }
 
             if (Status.DistanceToObjective < CurrentMovement.AcceptableDistance)
             {
                 SuccessHandler("AcceptableDistance");
-                return true;
+                return RunStatus.Success;
             }
 
             if (HasRecentlyFailed(CurrentMovement))
             {
                 FailedHandler("RecentlyFailed");
-                return false;
+                return RunStatus.Success;
             }
 
             if (Status.DistanceToObjective > 100)
             {
                 FailedHandler("MaxDistance");
-                return false;
+                return RunStatus.Success;
             }
 
             switch (Status.LastStatus)
             {
                 case MoveResult.ReachedDestination:
                     SuccessHandler();
-                    return true;
+                    return RunStatus.Success;
                 case MoveResult.PathGenerationFailed:
                 case MoveResult.Moved:
                     MovedHandler();
-                    await Coroutine.Yield();
-                    return true;
+                    return RunStatus.Running;
                 case MoveResult.Failed:
                     FailedHandler("Navigation");
-                    return false;
+                    return RunStatus.Failure;
                 default:
-                    await Coroutine.Yield();
-                    return true;
+                    return RunStatus.Success;
             }
 
         }

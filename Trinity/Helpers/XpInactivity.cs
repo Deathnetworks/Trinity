@@ -9,7 +9,7 @@ namespace Trinity.Helpers
 {
     public class XpInactivity
     {
-        private int _lastXpAmount;
+        private Int64 _lastXpAmount;
         private DateTime _lastCheckBag = DateTime.MinValue;
         private DateTime _lastFoundXp = DateTime.MinValue;
 
@@ -36,9 +36,6 @@ namespace Trinity.Helpers
         /// <returns></returns>
         internal bool XpInactive()
         {
-            //if (Trinity.Player.ParticipatingInTieredLootRun)
-            //    return false;
-
             if (Trinity.Settings.Advanced.DisableAllMovement)
                 return false;
 
@@ -86,7 +83,7 @@ namespace Trinity.Helpers
                 {
                     Logger.LogVerbose(LogCategory.GlobalHandler, "Experience Changed from {0} to {1}", _lastXpAmount, exp);
                     _lastFoundXp = DateTime.UtcNow;
-                    _lastXpAmount = Trinity.Player.Coinage;
+                    _lastXpAmount = exp;
                 }
 
                 int xpUnchangedSeconds = Convert.ToInt32(DateTime.UtcNow.Subtract(_lastFoundXp).TotalSeconds);

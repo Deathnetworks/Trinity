@@ -233,9 +233,6 @@ namespace Trinity
         // thanks to Main for the super fast can-stand-at code
         internal static Vector3 MainFindSafeZone(Vector3 origin, bool shouldKite = false, bool isStuck = false, IEnumerable<TrinityCacheObject> monsterList = null, bool avoidDeath = false)
         {
-            MainGridProvider.Update();
-            Navigator.Clear();
-
             const float gridSquareSize = 5f;
             const float maxDistance = 100f;
             const int maxWeight = 100;
@@ -336,16 +333,7 @@ namespace Trinity
                             continue;
                         }
                         timers[2].Stop();
-
-                        //timers[9].Start();
-                        //// Obstacles
-                        //if (CacheData.NavigationObstacles.Any(obstacle => xyz.Distance2DSqr(obstacle.Position) - (obstacle.Radius * obstacle.Radius) <= gridSquareRadius * gridSquareRadius))
-                        //{
-                        //    nodesObjects++;
-                        //    continue;
-                        //}
-                        //timers[9].Stop();
-
+                        
                         timers[10].Start();
                         if (CacheData.NavigationObstacles.Any(a => a.Position.Distance2DSqr(Trinity.Player.Position) < maxDistance * maxDistance &&
                             MathUtil.IntersectsPath(a.Position, a.Radius, Trinity.Player.Position, gridPoint.Position)))
@@ -372,18 +360,6 @@ namespace Trinity
                                 continue;
                             }
 
-                            //if (!hasEmergencyTeleportUp)
-                            //{
-                            //    // Any monsters blocking in a straight line between origin and this GridPoint
-                            //    foreach (CacheObstacleObject monster in CacheData.MonsterObstacles.Where(m =>
-                            //        MathEx.IntersectsPath(new Vector3(m.Position.X, m.Position.Y, 0), m.Radius, new Vector3(origin.X, origin.Y, 0), new Vector3(gridPoint.Position.X, gridPoint.Position.Y, 0))
-                            //        ))
-                            //    {
-
-                            //        nodesMonsters++;
-                            //        continue;
-                            //    }
-                            //}
                             timers[3].Stop();
 
                         }
@@ -425,14 +401,6 @@ namespace Trinity
 
                         if (shouldKite)
                         {
-                            // make sure we can raycast to our target
-                            //if (!DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) &&
-                            //    !NavHelper.CanRayCast(gridPoint.Position, Trinity.LastPrimaryTargetPosition))
-                            //{
-                            //    navRaycast++;
-                            //    continue;
-                            //}
-
                             /*
                             * We want to down-weight any grid points where monsters are closer to it than we are
                             */
@@ -490,10 +458,6 @@ namespace Trinity
                                 // position is inside avoidance
                                 if (PlayerStatus.CurrentHealthPct < health && distFromPointToAvoidance < radius)
                                     continue;
-
-                                // closer to avoidance than it is to player
-                                //if (distFromOriginToAvoidance < distFromPointToOrigin)
-                                //    continue;
 
                                 if (distFromPointToAvoidance < distFromPointToOrigin)
                                 {
@@ -896,14 +860,14 @@ namespace Trinity
         internal static Vector3 SimpleUnstucker()
         {
             var myPos = Trinity.Player.Position;
-            float rotation = (float)Trinity.Player.Rotation;
+            float rotation = Trinity.Player.Rotation;
 
-            const double totalPoints = 3 * Math.PI / 2;
-            const double start = Math.PI / 2;
+            const double totalPoints = 2 * Math.PI;
+            const double start = 0;
             const double step = Math.PI / 4;
 
             const float minDistance = 10f;
-            const float maxDistance = 45f;
+            const float maxDistance = 25f;
             const float stepDistance = 5f;
 
             HashSet<GridPoint> gridPoints = new HashSet<GridPoint>();
@@ -929,12 +893,14 @@ namespace Trinity
                         navigationObstacleFail++;
                         continue;
                     }
+
                     // If this hits a navigation wall, skip it
-                    if (Navigator.Raycast(myPos, newPos))
-                    {
-                        raycastFail++;
-                        continue;
-                    }
+                    //if (Navigator.Raycast(myPos, newPos))
+                    //{
+                    //    raycastFail++;
+                    //    continue;
+                    //}
+
                     // use distance as weight
                     gridPoints.Add(new GridPoint(newPos, (int)d, d));
                 }

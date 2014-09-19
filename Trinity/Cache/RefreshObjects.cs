@@ -589,48 +589,6 @@ namespace Trinity
             }
         }
 
-        private static bool UpdateCurrentTarget()
-        {
-            // Return true if we need to refresh objects and get a new target
-            bool forceUpdate = false;
-            try
-            {
-                Player.Position = ZetaDia.Me.Position;
-                Player.CurrentHealthPct = ZetaDia.Me.HitpointsCurrentPct;
-
-                if (CurrentTarget != null && CurrentTarget.IsUnit && CurrentTarget.Unit != null && CurrentTarget.Unit.IsValid)
-                {
-                    try
-                    {
-                        DiaUnit unit = CurrentTarget.Unit;
-
-                        CurrentTarget.Position = unit.Position;
-                        CurrentTarget.HitPointsPct = unit.HitpointsCurrentPct;
-                        CurrentTarget.HitPoints = unit.HitpointsCurrent;
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Updated CurrentTarget HitPoints={0:0.00} & Position={1}", CurrentTarget.HitPointsPct, CurrentTarget.Position);
-                    }
-                    catch (Exception)
-                    {
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Error updating current target information");
-                        CurrentTarget = null;
-                        forceUpdate = true;
-                    }
-                }
-                else if (CurrentTarget != null && CurrentTarget.IsUnit)
-                {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget is invalid, setting null");
-                    CurrentTarget = null;
-                    forceUpdate = true;
-                }
-            }
-            catch
-            {
-                Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Error updating current target information");
-                CurrentTarget = null;
-                forceUpdate = true;
-            }
-            return forceUpdate;
-        }
         // Refresh object list from Diablo 3 memory RefreshDiaObjects()
         private static void RefreshCacheInit()
         {

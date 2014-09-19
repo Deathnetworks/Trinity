@@ -431,11 +431,11 @@ namespace Trinity
             325136, // x1_Malthael_DeathFogMonster
             340512, // x1_Malthael_Mephisto_LightningObject
 
-            359693, //Server Prop X1_Unique_Monster_Generic_AOE_DOT_Fire_10foot-24594 (359693)
+            //359693, //Server Prop X1_Unique_Monster_Generic_AOE_DOT_Fire_10foot-24594 (359693)
 
-            359703, // X1_Unique_Monster_Generic_AOE_DOT_Cold_10foot-183301 (359703) Type=ServerProp
-            363356, // X1_Unique_Monster_Generic_AOE_DOT_Cold_20foot-183239 (363356) Type=ServerProp
-            360046, // X1_Unique_Monster_Generic_AOE_DOT_Poison_10foot-223788 (360046) Type=ServerProp
+            //359703, // X1_Unique_Monster_Generic_AOE_DOT_Cold_10foot-183301 (359703) Type=ServerProp
+            //363356, // X1_Unique_Monster_Generic_AOE_DOT_Cold_20foot-183239 (363356) Type=ServerProp
+            //360046, // X1_Unique_Monster_Generic_AOE_DOT_Poison_10foot-223788 (360046) Type=ServerProp
 
         };
 
@@ -470,10 +470,10 @@ namespace Trinity
             335505, // x1_malthael_drainSoul_ghost
             325136, // x1_Malthael_DeathFogMonster
             340512, // x1_Malthael_Mephisto_LightningObject
-            3528, //[2047F7CC] Type: Projectile Name: Butcher_hook-737821 ActorSNO: 3528, Distance: 45.17828
+            // 3528, //[2047F7CC] Type: Projectile Name: Butcher_hook-737821 ActorSNO: 3528, Distance: 45.17828
 
-            4394, //g_ChargedBolt_Projectile-200915 (4394) Type=Projectile
-            368392, // x1_Cesspool_Slime_Posion_Attack_Projectile-222254 (368392) Type=Projectile
+            // 4394, //g_ChargedBolt_Projectile-200915 (4394) Type=Projectile
+            // 368392, // x1_Cesspool_Slime_Posion_Attack_Projectile-222254 (368392) Type=Projectile
       };
 
         /// <summary>
@@ -967,6 +967,7 @@ namespace Trinity
         public static HashSet<int> BlackListIds { get { return blacklistIds; } }
         private static HashSet<int> blacklistIds = new HashSet<int> {
             
+            362323, // x1_WestmHub_GuardNoHelmUnarmed
             // World Objects
             163449, 2909, 58283, 58321, 87809, 90150, 91600, 97023, 97350, 97381, 72689, 121327, 54515, 3340, 122076, 123640,
             60665, 60844, 78554, 86400, 86428, 81699, 86266, 86400, 192466, 6190, 80002, 104596, 58836, 104827, 74909, 6155, 6156, 6158, 6159, 75132,

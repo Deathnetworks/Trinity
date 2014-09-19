@@ -39,7 +39,7 @@ namespace Trinity.DbProvider
             if (DateTime.UtcNow.Subtract(LastUsedMoveStop).TotalMilliseconds < 250)
                 return;
 
-            ZetaDia.Me.UsePower(SNOPower.Walk, ZetaDia.Me.Position, ZetaDia.CurrentWorldDynamicId   );
+            ZetaDia.Me.UsePower(SNOPower.Walk, ZetaDia.Me.Position, ZetaDia.CurrentWorldDynamicId);
         }
 
         // Anti-stuck variables
@@ -91,6 +91,7 @@ namespace Trinity.DbProvider
             {
                 TimeLastRecordedPosition = DateTime.UtcNow;
                 UnStuckCheckerLastResult = false;
+                SpeedSensors.Clear();
                 return UnStuckCheckerLastResult;
             }
 
@@ -101,10 +102,11 @@ namespace Trinity.DbProvider
                 LastPosition = Vector3.Zero;
                 TimeLastRecordedPosition = DateTime.UtcNow;
                 UnStuckCheckerLastResult = false;
+                SpeedSensors.Clear();
                 return UnStuckCheckerLastResult;
             }
 
-            if (LastPosition != Vector3.Zero && LastPosition.Distance(myPosition) <= 4f)
+            if (LastPosition != Vector3.Zero && LastPosition.Distance(myPosition) <= 4f && GetMovementSpeed() < 1)
             {
                 TimeLastRecordedPosition = DateTime.MinValue;
                 UnStuckCheckerLastResult = true;
@@ -272,7 +274,7 @@ namespace Trinity.DbProvider
                 SpeedSensors.Clear();
                 return 1d;
             }
-            
+
             // record speed once per second
             if (DateTime.UtcNow.Subtract(lastRecordedPosition).TotalMilliseconds >= 1000)
             {
