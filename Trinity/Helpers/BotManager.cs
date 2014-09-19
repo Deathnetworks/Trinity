@@ -36,7 +36,7 @@ namespace Trinity.Helpers
                 ReplaceCombatHook();
                 ReplaceVendorRunHook();
                 ReplaceLootHook();
-                InsertBotBehaviorHooks();
+                InsertOutOfGameHooks();
             }
             else
             {
@@ -54,7 +54,7 @@ namespace Trinity.Helpers
             if (!TreeHooks.Instance.Hooks.ContainsKey("Combat"))
                 return;
             // This is the do-all-be-all god-head all encompasing piece of trinity
-            StoreAndReplaceHook("Combat", new Decorator(Trinity.TargetCheck, new ActionRunCoroutine(ret => Trinity.HandleTargetTask())));
+            StoreAndReplaceHook("Combat", new Decorator(Trinity.TargetCheck, Trinity.HandleTargetComposite()));
         }
 
         private static void ReplaceVendorRunHook()
@@ -79,19 +79,21 @@ namespace Trinity.Helpers
             StoreAndReplaceHook("Loot", Composites.CreateLootBehavior(lootComposite));
         }
 
-        private static void InsertBotBehaviorHooks()
+        private static void InsertOutOfGameHooks()
         {
+            const string hookName = "TreeStart";
+
             if (_goldInactiveComposite == null)
                 _goldInactiveComposite = GoldInactivity.CreateGoldInactiveLeaveGame();
 
             if (_xpInactiveComposite == null)
                 _xpInactiveComposite = XpInactivity.CreateXpInactiveLeaveGame();
 
-            Logger.Log("Inserting GoldInactivity into BotBehavior");
-            TreeHooks.Instance.InsertHook("BotBehavior", 0, _goldInactiveComposite);
+            Logger.Log("Inserting GoldInactivity into " + hookName);
+            TreeHooks.Instance.InsertHook(hookName, 0, _goldInactiveComposite);
 
-            Logger.Log("Inserting GoldInactivity into BotBehavior");
-            TreeHooks.Instance.InsertHook("BotBehavior", 0, _xpInactiveComposite);
+            Logger.Log("Inserting XPInactivity into " + hookName);
+            TreeHooks.Instance.InsertHook(hookName, 0, _xpInactiveComposite);
         }
 
         internal static void InstanceOnOnHooksCleared(object sender, EventArgs eventArgs)
