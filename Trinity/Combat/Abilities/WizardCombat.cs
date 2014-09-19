@@ -3,6 +3,7 @@ using System.Linq;
 using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.Combat.Abilities
 {
@@ -25,10 +26,13 @@ namespace Trinity.Combat.Abilities
         internal static TrinityPower GetPower()
         {
             // Buffs
-            if (UseOOCBuff)
+            if ((Player.IsInCombat || UseOOCBuff) && !IsCurrentlyAvoiding)
             {
-                return GetBuffPower();
+                var power = GetBuffPower();
+                if (power != null && power.SNOPower != SNOPower.None)
+                    return power;
             }
+
             // In Combat, Avoiding
             if (IsCurrentlyAvoiding)
             {

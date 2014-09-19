@@ -118,19 +118,13 @@ namespace Trinity.Combat.Abilities
 
                 // HeavensFury
                 bool isHolyShotgun = (Legendary.FateOfTheFell.IsEquipped && Sets.ArmorOfAkkhan.IsThirdBonusActive);
-                if (!isHolyShotgun)
+                if (CanCastHeavensFury() && !isHolyShotgun)
                 {
-                    if (CanCastHeavensFury(isHolyShotgun))
-                    {
-                        return new TrinityPower(SNOPower.X1_Crusader_HeavensFury3, 16f, TargetUtil.GetBestClusterPoint());
-                    }
+                    return new TrinityPower(SNOPower.X1_Crusader_HeavensFury3, 16f, TargetUtil.GetBestClusterPoint());
                 }
-                else
+                if (CanCastHeavensFuryHolyShotgun(isHolyShotgun))
                 {
-                    if (CanCastHeavensFury(isHolyShotgun))
-                    {
-                        return new TrinityPower(SNOPower.X1_Crusader_HeavensFury3, 7f, CurrentTarget.ACDGuid);
-                    }
+                    return new TrinityPower(SNOPower.X1_Crusader_HeavensFury3, 7f, CurrentTarget.ACDGuid);
                 }
 
                 // Condemn
@@ -320,10 +314,14 @@ namespace Trinity.Combat.Abilities
             return CanCast(SNOPower.X1_Crusader_Condemn) && (TargetUtil.EliteOrTrashInRange(16f) || TargetUtil.AnyMobsInRange(15f, CrusaderSettings.CondemnAoECount));
         }
 
-        private static bool CanCastHeavensFury(bool isHolyShotgun)
+        private static bool CanCastHeavensFury()
         {
-                return (!isHolyShotgun && CanCast(SNOPower.X1_Crusader_HeavensFury3) && (TargetUtil.EliteOrTrashInRange(16f) || TargetUtil.ClusterExists(15f, 90f, CrusaderSettings.HeavensFuryAoECount))) ||
-                    (isHolyShotgun && CanCast(SNOPower.X1_Crusader_HeavensFury3) && TargetUtil.AnyMobsInRange(15f, 1));
+                return (CanCast(SNOPower.X1_Crusader_HeavensFury3) && (TargetUtil.EliteOrTrashInRange(16f) || TargetUtil.ClusterExists(15f, 90f, CrusaderSettings.HeavensFuryAoECount)));
+        }
+
+        private static bool CanCastHeavensFuryHolyShotgun(bool isHolyShotgun)
+        {
+            return (isHolyShotgun && CanCast(SNOPower.X1_Crusader_HeavensFury3) && TargetUtil.AnyMobsInRange(15f, 1));
         }
 
         private static bool CanCastFallingSword()

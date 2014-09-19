@@ -5,6 +5,7 @@ using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using System.Linq;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.Combat.Abilities
 {
@@ -22,10 +23,13 @@ namespace Trinity.Combat.Abilities
                 return GetDemonHunterDestroyPower();
 
             // Buffs
-            if (UseOOCBuff)
+            if ((Player.IsInCombat || UseOOCBuff) && !IsCurrentlyAvoiding)
             {
-                return GetBuffPower();
+                var power = GetBuffPower();
+                if (power != null && power.SNOPower != SNOPower.None)
+                    return power;
             }
+
             // In Combat, Avoiding
             if (IsCurrentlyAvoiding)
             {
@@ -73,7 +77,6 @@ namespace Trinity.Combat.Abilities
             // NotSpam Shadow Power
             if (!Settings.Combat.DemonHunter.SpamShadowPower && CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
                 (!GetHasBuff(SNOPower.DemonHunter_ShadowPower) || Player.CurrentHealthPct <= Trinity.PlayerEmergencyHealthPotionLimit) && // if we don't have the buff or our health is low
-                ((!Runes.DemonHunter.Punishment.IsActive && Player.SecondaryResource >= 14) || (Runes.DemonHunter.Punishment.IsActive && Player.SecondaryResource >= 39)) && // Save some Discipline for Preparation
                 (Player.CurrentHealthPct < 1f || Player.IsRooted || TargetUtil.AnyMobsInRange(15)))
             {
                 return new TrinityPower(SNOPower.DemonHunter_ShadowPower);
@@ -123,7 +126,7 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Use Wolf Howl on Unique/Elite/Champion - Would help for farming trash, but trash farming should not need this - Used on Elites to reduce Deaths per hour
-                if (Runes.DemonHunter.BatCompanion.IsActive && CanCast(SNOPower.X1_DemonHunter_Companion) &&
+                if (Runes.DemonHunter.WolfCompanion.IsActive && CanCast(SNOPower.X1_DemonHunter_Companion) &&
                     ((CurrentTarget.IsBossOrEliteRareUnique || TargetUtil.AnyMobsInRange(40, 10)) && CurrentTarget.RadiusDistance < 25f))
                 {
                     return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
@@ -154,7 +157,7 @@ namespace Trinity.Combat.Abilities
             {
                 // Preperation w/ Punishment
                 if (Runes.DemonHunter.Punishment.IsActive && CanCast(SNOPower.DemonHunter_Preparation, CanCastFlags.NoTimer) &&
-                    Player.SecondaryResource >= 25 && Player.PrimaryResourceMissing >= 75 && TimeSincePowerUse(SNOPower.DemonHunter_Preparation) >= 1000)
+                    Player.PrimaryResourceMissing >= 75 && TimeSincePowerUse(SNOPower.DemonHunter_Preparation) >= 1000)
                 {
                     return new TrinityPower(SNOPower.DemonHunter_Preparation);
                 }
@@ -372,6 +375,13 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         private static TrinityPower GetBuffPower()
         {
+            // Vengeance
+            if (CanCast(SNOPower.X1_DemonHunter_Vengeance, CanCastFlags.NoTimer) &&
+                ((!Settings.Combat.DemonHunter.VengeanceElitesOnly && TargetUtil.AnyMobsInRange(60, 6)) || TargetUtil.IsEliteTargetInRange(80f)))
+            {
+                return new TrinityPower(SNOPower.X1_DemonHunter_Vengeance);
+            }
+
             // Spam Shadow Power
             if (Settings.Combat.DemonHunter.SpamShadowPower && CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
                 (!GetHasBuff(SNOPower.DemonHunter_ShadowPower) || Player.CurrentHealthPct <= Trinity.PlayerEmergencyHealthPotionLimit) && // if we don't have the buff or our health is low
@@ -386,13 +396,6 @@ namespace Trinity.Combat.Abilities
                 !GetHasBuff(SNOPower.DemonHunter_ShadowPower) && Player.SecondaryResource >= 14)
             {
                 return new TrinityPower(SNOPower.DemonHunter_SmokeScreen);
-            }
-
-            // Vengeance
-            if (CanCast(SNOPower.X1_DemonHunter_Vengeance, CanCastFlags.NoTimer) &&
-                ((!Settings.Combat.DemonHunter.VengeanceElitesOnly && TargetUtil.AnyMobsInRange(60, 6)) || TargetUtil.IsEliteTargetInRange(60f)))
-            {
-                return new TrinityPower(SNOPower.X1_DemonHunter_Vengeance);
             }
 
             // Chakram:Shuriken Cloud
