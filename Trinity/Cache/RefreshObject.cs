@@ -716,7 +716,12 @@ namespace Trinity
 
                     // Always LoS Units during events
                     if (CurrentCacheObject.Type == GObjectType.Unit && Player.InActiveEvent)
+                    {
+                        if (!CacheData.HasBeenInLoS.ContainsKey(CurrentCacheObject.RActorGuid))
+                            CacheData.HasBeenInLoS.Add(CurrentCacheObject.RActorGuid, true);
+
                         return true;
+                    }
                 }
                 // Everything except items and the current target
                 if (CurrentCacheObject.RActorGuid != LastTargetRactorGUID && CurrentCacheObject.Type != GObjectType.Unknown)
