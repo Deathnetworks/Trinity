@@ -178,7 +178,8 @@ namespace Trinity
                                     // Ignore elite option, except if trying to town portal
                                     if ((!cacheObject.IsBoss || shouldIgnoreBosses) && !cacheObject.IsBountyObjective &&
                                         shouldIgnoreElites && cacheObject.IsEliteRareUnique && !isInHotSpot &&
-                                        !(cacheObject.HitPointsPct <= (Settings.Combat.Misc.ForceKillElitesHealth / 100)))
+                                        (!(cacheObject.HitPointsPct <= (Settings.Combat.Misc.ForceKillElitesHealth / 100)))
+                                        || HealthGlobeEmergency || GetHiPriorityShrine)
                                     {
                                         objWeightInfo = "Ignoring ";
                                         ignoring = true;
