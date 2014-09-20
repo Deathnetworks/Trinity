@@ -24,6 +24,7 @@ namespace Trinity.Config
         private bool _UsePowerPylon;
         private bool _UseFleetingShrine;
         private bool _HiPriorityShrines;
+        private bool _HiPriorityContainers;
         private bool _OpenAnyContainer;
         private bool _InspectWeaponRacks;
         private bool _InspectGroundClicky;
@@ -327,6 +328,24 @@ namespace Trinity.Config
 
         [DataMember(IsRequired = false)]
         [DefaultValue(false)]
+        public bool HiPriorityContainers
+        {
+            get
+            {
+                return _HiPriorityContainers;
+            }
+            set
+            {
+                if (_HiPriorityContainers != value)
+                {
+                    _HiPriorityContainers = value;
+                    OnPropertyChanged("HiPriorityContainers");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
         public bool OpenAnyContainer
         {
             get
@@ -569,6 +588,8 @@ namespace Trinity.Config
             OpenContainers = true;
             OpenRareChests = true;
             OpenContainerDelay = 500;
+            HiPriorityShrines = false;
+            HiPriorityContainers = false;
             EnableBountyEvents = true;
             UseChannelingPylon = true;
             UseConduitPylon = true;

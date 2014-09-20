@@ -51,7 +51,9 @@ namespace Trinity
 
                 bool HiPriorityShrine = Settings.WorldObject.HiPriorityShrines;
 
-                bool GetHiPriorityShrine = ObjectCache.Any(o => o.Type == GObjectType.Shrine) && HiPriorityShrine;
+                bool GetHiPriorityShrine = ObjectCache.Any(s => s.Type == GObjectType.Shrine) && HiPriorityShrine;
+
+                bool GetHiPriorityContainer = Settings.WorldObject.HiPriorityContainers && ObjectCache.Any(c => c.Type == GObjectType.Container);
 
                 bool profileTagCheck = false;
 
@@ -105,9 +107,9 @@ namespace Trinity
                         Player.Level >= 15 &&
                         Player.CurrentHealthPct > 0.10 &&
                         DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds > 500) ||
-                        HealthGlobeEmergency || GetHiPriorityShrine;
+                        HealthGlobeEmergency || GetHiPriorityShrine || GetHiPriorityContainer;
 
-                bool shouldIgnoreBosses = HealthGlobeEmergency || GetHiPriorityShrine;
+                bool shouldIgnoreBosses = HealthGlobeEmergency || GetHiPriorityShrine || GetHiPriorityContainer;
 
                 foreach (TrinityCacheObject cacheObject in ObjectCache.OrderBy(c => c.Distance))
                 {
@@ -179,7 +181,7 @@ namespace Trinity
                                     if ((!cacheObject.IsBoss || shouldIgnoreBosses) && !cacheObject.IsBountyObjective &&
                                         shouldIgnoreElites && cacheObject.IsEliteRareUnique && !isInHotSpot &&
                                         (!(cacheObject.HitPointsPct <= (Settings.Combat.Misc.ForceKillElitesHealth / 100)))
-                                        || HealthGlobeEmergency || GetHiPriorityShrine)
+                                        || HealthGlobeEmergency || GetHiPriorityShrine || GetHiPriorityContainer)
                                     {
                                         objWeightInfo = "Ignoring ";
                                         ignoring = true;
@@ -1087,7 +1089,7 @@ namespace Trinity
                                     cacheObject.Weight += 600d;
 
                                 // Open container for the damage buff
-                                if (Legendary.HarringtonWaistguard.IsEquipped && !Legendary.HarringtonWaistguard.IsBuffActive && ZetaDia.Me.IsInCombat && cacheObject.Distance < 80f)
+                                if (Legendary.HarringtonWaistguard.IsEquipped && !Legendary.HarringtonWaistguard.IsBuffActive && ZetaDia.Me.IsInCombat && cacheObject.Distance < 80f || GetHiPriorityContainer)
                                     cacheObject.Weight += 20000d;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets

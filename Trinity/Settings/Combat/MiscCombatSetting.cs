@@ -603,6 +603,7 @@ namespace Trinity.Config.Combat
             ForceKillSummoners = true;
             AvoidAoEOutOfCombat = true;
             FleeInGhostMode = true;
+            HiPriorityHG = false;
         }
         #endregion Methods
     }
