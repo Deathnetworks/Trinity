@@ -225,6 +225,8 @@ namespace Trinity
                 // Ignore all LoS
                 AddToCache = RefreshStepIgnoreLoS(AddToCache);
                 if (!AddToCache) { c_IgnoreReason = "IgnoreLoS"; return AddToCache; }
+
+                AddLoSUnit();
             }
 
             // If it's a unit, add it to the monster cache
@@ -702,24 +704,31 @@ namespace Trinity
 
                 // No need for raycasting in certain level areas (rift trial for example)
                 if (DataDictionary.NeverRaycastLevelAreaIds.Contains(Player.LevelAreaId))
+                {
+                    c_HasBeenInLoS = true;
                     return true;
+                }
 
                 if (!DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
                 {
                     // Bounty Objectives should always be on the weight list
                     if (CurrentCacheObject.IsBountyObjective)
+                    {
+                        c_HasBeenInLoS = true;
                         return true;
+                    }
 
                     // Quest Monsters should get LoS white-listed
                     if (CurrentCacheObject.IsQuestMonster)
+                    {
+                        c_HasBeenInLoS = true;
                         return true;
+                    }
 
                     // Always LoS Units during events
                     if (CurrentCacheObject.Type == GObjectType.Unit && Player.InActiveEvent)
                     {
-                        if (!CacheData.HasBeenInLoS.ContainsKey(CurrentCacheObject.RActorGuid))
-                            CacheData.HasBeenInLoS.Add(CurrentCacheObject.RActorGuid, true);
-
+                        c_HasBeenInLoS = true;
                         return true;
                     }
                 }
@@ -791,8 +800,6 @@ namespace Trinity
                                 else
                                 {
                                     c_HasBeenInLoS = true;
-                                    if (!CacheData.HasBeenInLoS.ContainsKey(CurrentCacheObject.RActorGuid))
-                                        CacheData.HasBeenInLoS.Add(CurrentCacheObject.RActorGuid, c_HasBeenInLoS);
                                 }
 
                             }
@@ -1017,6 +1024,12 @@ namespace Trinity
                 CacheData.CurrentUnitHealth[CurrentCacheObject.RActorGuid] = dThisCurrentHealth;
                 CacheData.LastCheckedUnitHealth[CurrentCacheObject.RActorGuid] = iLastCheckedHealth;
             }
+        }
+
+        private static void AddLoSUnit()
+        {
+            if (CurrentCacheObject.IsUnit && !CacheData.HasBeenInLoS.ContainsKey(CurrentCacheObject.RActorGuid))
+                CacheData.HasBeenInLoS.Add(CurrentCacheObject.RActorGuid, c_HasBeenInLoS);
         }
 
     }

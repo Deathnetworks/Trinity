@@ -207,7 +207,7 @@ namespace Trinity
                     return 0;
 
                 return Trinity.ObjectCache
-                    .Count(u => u.RActorGuid != this.RActorGuid && u.IsUnit && u.Position.Distance2D(this.Position) <= range); // && u.HasBeenInLoS);
+                    .Count(u => u.RActorGuid != this.RActorGuid && u.IsUnit && u.Position.Distance2D(this.Position) <= range && u.HasBeenInLoS);
             }
         }
 
