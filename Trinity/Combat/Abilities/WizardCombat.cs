@@ -41,6 +41,9 @@ namespace Trinity.Combat.Abilities
             {
                 return GetCombatPower();
             }
+            // Destructibles
+            if (UseDestructiblePower)
+                return DestroyObjectPower();
 
             // Default attacks
             return DefaultPower;
@@ -516,10 +519,8 @@ namespace Trinity.Combat.Abilities
         /// <summary>
         /// Gets the best Wizard object destruction power
         /// </summary>
-        private static TrinityPower DestroyObjectPower
+        private static TrinityPower DestroyObjectPower()
         {
-            get
-            {
                 if (CanCast(SNOPower.Wizard_WaveOfForce) && Player.PrimaryResource >= 25)
                     return new TrinityPower(SNOPower.Wizard_WaveOfForce, 9f);
 
@@ -547,7 +548,6 @@ namespace Trinity.Combat.Abilities
                 if (CanCast(SNOPower.Wizard_Blizzard))
                     return new TrinityPower(SNOPower.Wizard_Blizzard, 9f);
                 return DefaultPower;
-            }
         }
 
         /// <summary>

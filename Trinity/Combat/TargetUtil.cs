@@ -188,6 +188,7 @@ namespace Trinity
                 (from u in ObjectCache
                  where u.IsUnit &&
                  u.RadiusDistance <= maxRange
+                 orderby u.IsEliteRareUnique descending
                  orderby u.CountUnitsInFront() descending
                  select u).FirstOrDefault();
             if (result == null && CurrentTarget != null)
@@ -203,14 +204,15 @@ namespace Trinity
                 (from u in ObjectCache
                  where u.IsUnit &&
                  u.RadiusDistance <= maxRange
-                 orderby u.IsPlayerFacing(arcDegrees) descending
+                 orderby u.IsEliteRareUnique descending
                  orderby u.CountUnitsInFront() descending
                  select u).FirstOrDefault();
-            if (result == null && CurrentTarget != null)
-                result = CurrentTarget;
-            else
-                result = GetBestClusterUnit(15f, maxRange);
-            return result;
+
+            if (result != null) return result;
+
+            if (CurrentTarget != null)
+                return CurrentTarget;
+            return GetBestClusterUnit(15f, maxRange);
         }
 
         private static Vector3 GetBestAoEMovementPosition()
