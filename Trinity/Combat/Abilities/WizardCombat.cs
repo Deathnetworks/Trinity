@@ -40,7 +40,8 @@ namespace Trinity.Combat.Abilities
             if (CurrentTarget != null)
             {
                 return GetCombatPower();
-
+            }
+            
             // Destructibles
             if (UseDestructiblePower)
                 return DestroyObjectPower();
