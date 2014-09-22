@@ -79,6 +79,7 @@
                         <CheckBox IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=Avoidance}">Log Avoidance System</CheckBox>
                         <CheckBox IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=Animation}">Log Monster Animations</CheckBox>
                         <CheckBox IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=UnknownObjects}">Log Unknown Objects</CheckBox>
+                        <CheckBox IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=ActiveBuffs}">Log Active Buffs</CheckBox>
                     </UniformGrid>
                 </GroupBox>
                 <!--TPS-->

@@ -91,6 +91,8 @@ namespace Trinity
                     // Recording of all the XML's in use this run
                     UsedProfileManager.RecordProfile();
 
+                    DebugUtil.LogOnPulse();
+
                     MonkCombat.Monk_MaintainTempestRush();
                 }
                 catch (AccessViolationException)
