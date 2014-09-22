@@ -38,6 +38,8 @@ namespace Trinity
         private static GItemType c_item_GItemType = GItemType.Unknown;
         private static MonsterSize c_unit_MonsterSize = MonsterSize.Unknown;
         private static DiaObject c_diaObject = null;
+        private static DiaUnit c_diaUnit = null;
+        private static DiaGizmo c_diaGizmo = null;
         private static SNOAnim c_CurrentAnimation = SNOAnim.Invalid;
         private static bool c_unit_IsElite = false;
         private static bool c_unit_IsRare = false;
@@ -96,7 +98,6 @@ namespace Trinity
 
                 // Get Name
                 CurrentCacheObject.InternalName = nameNumberTrimRegex.Replace(freshObject.Name, "");
-                CurrentCacheObject.InternalName = nameNumberTrimRegex.Replace(freshObject.Name, "");
 
                 CurrentCacheObject.ActorSNO = freshObject.ActorSNO;
                 CurrentCacheObject.ActorType = freshObject.ActorType;
@@ -111,7 +112,7 @@ namespace Trinity
             CurrentCacheObject.LastSeenTime = DateTime.UtcNow;
 
             // Position
-            CurrentCacheObject.Position = CurrentCacheObject.Object.Position;
+            CurrentCacheObject.Position = c_diaObject.Position;
 
             // Distance
             CurrentCacheObject.Distance = Player.Position.Distance2D(CurrentCacheObject.Position);
@@ -121,7 +122,7 @@ namespace Trinity
             {
                 try
                 {
-                    radius = CurrentCacheObject.Object.CollisionSphere.Radius;
+                    radius = c_diaObject.CollisionSphere.Radius;
                 }
                 catch (Exception ex)
                 {
@@ -365,6 +366,8 @@ namespace Trinity
             c_item_GItemType = GItemType.Unknown;
             c_unit_MonsterSize = MonsterSize.Unknown;
             c_diaObject = null;
+            c_diaUnit = null;
+            c_diaGizmo = null;
             c_CurrentAnimation = SNOAnim.Invalid;
             c_HasDotDPS = false;
             c_MonsterAffixes = MonsterAffixes.None;
@@ -378,11 +381,11 @@ namespace Trinity
             // Null Common Data makes a DiaUseless!
             if (CurrentCacheObject.Type == GObjectType.Unit || CurrentCacheObject.Type == GObjectType.Item || CurrentCacheObject.Type == GObjectType.Gold)
             {
-                if (CurrentCacheObject.CommonData == null)
+                if (c_diaObject.CommonData == null)
                 {
                     AddToCache = false;
                 }
-                if (CurrentCacheObject.CommonData != null && !CurrentCacheObject.CommonData.IsValid)
+                if (c_diaObject.CommonData != null && !c_diaObject.CommonData.IsValid)
                 {
                     AddToCache = false;
                 }
@@ -415,8 +418,8 @@ namespace Trinity
                 try
                 {
                     // Check if it's a unit with an animation we should avoid. We need to recheck this every time.
-                    if (CurrentCacheObject.Unit != null && CurrentCacheObject.CommonData != null &&
-                        Settings.Combat.Misc.AvoidAOE && DataDictionary.AvoidanceAnimations.Contains(new DoubleInt(CurrentCacheObject.ActorSNO, (int)CurrentCacheObject.CommonData.CurrentAnimation)))
+                    if (c_diaObject is DiaUnit &&
+                        Settings.Combat.Misc.AvoidAOE && DataDictionary.AvoidanceAnimations.Contains(new DoubleInt(CurrentCacheObject.ActorSNO, (int)c_diaObject.CommonData.CurrentAnimation)))
                     {
                         // The ActorSNO and Animation match a known pair, avoid this!
                         // Example: "Grotesque" death animation
@@ -438,7 +441,7 @@ namespace Trinity
                             bool hasBuff = false;
                             try
                             {
-                                hasBuff = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.HasLookOverride) > 0;
+                                hasBuff = c_diaObject.CommonData.GetAttribute<int>(ActorAttributeType.HasLookOverride) > 0;
                             }
                             catch
                             {
@@ -476,18 +479,19 @@ namespace Trinity
                     {
                         using (new PerformanceLogger("RefreshCachedType.1"))
                         {
-                            if (CurrentCacheObject.CommonData == null)
+                            if (c_diaObject.CommonData == null)
                             {
                                 c_IgnoreSubStep = "InvalidUnitCommonData";
                                 AddToCache = false;
                             }
-                            else if (c_diaObject.ACDGuid != CurrentCacheObject.CommonData.ACDGuid)
+                            else if (c_diaObject.ACDGuid != c_diaObject.CommonData.ACDGuid)
                             {
                                 c_IgnoreSubStep = "InvalidUnitACDGuid";
                                 AddToCache = false;
                             }
                             else
                             {
+                                c_diaUnit = c_diaObject as DiaUnit;
                                 CurrentCacheObject.Type = GObjectType.Unit;
                             }
                         }
@@ -502,11 +506,11 @@ namespace Trinity
                         {
                             CurrentCacheObject.Type = GObjectType.Item;
 
-                            if (CurrentCacheObject.CommonData == null)
+                            if (c_diaObject.CommonData == null)
                             {
                                 AddToCache = false;
                             }
-                            if (CurrentCacheObject.CommonData != null && c_diaObject.ACDGuid != CurrentCacheObject.CommonData.ACDGuid)
+                            if (c_diaObject.CommonData != null && c_diaObject.ACDGuid != c_diaObject.CommonData.ACDGuid)
                             {
                                 AddToCache = false;
                             }
@@ -523,7 +527,6 @@ namespace Trinity
                     else if (c_diaObject is DiaGizmo && c_diaObject.ActorType == ActorType.Gizmo && CurrentCacheObject.Distance <= 90)
                     {
 
-                        DiaGizmo c_diaGizmo;
                         c_diaGizmo = (DiaGizmo)c_diaObject;
 
                         if (CurrentCacheObject.InternalName.Contains("CursedChest"))
@@ -1027,6 +1030,33 @@ namespace Trinity
                 CacheData.LastCheckedUnitHealth[CurrentCacheObject.RActorGuid] = iLastCheckedHealth;
             }
         }
+        private static void CacheObjectMinimapActive()
+        {
+            try
+            {
+                CurrentCacheObject.IsMinimapActive = c_diaObject.CommonData.GetAttribute<int>(ActorAttributeType.MinimapActive) > 0;
+            }
+            catch
+            {
+                // Stuff it
+
+            }
+        }
+        private static void CacheObjectIsBountyObjective()
+        {
+            try
+            {
+                CurrentCacheObject.IsBountyObjective = (c_diaObject.CommonData.GetAttribute<int>(ActorAttributeType.BountyObjective) != 0);
+                if (CurrentCacheObject.IsBountyObjective)
+                    CurrentCacheObject.KillRange = CurrentCacheObject.RadiusDistance + 10f;
+            }
+            catch
+            {
+                // Stuff it
+            }
+        }
+
+
 
         private static void AddLoSUnit()
         {

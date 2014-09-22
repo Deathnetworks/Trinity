@@ -17,7 +17,7 @@ namespace Trinity
         {
             try
             {
-                CurrentCacheObject.Animation = CurrentCacheObject.Object.CommonData.CurrentAnimation;
+                CurrentCacheObject.Animation = c_diaObject.CommonData.CurrentAnimation;
             }
             catch (Exception ex)
             {

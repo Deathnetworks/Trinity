@@ -41,56 +41,22 @@ namespace Trinity
                 c_IgnoreSubStep = "";
             }
 
-            try
+            CacheObjectIsBountyObjective();
+
+            CacheObjectMinimapActive();
+
+            if (c_diaObject is DiaGizmo)
             {
-                CurrentCacheObject.IsBountyObjective = (CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.BountyObjective) > 0);
-            }
-            catch (Exception)
-            {
-                Logger.LogDebug("Error refreshing IsBountyObjective");
-            }
-            try
-            {
-                CurrentCacheObject.IsQuestMonster = CurrentCacheObject.Object.CommonData.GetAttribute<int>(ActorAttributeType.QuestMonster) > 1;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogDebug(LogCategory.CacheManagement, "Error reading IsQuestMonster for Unit sno:{0} raGuid:{1} name:{2} ex:{3}",
-                    CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
+                CurrentCacheObject.GizmoType = c_diaGizmo.ActorInfo.GizmoType;
             }
 
-            try
-            {
-                CurrentCacheObject.IsMinimapActive = CurrentCacheObject.Object.CommonData.GetAttribute<int>(ActorAttributeType.MinimapActive) > 0;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogDebug(LogCategory.CacheManagement, "Error reading MinimapActive for Gizmo sno:{0} raGuid:{1} name:{2} ex:{3}",
-                    CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
-            }
-
-            try
-            {
-                CurrentCacheObject.IsQuestMonster = CurrentCacheObject.Object.CommonData.GetAttribute<int>(ActorAttributeType.QuestMonster) > 0;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogDebug(LogCategory.CacheManagement, "Error reading IsQuestMonster for Gizmo sno:{0} raGuid:{1} name:{2} ex:{3}",
-                    CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
-            }
-
-            if (CurrentCacheObject.Gizmo != null)
-            {
-                CurrentCacheObject.GizmoType = CurrentCacheObject.Gizmo.ActorInfo.GizmoType;
-            }
-
-                        // Anything that's been disabled by a script
+            // Anything that's been disabled by a script
             bool isGizmoDisabledByScript = false;
             try
             {
-                if (CurrentCacheObject.Object is DiaGizmo)
+                if (c_diaObject is DiaGizmo)
                 {
-                    isGizmoDisabledByScript = CurrentCacheObject.Object.CommonData.GetAttribute<int>(ActorAttributeType.GizmoDisabledByScript) > 0;
+                    isGizmoDisabledByScript = c_diaGizmo.IsGizmoDisabledByScript;
                 }
             }
             catch
@@ -133,9 +99,9 @@ namespace Trinity
             bool untargetable = false;
             try
             {
-                if (CurrentCacheObject.Object is DiaGizmo)
+                if (c_diaObject is DiaGizmo)
                 {
-                    untargetable = CurrentCacheObject.Object.CommonData.GetAttribute<int>(ActorAttributeType.Untargetable) > 0;
+                    untargetable = CacheObjectUntargetable() > 0;
                 }
             }
             catch
@@ -148,9 +114,9 @@ namespace Trinity
             bool invulnerable = false;
             try
             {
-                if (CurrentCacheObject.Object is DiaGizmo)
+                if (c_diaObject is DiaGizmo)
                 {
-                    invulnerable = CurrentCacheObject.Object.CommonData.GetAttribute<int>(ActorAttributeType.Invulnerable) > 0;
+                    invulnerable = CacheObjectInvulnerable() > 0;
                 }
             }
             catch
@@ -161,9 +127,9 @@ namespace Trinity
             bool noDamage = false;
             try
             {
-                if (CurrentCacheObject.Object is DiaGizmo)
+                if (c_diaObject is DiaGizmo)
                 {
-                    noDamage = CurrentCacheObject.Object.CommonData.GetAttribute<int>(ActorAttributeType.NoDamage) > 0;
+                    noDamage = CacheObjectNoDamage() > 0;
                 }
             }
             catch
@@ -203,7 +169,7 @@ namespace Trinity
                                 RActorGUID = CurrentCacheObject.RActorGuid,
                                 ObjectType = CurrentCacheObject.Type,
                             });
-                            
+
                             c_IgnoreSubStep = "IsLocked";
                             return false;
                         }
@@ -216,7 +182,7 @@ namespace Trinity
 
                         try
                         {
-                            string currentAnimation = CurrentCacheObject.CommonData.CurrentAnimation.ToString().ToLower();
+                            string currentAnimation = c_diaObject.CommonData.CurrentAnimation.ToString().ToLower();
                             gizmoUsed = currentAnimation.EndsWith("open") || currentAnimation.EndsWith("opening");
 
                             // special hax for A3 Iron Gates
@@ -235,7 +201,7 @@ namespace Trinity
 
                         try
                         {
-                            int gizmoState = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.GizmoState);
+                            int gizmoState = CacheObjectGizmoState();
                             if (gizmoState == 1)
                             {
                                 c_IgnoreSubStep = "GizmoState=1";
@@ -301,10 +267,10 @@ namespace Trinity
                         }
                     }
                     break;
-               case GObjectType.Interactable:
+                case GObjectType.Interactable:
                     {
                         AddToCache = true;
-                        
+
                         if (untargetable)
                         {
                             MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
@@ -325,14 +291,14 @@ namespace Trinity
                         int endAnimation;
                         if (DataDictionary.InteractEndAnimations.TryGetValue(CurrentCacheObject.ActorSNO, out endAnimation))
                         {
-                            if (endAnimation == (int)CurrentCacheObject.Gizmo.CommonData.CurrentAnimation)
+                            if (endAnimation == (int)c_diaGizmo.CommonData.CurrentAnimation)
                             {
                                 c_IgnoreSubStep = "EndAnimation";
                                 return false;
                             }
                         }
 
-                        if (CurrentCacheObject.Gizmo.HasBeenOperated)
+                        if (c_diaGizmo.HasBeenOperated)
                         {
                             c_IgnoreSubStep = "GizmoHasBeenOperated";
                             return false;
@@ -346,7 +312,7 @@ namespace Trinity
                         AddToCache = true;
                         try
                         {
-                            gizmoUsed = (CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.GizmoCharges) <= 0 && CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.GizmoCharges) > 0);
+                            gizmoUsed = (CacheObjectGizmoCharges() <= 0 && CacheObjectGizmoCharges() > 0);
                         }
                         catch
                         {
@@ -356,7 +322,7 @@ namespace Trinity
                         }
                         try
                         {
-                            int gizmoState = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.GizmoState);
+                            int gizmoState = CacheObjectGizmoState();
                             if (gizmoState == 1)
                             {
                                 AddToCache = false;
@@ -411,7 +377,7 @@ namespace Trinity
 
                         try
                         {
-                            int gizmoState = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.GizmoState);
+                            int gizmoState = CacheObjectGizmoState();
                             if (gizmoState == 1)
                             {
                                 AddToCache = false;
@@ -830,7 +796,7 @@ namespace Trinity
                         bool chestOpen;
                         try
                         {
-                            chestOpen = (CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.ChestOpen) > 0);
+                            chestOpen = CacheObjectIsChestOpen() > 0;
                         }
                         catch
                         {
@@ -888,7 +854,7 @@ namespace Trinity
                             if (isWeaponRack && Settings.WorldObject.InspectWeaponRacks)
                                 return true;
                         }
-                      
+
                         if (CurrentCacheObject.IsQuestMonster)
                         {
                             AddToCache = true;
@@ -913,6 +879,36 @@ namespace Trinity
                     }
             }
             return AddToCache;
+        }
+
+        private static int CacheObjectIsChestOpen()
+        {
+            return c_diaObject.CommonData.GetAttribute<int>(ActorAttributeType.ChestOpen);
+        }
+
+        private static int CacheObjectGizmoCharges()
+        {
+            return c_diaObject.CommonData.GetAttribute<int>(ActorAttributeType.GizmoCharges);
+        }
+
+        private static int CacheObjectGizmoState()
+        {
+            return c_diaObject.CommonData.GetAttribute<int>(ActorAttributeType.GizmoState);
+        }
+
+        private static int CacheObjectNoDamage()
+        {
+            return c_diaObject.CommonData.GetAttribute<int>(ActorAttributeType.NoDamage);
+        }
+
+        private static int CacheObjectInvulnerable()
+        {
+            return c_diaObject.CommonData.GetAttribute<int>(ActorAttributeType.Invulnerable);
+        }
+
+        private static int CacheObjectUntargetable()
+        {
+            return c_diaObject.CommonData.GetAttribute<int>(ActorAttributeType.Untargetable);
         }
     }
 }

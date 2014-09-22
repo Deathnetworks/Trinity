@@ -37,8 +37,8 @@ namespace Trinity
                 ((DiaItem)c_diaObject).CommonData.GetAttribute<int>(ActorAttributeType.ItemQualityLevelIdentified);
                 c_ItemDisplayName = diaItem.CommonData.Name;
 
-                CurrentCacheObject.DynamicID = CurrentCacheObject.CommonData.DynamicId;
-                CurrentCacheObject.GameBalanceID = CurrentCacheObject.CommonData.GameBalanceId;
+                CurrentCacheObject.DynamicID = c_diaObject.CommonData.DynamicId;
+                CurrentCacheObject.GameBalanceID = c_diaObject.CommonData.GameBalanceId;
 
                 c_ItemLevel = diaItem.CommonData.Level;
                 c_DBItemBaseType = diaItem.CommonData.ItemBaseType;
@@ -89,13 +89,13 @@ namespace Trinity
                     }
                 }
 
-                float damage, toughness, healing = 0;
-                bool isUpgrade = false;
+                //float damage, toughness, healing = 0;
+                //bool isUpgrade = false;
 
-                diaItem.CommonData.GetStatChanges(out damage, out healing, out toughness);
+                //diaItem.CommonData.GetStatChanges(out damage, out healing, out toughness);
 
-                if (damage > 0 && toughness > 0)
-                    isUpgrade = true;
+                //if (damage > 0 && toughness > 0)
+                //    isUpgrade = true;
 
                 var pickupItem = new PickupItem
                 {
@@ -116,10 +116,10 @@ namespace Trinity
                     ActorSNO = CurrentCacheObject.ActorSNO,
                     ACDGuid = CurrentCacheObject.ACDGuid,
                     RActorGUID = CurrentCacheObject.RActorGuid,
-                    IsUpgrade = isUpgrade,
-                    UpgradeDamage = damage,
-                    UpgradeToughness = toughness,
-                    UpgradeHealing = healing
+                    //IsUpgrade = isUpgrade,
+                    //UpgradeDamage = damage,
+                    //UpgradeToughness = toughness,
+                    //UpgradeHealing = healing
                 };
 
                 // Treat all globes as a yes
@@ -155,7 +155,7 @@ namespace Trinity
                     }
                     else if (Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy)
                     {
-                        AddToCache = ItemManager.Current.ShouldPickUpItem((ACDItem)CurrentCacheObject.CommonData);
+                        AddToCache = ItemManager.Current.ShouldPickUpItem((ACDItem)c_diaObject.CommonData);
                     }
                     else if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
                     {
@@ -214,7 +214,7 @@ namespace Trinity
             {
                 try
                 {
-                    c_GoldStackSize = ((ACDItem)CurrentCacheObject.CommonData).Gold;
+                    c_GoldStackSize = ((ACDItem)c_diaObject.CommonData).Gold;
                 }
                 catch
                 {
