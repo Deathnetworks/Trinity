@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using Trinity.Technicals;
+using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 
 namespace Trinity.Helpers
@@ -71,6 +72,11 @@ namespace Trinity.Helpers
         public static bool LogCategoryEnabled(LogCategory category)
         {
             return Trinity.Settings != null && Trinity.Settings.Advanced.LogCategories.HasFlag(category);
+        }
+
+        internal static void LogOnPulse()
+        {
+            Trinity.listCachedBuffs.ForEach(b => Logger.Log(LogCategory.ActiveBuffs,"Buff '{0}' is Active", b.InternalName));
         }
     }
 }

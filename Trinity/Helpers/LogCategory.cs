@@ -26,5 +26,6 @@ namespace Trinity.Technicals
         SpellTrack = 16384,
         Animation = 32768,
         UnknownObjects = 65536,
+        ActiveBuffs = 131072,
     }
 }
