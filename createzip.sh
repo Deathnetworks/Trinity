@@ -2,7 +2,7 @@
 
 ### For RRRIX's cygwin script :)
 
-VERSION=`cat /c/db/Plugins/Trinity/Plugin.cs | grep "new Version" | sed -E 's/ +return new Version//g' | sed -E 's/[\(\);]//g' | sed -E 's/, /./g'`
+VERSION=`cat /c/db/Plugins/Trinity/Plugin.cs | grep "new Version" | sed -E 's/ +return new Version//g' | sed -E 's/[\(\);]//g' | sed -E 's/, /./g' | sed -E 's/ //g'`
 
 A="TrinityPlugin-"
 B=$VERSION
@@ -12,4 +12,7 @@ ZIPFILE=$A$B$D
 
 ./CreateZip.cmd
 
-mv Latest-Trinity.zip ../Builds/$ZIPFILE
+
+echo Moving ZipFile to ../Builds/$ZIPFILE 
+
+mv -v Latest-Trinity.zip ../Builds/$ZIPFILE
