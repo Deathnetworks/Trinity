@@ -191,11 +191,13 @@ namespace Trinity
                  orderby u.IsEliteRareUnique descending
                  orderby u.CountUnitsInFront() descending
                  select u).FirstOrDefault();
-            if (result == null && CurrentTarget != null)
-                result = CurrentTarget;
-            else
-                result = GetBestClusterUnit(15f, maxRange);
-            return result;
+            if (result != null)
+                return result;
+
+            if (CurrentTarget != null)
+                return CurrentTarget;
+
+            return GetBestClusterUnit(15f, maxRange);
         }
 
         internal static TrinityCacheObject GetBestArcTarget(float maxRange, float arcDegrees)
@@ -204,11 +206,11 @@ namespace Trinity
                 (from u in ObjectCache
                  where u.IsUnit &&
                  u.RadiusDistance <= maxRange
-                 orderby u.IsEliteRareUnique descending
                  orderby u.CountUnitsInFront() descending
                  select u).FirstOrDefault();
 
-            if (result != null) return result;
+            if (result != null)
+                return result;
 
             if (CurrentTarget != null)
                 return CurrentTarget;
