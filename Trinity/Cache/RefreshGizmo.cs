@@ -15,6 +15,11 @@ namespace Trinity
     {
         private static bool RefreshGizmo(bool AddToCache)
         {
+            if (!(c_diaObject is DiaGizmo))
+                return false;
+
+            c_diaGizmo = c_diaObject as DiaGizmo;
+
             if (!Settings.WorldObject.AllowPlayerResurection && CurrentCacheObject.ActorSNO == DataDictionary.PLAYER_HEADSTONE_SNO)
             {
                 c_IgnoreSubStep = "IgnoreHeadstones";
@@ -45,7 +50,8 @@ namespace Trinity
 
             CacheObjectMinimapActive();
 
-            if (c_diaObject is DiaGizmo)
+
+            if (c_diaGizmo != null)
             {
                 CurrentCacheObject.GizmoType = c_diaGizmo.ActorInfo.GizmoType;
             }
