@@ -19,23 +19,26 @@ namespace Trinity
         {
             bool addToCache = true;
 
-            if (CurrentCacheObject.Unit == null)
+            if (!(c_diaObject is DiaUnit))
                 return false;
 
-            if (!CurrentCacheObject.Unit.IsValid)
+            if (c_diaUnit == null)
                 return false;
 
-            if (!CurrentCacheObject.Unit.CommonData.IsValid)
+            if (!c_diaUnit.IsValid)
                 return false;
 
-            if (CurrentCacheObject.CommonData.ACDGuid == -1)
+            if (!c_diaUnit.CommonData.IsValid)
+                return false;
+
+            if (c_diaObject.CommonData.ACDGuid == -1)
                 return false;
 
             // Always set this, otherwise we divide by zero later
             CurrentCacheObject.KillRange = CurrentBotKillRange;
 
             // grab this first
-            c_CurrentAnimation = CurrentCacheObject.Unit.CommonData.CurrentAnimation;
+            c_CurrentAnimation = c_diaUnit.CommonData.CurrentAnimation;
 
             // See if this is a boss
             CurrentCacheObject.IsBoss = DataDictionary.BossIds.Contains(CurrentCacheObject.ActorSNO);
@@ -47,11 +50,11 @@ namespace Trinity
 
             try
             {
-                if (CurrentCacheObject.Unit.Movement.IsValid)
+                if (c_diaUnit.Movement.IsValid)
                 {
-                    c_IsFacingPlayer = CurrentCacheObject.Unit.IsFacingPlayer;
-                    c_Rotation = CurrentCacheObject.Unit.Movement.Rotation;
-                    c_DirectionVector = CurrentCacheObject.Unit.Movement.DirectionVector;
+                    c_IsFacingPlayer = c_diaUnit.IsFacingPlayer;
+                    c_Rotation = c_diaUnit.Movement.Rotation;
+                    c_DirectionVector = c_diaUnit.Movement.DirectionVector;
                 }
             }
             catch (Exception ex)
@@ -71,7 +74,7 @@ namespace Trinity
             }
             else
             {
-                teamId = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.TeamID);
+                teamId = c_diaUnit.TeamId;
 
                 GenericCache.AddToCache(new GenericCacheObject
                 {
@@ -81,48 +84,24 @@ namespace Trinity
                 });
             }
 
-            try
-            {
-                CurrentCacheObject.IsBountyObjective = (CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.BountyObjective) != 0);
-                if (CurrentCacheObject.IsBountyObjective)
-                    CurrentCacheObject.KillRange = CurrentCacheObject.RadiusDistance + 10f;
-            }
-            catch (Exception)
-            {
-                Logger.LogDebug("Error refreshing IsBountyObjective");
-            }
+            CacheObjectIsBountyObjective();
 
             try
             {
-                CurrentCacheObject.IsNPC = (CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.IsNPC) > 0);
+                CurrentCacheObject.IsNPC = c_diaUnit.IsNPC;
             }
             catch (Exception)
             {
                 Logger.LogDebug("Error refreshing IsNPC");
             }
 
-            try
-            {
-                CurrentCacheObject.NPCIsOperable = (CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.NPCIsOperatable) > 0);
-            }
-            catch (Exception)
-            {
-                Logger.LogDebug("Error refreshing NPCIsOperable");
-            }
+            CacheUnitNPCIsOperatable();
+
+            CacheObjectMinimapActive();
 
             try
             {
-                CurrentCacheObject.IsMinimapActive = CurrentCacheObject.Unit.CommonData.GetAttribute<int>(ActorAttributeType.MinimapActive) > 0;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogDebug(LogCategory.CacheManagement, "Error reading IsMinimapActive for Unit sno:{0} raGuid:{1} name:{2} ex:{3}",
-                    CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
-            }
-
-            try
-            {
-                CurrentCacheObject.IsQuestMonster = CurrentCacheObject.Unit.CommonData.GetAttribute<int>(ActorAttributeType.QuestMonster) > 1;
+                CurrentCacheObject.IsQuestMonster = c_diaUnit.IsQuestMonster;
                 if (CurrentCacheObject.IsQuestMonster)
                     CurrentCacheObject.KillRange = CurrentCacheObject.RadiusDistance + 10f;
             }
@@ -134,7 +113,7 @@ namespace Trinity
 
             try
             {
-                CurrentCacheObject.IsQuestGiver = CurrentCacheObject.Unit.IsQuestGiver;
+                CurrentCacheObject.IsQuestGiver = c_diaUnit.IsQuestGiver;
 
                 // Interact with quest givers, except when doing town-runs
                 if (ZetaDia.CurrentAct == Act.OpenWorld && CurrentCacheObject.IsQuestGiver && !(IsReadyToTownRun || ForceVendorRunASAP || BrainBehavior.IsVendoring))
@@ -160,7 +139,7 @@ namespace Trinity
             /* Always refresh monster type */
             if (CurrentCacheObject.Type != GObjectType.Player && !CurrentCacheObject.IsBoss)
             {
-                switch (CurrentCacheObject.CommonData.MonsterInfo.MonsterType)
+                switch (c_diaObject.CommonData.MonsterInfo.MonsterType)
                 {
                     case MonsterType.Ally:
                     case MonsterType.Scenery:
@@ -224,7 +203,7 @@ namespace Trinity
                 return addToCache;
             }
 
-            if (CurrentCacheObject.Unit.IsDead)
+            if (c_diaUnit.IsDead)
             {
                 addToCache = false;
                 c_IgnoreSubStep = "IsDead";
@@ -234,7 +213,7 @@ namespace Trinity
             if (CurrentCacheObject.IsQuestMonster || CurrentCacheObject.IsBountyObjective)
                 return true;
 
-            addToCache = RefreshUnitAttributes(addToCache, CurrentCacheObject.Unit);
+            addToCache = RefreshUnitAttributes(addToCache, c_diaUnit);
 
             if (!addToCache)
                 return addToCache;
@@ -248,6 +227,18 @@ namespace Trinity
             return addToCache;
         }
 
+        private static void CacheUnitNPCIsOperatable()
+        {
+            try
+            {
+                CurrentCacheObject.NPCIsOperable = (c_diaObject.CommonData.GetAttribute<int>(ActorAttributeType.NPCIsOperatable) > 0);
+            }
+            catch (Exception)
+            {
+                Logger.LogDebug("Error refreshing NPCIsOperable");
+            }
+        }
+
         internal static Transform SetVector(Grid ctl)
         {
             return ctl.RenderTransform = new RotateTransform(180, ctl.RenderSize.Width / 2, ctl.RenderSize.Height / 2);
@@ -255,7 +246,7 @@ namespace Trinity
 
         private static void RefreshMonsterSize()
         {
-            SNORecordMonster monsterInfo = CurrentCacheObject.Unit.MonsterInfo;
+            SNORecordMonster monsterInfo = c_diaUnit.MonsterInfo;
             if (monsterInfo != null)
             {
                 c_unit_MonsterSize = monsterInfo.MonsterSize;
@@ -269,7 +260,7 @@ namespace Trinity
 
         private static void RefreshMonsterHealth()
         {
-            if (!CurrentCacheObject.Unit.IsValid)
+            if (!c_diaUnit.IsValid)
                 return;
 
             // health calculations
@@ -277,12 +268,12 @@ namespace Trinity
             // Get the max health of this unit, a cached version if available, if not cache it
             if (!CacheData.UnitMaxHealth.TryGetValue(CurrentCacheObject.RActorGuid, out maxHealth))
             {
-                maxHealth = CurrentCacheObject.Unit.HitpointsMax;
+                maxHealth = c_diaUnit.HitpointsMax;
                 CacheData.UnitMaxHealth.Add(CurrentCacheObject.RActorGuid, maxHealth);
             }
 
             // Health calculations            
-            c_HitPoints = CurrentCacheObject.Unit.HitpointsCurrent;
+            c_HitPoints = c_diaUnit.HitpointsCurrent;
 
             // And finally put the two together for a current health percentage
             c_HitPointsPct = c_HitPoints / maxHealth;
@@ -335,14 +326,16 @@ namespace Trinity
                 (Player.ActorClass == ActorClass.Monk && HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_WayOfTheHundredFists && s.RuneIndex == 0)))
                 )
             {
-                ////bool hasdotDPS = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.DOTDPS) != 0;
-                //bool isBleeding = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.Bleeding) != 0;
-                //c_HasDotDPS = hasdotDPS && isBleeding;
-                bool hasdotDPS = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.DOTDPS) != 0;
+                bool hasdotDPS = CacheObjectHasDOTDPS();
                 c_HasDotDPS = hasdotDPS;
             }
             return AddToCache;
 
+        }
+
+        private static bool CacheObjectHasDOTDPS()
+        {
+            return c_diaObject.CommonData.GetAttribute<int>(ActorAttributeType.DOTDPS) != 0;
         }
         private static double SetKillRange()
         {
@@ -383,7 +376,7 @@ namespace Trinity
             {
                 try
                 {
-                    affixFlags = CurrentCacheObject.CommonData.MonsterAffixes;
+                    affixFlags = c_diaObject.CommonData.MonsterAffixes;
                     CacheData.UnitMonsterAffix.Add(CurrentCacheObject.RActorGuid, affixFlags);
                 }
                 catch (Exception ex)
@@ -405,7 +398,7 @@ namespace Trinity
         }
         private static MonsterType RefreshMonsterType(bool addToDictionary)
         {
-            SNORecordMonster monsterInfo = CurrentCacheObject.CommonData.MonsterInfo;
+            SNORecordMonster monsterInfo = c_diaObject.CommonData.MonsterInfo;
             MonsterType monsterType;
             if (monsterInfo != null)
             {
@@ -432,11 +425,11 @@ namespace Trinity
         }
         private static bool RefreshStepCachedSummons()
         {
-            if (CurrentCacheObject.Unit != null && CurrentCacheObject.Unit.IsValid)
+            if (c_diaUnit != null && c_diaUnit.IsValid)
             {
                 try
                 {
-                    CurrentCacheObject.SummonedByACDId = CurrentCacheObject.Unit.SummonedByACDId;
+                    CurrentCacheObject.SummonedByACDId = c_diaUnit.SummonedByACDId;
                 }
                 catch
                 {
@@ -444,7 +437,7 @@ namespace Trinity
                 }
                 try
                 {
-                    CurrentCacheObject.IsSummoner = CurrentCacheObject.CommonData.GetAttribute<int>(ActorAttributeType.SummonerID) > 0;
+                    CurrentCacheObject.IsSummoner = c_diaUnit.SummonerId > 0;
                 }
                 catch
                 {
