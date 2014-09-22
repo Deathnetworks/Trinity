@@ -283,26 +283,26 @@ namespace Trinity.Combat.Abilities
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && !Settings.Combat.Monk.DisableMantraSpam)
             {
                 if (CanCast(SNOPower.X1_Monk_MantraOfConviction_v2) && (!GetHasBuff(SNOPower.X1_Monk_MantraOfConviction_v2) ||
-                    (hasSWK && GetHasBuff(SNOPower.Monk_SweepingWind))) &&
+                    (hasSWK && GetHasBuff(SNOPower.Monk_SweepingWind) && TargetUtil.AnyMobsInRange(10f))) &&
                     (Player.PrimaryResource >= 80) && CurrentTarget != null)
                 {
                     return new TrinityPower(SNOPower.X1_Monk_MantraOfConviction_v2);
                 }
 
                 if (CanCast(SNOPower.X1_Monk_MantraOfRetribution_v2) && (!GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) ||
-                    (hasSWK && GetHasBuff(SNOPower.Monk_SweepingWind))) &&
+                    (hasSWK && GetHasBuff(SNOPower.Monk_SweepingWind) && TargetUtil.AnyMobsInRange(10f))) &&
                     (Player.PrimaryResource >= 80) && CurrentTarget != null)
                 {
                     return new TrinityPower(SNOPower.X1_Monk_MantraOfRetribution_v2);
                 }
                 if (CanCast(SNOPower.X1_Monk_MantraOfHealing_v2) && (!GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) ||
-                    (hasSWK && GetHasBuff(SNOPower.Monk_SweepingWind))) &&
+                    (hasSWK && GetHasBuff(SNOPower.Monk_SweepingWind) && TargetUtil.AnyMobsInRange(10f))) &&
                     (Player.PrimaryResource >= 80) && CurrentTarget != null)
                 {
                     return new TrinityPower(SNOPower.X1_Monk_MantraOfHealing_v2);
                 }
                 if (CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && (!GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) ||
-                    (hasSWK && GetHasBuff(SNOPower.Monk_SweepingWind))) &&
+                    (hasSWK && GetHasBuff(SNOPower.Monk_SweepingWind) && TargetUtil.AnyMobsInRange(10f))) &&
                     (Player.PrimaryResource >= 80) && CurrentTarget != null)
                 {
                     return new TrinityPower(SNOPower.X1_Monk_MantraOfEvasion_v2);
@@ -672,7 +672,6 @@ namespace Trinity.Combat.Abilities
         {
             return (GetHasBuff(SNOPower.Monk_SweepingWind) || !Hotbar.Contains(SNOPower.Monk_SweepingWind));
         }
-
 
     }
 }
