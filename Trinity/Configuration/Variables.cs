@@ -229,10 +229,6 @@ namespace Trinity
         private static DateTime _lastDestroyedDestructible = DateTime.MinValue;
         private static bool _needClearDestructibles;
 
-        // An ordered list of all of the backtrack locations to navigate through once we finish our current activities
-        public static SortedList<int, Vector3> BacktrackList = new SortedList<int, Vector3>();
-        public static int TotalBacktracks = 0;
-
         // The number of loops to extend kill range for after a fight to try to maximize kill bonus exp etc.
         private static int _keepKillRadiusExtendedForSeconds;
         private static DateTime _timeKeepKillRadiusExtendedUntil = DateTime.MinValue;

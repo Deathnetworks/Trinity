@@ -129,8 +129,6 @@ namespace Trinity
         {
             // Issue final reports
             OutputReport();
-            BacktrackList = new SortedList<int, Vector3>();
-            TotalBacktracks = 0;
             PlayerMover.TotalAntiStuckAttempts = 1;
             PlayerMover.vSafeMovementLocation = Vector3.Zero;
             PlayerMover.LastPosition = Vector3.Zero;
@@ -149,8 +147,6 @@ namespace Trinity
                 TotalDeaths++;
                 DeathsThisRun++;
                 CacheData.AbilityLastUsed = new Dictionary<SNOPower, DateTime>(DataDictionary.LastUseAbilityTimeDefaults);
-                BacktrackList = new SortedList<int, Vector3>();
-                TotalBacktracks = 0;
                 PlayerMover.TotalAntiStuckAttempts = 1;
                 PlayerMover.vSafeMovementLocation = Vector3.Zero;
 
@@ -210,8 +206,6 @@ namespace Trinity
                 Blacklist60Seconds = new HashSet<int>();
                 Blacklist90Seconds = new HashSet<int>();
                 Blacklist15Seconds = new HashSet<int>();
-                BacktrackList = new SortedList<int, Vector3>();
-                TotalBacktracks = 0;
                 ShouldRefreshHotbarAbilities = true;
                 PlayerMover.TotalAntiStuckAttempts = 1;
                 PlayerMover.vSafeMovementLocation = Vector3.Zero;

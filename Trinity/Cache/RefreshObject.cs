@@ -702,7 +702,12 @@ namespace Trinity
 
                 // No need for raycasting in certain level areas (rift trial for example)
                 if (DataDictionary.NeverRaycastLevelAreaIds.Contains(Player.LevelAreaId))
+                {
+                    c_HasBeenRaycastable = true;
+                    if (!CacheData.HasBeenRayCasted.ContainsKey(CurrentCacheObject.RActorGuid))
+                        CacheData.HasBeenRayCasted.Add(CurrentCacheObject.RActorGuid, c_HasBeenRaycastable);
                     return true;
+                }
 
                 if (!DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
                 {
