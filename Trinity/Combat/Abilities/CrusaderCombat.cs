@@ -117,12 +117,12 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // HeavensFury
-                bool isHolyShotgun = (Legendary.FateOfTheFell.IsEquipped && Sets.ArmorOfAkkhan.IsThirdBonusActive);
-                if (CanCastHeavensFury() && !isHolyShotgun)
+                bool hasAkkhan = (Sets.ArmorOfAkkhan.IsThirdBonusActive);
+                if (CanCastHeavensFury() && !hasAkkhan)
                 {
                     return new TrinityPower(SNOPower.X1_Crusader_HeavensFury3, 16f, TargetUtil.GetBestClusterPoint());
                 }
-                if (CanCastHeavensFuryHolyShotgun(isHolyShotgun))
+                if (CanCastHeavensFuryHolyShotgun(hasAkkhan))
                 {
                     return new TrinityPower(SNOPower.X1_Crusader_HeavensFury3, 7f, CurrentTarget.ACDGuid);
                 }
@@ -137,6 +137,10 @@ namespace Trinity.Combat.Abilities
                 if (CanCastPhalanx())
                 {
                     return new TrinityPower(SNOPower.x1_Crusader_Phalanx3, 45f, TargetUtil.GetBestClusterPoint(15f, 45f));
+                }
+                if (CanCastPhalanxStampede(hasAkkhan))
+                {
+                    return new TrinityPower(SNOPower.x1_Crusader_Phalanx3, 7f, CurrentTarget.ACDGuid);
                 }
 
                 // Blessed Shield : Piercing Shield
@@ -304,6 +308,11 @@ namespace Trinity.Combat.Abilities
             return CanCast(SNOPower.x1_Crusader_Phalanx3) && (TargetUtil.ClusterExists(15f, 3) || TargetUtil.EliteOrTrashInRange(15f));
         }
 
+        private static bool CanCastPhalanxStampede(bool hasAkkhan)
+        {
+            return (hasAkkhan && CanCast(SNOPower.x1_Crusader_Phalanx3) && TargetUtil.AnyMobsInRange(15f, 1) && Runes.Crusader.Stampede.IsActive);
+        }
+
         private static bool CanCastSteedChargeOutOfCombat()
         {
             return CanCast(SNOPower.X1_Crusader_SteedCharge) && CrusaderSettings.SteedChargeOOC && Player.MovementSpeed > 0 && !Player.IsInTown;
@@ -319,9 +328,9 @@ namespace Trinity.Combat.Abilities
                 return (CanCast(SNOPower.X1_Crusader_HeavensFury3) && (TargetUtil.EliteOrTrashInRange(16f) || TargetUtil.ClusterExists(15f, 90f, CrusaderSettings.HeavensFuryAoECount)));
         }
 
-        private static bool CanCastHeavensFuryHolyShotgun(bool isHolyShotgun)
+        private static bool CanCastHeavensFuryHolyShotgun(bool hasAkkhan)
         {
-            return (isHolyShotgun && CanCast(SNOPower.X1_Crusader_HeavensFury3) && TargetUtil.AnyMobsInRange(15f, 1));
+            return (hasAkkhan && CanCast(SNOPower.X1_Crusader_HeavensFury3) && TargetUtil.AnyMobsInRange(15f, 1) && Runes.Crusader.FiresOfHeaven.IsActive);
         }
 
         private static bool CanCastFallingSword()

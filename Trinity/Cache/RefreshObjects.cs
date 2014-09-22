@@ -410,12 +410,14 @@ namespace Trinity
             const int setItemMarkerTexture = 404424;
             const int legendaryItemMarkerTexture = 275968;
 
-            foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsValid && (m.MinimapTexture == setItemMarkerTexture || m.MinimapTexture == legendaryItemMarkerTexture)))
+            foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsValid && 
+                (m.MinimapTexture == setItemMarkerTexture || m.MinimapTexture == legendaryItemMarkerTexture) && !Blacklist60Seconds.Contains(m.NameHash)))
             {
                 ObjectCache.Add(new TrinityCacheObject()
                 {
                     Position = marker.Position,
                     InternalName = (marker.MinimapTexture == setItemMarkerTexture ? "Set Item" : "Legendary Item") + " Minimap Marker",
+                    RActorGuid = marker.NameHash,
                     Distance = marker.Position.Distance(Player.Position),
                     ActorType = ActorType.Item,
                     Type = GObjectType.Item,
@@ -431,7 +433,8 @@ namespace Trinity
             {
                 // Add Rift Guardian POI's or Markers to ObjectCache
                 const int riftGuardianMarkerTexture = 81058;
-                Func<MinimapMarker, bool> riftGuardianMarkerFunc = m => m.IsValid && (m.IsPointOfInterest || m.MinimapTexture == riftGuardianMarkerTexture);
+                Func<MinimapMarker, bool> riftGuardianMarkerFunc = m => m.IsValid && (m.IsPointOfInterest || m.MinimapTexture == riftGuardianMarkerTexture) && 
+                    !Blacklist60Seconds.Contains(m.NameHash);
 
                 foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(riftGuardianMarkerFunc))
                 {
@@ -440,6 +443,7 @@ namespace Trinity
                         Position = marker.Position,
                         InternalName = "Rift Guardian",
                         Distance = marker.Position.Distance(Player.Position),
+                        RActorGuid = marker.NameHash,
                         ActorType = ActorType.Monster,
                         Type = GObjectType.Unit,
                         Radius = 10f,
@@ -450,13 +454,14 @@ namespace Trinity
 
             if (isRiftGuardianQuestStep || Player.ParticipatingInTieredLootRun) // X1_LR_DungeonFinder
             {
-                foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsPointOfInterest))
+                foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsPointOfInterest && !Blacklist60Seconds.Contains(m.NameHash)))
                 {
                     ObjectCache.Add(new TrinityCacheObject()
                     {
                         Position = marker.Position,
                         InternalName = "Rift Guardian",
                         Distance = marker.Position.Distance(Player.Position),
+                        RActorGuid = marker.NameHash,
                         ActorType = ActorType.Monster,
                         Type = GObjectType.Unit,
                         Radius = 10f,

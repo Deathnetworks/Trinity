@@ -102,20 +102,12 @@ namespace Trinity
 
             using (new PerformanceLogger("CanRayCast"))
             {
-                bool rayCastHit = Navigator.Raycast(vStartLocation, vDestination);
-                bool rayPointHit = false;
-                //float distance = vStartLocation.Distance2D(vDestination);
-                //for (float i = 1f; i < distance; i += 1f)
-                //{
-                //    var testPoint = MathEx.CalculatePointFrom(vDestination, vStartLocation, i);
-                //    if (!MainGridProvider.CanStandAt(testPoint))
-                //    {
-                //        rayPointHit = true;
-                //        break;
-                //    }
-                //}
+                if (DataDictionary.NeverRaycastLevelAreaIds.Contains(Trinity.Player.LevelAreaId))
+                    return true;
 
-                if (rayCastHit || rayPointHit)
+                bool rayCastHit = Navigator.Raycast(vStartLocation, vDestination);
+
+                if (rayCastHit)
                     return false;
 
                 return !CacheData.NavigationObstacles.Any(o => MathEx.IntersectsPath(o.Position, o.Radius, vStartLocation, vDestination));
@@ -333,7 +325,7 @@ namespace Trinity
                             continue;
                         }
                         timers[2].Stop();
-                        
+
                         timers[10].Start();
                         if (CacheData.NavigationObstacles.Any(a => a.Position.Distance2DSqr(Trinity.Player.Position) < maxDistance * maxDistance &&
                             MathUtil.IntersectsPath(a.Position, a.Radius, Trinity.Player.Position, gridPoint.Position)))
@@ -393,7 +385,7 @@ namespace Trinity
 
                         // Boss Areas
                         timers[5].Start();
-                        if (UnSafeZone.UnsafeKiteAreas.Any(a => a.WorldId == ZetaDia.CurrentWorldId && Vector3.Distance(a.Position, gridPoint.Position) <= a.Radius))
+                        if (UnSafeZone.UnsafeKiteAreas.Any(a => a.WorldId == Trinity.Player.WorldID && a.Position.Distance2DSqr(gridPoint.Position) <= (a.Radius * a.Radius)))
                         {
                             continue;
                         }
@@ -448,24 +440,20 @@ namespace Trinity
                             timers[8].Start();
                             foreach (CacheObstacleObject avoidance in CacheData.TimeBoundAvoidance)
                             {
-                                float distFromPointToAvoidance = gridPoint.Position.Distance2D(avoidance.Position);
-                                float distFromPointToOrigin = gridPoint.Position.Distance2D(origin);
-                                float distFromOriginToAvoidance = origin.Distance2D(avoidance.Position);
-
-                                float health = AvoidanceManager.GetAvoidanceHealthBySNO(avoidance.ActorSNO, 1f);
-                                float radius = AvoidanceManager.GetAvoidanceRadiusBySNO(avoidance.ActorSNO, 1f);
+                                float distSqrFromPointToAvoidance = gridPoint.Position.Distance2DSqr(avoidance.Position);
 
                                 // position is inside avoidance
-                                if (PlayerStatus.CurrentHealthPct < health && distFromPointToAvoidance < radius)
+                                if (distSqrFromPointToAvoidance < (avoidance.Radius * avoidance.Radius))
                                     continue;
 
-                                if (distFromPointToAvoidance < distFromPointToOrigin)
+                                float distSqrFromPointToOrigin = gridPoint.Position.Distance2DSqr(origin);
+                                if (distSqrFromPointToAvoidance < distSqrFromPointToOrigin)
                                 {
-                                    gridPoint.Weight -= distFromPointToOrigin;
+                                    gridPoint.Weight -= distSqrFromPointToOrigin;
                                 }
-                                else if (distFromPointToAvoidance > distFromPointToOrigin)
+                                else if (distSqrFromPointToAvoidance > distSqrFromPointToOrigin)
                                 {
-                                    gridPoint.Weight += distFromPointToAvoidance;
+                                    gridPoint.Weight += distSqrFromPointToAvoidance;
                                 }
                             }
                             timers[8].Stop();

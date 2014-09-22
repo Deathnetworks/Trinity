@@ -190,7 +190,7 @@ namespace Trinity
 
             if (minAvoidanceHealth == 0)
             {
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Ignoring Avoidance! Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
+                Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance! Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
                        CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO, minAvoidanceRadius, minAvoidanceHealth, CurrentCacheObject.Distance);
                 return false;
 
@@ -198,7 +198,7 @@ namespace Trinity
 
             //if (_lastAvoidance != CurrentCacheObject.ActorSNO)
             //{
-                Logger.Log(LogCategory.Avoidance, "> {0} Distance={1} {2}! {3} ({4})", 
+                Logger.LogDebug(LogCategory.Avoidance, "{0} Distance={1} {2}! {3} ({4})", 
                     (avoidanceType == AvoidanceType.None) ? CurrentCacheObject.Animation.ToString() : avoidanceType.ToString(), 
                     CurrentCacheObject.Distance, 
                     minAvoidanceHealth >= Player.CurrentHealthPct ? "Avoiding" : "Ignoring", 

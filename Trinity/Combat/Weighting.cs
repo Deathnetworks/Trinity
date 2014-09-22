@@ -181,7 +181,8 @@ namespace Trinity
                                     if ((!cacheObject.IsBoss || shouldIgnoreBosses) && !cacheObject.IsBountyObjective &&
                                         shouldIgnoreElites && cacheObject.IsEliteRareUnique && !isInHotSpot &&
                                         !(cacheObject.HitPointsPct <= (Settings.Combat.Misc.ForceKillElitesHealth / 100))
-                                        || HealthGlobeEmergency || GetHiPriorityShrine || GetHiPriorityContainer)
+                                        || HealthGlobeEmergency || GetHiPriorityShrine ||
+                                        (GetHiPriorityContainer && !(Legendary.HarringtonWaistguard.IsEquipped && Legendary.HarringtonWaistguard.IsBuffActive)))
                                     {
                                         objWeightInfo = "Ignoring ";
                                         ignoring = true;
@@ -1088,6 +1089,13 @@ namespace Trinity
                                     break;
                                 }
 
+                                if (Legendary.HarringtonWaistguard.IsBuffActive)
+                                {
+                                    objWeightInfo += " HarringtonBuffIsUp";
+                                    cacheObject.Weight = 0;
+                                    break;
+                                }
+
                                 // Weight Containers
                                 cacheObject.Weight = (maxRange - cacheObject.Distance) / maxRange * 100d;
 
@@ -1096,7 +1104,8 @@ namespace Trinity
                                     cacheObject.Weight += 600d;
 
                                 // Open container for the damage buff
-                                if (Legendary.HarringtonWaistguard.IsEquipped && !Legendary.HarringtonWaistguard.IsBuffActive && ZetaDia.Me.IsInCombat && cacheObject.Distance < 80f || GetHiPriorityContainer)
+                                if (Legendary.HarringtonWaistguard.IsEquipped && !Legendary.HarringtonWaistguard.IsBuffActive &&
+                                    ZetaDia.Me.IsInCombat && cacheObject.Distance < 80f || GetHiPriorityContainer)
                                     cacheObject.Weight += 20000d;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets

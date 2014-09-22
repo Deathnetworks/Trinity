@@ -258,23 +258,6 @@ namespace Trinity
 
                             }
                         }
-                        // Maintain a backtrack list only while fighting monsters
-                        if (CurrentTarget.IsUnit && Settings.Combat.Misc.AllowBacktracking &&
-                            (TotalBacktracks == 0 || Vector3.Distance(Player.Position, BacktrackList[TotalBacktracks]) >= 10f))
-                        {
-                            bool bAddThisBacktrack = true;
-                            // Check we aren't within 12 feet of 2 backtracks again (eg darting back & forth)
-                            if (TotalBacktracks >= 2)
-                            {
-                                if (Vector3.Distance(Player.Position, BacktrackList[TotalBacktracks - 1]) < 12f)
-                                    bAddThisBacktrack = false;
-                            }
-                            if (bAddThisBacktrack)
-                            {
-                                TotalBacktracks++;
-                                BacktrackList.Add(TotalBacktracks, Player.Position);
-                            }
-                        }
                     }
 
 
@@ -375,72 +358,20 @@ namespace Trinity
                         bool Monk_SpecialMovement = ((CurrentTarget.Type == GObjectType.Gold ||
                             CurrentTarget.IsUnit ||
                             CurrentTarget.Type == GObjectType.Barricade ||
-                            CurrentTarget.Type == GObjectType.Destructible) && (MonkCombat.Monk_TempestRushReady()));
-
-                        bool Attackable_SpecialMovement = ((CurrentTarget.Type == GObjectType.Avoidance &&
-                            ObjectCache.Any(u => (u.IsUnit || u.Type == GObjectType.Destructible || u.Type == GObjectType.Barricade) &&
-                                MathUtil.IntersectsPath(u.Position, u.Radius, Player.Position, CurrentTarget.Position))));
+                            CurrentTarget.Type == GObjectType.Destructible) && MonkCombat.Monk_TempestRushReady());
 
                         // If we're doing avoidance, globes or backtracking, try to use special abilities to move quicker
                         if ((CurrentTarget.Type == GObjectType.Avoidance ||
                             CurrentTarget.Type == GObjectType.HealthGlobe ||
                             CurrentTarget.Type == GObjectType.PowerGlobe ||
                             CurrentTarget.Type == GObjectType.ProgressionGlobe ||
-                            (CurrentTarget.Type == GObjectType.Gold && CombatBase.CanCast(SNOPower.DemonHunter_Vault)) ||
-                            ((CurrentTarget.Type == GObjectType.Container || CurrentTarget.Type == GObjectType.Item) &&
-                            CurrentTarget.Distance > 18f && CombatBase.CanCast(SNOPower.DemonHunter_Vault)) ||
-                            Monk_SpecialMovement ||
-                            (CurrentTarget.Type == GObjectType.Backtrack && Settings.Combat.Misc.AllowOOCMovement))
+                            Monk_SpecialMovement)
                             && NavHelper.CanRayCast(Player.Position, CurrentDestination)
                             )
                         {
-                            bool bFoundSpecialMovement = UsedSpecialMovement();
+                            bool usedSpecialMovement = UsedSpecialMovement();
 
-                            if (CurrentTarget.Type != GObjectType.Backtrack)
-                            {
-                                // Whirlwind for a barb
-
-                                if (Attackable_SpecialMovement && !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && !bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource >= 10)
-                                {
-                                    ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, CurrentDestination, CurrentWorldDynamicId, -1);
-                                    // Store the current destination for comparison incase of changes next loop
-                                    LastMoveToTarget = CurrentDestination;
-                                    // Reset total body-block count, since we should have moved
-                                    if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
-                                        _timesBlockedMoving = 0;
-
-                                }
-                                // Tempest rush for a monk
-                                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Monk_TempestRush) && Player.PrimaryResource >= Settings.Combat.Monk.TR_MinSpirit &&
-                                    ((CurrentTarget.Type == GObjectType.Item && CurrentTarget.Distance > 20f) || CurrentTarget.Type != GObjectType.Item) &&
-                                    Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly &&
-                                    MonkCombat.Monk_TempestRushReady())
-                                {
-                                    ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, CurrentDestination, CurrentWorldDynamicId, -1);
-                                    CacheData.AbilityLastUsed[SNOPower.Monk_TempestRush] = DateTime.UtcNow;
-                                    LastPowerUsed = SNOPower.Monk_TempestRush;
-                                    MonkCombat.LastTempestRushLocation = CurrentDestination;
-                                    // Store the current destination for comparison incase of changes next loop
-                                    LastMoveToTarget = CurrentDestination;
-                                    // Reset total body-block count, since we should have moved
-                                    if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
-                                        _timesBlockedMoving = 0;
-
-                                }
-                                // Strafe for a Demon Hunter
-                                if (Attackable_SpecialMovement && !bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Strafe) && Player.PrimaryResource >= 15)
-                                {
-                                    ZetaDia.Me.UsePower(SNOPower.DemonHunter_Strafe, CurrentDestination, CurrentWorldDynamicId, -1);
-                                    // Store the current destination for comparison incase of changes next loop
-                                    LastMoveToTarget = CurrentDestination;
-                                    // Reset total body-block count, since we should have moved
-                                    if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
-                                        _timesBlockedMoving = 0;
-
-                                    return GetRunStatus(RunStatus.Running);
-                                }
-                            }
-                            if (bFoundSpecialMovement)
+                            if (usedSpecialMovement)
                             {
                                 // Store the current destination for comparison incase of changes next loop
                                 LastMoveToTarget = CurrentDestination;
@@ -448,16 +379,17 @@ namespace Trinity
                                 if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                                     _timesBlockedMoving = 0;
 
+                                return GetRunStatus(RunStatus.Running);
                             }
-                            return GetRunStatus(RunStatus.Running);
                         }
                     }
 
-                    // Whirlwind against everything within range (except backtrack points)
+                    // Whirlwind against everything within range
 
-                    if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource >= 10 && TargetUtil.AnyMobsInRange(20) && !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && TargetCurrentDistance <= 12f && CurrentTarget.Type != GObjectType.Container && CurrentTarget.Type != GObjectType.Backtrack &&
+                    if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource >= 10 && TargetUtil.AnyMobsInRange(20) && 
+                        !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && TargetCurrentDistance <= 12f 
+                        && CurrentTarget.Type != GObjectType.Container && 
                         (!Hotbar.Contains(SNOPower.Barbarian_Sprint) || GetHasBuff(SNOPower.Barbarian_Sprint)) &&
-                        CurrentTarget.Type != GObjectType.Backtrack &&
                         (CurrentTarget.Type != GObjectType.Item && CurrentTarget.Type != GObjectType.Gold && TargetCurrentDistance >= 6f) &&
                         (CurrentTarget.Type != GObjectType.Unit ||
                         (CurrentTarget.IsUnit && !CurrentTarget.IsTreasureGoblin)))
@@ -728,18 +660,6 @@ namespace Trinity
                         }
                         // Now tell Trinity to get a new target!
                         _forceTargetUpdate = true;
-                    }
-                    break;
-                // * Backtrack - clear this waypoint
-                case GObjectType.Backtrack:
-                    // Remove the current backtrack location now we reached it
-                    BacktrackList.Remove(TotalBacktracks);
-                    TotalBacktracks--;
-                    // Never bother with the very first backtrack location
-                    if (TotalBacktracks <= 1)
-                    {
-                        TotalBacktracks = 0;
-                        BacktrackList = new SortedList<int, Vector3>();
                     }
                     break;
                 default:
@@ -1051,63 +971,100 @@ namespace Trinity
         /// <returns></returns>
         private static bool UsedSpecialMovement()
         {
+            bool attackableSpecialMovement = ((CurrentTarget.Type == GObjectType.Avoidance &&
+            ObjectCache.Any(u => (u.IsUnit || u.Type == GObjectType.Destructible || u.Type == GObjectType.Barricade) &&
+                MathUtil.IntersectsPath(u.Position, u.Radius, Player.Position, CurrentTarget.Position))));
+
             using (new PerformanceLogger("HandleTarget.UsedSpecialMovement"))
             {
-                // Log whether we used a  (for avoidance really)
-                bool bFoundSpecialMovement = false;
                 // Leap movement for a barb
-                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_Leap) &&
-                    TimeSinceUse(SNOPower.Barbarian_Leap) >= CombatBase.GetSNOPowerUseDelay(SNOPower.Barbarian_Leap) &&
-                    PowerManager.CanCast(SNOPower.Barbarian_Leap))
+                if (CombatBase.CanCast(SNOPower.Barbarian_Leap))
                 {
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Leap, CurrentDestination, CurrentWorldDynamicId, -1);
                     SpellHistory.RecordSpell(SNOPower.Barbarian_Leap);
-                    bFoundSpecialMovement = true;
+                    return true;
                 }
 
                 // Furious Charge movement for a barb
-                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_FuriousCharge) &&
-                    TimeSinceUse(SNOPower.Barbarian_FuriousCharge) >= CombatBase.GetSNOPowerUseDelay(SNOPower.Barbarian_FuriousCharge) &&
-                    PowerManager.CanCast(SNOPower.Barbarian_FuriousCharge))
+                if (CombatBase.CanCast(SNOPower.Barbarian_FuriousCharge))
                 {
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_FuriousCharge, CurrentDestination, CurrentWorldDynamicId, -1);
                     SpellHistory.RecordSpell(SNOPower.Barbarian_FuriousCharge);
-                    bFoundSpecialMovement = true;
+                    return true;
                 }
 
                 // Vault for a Demon Hunter
-                if (!bFoundSpecialMovement && CombatBase.CanCast(SNOPower.DemonHunter_Vault) && Settings.Combat.DemonHunter.VaultMode != DemonHunterVaultMode.MovementOnly &&
-                    CombatBase.TimeSincePowerUse(SNOPower.DemonHunter_Vault) >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
+                if (CombatBase.CanCast(SNOPower.DemonHunter_Vault) && Settings.Combat.DemonHunter.VaultMode != DemonHunterVaultMode.MovementOnly &&
                     (CombatBase.PlayerKiteDistance <= 0 || (!CacheData.MonsterObstacles.Any(a => a.Position.Distance(CurrentDestination) <= CombatBase.PlayerKiteDistance) &&
                     !CacheData.TimeBoundAvoidance.Any(a => a.Position.Distance(CurrentDestination) <= CombatBase.PlayerKiteDistance))) &&
-                    (!CacheData.TimeBoundAvoidance.Any(a => MathEx.IntersectsPath(a.Position, a.Radius, Trinity.Player.Position, CurrentDestination))))
+                    (!CacheData.TimeBoundAvoidance.Any(a => MathEx.IntersectsPath(a.Position, a.Radius, Player.Position, CurrentDestination))))
                 {
                     ZetaDia.Me.UsePower(SNOPower.DemonHunter_Vault, CurrentDestination, CurrentWorldDynamicId, -1);
                     SpellHistory.RecordSpell(SNOPower.DemonHunter_Vault);
-                    bFoundSpecialMovement = true;
+                    return true;
                 }
 
                 // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
-                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Wizard_Teleport) &&
-                    TimeSinceUse(SNOPower.Wizard_Teleport) >= CombatBase.GetSNOPowerUseDelay(SNOPower.Wizard_Teleport) &&
-                    Player.PrimaryResource >= 15 &&
-                    PowerManager.CanCast(SNOPower.Wizard_Teleport))
+                if (CombatBase.CanCast(SNOPower.Wizard_Teleport))
                 {
                     ZetaDia.Me.UsePower(SNOPower.Wizard_Teleport, CurrentDestination, CurrentWorldDynamicId, -1);
                     SpellHistory.RecordSpell(SNOPower.Wizard_Teleport);
-                    bFoundSpecialMovement = true;
+                    return true;
                 }
 
                 // Archon Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
-                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Wizard_Archon_Teleport) &&
-                    TimeSinceUse(SNOPower.Wizard_Archon_Teleport) >= CombatBase.GetSNOPowerUseDelay(SNOPower.Wizard_Archon_Teleport) &&
-                    PowerManager.CanCast(SNOPower.Wizard_Archon_Teleport))
+                if (CombatBase.CanCast(SNOPower.Wizard_Archon_Teleport))
                 {
                     ZetaDia.Me.UsePower(SNOPower.Wizard_Archon_Teleport, CurrentDestination, CurrentWorldDynamicId, -1);
                     SpellHistory.RecordSpell(SNOPower.Wizard_Archon_Teleport);
-                    bFoundSpecialMovement = true;
+                    return true;
                 }
-                return bFoundSpecialMovement;
+                // Whirlwind for a barb
+
+                if (attackableSpecialMovement && !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker  
+                    && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource >= 10)
+                {
+                    ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, CurrentDestination, CurrentWorldDynamicId, -1);
+                    // Store the current destination for comparison incase of changes next loop
+                    LastMoveToTarget = CurrentDestination;
+                    // Reset total body-block count, since we should have moved
+                    if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
+                        _timesBlockedMoving = 0;
+                    return true;
+                }
+
+                // Tempest rush for a monk
+                if (CombatBase.CanCast(SNOPower.Monk_TempestRush) && Player.PrimaryResource >= Settings.Combat.Monk.TR_MinSpirit &&
+                    ((CurrentTarget.Type == GObjectType.Item && CurrentTarget.Distance > 20f) || CurrentTarget.Type != GObjectType.Item) &&
+                    Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly &&
+                    MonkCombat.Monk_TempestRushReady())
+                {
+                    ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, CurrentDestination, CurrentWorldDynamicId, -1);
+                    CacheData.AbilityLastUsed[SNOPower.Monk_TempestRush] = DateTime.UtcNow;
+                    LastPowerUsed = SNOPower.Monk_TempestRush;
+                    MonkCombat.LastTempestRushLocation = CurrentDestination;
+                    // Store the current destination for comparison incase of changes next loop
+                    LastMoveToTarget = CurrentDestination;
+                    // Reset total body-block count, since we should have moved
+                    if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
+                        _timesBlockedMoving = 0;
+                    return true;
+
+                }
+
+                // Strafe for a Demon Hunter
+                if (attackableSpecialMovement && CombatBase.CanCast(SNOPower.DemonHunter_Strafe))
+                {
+                    ZetaDia.Me.UsePower(SNOPower.DemonHunter_Strafe, CurrentDestination, CurrentWorldDynamicId, -1);
+                    // Store the current destination for comparison incase of changes next loop
+                    LastMoveToTarget = CurrentDestination;
+                    // Reset total body-block count, since we should have moved
+                    if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
+                        _timesBlockedMoving = 0;
+                    return true;
+                } 
+                
+                return false;
             }
         }
 
@@ -1162,9 +1119,6 @@ namespace Trinity
                     case GObjectType.HealthGlobe:
                     case GObjectType.ProgressionGlobe:
                         action = "Pickup ";
-                        break;
-                    case GObjectType.Backtrack:
-                        action = "Backtrack ";
                         break;
                     case GObjectType.Interactable:
                         action = "Interact ";
@@ -1410,12 +1364,6 @@ namespace Trinity
                     case GObjectType.Avoidance:
                         {
                             TargetRangeRequired = 2f;
-                            break;
-                        }
-                    // * Backtrack Destination
-                    case GObjectType.Backtrack:
-                        {
-                            TargetRangeRequired = 5f;
                             break;
                         }
                     case GObjectType.Door:
