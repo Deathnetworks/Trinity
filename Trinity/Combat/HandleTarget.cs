@@ -34,19 +34,6 @@ namespace Trinity
             get { return ZetaDia.Me; }
         }
 
-        internal static Composite HandleTargetComposite()
-        {
-            return new PrioritySelector(
-                new Decorator(ret => ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && ZetaDia.Me.IsValid && ZetaDia.Me.CommonData.IsValid,
-                    new Action(ret => HandleTarget())
-                ),
-                new Sequence(
-                    new Action(ret => Logger.Log("Not in Game, Loading World, or Player is Invalid")),
-                    new Action(ret => RunStatus.Failure)
-                )
-            );
-        }
-
         private static bool _staleCache;
 
         /// <summary>
@@ -92,7 +79,7 @@ namespace Trinity
         /// Handles all aspects of moving to and attacking the current target
         /// </summary>
         /// <returns></returns>
-        private static RunStatus HandleTarget()
+        internal static RunStatus HandleTarget()
         {
             using (new PerformanceLogger("HandleTarget"))
             {
@@ -125,7 +112,7 @@ namespace Trinity
                         CombatBase.CurrentPower = AbilitySelector();
 
                     // Time based wait delay for certain powers with animations
-                    while (_isWaitingAfterPower && CombatBase.CurrentPower.ShouldWaitAfterUse)
+                    if (_isWaitingAfterPower && CombatBase.CurrentPower.ShouldWaitAfterUse)
                     {
                         return GetRunStatus(RunStatus.Running);
                     }
@@ -1387,7 +1374,7 @@ namespace Trinity
                     dist = CurrentTarget.Position.Distance2D(Player.Position);
 
                 bool usePowerResult;
-                if (CombatBase.CurrentPower.SNOPower == SNOPower.Walk && CombatBase.CurrentPower.TargetPosition.Distance2D(Player.Position) < 2f)
+                if (CombatBase.CurrentPower.SNOPower == SNOPower.Walk && CombatBase.CurrentPower.TargetPosition == Vector3.Zero)
                 {
                     Navigator.PlayerMover.MoveStop();
                     usePowerResult = true;

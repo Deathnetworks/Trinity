@@ -18,6 +18,13 @@ namespace Trinity
 
         internal static Stopwatch HotbarRefreshTimer = new Stopwatch();
 
+
+        private static bool TargetCheckResult(bool result, string source)
+        {
+            Logger.LogDebug(LogCategory.GlobalHandler, "TargetCheck returning {0}, {1}", result, source);
+            return result;
+        }
+
         /// <summary>
         /// Find fresh targets, start main BehaviorTree if needed, cast any buffs needed etc.
         /// </summary>
@@ -30,7 +37,7 @@ namespace Trinity
                 // If we aren't in the game or a world is loading, don't do anything yet
                 if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
                 {
-                    return false;
+                    return TargetCheckResult(false, "Not in Game, Invalid, Or Loading World");
                 }
 
                 // We keep dying because we're spawning in AoE and next to 50 elites and we need to just leave the game
@@ -41,12 +48,12 @@ namespace Trinity
                     Logger.Log("Durability is zero, emergency leave game");
                     ZetaDia.Service.Party.LeaveGame(true);
                     Thread.Sleep(11000);
-                    return false;
+                    return TargetCheckResult(false, "Recently Died, zero durability");
                 }
 
                 if (ZetaDia.Me.IsDead)
                 {
-                    return false;
+                    return TargetCheckResult(false, "Is Dead");
                 }
 
                 if (!HotbarRefreshTimer.IsRunning)
@@ -129,12 +136,12 @@ namespace Trinity
                     _isWholeNewTarget = true;
                     DontMoveMeIAmDoingShit = true;
                     _shouldPickNewAbilities = true;
-                    return true;
+                    return TargetCheckResult(true, "Current Target is not null");
                 }
 
                 // if we just opened a horadric cache, wait around to open it
                 if (DateTime.UtcNow.Subtract(Composites.LastFoundHoradricCache).TotalSeconds < 5)
-                    return true;
+                    return TargetCheckResult(true, "Recently opened Horadric Cache");
 
                 using (new PerformanceLogger("TargetCheck.OOCPotion"))
                 {
@@ -195,13 +202,10 @@ namespace Trinity
                 if ((Trinity.ForceVendorRunASAP || Trinity.IsReadyToTownRun) && TownRun.TownRunTimerRunning())
                 {
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Waiting for town run timer (Target Check)", true);
-                    return true;
+                    return TargetCheckResult(true, "Waiting for TownRunTimer");
                 }
 
-                // Ok let DemonBuddy do stuff this loop, since we're done for the moment
-                //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.GlobalHandler, sStatusText);
-
-                return false;
+                return TargetCheckResult(false, "End of TargetCheck");
             }
         }
         private static DateTime lastMaintenanceCheck = DateTime.UtcNow;

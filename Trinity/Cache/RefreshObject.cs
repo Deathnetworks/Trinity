@@ -408,11 +408,9 @@ namespace Trinity
             if (!c_IsObstacle)
             {
                 // See if it's an avoidance first from the SNO
-                bool isAvoidanceSNO = (DataDictionary.Avoidances.Contains(CurrentCacheObject.ActorSNO) ||
+                bool isAvoidanceSNO = DataDictionary.Avoidances.Contains(CurrentCacheObject.ActorSNO) ||
                     DataDictionary.ButcherFloorPanels.Contains(CurrentCacheObject.ActorSNO) ||
-                    DataDictionary.AvoidanceProjectiles.Contains(CurrentCacheObject.ActorSNO)) ||
-                    (Player.IsRanged && DataDictionary.DangerousMeleeRangeMonsters.Contains(CurrentCacheObject.ActorSNO));
-
+                    DataDictionary.AvoidanceProjectiles.Contains(CurrentCacheObject.ActorSNO);
                 try
                 {
                     // Check if it's a unit with an animation we should avoid. We need to recheck this every time.
