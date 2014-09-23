@@ -1,4 +1,5 @@
-﻿using System;
+﻿//!CompilerOption:AddRef:System.Management.dll
+using System;
 using System.IO;
 using System.Threading;
 using System.Windows;

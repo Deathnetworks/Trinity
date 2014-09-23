@@ -83,11 +83,6 @@ namespace Trinity.Helpers
             Trinity.listCachedBuffs.ForEach(b => Logger.Log(LogCategory.ActiveBuffs,"Buff '{0}' is Active", b.InternalName));
         }
 
-        internal static void LogOnGameJoined()
-        {
-            Trinity.listCachedBuffs.ForEach(b => Logger.Log(LogCategory.ActiveBuffs, "Buff '{0}' is Active", b.InternalName));
-        }
-
         public static void LogBuildAndItems(TrinityLogLevel level = TrinityLogLevel.Debug)
         {
             if (!ZetaDia.Me.IsValid || !ZetaDia.IsInGame) return;
@@ -134,6 +129,20 @@ namespace Trinity.Helpers
 
             PassiveUtils.Active.ForEach(logPassive);
 
+        }
+
+
+        public static void LogSystemInformation(TrinityLogLevel level = TrinityLogLevel.Debug)
+        {
+            Logger.Log(level, LogCategory.UserInformation, "------ System Information ------");
+            Logger.Log(level, LogCategory.UserInformation, "Processor: " + SystemInformation.Processor);
+            Logger.Log(level, LogCategory.UserInformation, "Operating System: " + SystemInformation.OperatingSystem);
+            Logger.Log(level, LogCategory.UserInformation, "Motherboard: " + SystemInformation.MotherBoard);
+            Logger.Log(level, LogCategory.UserInformation, "System Type: " + SystemInformation.SystemType);
+            Logger.Log(level, LogCategory.UserInformation, "Free Physical Memory: " + SystemInformation.FreeMemory);
+            Logger.Log(level, LogCategory.UserInformation, "Hard Drive: " + SystemInformation.HardDisk);
+            Logger.Log(level, LogCategory.UserInformation, "Video Card: " + SystemInformation.VideoCard);
+            Logger.Log(level, LogCategory.UserInformation, "Resolution: " + SystemInformation.Resolution);
         }
 
     }
