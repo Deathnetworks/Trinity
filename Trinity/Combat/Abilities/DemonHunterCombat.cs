@@ -364,7 +364,8 @@ namespace Trinity.Combat.Abilities
                 if (Trinity.ObjectCache.Any(u => u.Type == GObjectType.Unit && u.Weight > 0 && u.RadiusDistance < 15f))
                     return new TrinityPower(SNOPower.Walk, 2f, NavHelper.FindSafeZone(false, 0, Trinity.Player.Position, true));
 
-                return new TrinityPower(SNOPower.Walk);
+                return DefaultPower;
+                //return new TrinityPower(SNOPower.Walk);
             }
 
             return null;
