@@ -46,6 +46,8 @@ namespace Trinity
                     if (FirstProfile == "")
                         FirstProfile = sThisProfile;
                 }
+
+                DebugUtil.LogSystemInformation();
             }
             catch
             {
