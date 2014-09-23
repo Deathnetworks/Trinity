@@ -188,8 +188,8 @@ namespace Trinity
                 (from u in ObjectCache
                  where u.IsUnit &&
                  u.RadiusDistance <= maxRange
-                 orderby u.IsEliteRareUnique descending
-                 orderby u.CountUnitsInFront() descending
+                 orderby u.IsEliteRareUnique descending,
+                 u.CountUnitsInFront() descending
                  select u).FirstOrDefault();
             if (result != null)
                 return result;
@@ -249,9 +249,9 @@ namespace Trinity
                      (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                      u.RadiusDistance <= maxRange &&
                      u.NearbyUnitsWithinDistance(aoe_radius) >= count
-                     orderby u.Type != GObjectType.HealthGlobe && u.Type != GObjectType.PowerGlobe
-                     orderby u.NearbyUnitsWithinDistance(aoe_radius)
-                     orderby u.Distance descending
+                     orderby u.Type != GObjectType.HealthGlobe && u.Type != GObjectType.PowerGlobe,
+                     u.NearbyUnitsWithinDistance(aoe_radius),
+                     u.Distance descending
                      select u).ToList();
 
                 if (clusterUnits.Any())
@@ -286,8 +286,8 @@ namespace Trinity
                  where u.Type == GObjectType.HealthGlobe &&
                  (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                  u.RadiusDistance <= maxRange
-                 orderby u.NearbyUnitsWithinDistance(radius)
-                 orderby u.Distance descending
+                 orderby u.NearbyUnitsWithinDistance(radius),
+                 u.Distance descending
                  select u.Position).ToList();
 
             if (clusterUnits.Any())
@@ -320,8 +320,8 @@ namespace Trinity
                  where u.Type == GObjectType.PowerGlobe &&
                  (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                  u.RadiusDistance <= maxRange
-                 orderby u.NearbyUnitsWithinDistance(radius)
-                 orderby u.Distance descending
+                 orderby u.NearbyUnitsWithinDistance(radius),
+                 u.Distance descending
                  select u.Position).ToList();
 
             if (clusterUnits.Any())
@@ -386,10 +386,10 @@ namespace Trinity
                  ((useWeights && u.Weight > 0) || !useWeights) &&
                  (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                  u.RadiusDistance <= maxRange
-                 orderby !u.IsBossOrEliteRareUnique
-                 orderby u.NearbyUnitsWithinDistance(radius) descending
-                 orderby u.Distance
-                 orderby u.HitPointsPct descending
+                 orderby u.IsTrashMob,
+                  u.NearbyUnitsWithinDistance(radius) descending,
+                  u.Distance,
+                  u.HitPointsPct descending
                  select u).ToList();
 
             if (clusterUnits.Any())
@@ -435,11 +435,11 @@ namespace Trinity
                  ((useWeights && u.Weight > 0) || !useWeights) &&
                  (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                  u.RadiusDistance <= maxRange
-                 orderby u.Type != GObjectType.HealthGlobe // if it's a globe this will be false and sorted at the top
-                 orderby !u.IsBossOrEliteRareUnique
-                 orderby u.NearbyUnitsWithinDistance(radius) descending
-                 orderby u.Distance
-                 orderby u.HitPointsPct descending
+                 orderby u.Type != GObjectType.HealthGlobe, // if it's a globe this will be false and sorted at the top
+                 u.IsTrashMob,
+                 u.NearbyUnitsWithinDistance(radius) descending,
+                 u.Distance,
+                 u.HitPointsPct descending
                  select u.Position).ToList();
 
             if (clusterUnits.Any())
@@ -1078,11 +1078,11 @@ namespace Trinity
                  ((useWeights && u.Weight > 0) || !useWeights) &&
                  (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                  u.RadiusDistance <= maxRange && u.Distance >= procDistance
-                 orderby u.Type != GObjectType.HealthGlobe // if it's a globe this will be false and sorted at the top
-                 orderby !u.IsBossOrEliteRareUnique
-                 orderby u.NearbyUnitsWithinDistance(radius) descending
-                 orderby u.Distance
-                 orderby u.HitPointsPct descending
+                 orderby u.Type != GObjectType.HealthGlobe, // if it's a globe this will be false and sorted at the top
+                  !u.IsBossOrEliteRareUnique,
+                  u.NearbyUnitsWithinDistance(radius) descending,
+                  u.Distance,
+                  u.HitPointsPct descending
                  select u.Position).ToList();
 
             if (clusterUnits.Any())

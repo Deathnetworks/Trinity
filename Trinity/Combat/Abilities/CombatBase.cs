@@ -372,7 +372,7 @@ namespace Trinity.Combat.Abilities
                     case SNOPower.Weapon_Ranged_Projectile:
                         return 65f;
                     case SNOPower.Weapon_Ranged_Wand:
-                        return 35f;
+                        return 55f;
                     default:
                         return 10f;
                 }

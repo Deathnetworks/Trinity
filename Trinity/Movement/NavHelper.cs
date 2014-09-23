@@ -179,49 +179,6 @@ namespace Trinity
             return vBestLocation;
         }
 
-        internal static Vector3 NavCellSafeZone(Vector3 origin, bool shouldKite = false, bool isStuck = false, IEnumerable<TrinityCacheObject> monsterList = null, bool avoidDeath = false)
-        {
-            Vector3 myPosition = ZetaDia.Me.Position;
-
-            List<NavCell> allNavCells = new List<NavCell>();
-            foreach (Scene scene in ZetaDia.Scenes.GetScenes())
-            {
-                if (!scene.IsValid)
-                    continue;
-                if (!scene.SceneInfo.IsValid)
-                    continue;
-                if (!scene.Mesh.Zone.IsValid)
-                    continue;
-                if (!scene.Mesh.Zone.NavZoneDef.IsValid)
-                    continue;
-
-                NavZone navZone = scene.Mesh.Zone;
-                NavZoneDef zoneDef = navZone.NavZoneDef;
-
-                Vector3 zoneCenter = MathUtil.GetNavZoneCenter(navZone);
-
-                if (zoneCenter.Distance2DSqr(Trinity.Player.Position) > (300 * 300))
-                    continue;
-
-                List<NavCell> sceneNavCells = zoneDef.NavCells
-                    .Where(c => c.IsValid && c.Flags.HasFlag(NavCellFlags.AllowWalk) && MathUtil.GetNavCellCenter(c, navZone).Distance2DSqr(myPosition) < (150 * 150))
-                    .OrderByDescending(c => c.GetNavCellSize())
-                    .ToList();
-                if (!sceneNavCells.Any())
-                    continue;
-
-                allNavCells.AddRange(sceneNavCells);
-            }
-
-            foreach (NavCell navCell in allNavCells)
-            {
-
-            }
-
-
-            return Trinity.Player.Position;
-        }
-
         // thanks to Main for the super fast can-stand-at code
         internal static Vector3 MainFindSafeZone(Vector3 origin, bool shouldKite = false, bool isStuck = false, IEnumerable<TrinityCacheObject> monsterList = null, bool avoidDeath = false)
         {

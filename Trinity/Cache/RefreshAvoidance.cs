@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using Trinity.Helpers;
-using Trinity.Objects;
 using Trinity.Reference;
 using Trinity.Technicals;
-using Zeta.Bot.Navigation;
-using Zeta.Common.Plugins;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 
 namespace Trinity
 {
-    public partial class Trinity : IPlugin
+    public partial class Trinity
     {
         private static bool RefreshAvoidance()
         {
@@ -26,7 +22,7 @@ namespace Trinity
             }
 
             float customRadius;
-            if (DataDictionary.DefaultAvoidanceCustomRadius.TryGetValue(CurrentCacheObject.ActorSNO, out customRadius)||
+            if (DataDictionary.DefaultAvoidanceCustomRadius.TryGetValue(CurrentCacheObject.ActorSNO, out customRadius) ||
                 DataDictionary.DefaultAvoidanceAnimationCustomRadius.TryGetValue((int)CurrentCacheObject.Animation, out customRadius))
             {
                 CurrentCacheObject.Radius = customRadius;
@@ -44,7 +40,7 @@ namespace Trinity
             AvoidanceType avoidanceType = AvoidanceManager.GetAvoidanceType(CurrentCacheObject.ActorSNO);
 
             // Beast Charge should set aoe position as players current position!
-            var avoidAtPlayerPosition = DataDictionary.AvoidAnimationAtPlayer.Contains((int) CurrentCacheObject.Animation);
+            var avoidAtPlayerPosition = DataDictionary.AvoidAnimationAtPlayer.Contains((int)CurrentCacheObject.Animation);
             if (avoidAtPlayerPosition)
             {
                 CurrentCacheObject.Position = Player.Position;
@@ -157,7 +153,6 @@ namespace Trinity
                     break;
 
                 case AvoidanceType.Arcane:
-
                     if (Legendary.CountessJuliasCameo.IsEquipped)
                     {
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because CountessJuliasCameo is equipped", avoidanceType);
@@ -183,10 +178,7 @@ namespace Trinity
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because BlackthornesBattlegear is equipped", avoidanceType);
                     minAvoidanceHealth = 0;
                 }
-
             }
-
-
 
             if (minAvoidanceHealth == 0)
             {
@@ -196,16 +188,11 @@ namespace Trinity
 
             }
 
-            //if (_lastAvoidance != CurrentCacheObject.ActorSNO)
-            //{
-                Logger.LogDebug(LogCategory.Avoidance, "{0} Distance={1} {2}! {3} ({4})", 
-                    (avoidanceType == AvoidanceType.None) ? CurrentCacheObject.Animation.ToString() : avoidanceType.ToString(), 
-                    CurrentCacheObject.Distance, 
-                    minAvoidanceHealth >= Player.CurrentHealthPct ? "Avoiding" : "Ignoring", 
-                    CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
-
-            //    _lastAvoidance = CurrentCacheObject.ActorSNO;
-            //}
+            //Logger.LogDebug(LogCategory.Avoidance, "{0} Distance={1:0} {2}! {3} ({4})",
+            //    (avoidanceType == AvoidanceType.None) ? CurrentCacheObject.Animation.ToString() : avoidanceType.ToString(),
+            //    CurrentCacheObject.Distance,
+            //    minAvoidanceHealth >= Player.CurrentHealthPct ? "Adding" : "Ignoring",
+            //    CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
 
             // Add it to the list of known avoidance objects, *IF* our health is lower than this avoidance health limit
             if (minAvoidanceHealth >= Player.CurrentHealthPct)

@@ -358,17 +358,7 @@ namespace Trinity.Combat.Abilities
                 }
             }
 
-            // M6 fully equipped but no hated spender flee/kite
-            if (Sets.EmbodimentOfTheMarauder.IsFullyEquipped)
-            {
-                if (Trinity.ObjectCache.Any(u => u.Type == GObjectType.Unit && u.Weight > 0 && u.RadiusDistance < 15f))
-                    return new TrinityPower(SNOPower.Walk, 2f, NavHelper.FindSafeZone(false, 0, Trinity.Player.Position, true));
-
-                return DefaultPower;
-                //return new TrinityPower(SNOPower.Walk);
-            }
-
-            return null;
+            return DefaultPower;
         }
         /// <summary>
         /// Checks and casts buffs if needed
