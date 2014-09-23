@@ -143,69 +143,18 @@ namespace Trinity.UI.UIComponents
                                                 Logger.Log(LogCategory.UserInformation, "Exception Dumping ALL Items: {0}", ex);
                                             }
                                         });
-                DumpEquippedLegendaryCommand = new RelayCommand(
+                DumpSkillsAndItemsCommand = new RelayCommand(
                                         (parameter) =>
                                         {
                                             try
                                             {
+                                                UILoader.CloseWindow();
+                                                BotMain.Stop(false, "Dumping Debug Information");
                                                 ZetaDia.Actors.Update();
                                                 using (ZetaDia.Memory.SaveCacheState())
                                                 {
                                                     ZetaDia.Memory.TemporaryCacheState(false);
-
-                                                    if (ZetaDia.Me.IsValid && ZetaDia.IsInGame)
-                                                    {
-                                                        Action<Item> logItem = i => Logger.Log("Item: {0}: {1} ({2}) is Equipped", i.ItemType, i.Name, i.Id);
-
-                                                        Logger.Log("------ Equipped Legendaries: Items={0}, Sets={1} ------", Legendary.Equipped.Count, Sets.Equipped.Count);
-
-                                                        Legendary.Equipped.Where(c => !c.IsSetItem || !c.Set.IsEquipped).ForEach(i => logItem(i));
-
-                                                        Sets.Equipped.ForEach(s =>
-                                                        {
-                                                            Logger.Log("------ Set: {0} {1}: {2}/{3} Equipped. ActiveBonuses={4}/{5} ------",
-                                                                s.Name,
-                                                                s.IsClassRestricted ? "(" + s.ClassRestriction + ")" : string.Empty,
-                                                                s.EquippedItems.Count,
-                                                                s.Items.Count,
-                                                                s.CurrentBonuses,
-                                                                s.MaxBonuses);
-
-                                                            s.Items.Where(i => i.IsEquipped).ForEach(i => logItem(i));
-
-                                                        });
-                                                    }
-                                                }
-
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                Logger.Log(LogCategory.UserInformation, "Exception Dumping Equipped Legendary Items: {0}", ex);
-                                            }
-                                        });
-                DumpEquippedSkillsCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            try
-                                            {
-                                                ZetaDia.Actors.Update();
-                                                using (ZetaDia.Memory.SaveCacheState())
-                                                {
-                                                    ZetaDia.Memory.TemporaryCacheState(false);
-
-                                                    if (ZetaDia.Me.IsValid && ZetaDia.IsInGame)
-                                                    {
-                                                        Logger.Log("------ Active Skills / Runes ------", ActiveUtils.Active.Count, ActiveUtils.Active.Count);
-
-                                                        Action<Skill> logSkill = s => Logger.Log("Skill: {0} Rune={1}", s.Name, s.CurrentRune.Name);
-
-                                                        ActiveUtils.Active.ForEach(logSkill);
-
-                                                        Action<Passive> logPassive = p => Logger.Log("Passive: {0}", p.Name);
-
-                                                        PassiveUtils.Active.ForEach(logPassive);
-
-                                                    }
+                                                    DebugUtil.LogBuildAndItems(TrinityLogLevel.Info);
                                                 }
 
                                             }
@@ -483,7 +432,7 @@ namespace Trinity.UI.UIComponents
         /// Gets the test score command.
         /// </summary>
         /// <value>The save command.</value>
-        public ICommand DumpEquippedSkillsCommand
+        public ICommand DumpSkillsAndItemsCommand
         {
             get;
             private set;
