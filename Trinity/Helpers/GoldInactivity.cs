@@ -45,7 +45,7 @@ namespace Trinity.Helpers
             if (!Trinity.Settings.Advanced.GoldInactivityEnabled)
             {
                 // timer isn't enabled so move along!
-                ResetCheckGold();
+                //ResetCheckGold();
                 return false;
             }
             try

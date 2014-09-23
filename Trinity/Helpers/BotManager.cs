@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Windows;
 using Trinity.Config;
-using Trinity.Coroutines;
 using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -54,7 +52,7 @@ namespace Trinity.Helpers
             if (!TreeHooks.Instance.Hooks.ContainsKey("Combat"))
                 return;
             // This is the do-all-be-all god-head all encompasing piece of trinity
-            StoreAndReplaceHook("Combat", new Decorator(Trinity.TargetCheck, Trinity.HandleTargetComposite()));
+            StoreAndReplaceHook("Combat", new Decorator(Trinity.TargetCheck, new Action(ret => Trinity.HandleTarget())));
         }
 
         private static void ReplaceVendorRunHook()

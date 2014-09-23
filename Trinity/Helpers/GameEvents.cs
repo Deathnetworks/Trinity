@@ -46,6 +46,8 @@ namespace Trinity
                     if (FirstProfile == "")
                         FirstProfile = sThisProfile;
                 }
+
+                DebugUtil.LogSystemInformation();
             }
             catch
             {
@@ -165,6 +167,7 @@ namespace Trinity
         {
             TotalGamesJoined++;
             ResetEverythingNewGame();
+            DebugUtil.LogBuildAndItems();
         }
 
         // Each time we join & leave a game, might as well clear the hashset of looked-at dropped items - just to keep it smaller

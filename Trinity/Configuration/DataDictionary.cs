@@ -534,12 +534,6 @@ namespace Trinity
             {159369, 20f }, //MorluMeteor
         };
 
-        public static HashSet<int> DangerousMeleeRangeMonsters { get { return dangerousMeleeRangeMonsters; } }
-        private static readonly HashSet<int> dangerousMeleeRangeMonsters = new HashSet<int>()
-        {
-            360636, //X1_LR_Boss_TerrorDemon_A (360636)
-        };
-
         /*
          * Combat-related dictionaries/defaults
          */

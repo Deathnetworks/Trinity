@@ -1,4 +1,5 @@
-﻿using System;
+﻿//!CompilerOption:AddRef:System.Management.dll
+using System;
 using System.IO;
 using System.Threading;
 using System.Windows;
@@ -90,6 +91,8 @@ namespace Trinity
 
                     // Recording of all the XML's in use this run
                     UsedProfileManager.RecordProfile();
+
+                    DebugUtil.LogOnPulse();
 
                     MonkCombat.Monk_MaintainTempestRush();
                 }
