@@ -188,8 +188,8 @@ namespace Trinity
                 (from u in ObjectCache
                  where u.IsUnit &&
                  u.RadiusDistance <= maxRange
-                 orderby u.IsEliteRareUnique descending,
-                 u.CountUnitsInFront() descending
+                 orderby u.CountUnitsInFront() descending,
+                 u.IsEliteRareUnique descending
                  select u).FirstOrDefault();
             if (result != null)
                 return result;

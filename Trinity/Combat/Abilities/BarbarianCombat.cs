@@ -458,7 +458,7 @@ namespace Trinity.Combat.Abilities
 
                 bool currentEliteTargetInRange = CurrentTarget.RadiusDistance > 7f && CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 35f;
 
-                return CanCast(SNOPower.Barbarian_FuriousCharge, CanCastFlags.NoTimer) &&
+                return CanCast(SNOPower.Barbarian_FuriousCharge, CanCastFlags.NoTimer) && !IsCurrentlyAvoiding &&
                     (currentEliteTargetInRange || unitsInFrontOfBestTarget >= 3 || Sets.TheLegacyOfRaekor.IsFullyEquipped);
 
             }
