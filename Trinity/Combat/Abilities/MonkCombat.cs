@@ -28,10 +28,11 @@ namespace Trinity.Combat.Abilities
 
         public static TrinityPower GetPower()
         {     
-
+            // Destructible objects
             if (UseDestructiblePower)
                 return GetMonkDestroyPower();
 
+            // Epiphany: spirit regen, dash to targets
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.X1_Monk_Epiphany, CanCastFlags.NoTimer) &&
                 (TargetUtil.EliteOrTrashInRange(15f) || TargetUtil.AnyMobsInRange(15f, 5)) && 
                 (Player.PrimaryResourcePct < 0.50 || ((Runes.Monk.DesertShroud.IsActive || Runes.Monk.SoothingMist.IsActive) && Player.CurrentHealthPct < 0.50))
@@ -100,9 +101,8 @@ namespace Trinity.Combat.Abilities
             }
 
             // Breath of Heaven for spirit - Infused with Light
-                
-            if (!Player.IsIncapacitated && CanCast(SNOPower.Monk_BreathOfHeaven, CanCastFlags.NoTimer) && !GetHasBuff(SNOPower.Monk_BreathOfHeaven) && Runes.Monk.InfusedWithLight.IsActive &&
-                (TargetUtil.AnyMobsInRange(20) || TargetUtil.IsEliteTargetInRange(20)))
+            if (!UseOOCBuff && !Player.IsIncapacitated && CanCast(SNOPower.Monk_BreathOfHeaven, CanCastFlags.NoTimer) && !GetHasBuff(SNOPower.Monk_BreathOfHeaven) && Runes.Monk.InfusedWithLight.IsActive &&
+                (TargetUtil.AnyMobsInRange(20) || TargetUtil.IsEliteTargetInRange(20) || Player.PrimaryResource < 75))
             {
                 return new TrinityPower(SNOPower.Monk_BreathOfHeaven);
             }
@@ -124,6 +124,12 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 14f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1);
             }
 
+            // Sunwuko set Sweeping Winds spirit dumping
+            if (Player.PrimaryResource > 75 && CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) && hasSWK)
+            {
+                Trinity.SweepWindSpam = DateTime.UtcNow;
+                return new TrinityPower(SNOPower.Monk_SweepingWind);
+            }
 
             // Sweeping winds spam
             if ((Player.PrimaryResource >= 75 || (hasInnaSet && Player.PrimaryResource >= 5)) &&
@@ -131,7 +137,7 @@ namespace Trinity.Combat.Abilities
                 DateTime.UtcNow.Subtract(Trinity.SweepWindSpam).TotalMilliseconds >= 4000 && DateTime.UtcNow.Subtract(Trinity.SweepWindSpam).TotalMilliseconds <= 5400)
             {
                 Trinity.SweepWindSpam = DateTime.UtcNow;
-                return new TrinityPower(SNOPower.Monk_SweepingWind, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 0, 0);
+                return new TrinityPower(SNOPower.Monk_SweepingWind);
             }
 
             float minSweepingWindSpirit = hasInnaSet ? 5f : 75f;
@@ -148,7 +154,7 @@ namespace Trinity.Combat.Abilities
                 Player.PrimaryResource >= minSweepingWindSpirit)
             {
                 Trinity.SweepWindSpam = DateTime.UtcNow;
-                return new TrinityPower(SNOPower.Monk_SweepingWind, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 0, 0);
+                return new TrinityPower(SNOPower.Monk_SweepingWind);
             }
 
             // Sweeping Wind for Transcendance Health Regen
@@ -159,7 +165,7 @@ namespace Trinity.Combat.Abilities
                 Trinity.TimeSinceUse(SNOPower.Monk_SweepingWind) > 500)
             {
                 Trinity.SweepWindSpam = DateTime.UtcNow;
-                return new TrinityPower(SNOPower.Monk_SweepingWind, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 0, 0);
+                return new TrinityPower(SNOPower.Monk_SweepingWind);
             }
 
             // Exploding Palm
