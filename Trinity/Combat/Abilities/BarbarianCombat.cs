@@ -4,7 +4,6 @@ using Trinity.Config.Combat;
 using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
-using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.Combat.Abilities
 {
@@ -458,7 +457,7 @@ namespace Trinity.Combat.Abilities
 
                 bool currentEliteTargetInRange = CurrentTarget.RadiusDistance > 7f && CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 35f;
 
-                return CanCast(SNOPower.Barbarian_FuriousCharge, CanCastFlags.NoTimer) &&
+                return CanCast(SNOPower.Barbarian_FuriousCharge, CanCastFlags.NoTimer) && !IsCurrentlyAvoiding && 
                     (currentEliteTargetInRange || unitsInFrontOfBestTarget >= 3 || Sets.TheLegacyOfRaekor.IsFullyEquipped);
 
             }
@@ -745,7 +744,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                var bestTarget = TargetUtil.GetBestPierceTarget(35f);
+                var bestTarget = TargetUtil.GetBestPierceTarget(35f, 0, true);
 
                 if (bestTarget != null)
                     return new TrinityPower(SNOPower.Barbarian_FuriousCharge, V.F("Barbarian.FuriousCharge.UseRange"), bestTarget.Position);

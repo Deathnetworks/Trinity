@@ -134,30 +134,8 @@ namespace Trinity
 
                     MonkCombat.Monk_MaintainTempestRush();
 
-                    // Refresh the object Cache
+                    // Refresh the object Cache every time
                     RefreshDiaObjectCache();
-
-                    //CheckStaleCache();
-                    //using (new PerformanceLogger("HandleTarget.CheckForNewTarget"))
-                    //{
-                    //    // So, after all that, do we actually want a new target list?
-                    //    if (!_isWholeNewTarget && !_isWaitingForPower && !_isWaitingForPotion)
-                    //    {
-                    //        // Now call the function that refreshes targets
-                    //        // RefreshDiaObjectCache();
-
-                    //        // No target, return success
-                    //        if (CurrentTarget != null)
-                    //        {
-                    //            // Make sure we start trying to move again should we need to!
-                    //            IsAlreadyMoving = false;
-                    //            lastMovementCommand = DateTime.MinValue;
-                    //            _shouldPickNewAbilities = true;
-                    //        }
-
-                    //        UpdateCurrentTarget();
-                    //    }
-                    //}
 
                     if (CombatBase.CombatMovement.IsQueuedMovement & CombatBase.IsCombatAllowed)
                     {
@@ -1374,6 +1352,7 @@ namespace Trinity
                     dist = CurrentTarget.Position.Distance2D(Player.Position);
 
                 bool usePowerResult;
+                // For "no-attack" logic
                 if (CombatBase.CurrentPower.SNOPower == SNOPower.Walk && CombatBase.CurrentPower.TargetPosition == Vector3.Zero)
                 {
                     Navigator.PlayerMover.MoveStop();

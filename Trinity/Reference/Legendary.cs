@@ -3739,7 +3739,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HarringtonWaistguard = new Item
         {
-            Id = 210432,
+            Id = 298129,
             Name = "Harrington Waistguard",
             Quality = ItemQuality.Legendary,
             Slug = "harrington-waistguard",

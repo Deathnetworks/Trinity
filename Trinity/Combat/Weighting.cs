@@ -53,7 +53,8 @@ namespace Trinity
 
                 bool GetHiPriorityShrine = ObjectCache.Any(s => s.Type == GObjectType.Shrine) && HiPriorityShrine;
 
-                bool GetHiPriorityContainer = Settings.WorldObject.HiPriorityContainers && ObjectCache.Any(c => c.Type == GObjectType.Container);
+                bool GetHiPriorityContainer = Settings.WorldObject.HiPriorityContainers && ObjectCache.Any(c => c.Type == GObjectType.Container) &&
+                     !(Legendary.HarringtonWaistguard.IsEquipped && Legendary.HarringtonWaistguard.IsBuffActive);
 
                 bool profileTagCheck = false;
 
@@ -85,7 +86,7 @@ namespace Trinity
                      !DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId) &&
                      !profileTagCheck &&
                      !TownRun.IsTryingToTownPortal() &&
-                     CombatBase.IgnoringElites) || HealthGlobeEmergency || GetHiPriorityShrine;
+                     CombatBase.IgnoringElites);
 
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight,
                     "Starting weights: packSize={0} packRadius={1} MovementSpeed={2:0.0} Elites={3} AoEs={4} disableIgnoreTag={5} ({6}) closeRangePriority={7} townRun={8} questingArea={9} level={10} isQuestingMode={11}",
@@ -106,8 +107,7 @@ namespace Trinity
                         Settings.Combat.Misc.TrashPackSize > 1 &&
                         Player.Level >= 15 &&
                         Player.CurrentHealthPct > 0.10 &&
-                        DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds > 500) ||
-                        HealthGlobeEmergency || GetHiPriorityShrine || GetHiPriorityContainer;
+                        DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds > 500);
 
                 bool shouldIgnoreBosses = HealthGlobeEmergency || GetHiPriorityShrine || GetHiPriorityContainer;
 
@@ -159,7 +159,8 @@ namespace Trinity
                                     if (shouldIgnoreTrashMob && !isInHotSpot &&
                                         !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize) &&
                                         ignoreSummoner && !cacheObject.IsQuestMonster &&
-                                        !cacheObject.IsMinimapActive && !cacheObject.IsBountyObjective)
+                                        !cacheObject.IsMinimapActive && !cacheObject.IsBountyObjective ||
+                                        HealthGlobeEmergency || GetHiPriorityContainer || GetHiPriorityShrine)
                                     {
                                         objWeightInfo = "Ignoring ";
                                         ignoring = true;
@@ -181,8 +182,7 @@ namespace Trinity
                                     if ((!cacheObject.IsBoss || shouldIgnoreBosses) && !cacheObject.IsBountyObjective &&
                                         shouldIgnoreElites && cacheObject.IsEliteRareUnique && !isInHotSpot &&
                                         !(cacheObject.HitPointsPct <= (Settings.Combat.Misc.ForceKillElitesHealth / 100))
-                                        || HealthGlobeEmergency || GetHiPriorityShrine ||
-                                        (GetHiPriorityContainer && !(Legendary.HarringtonWaistguard.IsEquipped && Legendary.HarringtonWaistguard.IsBuffActive)))
+                                        || HealthGlobeEmergency || GetHiPriorityShrine || GetHiPriorityContainer)
                                     {
                                         objWeightInfo = "Ignoring ";
                                         ignoring = true;

@@ -170,7 +170,7 @@ namespace Trinity
 
             var clusterUnit =
                 (from u in ObjectCache
-                 where u.IsUnit && u.CommonData!= null && u.CommonData.IsValid &&
+                 where u.IsUnit && u.CommonData != null && u.CommonData.IsValid &&
                  u.RadiusDistance <= 200 &&
                  u.NearbyUnitsWithinDistance(clusterRadius) >= minCount
                  orderby u.NearbyUnitsWithinDistance(clusterRadius)
@@ -182,14 +182,15 @@ namespace Trinity
             return clusterUnit.Position;
         }
 
-        internal static TrinityCacheObject GetBestPierceTarget(float maxRange, int arcDegrees = 0)
+        internal static TrinityCacheObject GetBestPierceTarget(float maxRange, int arcDegrees = 0, bool ignoreUnitsInAoE = false)
         {
             var result =
                 (from u in ObjectCache
                  where u.IsUnit &&
-                 u.RadiusDistance <= maxRange
-                 orderby u.IsEliteRareUnique descending,
-                 u.CountUnitsInFront() descending
+                 u.RadiusDistance <= maxRange &&
+                 ((ignoreUnitsInAoE && !u.IsStandingInAvoidance) || !ignoreUnitsInAoE)
+                 orderby u.CountUnitsInFront() descending,
+                 u.IsEliteRareUnique descending
                  select u).FirstOrDefault();
             if (result != null)
                 return result;
@@ -197,7 +198,7 @@ namespace Trinity
             if (CurrentTarget != null)
                 return CurrentTarget;
 
-            return GetBestClusterUnit(15f, maxRange);
+            return GetBestClusterUnit(15f, maxRange, 1, true, !ignoreUnitsInAoE);
         }
 
         internal static TrinityCacheObject GetBestArcTarget(float maxRange, float arcDegrees)
@@ -506,11 +507,11 @@ namespace Trinity
         internal static int NumMobsInRangeOfPosition(Vector3 position, float range = 15f)
         {
             return (from u in ObjectCache
-                                where u.IsUnit &&
-                                        u.Weight > 0 &&
-                                        u.CommonData != null && u.CommonData.IsValid &&
-                                        u.Position.Distance2D(position) <= range
-                                select u).Count();
+                    where u.IsUnit &&
+                            u.Weight > 0 &&
+                            u.CommonData != null && u.CommonData.IsValid &&
+                            u.Position.Distance2D(position) <= range
+                    select u).Count();
         }
         /// <summary>
         /// Checks if there are any bosses in range of the specified position
@@ -531,11 +532,11 @@ namespace Trinity
         internal static List<TrinityCacheObject> ListUnitsInRangeOfPosition(Vector3 position, float range = 15f)
         {
             return (from u in ObjectCache
-                where u.IsUnit &&
-                    u.Weight > 0 &&
-                    u.CommonData != null && u.CommonData.IsValid &&
-                    u.Position.Distance2D(position) <= range
-                select u).ToList();
+                    where u.IsUnit &&
+                        u.Weight > 0 &&
+                        u.CommonData != null && u.CommonData.IsValid &&
+                        u.Position.Distance2D(position) <= range
+                    select u).ToList();
         }
 
         internal static bool AnyTrashInRange(float range = 10f, int minCount = 1, bool useWeights = true)
@@ -609,12 +610,12 @@ namespace Trinity
         internal static int NumElitesInRangeOfPosition(Vector3 position, float range = 15f)
         {
             return (from u in ObjectCache
-                                where u.IsUnit &&
-                                        u.Weight > 0 &&
-                                        u.IsBossOrEliteRareUnique &&
-                                        u.CommonData != null && u.CommonData.IsValid &&
-                                        u.Position.Distance2D(position) <= range
-                                select u).Count();
+                    where u.IsUnit &&
+                            u.Weight > 0 &&
+                            u.IsBossOrEliteRareUnique &&
+                            u.CommonData != null && u.CommonData.IsValid &&
+                            u.Position.Distance2D(position) <= range
+                    select u).Count();
         }
         /// <summary>
         /// Returns true if there is any elite units within the given range
@@ -853,7 +854,7 @@ namespace Trinity
             var unitsWithDebuff = (from u in ObjectCache
 
                                    where u.IsUnit &&
-                                          u.Weight > 0 && 
+                                          u.Weight > 0 &&
                                           u.CommonData != null && u.CommonData.IsValid &&
                                           u.Position.Distance2D(position) <= range &&
                                           SpellTracker.IsUnitTracked(u.ACDGuid, power)
@@ -926,7 +927,7 @@ namespace Trinity
         }
 
         internal static bool PercentOfMobsDebuffed(float maxRange = 30f, float minPercent = 0.5f)
-        {  
+        {
             int debuffed = (from u in ObjectCache
                             where u.IsUnit &&
                             u.RadiusDistance <= maxRange &&
@@ -1029,7 +1030,7 @@ namespace Trinity
                                         u.CommonData != null && u.CommonData.IsValid &&
                                         u.Position.Distance2D(position) <= range &&
                                         !debuffs.All(u.HasDebuff)
-                                 orderby u.Weight descending 
+                                 orderby u.Weight descending
                                  select u).ToList();
 
             if (unitsByWeight.Any())

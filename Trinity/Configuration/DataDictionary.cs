@@ -532,6 +532,7 @@ namespace Trinity
             {363356, 20f }, //RimeCold
             {359703, 20f }, //RimeCold
             {159369, 20f }, //MorluMeteor
+            {4103, 25f}, // Meteor
         };
 
         /*
