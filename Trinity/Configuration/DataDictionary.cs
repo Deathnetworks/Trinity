@@ -24,6 +24,8 @@ namespace Trinity
             210268, // A4 Corrupt Growth
         };
 
+        public const int RiftTrialLevelAreaId = 405915;
+
         /// <summary>
         /// Contains a list of Rift WorldId's
         /// </summary>
@@ -197,7 +199,7 @@ namespace Trinity
             55313, // Act 2 Caldeum Bazaar
         };
 
-        
+
 
         /// <summary>
         /// Contains the list of Boss Level Area ID's
@@ -216,7 +218,6 @@ namespace Trinity
         {
             60757, // Belial's chambers
             405915, // p1_TieredRift_Challenge
-
         };
 
         public static HashSet<int> QuestLevelAreaIds { get { return DataDictionary.questLevelAreaIds; } }
@@ -224,12 +225,10 @@ namespace Trinity
         {
             202446, // A1 New Tristram "Attack Area"
             19947, // A1 New Tristram
-             109457, // A1 New Tristram Inn
-             // 91324, // A1 Old Tristram Road
+            109457, // A1 New Tristram Inn
             109457, // A1 The Slaughtered Calf Inn
             62968, // A1 The Hidden Cellar
             60714, // A1 Leoric's Passage
-            // 101351, // A1 The Old Ruins
             83110, // A1 Cellar of the Damned
             19935, // A1 Wortham
             100854, // A1 Khazra Den
@@ -242,6 +241,7 @@ namespace Trinity
             309413, // A5 Westmarch Cathedral
 
             336846, // x1_westm_KingEvent01 - Westmarch Commons Contested Villa
+            405915, // p1_TieredRift_Challenge
         };
 
 

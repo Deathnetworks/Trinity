@@ -509,7 +509,7 @@ namespace Trinity
                             int attemptCount;
                             CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out attemptCount);
 
-                            Logger.LogVerbose(LogCategory.Behavior, "Interacting with {1} Distance {2:0} Radius {3:0.0} Attempt {4}",
+                            Logger.LogDebug(LogCategory.UserInformation, "Interacting with {1} Distance {2:0} Radius {3:0.0} Attempt {4}",
                                      SNOPower.Axe_Operate_Gizmo, CurrentTarget.InternalName, CurrentTarget.Distance, CurrentTarget.Radius, attemptCount);
 
                             if (CurrentTarget.ActorType == ActorType.Monster)
@@ -1363,7 +1363,8 @@ namespace Trinity
 
                 if (usePowerResult)
                 {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "UsePower SUCCESS {0} at {1} on {2} dist={3}", CombatBase.CurrentPower.SNOPower, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetACDGUID, dist);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Used Power {0} at {1} on {2} dist={3:0}", 
+                        CombatBase.CurrentPower.SNOPower, NavHelper.PrettyPrintVector3(CombatBase.CurrentPower.TargetPosition), CombatBase.CurrentPower.TargetACDGUID, dist);
                     if (CombatBase.CurrentPower.SNOPower == SNOPower.Monk_TempestRush)
                         MonkCombat.LastTempestRushLocation = CombatBase.CurrentPower.TargetPosition;
 

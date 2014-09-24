@@ -304,6 +304,12 @@ namespace Trinity
                             }
                         }
 
+                        if (c_diaGizmo.GizmoState == 1)
+                        {
+                            c_IgnoreSubStep = "GizmoState1";
+                            return false;
+                        }
+
                         if (c_diaGizmo.HasBeenOperated)
                         {
                             c_IgnoreSubStep = "GizmoHasBeenOperated";

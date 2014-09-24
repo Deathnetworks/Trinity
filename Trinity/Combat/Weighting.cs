@@ -77,8 +77,6 @@ namespace Trinity
                     Player.ActiveBounty != null &&
                     Player.ActiveBounty.Info.KillCount > 0;
 
-
-
                 bool shouldIgnoreElites =
                      (!(isKillBounty || Player.InActiveEvent) &&
                      !CombatBase.IsQuestingMode &&
@@ -1196,7 +1194,7 @@ namespace Trinity
                 if (CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0 && CurrentTarget.RActorGuid != LastTargetRactorGUID)
                 {
                     RecordTargetHistory();
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Target changed to {0} // {1} ({2})", CurrentTarget.ActorSNO, CurrentTarget.InternalName, CurrentTarget.Type);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Target changed to {0} // {1} ({2})", CurrentTarget.ActorSNO, CurrentTarget.InternalName, CurrentTarget.Type);
                 }
             }
         }

@@ -334,7 +334,7 @@ namespace Trinity
                     // Still no target, let's see if we should backtrack or wait for wrath to come off cooldown...
                     if (CurrentTarget == null)
                     {
-                        RefreshDoBackTrack();
+                        RefreshWaitTimers();
                     }
 
                     // Still no target, let's end it all!
@@ -723,7 +723,7 @@ namespace Trinity
                    select o;
         }
 
-        private static void RefreshDoBackTrack()
+        private static void RefreshWaitTimers()
         {
 
             // See if we should wait for [playersetting] milliseconds for possible loot drops before continuing run
