@@ -281,14 +281,6 @@ namespace Trinity
                         }
                         timers[2].Stop();
 
-                        //timers[10].Start();
-                        //if (CacheData.NavigationObstacles.Any(a => a.Position.Distance2DSqr(Trinity.Player.Position) < maxDistance * maxDistance &&
-                        //    MathUtil.IntersectsPath(a.Position, a.Radius, Trinity.Player.Position, gridPoint.Position)))
-                        //{
-                        //    pathFailures++;
-                        //}
-                        //timers[10].Stop();
-
                         // Monsters
                         if (shouldKite)
                         {

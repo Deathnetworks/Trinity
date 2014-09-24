@@ -3,6 +3,7 @@ using System.Linq;
 using Trinity.Reference;
 using Zeta.Bot;
 using Zeta.Common;
+using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using Logger = Trinity.Technicals.Logger;
 
@@ -111,7 +112,7 @@ namespace Trinity.Combat.Abilities
                 Player.CurrentHealthPct <= 0.50 &&
                 (CurrentTarget.IsBossOrEliteRareUnique || TargetUtil.IsEliteTargetInRange(75f)))
             {
-                var target = NavHelper.FindSafeZone(false, 1, CurrentTarget.Position, true);
+                var target = PlayerKiteDistance == 0 ? ZetaDia.Me.Position : NavHelper.FindSafeZone(false, 1, CurrentTarget.Position, true);
                 return new TrinityPower(SNOPower.Wizard_Teleport, 65f, target);
             }
 
@@ -336,8 +337,10 @@ namespace Trinity.Combat.Abilities
 
             // Default Attacks
             if (IsNull(power))
-                power = DefaultPower;
-
+            {
+                // Never use Melee (e.g. Range < 10f), only ranged attacks
+                power = DefaultPower.MinimumRange > 11f ? DefaultPower : new TrinityPower(SNOPower.Walk);
+            }
             return power;
         }
 
