@@ -58,6 +58,18 @@ namespace Trinity.Helpers
             }
         }
 
+        private static string _actualProcessorSpeed;
+        public static string ActualProcessorSpeed
+        {
+            get
+            {
+                if (!_initialized)
+                    Initialize();
+
+                return _actualProcessorSpeed;
+            }
+        }
+
         private static string _hardDisk;
         public static string HardDisk
         {
@@ -153,6 +165,7 @@ namespace Trinity.Helpers
                 foreach (var queryObj in win32Processor.Get().Cast<ManagementObject>())
                 {
                     _processor = queryObj["Name"].ToString();
+                    _actualProcessorSpeed = queryObj["CurrentClockSpeed"].ToString();
                     queryObj.Dispose();
                 }
             }
