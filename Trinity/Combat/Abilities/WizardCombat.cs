@@ -164,7 +164,8 @@ namespace Trinity.Combat.Abilities
             {
                 // ReSharper disable once InconsistentNaming
                 var _14s = TimeSpan.FromSeconds(14);
-                const float maxHydraDistance = 30f;
+                const float maxHydraDistance = 25f;
+                const float castDistance = 65f;
                 const float maxHydraDistSqr = maxHydraDistance * maxHydraDistance;
 
                 // This will check if We have the "Serpent Sparker" wand, and attempt to cast a 2nd hydra immediately after the first
@@ -172,7 +173,8 @@ namespace Trinity.Combat.Abilities
                 bool serpentSparkerRecast1 = Legendary.SerpentsSparker.IsEquipped && LastPowerUsed == SNOPower.Wizard_Hydra &&
                     SpellHistory.SpellUseCountInTime(SNOPower.Wizard_Hydra, TimeSpan.FromSeconds(2)) < 2;
 
-                bool baseRecast = TimeSpanSincePowerUse(SNOPower.Wizard_Hydra) > TimeSpan.FromSeconds(14);
+                int baseRecastDelay = HasPrimarySkill ? 14 : 3;
+                bool baseRecast = TimeSpanSincePowerUse(SNOPower.Wizard_Hydra) > TimeSpan.FromSeconds(baseRecastDelay);
                 var lastCast = SpellHistory.HistoryQueue
                     .Where(p => p.Power.SNOPower == SNOPower.Wizard_Hydra && p.TimeSinceUse < _14s)
                     .OrderBy(s => s.TimeSinceUse).ThenBy(p => p.Power.TargetPosition.Distance2DSqr(CurrentTarget.Position))
@@ -184,10 +186,10 @@ namespace Trinity.Combat.Abilities
 
                 if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_Hydra, CanCastFlags.NoTimer) &&
                     (baseRecast || distanceRecast || serpentSparkerRecast1) && !twoAlredyCastIn5Sec &&
-                    CurrentTarget.RadiusDistance <= maxHydraDistance && Player.PrimaryResource >= 15)
+                    CurrentTarget.RadiusDistance <= castDistance && Player.PrimaryResource >= 15)
                 {
                     var pos = TargetUtil.GetBestClusterPoint(maxHydraDistance);
-                    return new TrinityPower(SNOPower.Wizard_Hydra, maxHydraDistance, pos);
+                    return new TrinityPower(SNOPower.Wizard_Hydra, 55f, pos);
                 }
 
             }
