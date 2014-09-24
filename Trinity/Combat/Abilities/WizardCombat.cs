@@ -173,7 +173,7 @@ namespace Trinity.Combat.Abilities
                 bool serpentSparkerRecast1 = Legendary.SerpentsSparker.IsEquipped && LastPowerUsed == SNOPower.Wizard_Hydra &&
                     SpellHistory.SpellUseCountInTime(SNOPower.Wizard_Hydra, TimeSpan.FromSeconds(2)) < 2;
 
-                int baseRecastDelay = HasPrimarySkill ? 14 : 3;
+                int baseRecastDelay = HasPrimarySkill || Player.PrimaryResource < 60 ? 14 : 3;
                 bool baseRecast = TimeSpanSincePowerUse(SNOPower.Wizard_Hydra) > TimeSpan.FromSeconds(baseRecastDelay);
                 var lastCast = SpellHistory.HistoryQueue
                     .Where(p => p.Power.SNOPower == SNOPower.Wizard_Hydra && p.TimeSinceUse < _14s)
