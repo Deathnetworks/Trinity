@@ -759,7 +759,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item PauldronsOfAkkhan = new Item
         {
-            Id = 0,
+            Id = 358801,
             Name = "Pauldrons of Akkhan",
             Quality = ItemQuality.Legendary,
             Slug = "pauldrons-of-akkhan",
@@ -2499,7 +2499,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HelmOfAkkhan = new Item
         {
-            Id = 0,
+            Id = 358799,
             Name = "Helm of Akkhan",
             Quality = ItemQuality.Legendary,
             Slug = "helm-of-akkhan",
