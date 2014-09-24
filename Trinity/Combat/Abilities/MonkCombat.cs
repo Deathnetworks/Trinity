@@ -117,13 +117,6 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.Monk_SevenSidedStrike, 16f, CurrentTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 3);
             }
 
-            // WayOfTheHundredFists: apply fists of fury DoT if we have Infused with Light buff + WotHF:FoF
-            if (!UseOOCBuff && Runes.Monk.InfusedWithLight.IsActive && Runes.Monk.FistsOfFury.IsActive && GetHasBuff(SNOPower.Monk_BreathOfHeaven) && !CurrentTarget.HasDotDPS)
-            {
-                Monk_TickSweepingWindSpam();
-                return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 14f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1);
-            }
-
             // Sunwuko set Sweeping Winds spirit dumping
             if (Player.PrimaryResource > 75 && CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) && hasSWK)
             {
@@ -308,8 +301,7 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.X1_Monk_MantraOfEvasion_v2);
                 }
             }
-
-            
+         
             /*
              * Dual/Trigen Monk section
              * 
