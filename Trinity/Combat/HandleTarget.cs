@@ -71,7 +71,7 @@ namespace Trinity
 
             Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "HandleTarget returning {0} to tree" + extras, status);
 
-            return RunStatus.Success;
+            return status;
 
         }
 

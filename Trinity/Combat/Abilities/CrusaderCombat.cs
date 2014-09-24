@@ -1,6 +1,7 @@
 ﻿
 using System.Linq;
 using Zeta.Common;
+using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using Trinity.Reference;
 
@@ -315,7 +316,7 @@ namespace Trinity.Combat.Abilities
 
         private static bool CanCastSteedChargeOutOfCombat()
         {
-            return CanCast(SNOPower.X1_Crusader_SteedCharge) && CrusaderSettings.SteedChargeOOC && Player.MovementSpeed > 0 && !Player.IsInTown;
+            return CanCast(SNOPower.X1_Crusader_SteedCharge) && CrusaderSettings.SteedChargeOOC && Player.MovementSpeed > 0 && !Player.IsInTown && ZetaDia.Me.LoopingAnimationEndTime == 0;
         }
 
         private static bool CanCastCondemn()
