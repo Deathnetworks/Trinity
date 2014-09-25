@@ -158,10 +158,13 @@
     <Compile Include="Helpers\UsedProfileManager.cs" />
     <Compile Include="Configuration\Constants.cs" />
     <Compile Include="Objects\Item.cs" />
+    <Compile Include="Objects\ItemRank.cs" />
+    <Compile Include="Objects\ItemRankData.cs" />
     <Compile Include="Objects\Passive.cs" />
     <Compile Include="Objects\Rune.cs" />
     <Compile Include="Objects\Set.cs" />
     <Compile Include="Objects\Skill.cs" />
+    <Compile Include="Reference\ItemRanks.cs" />
     <Compile Include="Reference\Legendary.cs" />
     <Compile Include="Reference\Passives.cs" />
     <Compile Include="Reference\PassiveUtils.cs" />
