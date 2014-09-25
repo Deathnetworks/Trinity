@@ -295,13 +295,13 @@ namespace Trinity.Combat.Abilities
                 {
                     return new TrinityPower(SNOPower.X1_Monk_MantraOfRetribution_v2);
                 }
-                if (CanCast(SNOPower.X1_Monk_MantraOfHealing_v2) && (!GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) ||
+                if (CanCast(SNOPower.X1_Monk_MantraOfHealing_v2) && (!GetHasBuff(SNOPower.X1_Monk_MantraOfHealing_v2) ||
                     (hasSWK && GetHasBuff(SNOPower.Monk_SweepingWind))) &&
                     (Player.PrimaryResource >= 80) && CurrentTarget != null && TargetUtil.AnyMobsInRange(10f))
                 {
                     return new TrinityPower(SNOPower.X1_Monk_MantraOfHealing_v2);
                 }
-                if (CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && (!GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) ||
+                if (CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && (!GetHasBuff(SNOPower.X1_Monk_MantraOfEvasion_v2) ||
                     (hasSWK && GetHasBuff(SNOPower.Monk_SweepingWind))) &&
                     (Player.PrimaryResource >= 80) && CurrentTarget != null && TargetUtil.AnyMobsInRange(10f))
                 {
