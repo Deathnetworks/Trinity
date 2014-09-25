@@ -41,6 +41,22 @@ namespace Trinity.Reference
             return new HashSet<int>(GetRankedItems(actorClass, minPercent, minSampleSize, betterThanRank).Select(v => v.Item.Id));
         }
 
+        private static Dictionary<int,ItemRank> _itemRankDictionary = new Dictionary<int, ItemRank>();
+        public static ItemRank GetItemRank(ACDItem item)
+        {
+            if (!_itemRankDictionary.Any())
+                _itemRankDictionary = ToList().ToDictionary(k => k.Item.Id, k => k);
+
+            ItemRank itemRank;
+
+            if (_itemRankDictionary.TryGetValue(item.ActorSNO, out itemRank))
+            {
+                return itemRank;
+            }
+
+            return null;           
+        }
+
         private static Dictionary<ActorClass, HashSet<int>> _highRankedIds;
         public static Dictionary<ActorClass, HashSet<int>> HighRankedIds
         {
