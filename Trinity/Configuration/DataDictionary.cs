@@ -1043,7 +1043,6 @@ namespace Trinity
             // uber fire chains in Realm of Turmoil and Iron Gate in Realm of Chaos
             263014, 
             5724, 5727, 
-            116063, 
             5869, // trDun_Gargoyle_01
             5738, // trDun_Cath_Breakable_pillar
 
