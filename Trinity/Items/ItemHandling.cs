@@ -402,7 +402,7 @@ namespace Trinity
             if (name.StartsWith("wizardhat_")) return GItemType.WizardHat;
             if (name.StartsWith("xbow_")) return GItemType.TwoHandCrossbow;
             if (name == "console_powerglobe") return GItemType.PowerGlobe;
-            if (name.StartsWith("tiered_rifts_Orb")) return GItemType.ProgressionGlobe;
+            if (name.StartsWith("tiered_rifts_orb")) return GItemType.ProgressionGlobe;
             if (name.StartsWith("consumable_add_sockets")) return GItemType.ConsumableAddSockets; // Ramaladni's Gift
             if (name.StartsWith("tieredlootrunkey_")) return GItemType.TieredLootrunKey;
 
