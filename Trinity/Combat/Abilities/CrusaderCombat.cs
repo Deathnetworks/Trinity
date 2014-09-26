@@ -20,9 +20,10 @@ namespace Trinity.Combat.Abilities
 
             TrinityPower power = null;
 
-            if (!UseOOCBuff && IsCurrentlyAvoiding)
+            if (!UseOOCBuff && IsCurrentlyAvoiding) //Actually use steed to avoid
             {
-                if (CanCastSteedChargeOutOfCombat())
+                if (CanCast(SNOPower.X1_Crusader_SteedCharge, CombatBase.CanCastFlags.NoTimer) &&
+                    Player.CurrentHealthPct <= 0.75)
                 {
                     return new TrinityPower(SNOPower.X1_Crusader_SteedCharge);
                 }
@@ -240,11 +241,6 @@ namespace Trinity.Combat.Abilities
             // Buffs
             if (UseOOCBuff)
             {
-                if (CanCast(SNOPower.X1_Crusader_SteedCharge) && CrusaderSettings.SteedChargeOOC)
-                {
-                    return new TrinityPower(SNOPower.X1_Crusader_SteedCharge);
-                }
-
                 /*
                  *  Laws
                  */
@@ -320,7 +316,7 @@ namespace Trinity.Combat.Abilities
 
         private static bool CanCastCondemn()
         {
-            return CanCast(SNOPower.X1_Crusader_Condemn) && (TargetUtil.EliteOrTrashInRange(16f) || TargetUtil.AnyMobsInRange(15f, CrusaderSettings.CondemnAoECount));
+            return CanCast(SNOPower.X1_Crusader_Condemn) && Player.PrimaryResource > 36 && (TargetUtil.EliteOrTrashInRange(10f) || TargetUtil.AnyMobsInRange(10f, CrusaderSettings.CondemnAoECount));
         }
 
         private static bool CanCastHeavensFury()

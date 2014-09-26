@@ -482,6 +482,7 @@ namespace Trinity.DbProvider
             // See if we can use abilities like leap etc. for movement out of combat, but not in town
             if (Trinity.Settings.Combat.Misc.AllowOOCMovement && !Trinity.Player.IsInTown && !Trinity.DontMoveMeIAmDoingShit && cancelSpecialMovementAfterStuck)
             {
+                #region Barbarian
                 // Whirlwind for a barb, special context only
                 if (Trinity.Settings.Combat.Barbarian.SprintMode != BarbarianSprintMode.CombatOnly &&
                     Trinity.Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Trinity.ObjectCache.Any(u => u.IsUnit &&
@@ -522,7 +523,9 @@ namespace Trinity.DbProvider
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Furious Charge for OOC movement, distance={0}", destinationDistance);
                     return;
                 }
+                #endregion
 
+                #region Demon hunter
                 bool hasTacticalAdvantage = HotbarSkills.PassiveSkills.Any(s => s == SNOPower.DemonHunter_Passive_TacticalAdvantage);
                 bool hasDoubleDanettas = Sets.DanettasHatred.IsFirstBonusActive;
                 bool TacticalAndDanettas = (hasTacticalAdvantage && !hasDoubleDanettas);
@@ -550,6 +553,9 @@ namespace Trinity.DbProvider
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Vault for OOC movement, distance={0}", destinationDistance);
                     return;
                 }
+                #endregion
+
+                #region Monk
                 // Tempest rush for a monk
                 if (Trinity.Hotbar.Contains(SNOPower.Monk_TempestRush) &&
                     (Trinity.Settings.Combat.Monk.TROption == TempestRushOption.MovementOnly || Trinity.Settings.Combat.Monk.TROption == TempestRushOption.Always ||
@@ -632,8 +638,9 @@ namespace Trinity.DbProvider
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Dashing Strike for OOC movement, distance={0}", destinationDistance);
                 }
+                #endregion
 
-
+                #region Wizard
                 bool hasCalamity = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Teleport && s.RuneIndex == 0);
 
                 // Teleport for a wizard 
@@ -667,6 +674,21 @@ namespace Trinity.DbProvider
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Archon Teleport for OOC movement, distance={0}", destinationDistance);
                     return;
                 }
+                #endregion
+
+                #region Crusader
+
+                if (CombatBase.CanCast(SNOPower.X1_Crusader_SteedCharge, CombatBase.CanCastFlags.NoTimer) &&
+                    destinationDistance >= 15f && Trinity.Settings.Combat.Crusader.SteedChargeOOC && !ShrinesInArea(vMoveToTarget))
+                {
+                    ZetaDia.Me.UsePower(SNOPower.X1_Crusader_SteedCharge, vMoveToTarget, Trinity.CurrentWorldDynamicId, -1);
+                    SpellHistory.RecordSpell(SNOPower.X1_Crusader_SteedCharge);
+                    if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Steed Charge for OOC movement, distance={0}", destinationDistance);
+                    return;
+                }
+
+                #endregion
             }
 
             if (MyPosition.Distance2D(vMoveToTarget) > 1f)
