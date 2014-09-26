@@ -31,11 +31,8 @@ namespace Trinity
             double minAvoidanceHealth = GetAvoidanceHealth(CurrentCacheObject.ActorSNO);
             double minAvoidanceRadius = GetAvoidanceRadius(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
 
-            // Are we allowed to path around avoidance?
-            //if (Settings.Combat.Misc.AvoidanceNavigation)
-            {
-                MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, (float)minAvoidanceRadius);
-            }
+            // Add Navigation cell weights to path around avoidance
+            MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, (float)minAvoidanceRadius);
 
             AvoidanceType avoidanceType = AvoidanceManager.GetAvoidanceType(CurrentCacheObject.ActorSNO);
 

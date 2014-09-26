@@ -25,11 +25,13 @@ namespace Trinity.Helpers
 
         public static void LogAnimation(TrinityCacheObject cacheObject)
         {
-            if (!LogCategoryEnabled(LogCategory.Animation) || !cacheObject.CommonData.IsValid || !cacheObject.CommonData.AnimationInfo.IsValid)
+            if (!LogCategoryEnabled(LogCategory.Animation) || cacheObject.CommonData == null || !cacheObject.CommonData.IsValid || !cacheObject.CommonData.AnimationInfo.IsValid)
                 return;
 
             var state = cacheObject.CommonData.AnimationState.ToString();
             var name = cacheObject.CommonData.CurrentAnimation.ToString();
+
+            
 
             // Log Animation
             if (!_seenAnimationCache.ContainsKey(name))

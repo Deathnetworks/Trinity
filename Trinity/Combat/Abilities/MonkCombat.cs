@@ -117,13 +117,6 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.Monk_SevenSidedStrike, 16f, CurrentTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 3);
             }
 
-            // Sunwuko set Sweeping Winds spirit dumping
-            if (Player.PrimaryResource > 75 && CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) && hasSWK)
-            {
-                Trinity.SweepWindSpam = DateTime.UtcNow;
-                return new TrinityPower(SNOPower.Monk_SweepingWind);
-            }
-
             // Sweeping winds spam
             if ((Player.PrimaryResource >= 75 || (hasInnaSet && Player.PrimaryResource >= 5)) &&
                 CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) && (GetHasBuff(SNOPower.Monk_SweepingWind) || hasSWK) &&
@@ -301,7 +294,14 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.X1_Monk_MantraOfEvasion_v2);
                 }
             }
-         
+
+            // Sunwuko set Sweeping Winds spirit dumping
+            if (Player.PrimaryResource > 75 && CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) && hasSWK)
+            {
+                Trinity.SweepWindSpam = DateTime.UtcNow;
+                return new TrinityPower(SNOPower.Monk_SweepingWind);
+            }
+       
             /*
              * Dual/Trigen Monk section
              * 

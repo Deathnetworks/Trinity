@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Trinity.Items;
 using Trinity.Reference;
+using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using Trinity.Objects;
@@ -338,7 +339,6 @@ namespace Trinity
             new DoubleInt((int)SNOActor.Triune_Berserker_C, (int)SNOAnim.Triune_Berserker_specialAttack_loop_01),
             new DoubleInt((int)SNOActor.Triune_Berserker_D, (int)SNOAnim.Triune_Berserker_specialAttack_01),
             new DoubleInt((int)SNOActor.Triune_Berserker_D, (int)SNOAnim.Triune_Berserker_specialAttack_loop_01),
-  
        };
 
 
@@ -431,11 +431,24 @@ namespace Trinity
             325136, // x1_Malthael_DeathFogMonster
             340512, // x1_Malthael_Mephisto_LightningObject
 
-            //359693, //Server Prop X1_Unique_Monster_Generic_AOE_DOT_Fire_10foot-24594 (359693)
-
-            //359703, // X1_Unique_Monster_Generic_AOE_DOT_Cold_10foot-183301 (359703) Type=ServerProp
-            //363356, // X1_Unique_Monster_Generic_AOE_DOT_Cold_20foot-183239 (363356) Type=ServerProp
-            //360046, // X1_Unique_Monster_Generic_AOE_DOT_Poison_10foot-223788 (360046) Type=ServerProp
+            359703, // X1_Unique_Monster_Generic_AOE_DOT_Cold_10foot
+            363356, // X1_Unique_Monster_Generic_AOE_DOT_Cold_20foot
+            359693, // X1_Unique_Monster_Generic_AOE_DOT_Fire_10foot
+            363357, // X1_Unique_Monster_Generic_AOE_DOT_Fire_20foot
+            364542, // X1_Unique_Monster_Generic_AOE_DOT_Lightning_10foot
+            364543, // X1_Unique_Monster_Generic_AOE_DOT_Lightning_20foot
+            377537, // X1_Unique_Monster_Generic_AOE_DOT_Lightning_hardpoints
+            360046, // X1_Unique_Monster_Generic_AOE_DOT_Poison_10foot
+            363358, // X1_Unique_Monster_Generic_AOE_DOT_Poison_20foot
+            368156, // X1_Unique_Monster_Generic_AOE_Lightning_Ring
+            358917, // X1_Unique_Monster_Generic_AOE_Sphere_Distortion
+            377086, // X1_Unique_Monster_Generic_Projectile_Arcane
+            377087, // X1_Unique_Monster_Generic_Projectile_Cold
+            377088, // X1_Unique_Monster_Generic_Projectile_Fire
+            377089, // X1_Unique_Monster_Generic_Projectile_Holy
+            377090, // X1_Unique_Monster_Generic_Projectile_Lightning
+            377091, // X1_Unique_Monster_Generic_Projectile_Physical
+            377092, // X1_Unique_Monster_Generic_Projectile_Poison
 
         };
 
@@ -470,7 +483,16 @@ namespace Trinity
             335505, // x1_malthael_drainSoul_ghost
             325136, // x1_Malthael_DeathFogMonster
             340512, // x1_Malthael_Mephisto_LightningObject
-            // 3528, //[2047F7CC] Type: Projectile Name: Butcher_hook-737821 ActorSNO: 3528, Distance: 45.17828
+
+            377086, // X1_Unique_Monster_Generic_Projectile_Arcane
+            377087, // X1_Unique_Monster_Generic_Projectile_Cold
+            377088, // X1_Unique_Monster_Generic_Projectile_Fire
+            377089, // X1_Unique_Monster_Generic_Projectile_Holy
+            377090, // X1_Unique_Monster_Generic_Projectile_Lightning
+            377091, // X1_Unique_Monster_Generic_Projectile_Physical
+            377092, // X1_Unique_Monster_Generic_Projectile_Poison
+
+            3528,   // Butcher_hook
 
             // 4394, //g_ChargedBolt_Projectile-200915 (4394) Type=Projectile
             // 368392, // x1_Cesspool_Slime_Posion_Attack_Projectile-222254 (368392) Type=Projectile
@@ -529,10 +551,28 @@ namespace Trinity
             {219736, 35f }, // Mallet Demons
             {219751, 35f }, // Mallet Demons
 
-            {363356, 20f }, //RimeCold
-            {359703, 20f }, //RimeCold
             {159369, 20f }, //MorluMeteor
             {4103, 25f}, // Meteor
+            {3528, 15f}, // Butcher_hook
+
+            {359703, 10f}, // X1_Unique_Monster_Generic_AOE_DOT_Cold_10foot
+            {363356, 20f}, // X1_Unique_Monster_Generic_AOE_DOT_Cold_20foot
+            {359693, 10f}, // X1_Unique_Monster_Generic_AOE_DOT_Fire_10foot
+            {363357, 20f}, // X1_Unique_Monster_Generic_AOE_DOT_Fire_20foot
+            {364542, 10f}, // X1_Unique_Monster_Generic_AOE_DOT_Lightning_10foot
+            {364543, 20f}, // X1_Unique_Monster_Generic_AOE_DOT_Lightning_20foot
+            {377537, 10f}, // X1_Unique_Monster_Generic_AOE_DOT_Lightning_hardpoints
+            {360046, 10f}, // X1_Unique_Monster_Generic_AOE_DOT_Poison_10foot
+            {363358, 20f}, // X1_Unique_Monster_Generic_AOE_DOT_Poison_20foot
+            {368156, 10f}, // X1_Unique_Monster_Generic_AOE_Lightning_Ring
+            {358917, 10f}, // X1_Unique_Monster_Generic_AOE_Sphere_Distortion
+            {377086, 10f}, // X1_Unique_Monster_Generic_Projectile_Arcane
+            {377087, 10f}, // X1_Unique_Monster_Generic_Projectile_Cold
+            {377088, 10f}, // X1_Unique_Monster_Generic_Projectile_Fire
+            {377089, 10f}, // X1_Unique_Monster_Generic_Projectile_Holy
+            {377090, 10f}, // X1_Unique_Monster_Generic_Projectile_Lightning
+            {377091, 10f}, // X1_Unique_Monster_Generic_Projectile_Physical
+            {377092, 10f}, // X1_Unique_Monster_Generic_Projectile_Poison
         };
 
         /*
@@ -1141,6 +1181,28 @@ namespace Trinity
             "Suwaiya",
             "Tecpatl",
             "Diabolic Wand"
+        };
+        // Chamber of Suffering (Butcher's Lair)
+        public static HashSet<Vector3> ChamberOfSufferingSafePoints = new HashSet<Vector3> 
+        {
+            new Vector3(122.3376f, 120.1721f, 0), // Center
+            new Vector3(138.504f,  88.64854f, 0), // Top Left
+            new Vector3(98.61596f, 95.93278f, 0), // Top
+            new Vector3(93.04589f, 134.9459f, 0), // Top Right
+            new Vector3(107.9791f, 150.6952f, 0), // Bottom Right
+            new Vector3(146.8563f, 144.0836f, 0), // Bottom
+            new Vector3(151.9562f, 104.8417f, 0), // Bottom Left
+        };
+
+        public static Dictionary<int, Vector3> ButcherPanelPositions = new Dictionary<int, Vector3>
+        {
+            { 201426, new Vector3(121, 121, 0)}, // ButcherLair_FloorPanel_MidMiddle_Base
+            { 201242, new Vector3(158, 111, 0)}, // ButcherLair_FloorPanel_LowerLeft_Base
+            { 200969, new Vector3(152, 151, 0)}, // ButcherLair_FloorPanel_LowerMid_Base
+            { 201438, new Vector3(91, 91, 0)}, // ButcherLair_FloorPanel_UpperMid_Base
+            { 201423, new Vector3(133, 78, 0)}, // ButcherLair_FloorPanel_UpperLeft_Base
+            { 201464, new Vector3(107, 160, 0)}, // ButcherLair_FloorPanel_LowerRight_Base
+            { 201454, new Vector3(80, 134, 0)}, // ButcherLair_FloorPanel_UpperRight_Base
         };
 
         public readonly static Dictionary<Item, SNOPower> PowerByItem = new Dictionary<Item, SNOPower>

@@ -20,6 +20,14 @@ namespace Trinity
 {
     public partial class Trinity : IPlugin
     {
+        private static Func<TrinityCacheObject, bool> objectIsCharging = u =>
+            u.IsFacingPlayer && (u.Animation == SNOAnim.Beast_start_charge_02 ||
+            u.Animation == SNOAnim.Beast_charge_02 || u.Animation == SNOAnim.Beast_charge_04 ||
+            u.Animation == SNOAnim.Butcher_Attack_Charge_01_in || // The butcher charge kinda works like this, right? :)
+            u.Animation == SNOAnim.Butcher_Attack_Chain_01_out || u.Animation == SNOAnim.Butcher_Attack_Chain_01_in ||
+            u.Animation == SNOAnim.Butcher_Attack_05_telegraph || u.Animation == SNOAnim.Butcher_BreakFree_run_01);
+
+
         /// <summary>
         /// For backwards compatability
         /// </summary>
@@ -62,11 +70,6 @@ namespace Trinity
 
             using (new PerformanceLogger("RefreshDiaObjectCache"))
             {
-                //if (DateTime.UtcNow.Subtract(LastRefreshedCache).TotalMilliseconds < Settings.Advanced.CacheRefreshRate && !forceUpdate)
-                //{
-                //    if (!UpdateCurrentTarget())
-                //        return false;
-                //}
                 LastRefreshedCache = DateTime.UtcNow;
 
                 /*
@@ -132,13 +135,13 @@ namespace Trinity
                     }
                 }
 
+
                 /* Beast Charge Experimental Avoidance */
                 if (Settings.Combat.Misc.UseExperimentalSavageBeastAvoidance)
                 {
                     const float beastChargePathWidth = 10f;
-                    const int beastChargerSNO = 3337;
-                    foreach (var unit1 in ObjectCache.Where(u => u.IsFacingPlayer && u.Animation == SNOAnim.Beast_start_charge_02 ||
-                                    u.Animation == SNOAnim.Beast_charge_02 || u.Animation == SNOAnim.Beast_charge_04))
+                    List<int> chargerSnoList = new List<int>();
+                    foreach (var unit1 in ObjectCache.Where(u => objectIsCharging(u)))
                     {
 
                         Vector3 endPoint = MathEx.GetPointAt(unit1.Position, 90f, unit1.Unit.Movement.Rotation);
@@ -148,25 +151,29 @@ namespace Trinity
                             Vector3 pathSpot = MathEx.CalculatePointFrom(unit1.Position, endPoint, i);
 
                             Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
-                                "Generating BeastCharge Avoidance: {0} dist: {1}",
+                                "Generating Charge Avoidance: {0} dist: {1}",
                                 pathSpot, pathSpot.Distance2D(unit1.Position));
 
-                            if (Trinity.Player.Position.Distance2D(pathSpot) <= beastChargePathWidth)
+                            var minWidth = Math.Max(beastChargePathWidth, unit1.Radius) + 5f;
+
+                            if (Player.Position.Distance2D(pathSpot) <= minWidth)
                             {
-                                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Avoiding Beast Charger!");
+                                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Avoiding Charger!");
                                 _standingInAvoidance = true;
                             }
-                            CacheData.TimeBoundAvoidance.Add(new CacheObstacleObject(pathSpot, beastChargePathWidth, beastChargerSNO,
-                                "BeastCharge"));
+                            CacheData.TimeBoundAvoidance.Add(new CacheObstacleObject(pathSpot, minWidth, unit1.ActorSNO,
+                                "Charger"));
+
+                            chargerSnoList.Add(unit1.ActorSNO);
                         }
-                        if (CacheData.TimeBoundAvoidance.Any(aoe => aoe.ActorSNO == beastChargerSNO))
+                        if (CacheData.TimeBoundAvoidance.Any(aoe => chargerSnoList.Contains(aoe.ActorSNO)))
                             Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                                 "Generated {0} avoidance points for BeastCharge, minDistance={1} maxDistance={2}",
-                                CacheData.TimeBoundAvoidance.Count(aoe => aoe.ActorSNO == beastChargerSNO),
-                                CacheData.TimeBoundAvoidance.Where(aoe => aoe.ActorSNO == beastChargerSNO)
-                                    .Min(aoe => aoe.Position.Distance2D(Trinity.Player.Position)),
-                                CacheData.TimeBoundAvoidance.Where(aoe => aoe.ActorSNO == beastChargerSNO)
-                                    .Max(aoe => aoe.Position.Distance2D(Trinity.Player.Position)));
+                                CacheData.TimeBoundAvoidance.Count(aoe => chargerSnoList.Contains(aoe.ActorSNO)),
+                                CacheData.TimeBoundAvoidance.Where(aoe => chargerSnoList.Contains(aoe.ActorSNO))
+                                    .Min(aoe => aoe.Position.Distance2D(Player.Position)),
+                                CacheData.TimeBoundAvoidance.Where(aoe => chargerSnoList.Contains(aoe.ActorSNO))
+                                    .Max(aoe => aoe.Position.Distance2D(Player.Position)));
                     }
                 }
 
@@ -410,7 +417,7 @@ namespace Trinity
             const int setItemMarkerTexture = 404424;
             const int legendaryItemMarkerTexture = 275968;
 
-            foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsValid && 
+            foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsValid &&
                 (m.MinimapTexture == setItemMarkerTexture || m.MinimapTexture == legendaryItemMarkerTexture) && !Blacklist60Seconds.Contains(m.NameHash)))
             {
                 ObjectCache.Add(new TrinityCacheObject()
@@ -433,7 +440,7 @@ namespace Trinity
             {
                 // Add Rift Guardian POI's or Markers to ObjectCache
                 const int riftGuardianMarkerTexture = 81058;
-                Func<MinimapMarker, bool> riftGuardianMarkerFunc = m => m.IsValid && (m.IsPointOfInterest || m.MinimapTexture == riftGuardianMarkerTexture) && 
+                Func<MinimapMarker, bool> riftGuardianMarkerFunc = m => m.IsValid && (m.IsPointOfInterest || m.MinimapTexture == riftGuardianMarkerTexture) &&
                     !Blacklist60Seconds.Contains(m.NameHash);
 
                 foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(riftGuardianMarkerFunc))
