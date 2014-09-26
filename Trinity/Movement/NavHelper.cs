@@ -125,33 +125,56 @@ namespace Trinity
         /// <returns></returns>
         internal static Vector3 FindSafeZone(bool isStuck, int stuckAttempts, Vector3 dangerPoint, bool shouldKite = false, IEnumerable<TrinityCacheObject> monsterList = null, bool avoidDeath = false)
         {
+            // Handle The Butcher's Lair
+            var butcherFloorPanels = CacheData.TimeBoundAvoidance.Where(aoe => DataDictionary.ButcherFloorPanels.Contains(aoe.ActorSNO)).ToList();
+            if (butcherFloorPanels.Any())
+            {
+                foreach (var safePoint in DataDictionary.ButcherPanelPositions.OrderBy(p => p.Value.Distance2DSqr(Trinity.Player.Position)))
+                {
+                    // Floor panel with fire animation was added to cache
+                    if (butcherFloorPanels.Any(p => p.ActorSNO == safePoint.Key && p.Position.Distance2DSqr(safePoint.Value) <= 15f * 15f))
+                    {
+                        continue;
+                    }
+
+                    // floor panel position is in Butcher animation avoidance (charging, chain hook)
+                    if (CacheData.TimeBoundAvoidance.Any(aoe => aoe.Position.Distance2D(safePoint.Value) < aoe.Radius))
+                        continue;
+
+                    // no avoidance object in cache, this point is safe
+                    return safePoint.Value;
+                }
+
+                // Don't fall back to regular avoidance
+                return Vector3.Zero;
+            }
+
             if (!isStuck)
             {
                 if (shouldKite && DateTime.UtcNow.Subtract(lastFoundSafeSpot).TotalMilliseconds <= 1500 && lastSafeZonePosition != Vector3.Zero)
                 {
                     return lastSafeZonePosition;
                 }
-                else if (DateTime.UtcNow.Subtract(lastFoundSafeSpot).TotalMilliseconds <= 800 && lastSafeZonePosition != Vector3.Zero)
+                if (DateTime.UtcNow.Subtract(lastFoundSafeSpot).TotalMilliseconds <= 800 && lastSafeZonePosition != Vector3.Zero)
                 {
                     return lastSafeZonePosition;
                 }
-                hasEmergencyTeleportUp = (
+                hasEmergencyTeleportUp = (!PlayerStatus.IsIncapacitated && (
                     // Leap is available
-                    (!PlayerStatus.IsIncapacitated && CombatBase.CanCast(SNOPower.Barbarian_Leap)) ||
+                    (CombatBase.CanCast(SNOPower.Barbarian_Leap)) ||
                     // Whirlwind is available
-                    (!PlayerStatus.IsIncapacitated && CombatBase.CanCast(SNOPower.Barbarian_Whirlwind) &&
+                    (CombatBase.CanCast(SNOPower.Barbarian_Whirlwind) &&
                         ((PlayerStatus.PrimaryResource >= 10 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= Trinity.MinEnergyReserve)) ||
                     // Tempest rush is available
-                    (!PlayerStatus.IsIncapacitated && CombatBase.CanCast(SNOPower.Monk_TempestRush) &&
+                    (CombatBase.CanCast(SNOPower.Monk_TempestRush) &&
                         ((PlayerStatus.PrimaryResource >= 20 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= Trinity.MinEnergyReserve)) ||
                     // Teleport is available
-                    (!PlayerStatus.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Teleport) && PlayerStatus.PrimaryResource >= 15) ||
+                    (CombatBase.CanCast(SNOPower.Wizard_Teleport) && PlayerStatus.PrimaryResource >= 15) ||
                     // Archon Teleport is available
-                    (!PlayerStatus.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Archon_Teleport))
-                    );
+                    (CombatBase.CanCast(SNOPower.Wizard_Archon_Teleport))
+                    ));
                 // Wizards can look for bee stings in range and try a wave of force to dispel them
-                if (!shouldKite && PlayerStatus.ActorClass == ActorClass.Wizard && Hotbar.Contains(SNOPower.Wizard_WaveOfForce) && PlayerStatus.PrimaryResource >= 25 &&
-                    DateTime.UtcNow.Subtract(CacheData.AbilityLastUsed[SNOPower.Wizard_WaveOfForce]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(SNOPower.Wizard_WaveOfForce) &&
+                if (!shouldKite && PlayerStatus.ActorClass == ActorClass.Wizard && CombatBase.CanCast(SNOPower.Wizard_WaveOfForce) &&
                     !PlayerStatus.IsIncapacitated && CacheData.TimeBoundAvoidance.Count(u => u.ActorSNO == 5212 && u.Position.Distance(PlayerStatus.Position) <= 15f) >= 2 &&
                     (
                     //HotbarSkills.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) || 
@@ -160,6 +183,7 @@ namespace Trinity
                     ZetaDia.Me.UsePower(SNOPower.Wizard_WaveOfForce, Vector3.Zero, PlayerStatus.WorldDynamicID, -1);
                 }
             }
+
 
             float highestWeight = 0f;
 
@@ -547,7 +571,7 @@ namespace Trinity
             new UnSafeZone
             {
                 WorldId = 78839,
-                Position = (new Vector3(59.50927f,60.12386f,0.100002f)),
+                Position = (new Vector3(54.07843f, 55.02061f, 0.100002f)),
                 Name = "Chamber of Suffering (Butcher)",
                 Radius = 120f
             },

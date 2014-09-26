@@ -25,11 +25,13 @@ namespace Trinity.Helpers
 
         public static void LogAnimation(TrinityCacheObject cacheObject)
         {
-            if (!LogCategoryEnabled(LogCategory.Animation) || !cacheObject.CommonData.IsValid || !cacheObject.CommonData.AnimationInfo.IsValid)
+            if (!LogCategoryEnabled(LogCategory.Animation) || cacheObject.CommonData == null || !cacheObject.CommonData.IsValid || !cacheObject.CommonData.AnimationInfo.IsValid)
                 return;
 
             var state = cacheObject.CommonData.AnimationState.ToString();
             var name = cacheObject.CommonData.CurrentAnimation.ToString();
+
+            
 
             // Log Animation
             if (!_seenAnimationCache.ContainsKey(name))
@@ -136,6 +138,7 @@ namespace Trinity.Helpers
         {
             Logger.Log(level, LogCategory.UserInformation, "------ System Information ------");
             Logger.Log(level, LogCategory.UserInformation, "Processor: " + SystemInformation.Processor);
+            Logger.Log(level, LogCategory.UserInformation, "Current Speed: " + SystemInformation.ActualProcessorSpeed);
             Logger.Log(level, LogCategory.UserInformation, "Operating System: " + SystemInformation.OperatingSystem);
             Logger.Log(level, LogCategory.UserInformation, "Motherboard: " + SystemInformation.MotherBoard);
             Logger.Log(level, LogCategory.UserInformation, "System Type: " + SystemInformation.SystemType);

@@ -13,7 +13,11 @@ namespace Trinity.Reference
         public class Sets : Reference.Sets { }
 
         // The following items are not listed on the game guide index pages (dafuq blizzard? update your guide already)
-        public static Item RingofRoyalGrandeur = new Item
+        
+        /// <summary>
+        /// Ring of Royal Grandeur - Reduces the number of items needed for set bonuses by 1 (to a minimum of 2).
+        /// </summary>
+        public static Item RingOfRoyalGrandeur = new Item
         {
             Id = 298094,
             Name = "Ring of Royal Grandeur",
@@ -27,6 +31,206 @@ namespace Trinity.Reference
             RelativeUrl = "/d3/en/item/ring-of-royal-grandeur-3qRFop",
             IsCrafted = false,
             LegendaryAffix = "Reduces the number of items needed for set bonuses by 1 (to a minimum of 2).",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Sanguinary Vambraces - Chance on being hit to deal 1000% of your Thorns damage to nearby enemies.
+        /// </summary>
+        public static Item SanguinaryVambraces = new Item
+        {
+            Id = 298120,
+            Name = "Sanguinary Vambraces",
+            Quality = ItemQuality.Legendary,
+            Slug = "sanguinary-vambraces-1385JU",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/sanguinary-vambraces-1385JU",
+            Url = "https://us.battle.net/d3/en/item/sanguinary-vambraces-1385JU",
+            RelativeUrl = "/d3/en/item/sanguinary-vambraces-1385JU",
+            IsCrafted = false,
+            LegendaryAffix = "Chance on being hit to deal 1000% of your Thorns damage to nearby enemies.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Pride's Fall - Your resource costs are reduced by 30% after not taking damage for 5 seconds.
+        /// </summary>
+        public static Item PridesFall = new Item
+        {
+            Id = 298147,
+            Name = "Pride's Fall",
+            Quality = ItemQuality.Legendary,
+            Slug = "prides-fall-pgClp",
+            ItemType = ItemType.Helm,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/prides-fall-pgClp",
+            Url = "https://us.battle.net/d3/en/item/prides-fall-pgClp",
+            RelativeUrl = "/d3/en/item/prides-fall-pgClp",
+            IsCrafted = false,
+            LegendaryAffix = "Your resource costs are reduced by 30% after not taking damage for 5 seconds.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Insatiable Belt - Picking up a Health Globe increases your maximum Life by 5% for 15 seconds, stacking up to 5 times.
+        /// </summary>
+        public static Item InsatiableBelt = new Item
+        {
+            Id = 298126,
+            Name = "Insatiable Belt",
+            Quality = ItemQuality.Legendary,
+            Slug = "insatiable-belt-1Yuo9W",
+            ItemType = ItemType.Belt,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/insatiable-belt-1Yuo9W",
+            Url = "https://us.battle.net/d3/en/item/insatiable-belt-1Yuo9W",
+            RelativeUrl = "/d3/en/item/insatiable-belt-1Yuo9W",
+            IsCrafted = false,
+            LegendaryAffix = "Picking up a Health Globe increases your maximum Life by 5% for 15 seconds, stacking up to 5 times.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Salvation - Blocked attacks heal you and your allies for 20–30% of the amount blocked.
+        /// </summary>
+        public static Item Salvation = new Item
+        {
+            Id = 299418,
+            Name = "Salvation",
+            Quality = ItemQuality.Legendary,
+            Slug = "salvation-TxMPT",
+            ItemType = ItemType.CrusaderShield,
+            BaseType = ItemBaseType.None,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/salvation-TxMPT",
+            Url = "https://us.battle.net/d3/en/item/salvation-TxMPT",
+            RelativeUrl = "/d3/en/item/salvation-TxMPT",
+            IsCrafted = false,
+            LegendaryAffix = "Blocked attacks heal you and your allies for 20–30% of the amount blocked.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Gloves of Worship - Shrine effects last for 10 minutes.
+        /// </summary>
+        public static Item GlovesOfWorship = new Item
+        {
+            Id = 332344,
+            Name = "Gloves of Worship",
+            Quality = ItemQuality.Legendary,
+            Slug = "gloves-of-worship-FA37P",
+            ItemType = ItemType.Gloves,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/gloves-of-worship-FA37P",
+            Url = "https://us.battle.net/d3/en/item/gloves-of-worship-FA37P",
+            RelativeUrl = "/d3/en/item/gloves-of-worship-FA37P",
+            IsCrafted = false,
+            LegendaryAffix = "Shrine effects last for 10 minutes.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Avarice Band - Each time you pick up gold, increase your Gold and Health Pickup radius by 1 yard for 10 seconds, stacking up to 30 times.
+        /// </summary>
+        public static Item AvariceBand = new Item
+        {
+            Id = 298095,
+            Name = "Avarice Band",
+            Quality = ItemQuality.Legendary,
+            Slug = "avarice-band-3qROK2",
+            ItemType = ItemType.Ring,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/avarice-band-3qROK2",
+            Url = "https://us.battle.net/d3/en/item/avarice-band-3qROK2",
+            RelativeUrl = "/d3/en/item/avarice-band-3qROK2",
+            IsCrafted = false,
+            LegendaryAffix = "Each time you pick up gold, increase your Gold and Health Pickup radius by 1 yard for 10 seconds, stacking up to 30 times.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Mad Monarch's Scepter - After killing 10 enemies, you release a Poison Nova that deals 1050–1400% weapon damage as Poison to enemies within 30 yards.
+        /// </summary>
+        public static Item MadMonarchsScepter = new Item
+        {
+            Id = 271663,
+            Name = "Mad Monarch's Scepter",
+            Quality = ItemQuality.Legendary,
+            Slug = "mad-monarchs-scepter-2F34bH",
+            ItemType = ItemType.Mace,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/mad-monarchs-scepter-2F34bH",
+            Url = "https://us.battle.net/d3/en/item/mad-monarchs-scepter-2F34bH",
+            RelativeUrl = "/d3/en/item/mad-monarchs-scepter-2F34bH",
+            IsCrafted = false,
+            LegendaryAffix = "After killing 10 enemies, you release a Poison Nova that deals 1050–1400% weapon damage as Poison to enemies within 30 yards.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Golden Gorget of Leoric - After earning a massacre bonus, 4–6 Skeletons are summoned to fight by your side for 10 seconds.
+        /// </summary>
+        public static Item GoldenGorgetOfLeoric = new Item
+        {
+            Id = 298052,
+            Name = "Golden Gorget of Leoric",
+            Quality = ItemQuality.Legendary,
+            Slug = "golden-gorget-of-leoric-1I0CCL",
+            ItemType = ItemType.Amulet,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/golden-gorget-of-leoric-1I0CCL",
+            Url = "https://us.battle.net/d3/en/item/golden-gorget-of-leoric-1I0CCL",
+            RelativeUrl = "/d3/en/item/golden-gorget-of-leoric-1I0CCL",
+            IsCrafted = false,
+            LegendaryAffix = "After earning a massacre bonus, 4–6 Skeletons are summoned to fight by your side for 10 seconds.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Illusory Boots - You may move unhindered through enemies.
+        /// </summary>
+        public static Item IllusoryBoots = new Item
+        {
+            Id = 332342,
+            Name = "Illusory Boots",
+            Quality = ItemQuality.Legendary,
+            Slug = "illusory-boots-29WYI0",
+            ItemType = ItemType.Boots,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/illusory-boots-29WYI0",
+            Url = "https://us.battle.net/d3/en/item/illusory-boots-29WYI0",
+            RelativeUrl = "/d3/en/item/illusory-boots-29WYI0",
+            IsCrafted = false,
+            LegendaryAffix = "You may move unhindered through enemies.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Pauldrons of the Skeleton King - When receiving fatal damage, there is a chance that you are instead restored to 25% of maximum Life and cause nearby enemies to flee in fear.
+        /// </summary>
+        public static Item PauldronsOfTheSkeletonKing = new Item
+        {
+            Id = 298164,
+            Name = "Pauldrons of the Skeleton King",
+            Quality = ItemQuality.Legendary,
+            Slug = "pauldrons-of-the-skeleton-king-2AGH0r",
+            ItemType = ItemType.Shoulder,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/pauldrons-of-the-skeleton-king-2AGH0r",
+            Url = "https://us.battle.net/d3/en/item/pauldrons-of-the-skeleton-king-2AGH0r",
+            RelativeUrl = "/d3/en/item/pauldrons-of-the-skeleton-king-2AGH0r",
+            IsCrafted = false,
+            LegendaryAffix = "When receiving fatal damage, there is a chance that you are instead restored to 25% of maximum Life and cause nearby enemies to flee in fear.",
             SetName = "",
         };
 
@@ -759,7 +963,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item PauldronsOfAkkhan = new Item
         {
-            Id = 0,
+            Id = 358801,
             Name = "Pauldrons of Akkhan",
             Quality = ItemQuality.Legendary,
             Slug = "pauldrons-of-akkhan",
@@ -2499,7 +2703,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HelmOfAkkhan = new Item
         {
-            Id = 0,
+            Id = 358799,
             Name = "Helm of Akkhan",
             Quality = ItemQuality.Legendary,
             Slug = "helm-of-akkhan",

@@ -71,7 +71,7 @@ namespace Trinity
 
             Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "HandleTarget returning {0} to tree" + extras, status);
 
-            return RunStatus.Success;
+            return status;
 
         }
 
@@ -351,9 +351,9 @@ namespace Trinity
 
                     // Whirlwind against everything within range
 
-                    if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource >= 10 && TargetUtil.AnyMobsInRange(20) && 
-                        !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && TargetCurrentDistance <= 12f 
-                        && CurrentTarget.Type != GObjectType.Container && 
+                    if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource >= 10 && TargetUtil.AnyMobsInRange(20) &&
+                        !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && TargetCurrentDistance <= 12f
+                        && CurrentTarget.Type != GObjectType.Container &&
                         (!Hotbar.Contains(SNOPower.Barbarian_Sprint) || GetHasBuff(SNOPower.Barbarian_Sprint)) &&
                         (CurrentTarget.Type != GObjectType.Item && CurrentTarget.Type != GObjectType.Gold && TargetCurrentDistance >= 6f) &&
                         (CurrentTarget.Type != GObjectType.Unit ||
@@ -509,7 +509,7 @@ namespace Trinity
                             int attemptCount;
                             CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out attemptCount);
 
-                            Logger.LogVerbose(LogCategory.Behavior, "Interacting with {1} Distance {2:0} Radius {3:0.0} Attempt {4}",
+                            Logger.LogDebug(LogCategory.UserInformation, "Interacting with {1} Distance {2:0} Radius {3:0.0} Attempt {4}",
                                      SNOPower.Axe_Operate_Gizmo, CurrentTarget.InternalName, CurrentTarget.Distance, CurrentTarget.Radius, attemptCount);
 
                             if (CurrentTarget.ActorType == ActorType.Monster)
@@ -986,7 +986,7 @@ namespace Trinity
                 }
                 // Whirlwind for a barb
 
-                if (attackableSpecialMovement && !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker  
+                if (attackableSpecialMovement && !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker
                     && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource >= 10)
                 {
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, CurrentDestination, CurrentWorldDynamicId, -1);
@@ -1027,8 +1027,8 @@ namespace Trinity
                     if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                         _timesBlockedMoving = 0;
                     return true;
-                } 
-                
+                }
+
                 return false;
             }
         }
@@ -1363,7 +1363,9 @@ namespace Trinity
 
                 if (usePowerResult)
                 {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "UsePower SUCCESS {0} at {1} on {2} dist={3}", CombatBase.CurrentPower.SNOPower, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetACDGUID, dist);
+                    string powerResultInfo = CombatBase.CurrentPower.TargetPosition != Vector3.Zero ? "at " + NavHelper.PrettyPrintVector3(CombatBase.CurrentPower.TargetPosition) + " dist=" + (int)dist : "";
+                    powerResultInfo += CombatBase.CurrentPower.TargetACDGUID != -1 ? " on " + CombatBase.CurrentPower.TargetACDGUID : "";
+                    Logger.LogDebug("Used Power {0} " + powerResultInfo, CombatBase.CurrentPower.SNOPower);
                     if (CombatBase.CurrentPower.SNOPower == SNOPower.Monk_TempestRush)
                         MonkCombat.LastTempestRushLocation = CombatBase.CurrentPower.TargetPosition;
 

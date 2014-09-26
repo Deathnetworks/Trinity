@@ -32,6 +32,7 @@ namespace Trinity.Combat.Abilities
             if (UseDestructiblePower)
                 return GetMonkDestroyPower();
 
+            // Epiphany: spirit regen, dash to targets
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.X1_Monk_Epiphany, CanCastFlags.NoTimer) &&
                 (TargetUtil.EliteOrTrashInRange(15f) || TargetUtil.AnyMobsInRange(15f, 5)) && 
                 (Player.PrimaryResourcePct < 0.50 || ((Runes.Monk.DesertShroud.IsActive || Runes.Monk.SoothingMist.IsActive) && Player.CurrentHealthPct < 0.50))
@@ -48,7 +49,7 @@ namespace Trinity.Combat.Abilities
 
             // Mystic ally
             if (CanCast(SNOPower.X1_Monk_MysticAlly_v2) && TargetUtil.EliteOrTrashInRange(30f)
-                && (!Runes.Monk.AirAlly.IsActive | !Runes.Monk.EnduringAlly.IsActive))
+                && (!Runes.Monk.AirAlly.IsActive || !Runes.Monk.EnduringAlly.IsActive))
             {
                 return new TrinityPower(SNOPower.X1_Monk_MysticAlly_v2, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 2, 2);
             }
@@ -105,9 +106,8 @@ namespace Trinity.Combat.Abilities
             }
 
             // Breath of Heaven for spirit - Infused with Light
-                
-            if (!Player.IsIncapacitated && CanCast(SNOPower.Monk_BreathOfHeaven, CanCastFlags.NoTimer) && !GetHasBuff(SNOPower.Monk_BreathOfHeaven) && Runes.Monk.InfusedWithLight.IsActive &&
-                (TargetUtil.AnyMobsInRange(20) || TargetUtil.IsEliteTargetInRange(20)))
+            if (!UseOOCBuff && !Player.IsIncapacitated && CanCast(SNOPower.Monk_BreathOfHeaven, CanCastFlags.NoTimer) && !GetHasBuff(SNOPower.Monk_BreathOfHeaven) && Runes.Monk.InfusedWithLight.IsActive &&
+                (TargetUtil.AnyMobsInRange(20) || TargetUtil.IsEliteTargetInRange(20) || Player.PrimaryResource < 75))
             {
                 return new TrinityPower(SNOPower.Monk_BreathOfHeaven);
             }
@@ -123,20 +123,12 @@ namespace Trinity.Combat.Abilities
             }
 
             // WayOfTheHundredFists: apply fists of fury DoT if we have Infused with Light buff + WotHF:FoF
-            if (!UseOOCBuff && Runes.Monk.InfusedWithLight.IsActive && Runes.Monk.FistsOfFury.IsActive && GetHasBuff(SNOPower.Monk_BreathOfHeaven) && !CurrentTarget.HasDotDPS)
-            {
-                Monk_TickSweepingWindSpam();
-                return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 14f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1);
-            }
-
-
-            // Sweeping winds spam
             if ((Player.PrimaryResource >= 75 || (hasInnaSet && Player.PrimaryResource >= 5)) &&
                 CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) && (GetHasBuff(SNOPower.Monk_SweepingWind) || hasSWK) &&
                 DateTime.UtcNow.Subtract(Trinity.SweepWindSpam).TotalMilliseconds >= 4000 && DateTime.UtcNow.Subtract(Trinity.SweepWindSpam).TotalMilliseconds <= 5400)
             {
                 Trinity.SweepWindSpam = DateTime.UtcNow;
-                return new TrinityPower(SNOPower.Monk_SweepingWind, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 0, 0);
+                return new TrinityPower(SNOPower.Monk_SweepingWind);
             }
 
             float minSweepingWindSpirit = hasInnaSet ? 5f : 75f;
@@ -153,7 +145,7 @@ namespace Trinity.Combat.Abilities
                 Player.PrimaryResource >= minSweepingWindSpirit)
             {
                 Trinity.SweepWindSpam = DateTime.UtcNow;
-                return new TrinityPower(SNOPower.Monk_SweepingWind, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 0, 0);
+                return new TrinityPower(SNOPower.Monk_SweepingWind);
             }
 
             // Sweeping Wind for Transcendance Health Regen
@@ -164,7 +156,7 @@ namespace Trinity.Combat.Abilities
                 Trinity.TimeSinceUse(SNOPower.Monk_SweepingWind) > 500)
             {
                 Trinity.SweepWindSpam = DateTime.UtcNow;
-                return new TrinityPower(SNOPower.Monk_SweepingWind, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 0, 0);
+                return new TrinityPower(SNOPower.Monk_SweepingWind);
             }
 
             // Exploding Palm
@@ -310,12 +302,18 @@ namespace Trinity.Combat.Abilities
             }
 
             
+            if (Player.PrimaryResource > 75 && CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) && hasSWK)
+            {
+                Trinity.SweepWindSpam = DateTime.UtcNow;
+                return new TrinityPower(SNOPower.Monk_SweepingWind);
+            }
             /*
              * Dual/Trigen Monk section
              * 
              * Cycle through Deadly Reach, Way of the Hundred Fists, and Fists of Thunder every 3 seconds to keep 8% passive buff up if we have Combination Strike
              *  - or - 
              * Keep Foresight and Blazing Fists buffs up every 30/5 seconds
+             */
              */
             bool hasCombinationStrike = Passives.Monk.CombinationStrike.IsActive;
             bool isDualOrTriGen = HotbarSkills.AssignedSkills.Count(s =>

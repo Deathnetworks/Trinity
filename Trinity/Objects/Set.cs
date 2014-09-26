@@ -97,7 +97,7 @@ namespace Trinity.Objects
 
         private bool IsBonusActive(int requiredItemCountForBonus)
         {
-            var actualRequired = requiredItemCountForBonus - (Legendary.RingofRoyalGrandeur.IsEquipped ? 1 : 0);
+            var actualRequired = requiredItemCountForBonus - (Legendary.RingOfRoyalGrandeur.IsEquipped ? 1 : 0);
             if (actualRequired < 2) actualRequired = 2;
             return requiredItemCountForBonus > 0 && EquippedItems.Count >= actualRequired;
         }

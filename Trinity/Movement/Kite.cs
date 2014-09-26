@@ -124,7 +124,7 @@ namespace Trinity
                         {
                             timeCancelledKiteMove = DateTime.UtcNow;
                             cancelledKiteMoveForMilliseconds = 1500;
-                            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kite movement failed, cancelling for {0:0}ms", cancelledKiteMoveForMilliseconds);
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Kite movement failed, cancelling for {0:0}ms", cancelledKiteMoveForMilliseconds);
                             return;
                         }
                         else
@@ -157,11 +157,11 @@ namespace Trinity
                 }
                 else if (!shouldEmergencyMove && NeedToKite)
                 {
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Emergency movement cancelled for {0:0}ms", DateTime.UtcNow.Subtract(timeCancelledEmergencyMove).TotalMilliseconds - cancelledKiteMoveForMilliseconds);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Emergency movement cancelled for {0:0}ms", DateTime.UtcNow.Subtract(timeCancelledEmergencyMove).TotalMilliseconds - cancelledKiteMoveForMilliseconds);
                 }
                 else if (!shouldKite && TryToKite)
                 {
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kite movement cancelled for {0:0}ms", DateTime.UtcNow.Subtract(timeCancelledKiteMove).TotalMilliseconds - cancelledKiteMoveForMilliseconds);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Kite movement cancelled for {0:0}ms", DateTime.UtcNow.Subtract(timeCancelledKiteMove).TotalMilliseconds - cancelledKiteMoveForMilliseconds);
                 }
             }
         }
