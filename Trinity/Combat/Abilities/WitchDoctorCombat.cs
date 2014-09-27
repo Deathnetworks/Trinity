@@ -198,6 +198,10 @@ namespace Trinity.Combat.Abilities
 
                 if (Sets.RaimentOfTheJadeHarvester.IsMaxBonusActive)
                 {
+                    //LogTargetArea("BestLargeCluster", Enemies.BestLargeCluster);
+                    //LogTargetArea("BestCluster", Enemies.BestCluster);
+                    //LogTargetArea("Nearby", Enemies.Nearby);
+                    //LogTargetArea("CloseNearby", Enemies.CloseNearby);
 
                     // Piranhas
                     if (CanCast(SNOPower.Witchdoctor_Piranhas) && Player.PrimaryResource >= 250 &&
@@ -671,7 +675,7 @@ namespace Trinity.Combat.Abilities
 
         private static readonly Action<string, TargetArea> LogTargetArea = (message, area) =>
         {
-            Logger.LogNormal(message + " Units={0} Elites={1} DebuffedUnits={2} TotalDebuffs={4} AvgHealth={3:#.#} ---",
+            Logger.LogDebug(message + " Units={0} Elites={1} DebuffedUnits={2} TotalDebuffs={4} AvgHealth={3:#.#} ---",
                 area.UnitCount,
                 area.EliteCount,
                 area.DebuffedCount(HarvesterDebuffs),

@@ -170,7 +170,7 @@ namespace Trinity
 
             var clusterUnit =
                 (from u in ObjectCache
-                 where u.IsUnit && u.CommonData != null && u.CommonData.IsValid &&
+                 where u.IsUnit && 
                  u.RadiusDistance <= 200 &&
                  u.NearbyUnitsWithinDistance(clusterRadius) >= minCount
                  orderby u.NearbyUnitsWithinDistance(clusterRadius)
@@ -495,7 +495,6 @@ namespace Trinity
             var inRangeCount = (from u in ObjectCache
                                 where u.IsUnit &&
                                         u.Weight > 0 &&
-                                        u.CommonData != null && u.CommonData.IsValid &&
                                         u.Position.Distance2D(position) <= range
                                 select u).Count();
 
@@ -509,7 +508,6 @@ namespace Trinity
             return (from u in ObjectCache
                     where u.IsUnit &&
                             u.Weight > 0 &&
-                            u.CommonData != null && u.CommonData.IsValid &&
                             u.Position.Distance2D(position) <= range
                     select u).Count();
         }
@@ -522,7 +520,6 @@ namespace Trinity
                     where u.IsUnit &&
                             u.Weight > 0 &&
                             u.IsBoss &&
-                            u.CommonData != null && u.CommonData.IsValid &&
                             u.Position.Distance2D(position) <= range
                     select u).Count();
         }
@@ -534,7 +531,6 @@ namespace Trinity
             return (from u in ObjectCache
                     where u.IsUnit &&
                         u.Weight > 0 &&
-                        u.CommonData != null && u.CommonData.IsValid &&
                         u.Position.Distance2D(position) <= range
                     select u).ToList();
         }
@@ -598,7 +594,6 @@ namespace Trinity
                                 where u.IsUnit &&
                                         u.Weight > 0 &&
                                         u.IsBossOrEliteRareUnique &&
-                                        u.CommonData != null && u.CommonData.IsValid &&
                                         u.Position.Distance2D(position) <= range
                                 select u).Count();
 
@@ -613,7 +608,6 @@ namespace Trinity
                     where u.IsUnit &&
                             u.Weight > 0 &&
                             u.IsBossOrEliteRareUnique &&
-                            u.CommonData != null && u.CommonData.IsValid &&
                             u.Position.Distance2D(position) <= range
                     select u).Count();
         }
@@ -855,10 +849,8 @@ namespace Trinity
 
                                    where u.IsUnit &&
                                           u.Weight > 0 &&
-                                          u.CommonData != null && u.CommonData.IsValid &&
                                           u.Position.Distance2D(position) <= range &&
                                           SpellTracker.IsUnitTracked(u.ACDGuid, power)
-
                                    select u).ToList();
 
             // Make sure units exist
@@ -1001,7 +993,6 @@ namespace Trinity
 
                                  where u.IsUnit &&
                                         u.Weight > 0 &&
-                                        u.CommonData != null && u.CommonData.IsValid &&
                                         u.Position.Distance2D(position) <= range &&
                                         (debuff == SNOPower.None || !SpellTracker.IsUnitTracked(u.ACDGuid, debuff))
                                  orderby u.HitPoints ascending
@@ -1027,7 +1018,6 @@ namespace Trinity
 
                                  where u.IsUnit &&
                                         u.Weight > 0 &&
-                                        u.CommonData != null && u.CommonData.IsValid &&
                                         u.Position.Distance2D(position) <= range &&
                                         !debuffs.All(u.HasDebuff)
                                  orderby u.Weight descending
