@@ -7,7 +7,6 @@ using Trinity.Objects;
 using Trinity.Reference;
 using Zeta.Game;
 using Zeta.Game.Internals;
-using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
 
 namespace Trinity.Reference

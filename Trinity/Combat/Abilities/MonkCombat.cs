@@ -314,7 +314,6 @@ namespace Trinity.Combat.Abilities
              *  - or - 
              * Keep Foresight and Blazing Fists buffs up every 30/5 seconds
              */
-             */
             bool hasCombinationStrike = Passives.Monk.CombinationStrike.IsActive;
             bool isDualOrTriGen = HotbarSkills.AssignedSkills.Count(s =>
                 s.Power == SNOPower.Monk_DeadlyReach ||
