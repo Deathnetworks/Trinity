@@ -67,7 +67,19 @@ namespace Trinity
         {
             get
             {
-                if (_object != null && _object.IsValid && _object.CommonData != null && _object.CommonData.IsValid && (_commonData == null || (_commonData != null && !_commonData.IsValid)))
+                if (_object == null)
+                    return null;
+
+                if (!_object.IsValid)
+                    return null;
+
+                if (_object.CommonData == null)
+                    return null;
+
+                if (!_object.CommonData.IsValid)
+                    return null;
+
+                if (_commonData == null || (_commonData != null && !_commonData.IsValid))
                 {
                     _commonData = _object.CommonData;
                 }
