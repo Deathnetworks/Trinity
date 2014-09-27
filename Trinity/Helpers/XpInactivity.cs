@@ -53,9 +53,18 @@ namespace Trinity.Helpers
                     ResetCheckXp(); //If not in game, reset the timer
                     return false;
                 }
+
                 if (ZetaDia.IsLoadingWorld)
                 {
                     Logger.Log("Loading world, XP inactivity reset");
+                    ResetCheckXp();
+                    return false;
+                }
+
+                if (ZetaDia.IsInTown)
+                {
+                    Logger.Log("Loading world, XP inactivity reset");
+                    ResetCheckXp();
                     return false;
                 }
 

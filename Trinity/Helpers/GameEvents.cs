@@ -79,6 +79,7 @@ namespace Trinity
             PlayerMover.LastRestartedGame = DateTime.UtcNow;
             Logger.Log("Bot Starting, Resetting Gold Inactivity Timer");
             GoldInactivity.Instance.ResetCheckGold();
+            XpInactivity.Instance.ResetCheckXp();
 
             if (CharacterSettings.Instance.KillRadius < 20)
             {
@@ -230,6 +231,7 @@ namespace Trinity
 
                 Logger.Log("New Game, resetting Gold Inactivity Timer");
                 GoldInactivity.Instance.ResetCheckGold();
+                XpInactivity.Instance.ResetCheckXp();
 
                 CombatBase.IsQuestingMode = false;
 
