@@ -356,6 +356,7 @@ namespace Trinity
             if (name.StartsWith("crafting_")) return GItemType.CraftingMaterial;
             if (name.StartsWith("craftingmaterials_")) return GItemType.CraftingMaterial;
             if (name.StartsWith("craftingplan_")) return GItemType.CraftingPlan;
+            if (name.StartsWith("craftingreagent_legendary_unique_infernalmachine_")) return GItemType.InfernalKey;
             if (name.StartsWith("craftingreagent_legendary_")) return GItemType.CraftingMaterial;
             if (name.StartsWith("crushield_")) return GItemType.CrusaderShield;
             if (name.StartsWith("dagger_")) return GItemType.Dagger;
@@ -417,6 +418,11 @@ namespace Trinity
                     return GItemType.FollowerEnchantress;
             }
 
+            if (name.StartsWith("demonkey_") || name.StartsWith("demontrebuchetkey"))
+            {
+                return GItemType.InfernalKey;
+            }
+
             // Fall back on some partial DB item type checking 
             if (name.StartsWith("crafting_"))
             {
@@ -446,11 +452,7 @@ namespace Trinity
             {
                 if (dbItemType == ItemType.MightyBelt) return GItemType.MightyBelt;
                 return GItemType.Belt;
-            }
-            if (name.StartsWith("demonkey_") || name.StartsWith("demontrebuchetkey"))
-            {
-                return GItemType.InfernalKey;
-            }
+            }            
 
             // hax for fuimusbruce's horadric hamburger
             if (name.StartsWith("offhand_"))

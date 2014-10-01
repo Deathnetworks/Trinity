@@ -412,6 +412,26 @@ namespace Trinity
             }
         }
 
+        /// <summary>
+        /// Force Notification on Items
+        /// </summary>
+        internal static void LogGoodItems(CachedACDItem acdItem, GItemBaseType itemBaseType, GItemType itemType)
+        {
+
+            string nameAndCount = acdItem.RealName;
+
+            if (acdItem.ItemStackQuantity > 1)
+            {
+                nameAndCount = string.Format("{0}, Count {1}", nameAndCount, acdItem.ItemStackQuantity);
+            }
+
+            NotificationManager.AddNotificationToQueue(nameAndCount,
+                                ZetaDia.Service.Hero.Name + " new item!", ProwlNotificationPriority.Emergency);
+
+            NotificationManager.EmailMessage.AppendLine(itemBaseType.ToString() + " - " + itemType.ToString() + " '" + nameAndCount + "'.")
+                            .AppendLine();
+        }
+
 
         /// <summary>
         /// Log the nice items we found and stashed
@@ -453,9 +473,6 @@ namespace Trinity
                         Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "+  Score:       {0:0}", itemValue);
                         Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "+  Attributes: {0}", ValueItemStatString);
                         Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+");
-
-                        if (acdItem.RealName.ToLower() == "ramalandi's gift")
-                            NotificationManager.AddNotificationToQueue(acdItem.RealName, ZetaDia.Service.Hero.Name + " new item!", ProwlNotificationPriority.Emergency);
                     }
                     else
                     {

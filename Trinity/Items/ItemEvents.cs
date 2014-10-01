@@ -24,6 +24,14 @@ namespace Trinity
                     TownRun.LogGoodItems(cachedItem, cachedItem.TrinityItemBaseType, cachedItem.TrinityItemType, ItemValuation.ValueThisItem(cachedItem, cachedItem.TrinityItemType));
                     break;
             }
+
+
+            //Log additional items - Ramalandni's Gift - Infernal Keys - Horadric Cache
+            if (shouldLogItemCustom(cachedItem))
+            {
+                TownRun.LogGoodItems(cachedItem, cachedItem.TrinityItemBaseType, cachedItem.TrinityItemType);
+            }
+            
         }
 
         internal static void TrinityOnItemSalvaged(object sender, ItemEventArgs e)
@@ -76,6 +84,17 @@ namespace Trinity
             Trinity.IsReadyToTownRun = false;
         }
 
+        private static bool shouldLogItemCustom(CachedACDItem i)
+        {
+            switch (i.TrinityItemType)
+            {
+                case GItemType.ConsumableAddSockets:
+                case GItemType.InfernalKey:
+                case GItemType.HoradricCache:                
+                    return true;
+            }
 
+            return false;
+        }
     }
 }
