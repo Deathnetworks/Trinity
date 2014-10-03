@@ -176,8 +176,9 @@ namespace Trinity.Combat.Abilities
             }
 
             // Marked for Death
+            int minDiscipline = Hotbar.Contains(SNOPower.DemonHunter_SmokeScreen) ? 3 : 17;
             if (CanCast(SNOPower.DemonHunter_MarkedForDeath, CanCastFlags.NoTimer) &&
-                Player.SecondaryResource >= 3 && !CurrentTarget.HasDebuff(SNOPower.DemonHunter_MarkedForDeath) && !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.DemonHunter_MarkedForDeath))
+                Player.SecondaryResource >= minDiscipline && !CurrentTarget.HasDebuff(SNOPower.DemonHunter_MarkedForDeath) && !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.DemonHunter_MarkedForDeath))
             {
                 return new TrinityPower(SNOPower.DemonHunter_MarkedForDeath, 40f, CurrentTarget.ACDGuid);
             }
