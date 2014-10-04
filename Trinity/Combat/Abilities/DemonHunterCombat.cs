@@ -317,7 +317,7 @@ namespace Trinity.Combat.Abilities
             // Spines of Seething Hatred, grants 4 hatred
             if (Legendary.SpinesOfSeethingHatred.IsEquipped && CanCast(SNOPower.DemonHunter_Chakram, CanCastFlags.NoTimer))
             {
-                return new TrinityPower(SNOPower.DemonHunter_Chakram);
+                return new TrinityPower(SNOPower.DemonHunter_Chakram, 50f, CurrentTarget.ACDGuid)
             }
 
             // Hungering Arrow
