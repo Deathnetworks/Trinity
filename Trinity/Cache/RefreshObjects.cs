@@ -429,7 +429,7 @@ namespace Trinity
                     ActorType = ActorType.Item,
                     Type = GObjectType.Item,
                     Radius = 2f,
-                    Weight = 20000
+                    Weight = 50
                 });
             }
 
