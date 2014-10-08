@@ -142,7 +142,8 @@ namespace Trinity.Combat.Abilities
 
             // Smoke Screen
             if (CanCast(SNOPower.DemonHunter_SmokeScreen) && !GetHasBuff(SNOPower.DemonHunter_ShadowPower) && Player.SecondaryResource >= 14 &&
-                (Player.CurrentHealthPct <= 0.50 || Player.IsRooted || TargetUtil.AnyMobsInRange(15) || Player.IsIncapacitated))
+                (Player.CurrentHealthPct <= 0.50 || Player.IsRooted || TargetUtil.AnyElitesInRange(50) ||
+                TargetUtil.AnyMobsInRange(15) || Player.IsIncapacitated || IsCurrentlyAvoiding))
             {
                 return new TrinityPower(SNOPower.DemonHunter_SmokeScreen);
             }
@@ -176,9 +177,10 @@ namespace Trinity.Combat.Abilities
             }
 
             // Marked for Death
-            int minDiscipline = Hotbar.Contains(SNOPower.DemonHunter_SmokeScreen) ? 3 : 17;
             if (CanCast(SNOPower.DemonHunter_MarkedForDeath, CanCastFlags.NoTimer) &&
-                Player.SecondaryResource >= minDiscipline && !CurrentTarget.HasDebuff(SNOPower.DemonHunter_MarkedForDeath) && !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.DemonHunter_MarkedForDeath))
+                Player.SecondaryResource >= (Hotbar.Contains(SNOPower.DemonHunter_SmokeScreen) ? 17 : 3) &&
+                !CurrentTarget.HasDebuff(SNOPower.DemonHunter_MarkedForDeath) &&
+                !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.DemonHunter_MarkedForDeath))
             {
                 return new TrinityPower(SNOPower.DemonHunter_MarkedForDeath, 40f, CurrentTarget.ACDGuid);
             }

@@ -142,13 +142,18 @@ namespace Trinity.Combat.Abilities
             }
 
             // Slow Time for in combat
-            if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_SlowTime, CanCastFlags.NoTimer) &&
-                (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 40f)) &&
-                (TimeSpanSincePowerUse(SNOPower.Wizard_SlowTime) > TimeSpan.FromSeconds(15) || SpellHistory.DistanceFromLastTarget(SNOPower.Wizard_SlowTime) > 30f))
+            if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_SlowTime, CanCastFlags.NoTimer))
             {
-                if (TargetUtil.AnyMobsInRange(20f))
-                    return new TrinityPower(SNOPower.Wizard_SlowTime); // cast of Self
-                return new TrinityPower(SNOPower.Wizard_SlowTime, 55f, TargetUtil.GetBestClusterUnit(20f).Position);
+                if (Legendary.GestureOfOrpheus.IsEquipped && SpellHistory.DistanceFromLastTarget(SNOPower.Wizard_SlowTime) > 10f)
+                    return new TrinityPower(SNOPower.Wizard_SlowTime);
+
+                if ((TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 40f)) &&
+                 (TimeSpanSincePowerUse(SNOPower.Wizard_SlowTime) > TimeSpan.FromSeconds(15) || SpellHistory.DistanceFromLastTarget(SNOPower.Wizard_SlowTime) > 30f))
+                {
+                    if (TargetUtil.AnyMobsInRange(20f))
+                        return new TrinityPower(SNOPower.Wizard_SlowTime); // cast of Self
+                    return new TrinityPower(SNOPower.Wizard_SlowTime, 55f, TargetUtil.GetBestClusterUnit(20f).Position);
+                }
             }
 
             // Mirror Image  @ half health or 5+ monsters or rooted/incapacitated or last elite left @25% health
