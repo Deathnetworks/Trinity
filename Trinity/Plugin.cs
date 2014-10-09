@@ -1,7 +1,6 @@
 ﻿//!CompilerOption:AddRef:System.Management.dll
 using System;
 using System.IO;
-using System.Threading;
 using System.Windows;
 using Trinity.Cache;
 using Trinity.Combat;
@@ -28,7 +27,7 @@ namespace Trinity
         {
             get
             {
-                return new Version(2, 1, 21);
+                return new Version(2, 1, 22);
             }
         }
 
