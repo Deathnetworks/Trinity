@@ -646,8 +646,12 @@ namespace Trinity
                 //reset current target
                 CurrentTarget = null;
                 // Reset all variables for target-weight finding
-                AnyTreasureGoblinsPresent = false;
                 CurrentBotKillRange = Settings.Combat.Misc.NonEliteRange;
+
+                if (AnyTreasureGoblinsPresent && Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze && CurrentBotKillRange < 60f)
+                    CurrentBotKillRange = 60f;
+
+                AnyTreasureGoblinsPresent = false;
 
                 // Max kill range if we're questing
                 if (DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId))

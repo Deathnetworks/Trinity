@@ -81,7 +81,7 @@ namespace Trinity
             /*
              *  Initialize Variables
              */
-            bool AddToCache;
+            bool AddToCache = true;
 
             RefreshStepInit();
             /*
@@ -164,9 +164,6 @@ namespace Trinity
                 return AddToCache;
             }
 
-            // Summons by the player 
-            AddToCache = RefreshStepCachedSummons();
-            if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return false; }
 
             using (new PerformanceLogger("RefreshDiaObject.CachedType"))
             {
@@ -176,6 +173,10 @@ namespace Trinity
                 AddToCache = RefreshStepCachedObjectType(AddToCache);
                 if (!AddToCache) { c_IgnoreReason = "CachedObjectType"; return AddToCache; }
             }
+
+            // Summons by the player 
+            AddToCache = RefreshStepCachedSummons();
+            if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return false; }
 
             CurrentCacheObject.Type = CurrentCacheObject.Type;
             if (CurrentCacheObject.Type != GObjectType.Item)

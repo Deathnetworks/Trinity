@@ -150,12 +150,14 @@ namespace Trinity.Items
             if (DataDictionary.VanityItems.Any(i => item.InternalName.StartsWith(i)))
                 return false;
 
-            if (Trinity.Settings.Loot.TownRun.KeepTieredLootRunKeysInBackpack && item.ItemType == ItemType.KeystoneFragment && item.TieredLootRunKeyLevel >= 1)
-                return false;
-            if (Trinity.Settings.Loot.TownRun.KeepTrialLootRunKeysInBackpack && item.ItemType == ItemType.KeystoneFragment && item.TieredLootRunKeyLevel == 0)
-                return false;
-            if (Trinity.Settings.Loot.TownRun.KeepRiftKeysInBackpack && item.ItemType == ItemType.KeystoneFragment && item.TieredLootRunKeyLevel <= -1)
-                return false;
+            if (item.ItemType == ItemType.KeystoneFragment)
+            {
+                if ((Trinity.Settings.Loot.TownRun.KeepTieredLootRunKeysInBackpack && item.TieredLootRunKeyLevel >= 1) ||
+                (Trinity.Settings.Loot.TownRun.KeepTrialLootRunKeysInBackpack && item.TieredLootRunKeyLevel == 0) ||
+                (Trinity.Settings.Loot.TownRun.KeepRiftKeysInBackpack && item.TieredLootRunKeyLevel <= -1))
+                    return false;
+                return true;
+            } 
 
             if (Trinity.Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy)
             {
