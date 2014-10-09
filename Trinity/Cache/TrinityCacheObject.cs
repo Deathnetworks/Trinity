@@ -61,29 +61,21 @@ namespace Trinity
 
 
         [NoCopy]
-        private ACD _commonData;
-        [NoCopy]
         public ACD CommonData
         {
             get
             {
-                if (_object == null)
-                    return null;
+                if (Object == null) return null;
 
-                if (!_object.IsValid)
-                    return null;
+                return Object.CommonData;
+            }
+        }
 
-                if (_object.CommonData == null)
-                    return null;
-
-                if (!_object.CommonData.IsValid)
-                    return null;
-
-                if (_commonData == null || (_commonData != null && !_commonData.IsValid))
-                {
-                    _commonData = _object.CommonData;
-                }
-                return _commonData;
+        public bool CommonDataIsValid
+        {
+            get
+            {
+                return CommonData != null && CommonData.IsValid;
             }
         }
 

@@ -417,8 +417,10 @@ namespace Trinity
             const int setItemMarkerTexture = 404424;
             const int legendaryItemMarkerTexture = 275968;
 
-            foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsValid &&
-                (m.MinimapTexture == setItemMarkerTexture || m.MinimapTexture == legendaryItemMarkerTexture) && !Blacklist60Seconds.Contains(m.NameHash)))
+            var legendaryItemMarkers = ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsValid &&
+                (m.MinimapTexture == setItemMarkerTexture || m.MinimapTexture == legendaryItemMarkerTexture) && !Blacklist60Seconds.Contains(m.NameHash)).ToList();
+
+            foreach (var marker in legendaryItemMarkers)
             {
                 ObjectCache.Add(new TrinityCacheObject()
                 {
@@ -433,6 +435,30 @@ namespace Trinity
                 });
             }
 
+            if (legendaryItemMarkers.Any())
+            {
+                var legendaryItems = ZetaDia.Actors.GetActorsOfType<DiaItem>().Where(i => i.IsValid && i.IsACDBased && i.Position.Distance2D(ZetaDia.Me.Position) < 5f && legendaryItemMarkers.Any(im => i.Position.Distance2D(i.Position) < 2f));
+
+                foreach (var diaItem in legendaryItems)
+                {
+                    ObjectCache.Add(new TrinityCacheObject()
+                    {
+                        Position = diaItem.Position,
+                        InternalName = diaItem.Name,
+                        RActorGuid = diaItem.RActorGuid,
+                        ActorSNO = diaItem.ActorSNO,
+                        ACDGuid =  diaItem.ACDGuid,
+                        HasBeenNavigable = true,
+                        HasBeenInLoS = true,
+                        Distance = diaItem.Distance,
+                        ActorType = ActorType.Item,
+                        Type = GObjectType.Item,
+                        Radius = 2f,
+                        Weight = 50,
+                        ItemQuality = ItemQuality.Legendary,
+                    });
+                }
+            }
 
             bool isRiftGuardianQuestStep = ZetaDia.CurrentQuest.QuestSNO == 337492 && ZetaDia.CurrentQuest.StepId == 16;
 

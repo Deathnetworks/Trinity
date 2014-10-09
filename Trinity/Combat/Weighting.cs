@@ -499,14 +499,11 @@ namespace Trinity
                             {
                                 bool isTwoSquare = true;
 
-                                try
-                                {
+                                if (cacheObject.Item != null && cacheObject.Item.CommonData != null)
                                     isTwoSquare = cacheObject.Item.CommonData.IsTwoSquareItem;
-                                }
-                                catch { }
 
                                 // Don't pickup items if we're doing a TownRun
-                                if (cacheObject.Type == GObjectType.Item && 
+                                if (cacheObject.Type == GObjectType.Item &&
                                     TrinityItemManager.FindValidBackpackLocation(isTwoSquare) == new Vector2(-1, -1))
                                 {
                                     objWeightInfo += "TownRun";
