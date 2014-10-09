@@ -141,9 +141,9 @@ namespace Trinity.Combat.Abilities
             }
 
             // Smoke Screen
-            if (CanCast(SNOPower.DemonHunter_SmokeScreen) && !GetHasBuff(SNOPower.DemonHunter_ShadowPower) && Player.SecondaryResource >= 14 &&
-                (Player.CurrentHealthPct <= 0.50 || Player.IsRooted || TargetUtil.AnyElitesInRange(50) ||
-                TargetUtil.AnyMobsInRange(15) || Player.IsIncapacitated || IsCurrentlyAvoiding))
+            if (CanCast(SNOPower.DemonHunter_SmokeScreen, CanCastFlags.NoTimer) &&
+                !GetHasBuff(SNOPower.DemonHunter_ShadowPower) && Player.SecondaryResource >= 14 &&
+                (Player.CurrentHealthPct <= 0.50 || Player.IsRooted || TargetUtil.AnyMobsInRange(40) || Player.IsIncapacitated || IsCurrentlyAvoiding))
             {
                 return new TrinityPower(SNOPower.DemonHunter_SmokeScreen);
             }
@@ -170,7 +170,8 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // no rune || invigoration || focused mind || Backup Plan || Battle Scars (need Disc)
-                if ((!Runes.DemonHunter.Punishment.IsActive) && CanCast(SNOPower.DemonHunter_Preparation) && Player.SecondaryResource <= 15 && TimeSincePowerUse(SNOPower.DemonHunter_Preparation) >= 1000)
+                if ((!Runes.DemonHunter.Punishment.IsActive) && CanCast(SNOPower.DemonHunter_Preparation, CanCastFlags.NoTimer) &&
+                    Player.SecondaryResource <= 15 && TimeSincePowerUse(SNOPower.DemonHunter_Preparation) >= 1000)
                 {
                     return new TrinityPower(SNOPower.DemonHunter_Preparation);
                 }

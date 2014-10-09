@@ -52,7 +52,7 @@ namespace Trinity.Combat.Abilities
 
                 // LawsOfValor
                 // LawsOfValor2
-                if (CanCast(SNOPower.X1_Crusader_LawsOfValor2) && (TargetUtil.EliteOrTrashInRange(16f) || TargetUtil.AnyMobsInRange(15f, 5)))
+                if (CanCast(SNOPower.X1_Crusader_LawsOfValor2) && (TargetUtil.EliteOrTrashInRange(16f) || TargetUtil.AnyMobsInRange(15f, 5) || Settings.Combat.Crusader.SpamLawsOfValor))
                 {
                     return new TrinityPower(SNOPower.X1_Crusader_LawsOfValor2);
                 }
