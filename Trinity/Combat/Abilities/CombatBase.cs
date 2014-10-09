@@ -391,7 +391,7 @@ namespace Trinity.Combat.Abilities
             if (!hasPower)
                 return false;
 
-            // Skip this for Barb, Crusader, WD
+            // Skip this for Barb, Crusader, WD, Monk
             if (Player.ActorClass == ActorClass.Wizard || Player.ActorClass == ActorClass.DemonHunter)
             {
                 bool timer = flags.HasFlag(CanCastFlags.NoTimer) || SNOPowerUseTimer(power);

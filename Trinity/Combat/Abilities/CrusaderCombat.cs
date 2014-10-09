@@ -317,7 +317,8 @@ namespace Trinity.Combat.Abilities
 
         private static bool CanCastCondemn()
         {
-            return CanCast(SNOPower.X1_Crusader_Condemn) && Player.PrimaryResource > 36 && (TargetUtil.EliteOrTrashInRange(10f) || TargetUtil.AnyMobsInRange(10f, CrusaderSettings.CondemnAoECount));
+            return CanCast(SNOPower.X1_Crusader_Condemn) && (TargetUtil.EliteOrTrashInRange(10f) || TargetUtil.AnyMobsInRange(10f, CrusaderSettings.CondemnAoECount))
+                && (!Legendary.FrydehrsWrath.IsEquipped || Player.PrimaryResource >= 40);
         }
 
         private static bool CanCastHeavensFury()

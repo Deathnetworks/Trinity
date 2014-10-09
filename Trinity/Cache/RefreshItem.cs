@@ -60,7 +60,7 @@ namespace Trinity
                 }
 
                 if (itemBaseType == GItemBaseType.Gem)
-                    c_ItemLevel = diaItem.CommonData.GemQuality;
+                    c_ItemLevel = (int)diaItem.CommonData.GemQuality;
 
                 CurrentCacheObject.ObjectHash = HashGenerator.GenerateItemHash(
                     CurrentCacheObject.Position,

@@ -26,7 +26,7 @@ namespace Trinity.Combat
             if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid)
                 return;
 
-            List<TrinityCacheObject> units = Trinity.ObjectCache.Where(o => o.IsUnit || o.IsBossOrEliteRareUnique).ToList();
+            List<TrinityCacheObject> units = Trinity.ObjectCache.Where(o => o.IsUnit && o.CommonDataIsValid || o.IsBossOrEliteRareUnique).ToList();
             var unitsGuids = new HashSet<int>(units.Select(e => e.ACDGuid));
 
             // Find Newly Dead Units

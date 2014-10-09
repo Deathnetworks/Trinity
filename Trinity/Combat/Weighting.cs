@@ -116,6 +116,8 @@ namespace Trinity
 
                     bool shouldIgnoreTrashMob = shouldIgnoreTrashMobs && !elitesInRangeOfUnit;
 
+                    bool GoblinKamikaze = cacheObject.IsTreasureGoblin && Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze;
+
                     string objWeightInfo = "";
 
                     // Just to make sure each one starts at 0 weight...
@@ -158,7 +160,7 @@ namespace Trinity
                                         !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize) &&
                                         ignoreSummoner && !cacheObject.IsQuestMonster &&
                                         !cacheObject.IsMinimapActive && !cacheObject.IsBountyObjective ||
-                                        HealthGlobeEmergency || GetHiPriorityContainer || GetHiPriorityShrine)
+                                        HealthGlobeEmergency || GetHiPriorityContainer || GetHiPriorityShrine || GoblinKamikaze)
                                     {
                                         objWeightInfo = "Ignoring ";
                                         ignoring = true;
@@ -180,7 +182,7 @@ namespace Trinity
                                     if ((!cacheObject.IsBoss || shouldIgnoreBosses) && !cacheObject.IsBountyObjective &&
                                         shouldIgnoreElites && cacheObject.IsEliteRareUnique && !isInHotSpot &&
                                         !(cacheObject.HitPointsPct <= (Settings.Combat.Misc.ForceKillElitesHealth / 100))
-                                        || HealthGlobeEmergency || GetHiPriorityShrine || GetHiPriorityContainer)
+                                        || HealthGlobeEmergency || GetHiPriorityShrine || GetHiPriorityContainer || GoblinKamikaze)
                                     {
                                         objWeightInfo = "Ignoring ";
                                         ignoring = true;
@@ -497,14 +499,11 @@ namespace Trinity
                             {
                                 bool isTwoSquare = true;
 
-                                try
-                                {
+                                if (cacheObject.Item != null && cacheObject.Item.CommonData != null)
                                     isTwoSquare = cacheObject.Item.CommonData.IsTwoSquareItem;
-                                }
-                                catch { }
 
                                 // Don't pickup items if we're doing a TownRun
-                                if (cacheObject.Type == GObjectType.Item && 
+                                if (cacheObject.Type == GObjectType.Item &&
                                     TrinityItemManager.FindValidBackpackLocation(isTwoSquare) == new Vector2(-1, -1))
                                 {
                                     objWeightInfo += "TownRun";
