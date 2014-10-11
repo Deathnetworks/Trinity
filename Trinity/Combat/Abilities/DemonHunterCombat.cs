@@ -52,6 +52,14 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         private static TrinityPower GetCombatAvoidancePower()
         {
+            // Smoke Screen
+            if (CanCast(SNOPower.DemonHunter_SmokeScreen, CanCastFlags.NoTimer) &&
+                !GetHasBuff(SNOPower.DemonHunter_ShadowPower) && Player.SecondaryResource >= 14 &&
+                (Player.CurrentHealthPct <= 0.50 || Player.IsRooted || Player.IsIncapacitated))
+            {
+                return new TrinityPower(SNOPower.DemonHunter_SmokeScreen);
+            }
+
             return null;
         }
         /// <summary>
@@ -92,7 +100,7 @@ namespace Trinity.Combat.Abilities
 
             // Caltrops
             if (!Player.IsIncapacitated && CanCast(SNOPower.DemonHunter_Caltrops) &&
-                Player.SecondaryResource >= 6 && TargetUtil.AnyMobsInRange(40))
+                Player.SecondaryResource >= 6 && TargetUtil.AnyMobsInRange(40) && !GetHasBuff(SNOPower.DemonHunter_Caltrops))
             {
                 return new TrinityPower(SNOPower.DemonHunter_Caltrops);
             }
@@ -143,7 +151,8 @@ namespace Trinity.Combat.Abilities
             // Smoke Screen
             if (CanCast(SNOPower.DemonHunter_SmokeScreen, CanCastFlags.NoTimer) &&
                 !GetHasBuff(SNOPower.DemonHunter_ShadowPower) && Player.SecondaryResource >= 14 &&
-                (Player.CurrentHealthPct <= 0.50 || Player.IsRooted || TargetUtil.AnyMobsInRange(40) || Player.IsIncapacitated || IsCurrentlyAvoiding))
+                (Player.CurrentHealthPct <= 0.50 || Player.IsRooted || TargetUtil.AnyMobsInRange(15) ||
+                (Legendary.MeticulousBolts.IsEquipped && TargetUtil.AnyMobsInRange(60)) || Player.IsIncapacitated))
             {
                 return new TrinityPower(SNOPower.DemonHunter_SmokeScreen);
             }

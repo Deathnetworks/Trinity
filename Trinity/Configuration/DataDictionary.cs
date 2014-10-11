@@ -721,7 +721,7 @@ namespace Trinity
             84919, // Skelton King
             108444, // ZombieFemale_A_TristramQuest (Wretched Mothers)
             176889, // ZombieFemale_Unique_WretchedQueen
-
+            129439, //Arsect The Venomous
             164502, // sandMonster_A_Head_Guardian
 
             // A5
@@ -899,6 +899,8 @@ namespace Trinity
             225252, // Shamanic Ward - Revenge of Gharbad bounty
 
             331397, // x1_westm_Graveyard_Floor_Sarcophagus_Undead_Husband_Event
+
+            386274, // Tgoblin_Gold_Pile_C
         };
 
         /// <summary>
