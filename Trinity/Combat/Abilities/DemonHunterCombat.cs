@@ -126,7 +126,7 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Use Wolf Howl on Unique/Elite/Champion - Would help for farming trash, but trash farming should not need this - Used on Elites to reduce Deaths per hour
-                if (Runes.DemonHunter.WolfCompanion.IsActive && CanCast(SNOPower.X1_DemonHunter_Companion) &&
+                if (Runes.DemonHunter.WolfCompanion.IsActive && CanCast(SNOPower.X1_DemonHunter_Companion, CanCastFlags.NoTimer) &&
                     ((CurrentTarget.IsBossOrEliteRareUnique || TargetUtil.AnyMobsInRange(40, 10)) && CurrentTarget.RadiusDistance < 25f))
                 {
                     return new TrinityPower(SNOPower.X1_DemonHunter_Companion);

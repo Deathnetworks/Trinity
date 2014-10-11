@@ -6,6 +6,7 @@ using Trinity.Cache;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Configuration;
+using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Common;
@@ -417,46 +418,49 @@ namespace Trinity
             const int setItemMarkerTexture = 404424;
             const int legendaryItemMarkerTexture = 275968;
 
-            var legendaryItemMarkers = ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsValid &&
-                (m.MinimapTexture == setItemMarkerTexture || m.MinimapTexture == legendaryItemMarkerTexture) && !Blacklist60Seconds.Contains(m.NameHash)).ToList();
-
-            foreach (var marker in legendaryItemMarkers)
+            if (!IsReadyToTownRun && !ForceVendorRunASAP)
             {
-                ObjectCache.Add(new TrinityCacheObject()
-                {
-                    Position = marker.Position,
-                    InternalName = (marker.MinimapTexture == setItemMarkerTexture ? "Set Item" : "Legendary Item") + " Minimap Marker",
-                    RActorGuid = marker.NameHash,
-                    Distance = marker.Position.Distance(Player.Position),
-                    ActorType = ActorType.Item,
-                    Type = GObjectType.Item,
-                    Radius = 2f,
-                    Weight = 50
-                });
-            }
+                var legendaryItemMarkers = ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsValid &&
+                    (m.MinimapTexture == setItemMarkerTexture || m.MinimapTexture == legendaryItemMarkerTexture) && !Blacklist60Seconds.Contains(m.NameHash)).ToList();
 
-            if (legendaryItemMarkers.Any())
-            {
-                var legendaryItems = ZetaDia.Actors.GetActorsOfType<DiaItem>().Where(i => i.IsValid && i.IsACDBased && i.Position.Distance2D(ZetaDia.Me.Position) < 5f && legendaryItemMarkers.Any(im => i.Position.Distance2D(i.Position) < 2f));
-
-                foreach (var diaItem in legendaryItems)
+                foreach (var marker in legendaryItemMarkers)
                 {
                     ObjectCache.Add(new TrinityCacheObject()
                     {
-                        Position = diaItem.Position,
-                        InternalName = diaItem.Name,
-                        RActorGuid = diaItem.RActorGuid,
-                        ActorSNO = diaItem.ActorSNO,
-                        ACDGuid =  diaItem.ACDGuid,
-                        HasBeenNavigable = true,
-                        HasBeenInLoS = true,
-                        Distance = diaItem.Distance,
+                        Position = marker.Position,
+                        InternalName = (marker.MinimapTexture == setItemMarkerTexture ? "Set Item" : "Legendary Item") + " Minimap Marker",
+                        RActorGuid = marker.NameHash,
+                        Distance = marker.Position.Distance(Player.Position),
                         ActorType = ActorType.Item,
                         Type = GObjectType.Item,
                         Radius = 2f,
-                        Weight = 50,
-                        ItemQuality = ItemQuality.Legendary,
+                        Weight = 50
                     });
+                }
+
+                if (legendaryItemMarkers.Any() && TrinityItemManager.FindValidBackpackLocation(true) != new Vector2(-1, -1))
+                {
+                    var legendaryItems = ZetaDia.Actors.GetActorsOfType<DiaItem>().Where(i => i.IsValid && i.IsACDBased && i.Position.Distance2D(ZetaDia.Me.Position) < 5f && legendaryItemMarkers.Any(im => i.Position.Distance2D(i.Position) < 2f));
+
+                    foreach (var diaItem in legendaryItems)
+                    {
+                        ObjectCache.Add(new TrinityCacheObject()
+                        {
+                            Position = diaItem.Position,
+                            InternalName = diaItem.Name,
+                            RActorGuid = diaItem.RActorGuid,
+                            ActorSNO = diaItem.ActorSNO,
+                            ACDGuid = diaItem.ACDGuid,
+                            HasBeenNavigable = true,
+                            HasBeenInLoS = true,
+                            Distance = diaItem.Distance,
+                            ActorType = ActorType.Item,
+                            Type = GObjectType.Item,
+                            Radius = 2f,
+                            Weight = 50,
+                            ItemQuality = ItemQuality.Legendary,
+                        });
+                    }
                 }
             }
 

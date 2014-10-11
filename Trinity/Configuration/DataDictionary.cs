@@ -758,7 +758,7 @@ namespace Trinity
 
         public static HashSet<int> ZombieDogIds { get { return zombieDogIds; } }
         private static readonly HashSet<int> zombieDogIds = new HashSet<int> { 
-            110959, 103235, 103215, 105763, 103217, 51353 
+            110959, 103235, 103215, 105763, 103217, 51353, 
         };
 
         public static HashSet<int> DemonHunterPetIds { get { return demonHunterPetIds; } }
@@ -768,7 +768,11 @@ namespace Trinity
             133741, 
             159144, 
             181748, 
-            159098 
+            159098,
+            159102,
+            159144,
+            334861,
+
         };
 
         public static HashSet<int> DemonHunterSentryIds { get { return demonHunterSentryIds; } }
