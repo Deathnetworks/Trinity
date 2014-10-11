@@ -93,6 +93,18 @@ namespace Trinity
                                        select m).ToList();
                 }
 
+                // Lightning DH running out of Discipline
+                if(Player.ActorClass == ActorClass.DemonHunter && !CombatBase.CanCast(SNOPower.DemonHunter_Preparation) &&
+                    Player.SecondaryResource <= 25 && TargetUtil.AnyMobsInRange(90f, false) && Reference.Runes.DemonHunter.FocusedMind.IsActive &&
+                    !GetHasBuff(SNOPower.DemonHunter_Preparation) && Reference.Legendary.MeticulousBolts.IsEquipped)
+                {
+                    TryToKite = true;
+                    vKitePointAvoid = Player.Position;
+                    kiteMonsterList = (from m in ObjectCache
+                                       where m.IsUnit
+                                       select m).ToList();
+                }
+
                 // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
                 bool shouldKamikazeTreasureGoblins = (!AnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize);
 
