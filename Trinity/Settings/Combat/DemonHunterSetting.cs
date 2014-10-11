@@ -254,7 +254,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(KiteMode.Bosses)]
+        [DefaultValue(KiteMode.Always)]
         public KiteMode KiteMode
         {
             get
