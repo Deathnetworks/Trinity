@@ -70,7 +70,7 @@
 
                 <TextBlock Text="Kite Trigger Range" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
                 <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                    Interval="500" Maximum="40" Minimum="0" 
+                    Interval="500" Maximum="40" Minimum="0"
                     SmallChange="1" LargeChange="5" 
                     TickPlacement="BottomRight" TickFrequency="1"
                     Value="{Binding Path=DH.KiteLimit}" 
@@ -139,6 +139,7 @@
                         <CheckBox Margin="2" IsChecked="{Binding Path=DH.SpamShadowPower}" ToolTip="For use with Shadow Glide rune for Out of Combat Sprint">Spam Shadow Power</CheckBox>
                         <CheckBox Margin="2" IsChecked="{Binding Path=DH.SpamPreparation}">Preparation Out of Combat</CheckBox>
                         <CheckBox Margin="2" IsChecked="{Binding Path=DH.VengeanceElitesOnly}">Vengeance Elites Only</CheckBox>
+                        <CheckBox Margin="2" IsChecked="{Binding Path=DH.CompanionOffCooldown}">Cast companion off cooldown</CheckBox>
                     </UniformGrid>
                     <GroupBox>
                         <GroupBox.Header>Vault</GroupBox.Header>

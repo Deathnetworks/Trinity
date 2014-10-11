@@ -95,7 +95,7 @@ namespace Trinity
 
                 // Lightning DH running out of Discipline
                 if(Player.ActorClass == ActorClass.DemonHunter && !CombatBase.CanCast(SNOPower.DemonHunter_Preparation) &&
-                    Player.SecondaryResource <= 25 && TargetUtil.AnyMobsInRange(90f, false) && Reference.Runes.DemonHunter.FocusedMind.IsActive &&
+                    Player.SecondaryResource <= 25 && TargetUtil.AnyElitesInRange(90f) && Reference.Runes.DemonHunter.FocusedMind.IsActive &&
                     !GetHasBuff(SNOPower.DemonHunter_Preparation) && Reference.Legendary.MeticulousBolts.IsEquipped)
                 {
                     TryToKite = true;

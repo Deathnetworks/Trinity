@@ -15,6 +15,7 @@ namespace Trinity.Config.Combat
         private bool _SpamSmokeScreen;
         private bool _SpamShadowPower;
         private bool _SpamPreparation;
+        private bool _CompanionOffCooldown;
         private int _StrafeMinHatred;
         private int _RapidFireMinHatred;
         private bool _VengeanceElitesOnly;
@@ -201,6 +202,24 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool CompanionOffCooldown
+        {
+            get
+            {
+                return _CompanionOffCooldown;
+            }
+            set
+            {
+                if (_CompanionOffCooldown != value)
+                {
+                    _CompanionOffCooldown = value;
+                    OnPropertyChanged("CompanionOffCooldown");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
         [DefaultValue(48)]
         public int StrafeMinHatred
         {
@@ -254,7 +273,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(KiteMode.Always)]
+        [DefaultValue(KiteMode.Bosses)]
         public KiteMode KiteMode
         {
             get

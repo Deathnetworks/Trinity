@@ -53,9 +53,7 @@ namespace Trinity.Combat.Abilities
         private static TrinityPower GetCombatAvoidancePower()
         {
             // Smoke Screen
-            if (CanCast(SNOPower.DemonHunter_SmokeScreen, CanCastFlags.NoTimer) &&
-                !GetHasBuff(SNOPower.DemonHunter_ShadowPower) && Player.SecondaryResource >= 14 &&
-                (Player.CurrentHealthPct <= 0.50 || Player.IsRooted || Player.IsIncapacitated))
+            if (CanCast(SNOPower.DemonHunter_SmokeScreen, CanCastFlags.NoTimer) && Player.SecondaryResource >= 14)
             {
                 return new TrinityPower(SNOPower.DemonHunter_SmokeScreen);
             }
@@ -144,6 +142,12 @@ namespace Trinity.Combat.Abilities
             // Companion active attack on elite
             if (CanCast(SNOPower.X1_DemonHunter_Companion) && CurrentTarget.IsEliteRareUnique &&
                 Player.SecondaryResource >= 10)
+            {
+                return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
+            }
+
+            // Companion off CD
+            if (CanCast(SNOPower.X1_DemonHunter_Companion) && TargetUtil.AnyMobsInRange(40) && Settings.Combat.DemonHunter.CompanionOffCooldown)
             {
                 return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
             }
