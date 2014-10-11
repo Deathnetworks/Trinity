@@ -670,7 +670,7 @@ namespace Trinity
         /// </summary>
         public static HashSet<int> GoblinIds { get { return goblinIds; } }
         private static readonly HashSet<int> goblinIds = new HashSet<int> {
-            5984, 5985, 5987, 5988, 405186,
+            5984, 5985, 5987, 5988, 405186, 380657
          };
 
         /// <summary>
