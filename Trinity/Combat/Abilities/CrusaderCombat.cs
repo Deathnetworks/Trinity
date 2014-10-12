@@ -123,9 +123,9 @@ namespace Trinity.Combat.Abilities
                 {
                     return new TrinityPower(SNOPower.X1_Crusader_HeavensFury3, 65f, TargetUtil.GetBestClusterPoint());
                 }
-                if (CanCastHeavensFuryHolyShotgun(hasAkkhan))
+                if (CanCastHeavensFuryHolyShotgun() && hasAkkhan)
                 {
-                    return new TrinityPower(SNOPower.X1_Crusader_HeavensFury3, 7f, CurrentTarget.Position);
+                    return new TrinityPower(SNOPower.X1_Crusader_HeavensFury3, 15f, CurrentTarget.Position);
                 }
 
                 // Condemn
@@ -330,9 +330,9 @@ namespace Trinity.Combat.Abilities
             return (CanCast(SNOPower.X1_Crusader_HeavensFury3) && (TargetUtil.EliteOrTrashInRange(65f) || TargetUtil.ClusterExists(15f, 65f, CrusaderSettings.HeavensFuryAoECount)));
         }
 
-        private static bool CanCastHeavensFuryHolyShotgun(bool hasAkkhan)
+        private static bool CanCastHeavensFuryHolyShotgun()
         {
-            return (hasAkkhan && CanCast(SNOPower.X1_Crusader_HeavensFury3) && TargetUtil.AnyMobsInRange(15f, 1) && Runes.Crusader.FiresOfHeaven.IsActive);
+            return (CanCast(SNOPower.X1_Crusader_HeavensFury3) && TargetUtil.AnyMobsInRange(15f, 1) && Runes.Crusader.FiresOfHeaven.IsActive);
         }
 
         private static bool CanCastFallingSword()
