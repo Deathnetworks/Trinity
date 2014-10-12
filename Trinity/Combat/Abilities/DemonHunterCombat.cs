@@ -53,7 +53,7 @@ namespace Trinity.Combat.Abilities
         private static TrinityPower GetCombatAvoidancePower()
         {
             // Smoke Screen
-            if (CanCast(SNOPower.DemonHunter_SmokeScreen, CanCastFlags.NoTimer) && Player.SecondaryResource >= 14)
+            if (CanCast(SNOPower.DemonHunter_SmokeScreen, CanCastFlags.NoTimer))
             {
                 return new TrinityPower(SNOPower.DemonHunter_SmokeScreen);
             }
@@ -91,14 +91,13 @@ namespace Trinity.Combat.Abilities
 
             // Sentry Turret
             if (!Player.IsIncapacitated && CanCast(SNOPower.DemonHunter_Sentry, CanCastFlags.NoTimer) &&
-               TargetUtil.AnyMobsInRange(65) && Player.PrimaryResource >= 30)
+               TargetUtil.AnyMobsInRange(65))
             {
                 return new TrinityPower(SNOPower.DemonHunter_Sentry, 75f, TargetUtil.GetBestClusterPoint(35f, 75f, false));
             }
 
             // Caltrops
-            if (!Player.IsIncapacitated && CanCast(SNOPower.DemonHunter_Caltrops) &&
-                Player.SecondaryResource >= 6 && TargetUtil.AnyMobsInRange(40) && !GetHasBuff(SNOPower.DemonHunter_Caltrops))
+            if (!Player.IsIncapacitated && CanCast(SNOPower.DemonHunter_Caltrops) && TargetUtil.AnyMobsInRange(40) && !GetHasBuff(SNOPower.DemonHunter_Caltrops))
             {
                 return new TrinityPower(SNOPower.DemonHunter_Caltrops);
             }
@@ -140,21 +139,20 @@ namespace Trinity.Combat.Abilities
             }
 
             // Companion active attack on elite
-            if (CanCast(SNOPower.X1_DemonHunter_Companion) && CurrentTarget.IsEliteRareUnique &&
-                Player.SecondaryResource >= 10)
+            if (CanCast(SNOPower.X1_DemonHunter_Companion) && CurrentTarget.IsEliteRareUnique )
             {
                 return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
             }
 
             // Companion off CD
-            if (CanCast(SNOPower.X1_DemonHunter_Companion) && TargetUtil.AnyMobsInRange(40) && Settings.Combat.DemonHunter.CompanionOffCooldown)
+            if (CanCast(SNOPower.X1_DemonHunter_Companion, CanCastFlags.NoTimer) && TargetUtil.AnyMobsInRange(60) && Settings.Combat.DemonHunter.CompanionOffCooldown)
             {
                 return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
             }
 
             // Smoke Screen
             if (CanCast(SNOPower.DemonHunter_SmokeScreen, CanCastFlags.NoTimer) &&
-                !GetHasBuff(SNOPower.DemonHunter_ShadowPower) && Player.SecondaryResource >= 14 &&
+                !GetHasBuff(SNOPower.DemonHunter_ShadowPower) &&
                 (Player.CurrentHealthPct <= 0.50 || Player.IsRooted || TargetUtil.AnyMobsInRange(15) ||
                 (Legendary.MeticulousBolts.IsEquipped && TargetUtil.AnyMobsInRange(60)) || Player.IsIncapacitated))
             {
@@ -270,7 +268,7 @@ namespace Trinity.Combat.Abilities
 
             // Spike Trap
             if (!Player.IsIncapacitated && CanCast(SNOPower.DemonHunter_SpikeTrap) &&
-                LastPowerUsed != SNOPower.DemonHunter_SpikeTrap && Player.PrimaryResource >= 30)
+                LastPowerUsed != SNOPower.DemonHunter_SpikeTrap)
             {
                 // For distant monsters, try to target a little bit in-front of them (as they run towards us), if it's not a treasure goblin
                 float reducedDistance = 0f;
@@ -401,7 +399,7 @@ namespace Trinity.Combat.Abilities
 
             // Smoke Screen spam
             if (Settings.Combat.DemonHunter.SpamSmokeScreen && CanCast(SNOPower.DemonHunter_SmokeScreen) &&
-                !GetHasBuff(SNOPower.DemonHunter_ShadowPower) && Player.SecondaryResource >= 14)
+                !GetHasBuff(SNOPower.DemonHunter_ShadowPower))
             {
                 return new TrinityPower(SNOPower.DemonHunter_SmokeScreen);
             }
