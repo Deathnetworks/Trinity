@@ -178,7 +178,7 @@ namespace Trinity.Technicals
         {
             get
             {
-                return Path.Combine(DemonBuddyPath, "Routines", TrinityName, CombatRoutineFileName);
+                return Path.Combine(DemonBuddyPath, "Routines", TrinityRoutineName, CombatRoutineFileName);
             }
         }
 
@@ -190,6 +190,18 @@ namespace Trinity.Technicals
             get
             {
                 return "Trinity";
+            }
+        }
+
+        /// <summary>
+        /// Gets the name of the trinity routine.
+        /// </summary>
+        /// <value>The name of the trinity routine.</value>
+        public static string TrinityRoutineName
+        {
+            get
+            {
+                return "TrinityRoutine";
             }
         }
 

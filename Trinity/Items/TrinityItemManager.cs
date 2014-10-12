@@ -715,6 +715,20 @@ namespace Trinity.Items
                         int row = item.InventoryRow;
                         int col = item.InventoryColumn;
 
+                        if (row < 0 || row > 5)
+                        {
+                            Logger.LogError("Item {0} ({1}) is reporting invalid backpack row of {2}!", 
+                                item.Name, item.InternalName, item.InventoryRow);
+                            continue;
+                        }
+
+                        if (row < 0 || row > 9)
+                        {
+                            Logger.LogError("Item {0} ({1}) is reporting invalid backpack column of {2}!", 
+                                item.Name, item.InternalName, item.InventoryColumn);
+                            continue;
+                        }
+
                         // Slot is already protected, don't double count
                         if (!backpackSlotBlocked[col, row])
                         {
