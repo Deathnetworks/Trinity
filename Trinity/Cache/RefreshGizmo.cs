@@ -424,7 +424,7 @@ namespace Trinity
                         // Determine what shrine type it is, and blacklist if the user has disabled it
                         switch (CurrentCacheObject.ActorSNO)
                         {
-                            case 176077:  //Frenzy Shrine
+                            case (int)SNOActor.Shrine_Global_Frenzied:  //Frenzy Shrine
                                 if (!Settings.WorldObject.UseFrenzyShrine)
                                 {
                                     Blacklist60Seconds.Add(CurrentCacheObject.RActorGuid);
@@ -440,7 +440,7 @@ namespace Trinity
                                 }
                                 break;
 
-                            case 176076:  //Fortune Shrine
+                            case (int)SNOActor.Shrine_Global_Fortune:  //Fortune Shrine 
                                 if (!Settings.WorldObject.UseFortuneShrine)
                                 {
                                     AddToCache = false;
@@ -449,7 +449,7 @@ namespace Trinity
                                 }
                                 break;
 
-                            case 176074:  //Protection Shrine
+                            case (int)SNOActor.Shrine_Global_Blessed: //Protection Shrine
                                 if (!Settings.WorldObject.UseProtectionShrine)
                                 {
                                     AddToCache = false;
@@ -458,7 +458,7 @@ namespace Trinity
                                 }
                                 break;
 
-                            case 260330:  //Empowered Shrine
+                            case (int)SNOActor.Shrine_Global_Reloaded: //Empowered Shrine - Shrine_Global_Reloaded
                                 if (!Settings.WorldObject.UseEmpoweredShrine)
                                 {
                                     AddToCache = false;
@@ -467,7 +467,7 @@ namespace Trinity
                                 }
                                 break;
 
-                            case 176075:  //Enlightened Shrine
+                            case (int)SNOActor.Shrine_Global_Enlightened:  //Enlightened Shrine - Shrine_Global_Enlightened
                                 if (!Settings.WorldObject.UseEnlightenedShrine)
                                 {
                                     AddToCache = false;
@@ -476,7 +476,7 @@ namespace Trinity
                                 }
                                 break;
 
-                            case 260331:  //Fleeting Shrine
+                            case (int)SNOActor.Shrine_Global_Hoarder:  //Fleeting Shrine
                                 if (!Settings.WorldObject.UseFleetingShrine)
                                 {
                                     AddToCache = false;
@@ -485,7 +485,7 @@ namespace Trinity
                                 }
                                 break;
 
-                            case 330697:  //Channeling Pylon
+                            case (int)SNOActor.x1_LR_Shrine_Infinite_Casting:  //Channeling Pylon - x1_LR_Shrine_Infinite_Casting
                                 if (!Settings.WorldObject.UseChannelingPylon)
                                 {
                                     AddToCache = false;
@@ -494,7 +494,7 @@ namespace Trinity
                                 }
                                 break;
 
-                            case 330696:  //Conduit Pylon
+                            case (int)SNOActor.x1_LR_Shrine_Electrified:  //Conduit Pylon - x1_LR_Shrine_Electrified
                                 if (!Settings.WorldObject.UseConduitPylon)
                                 {
                                     AddToCache = false;
@@ -503,7 +503,7 @@ namespace Trinity
                                 }
                                 break;
 
-                            case 330698:  //Shield Pylon
+                            case (int)SNOActor.x1_LR_Shrine_Invulnerable:  //Shield Pylon -x1_LR_Shrine_Invulnerable
                                 if (!Settings.WorldObject.UseShieldPylon)
                                 {
                                     AddToCache = false;
@@ -512,7 +512,7 @@ namespace Trinity
                                 }
                                 break;
 
-                            case 330699:  //Speed Pylon
+                            case (int)SNOActor.x1_LR_Shrine_Run_Speed:  //Speed Pylon - x1_LR_Shrine_Run_Speed
                                 if (!Settings.WorldObject.UseSpeedPylon)
                                 {
                                     AddToCache = false;
@@ -520,7 +520,7 @@ namespace Trinity
                                     return AddToCache;
                                 }
                                 break;
-                            case 330695:  //Power Pylon
+                            case (int)SNOActor.x1_LR_Shrine_Damage:  //Power Pylon - x1_LR_Shrine_Damage
                                 if (!Settings.WorldObject.UsePowerPylon)
                                 {
                                     AddToCache = false;
