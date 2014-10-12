@@ -35,10 +35,21 @@ namespace Trinity.Combat.Abilities
             NoPowerManager = 8
         }
 
+        private static int _playerKiteDistance;
         /// <summary>
         /// Distance to kite, read settings (class independant)
         /// </summary>
-        public static int PlayerKiteDistance { get; set; }
+        public static int PlayerKiteDistance
+        {
+            get
+            {
+                // Conduit Pylon buff is active, no kite distance
+                if (GetHasBuff(SNOPower.Pages_Buff_Electrified))
+                    return 0;
+                return _playerKiteDistance;
+            }
+            set { _playerKiteDistance = value; }
+        }
 
         // When to Kite
         public static KiteMode PlayerKiteMode
