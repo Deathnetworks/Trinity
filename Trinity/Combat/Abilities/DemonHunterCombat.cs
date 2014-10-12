@@ -414,6 +414,12 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.DemonHunter_Chakram);
             }
 
+            // Preperation
+            if (CanCast(SNOPower.DemonHunter_Preparation, CanCastFlags.NoTimer) && Settings.Combat.DemonHunter.SpamPreparation)
+            {
+                return new TrinityPower(SNOPower.DemonHunter_Preparation);
+            }
+
             return null;
         }
 
