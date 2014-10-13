@@ -150,7 +150,7 @@ namespace Trinity
                         }
                         if (ZetaDia.Me.IsValid)
                         {
-                            var equippedItems = ZetaDia.Me.Inventory.Equipped.Where(i => i.DurabilityCurrent != i.DurabilityMax).ToList();
+                            var equippedItems = ZetaDia.Me.Inventory.Equipped.Where(i => i.DurabilityMax > 0 && i.DurabilityCurrent != i.DurabilityMax).ToList();
                             if (equippedItems.Any())
                             {
                                 double min = equippedItems.Min(i => i.DurabilityPercent);

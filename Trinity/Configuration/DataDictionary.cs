@@ -905,6 +905,10 @@ namespace Trinity
             331397, // x1_westm_Graveyard_Floor_Sarcophagus_Undead_Husband_Event
 
             386274, // Tgoblin_Gold_Pile_C
+
+            93306, // Breakable Cart - blocks path in Dulgur Oasis
+
+            118384, // [23F7AE24] GizmoType: BreakableDoor Name: CaOut_Oasis_Gear_Box-2942 ActorSNO: 118384 Distance: 16.99475 Position: <3684.536, 4162.767, 100.4347> Barracade: True Radius: 25.60872 Health0.00100000004749745/1
         };
 
         /// <summary>
