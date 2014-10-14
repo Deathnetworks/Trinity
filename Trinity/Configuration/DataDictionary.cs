@@ -718,11 +718,12 @@ namespace Trinity
             115403, // A1 Cain Skeleton boss
             4373, 4376, 177539, // A1 Robbers
             168240, // A2 Jewler quest
-            84919, // Skelton King
+            84919, // Skeleton King
             108444, // ZombieFemale_A_TristramQuest (Wretched Mothers)
             176889, // ZombieFemale_Unique_WretchedQueen
             129439, //Arsect The Venomous
             164502, // sandMonster_A_Head_Guardian
+            378665, // Greed
 
             // A5
             316839, // x1_deathOrb_bodyPile
@@ -906,9 +907,7 @@ namespace Trinity
 
             386274, // Tgoblin_Gold_Pile_C
 
-            93306, // Breakable Cart - blocks path in Dulgur Oasis
-
-            118384, // [23F7AE24] GizmoType: BreakableDoor Name: CaOut_Oasis_Gear_Box-2942 ActorSNO: 118384 Distance: 16.99475 Position: <3684.536, 4162.767, 100.4347> Barracade: True Radius: 25.60872 Health0.00100000004749745/1
+            211861, //Pinata
         };
 
         /// <summary>

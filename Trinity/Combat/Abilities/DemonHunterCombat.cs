@@ -289,6 +289,16 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 65f, CurrentTarget.ACDGuid);
             }
 
+            // Elemental Arrow for Lightning DH
+            if (CanCast(SNOPower.DemonHunter_ElementalArrow) && !Player.IsIncapacitated && Runes.DemonHunter.BallLightning.IsActive &&
+                Passives.DemonHunter.NightStalker.IsActive && Player.PrimaryResource >= 10)
+            {
+                var bestTarget = TargetUtil.GetBestPierceTarget(60f, 0, true);
+
+                if (bestTarget != null)
+                    return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 65f, bestTarget.Position);
+                return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 65f, CurrentTarget.Position);
+            }
             // Chakram normal attack
             if (Hotbar.Contains(SNOPower.DemonHunter_Chakram) && !Player.IsIncapacitated &&
                 !Runes.DemonHunter.ShurikenCloud.IsActive &&
