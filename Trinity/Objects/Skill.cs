@@ -148,7 +148,7 @@ namespace Trinity.Objects
         /// </summary>
         public bool IsActive
         {
-            get { return ActiveUtils.ActiveIds.Contains(SNOPower); }
+            get { return SkillUtils.ActiveIds.Contains(SNOPower); }
         }
 
         /// <summary>

@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using Trinity.Cache;
 using Trinity.Helpers;
 using Trinity.ItemRules.Core;
+using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Items;
@@ -912,13 +913,7 @@ namespace Trinity.ItemRules
                                                     item.Stats.ArcaneSkillDamagePercentBonus,
                                                     item.Stats.HolySkillDamagePercentBonus }.Max());
 
-            itemDic.Add("[SKILLDMG%]", new float[] { item.Stats.FireSkillDamagePercentBonus,
-                                                    item.Stats.LightningSkillDamagePercentBonus,
-                                                    item.Stats.ColdSkillDamagePercentBonus,
-                                                    item.Stats.PosionSkillDamagePercentBonus,
-                                                    item.Stats.ArcaneSkillDamagePercentBonus,
-                                                    item.Stats.HolySkillDamagePercentBonus,
-                                                    item.Stats.SkillDamagePercentBonus}.Max());
+            itemDic.Add("[SKILLDMG%]", SkillBySlot.GetSkillDamagePercent(item));
 
              float damage, healing, toughness;
              item.GetStatChanges(out damage, out healing, out toughness);
