@@ -162,10 +162,8 @@ namespace Trinity.Combat.Abilities
             // Preperation
             bool hasBattleScars = Runes.DemonHunter.BattleScars.IsActive;
 
-            float preperationTriggerRange = V.F("DemonHunter.PreperationTriggerRange");
-            if (((!Player.IsIncapacitated &&
-                (TargetUtil.AnyMobsInRange(preperationTriggerRange))) || Settings.Combat.DemonHunter.SpamPreparation || Runes.DemonHunter.Punishment.IsActive) &&
-                Hotbar.Contains(SNOPower.DemonHunter_Preparation))
+            //float preperationTriggerRange = V.F("DemonHunter.PreperationTriggerRange");
+            if (!Player.IsIncapacitated && Hotbar.Contains(SNOPower.DemonHunter_Preparation))
             {
                 // Preperation w/ Punishment
                 if (Runes.DemonHunter.Punishment.IsActive && CanCast(SNOPower.DemonHunter_Preparation, CanCastFlags.NoTimer) &&
@@ -188,9 +186,10 @@ namespace Trinity.Combat.Abilities
                 }
             }
 
+            int mfdResource = Hotbar.Contains(SNOPower.DemonHunter_SmokeScreen) ? (Runes.DemonHunter.MortalEnemy.IsActive ? 3 : 17) : 17;
             // Marked for Death
             if (CanCast(SNOPower.DemonHunter_MarkedForDeath, CanCastFlags.NoTimer) &&
-                Player.SecondaryResource >= (Hotbar.Contains(SNOPower.DemonHunter_SmokeScreen) ? 17 : 3) &&
+                Player.SecondaryResource >= mfdResource &&
                 !CurrentTarget.HasDebuff(SNOPower.DemonHunter_MarkedForDeath) &&
                 !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.DemonHunter_MarkedForDeath))
             {
@@ -291,13 +290,13 @@ namespace Trinity.Combat.Abilities
 
             // Elemental Arrow for Lightning DH
             if (CanCast(SNOPower.DemonHunter_ElementalArrow) && !Player.IsIncapacitated && Runes.DemonHunter.BallLightning.IsActive &&
-                Passives.DemonHunter.NightStalker.IsActive && Player.PrimaryResource >= 10)
+                Passives.DemonHunter.NightStalker.IsActive && Legendary.MeticulousBolts.IsEquipped && Player.PrimaryResource >= 10)
             {
-                var bestTarget = TargetUtil.GetBestPierceTarget(60f, 0, true);
+                var bestTarget = TargetUtil.GetBestPierceTarget(40f);
 
                 if (bestTarget != null)
-                    return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 65f, bestTarget.Position);
-                return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 65f, CurrentTarget.Position);
+                    return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 10f, bestTarget.Position);
+                return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 10f, CurrentTarget.Position);
             }
             // Chakram normal attack
             if (Hotbar.Contains(SNOPower.DemonHunter_Chakram) && !Player.IsIncapacitated &&
@@ -415,7 +414,7 @@ namespace Trinity.Combat.Abilities
             }
 
             // Chakram:Shuriken Cloud
-            if (!Player.IsInTown && Hotbar.Contains(SNOPower.DemonHunter_Chakram) && !Player.IsIncapacitated &&
+            if (!Player.IsInTown && CanCast(SNOPower.DemonHunter_Chakram, CanCastFlags.NoTimer) && !Player.IsIncapacitated &&
                 Runes.DemonHunter.ShurikenCloud.IsActive && TimeSincePowerUse(SNOPower.DemonHunter_Chakram) >= 110000 &&
                 ((Player.PrimaryResource >= 10 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
             {
