@@ -23,7 +23,7 @@ namespace Trinity
             batch = true;
 
             // Barbarian 
-            Set(new TVar("Barbarian.MinEnergyReserve", 10, "Ignore Pain Emergency Use Minimum Health Percent"));
+            Set(new TVar("Barbarian.MinEnergyReserve", 10, "Barbarian emergency Fury reserve"));
             Set(new TVar("Barbarian.IgnorePain.MinHealth", 0.45f, "Ignore Pain Emergency Use Minimum Health Percent"));
             Set(new TVar("Barbarian.FuryDumpRaekor.MinHealth", 0.85f, "Health at which to start dumping fury"));
             Set(new TVar("Barbarian.Avoidance.WOTB.Other", 0.3f, "General WOTB Avoidance health multiplier"));
@@ -253,7 +253,7 @@ namespace Trinity
             Set(new TVar("DemonHunter.ClusterArrow.UseRange", 45f, "Cluster Arrow Maximum range"));
             // Monk
             Set(new TVar("Monk.Avoidance.Serenity", 0f, "Monk Serenity buff Avoidance health multiplier"));
-            Set(new TVar("Monk.MinEnergyReserve", 0, "Ignore Pain Emergency Use Minimum Health Percent"));
+            Set(new TVar("Monk.MinEnergyReserve", 0, "Monk emergency Spirit reserves"));
             Set(new TVar("Monk.SweepingWind.SpamOnLowHealthPct", 0.50f, "Spam Sweeping Wind for Health Regen when below this Health Percent"));
             Set(new TVar("Monk.MantraOfHealing.UseHealthPct", 0.35f, "Health threshold to pop Mantra of Healing active buff"));
 
@@ -265,7 +265,7 @@ namespace Trinity
             Set(new TVar("WitchDoctor.Firebats.MaintainRange", 35f, "Maintain Firebats while any mobs are in this range"));
 
             // Wizard
-            Set(new TVar("Wizard.MinEnergyReserve", 0, "Ignore Pain Emergency Use Minimum Health Percent"));
+            Set(new TVar("Wizard.MinEnergyReserve", 0, "Wizard emergency arcane power reserve"));
 
             // Global
             Set(new TVar("Combat.DefaultTickPreDelay", 1, "Default Combat Power Pre-use Delay (in ticks)"));

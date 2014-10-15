@@ -718,11 +718,12 @@ namespace Trinity
             115403, // A1 Cain Skeleton boss
             4373, 4376, 177539, // A1 Robbers
             168240, // A2 Jewler quest
-            84919, // Skelton King
+            84919, // Skeleton King
             108444, // ZombieFemale_A_TristramQuest (Wretched Mothers)
             176889, // ZombieFemale_Unique_WretchedQueen
             129439, //Arsect The Venomous
             164502, // sandMonster_A_Head_Guardian
+            378665, // Greed
 
             // A5
             316839, // x1_deathOrb_bodyPile
@@ -905,6 +906,8 @@ namespace Trinity
             331397, // x1_westm_Graveyard_Floor_Sarcophagus_Undead_Husband_Event
 
             386274, // Tgoblin_Gold_Pile_C
+
+            211861, //Pinata
         };
 
         /// <summary>

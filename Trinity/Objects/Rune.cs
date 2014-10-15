@@ -77,7 +77,7 @@ namespace Trinity.Objects
         /// </summary>
         public Skill Skill
         {
-            get { return ActiveUtils.ByActorClass(Class).ElementAtOrDefault(SkillIndex); } 
+            get { return SkillUtils.ByActorClass(Class).ElementAtOrDefault(SkillIndex); } 
         }
 
         /// <summary>
