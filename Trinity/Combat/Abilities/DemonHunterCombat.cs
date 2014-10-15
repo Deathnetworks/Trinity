@@ -171,7 +171,7 @@ namespace Trinity.Combat.Abilities
 
             // Vault
             if (CanCast(SNOPower.DemonHunter_Vault) && !Player.IsRooted && !Player.IsIncapacitated &&
-                Settings.Combat.DemonHunter.VaultMode != DemonHunterVaultMode.MovementOnly &&
+                Settings.Combat.DemonHunter.VaultMode == DemonHunterVaultMode.CombatOnly &&
                 (TargetUtil.AnyMobsInRange(7f, 6) || Player.CurrentHealthPct <= 0.7) &&
                 // if we have ShadowPower and Disicpline is >= 16
                 // or if we don't have ShadoWpower and Discipline is >= 22
@@ -409,17 +409,6 @@ namespace Trinity.Combat.Abilities
                 Runes.DemonHunter.Punishment.IsActive && Player.PrimaryResourceMissing >= 75)
             {
                 return new TrinityPower(SNOPower.DemonHunter_Preparation);
-            }
-
-            // Vault
-            if (CanCast(SNOPower.DemonHunter_Vault) && !Player.IsRooted && !Player.IsIncapacitated &&
-               (Player.SecondaryResource >= (Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) ? 22 : 16)) &&
-               Settings.Combat.DemonHunter.VaultMode == DemonHunterVaultMode.MovementOnly &&
-               TimeSincePowerUse(SNOPower.DemonHunter_Vault) >= Settings.Combat.DemonHunter.VaultMovementDelay)
-            {
-                Vector3 vNewTarget = NavHelper.MainFindSafeZone(Player.Position, true);
-
-                return new TrinityPower(SNOPower.DemonHunter_Vault, 20f, vNewTarget);
             }
 
             return null;
