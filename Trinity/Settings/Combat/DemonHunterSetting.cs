@@ -14,7 +14,6 @@ namespace Trinity.Config.Combat
         private int _VaultMovementDelay;
         private bool _SpamSmokeScreen;
         private bool _SpamShadowPower;
-        private bool _SpamPreparation;
         private bool _CompanionOffCooldown;
         private int _StrafeMinHatred;
         private int _RapidFireMinHatred;
@@ -179,24 +178,6 @@ namespace Trinity.Config.Combat
                 {
                     _SpamShadowPower = value;
                     OnPropertyChanged("SpamShadowPower");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool SpamPreparation
-        {
-            get
-            {
-                return _SpamPreparation;
-            }
-            set
-            {
-                if (_SpamPreparation != value)
-                {
-                    _SpamPreparation = value;
-                    OnPropertyChanged("SpamPreparation");
                 }
             }
         }

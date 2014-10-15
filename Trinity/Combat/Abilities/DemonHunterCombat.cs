@@ -159,33 +159,6 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.DemonHunter_SmokeScreen);
             }
 
-            // Preperation
-            bool hasBattleScars = Runes.DemonHunter.BattleScars.IsActive;
-
-            //float preperationTriggerRange = V.F("DemonHunter.PreperationTriggerRange");
-            if (!Player.IsIncapacitated && Hotbar.Contains(SNOPower.DemonHunter_Preparation))
-            {
-                // Preperation w/ Punishment
-                if (Runes.DemonHunter.Punishment.IsActive && CanCast(SNOPower.DemonHunter_Preparation, CanCastFlags.NoTimer) &&
-                    Player.PrimaryResourceMissing >= 75 && TimeSincePowerUse(SNOPower.DemonHunter_Preparation) >= 1000)
-                {
-                    return new TrinityPower(SNOPower.DemonHunter_Preparation);
-                }
-
-                // Preperation w/ Battle Scars - check for health only
-                if (hasBattleScars && CanCast(SNOPower.DemonHunter_Preparation) && Player.CurrentHealthPct < 0.6)
-                {
-                    return new TrinityPower(SNOPower.DemonHunter_Preparation);
-                }
-
-                // no rune || invigoration || focused mind || Backup Plan || Battle Scars (need Disc)
-                if ((!Runes.DemonHunter.Punishment.IsActive) && CanCast(SNOPower.DemonHunter_Preparation, CanCastFlags.NoTimer) &&
-                    Player.SecondaryResource <= 15 && TimeSincePowerUse(SNOPower.DemonHunter_Preparation) >= 1000)
-                {
-                    return new TrinityPower(SNOPower.DemonHunter_Preparation);
-                }
-            }
-
             int mfdResource = Hotbar.Contains(SNOPower.DemonHunter_SmokeScreen) ? (Runes.DemonHunter.MortalEnemy.IsActive ? 3 : 17) : 17;
             // Marked for Death
             if (CanCast(SNOPower.DemonHunter_MarkedForDeath, CanCastFlags.NoTimer) &&
@@ -422,10 +395,9 @@ namespace Trinity.Combat.Abilities
             }
 
             // Preparation, restore Disc if needed
-            int discRestored = Runes.DemonHunter.FocusedMind.IsActive ? 45 : 30;
             float useDelay = Runes.DemonHunter.FocusedMind.IsActive ? 15000 : 500;
             if (CanCast(SNOPower.DemonHunter_Preparation, CanCastFlags.NoTimer) &&
-            Player.SecondaryResourceMissing >= discRestored &&
+            Player.SecondaryResource <= V.F("DemonHunter.MinPreparationDiscipline") &&
             !Runes.DemonHunter.Punishment.IsActive && 
             TimeSincePowerUse(SNOPower.DemonHunter_Preparation) >= useDelay)
             {
@@ -433,11 +405,23 @@ namespace Trinity.Combat.Abilities
             }
 
             // Preparation: Punishment
-            if (CanCast(SNOPower.DemonHunter_Preparation, CanCastFlags.NoTimer) && Settings.Combat.DemonHunter.SpamPreparation && 
+            if (CanCast(SNOPower.DemonHunter_Preparation, CanCastFlags.NoTimer) && 
                 Runes.DemonHunter.Punishment.IsActive && Player.PrimaryResourceMissing >= 75)
             {
                 return new TrinityPower(SNOPower.DemonHunter_Preparation);
             }
+
+            // Vault
+            if (CanCast(SNOPower.DemonHunter_Vault) && !Player.IsRooted && !Player.IsIncapacitated &&
+               (Player.SecondaryResource >= (Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) ? 22 : 16)) &&
+               Settings.Combat.DemonHunter.VaultMode == DemonHunterVaultMode.MovementOnly &&
+               TimeSincePowerUse(SNOPower.DemonHunter_Vault) >= Settings.Combat.DemonHunter.VaultMovementDelay)
+            {
+                Vector3 vNewTarget = NavHelper.MainFindSafeZone(Player.Position, true);
+
+                return new TrinityPower(SNOPower.DemonHunter_Vault, 20f, vNewTarget);
+            }
+
             return null;
         }
 

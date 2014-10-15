@@ -248,9 +248,10 @@ namespace Trinity
             Set(new TVar("SpellDelay.X1_DemonHunter_EvasiveFire", 5, "Spell Use Delay/Interval, milliseconds"));
 
             // Demon Hunter
-            Set(new TVar("DemonHunter.MinEnergyReserve", 75, "DemonHunter emergency hated reserves"));
+            Set(new TVar("DemonHunter.MinEnergyReserve", 75, "DemonHunter emergency hatred reserves"));
             Set(new TVar("DemonHunter.PreperationTriggerRange", 40f, "Preperation monster trigger range"));
             Set(new TVar("DemonHunter.ClusterArrow.UseRange", 45f, "Cluster Arrow Maximum range"));
+            Set(new TVar("DemonHunter.MinPreparationDiscipline", 15, "Minimum Preparation Discipline"));
             // Monk
             Set(new TVar("Monk.Avoidance.Serenity", 0f, "Monk Serenity buff Avoidance health multiplier"));
             Set(new TVar("Monk.MinEnergyReserve", 0, "Monk emergency Spirit reserves"));
