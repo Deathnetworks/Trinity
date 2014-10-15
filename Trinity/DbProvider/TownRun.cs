@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Trinity.Config.Loot;
 using Trinity.Items;
@@ -410,23 +411,24 @@ namespace Trinity
         /// </summary>
         internal static void LogGoodItems(CachedACDItem acdItem, GItemBaseType itemBaseType, GItemType itemType, double itemValue)
         {
-            FileStream LogStream = null;
+            FileStream logStream = null;
             try
             {
                 string filePath = Path.Combine(FileManager.LoggingPath, "StashLog - " + Trinity.Player.ActorClass.ToString() + ".log");
-                LogStream = File.Open(filePath, FileMode.Append, FileAccess.Write, FileShare.Read);
+                logStream = File.Open(filePath, FileMode.Append, FileAccess.Write, FileShare.Read);
 
                 //TODO : Change File Log writing
-                using (StreamWriter LogWriter = new StreamWriter(LogStream))
+                using (StreamWriter logWriter = new StreamWriter(logStream))
                 {
                     if (!_loggedAnythingThisStash)
                     {
                         _loggedAnythingThisStash = true;
-                        LogWriter.WriteLine(DateTime.Now.ToString() + ":");
-                        LogWriter.WriteLine("====================");
+                        logWriter.WriteLine(DateTime.Now + ":");
+                        logWriter.WriteLine("====================");
                     }
                     string sLegendaryString = "";
                     bool shouldSendNotifications = false;
+
                     if (acdItem.Quality >= ItemQuality.Legendary)
                     {
                         if (!Trinity.Settings.Notification.LegendaryScoring)
@@ -434,8 +436,8 @@ namespace Trinity
                         else if (Trinity.Settings.Notification.LegendaryScoring && Trinity.CheckScoreForNotification(itemBaseType, itemValue))
                             shouldSendNotifications = true;
                         if (shouldSendNotifications)
-                            NotificationManager.AddNotificationToQueue(acdItem.RealName + " [" + itemType.ToString() +
-                                "] (Score=" + itemValue.ToString() + ". " + ValueItemStatString + ")",
+                            NotificationManager.AddNotificationToQueue(acdItem.RealName + " [" + itemType +
+                                "] (Score=" + itemValue + ". " + acdItem.AcdItem.Stats + ")",
                                 ZetaDia.Service.Hero.Name + " new legendary!", ProwlNotificationPriority.Emergency);
                         sLegendaryString = " {legendary item}";
 
@@ -443,7 +445,7 @@ namespace Trinity
                         Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "+=+=+=+=+=+=+=+=+ LEGENDARY FOUND +=+=+=+=+=+=+=+=+");
                         Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "+  Name:       {0} ({1})", acdItem.RealName, itemType);
                         Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "+  Score:       {0:0}", itemValue);
-                        Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "+  Attributes: {0}", ValueItemStatString);
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "+  Attributes: {0}", acdItem.AcdItem.Stats.ToString());
                         Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+");
                     }
                     else
@@ -452,25 +454,26 @@ namespace Trinity
                         // Check for non-legendary notifications
                         shouldSendNotifications = Trinity.CheckScoreForNotification(itemBaseType, itemValue);
                         if (shouldSendNotifications)
-                            NotificationManager.AddNotificationToQueue(acdItem.RealName + " [" + itemType.ToString() + "] (Score=" + itemValue.ToString() + ". " + ValueItemStatString + ")", ZetaDia.Service.Hero.Name + " new item!", ProwlNotificationPriority.Emergency);
+                            NotificationManager.AddNotificationToQueue(acdItem.RealName + " [" + itemType + "] (Score=" + itemValue + ". " + acdItem.AcdItem.Stats + ")", 
+                                ZetaDia.Service.Hero.BattleTagName + " new item!", ProwlNotificationPriority.Normal);
                     }
                     if (shouldSendNotifications)
                     {
-                        NotificationManager.EmailMessage.AppendLine(itemBaseType.ToString() + " - " + itemType.ToString() + " '" + acdItem.RealName + "'. Score = " + Math.Round(itemValue).ToString() + sLegendaryString)
-                            .AppendLine("  " + ValueItemStatString)
+                        NotificationManager.EmailMessage.AppendLine(itemBaseType + " - " + itemType + " '" + acdItem.RealName + "'. Score = " + Math.Round(itemValue) + sLegendaryString)
+                            .AppendLine("  " + acdItem.AcdItem.Stats)
                             .AppendLine();
                     }
-                    LogWriter.WriteLine(itemBaseType.ToString() + " - " + itemType.ToString() + " '" + acdItem.RealName + "'. Score = " + Math.Round(itemValue).ToString() + sLegendaryString);
-                    LogWriter.WriteLine("  " + ValueItemStatString);
-                    LogWriter.WriteLine("");
+                    logWriter.WriteLine(itemBaseType + " - " + itemType + " '" + acdItem.RealName + "'. Score = " + Math.Round(itemValue) + sLegendaryString);
+                    logWriter.WriteLine("  " + acdItem.AcdItem.Stats);
+                    logWriter.WriteLine("");
                 }
-                LogStream.Close();
+                logStream.Close();
             }
             catch (IOException)
             {
                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Fatal Error: File access error for stash log file.");
-                if (LogStream != null)
-                    LogStream.Close();
+                if (logStream != null)
+                    logStream.Close();
             }
         }
 
@@ -479,36 +482,36 @@ namespace Trinity
         /// </summary>
         internal static void LogJunkItems(CachedACDItem acdItem, GItemBaseType itemBaseType, GItemType itemType, double itemValue)
         {
-            FileStream LogStream = null;
+            FileStream logStream = null;
             try
             {
                 string filePath = Path.Combine(FileManager.LoggingPath, "JunkLog - " + Trinity.Player.ActorClass.ToString() + ".log");
-                LogStream = File.Open(filePath, FileMode.Append, FileAccess.Write, FileShare.Read);
-                using (StreamWriter LogWriter = new StreamWriter(LogStream))
+                logStream = File.Open(filePath, FileMode.Append, FileAccess.Write, FileShare.Read);
+                using (StreamWriter logWriter = new StreamWriter(logStream))
                 {
                     if (!_loggedJunkThisStash)
                     {
                         _loggedJunkThisStash = true;
-                        LogWriter.WriteLine(DateTime.Now.ToString() + ":");
-                        LogWriter.WriteLine("====================");
+                        logWriter.WriteLine(DateTime.Now + ":");
+                        logWriter.WriteLine("====================");
                     }
                     string isLegendaryItem = "";
                     if (acdItem.Quality >= ItemQuality.Legendary)
                         isLegendaryItem = " {legendary item}";
-                    LogWriter.WriteLine(itemBaseType.ToString() + " - " + itemType.ToString() + " '" + acdItem.RealName + "'. Score = " + itemValue.ToString("0") + isLegendaryItem);
+                    logWriter.WriteLine(itemBaseType.ToString() + " - " + itemType.ToString() + " '" + acdItem.RealName + "'. Score = " + itemValue.ToString("0") + isLegendaryItem);
                     if (JunkItemStatString != "")
-                        LogWriter.WriteLine("  " + JunkItemStatString);
+                        logWriter.WriteLine("  " + JunkItemStatString);
                     else
-                        LogWriter.WriteLine("  (no scorable attributes)");
-                    LogWriter.WriteLine("");
+                        logWriter.WriteLine("  (no scorable attributes)");
+                    logWriter.WriteLine("");
                 }
-                LogStream.Close();
+                logStream.Close();
             }
             catch (IOException)
             {
                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Fatal Error: File access error for junk log file.");
-                if (LogStream != null)
-                    LogStream.Close();
+                if (logStream != null)
+                    logStream.Close();
             }
         }
 
