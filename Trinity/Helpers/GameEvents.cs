@@ -113,9 +113,9 @@ namespace Trinity
             ClearCachesOnGameChange(sender, e);
 
             // reload the profile juuuuuuuuuuuust in case Demonbuddy missed it... which it is known to do on disconnects
-            string currentProfilePath = ProfileManager.CurrentProfile.Path;
-            ProfileManager.Load(currentProfilePath);
-            Navigator.SearchGridProvider.Update();
+            //string currentProfilePath = ProfileManager.CurrentProfile.Path;
+            //ProfileManager.Load(currentProfilePath);
+            //Navigator.SearchGridProvider.Update();
             ResetEverythingNewGame();
             UsedProfileManager.SetProfileInWindowTitle();
         }

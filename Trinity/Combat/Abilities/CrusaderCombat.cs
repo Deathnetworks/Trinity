@@ -241,7 +241,7 @@ namespace Trinity.Combat.Abilities
             // Buffs
             if (UseOOCBuff)
             {
-                if (CanCast(SNOPower.X1_Crusader_SteedCharge) && CrusaderSettings.SteedChargeOOC)
+                if (CanCast(SNOPower.X1_Crusader_SteedCharge) && CrusaderSettings.SteedChargeOOC && ZetaDia.Me.Movement.SpeedXY > 0)
                 {
                     return new TrinityPower(SNOPower.X1_Crusader_SteedCharge);
                 }
