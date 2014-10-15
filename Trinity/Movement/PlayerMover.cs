@@ -523,11 +523,7 @@ namespace Trinity.DbProvider
                     return;
                 }
 
-                bool hasTacticalAdvantage = HotbarSkills.PassiveSkills.Any(s => s == SNOPower.DemonHunter_Passive_TacticalAdvantage);
-                bool hasDoubleDanettas = Sets.DanettasHatred.IsFirstBonusActive;
-                bool TacticalAndDanettas = (hasTacticalAdvantage && !hasDoubleDanettas);
-                int vaultDelay = TacticalAndDanettas ? 2000 : Trinity.Settings.Combat.DemonHunter.VaultMovementDelay;
-
+                int vaultDelay = Trinity.Settings.Combat.DemonHunter.VaultMovementDelay;
                 // DemonHunter Vault
                 if (Trinity.Hotbar.Contains(SNOPower.DemonHunter_Vault) && Trinity.Settings.Combat.DemonHunter.VaultMode != DemonHunterVaultMode.CombatOnly &&
                     CombatBase.TimeSincePowerUse(SNOPower.DemonHunter_Vault) > vaultDelay &&
