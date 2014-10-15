@@ -904,14 +904,15 @@ namespace Trinity.ItemRules
             itemDic.Add("[ARCANEDMG%]", item.Stats.ArcaneSkillDamagePercentBonus);
             itemDic.Add("[HOLYDMG%]", item.Stats.HolySkillDamagePercentBonus);
 
-            itemDic.Add("[PHYSDMG%]", item.Stats.SkillDamagePercentBonus);
+            itemDic.Add("[PHYSDMG%]", item.Stats.PhysicalSkillDamagePercentBonus);
 
             itemDic.Add("[ELEMDMG%]", new float[] { item.Stats.FireSkillDamagePercentBonus,
                                                     item.Stats.LightningSkillDamagePercentBonus,
                                                     item.Stats.ColdSkillDamagePercentBonus,
                                                     item.Stats.PosionSkillDamagePercentBonus,
                                                     item.Stats.ArcaneSkillDamagePercentBonus,
-                                                    item.Stats.HolySkillDamagePercentBonus }.Max());
+                                                    item.Stats.HolySkillDamagePercentBonus,
+                                                    item.Stats.PhysicalSkillDamagePercentBonus }.Max());
 
             itemDic.Add("[SKILLDMG%]", SkillBySlot.GetSkillDamagePercent(item));
 
