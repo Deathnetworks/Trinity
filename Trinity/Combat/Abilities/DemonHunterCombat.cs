@@ -421,12 +421,23 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.DemonHunter_Chakram);
             }
 
-            // Preperation
-            if (CanCast(SNOPower.DemonHunter_Preparation, CanCastFlags.NoTimer) && Settings.Combat.DemonHunter.SpamPreparation)
+            // Preparation, restore Disc if needed
+            int discRestored = Runes.DemonHunter.FocusedMind.IsActive ? 45 : 30;
+            float useDelay = Runes.DemonHunter.FocusedMind.IsActive ? 15000 : 500;
+            if (CanCast(SNOPower.DemonHunter_Preparation, CanCastFlags.NoTimer) &&
+            Player.SecondaryResourceMissing >= discRestored &&
+            !Runes.DemonHunter.Punishment.IsActive && 
+            TimeSincePowerUse(SNOPower.DemonHunter_Preparation) >= useDelay)
             {
                 return new TrinityPower(SNOPower.DemonHunter_Preparation);
             }
 
+            // Preparation: Punishment
+            if (CanCast(SNOPower.DemonHunter_Preparation, CanCastFlags.NoTimer) && Settings.Combat.DemonHunter.SpamPreparation && 
+                Runes.DemonHunter.Punishment.IsActive && Player.PrimaryResourceMissing >= 75)
+            {
+                return new TrinityPower(SNOPower.DemonHunter_Preparation);
+            }
             return null;
         }
 
