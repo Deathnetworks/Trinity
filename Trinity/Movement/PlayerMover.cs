@@ -525,6 +525,7 @@ namespace Trinity.DbProvider
                 }
                 #endregion
 
+                #region Demonhunter
                 int vaultDelay = Trinity.Settings.Combat.DemonHunter.VaultMovementDelay;
 
                 if (Trinity.Hotbar.Contains(SNOPower.DemonHunter_Vault) && Trinity.Settings.Combat.DemonHunter.VaultMode != DemonHunterVaultMode.CombatOnly &&
