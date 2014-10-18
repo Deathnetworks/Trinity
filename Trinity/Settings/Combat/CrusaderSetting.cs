@@ -9,6 +9,7 @@ namespace Trinity.Config.Combat
         #region Fields
         private bool _spamPhalanx;
         private bool _SpamAkarats;
+        private bool _SpamLawsOfValor;
         private int _TauntAoECount;
         private int _SweepAttackAoECount;
         private int _JudgmentAoECount;
@@ -115,6 +116,25 @@ namespace Trinity.Config.Combat
                 }
             }
         }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool SpamLawsOfValor
+        {
+            get
+            {
+                return _SpamLawsOfValor;
+            }
+            set
+            {
+                if (_SpamLawsOfValor != value)
+                {
+                    _SpamLawsOfValor = value;
+                    OnPropertyChanged("SpamLawsOfValor");
+                }
+            }
+        }
+
         [DataMember(IsRequired = false)]
         [DefaultValue(5)]
         public int ProvokeAoECount

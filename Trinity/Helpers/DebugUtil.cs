@@ -112,7 +112,7 @@ namespace Trinity.Helpers
 
             });
         
-            Logger.Log(level, LogCategory.UserInformation, "------ Active Skills / Runes ------", ActiveUtils.Active.Count, ActiveUtils.Active.Count);
+            Logger.Log(level, LogCategory.UserInformation, "------ Active Skills / Runes ------", SkillUtils.Active.Count, SkillUtils.Active.Count);
 
             Action<Skill> logSkill = s =>
             {
@@ -123,9 +123,9 @@ namespace Trinity.Helpers
                 );
             };
 
-            ActiveUtils.Active.ForEach(logSkill);
+            SkillUtils.Active.ForEach(logSkill);
 
-            Logger.Log(level, LogCategory.UserInformation, "------ Passives ------", ActiveUtils.Active.Count, ActiveUtils.Active.Count);
+            Logger.Log(level, LogCategory.UserInformation, "------ Passives ------", SkillUtils.Active.Count, SkillUtils.Active.Count);
 
             Action<Passive> logPassive = p => Logger.Log(level, LogCategory.UserInformation, "Passive: {0}", p.Name);
 

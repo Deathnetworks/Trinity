@@ -150,12 +150,14 @@ namespace Trinity.Items
             if (DataDictionary.VanityItems.Any(i => item.InternalName.StartsWith(i)))
                 return false;
 
-            if (Trinity.Settings.Loot.TownRun.KeepTieredLootRunKeysInBackpack && item.ItemType == ItemType.KeystoneFragment && item.TieredLootRunKeyLevel >= 1)
-                return false;
-            if (Trinity.Settings.Loot.TownRun.KeepTrialLootRunKeysInBackpack && item.ItemType == ItemType.KeystoneFragment && item.TieredLootRunKeyLevel == 0)
-                return false;
-            if (Trinity.Settings.Loot.TownRun.KeepRiftKeysInBackpack && item.ItemType == ItemType.KeystoneFragment && item.TieredLootRunKeyLevel <= -1)
-                return false;
+            if (item.ItemType == ItemType.KeystoneFragment)
+            {
+                if ((Trinity.Settings.Loot.TownRun.KeepTieredLootRunKeysInBackpack && item.TieredLootRunKeyLevel >= 1) ||
+                (Trinity.Settings.Loot.TownRun.KeepTrialLootRunKeysInBackpack && item.TieredLootRunKeyLevel == 0) ||
+                (Trinity.Settings.Loot.TownRun.KeepRiftKeysInBackpack && item.TieredLootRunKeyLevel <= -1))
+                    return false;
+                return true;
+            } 
 
             if (Trinity.Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy)
             {
@@ -712,6 +714,20 @@ namespace Trinity.Items
 
                         int row = item.InventoryRow;
                         int col = item.InventoryColumn;
+
+                        if (row < 0 || row > 5)
+                        {
+                            Logger.LogError("Item {0} ({1}) is reporting invalid backpack row of {2}!", 
+                                item.Name, item.InternalName, item.InventoryRow);
+                            continue;
+                        }
+
+                        if (row < 0 || row > 9)
+                        {
+                            Logger.LogError("Item {0} ({1}) is reporting invalid backpack column of {2}!", 
+                                item.Name, item.InternalName, item.InventoryColumn);
+                            continue;
+                        }
 
                         // Slot is already protected, don't double count
                         if (!backpackSlotBlocked[col, row])

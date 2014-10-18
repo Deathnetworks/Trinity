@@ -182,6 +182,7 @@ namespace Trinity
         private static readonly HashSet<int> neverTownPortalLevelAreaIds = new HashSet<int>()
         {
             202446, // A1 New Tristram "Attack Area"
+            19947, // A1 New Tristram "Attack Area"
 
             284069, // A5 Westmarch Overlook
             308323, // A5 Westmarch Wolf Gate
@@ -669,7 +670,7 @@ namespace Trinity
         /// </summary>
         public static HashSet<int> GoblinIds { get { return goblinIds; } }
         private static readonly HashSet<int> goblinIds = new HashSet<int> {
-            5984, 5985, 5987, 5988
+            5984, 5985, 5987, 5988, 405186, 380657
          };
 
         /// <summary>
@@ -684,6 +685,7 @@ namespace Trinity
             62736, 130794, // demon flyer
             5508, // succubus 
             5388, 4286, 256015, 256000, 255996,
+            5984, 5985, 5987, 5988, 405186, //goblins
        };
         // A list of bosses in the game, just to make CERTAIN they are treated as elites
         /// <summary>
@@ -709,6 +711,7 @@ namespace Trinity
             144001, 144003, 143996, 143994, 
             // Jondar, Chancellor, Queen Araneae (act 1 dungeons), Skeleton King, Butcher
             86624, 156353, 51341, 5350, 3526,
+            361347, //Jondar from the Adventure mode
             215103, // Istaku            
             4630, // Rakanoth
             256015, // Xah'Rith Keywarden
@@ -718,8 +721,9 @@ namespace Trinity
             84919, // Skelton King
             108444, // ZombieFemale_A_TristramQuest (Wretched Mothers)
             176889, // ZombieFemale_Unique_WretchedQueen
-
+            129439, //Arsect The Venomous
             164502, // sandMonster_A_Head_Guardian
+            378665, // Greed
 
             // A5
             316839, // x1_deathOrb_bodyPile
@@ -755,7 +759,7 @@ namespace Trinity
 
         public static HashSet<int> ZombieDogIds { get { return zombieDogIds; } }
         private static readonly HashSet<int> zombieDogIds = new HashSet<int> { 
-            110959, 103235, 103215, 105763, 103217, 51353 
+            110959, 103235, 103215, 105763, 103217, 51353, 
         };
 
         public static HashSet<int> DemonHunterPetIds { get { return demonHunterPetIds; } }
@@ -765,12 +769,16 @@ namespace Trinity
             133741, 
             159144, 
             181748, 
-            159098 
+            159098,
+            159102,
+            159144,
+            334861,
+
         };
 
         public static HashSet<int> DemonHunterSentryIds { get { return demonHunterSentryIds; } }
         private static readonly HashSet<int> demonHunterSentryIds = new HashSet<int> { 
-            141402
+           141402, 150025, 150024, 168815, 150026, 150027,
         };
 
         public static HashSet<int> WizardHydraIds { get { return wizardHydraIds; } }
@@ -896,6 +904,10 @@ namespace Trinity
             225252, // Shamanic Ward - Revenge of Gharbad bounty
 
             331397, // x1_westm_Graveyard_Floor_Sarcophagus_Undead_Husband_Event           
+
+            386274, // Tgoblin_Gold_Pile_C
+
+            211861, //Pinata
         };
 
         public static HashSet<int> GoblinDestructibles { get { return forceDestructibles; } }

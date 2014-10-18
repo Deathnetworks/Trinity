@@ -7,7 +7,7 @@ using Trinity.Objects;
 namespace Trinity.Reference
 {
     public class Sets : FieldCollection<Sets, Set>
-    {    
+    {
 
         public static Set ThousandStorms = new Set
         {
@@ -91,7 +91,7 @@ namespace Trinity.Reference
         {
             Name = "Might of the Earth",
             Items = new List<Item>
-            {                
+            {
                 //Eyes of the Earth
                 //Pull of the Earth
                 //Spires of the Earth
@@ -371,12 +371,12 @@ namespace Trinity.Reference
             Name = "Armor of Akkhan",
             Items = new List<Item>
             {
+                Legendary.BreastplateOfAkkhan,  
                 Legendary.CuissesOfAkkhan,
                 Legendary.GauntletsOfAkkhan,
                 Legendary.HelmOfAkkhan,
                 Legendary.PauldronsOfAkkhan,
-                Legendary.SabatonsOfAkkhan,    
-                Legendary.BreastplateOfAkkhan    
+                Legendary.SabatonsOfAkkhan
             },
             FirstBonusItemCount = 2,
             SecondBonusItemCount = 4,
@@ -521,7 +521,7 @@ namespace Trinity.Reference
         {
             get
             {
-                return ToList().Where(s => s.IsEquipped).ToList();                 
+                return ToList().Where(s => s.IsEquipped).ToList();
             }
         }
 
