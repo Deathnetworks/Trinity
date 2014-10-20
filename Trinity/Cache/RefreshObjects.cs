@@ -425,10 +425,12 @@ namespace Trinity
 
                 foreach (var marker in legendaryItemMarkers)
                 {
+                    var name = (marker.MinimapTexture == setItemMarkerTexture ? "Set Item" : "Legendary Item") + " Minimap Marker";
+                    Logger.LogDebug(LogCategory.CacheManagement, "Adding Legendary minimap Marker {0} {1}", name, marker.NameHash);
                     ObjectCache.Add(new TrinityCacheObject()
                     {
                         Position = marker.Position,
-                        InternalName = (marker.MinimapTexture == setItemMarkerTexture ? "Set Item" : "Legendary Item") + " Minimap Marker",
+                        InternalName = name,
                         RActorGuid = marker.NameHash,
                         Distance = marker.Position.Distance(Player.Position),
                         ActorType = ActorType.Item,
@@ -440,10 +442,14 @@ namespace Trinity
 
                 if (legendaryItemMarkers.Any() && TrinityItemManager.FindValidBackpackLocation(true) != new Vector2(-1, -1))
                 {
-                    var legendaryItems = ZetaDia.Actors.GetActorsOfType<DiaItem>().Where(i => i.IsValid && i.IsACDBased && i.Position.Distance2D(ZetaDia.Me.Position) < 5f && legendaryItemMarkers.Any(im => i.Position.Distance2D(i.Position) < 2f));
+                    var legendaryItems = ZetaDia.Actors.GetActorsOfType<DiaItem>().Where(i => i.IsValid && i.IsACDBased && i.Position.Distance2D(ZetaDia.Me.Position) < 5f && 
+                        legendaryItemMarkers.Any(im => i.Position.Distance2D(i.Position) < 2f));
 
                     foreach (var diaItem in legendaryItems)
                     {
+                        Logger.LogDebug(LogCategory.CacheManagement, "Adding Legendary Item from Marker {0} dist={1} ActorSNO={2} ACD={3} RActor={4}", 
+                            diaItem.Name, diaItem.Distance, diaItem.ActorSNO, diaItem.ACDGuid, diaItem.RActorGuid);
+
                         ObjectCache.Add(new TrinityCacheObject()
                         {
                             Position = diaItem.Position,
@@ -475,6 +481,7 @@ namespace Trinity
 
                 foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(riftGuardianMarkerFunc))
                 {
+                    Logger.LogDebug(LogCategory.CacheManagement, "Adding Rift Guardian POI, distance {0}", marker.Position.Distance2D(Player.Position));
                     ObjectCache.Add(new TrinityCacheObject()
                     {
                         Position = marker.Position,
@@ -728,9 +735,6 @@ namespace Trinity
 
                 // Flag for if we should search for an avoidance spot or not
                 _standingInAvoidance = false;
-
-                // Highest weight found as we progress through, so we can pick the best target at the end (the one with the highest weight)
-                HighestWeightFound = 0;
 
                 // Here's the list we'll use to store each object
                 ObjectCache = new List<TrinityCacheObject>();

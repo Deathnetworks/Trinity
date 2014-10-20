@@ -118,6 +118,8 @@ namespace Trinity.Combat
 
             Trinity.Hotbar = new List<SNOPower>();
 
+            CPlayer cPlayer = CPlayer;
+
             for (int i = 0; i <= 5; i++)
             {
                 SNOPower power = cPlayer.GetPowerForSlot((HotbarSlot)i);
@@ -150,7 +152,7 @@ namespace Trinity.Combat
                 {
                     Power = p,
                     Slot = GetHotbarSlotFromPower(p),
-                    RuneIndex = GetRuneIndexFromPower(p)
+                    RuneIndex = GetRuneIndexFromPower(p, cPlayer)
                 });
             }
 
@@ -196,7 +198,7 @@ namespace Trinity.Combat
         /// </summary>
         /// <param name="power"></param>
         /// <returns></returns>
-        private static int GetRuneIndexFromPower(SNOPower power)
+        private static int GetRuneIndexFromPower(SNOPower power, CPlayer cPlayer)
         {
             const int runeIndex = -999;
             HotbarSlot slot = GetHotbarSlotFromPower(power);
@@ -217,7 +219,7 @@ namespace Trinity.Combat
             return Trinity.Hotbar[(int)slot];
         }
 
-        private static CPlayer cPlayer { get { return ZetaDia.CPlayer; } }
+        private static CPlayer CPlayer { get { return ZetaDia.CPlayer; } }
 
     }
 
