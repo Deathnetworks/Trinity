@@ -4,7 +4,7 @@ namespace Trinity.Technicals
     /// <summary>
     /// Enumerate severity level for logging 
     /// </summary>
-    internal enum TrinityLogLevel
+    public enum TrinityLogLevel
     {
         Error = 4,
         Info = 3,

@@ -1,35 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
-using Buddy.Coroutines;
-using Trinity.Combat.Abilities;
+using Trinity.Configuration;
 using Trinity.DbProvider;
-using Trinity.Objects;
-using Trinity.Reference;
+using Trinity.Technicals;
+using Zeta.Bot;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Game;
-using Zeta.Game.Internals.Actors;
 using Zeta.TreeSharp;
 using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.Combat
 {
-
     public delegate bool CombatMovementCondition(CombatMovement movement);
     public delegate void CombatMovementUpdateDelegate(CombatMovement movement);
 
+    /// <summary>
+    /// Executed by HandleTarget when added to CombatMovement.Queue();
+    /// </summary>
     public class CombatMovement
     {
-        /// <summary>
-        /// Executed by HandleTarget when added to CombatMovement.Queue();
-        /// </summary>
-        public CombatMovement()
-        {
-            AcceptableDistance = 5;
-        }
-
         /// <summary>
         /// A friendly name to identify this SpecialMovement
         /// </summary>
@@ -39,11 +32,6 @@ namespace Trinity.Combat
         /// Destination where this SpecialMovement will move to
         /// </summary>
         public Vector3 Destination { get; set; }
-
-        /// <summary>
-        /// How close it should get to the destination before considering the destination reached
-        /// </summary>
-        public float AcceptableDistance { get; set; }
 
         /// <summary>
         /// Executed directly after moving, will stop SpecialMovement if true is returned
@@ -60,15 +48,30 @@ namespace Trinity.Combat
         /// </summary>
         public CombatMovementUpdateDelegate OnFinished { get; set; }
 
+        /// <summary>
+        /// Optional Options to further customize the movement
+        /// </summary>
+        public CombatMovementOptions Options = new CombatMovementOptions();
+
+        /// <summary>
+        /// The position of player when movement started
+        /// </summary>
         public Vector3 StartPosition { get; set; }
+
+        /// <summary>
+        /// Status is updated every tick and passed to OnUpdate() and OnFinished() events
+        /// </summary>
         public CombatMovementStatus Status { get; set; }
-        public DateTime LastUsed { get; set; }
-        public bool Verbose { get; set; }
+
+        public DateTime LastFinishedTime { get; set; }
+        public DateTime LastStartedTime { get; set; }
 
         public override int GetHashCode()
         {
-            return Name.GetHashCode() ^ Destination.GetHashCode();
+            return Name.GetHashCode();
         }
+
+
     }
 
     public class CombatMovementStatus
@@ -79,54 +82,96 @@ namespace Trinity.Combat
         public double ChangeInDistance { get; set; }
     }
 
-    public class CombatMovementManager
+    public class CombatMovementOptions
     {
+        public CombatMovementOptions ()
+        {
+            FailureBlacklistSeconds = 1.5;
+            SuccessBlacklistSeconds = 0;
+            ChangeInDistanceLimit = 2f;
+            TimeBeforeBlocked = 500;
+            Logging = LogLevel.Info;
+            AcceptableDistance = 8f;
+            MaxDistance = 150f;
+        }
+
         /// <summary>
         /// Change in distance since last move tick
         /// </summary>
-        public float DistanceChangeLimit { get; set; }
+        public float ChangeInDistanceLimit { get; set; }
 
         /// <summary>
-        /// Time below the DistanceChangeLimit before considered blocked
+        /// Time in Milliseconds below the ChangeInDistance setting to be 'blocked'
         /// </summary>
-        public double TimeToConsiderBlocked { get; set; }
+        public double TimeBeforeBlocked { get; set; }
 
         /// <summary>
         /// Duration movements are blacklisted from re-queue after Blocked or failed MoveResult
         /// </summary>
-        public int FailureBlacklistSeconds { get; set; }
+        public double FailureBlacklistSeconds { get; set; }
+        public int SuccessBlacklistSeconds { get; set; }
 
-        private Queue<CombatMovement> InternalQueue { get; set; }
+        /// <summary>
+        /// How detailed the logging will be
+        /// </summary>
+        public LogLevel Logging { get; set; }
+
+        /// <summary>
+        /// How close it should get to the destination before considering the destination reached
+        /// </summary>
+        public float AcceptableDistance { get; set; }
+
+        /// <summary>
+        /// How far away the destination is allowed to be
+        /// </summary>
+        public double MaxDistance { get; set; }
+
+
+    }
+    
+    public class CombatMovementManager
+    {
         private CombatMovement CurrentMovement { get; set; }
-        private List<CombatMovement> Blacklist { get; set; }
-        private CombatMovementStatus Status { get; set; }
-        private bool _isBlocked;
+        private readonly Queue<CombatMovement> _internalQueue = new Queue<CombatMovement>();
+        private readonly List<CombatMovement> _blacklist = new List<CombatMovement>();
+        private readonly CombatMovementStatus _status = new CombatMovementStatus();
+        private CombatMovementOptions _options = new CombatMovementOptions();
 
-        public CombatMovementManager()
+        public void Queue(CombatMovement movement)
         {
-            FailureBlacklistSeconds = 5;
-            DistanceChangeLimit = 1.5f;
-            TimeToConsiderBlocked = 750;
-            Blacklist = new List<CombatMovement>();
-            InternalQueue = new Queue<CombatMovement>();
-            Status = new CombatMovementStatus();
+            if (movement != null && !IsBlacklisted(movement))
+            {
+                _internalQueue.Enqueue(movement);
+
+                if (movement.Options.Logging >= LogLevel.Info)
+                    LogLocation("Queueing", movement);
+            }
         }
 
         public RunStatus Execute()
-        {
-            if (!IsQueuedMovement) return RunStatus.Failure;
+        {           
+            if (!IsQueuedMovement) 
+                return RunStatus.Failure;
 
             if (CurrentMovement == null)
-                CurrentMovement = InternalQueue.Dequeue();
+            {                
+                CurrentMovement = _internalQueue.Dequeue();
+                CurrentMovement.StartPosition = ZetaDia.Me.Position;
+                CurrentMovement.LastStartedTime = DateTime.UtcNow;
+                Stuck.Reset();
+            }
+
+            _options = CurrentMovement.Options;
 
             if (CurrentMovement.OnUpdate != null)
                 CurrentMovement.OnUpdate.Invoke(CurrentMovement);
 
-            Status.LastStatus = PlayerMover.NavigateTo(CurrentMovement.Destination, CurrentMovement.Name);
-            Status.DistanceToObjective = ZetaDia.Me.Position.Distance(CurrentMovement.Destination);
-            Status.ChangeInDistance = Status.LastPosition.Distance(CurrentMovement.Destination) - Status.DistanceToObjective;
-            Status.LastPosition = ZetaDia.Me.Position;
-            CurrentMovement.Status = Status;
+            _status.LastStatus = PlayerMover.NavigateTo(CurrentMovement.Destination, CurrentMovement.Name);
+            _status.DistanceToObjective = ZetaDia.Me.Position.Distance(CurrentMovement.Destination);
+            _status.ChangeInDistance = _status.LastPosition.Distance(CurrentMovement.Destination) - _status.DistanceToObjective;
+            _status.LastPosition = ZetaDia.Me.Position;
+
+            CurrentMovement.Status = _status;
 
             if (CurrentMovement.StopCondition != null &&
                 CurrentMovement.StopCondition.Invoke(CurrentMovement))
@@ -135,31 +180,31 @@ namespace Trinity.Combat
                 return RunStatus.Failure;
             }
 
-            if (IsBlocked)
+            if (Stuck.IsStuck(_options.ChangeInDistanceLimit,_options.TimeBeforeBlocked))
             {
-                FailedHandler("Blocked");
+                FailedHandler("Blocked " + Stuck.LastLogMessage);
                 return RunStatus.Failure;
             }
 
-            if (Status.DistanceToObjective < CurrentMovement.AcceptableDistance)
+            if (_status.DistanceToObjective < _options.AcceptableDistance)
             {
-                SuccessHandler("AcceptableDistance");
+                SuccessHandler(string.Format("AcceptableDistance: {0}", _options.AcceptableDistance));
                 return RunStatus.Success;
             }
 
-            if (HasRecentlyFailed(CurrentMovement))
+            if (IsBlacklisted(CurrentMovement))
             {
                 FailedHandler("RecentlyFailed");
                 return RunStatus.Success;
             }
 
-            if (Status.DistanceToObjective > 100)
+            if (_status.DistanceToObjective > _options.MaxDistance)
             {
-                FailedHandler("MaxDistance");
+                FailedHandler(string.Format("MaxDistance: {0}", _options.MaxDistance));
                 return RunStatus.Success;
             }
 
-            switch (Status.LastStatus)
+            switch (_status.LastStatus)
             {
                 case MoveResult.ReachedDestination:
                     SuccessHandler();
@@ -177,60 +222,42 @@ namespace Trinity.Combat
 
         }
 
-        private bool IsBlocked
-        {
-            get
-            {
-                if (Status.ChangeInDistance < DistanceChangeLimit && !_isBlocked)
-                {
-                    _isBlocked = true;
-                    BlockedSince = DateTime.UtcNow;
-                }
-
-                if (Status.ChangeInDistance >= DistanceChangeLimit && _isBlocked)
-                    _isBlocked = false;
-
-                if (_isBlocked && TimeSinceBlocked >= TimeToConsiderBlocked)
-                {
-                    _isBlocked = false;
-                    return true;
-                }
-
-                return false;
-            }
-
-        }
-
+        /// <summary>
+        /// CombatMovement is finished successfully - arrived at destination.
+        /// </summary>
+        /// <param name="reason"></param>
         public void SuccessHandler(string reason = "")
         {
-            if (CurrentMovement.Verbose)
+            if (CurrentMovement.Options.Logging >= LogLevel.Info)
             {
                 var location = (!string.IsNullOrEmpty(reason) ? "(" + reason + ")" : reason);
                 LogLocation("Arrived at " + location, CurrentMovement);
             }
+
+            if (CurrentMovement.Options.SuccessBlacklistSeconds > 0 && !_blacklist.Contains(CurrentMovement))
+                _blacklist.Add(CurrentMovement);
+
             FinishedHandler();
         }
 
+        /// <summary>
+        /// CombatMovement is in progress
+        /// </summary>
         public void MovedHandler()
         {
-            if (CurrentMovement.Verbose)
-                LogLocation("Moving to", CurrentMovement);
+            //if (CurrentMovement.Options.Logging >= LogLevel.Debug)
+            LogLocation("Moving to", CurrentMovement, Stuck.LastLogMessage, TrinityLogLevel.Verbose);
         }
 
-        public void FinishedHandler()
-        {
-            if (CurrentMovement.OnFinished != null)
-                CurrentMovement.OnFinished.Invoke(CurrentMovement);
-
-            CurrentMovement = null;
-        }
-
+        /// <summary>
+        /// CombatMovement was a dismal failure.
+        /// </summary>
         public void FailedHandler(string reason = "")
         {
-            if (!Blacklist.Contains(CurrentMovement))
-                Blacklist.Add(CurrentMovement);
+            if (!_blacklist.Contains(CurrentMovement))
+                _blacklist.Add(CurrentMovement);
 
-            if (CurrentMovement.Verbose)
+            if (CurrentMovement.Options.Logging >= LogLevel.Debug)
             {
                 var location = (!string.IsNullOrEmpty(reason) ? "(" + reason + ") " : reason);
                 LogLocation("Failed " + location + "moving to ", CurrentMovement);
@@ -238,57 +265,104 @@ namespace Trinity.Combat
             FinishedHandler();
         }
 
-        public void LogLocation(string pre, CombatMovement movement)
+        /// <summary>
+        /// Common tidy-up after finishing
+        /// </summary>
+        public void FinishedHandler()
         {
-            Logger.LogNormal(pre + " {0} Distance={4:0.##} ({1:0.##},{2:0.##},{3:0.##})",
+            CurrentMovement.LastFinishedTime = DateTime.UtcNow;
+
+            if (CurrentMovement.OnFinished != null)
+                CurrentMovement.OnFinished.Invoke(CurrentMovement);
+
+            CurrentMovement = null;
+        }
+
+        public void LogLocation(string pre, CombatMovement movement, string post = "", TrinityLogLevel level = TrinityLogLevel.Info)
+        {
+            Logger.Log(level, LogCategory.Movement, pre + " {0} Distance={4:0.#} ({1:0.#},{2:0.#},{3:0.#}) {5}",
                 movement.Name,
                 movement.Destination.X,
                 movement.Destination.Y,
                 movement.Destination.Z,
-                ZetaDia.Me.Position.Distance(movement.Destination));
-        }
-
-        public void Queue(CombatMovement movement)
-        {
-            if (HasRecentlyFailed(movement))
-            {
-                Logger.LogNormal("Discarding Queue (recently failed)");
-            }
-            else
-            {
-                movement.StartPosition = ZetaDia.Me.Position;
-                movement.LastUsed = DateTime.UtcNow;
-                LogLocation("Queueing", movement);
-                InternalQueue.Enqueue(movement);
-            }
+                ZetaDia.Me.Position.Distance(movement.Destination),
+                post);
         }
 
         public bool IsQueuedMovement
         {
-            get
+            get { return _internalQueue.Count > 0 || CurrentMovement != null; }
+        }
+
+        public bool IsBlacklisted(CombatMovement movement)
+        {
+            _blacklist.RemoveAll(m => DateTime.UtcNow.Subtract(m.LastFinishedTime).TotalSeconds > m.Options.FailureBlacklistSeconds);
+            return _blacklist.Any(m => m.Name == movement.Name);
+        }
+
+        public static class Stuck
+        {
+            static Stuck()
             {
-                return InternalQueue.Count > 0 || CurrentMovement != null;
+                Pulsator.OnPulse += (sender, args) => Pulse();
+            }
+
+            private static bool _isMoving;
+            private static Vector3 _lastPosition = Vector3.Zero;
+            public static float ChangeInDistance { get; set; }
+            private const int MaxPossibleDistanceTravelled = 200;
+            static readonly Stopwatch StuckTime = new Stopwatch();
+            private static string _log;
+
+            private static void Pulse()
+            {
+                ChangeInDistance = _lastPosition.Distance(ZetaDia.Me.Position);
+                _lastPosition = ZetaDia.Me.Position;
+                IsStuck();
+            }
+
+            public static double StuckElapsedMilliseconds
+            {
+                get { return StuckTime.ElapsedMilliseconds; }
+            }
+
+            public static string LastLogMessage
+            {
+                get { return _log; }
+            }
+            
+            public static bool IsStuck(float changeInDistanceLimit = 2.5f, double stuckTimeLimit = 500)
+            {
+                if (ChangeInDistance < MaxPossibleDistanceTravelled && ChangeInDistance < changeInDistanceLimit * ZetaDia.Me.MovementScalar)
+                {
+                    if (_isMoving)
+                    {
+                        Reset();
+                        StuckTime.Start();
+                    }
+                    _isMoving = false;
+                }
+                else
+                {
+                    Reset();
+                }
+
+                _log = string.Format("Speed={0:0.#}/{1:0.#} StuckTime={2:0.#}/{3:0.#}", ChangeInDistance, changeInDistanceLimit * ZetaDia.Me.MovementScalar, StuckTime.ElapsedMilliseconds, stuckTimeLimit);
+                
+                var stuck = !_isMoving && StuckTime.ElapsedMilliseconds >= stuckTimeLimit;
+
+                return stuck;
+            }
+
+            public static void Reset()
+            {
+                StuckTime.Stop();
+                StuckTime.Reset();
+                _isMoving = true;
             }
         }
-
-        public bool HasRecentlyFailed(CombatMovement movement)
-        {
-            return RecentlyFailed.Any(m => m.Name == movement.Name);
-        }
-
-        public List<CombatMovement> RecentlyFailed
-        {
-            get
-            {
-                Blacklist.RemoveAll(m => DateTime.UtcNow.Subtract(m.LastUsed).TotalSeconds > FailureBlacklistSeconds);
-                return Blacklist;
-            }
-        }
-
-        public DateTime BlockedSince = DateTime.MinValue;
-        public double TimeSinceBlocked { get { return DateTime.UtcNow.Subtract(BlockedSince).TotalMilliseconds; } }
-
-
     }
+
+
 
 }

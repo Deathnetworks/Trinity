@@ -53,6 +53,11 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
                 }
 
+                // Soul harvest at current location while avoiding
+                if (Sets.RaimentOfTheJadeHarvester.IsMaxBonusActive && MinimumSoulHarvestCriteria(Enemies.BestCluster))
+                {
+                    Skills.WitchDoctor.SoulHarvest.Cast();
+                }
             }
 
             // Incapacitated or Rooted
@@ -172,35 +177,6 @@ namespace Trinity.Combat.Abilities
                 bool hasVengefulSpirit = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SoulHarvest && s.RuneIndex == 4);
                 bool hasSwallowYourSoul = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SoulHarvest && s.RuneIndex == 3);
 				
-				//START Tiklandian Visage ----------------------------------------------------------------------
-				if (Legendary.TiklandianVisage.IsEquipped)
-                {
-                    // Piranhas
-                    if (CanCast(SNOPower.Witchdoctor_Piranhas) && Player.PrimaryResource >= 250 &&
-                        (TargetUtil.ClusterExists(15f, 45f) || TargetUtil.AnyElitesInRange(45f)) &&
-                        LastPowerUsed != SNOPower.Witchdoctor_Piranhas &&
-                        Player.PrimaryResource >= 250)
-                    {
-                        return new TrinityPower(SNOPower.Witchdoctor_Piranhas, 25f, Enemies.BestCluster.Position);
-                    }
-					
-					//Cast Horrify before we go into the fray
-					if (CanCast(SNOPower.Witchdoctor_Horrify))
-					{
-						return new TrinityPower(SNOPower.Witchdoctor_Horrify);
-					}
-
-                    // Should we move to cluster for harvest
-                    if (TikHorrifyCriteria(Enemies.BestLargeCluster))
-                    {
-                        //LogTargetArea("--- Found a good harvest location...", Enemies.BestLargeCluster);
-                        MoveToHorrifyPoint(Enemies.BestLargeCluster);
-                    }
-
-				}
-
-                // END Tiklandian Visage ----------------------------------------------------------------------   
-
                 // START Jade Harvester -----------------------------------------------------------------------
 
                 if (Sets.RaimentOfTheJadeHarvester.IsMaxBonusActive)
@@ -288,6 +264,33 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // END Jade Harvester -----------------------------------------------------------------------
+
+                // Tiklandian Visage ----------------------------------------------------------------------
+                // Constantly casts Horrify and moves the middle of clusters
+
+                if (Legendary.TiklandianVisage.IsEquipped)
+                {
+                    // Piranhas
+                    if (CanCast(SNOPower.Witchdoctor_Piranhas) && Player.PrimaryResource >= 250 &&
+                        (TargetUtil.ClusterExists(15f, 45f) || TargetUtil.AnyElitesInRange(45f)) &&
+                        LastPowerUsed != SNOPower.Witchdoctor_Piranhas &&
+                        Player.PrimaryResource >= 250)
+                    {
+                        return new TrinityPower(SNOPower.Witchdoctor_Piranhas, 25f, Enemies.BestCluster.Position);
+                    }
+
+                    //Cast Horrify before we go into the fray
+                    if (CanCast(SNOPower.Witchdoctor_Horrify))
+                        return new TrinityPower(SNOPower.Witchdoctor_Horrify);
+
+                    // Should we move to a better position to fear people
+                    if (TikHorrifyCriteria(Enemies.BestLargeCluster))
+                        MoveToHorrifyPoint(Enemies.BestLargeCluster);
+                    
+
+                }
+
+                // END Tiklandian Visage ----------------------------------------------------------------------   
 
                 // Sacrifice
                 if (CanCast(SNOPower.Witchdoctor_Sacrifice) && Trinity.PlayerOwnedZombieDogCount > 0 &&
@@ -654,12 +657,12 @@ namespace Trinity.Combat.Abilities
         
         private static readonly Func<TargetArea,bool> MinimumSoulHarvestCriteria = area =>
 
-            //Harvest is off cooldown AND at least 2 debuffs exists && at least half of the units have a havestable debuff
+            //Harvest is off cooldown AND at least 2 debuffs exists && at least 40% of the units have a havestable debuff
             Skills.WitchDoctor.SoulHarvest.CanCast() && area.TotalDebuffCount(HarvesterCoreDebuffs) >= 2 && 
-            area.DebuffedCount(HarvesterCoreDebuffs) >= area.UnitCount * 0.5 &&
+            area.DebuffedCount(HarvesterCoreDebuffs) >= area.UnitCount * 0.4 &&
 
-            // AND there's an elite, boss or more than 3 units or greater than half the units within sight are within this cluster
-            (area.EliteCount > 0 || area.BossCount > 0 || area.UnitCount >= 3 || area.UnitCount >= (float)Enemies.Nearby.UnitCount * 0.50);
+            // AND there's an elite, boss or more than 3 units or greater 35% of the units within sight are within this cluster
+            (area.EliteCount > 0 || area.BossCount > 0 || area.UnitCount >= 3 || area.UnitCount >= (float)Enemies.Nearby.UnitCount * 0.35);
 
 
         private static readonly Func<TargetArea, bool> IdealSoulHarvestCriteria = area =>
@@ -696,8 +699,6 @@ namespace Trinity.Combat.Abilities
             {
                 Name = "Jade Harvest Position",
                 Destination = area.Position,
-                AcceptableDistance = 8f,
-                Verbose = false,
                 OnUpdate = m =>
                 {
                     // Only change destination if the new target is way better
@@ -712,6 +713,10 @@ namespace Trinity.Combat.Abilities
                         //LogTargetArea("--- Harvesting (CombatMovement)", area);
                         Skills.WitchDoctor.SoulHarvest.Cast();                        
                     }
+                },
+                Options = new CombatMovementOptions
+                {
+                    Logging = LogLevel.Verbose,                    
                 }
             });
         }
@@ -720,10 +725,8 @@ namespace Trinity.Combat.Abilities
         {
             CombatMovement.Queue(new CombatMovement
             {
-                Name = "Horrify Position",
+                Name = "Horrify Position",                
                 Destination = area.Position,
-                AcceptableDistance = 8f,
-                Verbose = false,
                 OnUpdate = m =>
                 {
                     // Only change destination if the new target is way better
@@ -731,6 +734,15 @@ namespace Trinity.Combat.Abilities
                         Enemies.BestLargeCluster.Position.Distance(m.Destination) > 15f)
                         m.Destination = Enemies.BestLargeCluster.Position;
                 },
+                Options = new CombatMovementOptions
+                {
+                    AcceptableDistance = 12f,
+                    Logging = LogLevel.Verbose,
+                    ChangeInDistanceLimit = 2f,
+                    SuccessBlacklistSeconds = 3,
+                    FailureBlacklistSeconds = 7,
+                    TimeBeforeBlocked = 500
+                }
 	
             });
         }
