@@ -109,6 +109,9 @@ namespace Trinity
 
                 bool shouldIgnoreBosses = HealthGlobeEmergency || GetHiPriorityShrine || GetHiPriorityContainer;
 
+                // Highest weight found as we progress through, so we can pick the best target at the end (the one with the highest weight)
+                HighestWeightFound = 0;
+
                 foreach (TrinityCacheObject cacheObject in ObjectCache.OrderBy(c => c.Distance))
                 {
                     bool elitesInRangeOfUnit = !CombatBase.IgnoringElites &&

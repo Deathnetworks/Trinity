@@ -546,6 +546,7 @@ namespace Trinity.DbProvider
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Vault for OOC movement, distance={0}", destinationDistance);
                     return;
                 }
+
                 // Tempest rush for a monk
                 if (Trinity.Hotbar.Contains(SNOPower.Monk_TempestRush) &&
                     (Trinity.Settings.Combat.Monk.TROption == TempestRushOption.MovementOnly || Trinity.Settings.Combat.Monk.TROption == TempestRushOption.Always ||
