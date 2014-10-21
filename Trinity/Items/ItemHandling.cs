@@ -97,11 +97,6 @@ namespace Trinity
                 return false;
             }
 
-            if (itemType == GItemType.CraftTome)
-            {
-                return Settings.Loot.Pickup.CraftTomes;
-            }
-
             // Plans
             if (item.InternalName.ToLower().StartsWith("craftingplan_smith") && (item.ACDItem.GetTrinityItemQuality() < Settings.Loot.Pickup.MiscItemQuality || !Settings.Loot.Pickup.Plans))
             {

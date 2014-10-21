@@ -185,7 +185,8 @@ namespace Trinity.Combat.Abilities
 
             // Rain of Vengeance
             if (CanCast(SNOPower.DemonHunter_RainOfVengeance) && !Player.IsIncapacitated &&
-                (TargetUtil.ClusterExists(45f, 3) || TargetUtil.EliteOrTrashInRange(45f)))
+                (TargetUtil.ClusterExists(45f, 3) || TargetUtil.EliteOrTrashInRange(45f)) ||
+                (TargetUtil.AnyMobsInRange(45f) && Settings.Combat.DemonHunter.RainOfVengeanceOffCD))
             {
                 var bestClusterPoint = TargetUtil.GetBestClusterPoint(45f, 65f, false);
 

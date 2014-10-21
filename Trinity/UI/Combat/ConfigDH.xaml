@@ -138,7 +138,8 @@
                         <CheckBox Margin="2" IsChecked="{Binding Path=DH.SpamSmokeScreen}" ToolTip="For use with Displacement rune">Spam Smoke Screen</CheckBox>
                         <CheckBox Margin="2" IsChecked="{Binding Path=DH.SpamShadowPower}" ToolTip="For use with Shadow Glide rune for Out of Combat Sprint">Spam Shadow Power</CheckBox>
                         <CheckBox Margin="2" IsChecked="{Binding Path=DH.VengeanceElitesOnly}">Vengeance Elites Only</CheckBox>
-                        <CheckBox Margin="2" IsChecked="{Binding Path=DH.CompanionOffCooldown}">Companion Off Cooldown</CheckBox>
+                        <CheckBox Margin="2" IsChecked="{Binding Path=DH.CompanionOffCooldown}">Companion Off CD</CheckBox>
+                        <CheckBox Margin="2" IsChecked="{Binding Path=DH.RainOfVengeanceOffCD}">Rain of Vengeance Off CD</CheckBox>
                     </UniformGrid>
                     <GroupBox>
                         <GroupBox.Header>Vault</GroupBox.Header>

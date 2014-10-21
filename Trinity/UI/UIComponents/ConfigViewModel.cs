@@ -987,7 +987,6 @@ namespace Trinity.UI.UIComponents
                 _Model.Loot.Pickup.MiscItemQuality = TrinityItemQuality.Common;
                 _Model.Loot.Pickup.PotionCount = 98;
                 _Model.Loot.Pickup.Plans = true;
-                _Model.Loot.Pickup.CraftTomes = true;
                 _Model.Loot.Pickup.PickupLowLevel = true;
                 _Model.Loot.Pickup.LegendaryPlans = true;
             }
@@ -1018,7 +1017,6 @@ namespace Trinity.UI.UIComponents
                 _Model.Loot.Pickup.MiscItemQuality = TrinityItemQuality.Legendary;
                 _Model.Loot.Pickup.PotionCount = 98;
                 _Model.Loot.Pickup.Plans = true;
-                _Model.Loot.Pickup.CraftTomes = true;
                 _Model.Loot.Pickup.PickupLowLevel = true;
                 _Model.Loot.Pickup.LegendaryPlans = true;
 
