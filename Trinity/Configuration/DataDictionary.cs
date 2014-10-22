@@ -1110,6 +1110,11 @@ namespace Trinity
 
             356639, // x1_Catacombs_Breakable_Window_Relief
 
+            //x1_Westm_HeroWorship01_VO Dist=10 IsElite=False LoS=True HP=1,00 Dir=SW - Name=x1
+            //It's trying to attack that in town
+            //x1_Westm_HeroWorship01_VO = 321451,
+            321451, 
+
         };
 
         /// <summary>
