@@ -38,8 +38,8 @@ namespace Trinity.Reference
                 Legendary.InnasFavor
             },
             FirstBonusItemCount = 2,
-            SecondBonusItemCount = 4,
-            ThirdBonusItemCount = 6
+            SecondBonusItemCount = 3,
+            ThirdBonusItemCount = 4
         };
 
         public static Set RaimentOfTheJadeHarvester = new Set
