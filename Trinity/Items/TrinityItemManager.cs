@@ -739,9 +739,18 @@ namespace Trinity.Items
                         if (!item.IsTwoSquareItem)
                             continue;
 
-                        // Slot is already protected, don't double count
-                        if (backpackSlotBlocked[col, row + 1])
+                        try
+                        {
+                            // Slot is already protected, don't double count
+                            if (backpackSlotBlocked[col, row + 1])
+                                continue;
+                        }
+                        catch (IndexOutOfRangeException)
+                        {
+                            Logger.LogError("Error checking for next slot on item {0}, row={1} col={2} IsTwoSquare={3} ItemType={4}", 
+                                item.Name, item.InventoryRow, item.InventoryColumn, item.ItemType);
                             continue;
+                        }
 
                         freeBagSlots--;
                         backpackSlotBlocked[col, row + 1] = true;
