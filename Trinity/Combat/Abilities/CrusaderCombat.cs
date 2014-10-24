@@ -117,6 +117,11 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.X1_Crusader_FallingSword, 16f, TargetUtil.GetBestClusterPoint(15f, 65f, false));
                 }
 
+                if (Legendary.FateOfTheFell.IsEquipped && Player.PrimaryResourcePct > 0.5)
+                {
+                    return new TrinityPower(SNOPower.X1_Crusader_HeavensFury3, 65f, TargetUtil.GetBestPierceTarget(65f,45).Position);
+                }
+
                 // HeavensFury
                 bool hasAkkhan = (Sets.ArmorOfAkkhan.IsThirdBonusActive);
                 if (CanCastHeavensFury() && !hasAkkhan)
