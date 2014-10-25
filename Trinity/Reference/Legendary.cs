@@ -4763,7 +4763,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item BlackthornesDuncraigCross = new Item
         {
-            Id = 298050,
+            Id = 224189, //298050,
             Name = "Blackthorne's Duncraig Cross",
             Quality = ItemQuality.Legendary,
             Slug = "blackthornes-duncraig-cross",
