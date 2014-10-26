@@ -13,7 +13,27 @@ namespace Trinity.Reference
         public class Sets : Reference.Sets { }
 
         // The following items are not listed on the game guide index pages (dafuq blizzard? update your guide already)
-        
+
+        /// <summary>
+        /// Helltrapper - 7–10% chance on hit to summon a Spike Trap, Caltrops or Sentry.
+        /// </summary>
+        public static Item Helltrapper = new Item
+        {
+            Id = 271914,
+            Name = "Helltrapper",
+            Quality = ItemQuality.Legendary,
+            Slug = "helltrapper-3tfdaj",
+            ItemType = ItemType.HandCrossbow,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "Unique_HandXBow_102_x1",
+            DataUrl = "https://us.battle.net/api/d3/data/item/helltrapper-3tfdaj",
+            Url = "https://us.battle.net/d3/en/item/helltrapper-3tfdaj",
+            RelativeUrl = "/d3/en/item/helltrapper-3tfdaj",
+            IsCrafted = false,
+            LegendaryAffix = "7–10% chance on hit to summon a Spike Trap, Caltrops or Sentry",
+            SetName = "",
+        };
+
         /// <summary>
         /// Ring of Royal Grandeur - Reduces the number of items needed for set bonuses by 1 (to a minimum of 2).
         /// </summary>
@@ -983,7 +1003,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item RaekorsBurden = new Item
         {
-            Id = 0,
+            Id = 336989,
             Name = "Raekor's Burden",
             Quality = ItemQuality.Legendary,
             Slug = "raekors-burden",
@@ -1363,7 +1383,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item NemesisBracers = new Item
         {
-            Id = 205615,
+            Id = 298121, //205615,
             Name = "Nemesis Bracers",
             Quality = ItemQuality.Legendary,
             Slug = "nemesis-bracers",
@@ -4763,7 +4783,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item BlackthornesDuncraigCross = new Item
         {
-            Id = 298050,
+            Id = 224189,
             Name = "Blackthorne's Duncraig Cross",
             Quality = ItemQuality.Legendary,
             Slug = "blackthornes-duncraig-cross",
@@ -12248,7 +12268,7 @@ namespace Trinity.Reference
         //public static Item DanettasSpite = new Item(211745, "Danetta's Spite", ItemType.HandCrossbow);
         //public static Item DanettasRevenge = new Item(211749, "Danetta's Revenge", ItemType.HandCrossbow);
         //public static Item Dawn = new Item(196409, "Dawn", ItemType.HandCrossbow);
-        //public static Item Helltrapper = new Item(271914, "Helltrapper", ItemType.HandCrossbow);
+
         //public static Item Izzuccob = new Item(192467, "Izzuccob", ItemType.HandCrossbow);
 
         //// Helm   
