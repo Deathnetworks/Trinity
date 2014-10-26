@@ -1003,7 +1003,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item RaekorsBurden = new Item
         {
-            Id = 0,
+            Id = 336989,
             Name = "Raekor's Burden",
             Quality = ItemQuality.Legendary,
             Slug = "raekors-burden",
