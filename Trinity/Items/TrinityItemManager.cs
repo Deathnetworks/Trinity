@@ -513,12 +513,28 @@ namespace Trinity.Items
 
         public static void DumpQuickItems()
         {
-            List<ACDItem> itemList = ZetaDia.Actors.GetActorsOfType<ACDItem>(true).OrderBy(i => i.InventorySlot).ThenBy(i => i.Name).ToList();
+            List<ACDItem> itemList;
+            try
+            {
+                itemList = ZetaDia.Actors.GetActorsOfType<ACDItem>(true).OrderBy(i => i.InventorySlot).ThenBy(i => i.Name).ToList();
+            }
+            catch
+            {
+                Logger.LogError("QuickDump: Item Errors Detected!");
+                itemList = ZetaDia.Actors.GetActorsOfType<ACDItem>(true).ToList();
+            }
             StringBuilder sbTopList = new StringBuilder();
             foreach (var item in itemList)
             {
-                sbTopList.AppendFormat("\nName={0} InternalName={1} ActorSNO={2} DynamicID={3} InventorySlot={4}",
-                    item.Name, item.InternalName, item.ActorSNO, item.DynamicId, item.InventorySlot);
+                try
+                {
+                    sbTopList.AppendFormat("\nName={0} InternalName={1} ActorSNO={2} DynamicID={3} InventorySlot={4}",
+                        item.Name, item.InternalName, item.ActorSNO, item.DynamicId, item.InventorySlot);
+                }
+                catch (Exception ex)
+                {
+                    sbTopList.AppendFormat("Exception reading data from ACDItem ACDGuid={0}", item.ACDGuid);
+                }
             }
             Logger.Log(sbTopList.ToString());
         }
