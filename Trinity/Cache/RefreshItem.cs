@@ -190,23 +190,19 @@ namespace Trinity
             }
         }
 
-        private static bool RefreshGold(bool AddToCache)
+        private static bool RefreshGold()
         {
-            AddToCache = true;
-
             if (!Settings.Loot.Pickup.PickupGold)
             {
                 c_IgnoreSubStep = "PickupDisabled";
-                AddToCache = false;
-                return AddToCache;
+                return false;
             }
 
             if (Player.ActorClass == ActorClass.Barbarian && Settings.Combat.Barbarian.IgnoreGoldInWOTB && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) &&
                 GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
             {
-                AddToCache = false;
                 c_IgnoreSubStep = "IgnoreGoldInWOTB";
-                return AddToCache;
+                return false;
             }
 
             // Get the gold amount of this pile, cached if possible
@@ -219,26 +215,19 @@ namespace Trinity
                 catch
                 {
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting gold pile amount for item {0} [{1}]", CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
-                    AddToCache = false;
                     c_IgnoreSubStep = "GetAttributeException";
+                    return false;
                 }
                 CacheData.GoldStack.Add(CurrentCacheObject.RActorGuid, c_GoldStackSize);
             }
 
             if (c_GoldStackSize < Settings.Loot.Pickup.MinimumGoldStack)
             {
-                AddToCache = false;
                 c_IgnoreSubStep = "NotEnoughGold";
-                return AddToCache;
+                return false;
             }
 
-            if (CurrentCacheObject.Distance <= Player.GoldPickupRadius)
-            {
-                AddToCache = false;
-                c_IgnoreSubStep = "WithinPickupRadius";
-                return AddToCache;
-            }
-            return AddToCache;
+            return true;
         }
         private static bool RefreshItemStats(GItemBaseType tempbasetype)
         {
