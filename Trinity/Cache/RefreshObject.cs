@@ -646,7 +646,7 @@ namespace Trinity
                         //    c_IgnoreSubStep = "LootingDisabled";
                         //    break;
                         //}
-                        AddToCache = RefreshGold(AddToCache);
+                        AddToCache = RefreshGold();
                         break;
                     }
                 case GObjectType.PowerGlobe:
