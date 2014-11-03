@@ -766,6 +766,37 @@ namespace Trinity.ItemRules
             itemDic.Add("[ITEMID]", item.BalanceID.ToString());
         }
 
+        private static Regex ItemQualityRegex = new Regex("{c:[a-zA-Z0-9]{8}}", RegexOptions.Compiled);
+
+        private bool isSet (ACDItem item)
+        {
+            if (item == null)
+                return false;
+            if (!item.IsValid)
+                return false;
+
+            /*
+            {c:ff00ff00} = Set
+            {c:ffff8000} = Legendary
+            {c:ffffff00} = Rare
+            {c:ff6969ff} = Magic
+             */
+
+            string itemLink = item.ItemLink;
+
+            string linkColor = ItemQualityRegex.Match(itemLink).Value;
+
+            string itemLinkLog = itemLink.Replace("{", "{{").Replace("}", "}}");
+
+            switch (linkColor)
+            {
+                case "{c:ff00ff00}": // Green
+                    return true;                
+                default:
+                    return false;
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -806,6 +837,7 @@ namespace Trinity.ItemRules
             //itemDic.Add("[QUALITY]", Regex.Replace(item.ItemQualityLevel.ToString(), @"[\d-]", string.Empty));
             itemDic.Add("[QUALITY]", Regex.Replace(item.ItemLinkColorQuality().ToString(), @"[\d-]", string.Empty));
             itemDic.Add("[D3QUALITY]", item.ItemQualityLevel.ToString());
+            itemDic.Add("[SET]", isSet(item));
 
             // - ROLL ----------------------------------------------------------//
             float roll;
