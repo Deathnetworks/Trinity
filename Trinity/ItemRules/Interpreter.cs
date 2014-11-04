@@ -12,6 +12,8 @@ using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Items;
 using Zeta.Game.Internals.Actors;
+
+
 namespace Trinity.ItemRules
 {
     #region Interpreter
@@ -797,6 +799,19 @@ namespace Trinity.ItemRules
             }
         }
 
+        private string inSet(ACDItem item)
+        {
+            if (isSet(item))
+            {
+                var set = Sets.Where(x => x.ItemIds.Contains(item.ActorSNO)).FirstOrDefault();
+
+                if (set != null)
+                    return set.Name;
+            }
+
+            return "NO SET FOUND";
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -838,6 +853,7 @@ namespace Trinity.ItemRules
             itemDic.Add("[QUALITY]", Regex.Replace(item.ItemLinkColorQuality().ToString(), @"[\d-]", string.Empty));
             itemDic.Add("[D3QUALITY]", item.ItemQualityLevel.ToString());
             itemDic.Add("[SET]", isSet(item));
+            itemDic.Add("[INSET]", inSet(item));
 
             // - ROLL ----------------------------------------------------------//
             float roll;
