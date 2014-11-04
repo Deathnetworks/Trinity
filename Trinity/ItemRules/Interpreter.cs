@@ -770,7 +770,7 @@ namespace Trinity.ItemRules
 
         private static Regex ItemQualityRegex = new Regex("{c:[a-zA-Z0-9]{8}}", RegexOptions.Compiled);
 
-        private bool isSet (ACDItem item)
+        private bool isSet(ACDItem item)
         {
             if (item == null)
                 return false;
@@ -793,7 +793,7 @@ namespace Trinity.ItemRules
             switch (linkColor)
             {
                 case "{c:ff00ff00}": // Green
-                    return true;                
+                    return true;
                 default:
                     return false;
             }
@@ -853,7 +853,8 @@ namespace Trinity.ItemRules
             itemDic.Add("[QUALITY]", Regex.Replace(item.ItemLinkColorQuality().ToString(), @"[\d-]", string.Empty));
             itemDic.Add("[D3QUALITY]", item.ItemQualityLevel.ToString());
             itemDic.Add("[SET]", isSet(item));
-            itemDic.Add("[INSET]", inSet(item));
+            itemDic.Add("[SETNAME]", inSet(item).Replace(" ", "")); //remove spaces to appease the parser Gods <== For use in Macros
+            itemDic.Add("[SETFULLNAME]", inSet(item));
 
             // - ROLL ----------------------------------------------------------//
             float roll;
@@ -964,11 +965,11 @@ namespace Trinity.ItemRules
 
             itemDic.Add("[SKILLDMG%]", SkillBySlot.GetSkillDamagePercent(item));
 
-             float damage, healing, toughness;
-             item.GetStatChanges(out damage, out healing, out toughness);
-             itemDic.Add("[UPDMG]", damage);
-             itemDic.Add("[UPHEAL]", healing);
-             itemDic.Add("[UPTOUGH]", toughness);
+            float damage, healing, toughness;
+            item.GetStatChanges(out damage, out healing, out toughness);
+            itemDic.Add("[UPDMG]", damage);
+            itemDic.Add("[UPHEAL]", healing);
+            itemDic.Add("[UPTOUGH]", toughness);
 
             // - NEW STATS ADDED --------------------------------------------------//
             itemDic.Add("[LEVELRED]", (float)item.Stats.ItemLevelRequirementReduction);
