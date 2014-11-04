@@ -803,10 +803,10 @@ namespace Trinity.ItemRules
         {
             if (isSet(item))
             {
-                var set = Sets.Where(x => x.ItemIds.Contains(item.ActorSNO)).FirstOrDefault();
+                var set = Legendary.ToList().Where(x => x.Id == item.ActorSNO).FirstOrDefault();
 
                 if (set != null)
-                    return set.Name;
+                    return set.SetName;
             }
 
             return "NO SET FOUND";
