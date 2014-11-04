@@ -79,7 +79,6 @@ namespace Trinity
             PlayerMover.LastRestartedGame = DateTime.UtcNow;
             Logger.Log("Bot Starting, Resetting Gold Inactivity Timer");
             GoldInactivity.Instance.ResetCheckGold();
-            XpInactivity.Instance.ResetCheckXp();
 
             if (CharacterSettings.Instance.KillRadius < 20)
             {
