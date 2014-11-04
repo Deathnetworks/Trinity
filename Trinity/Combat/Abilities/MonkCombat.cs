@@ -301,8 +301,8 @@ namespace Trinity.Combat.Abilities
                 }
             }
 
-            
-            if (Player.PrimaryResource > 75 && CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) && hasSWK)
+
+            if (Player.PrimaryResource > 75 && CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) && hasSWK && CurrentTarget != null)
             {
                 Trinity.SweepWindSpam = DateTime.UtcNow;
                 return new TrinityPower(SNOPower.Monk_SweepingWind);
