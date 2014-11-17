@@ -15,6 +15,7 @@ namespace Trinity.Config.Combat
         private bool _SpamSmokeScreen;
         private bool _SpamShadowPower;
         private bool _CompanionOffCooldown;
+        private bool _RainOfVengeanceOffCD;
         private int _StrafeMinHatred;
         private int _RapidFireMinHatred;
         private bool _VengeanceElitesOnly;
@@ -160,6 +161,24 @@ namespace Trinity.Config.Combat
                 {
                     _SpamSmokeScreen = value;
                     OnPropertyChanged("SpamSmokeScreen");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool RainOfVengeanceOffCD
+        {
+            get
+            {
+                return _RainOfVengeanceOffCD;
+            }
+            set
+            {
+                if (_RainOfVengeanceOffCD != value)
+                {
+                    _RainOfVengeanceOffCD = value;
+                    OnPropertyChanged("RainOfVengeanceOffCD");
                 }
             }
         }

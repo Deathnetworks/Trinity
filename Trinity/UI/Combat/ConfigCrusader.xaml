@@ -29,6 +29,7 @@
                         <CheckBox IsChecked="{Binding Path=Crusader.SteedChargeOOC}" ToolTip="Use Steed Charge OOC" Content="Use Steed Charge OOC" />
                         <CheckBox IsChecked="{Binding Path=Crusader.SpamAkarats}" Content="Use Akarats off CD" />
                         <CheckBox IsChecked="{Binding Path=Crusader.SpamPhalanx}" Content="Use Phalanx off CD" />
+                        <CheckBox IsChecked="{Binding Path=Crusader.SpamLawsOfValor}" Content="Use Laws of Valor off CD" />
                     </UniformGrid>
 
                     <!--Emergency Health-->

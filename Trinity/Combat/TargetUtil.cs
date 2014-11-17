@@ -187,7 +187,7 @@ namespace Trinity
             var result =
                 (from u in ObjectCache
                  where u.IsUnit &&
-                 u.RadiusDistance <= maxRange &&
+                 u.RadiusDistance <= maxRange && u.HasBeenInLoS &&
                  ((ignoreUnitsInAoE && !u.IsStandingInAvoidance) || !ignoreUnitsInAoE)
                  orderby u.CountUnitsInFront() descending,
                  u.IsEliteRareUnique descending

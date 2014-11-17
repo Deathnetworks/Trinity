@@ -79,6 +79,7 @@ namespace Trinity
             PlayerMover.LastRestartedGame = DateTime.UtcNow;
             Logger.Log("Bot Starting, Resetting Gold Inactivity Timer");
             GoldInactivity.Instance.ResetCheckGold();
+            XpInactivity.Instance.ResetCheckXp();
 
             if (CharacterSettings.Instance.KillRadius < 20)
             {
@@ -129,6 +130,8 @@ namespace Trinity
         // When the bot stops, output a final item-stats report so it is as up-to-date as can be
         private static void TrinityBotStop(IBot bot)
         {
+            GoldInactivity.Instance.ResetCheckGold();
+            XpInactivity.Instance.ResetCheckXp();
             // Issue final reports
             OutputReport();
             PlayerMover.TotalAntiStuckAttempts = 1;

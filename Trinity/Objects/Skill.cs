@@ -198,7 +198,7 @@ namespace Trinity.Objects
         {
             get
             {
-                if (ZetaDia.IsInGame && ZetaDia.Me.IsValid && ZetaDia.CPlayer.IsValid && IsActive)
+                if (ZetaDia.IsInGame && ZetaDia.Me.IsValid && IsActive)
                     return ZetaDia.CPlayer.GetActiveSkillBySlot(HotbarSkills.BySNOPower(SNOPower).Slot).HasRuneEquipped;
 
                 return false;

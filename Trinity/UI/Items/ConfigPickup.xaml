@@ -320,7 +320,6 @@
                     <CheckBox Content="Designs" IsChecked="{Binding Path=Pickup.Designs}" Margin="5"/>
                     <CheckBox Content="Plans" IsChecked="{Binding Path=Pickup.Plans}" Margin="5"/>
                     <CheckBox Content="Legendary Plans" IsChecked="{Binding Path=Pickup.LegendaryPlans}" Margin="5"/>
-                    <CheckBox Content="Craft Tomes" IsChecked="{Binding Path=Pickup.CraftTomes}" Margin="5"/>
                     <CheckBox Content="Craft Materials" IsChecked="{Binding Path=Pickup.CraftMaterials}" Margin="5"/>
                     <CheckBox Content="Infernal Keys" IsChecked="{Binding Path=Pickup.InfernalKeys}" Margin="5"/>
                     <CheckBox Content="Low Level Items" IsChecked="{Binding Path=Pickup.PickupLowLevel}" Margin="5" ToolTip="Pickup Grey and White Items to level 6/11 (for questing)"/>

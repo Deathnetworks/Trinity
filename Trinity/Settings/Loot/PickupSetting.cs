@@ -25,7 +25,6 @@ namespace Trinity.Config.Loot
         private int _LegendaryLevel;
         private int _MinimumGoldStack;
         private bool _PickupGold;
-        private bool _CraftTomes;
         private bool _Plans;
         private bool _LegendaryPlans;
         private bool _Designs;
@@ -328,24 +327,6 @@ namespace Trinity.Config.Loot
                 {
                     _PickupGold = value;
                     OnPropertyChanged("PickupGold");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(true)]
-        public bool CraftTomes
-        {
-            get
-            {
-                return _CraftTomes;
-            }
-            set
-            {
-                if (_CraftTomes != value)
-                {
-                    _CraftTomes = value;
-                    OnPropertyChanged("CraftTomes");
                 }
             }
         }
