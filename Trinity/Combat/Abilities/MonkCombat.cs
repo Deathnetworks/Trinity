@@ -94,7 +94,7 @@ namespace Trinity.Combat.Abilities
             // Breath of Heaven Section
 
             // Breath of Heaven when needing healing or the buff
-            if (!UseOOCBuff && (Player.CurrentHealthPct <= 0.6 || !GetHasBuff(SNOPower.Monk_BreathOfHeaven)) && CanCast(SNOPower.Monk_BreathOfHeaven) &&
+            if (!UseOOCBuff && Player.CurrentHealthPct <= 0.6 && CanCast(SNOPower.Monk_BreathOfHeaven) &&
                 (Player.PrimaryResource >= 35 || (!CanCast(SNOPower.Monk_Serenity) && Player.PrimaryResource >= 25)))
             {
                 return new TrinityPower(SNOPower.Monk_BreathOfHeaven, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 1, 1);
