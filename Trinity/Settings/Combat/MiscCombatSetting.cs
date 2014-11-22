@@ -107,7 +107,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(true)]
+        [DefaultValue(false)]
         public bool HiPriorityHG
         {
             get
