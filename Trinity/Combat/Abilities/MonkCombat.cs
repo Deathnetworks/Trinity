@@ -178,7 +178,7 @@ namespace Trinity.Combat.Abilities
                     return JawBreakerDashingStrike();
                 }
 
-                if (CurrentTarget.IsEliteRareUnique || TargetUtil.ClusterExists(15f, 3) &&
+                if (CurrentTarget.IsEliteRareUnique || (TargetUtil.ClusterExists(15f, 3) || hasSWK && TargetUtil.AnyMobsInRange(50)) &&
                     TargetUtil.IsUnitWithDebuffInRangeOfPosition(15f, TargetUtil.GetBestClusterPoint(), SNOPower.Monk_ExplodingPalm) ||
                     TargetUtil.AnyMobsInRangeOfPosition(CurrentTarget.Position, 20f, 3) && Skills.Monk.ExplodingPalm.IsTrackedOnUnit(CurrentTarget))                
                 {
