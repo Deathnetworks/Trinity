@@ -165,7 +165,7 @@ namespace Trinity
                             TrinityOnJoinGame(null, null);
                     }
 
-                    BeginInvoke(BotManager.SetBotTicksPerSecond);
+                    BotManager.SetBotTicksPerSecond();
 
                     UI.UILoader.PreLoadWindowContent();
 
