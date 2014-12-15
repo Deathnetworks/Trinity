@@ -10,6 +10,7 @@ using Trinity.DbProvider;
 using Trinity.Helpers;
 using Trinity.Items;
 using Trinity.Technicals;
+using Trinity.UI;
 using Zeta.Bot;
 using Zeta.Bot.Navigation;
 using Zeta.Common.Plugins;
@@ -120,6 +121,7 @@ namespace Trinity
                 BotMain.OnStop += TrinityBotStop;
 
                 SetWindowTitle();
+                TabUi.InstallTab();
 
                 if (!Directory.Exists(FileManager.PluginPath))
                 {
@@ -167,7 +169,7 @@ namespace Trinity
 
                     BotManager.SetBotTicksPerSecond();
 
-                    UI.UILoader.PreLoadWindowContent();
+                    UILoader.PreLoadWindowContent();
 
                     Events.OnCacheUpdated += Enemies.Update;
 
@@ -195,6 +197,7 @@ namespace Trinity
         {
             _isPluginEnabled = false;
 
+            TabUi.RemoveTab();
             BotManager.ReplaceTreeHooks();
 
             Navigator.PlayerMover = new DefaultPlayerMover();

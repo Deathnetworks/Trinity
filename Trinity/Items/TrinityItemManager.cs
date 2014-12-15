@@ -738,7 +738,7 @@ namespace Trinity.Items
                             continue;
                         }
 
-                        if (row < 0 || row > 9)
+                        if (col < 0 || col > 9)
                         {
                             Logger.LogError("Item {0} ({1}) is reporting invalid backpack column of {2}!", 
                                 item.Name, item.InternalName, item.InventoryColumn);

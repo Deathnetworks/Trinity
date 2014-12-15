@@ -1,6 +1,9 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Linq;
+using System.Text.RegularExpressions;
 using Buddy.Auth.Math;
 using Trinity.Config.Combat;
+using Trinity.Items;
+using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
@@ -104,6 +107,35 @@ namespace Trinity.Helpers
             return qualityResult;
         }
 
+        public static bool IsSetItem(this ACDItem item)
+        {
+            if (item == null)
+                return false;
+            if (!item.IsValid)
+                return false;
+
+            string itemLink = item.ItemLink;
+
+            string linkColor = ItemQualityRegex.Match(itemLink).Value;
+
+            if (linkColor == "{c:ff00ff00}")
+                return true;
+
+            return false;
+        }
+
+        public static string ItemSetName(this ACDItem item)
+        {
+            if (!item.IsSetItem())
+                return null;
+
+            var set = Sets.Where(s => s.ItemIds.Contains(item.ActorSNO)).FirstOrDefault();
+            if (set != null)
+                return set.Name;
+            
+            return null;
+        }
+
         public static int GetGemQualityLevel(this ACDItem item)
         {
             if (item == null)
@@ -123,5 +155,14 @@ namespace Trinity.Helpers
             return diff.X * diff.Y;
         }
 
+        /// <summary>
+        /// Returns if a DiaObject is not null, is valid, and it's ACD is not null, and is valid
+        /// </summary>
+        /// <param name="diaObject"></param>
+        /// <returns></returns>
+        public static bool IsFullyValid(this DiaObject diaObject)
+        {
+            return diaObject != null && diaObject.IsValid && diaObject.CommonData != null && diaObject.CommonData.IsValid;
+        }
     }
 }

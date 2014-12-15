@@ -425,7 +425,7 @@ namespace Trinity
         }
         private static bool RefreshStepCachedSummons()
         {
-            if (c_diaUnit != null && c_diaUnit.IsValid)
+            if (c_diaUnit.IsFullyValid())
             {
                 try
                 {

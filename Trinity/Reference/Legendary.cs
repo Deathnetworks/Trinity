@@ -1663,7 +1663,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item AughildsSearch = new Item
         {
-            Id = 212581,
+            Id = 222972,
             Name = "Aughild's Search",
             Quality = ItemQuality.Legendary,
             Slug = "aughilds-search",
@@ -2283,7 +2283,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item AughildsRule = new Item
         {
-            Id = 364697,
+            Id = 197193,
             Name = "Aughild's Rule",
             Quality = ItemQuality.Legendary,
             Slug = "aughilds-rule",

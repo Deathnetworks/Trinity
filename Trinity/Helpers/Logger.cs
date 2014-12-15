@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using JetBrains.Annotations;
 using log4net;
 using log4net.Appender;
 using log4net.Layout;
@@ -131,7 +130,7 @@ namespace Trinity.Technicals
         }
 
         /// <summary>
-        /// Logs a message with Normal/UserInformation
+        /// Logs a message with Debug/UserInformation
         /// </summary>
         /// <param name="formatMessage"></param>
         /// <param name="args"></param>
@@ -140,7 +139,7 @@ namespace Trinity.Technicals
             Log(TrinityLogLevel.Debug, LogCategory.UserInformation, formatMessage, args);
         }
         /// <summary>
-        /// Logs a message with Normal/UserInformation
+        /// Logs a message with Debug/UserInformation
         /// </summary>
         /// <param name="formatMessage"></param>
         /// <param name="args"></param>
@@ -150,7 +149,7 @@ namespace Trinity.Technicals
         }
 
         /// <summary>
-        /// Logs a message with Normal/UserInformation
+        /// Logs a message with Error/UserInformation
         /// </summary>
         /// <param name="formatMessage"></param>
         /// <param name="args"></param>
@@ -159,7 +158,7 @@ namespace Trinity.Technicals
             Log(TrinityLogLevel.Error, LogCategory.UserInformation, formatMessage, args);
         }
         /// <summary>
-        /// Logs a message with Normal/UserInformation
+        /// Logs a message with Error/UserInformation
         /// </summary>
         /// <param name="formatMessage"></param>
         /// <param name="args"></param>
@@ -192,7 +191,7 @@ namespace Trinity.Technicals
             return logLevel;
         }
 
-        public static string ListToString(System.Collections.Generic.List<object> list)
+        public static string ListToString(List<object> list)
         {
             string result = "";
             for (int i = 0; i < list.Count; i++)
