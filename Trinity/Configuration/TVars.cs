@@ -252,6 +252,8 @@ namespace Trinity
             Set(new TVar("DemonHunter.PreperationTriggerRange", 40f, "Preperation monster trigger range"));
             Set(new TVar("DemonHunter.ClusterArrow.UseRange", 45f, "Cluster Arrow Maximum range"));
             Set(new TVar("DemonHunter.MinPreparationDiscipline", 15, "Minimum Preparation Discipline"));
+            Set(new TVar("DemonHunter.HatredForHealthGlobes", 100, "minHatred for picking up Health Globes with Blood Vengeance passive"));
+            
             // Monk
             Set(new TVar("Monk.Avoidance.Serenity", 0f, "Monk Serenity buff Avoidance health multiplier"));
             Set(new TVar("Monk.MinEnergyReserve", 0, "Monk emergency Spirit reserves"));
@@ -264,6 +266,7 @@ namespace Trinity
             Set(new TVar("WitchDoctor.SpiritWalk.HealingJourneyHealth", 0.65f, "Percent Health Threshold to use Spirit Walk with Healing Journey"));
             Set(new TVar("WitchDoctor.SpiritWalk.HonoredGuestMana", 0.50f, "Percent Mana Threshold to use Spirit Walk with Honored Guest"));
             Set(new TVar("WitchDoctor.Firebats.MaintainRange", 35f, "Maintain Firebats while any mobs are in this range"));
+            Set(new TVar("WitchDoctor.ManaForHealthGlobes", 1200, "minMana for picking up Health Globes with Gruesome Feast passive"));
 
             // Wizard
             Set(new TVar("Wizard.MinEnergyReserve", 0, "Wizard emergency arcane power reserve"));

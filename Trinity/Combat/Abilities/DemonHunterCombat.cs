@@ -183,17 +183,6 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.DemonHunter_Vault, 20f, vNewTarget);
             }
 
-            // Rain of Vengeance
-            if (CanCast(SNOPower.DemonHunter_RainOfVengeance) && !Player.IsIncapacitated &&
-                (TargetUtil.ClusterExists(45f, 3) || TargetUtil.EliteOrTrashInRange(45f)) ||
-                (TargetUtil.AnyMobsInRange(45f) && Settings.Combat.DemonHunter.RainOfVengeanceOffCD))
-            {
-                var bestClusterPoint = TargetUtil.GetBestClusterPoint(45f, 65f, false);
-
-                return new TrinityPower(SNOPower.DemonHunter_RainOfVengeance, 0f, bestClusterPoint);
-            }
-
-
             // Multi Shot
             if (CanCast(SNOPower.DemonHunter_Multishot) && !Player.IsIncapacitated &&
                 ((Player.PrimaryResource >= 30 && !IsWaitingForSpecial) || Player.PrimaryResource > MinEnergyReserve) &&
@@ -358,6 +347,17 @@ namespace Trinity.Combat.Abilities
                 }
             }
 
+            // Rain of Vengeance
+            if (CanCast(SNOPower.DemonHunter_RainOfVengeance) && !Player.IsIncapacitated &&
+               (TargetUtil.ClusterExists(45f, 3) || TargetUtil.EliteOrTrashInRange(45f)) ||
+               (TargetUtil.AnyMobsInRange(55f) && Settings.Combat.DemonHunter.RainOfVengeanceOffCD && !Runes.DemonHunter.DarkCloud.IsActive))
+            {
+                var bestClusterPoint = TargetUtil.GetBestClusterPoint(45f, 65f, false);
+
+                return new TrinityPower(SNOPower.DemonHunter_RainOfVengeance, 0f, bestClusterPoint);
+            }
+
+
             return DefaultPower;
         }
         /// <summary>
@@ -414,6 +414,13 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.DemonHunter_Preparation);
             }
 
+            // Rain of Vengeance OffCD with Dark Cloud
+            if (!Player.IsInTown && CanCast(SNOPower.DemonHunter_RainOfVengeance, CanCastFlags.NoTimer) &&
+               !Player.IsIncapacitated && Runes.DemonHunter.DarkCloud.IsActive && Settings.Combat.DemonHunter.RainOfVengeanceOffCD)
+            {
+                return new TrinityPower(SNOPower.DemonHunter_RainOfVengeance);
+            } 
+            
             return null;
         }
 

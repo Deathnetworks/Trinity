@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Trinity.Helpers;
 using Trinity.Objects;
+using Trinity.Technicals;
 using Zeta.Game;
 using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
@@ -52,42 +53,49 @@ namespace Trinity.Items
         {
 
             ActorSNO = item.ActorSNO;
-            GameBalanceId = item.GameBalanceId;
-            DynamicID = item.DynamicId;
-            ACDGuid = item.ACDGuid;
-            InventorySlot = item.InventorySlot;
-            ValidInventorySlots = item.ValidInventorySlots;
-            RequiredLevel = item.RequiredLevel;
-            IsUnidentified = item.IsUnidentified;
-            IsTwoHand = item.IsTwoHand;
-            IsOneHand = item.IsOneHand;
             Name = item.Name;
-            InternalName = item.InternalName;
-            ItemType = item.ItemType;
-            ItemBaseType = item.ItemBaseType;
-            IsShield = ShieldTypes.Contains(ItemType);
-            IsOffHand = OffHandTypes.Contains(ItemType);
-            IsArmor = ArmorTypes.Contains(ItemType);
-            IsJewlery = JewleryTypes.Contains(ItemType);
-            IsWeapon = WeaponTypes.Contains(ItemType);
-            IsEquipment = item.ItemBaseType == ItemBaseType.Armor || item.ItemBaseType == ItemBaseType.Jewelry || item.ItemBaseType == ItemBaseType.Weapon;
-            IsMisc = MiscTypes.Contains(ItemType);
-            IsGem = item.ItemBaseType == ItemBaseType.Gem;
-            IsTwoSquareItem = item.IsTwoSquareItem;
-            IsPotion = item.IsPotion;
-            ItemQualityLevel = item.ItemQualityLevel;
-            GemQuality = item.GemQuality;
-            TieredLootRunKeyLevel = item.TieredLootRunKeyLevel;
-            ItemStackQuantity = item.ItemStackQuantity;
-            IsSetItem = item.IsSetItem();
-            ItemSetName = item.ItemSetName();
+            try
+            {
+                GameBalanceId = item.GameBalanceId;
+                DynamicID = item.DynamicId;
+                ACDGuid = item.ACDGuid;
+                InventorySlot = item.InventorySlot;
+                ValidInventorySlots = item.ValidInventorySlots;
+                RequiredLevel = item.RequiredLevel;
+                IsUnidentified = item.IsUnidentified;
+                IsTwoHand = item.IsTwoHand;
+                IsOneHand = item.IsOneHand;
+                InternalName = item.InternalName;
+                ItemType = item.ItemType;
+                ItemBaseType = item.ItemBaseType;
+                IsShield = ShieldTypes.Contains(ItemType);
+                IsOffHand = OffHandTypes.Contains(ItemType);
+                IsArmor = ArmorTypes.Contains(ItemType);
+                IsJewlery = JewleryTypes.Contains(ItemType);
+                IsWeapon = WeaponTypes.Contains(ItemType);
+                IsEquipment = item.ItemBaseType == ItemBaseType.Armor || item.ItemBaseType == ItemBaseType.Jewelry || item.ItemBaseType == ItemBaseType.Weapon;
+                IsMisc = MiscTypes.Contains(ItemType);
+                IsGem = item.ItemBaseType == ItemBaseType.Gem;
+                IsTwoSquareItem = item.IsTwoSquareItem;
+                IsPotion = item.IsPotion;
+                ItemQualityLevel = item.ItemQualityLevel;
+                GemQuality = item.GemQuality;
+                TieredLootRunKeyLevel = item.TieredLootRunKeyLevel;
+                ItemStackQuantity = item.ItemStackQuantity;
+                IsSetItem = item.IsSetItem();
+                ItemSetName = item.ItemSetName();
 
-            HasSingleUseSlot = IsSingleSlotItem();
+                HasSingleUseSlot = IsSingleSlotItem();
 
-            Item = item;
-            Stats = item.Stats;
-            StatsData = ItemStatsDataFactory.GetItemStatsDataFromStats(Stats);
-            ReferenceItem = new Item(Item);
+                Item = item;
+                Stats = item.Stats;
+                StatsData = ItemStatsDataFactory.GetItemStatsDataFromStats(Stats);
+                ReferenceItem = new Item(Item);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error wrapping item {0}/{1}: " + ex, Name, ActorSNO);
+            }
         }
 
         /// <summary>

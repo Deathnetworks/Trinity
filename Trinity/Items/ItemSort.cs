@@ -243,6 +243,7 @@ namespace Trinity.Items
                     _sortBehavior = CreateSortBehavior(inventorySlot: InventorySlot.BackpackItems);
                     TreeHooks.Instance.InsertHook(HookName, 0, _sortBehavior);
                     _hookInserted = true;
+                    BotMain.OnStop += bot => RemoveBehavior();
                 }
             }
             catch (Exception ex)
@@ -273,6 +274,7 @@ namespace Trinity.Items
                     _sortBehavior = CreateSortBehavior(inventorySlot: InventorySlot.SharedStash);
                     TreeHooks.Instance.InsertHook(HookName, 0, _sortBehavior);
                     _hookInserted = true;
+                    BotMain.OnStop += bot => RemoveBehavior();
                 }
             }
             catch (Exception ex)
