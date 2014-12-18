@@ -1,8 +1,6 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
-using Buddy.Auth.Math;
 using Trinity.Config.Combat;
-using Trinity.Items;
 using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Game.Internals.Actors;

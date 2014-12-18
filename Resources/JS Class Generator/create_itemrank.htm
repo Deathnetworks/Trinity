@@ -6,8 +6,9 @@
         <script src="handlebars.js"></script>
         <script src="handlebars_helper.js"></script>
         <script src="itemrank-parse.js"></script>    
-        <style>            
-            span, .class, .skill, .rune, .passive { padding-left: 25px; display: block }
+        <style>
+            * { font-family: Consolas, Courier, monospace; font-size: 10pt; }
+            span, .class, .skill, .rune, .passive { padding-left: 25px; display: block;  }
             .template { display: none; }
         </style>
     </head>
@@ -21,7 +22,7 @@
                 <br/>// AUTO-GENERATED on {{timestamp}}<br/><br/>
 
                 {{#each all}} 
-                public static ItemRank {{Strip Name }} = new ItemRank<br/><br/>
+                public static ItemRank {{Strip Name }} = new ItemRank<br/>
                 {<br/>
                 <span>
                     Item = Legendary.{{Id}},<br/><br/>

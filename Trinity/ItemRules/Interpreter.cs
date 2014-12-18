@@ -12,6 +12,7 @@ using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Items;
 using Zeta.Game.Internals.Actors;
+
 namespace Trinity.ItemRules
 {
     #region Interpreter

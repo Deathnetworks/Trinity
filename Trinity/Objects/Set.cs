@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Trinity.Cache;
-using Trinity.Items;
 using Trinity.Reference;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;

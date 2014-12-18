@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Trinity.Cache;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;

@@ -5,7 +5,6 @@ using Trinity.Technicals;
 using Zeta.Common.Plugins;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
-using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {

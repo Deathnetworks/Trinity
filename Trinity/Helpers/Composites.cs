@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Trinity.DbProvider;
 using Trinity.Technicals;
 using Zeta.Bot.Logic;
 using Zeta.Game;

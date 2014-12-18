@@ -1,4 +1,5 @@
 ﻿//!CompilerOption:AddRef:System.Management.dll
+
 using System;
 using System.IO;
 using System.Windows;
@@ -9,13 +10,13 @@ using Trinity.Configuration;
 using Trinity.DbProvider;
 using Trinity.Helpers;
 using Trinity.Items;
+using Trinity.Settings.Loot;
 using Trinity.Technicals;
 using Trinity.UI;
 using Zeta.Bot;
 using Zeta.Bot.Navigation;
 using Zeta.Common.Plugins;
 using Zeta.Game;
-using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
@@ -154,7 +155,7 @@ namespace Trinity
                     LootTargeting.Instance.Provider = new BlankLootProvider();
                     ObstacleTargeting.Instance.Provider = new BlankObstacleProvider();
 
-                    if (Settings.Loot.ItemFilterMode != Config.Loot.ItemFilterMode.DemonBuddy)
+                    if (Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy)
                     {
                         ItemManager.Current = new TrinityItemManager();
                     }

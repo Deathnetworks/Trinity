@@ -1,5 +1,7 @@
-﻿using Zeta.Bot;
+﻿using Trinity.DbProvider;
+using Zeta.Bot;
 using Zeta.Game.Internals.Actors;
+
 namespace Trinity
 {
     public class ItemEvents

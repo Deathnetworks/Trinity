@@ -180,6 +180,7 @@
     <Compile Include="Combat\CombatMovement.cs" />
     <Compile Include="Reference\SkillUtils.cs" />
     <Compile Include="Settings\Combat\CrusaderSetting.cs" />
+    <Compile Include="Settings\Loot\ItemRankSettings.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Combat\HandleTarget.cs" />
     <Compile Include="Combat\AbilitySelector.cs" />
@@ -324,6 +325,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\ConfigCombat.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Items\ConfigItemRank.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

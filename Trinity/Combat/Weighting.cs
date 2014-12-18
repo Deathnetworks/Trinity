@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using JetBrains.Annotations;
 using Trinity.Cache;
 using Trinity.Combat;
 using Trinity.Combat.Abilities;
@@ -10,7 +9,6 @@ using Trinity.Items;
 using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
-using Zeta.Bot.Logic;
 using Zeta.Bot.Profile.Common;
 using Zeta.Bot.Settings;
 using Zeta.Common;

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.Serialization;
+using Trinity.Settings.Loot;
 
 namespace Trinity.Config.Loot
 {
@@ -11,6 +12,7 @@ namespace Trinity.Config.Loot
         private PickupSetting _Pickup;
         private TownRunSetting _TownRun;
         private ItemRuleSetting _ItemRules;
+        private ItemRankSettings _itemRank;
         #endregion Fields
 
         #region Events
@@ -95,6 +97,22 @@ namespace Trinity.Config.Loot
                 {
                     _ItemRules = value;
                     OnPropertyChanged("ItemRules");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        public ItemRankSettings ItemRank
+        {
+            get
+            {
+                return _itemRank;
+            }
+            set
+            {
+                if (_itemRank != value)
+                {
+                    _itemRank = value;
+                    OnPropertyChanged("ItemRank");
                 }
             }
         }

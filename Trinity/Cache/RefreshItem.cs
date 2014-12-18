@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using Trinity.Cache;
-using Trinity.Config.Loot;
 using Trinity.Helpers;
+using Trinity.Settings.Loot;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Game;

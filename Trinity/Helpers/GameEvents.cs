@@ -6,9 +6,9 @@ using Trinity.DbProvider;
 using Trinity.Helpers;
 using Trinity.ItemRules;
 using Trinity.Items;
+using Trinity.Settings.Loot;
 using Trinity.Technicals;
 using Zeta.Bot;
-using Zeta.Bot.Navigation;
 using Zeta.Bot.Settings;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
@@ -93,7 +93,7 @@ namespace Trinity
                     CharacterSettings.Instance.LootRadius);
             }
 
-            if (Settings.Loot.ItemFilterMode == Config.Loot.ItemFilterMode.TrinityWithItemRules)
+            if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
             {
                 try
                 {

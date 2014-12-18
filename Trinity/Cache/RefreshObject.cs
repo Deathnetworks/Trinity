@@ -4,13 +4,13 @@ using Trinity.Cache;
 using Trinity.Helpers;
 using Trinity.Items;
 using Trinity.Technicals;
-using Zeta.Bot;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 using Logger = Trinity.Technicals.Logger;
+
 namespace Trinity
 {
     public partial class Trinity

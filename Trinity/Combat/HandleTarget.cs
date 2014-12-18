@@ -1,24 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Buddy.Coroutines;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.DbProvider;
 using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Bot;
-using Zeta.Bot.Coroutines;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 using Zeta.TreeSharp;
-using Action = Zeta.TreeSharp.Action;
 using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity

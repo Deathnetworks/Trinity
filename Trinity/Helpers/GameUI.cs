@@ -1,5 +1,4 @@
 ﻿using System;
-using Trinity.Config.Loot;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Game;
@@ -31,6 +30,16 @@ namespace Trinity
         private const ulong reviveAtCorpseHash = 0xE3CBD66296A39588;
         private const ulong reviveAtCheckpointHash = 0xBFAAF48BA9316742;
         private const ulong reviveInTownHash = 0x7A2AF9C0F3045ADA;
+
+        public static UIElement StashDialogMainPage
+        {
+            get { return UIElement.FromHash(0xB83F0423F7247928); }
+        }
+
+        public static UIElement StashDialogMainPageTab1
+        {
+            get { return UIElement.FromHash(0x276522EDF3238841); }
+        }
 
         //[1DDA2480] Mouseover: 0x42E152B771A6BCC1, Name: Root.NormalLayer.rift_join_party_main.stack.wrapper.Accept
         //[1FCC8E70] Mouseover: 0x42E152B771A6BCC1, Name: Root.NormalLayer.rift_join_party_main.stack.wrapper.Accept

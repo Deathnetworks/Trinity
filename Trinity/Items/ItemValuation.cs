@@ -1,6 +1,8 @@
 ﻿using System;
+using Trinity.DbProvider;
 using Trinity.Technicals;
 using Zeta.Game.Internals.Actors;
+
 namespace Trinity
 {
     public class ItemValuation

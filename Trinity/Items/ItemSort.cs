@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Controls.Primitives;
-using System.Xml.Linq;
 using Buddy.Coroutines;
+using Trinity.DbProvider;
 using Trinity.Helpers;
 using Zeta.Bot;
+using Zeta.Bot.Coroutines;
+using Zeta.Bot.Navigation;
 using Zeta.Bot.Settings;
 using Zeta.Common;
 using Zeta.Game;
@@ -139,15 +140,21 @@ namespace Trinity.Items
                     bool isSameSet = thisItem.ItemSetName == thatItem.ItemSetName;
                     if (isSameSet)
                     {
-                        if (thisItem.IsTwoSquareItem && thatItem.IsTwoSquareItem)
-                            return thisItem.ItemType.CompareTo(thatItem.ItemType);
                         if (!thisItem.IsTwoSquareItem && thatItem.IsTwoSquareItem)
                             return 1;
                         if (thisItem.IsTwoSquareItem && !thatItem.IsTwoSquareItem)
                             return -1;
+
+                        return String.Compare(thisSortName, thatSortName, StringComparison.InvariantCulture);
                     }
 
                     return String.Compare(thisItem.ItemSetName, thatItem.ItemSetName, StringComparison.InvariantCulture);
+                }
+
+                // Compare ItemQualityLevel - Legendaries come before other junk
+                if (thisItem.ItemQualityLevel != thatItem.ItemQualityLevel)
+                {
+                    return thisItem.ItemQualityLevel.CompareTo(thatItem.ItemQualityLevel);
                 }
 
                 // Compare ItemBaseType order
@@ -156,35 +163,22 @@ namespace Trinity.Items
                 if (thatItem.ItemBaseType == ItemBaseType.Weapon && thisItem.ItemBaseType != ItemBaseType.Weapon)
                     return -1;
 
+                // Compare Armor
                 if (thisItem.ItemBaseType == ItemBaseType.Armor)
                 {
                     if (thatItem.ItemBaseType == ItemBaseType.Weapon)
                         return -1;
                     if (thatItem.ItemBaseType != ItemBaseType.Armor)
                         return 1;
-                }
-                if (thisItem.ItemBaseType == ItemBaseType.Jewelry)
-                {
-                    if (thatItem.ItemBaseType == ItemBaseType.Weapon)
-                        return -1;
 
-                    if (thatItem.ItemBaseType == ItemBaseType.Armor)
-                        return -1;
-
-                    return 1;
-                }
-
-                // Compare ItemQualityLevel
-                if (thisItem.ItemQualityLevel != thatItem.ItemQualityLevel)
-                {
-                    return thisItem.ItemQualityLevel.CompareTo(thatItem.ItemQualityLevel);
-                }
-
-                // Compare Armor
-                if (thisItem.ItemBaseType == ItemBaseType.Armor)
-                {
                     if (thisItem.ItemType != thatItem.ItemType)
                     {
+                        if (thisItem.IsTwoSquareItem && !thatItem.IsTwoSquareItem)
+                            return 1;
+
+                        if (!thisItem.IsTwoSquareItem && thatItem.IsTwoSquareItem)
+                            return -1;
+
                         return thisItem.ItemType.CompareTo(thatItem.ItemType);
                     }
 
@@ -194,6 +188,12 @@ namespace Trinity.Items
                 // Compare Jewlery
                 if (thisItem.ItemBaseType == ItemBaseType.Jewelry)
                 {
+                    if (thatItem.ItemBaseType == ItemBaseType.Weapon)
+                        return -1;
+
+                    if (thatItem.ItemBaseType == ItemBaseType.Armor)
+                        return -1;
+
                     if (thisItem.ItemType != thatItem.ItemType)
                     {
                         return thisItem.ItemType.CompareTo(thatItem.ItemType);
@@ -202,19 +202,24 @@ namespace Trinity.Items
                     return String.Compare(thisSortName, thatSortName, StringComparison.InvariantCulture);
                 }
 
-                // Weapons, sort by ItemType, Average Damage
+                // Weapons, sort by Has Sockets, Average Damage
                 if (thisItem.ItemBaseType == ItemBaseType.Weapon)
                 {
-                    if (thisItem.ItemType != thatItem.ItemType)
-                    {
-                        return thisItem.ItemType.CompareTo(thatItem.ItemType);
-                    }
-
-                    if ((thisItem.StatsData.MinDamage + thisItem.Stats.MaxDamage) / 2 > (thatItem.StatsData.MinDamage + thatItem.StatsData.MaxDamage) / 2)
-                    {
+                    if (thisItem.StatsData.Sockets > 0 && thatItem.StatsData.Sockets == 0)
                         return 1;
-                    }
-                    return 0;
+                    if (thatItem.StatsData.Sockets > 0 && thisItem.StatsData.Sockets == 0)
+                        return -1;
+
+                    if (((thisItem.StatsData.MinDamage + thisItem.Stats.MaxDamage) / 2) > ((thatItem.StatsData.MinDamage + thatItem.StatsData.MaxDamage) / 2))
+                        return 1;
+
+                    if (((thisItem.StatsData.MinDamage + thisItem.Stats.MaxDamage) / 2) < ((thatItem.StatsData.MinDamage + thatItem.StatsData.MaxDamage) / 2))
+                        return -1;
+
+                    if (thisItem.ItemType != thatItem.ItemType)
+                        return thisItem.ItemType.CompareTo(thatItem.ItemType);
+
+                    return thisItem.StatsData.WeaponDamagePerSecond.CompareTo(thatItem.StatsData.WeaponDamagePerSecond);
                 }
                 return 1;
 
@@ -238,6 +243,9 @@ namespace Trinity.Items
 
             try
             {
+                GoldInactivity.Instance.ResetCheckGold();
+                XpInactivity.Instance.ResetCheckXp();
+
                 if (!_hookInserted)
                 {
                     _sortBehavior = CreateSortBehavior(inventorySlot: InventorySlot.BackpackItems);
@@ -261,14 +269,12 @@ namespace Trinity.Items
                 Logger.LogError("Unable to sort stash while bot is not running");
                 return;
             }
-            if (!UIElements.StashWindow.IsVisible)
-            {
-                Logger.LogError("Unable to sort stash while stash window is not open. Open the stash window first!");
-                return;
-            }
 
             try
             {
+                GoldInactivity.Instance.ResetCheckGold();
+                XpInactivity.Instance.ResetCheckXp();
+
                 if (!_hookInserted)
                 {
                     _sortBehavior = CreateSortBehavior(inventorySlot: InventorySlot.SharedStash);
@@ -315,19 +321,16 @@ namespace Trinity.Items
 
         private static async Task<bool> SortTask(InventorySlot inventorySlot)
         {
-            Logger.Log("Starting sort task");
-
-            GoldInactivity.Instance.ResetCheckGold();
-            XpInactivity.Instance.ResetCheckXp();
+            Logger.Log("Starting sort task for {0}", inventorySlot);
 
             if (!ZetaDia.IsInGame)
                 return false;
             if (ZetaDia.IsLoadingWorld)
                 return false;
-            if (ZetaDia.Me == null)
+            if (!ZetaDia.Me.IsFullyValid())
                 return false;
-            if (!ZetaDia.Me.IsValid)
-                return false;
+
+            await ReturnToStashTask(inventorySlot);
 
             Logger.Log("Preparing sort task...");
 
@@ -362,8 +365,6 @@ namespace Trinity.Items
 
 
             var equipment = wrappedItems.Where(i => i.IsEquipment).OrderByDescending(i => i);
-            //equipment.Sort();
-            //equipment.Reverse();
             _sortedItemsQueue = new Queue<ItemWrapper>(equipment);
             Logger.LogDebug("Queued {0} items for forward sort", _sortedItemsQueue.Count());
 
@@ -373,8 +374,6 @@ namespace Trinity.Items
             }
 
             var misc = wrappedItems.Where(i => !i.IsEquipment).OrderByDescending(i => i);
-            //misc.Sort();
-            //misc.Reverse();
             _reverseSortedItemsQueue = new Queue<ItemWrapper>(misc);
             Logger.LogDebug("Queued {0} items for reverse sort", _reverseSortedItemsQueue.Count());
 
@@ -392,7 +391,7 @@ namespace Trinity.Items
                 return false;
             }
 
-            if (!UIElements.InventoryWindow.IsVisible)
+            if (!UIElements.InventoryWindow.IsVisible && inventorySlot == InventorySlot.BackpackItems)
             {
                 Logger.Log("Opening inventory window");
                 var inventoryButton = UIElement.FromName("Root.NormalLayer.game_dialog_backgroundScreenPC.button_inventory");
@@ -409,9 +408,69 @@ namespace Trinity.Items
             }
 
             Logger.Log("Executing sort task");
-            await SortItems(inventorySlot);
-            await ReverseItems(inventorySlot);
+            if (GameUI.IsElementVisible(GameUI.StashDialogMainPage) && inventorySlot == InventorySlot.SharedStash)
+            {
+                await SortItems(inventorySlot);
+                await ReverseItems(inventorySlot);
+
+                Logger.Log("Waiting 5 seconds...");
+                BotMain.StatusText = "Waiting 5 seconds...";
+                await Coroutine.Sleep(5000);
+
+                if (_startedOutOfTown && ZetaDia.IsInTown)
+                    await CommonBehaviors.TakeTownPortalBack().ExecuteCoroutine();
+            }
+            else
+            {
+                await SortItems(inventorySlot);
+                await ReverseItems(inventorySlot);
+            }
+
             RemoveBehavior();
+            return true;
+        }
+
+        private static bool _startedOutOfTown;
+        private static async Task<bool> ReturnToStashTask(InventorySlot inventorySlot)
+        {
+            if (inventorySlot == InventorySlot.SharedStash)
+            {
+                if (ZetaDia.Me.IsInCombat)
+                    return false;
+
+                if (!ZetaDia.IsInTown)
+                {
+                    _startedOutOfTown = true;
+                    await CommonCoroutines.UseTownPortal("Returning to stash");
+                }
+
+                if (!GameUI.IsElementVisible(GameUI.StashDialogMainPage))
+                {
+                    // Move to Stash
+                    if (TownRun.StashLocation.Distance2D(ZetaDia.Me.Position) > 10f)
+                        await CommonCoroutines.MoveAndStop(TownRun.StashLocation, 10f, "Shared Stash");
+
+                    if (TownRun.StashLocation.Distance2D(ZetaDia.Me.Position) <= 10f && TownRun.SharedStash == null)
+                    {
+                        Logger.LogError("Shared Stash actor is null!");
+                        RemoveBehavior();
+                        return true;
+                    }
+
+                    // Open Stash
+                    if (TownRun.StashLocation.Distance2D(ZetaDia.Me.Position) <= 10f && TownRun.SharedStash != null && GameUI.IsElementVisible(GameUI.StashDialogMainPage))
+                    {
+                        while (ZetaDia.Me.Movement.IsMoving)
+                        {
+                            Navigator.PlayerMover.MoveStop();
+                            await Coroutine.Yield();
+                        }
+                        Logger.Log("Opening Stash");
+                        TownRun.SharedStash.Interact();
+                        await Coroutine.Sleep(ItemMovementDelay);
+                    }
+                }
+            }
             return true;
         }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Trinity.Config.Combat;
+using Trinity.DbProvider;
 using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;

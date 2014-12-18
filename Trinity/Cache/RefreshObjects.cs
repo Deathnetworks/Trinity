@@ -6,6 +6,7 @@ using Trinity.Cache;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Configuration;
+using Trinity.DbProvider;
 using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Bot;

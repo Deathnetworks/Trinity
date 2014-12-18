@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Trinity.Combat;
+using Trinity.DbProvider;
 using Trinity.Helpers;
 using Trinity.Technicals;
 using Zeta.Bot.Logic;

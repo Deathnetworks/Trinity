@@ -1,11 +1,9 @@
 ﻿using System;
+using System.Linq;
 using Trinity.Config.Combat;
 using Trinity.Reference;
 using Zeta.Common;
-using Zeta.Game;
 using Zeta.Game.Internals.Actors;
-using System.Linq;
-using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.Combat.Abilities
 {

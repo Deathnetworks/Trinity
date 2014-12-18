@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
 using Trinity.Objects;
 using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Game;
-using Zeta.Common;
 using Zeta.Game.Internals.Actors;
-using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.Helpers
 {
@@ -100,12 +95,12 @@ namespace Trinity.Helpers
             {
                 var missingItems = actualEquipped.Where(i => referenceEquipped.All(item => item.Id != i.ActorSNO));
                 Logger.Log(">> Warning - One or more of your equipped items is recorded incorrectly in Trinity; please report:");
-                missingItems.ForEach(i => Logger.Log(">> {0} {1} ActorSNO={2} BaseType={3} ItemType={4}", i.InternalName, i.Name, i.ActorSNO, i.ItemBaseType, i.ItemType));
+                Zeta.Common.Extensions.ForEach(missingItems, i => Logger.Log(">> {0} {1} ActorSNO={2} BaseType={3} ItemType={4}", i.InternalName, i.Name, i.ActorSNO, i.ItemBaseType, i.ItemType));
             }
 
             Logger.Log(level, LogCategory.UserInformation, "------ Equipped Legendaries: Items={0}, Sets={1} ------", Legendary.Equipped.Count, Sets.Equipped.Count);
 
-            Legendary.Equipped.Where(c => !c.IsSetItem || !c.Set.IsEquipped).ForEach(i => logItem(i,level));
+            Zeta.Common.Extensions.ForEach(Legendary.Equipped.Where(c => !c.IsSetItem || !c.Set.IsEquipped), i => logItem(i,level));
 
             Sets.Equipped.ForEach(s =>
             {
@@ -117,7 +112,7 @@ namespace Trinity.Helpers
                     s.CurrentBonuses,
                     s.MaxBonuses);
 
-                s.Items.Where(i => i.IsEquipped).ForEach(i => logItem(i,level));
+                Zeta.Common.Extensions.ForEach(s.Items.Where(i => i.IsEquipped), i => logItem(i,level));
             });
         
             Logger.Log(level, LogCategory.UserInformation, "------ Active Skills / Runes ------", SkillUtils.Active.Count, SkillUtils.Active.Count);

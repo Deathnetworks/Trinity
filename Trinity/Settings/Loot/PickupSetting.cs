@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.Serialization;
 using Trinity.Config.Combat;
+using Trinity.Settings.Loot;
 
 namespace Trinity.Config.Loot
 {
@@ -8,40 +9,42 @@ namespace Trinity.Config.Loot
     public class PickupSetting : ITrinitySetting<PickupSetting>, INotifyPropertyChanged
     {
         #region Fields
-        private bool _PickupUpgrades;
-        private bool _PickupGrayItems;
-        private bool _PickupWhiteItems;
-        private int _WeaponBlueLevel;
-        private int _WeaponYellowLevel;
-        private int _ArmorBlueLevel;
-        private int _ArmorYellowLevel;
-        private int _JewelryBlueLevel;
-        private int _JewelryYellowLevel;
-        private bool _PickupblueFollowerItems;
-        private bool _PickupYellowFollowerItems;
-        private int _PotionCount;
-        private TrinityGemType _GemType;
-        private int _GemLevel;
-        private int _LegendaryLevel;
-        private int _MinimumGoldStack;
-        private bool _PickupGold;
-        private bool _Plans;
-        private bool _LegendaryPlans;
-        private bool _Designs;
-        private TrinityItemQuality _TItemQuality;
-        private bool _CraftMaterials;
-        private bool _InfernalKeys;
-        private bool _PickupLowLevel;
-        private bool _LootRunKey;
-        private bool _BloodShards;
-        private bool _IgnoreTwoHandedWeapons;
+        private bool _pickupUpgrades;
+        private bool _pickupGrayItems;
+        private bool _pickupWhiteItems;
+        private bool _pickupBlueWeapons;
+        private bool _pickupYellowWeapons;
+        private bool _pickupBlueArmor;
+        private bool _pickupYellowAmor;
+        private bool _pickupBlueJewlery;
+        private bool _pickupYellowJewlery;
+        private bool _pickupblueFollowerItems;
+        private bool _pickupYellowFollowerItems;
+        private bool _pickupLegendaries;
+        private int _potionCount;
+        private TrinityGemType _gemType;
+        private int _gemLevel;
+        private int _minimumGoldStack;
+        private bool _pickupGold;
+        private bool _plans;
+        private bool _legendaryPlans;
+        private bool _designs;
+        private TrinityItemQuality _miscItemQuality;
+        private bool _craftMaterials;
+        private bool _infernalKeys;
+        private bool _pickupLowLevel;
+        private bool _lootRunKey;
+        private bool _trialKeys;
+        private bool _ramadalinisGift;
+        private bool _bloodShards;
+        private bool _ignoreTwoHandedWeapons;
 
-        private bool _IgnoreLegendaryInAoE;
-        private bool _IgnoreNonLegendaryInAoE;
-        private bool _IgnoreLegendaryNearElites;
-        private bool _IgnoreRareNearElites;
-        private bool _IgnoreGoldInAoE;
-        private bool _IgnoreGoldNearElites;
+        private bool _ignoreLegendaryInAoE;
+        private bool _ignoreNonLegendaryInAoE;
+        private bool _ignoreLegendaryNearElites;
+        private bool _ignoreRareNearElites;
+        private bool _ignoreGoldInAoE;
+        private bool _ignoreGoldNearElites;
         #endregion Fields
 
         #region Events
@@ -68,13 +71,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _PickupUpgrades;
+                return _pickupUpgrades;
             }
             set
             {
-                if (_PickupUpgrades != value)
+                if (_pickupUpgrades != value)
                 {
-                    _PickupUpgrades = value;
+                    _pickupUpgrades = value;
                     OnPropertyChanged("PickupUpgrades");
                 }
             }
@@ -85,13 +88,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _PickupGrayItems;
+                return _pickupGrayItems;
             }
             set
             {
-                if (_PickupGrayItems != value)
+                if (_pickupGrayItems != value)
                 {
-                    _PickupGrayItems = value;
+                    _pickupGrayItems = value;
                     OnPropertyChanged("PickupGrayItems");
                 }
             }
@@ -103,122 +106,122 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _PickupWhiteItems;
+                return _pickupWhiteItems;
             }
             set
             {
-                if (_PickupWhiteItems != value)
+                if (_pickupWhiteItems != value)
                 {
-                    _PickupWhiteItems = value;
+                    _pickupWhiteItems = value;
                     OnPropertyChanged("PickupWhiteItems");
                 }
             }
         }
         
         [DataMember(IsRequired = false)]
-        [DefaultValue(0)]
-        public int WeaponBlueLevel
+        [DefaultValue(false)]
+        public bool PickupBlueWeapons
         {
             get
             {
-                return _WeaponBlueLevel;
+                return _pickupBlueWeapons;
             }
             set
             {
-                if (_WeaponBlueLevel != value)
+                if (_pickupBlueWeapons != value)
                 {
-                    _WeaponBlueLevel = value;
-                    OnPropertyChanged("WeaponBlueLevel");
+                    _pickupBlueWeapons = value;
+                    OnPropertyChanged("PickupBlueWeapons");
                 }
             }
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(70)]
-        public int WeaponYellowLevel
+        [DefaultValue(false)]
+        public bool PickupYellowWeapons
         {
             get
             {
-                return _WeaponYellowLevel;
+                return _pickupYellowWeapons;
             }
             set
             {
-                if (_WeaponYellowLevel != value)
+                if (_pickupYellowWeapons != value)
                 {
-                    _WeaponYellowLevel = value;
-                    OnPropertyChanged("WeaponYellowLevel");
+                    _pickupYellowWeapons = value;
+                    OnPropertyChanged("PickupYellowWeapons");
                 }
             }
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(0)]
-        public int ArmorBlueLevel
+        [DefaultValue(false)]
+        public bool PickupBlueArmor
         {
             get
             {
-                return _ArmorBlueLevel;
+                return _pickupBlueArmor;
             }
             set
             {
-                if (_ArmorBlueLevel != value)
+                if (_pickupBlueArmor != value)
                 {
-                    _ArmorBlueLevel = value;
-                    OnPropertyChanged("ArmorBlueLevel");
+                    _pickupBlueArmor = value;
+                    OnPropertyChanged("PickupBlueArmor");
                 }
             }
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(70)]
-        public int ArmorYellowLevel
+        [DefaultValue(false)]
+        public bool PickupYellowArmor
         {
             get
             {
-                return _ArmorYellowLevel;
+                return _pickupYellowAmor;
             }
             set
             {
-                if (_ArmorYellowLevel != value)
+                if (_pickupYellowAmor != value)
                 {
-                    _ArmorYellowLevel = value;
-                    OnPropertyChanged("ArmorYellowLevel");
+                    _pickupYellowAmor = value;
+                    OnPropertyChanged("PickupYellowArmor");
                 }
             }
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(0)]
-        public int JewelryBlueLevel
+        [DefaultValue(false)]
+        public bool PickupBlueJewlery
         {
             get
             {
-                return _JewelryBlueLevel;
+                return _pickupBlueJewlery;
             }
             set
             {
-                if (_JewelryBlueLevel != value)
+                if (_pickupBlueJewlery != value)
                 {
-                    _JewelryBlueLevel = value;
-                    OnPropertyChanged("JewelryBlueLevel");
+                    _pickupBlueJewlery = value;
+                    OnPropertyChanged("PickupBlueJewlery");
                 }
             }
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(70)]
-        public int JewelryYellowLevel
+        [DefaultValue(false)]
+        public bool PickupYellowJewlery
         {
             get
             {
-                return _JewelryYellowLevel;
+                return _pickupYellowJewlery;
             }
             set
             {
-                if (_JewelryYellowLevel != value)
+                if (_pickupYellowJewlery != value)
                 {
-                    _JewelryYellowLevel = value;
-                    OnPropertyChanged("JewelryYellowLevel");
+                    _pickupYellowJewlery = value;
+                    OnPropertyChanged("PickupYellowJewlery");
                 }
             }
         }
@@ -229,13 +232,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _PotionCount;
+                return _potionCount;
             }
             set
             {
-                if (_PotionCount != value)
+                if (_potionCount != value)
                 {
-                    _PotionCount = value;
+                    _potionCount = value;
                     OnPropertyChanged("PotionCount");
                 }
             }
@@ -247,13 +250,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _GemType;
+                return _gemType;
             }
             set
             {
-                if (_GemType != value)
+                if (_gemType != value)
                 {
-                    _GemType = value;
+                    _gemType = value;
                     OnPropertyChanged("GemType");
                 }
             }
@@ -265,32 +268,32 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _GemLevel;
+                return _gemLevel;
             }
             set
             {
-                if (_GemLevel != value)
+                if (_gemLevel != value)
                 {
-                    _GemLevel = value;
+                    _gemLevel = value;
                     OnPropertyChanged("GemLevel");
                 }
             }
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1)]
-        public int LegendaryLevel
+        [DefaultValue(true)]
+        public bool PickupLegendaries
         {
             get
             {
-                return _LegendaryLevel;
+                return _pickupLegendaries;
             }
             set
             {
-                if (_LegendaryLevel != value)
+                if (_pickupLegendaries != value)
                 {
-                    _LegendaryLevel = value;
-                    OnPropertyChanged("LegendaryLevel");
+                    _pickupLegendaries = value;
+                    OnPropertyChanged("PickupLegendaries");
                 }
             }
         }
@@ -301,13 +304,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _MinimumGoldStack;
+                return _minimumGoldStack;
             }
             set
             {
-                if (_MinimumGoldStack != value)
+                if (_minimumGoldStack != value)
                 {
-                    _MinimumGoldStack = value;
+                    _minimumGoldStack = value;
                     OnPropertyChanged("MinimumGoldStack");
                 }
             }
@@ -319,13 +322,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _PickupGold;
+                return _pickupGold;
             }
             set
             {
-                if (_PickupGold != value)
+                if (_pickupGold != value)
                 {
-                    _PickupGold = value;
+                    _pickupGold = value;
                     OnPropertyChanged("PickupGold");
                 }
             }
@@ -337,13 +340,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _Plans;
+                return _plans;
             }
             set
             {
-                if (_Plans != value)
+                if (_plans != value)
                 {
-                    _Plans = value;
+                    _plans = value;
                     OnPropertyChanged("Plans");
                 }
             }
@@ -355,13 +358,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _LegendaryPlans;
+                return _legendaryPlans;
             }
             set
             {
-                if (_LegendaryPlans != value)
+                if (_legendaryPlans != value)
                 {
-                    _LegendaryPlans = value;
+                    _legendaryPlans = value;
                     OnPropertyChanged("LegendaryPlans");
                 }
             }
@@ -373,13 +376,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _Designs;
+                return _designs;
             }
             set
             {
-                if (_Designs != value)
+                if (_designs != value)
                 {
-                    _Designs = value;
+                    _designs = value;
                     OnPropertyChanged("Designs");
                 }
             }
@@ -391,13 +394,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _PickupblueFollowerItems;
+                return _pickupblueFollowerItems;
             }
             set
             {
-                if (_PickupblueFollowerItems != value)
+                if (_pickupblueFollowerItems != value)
                 {
-                    _PickupblueFollowerItems = value;
+                    _pickupblueFollowerItems = value;
                     OnPropertyChanged("FollowerBluePickup");
                 }
             }
@@ -409,13 +412,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _PickupYellowFollowerItems;
+                return _pickupYellowFollowerItems;
             }
             set
             {
-                if (_PickupYellowFollowerItems != value)
+                if (_pickupYellowFollowerItems != value)
                 {
-                    _PickupYellowFollowerItems = value;
+                    _pickupYellowFollowerItems = value;
                     OnPropertyChanged("FollowerYellowPickup");
                 }
             }
@@ -427,13 +430,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _TItemQuality;
+                return _miscItemQuality;
             }
             set
             {
-                if (_TItemQuality != value)
+                if (_miscItemQuality != value)
                 {
-                    _TItemQuality = value;
+                    _miscItemQuality = value;
                     OnPropertyChanged("MiscItemLevel");
                 }
             }
@@ -445,13 +448,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _CraftMaterials;
+                return _craftMaterials;
             }
             set
             {
-                if (_CraftMaterials != value)
+                if (_craftMaterials != value)
                 {
-                    _CraftMaterials = value;
+                    _craftMaterials = value;
                     OnPropertyChanged("CraftMaterials");
                 }
             }
@@ -462,13 +465,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _InfernalKeys;
+                return _infernalKeys;
             }
             set
             {
-                if (_InfernalKeys != value)
+                if (_infernalKeys != value)
                 {
-                    _InfernalKeys = value;
+                    _infernalKeys = value;
                     OnPropertyChanged("InfernalKeys");
                 }
             }
@@ -479,13 +482,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _PickupLowLevel;
+                return _pickupLowLevel;
             }
             set
             {
-                if (_PickupLowLevel != value)
+                if (_pickupLowLevel != value)
                 {
-                    _PickupLowLevel = value;
+                    _pickupLowLevel = value;
                     OnPropertyChanged("PickupLowLevel");
                 }
             }
@@ -497,14 +500,50 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _LootRunKey;
+                return _lootRunKey;
             }
             set
             {
-                if (_LootRunKey != value)
+                if (_lootRunKey != value)
                 {
-                    _LootRunKey = value;
+                    _lootRunKey = value;
                     OnPropertyChanged("LootRunKey");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool TrialKeys
+        {
+            get
+            {
+                return _trialKeys;
+            }
+            set
+            {
+                if (_trialKeys != value)
+                {
+                    _trialKeys = value;
+                    OnPropertyChanged("TrialKeys");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool RamadalinisGift
+        {
+            get
+            {
+                return _ramadalinisGift;
+            }
+            set
+            {
+                if (_ramadalinisGift != value)
+                {
+                    _ramadalinisGift = value;
+                    OnPropertyChanged("RamadalinisGift");
                 }
             }
         }
@@ -515,13 +554,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _BloodShards;
+                return _bloodShards;
             }
             set
             {
-                if (_BloodShards != value)
+                if (_bloodShards != value)
                 {
-                    _BloodShards = value;
+                    _bloodShards = value;
                     OnPropertyChanged("BloodShards");
                 }
             }
@@ -533,13 +572,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _IgnoreTwoHandedWeapons;
+                return _ignoreTwoHandedWeapons;
             }
             set
             {
-                if (_IgnoreTwoHandedWeapons != value)
+                if (_ignoreTwoHandedWeapons != value)
                 {
-                    _IgnoreTwoHandedWeapons = value;
+                    _ignoreTwoHandedWeapons = value;
                     OnPropertyChanged("TwoHandedWeapons");
                 }
             }
@@ -550,13 +589,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _IgnoreLegendaryInAoE;
+                return _ignoreLegendaryInAoE;
             }
             set
             {
-                if (_IgnoreLegendaryInAoE != value)
+                if (_ignoreLegendaryInAoE != value)
                 {
-                    _IgnoreLegendaryInAoE = value;
+                    _ignoreLegendaryInAoE = value;
                     OnPropertyChanged("IgnoreLegendaryInAoE");
                 }
             }
@@ -567,13 +606,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _IgnoreNonLegendaryInAoE;
+                return _ignoreNonLegendaryInAoE;
             }
             set
             {
-                if (_IgnoreNonLegendaryInAoE != value)
+                if (_ignoreNonLegendaryInAoE != value)
                 {
-                    _IgnoreNonLegendaryInAoE = value;
+                    _ignoreNonLegendaryInAoE = value;
                     OnPropertyChanged("IgnoreNonLegendaryInAoE");
                 }
             }
@@ -584,13 +623,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _IgnoreLegendaryNearElites;
+                return _ignoreLegendaryNearElites;
             }
             set
             {
-                if (_IgnoreLegendaryNearElites != value)
+                if (_ignoreLegendaryNearElites != value)
                 {
-                    _IgnoreLegendaryNearElites = value;
+                    _ignoreLegendaryNearElites = value;
                     OnPropertyChanged("IgnoreLegendaryNearElites");
                 }
             }
@@ -601,13 +640,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _IgnoreRareNearElites;
+                return _ignoreRareNearElites;
             }
             set
             {
-                if (_IgnoreRareNearElites != value)
+                if (_ignoreRareNearElites != value)
                 {
-                    _IgnoreRareNearElites = value;
+                    _ignoreRareNearElites = value;
                     OnPropertyChanged("IgnoreNonLegendaryNearElites");
                 }
             }
@@ -618,13 +657,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _IgnoreGoldInAoE;
+                return _ignoreGoldInAoE;
             }
             set
             {
-                if (_IgnoreGoldInAoE != value)
+                if (_ignoreGoldInAoE != value)
                 {
-                    _IgnoreGoldInAoE = value;
+                    _ignoreGoldInAoE = value;
                     OnPropertyChanged("IgnoreGoldInAoE");
                 }
             }
@@ -635,13 +674,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _IgnoreGoldNearElites;
+                return _ignoreGoldNearElites;
             }
             set
             {
-                if (_IgnoreGoldNearElites != value)
+                if (_ignoreGoldNearElites != value)
                 {
-                    _IgnoreGoldNearElites = value;
+                    _ignoreGoldNearElites = value;
                     OnPropertyChanged("IgnoreGoldNearElites");
                 }
             }
@@ -695,6 +734,9 @@ namespace Trinity.Config.Loot
             BloodShards = true;
             LootRunKey = true;
             PickupGold = true;
+            RamadalinisGift = true;
+            TrialKeys = true;
+            PickupLegendaries = true;
         }
         #endregion Methods
     }

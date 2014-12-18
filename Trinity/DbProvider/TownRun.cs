@@ -3,35 +3,31 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
-using Trinity.Config.Loot;
+using System.Windows.Data;
+using Trinity.Helpers;
 using Trinity.Items;
 using Trinity.Notifications;
+using Trinity.Settings.Loot;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Coroutines;
 using Zeta.Bot.Logic;
 using Zeta.Bot.Profile;
 using Zeta.Bot.Profile.Common;
+using Zeta.Bot.Settings;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
+using Zeta.Game.Internals.Actors.Gizmos;
+using Zeta.Game.Internals.SNO;
 using Zeta.TreeSharp;
 using Logger = Trinity.Technicals.Logger;
-using NotificationManager = Trinity.Notifications.NotificationManager;
 
-namespace Trinity
+namespace Trinity.DbProvider
 {
     internal class TownRun
     {
-        static TownRun()
-        {
-            PreTownRunWorldId = -1;
-            PreTownRunPosition = Vector3.Zero;
-            WasVendoring = false;
-        }
-
         // Whether salvage/sell run should go to a middle-waypoint first to help prevent stucks
 
         internal static bool LastTownRunCheckResult = false;
@@ -45,13 +41,22 @@ namespace Trinity
         internal static bool TestingBackpack = false;
 
 
-        // Stash mapper - it's an array representing every slot in your stash, true or false dictating if the slot is free or not
-
-        private static bool[,] StashSlotBlocked = new bool[7, 30];
-
         // DateTime check to prevent inventory-check spam when looking for repairs being needed
         internal static DateTime LastCheckBackpackDurability = DateTime.UtcNow;
         private static DateTime _LastCompletedTownRun = DateTime.MinValue;
+        private static bool lastTownPortalCheckResult;
+        private static DateTime lastTownPortalCheckTime = DateTime.MinValue;
+        internal static Stopwatch randomTimer = new Stopwatch();
+        internal static Random timerRandomizer = new Random();
+        internal static int randomTimerVal = -1;
+        internal static Stopwatch TownRunCheckTimer = new Stopwatch();
+
+        static TownRun()
+        {
+            PreTownRunWorldId = -1;
+            PreTownRunPosition = Vector3.Zero;
+            WasVendoring = false;
+        }
 
 
         internal static Vector3 PreTownRunPosition { get; set; }
@@ -59,7 +64,7 @@ namespace Trinity
         internal static bool WasVendoring { get; set; }
 
         /// <summary>
-        /// Called from Plugin.Pulse
+        ///     Called from Plugin.Pulse
         /// </summary>
         internal static void VendorRunPulseCheck()
         {
@@ -72,7 +77,7 @@ namespace Trinity
         }
 
         /// <summary>
-        /// Records the position when we first run out of bag space, so we can return to that same position after a town run
+        ///     Records the position when we first run out of bag space, so we can return to that same position after a town run
         /// </summary>
         internal static void SetPreTownRunPosition()
         {
@@ -84,7 +89,7 @@ namespace Trinity
         }
 
         /// <summary>
-        /// TownRunCheckOverlord - determine if we should do a town-run or not
+        ///     TownRunCheckOverlord - determine if we should do a town-run or not
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
@@ -143,12 +148,12 @@ namespace Trinity
                         }
                         if (ZetaDia.Me.IsValid)
                         {
-                            var equippedItems = ZetaDia.Me.Inventory.Equipped.Where(i => i.DurabilityMax > 0 && i.DurabilityCurrent != i.DurabilityMax).ToList();
+                            List<ACDItem> equippedItems = ZetaDia.Me.Inventory.Equipped.Where(i => i.DurabilityMax > 0 && i.DurabilityCurrent != i.DurabilityMax).ToList();
                             if (equippedItems.Any())
                             {
                                 double min = equippedItems.Min(i => i.DurabilityPercent);
 
-                                float threshold = Trinity.Player.IsInTown ? 0.50f : Zeta.Bot.Settings.CharacterSettings.Instance.RepairWhenDurabilityBelow;
+                                float threshold = Trinity.Player.IsInTown ? 0.50f : CharacterSettings.Instance.RepairWhenDurabilityBelow;
                                 bool needsRepair = min <= threshold;
 
                                 if (needsRepair)
@@ -161,7 +166,6 @@ namespace Trinity
                                 }
                             }
                         }
-
                     }
 
                     if (ErrorDialog.IsVisible)
@@ -203,7 +207,7 @@ namespace Trinity
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Unable to Town Portal - Boss Area!");
                         return false;
                     }
-                    if (Trinity.IsReadyToTownRun && ZetaDia.IsInTown && DbProvider.DeathHandler.EquipmentNeedsEmergencyRepair())
+                    if (Trinity.IsReadyToTownRun && ZetaDia.IsInTown && DeathHandler.EquipmentNeedsEmergencyRepair())
                     {
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "EquipmentNeedsEmergencyRepair!");
                         return true;
@@ -246,7 +250,7 @@ namespace Trinity
 
         public static async Task<bool> TownRunCoroutineWrapper(Decorator original)
         {
-            foreach (var child in original.Children)
+            foreach (Composite child in original.Children)
             {
                 await child.ExecuteCoroutine();
             }
@@ -273,11 +277,8 @@ namespace Trinity
             return TownRunCheckTimer.IsRunning && TownRunCheckTimer.ElapsedMilliseconds < 2000;
         }
 
-        private static bool lastTownPortalCheckResult = false;
-        private static DateTime lastTownPortalCheckTime = DateTime.MinValue;
-
         /// <summary>
-        /// Returns if we're trying to TownRun or if profile tag is UseTownPortalTag
+        ///     Returns if we're trying to TownRun or if profile tag is UseTownPortalTag
         /// </summary>
         /// <returns></returns>
         internal static bool IsTryingToTownPortal()
@@ -329,10 +330,6 @@ namespace Trinity
             return result;
         }
 
-        internal static Stopwatch randomTimer = new Stopwatch();
-        internal static Random timerRandomizer = new Random();
-        internal static int randomTimerVal = -1;
-
         internal static void SetStartRandomTimer()
         {
             if (!randomTimer.IsRunning)
@@ -381,8 +378,6 @@ namespace Trinity
             return SalvageOption.Sell;
         }
 
-        internal static Stopwatch TownRunCheckTimer = new Stopwatch();
-
 
         internal static void SendEmailNotification()
         {
@@ -407,18 +402,18 @@ namespace Trinity
 
 
         /// <summary>
-        /// Log the nice items we found and stashed
+        ///     Log the nice items we found and stashed
         /// </summary>
         internal static void LogGoodItems(CachedACDItem acdItem, GItemBaseType itemBaseType, GItemType itemType, double itemValue)
         {
             FileStream logStream = null;
             try
             {
-                string filePath = Path.Combine(FileManager.LoggingPath, "StashLog - " + Trinity.Player.ActorClass.ToString() + ".log");
+                string filePath = Path.Combine(FileManager.LoggingPath, "StashLog - " + Trinity.Player.ActorClass + ".log");
                 logStream = File.Open(filePath, FileMode.Append, FileAccess.Write, FileShare.Read);
 
                 //TODO : Change File Log writing
-                using (StreamWriter logWriter = new StreamWriter(logStream))
+                using (var logWriter = new StreamWriter(logStream))
                 {
                     if (!_loggedAnythingThisStash)
                     {
@@ -437,7 +432,7 @@ namespace Trinity
                             shouldSendNotifications = true;
                         if (shouldSendNotifications)
                             NotificationManager.AddNotificationToQueue(acdItem.RealName + " [" + itemType +
-                                "] (Score=" + itemValue + ". " + acdItem.AcdItem.Stats + ")",
+                                                                       "] (Score=" + itemValue + ". " + acdItem.AcdItem.Stats + ")",
                                 ZetaDia.Service.Hero.Name + " new legendary!", ProwlNotificationPriority.Emergency);
                         sLegendaryString = " {legendary item}";
 
@@ -450,11 +445,10 @@ namespace Trinity
                     }
                     else
                     {
-
                         // Check for non-legendary notifications
                         shouldSendNotifications = Trinity.CheckScoreForNotification(itemBaseType, itemValue);
                         if (shouldSendNotifications)
-                            NotificationManager.AddNotificationToQueue(acdItem.RealName + " [" + itemType + "] (Score=" + itemValue + ". " + acdItem.AcdItem.Stats + ")", 
+                            NotificationManager.AddNotificationToQueue(acdItem.RealName + " [" + itemType + "] (Score=" + itemValue + ". " + acdItem.AcdItem.Stats + ")",
                                 ZetaDia.Service.Hero.BattleTagName + " new item!", ProwlNotificationPriority.Normal);
                     }
                     if (shouldSendNotifications)
@@ -478,16 +472,16 @@ namespace Trinity
         }
 
         /// <summary>
-        /// Log the rubbish junk items we salvaged or sold
+        ///     Log the rubbish junk items we salvaged or sold
         /// </summary>
         internal static void LogJunkItems(CachedACDItem acdItem, GItemBaseType itemBaseType, GItemType itemType, double itemValue)
         {
             FileStream logStream = null;
             try
             {
-                string filePath = Path.Combine(FileManager.LoggingPath, "JunkLog - " + Trinity.Player.ActorClass.ToString() + ".log");
+                string filePath = Path.Combine(FileManager.LoggingPath, "JunkLog - " + Trinity.Player.ActorClass + ".log");
                 logStream = File.Open(filePath, FileMode.Append, FileAccess.Write, FileShare.Read);
-                using (StreamWriter logWriter = new StreamWriter(logStream))
+                using (var logWriter = new StreamWriter(logStream))
                 {
                     if (!_loggedJunkThisStash)
                     {
@@ -498,7 +492,7 @@ namespace Trinity
                     string isLegendaryItem = "";
                     if (acdItem.Quality >= ItemQuality.Legendary)
                         isLegendaryItem = " {legendary item}";
-                    logWriter.WriteLine(itemBaseType.ToString() + " - " + itemType.ToString() + " '" + acdItem.RealName + "'. Score = " + itemValue.ToString("0") + isLegendaryItem);
+                    logWriter.WriteLine(itemBaseType + " - " + itemType + " '" + acdItem.RealName + "'. Score = " + itemValue.ToString("0") + isLegendaryItem);
                     if (JunkItemStatString != "")
                         logWriter.WriteLine("  " + JunkItemStatString);
                     else
@@ -514,230 +508,37 @@ namespace Trinity
                     logStream.Close();
             }
         }
-
-
-        internal static Vector2 SortingFindLocationStash(bool isOriginalTwoSlot, bool endOfStash = false)
+        public static Vector3 StashLocation
         {
-            int iPointX = -1;
-            int iPointY = -1;
-            for (int iRow = 0; iRow <= 29; iRow++)
+            get
             {
-                for (int iColumn = 0; iColumn <= 6; iColumn++)
+                switch (ZetaDia.CurrentLevelAreaId)
                 {
-                    if (!StashSlotBlocked[iColumn, iRow])
-                    {
-                        bool bNotEnoughSpace = false;
-                        if (iRow != 9 && iRow != 19 && iRow != 29)
-                        {
-                            bNotEnoughSpace = (isOriginalTwoSlot && StashSlotBlocked[iColumn, iRow + 1]);
-                        }
-                        else
-                        {
-                            if (isOriginalTwoSlot)
-                                bNotEnoughSpace = true;
-                        }
-                        if (!bNotEnoughSpace)
-                        {
-                            iPointX = iColumn;
-                            iPointY = iRow;
-                            if (!endOfStash)
-                                goto FoundStashLocation;
-                        }
-                    }
+                    case 19947: // Campaign A1 Hub
+                        return new Vector3(2968.16f, 2789.63f, 23.94531f);
+                    case 332339: // OpenWorld A1 Hub
+                        return new Vector3(388.16f, 509.63f, 23.94531f);
+                    case 168314: // A2 Hub
+                        return new Vector3(323.0558f, 222.7048f, 0f);
+                    case 92945: // A3/A4 Hub
+                        return new Vector3(387.6834f, 382.0295f, 0f);
+                    case 270011: // A5 Hub
+                        return new Vector3(502.8296f, 739.7472f, 2.598635f);
+                    default:
+                        throw new ValueUnavailableException("Unknown LevelArea Id " + ZetaDia.CurrentLevelAreaId);
                 }
             }
-        FoundStashLocation:
-            if ((iPointX < 0) || (iPointY < 0))
-            {
-                return new Vector2(-1, -1);
-            }
-            return new Vector2(iPointX, iPointY);
         }
 
-        /// <summary>
-        /// Sorts the stash
-        /// </summary>
-        //internal static void SortStash()
-        //{
-        //    bool[,] BackpackSlotBlocked = new bool[10, 6];
+        public static DiaGizmo SharedStash
+        {
+            get
+            {
+                return ZetaDia.Actors.GetActorsOfType<GizmoPlayerSharedStash>()
+                    .FirstOrDefault(o => o.IsFullyValid() && o.ActorInfo.IsValid && o.ActorInfo.GizmoType == GizmoType.SharedStash);
+            }
+        }
 
-        //    // Check we can get the player dynamic ID
-        //    int iPlayerDynamicID = -1;
-        //    try
-        //    {
-        //        iPlayerDynamicID = Trinity.Player.MyDynamicID;
-        //    }
-        //    catch
-        //    {
-        //        Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Failure getting your player data from DemonBuddy, abandoning the sort!");
-        //        return;
-        //    }
-        //    if (iPlayerDynamicID == -1)
-        //    {
-        //        Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Failure getting your player data, abandoning the sort!");
-        //        return;
-        //    }
-
-        //    // List used for all the sorting
-        //    List<StashSortItem> listSortMyStash = new List<StashSortItem>();
-
-        //    // Map out the backpack free slots
-        //    for (int row = 0; row <= 5; row++)
-        //        for (int col = 0; col <= 9; col++)
-        //            BackpackSlotBlocked[col, row] = false;
-
-        //    foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
-        //    {
-        //        int inventoryRow = item.InventoryRow;
-        //        int inventoryColumn = item.InventoryColumn;
-
-        //        // Mark this slot as not-free
-        //        BackpackSlotBlocked[inventoryColumn, inventoryRow] = true;
-
-        //        // Try and reliably find out if this is a two slot item or not
-        //        if (item.IsTwoSquareItem && inventoryRow < 5)
-        //        {
-        //            BackpackSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
-        //        }
-        //    }
-
-        //    // Map out the stash free slots
-        //    for (int iRow = 0; iRow <= 29; iRow++)
-        //        for (int iColumn = 0; iColumn <= 6; iColumn++)
-        //            StashSlotBlocked[iColumn, iRow] = false;
-
-        //    // Block off the entire of any "protected stash pages"
-        //    foreach (int iProtPage in Zeta.Bot.Settings.CharacterSettings.Instance.ProtectedStashPages)
-        //        for (int iProtRow = 0; iProtRow <= 9; iProtRow++)
-        //            for (int iProtColumn = 0; iProtColumn <= 6; iProtColumn++)
-        //                StashSlotBlocked[iProtColumn, iProtRow + (iProtPage * 10)] = true;
-
-        //    // Remove rows we don't have
-        //    for (int iRow = (ZetaDia.Me.NumSharedStashSlots / 7); iRow <= 29; iRow++)
-        //        for (int iColumn = 0; iColumn <= 6; iColumn++)
-        //            StashSlotBlocked[iColumn, iRow] = true;
-
-        //    // Map out all the items already in the stash and store their scores if appropriate
-        //    foreach (ACDItem item in ZetaDia.Me.Inventory.StashItems)
-        //    {
-        //        int inventoryRow = item.InventoryRow;
-        //        int inventoryColumn = item.InventoryColumn;
-
-        //        // Mark this slot as not-free
-        //        StashSlotBlocked[inventoryColumn, inventoryRow] = true;
-
-        //        // Try and reliably find out if this is a two slot item or not
-        //        GItemType itemType = Trinity.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType);
-
-        //        if (item.IsTwoSquareItem && inventoryRow != 19 && inventoryRow != 9 && inventoryRow != 29)
-        //        {
-        //            StashSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
-        //        }
-        //        else if (item.IsTwoSquareItem && (inventoryRow == 19 || inventoryRow == 9 || inventoryRow == 29))
-        //        {
-        //            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "WARNING: There was an error reading your stash, abandoning the process.");
-        //            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Always make sure you empty your backpack, open the stash, then RESTART DEMONBUDDY before sorting!");
-        //            return;
-        //        }
-        //        CachedACDItem cItem = new CachedACDItem(item, item.InternalName, item.Name, item.Level, item.ItemQualityLevel, item.Gold, item.GameBalanceId,
-        //            item.DynamicId, item.Stats.WeaponDamagePerSecond, item.IsOneHand, item.IsTwoHand, item.DyeType, item.ItemType, item.ItemBaseType, item.FollowerSpecialType,
-        //            item.IsUnidentified, item.ItemStackQuantity, item.Stats);
-
-        //        double ItemValue = ItemValuation.ValueThisItem(cItem, itemType);
-        //        double NeedScore = Trinity.ScoreNeeded(item.ItemBaseType);
-
-        //        // Ignore stackable items
-        //        // TODO check if item.MaxStackCount is 0 on non stackable items or 1
-        //        if (!(item.MaxStackCount > 1) && itemType != GItemType.StaffOfHerding)
-        //        {
-        //            listSortMyStash.Add(new StashSortItem(((ItemValue / NeedScore) * 1000), 1, inventoryColumn, inventoryRow, item.DynamicId, item.IsTwoSquareItem));
-        //        }
-        //    }
-
-
-        //    // Sort the items in the stash by their row number, lowest to highest
-        //    listSortMyStash.Sort((p1, p2) => p1.InventoryRow.CompareTo(p2.InventoryRow));
-
-        //    // Now move items into your backpack until full, then into the END of the stash
-        //    Vector2 vFreeSlot;
-
-        //    // Loop through all stash items
-        //    foreach (StashSortItem thisstashsort in listSortMyStash)
-        //    {
-        //        vFreeSlot = Trinity.SortingFindLocationBackpack(thisstashsort.IsTwoSlot);
-        //        int iStashOrPack = 1;
-        //        if (vFreeSlot.X == -1 || vFreeSlot.Y == -1)
-        //        {
-        //            vFreeSlot = SortingFindLocationStash(thisstashsort.IsTwoSlot, true);
-        //            if (vFreeSlot.X == -1 || vFreeSlot.Y == -1)
-        //                continue;
-        //            iStashOrPack = 2;
-        //        }
-        //        if (iStashOrPack == 1)
-        //        {
-        //            ZetaDia.Me.Inventory.MoveItem(thisstashsort.DynamicID, iPlayerDynamicID, InventorySlot.BackpackItems, (int)vFreeSlot.X, (int)vFreeSlot.Y);
-        //            StashSlotBlocked[thisstashsort.InventoryColumn, thisstashsort.InventoryRow] = false;
-        //            if (thisstashsort.IsTwoSlot)
-        //                StashSlotBlocked[thisstashsort.InventoryColumn, thisstashsort.InventoryRow + 1] = false;
-        //            BackpackSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y] = true;
-        //            if (thisstashsort.IsTwoSlot)
-        //                BackpackSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y + 1] = true;
-        //            thisstashsort.InventoryColumn = (int)vFreeSlot.X;
-        //            thisstashsort.InventoryRow = (int)vFreeSlot.Y;
-        //            thisstashsort.StashOrPack = 2;
-        //        }
-        //        else
-        //        {
-        //            ZetaDia.Me.Inventory.MoveItem(thisstashsort.DynamicID, iPlayerDynamicID, InventorySlot.SharedStash, (int)vFreeSlot.X, (int)vFreeSlot.Y);
-        //            StashSlotBlocked[thisstashsort.InventoryColumn, thisstashsort.InventoryRow] = false;
-        //            if (thisstashsort.IsTwoSlot)
-        //                StashSlotBlocked[thisstashsort.InventoryColumn, thisstashsort.InventoryRow + 1] = false;
-        //            StashSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y] = true;
-        //            if (thisstashsort.IsTwoSlot)
-        //                StashSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y + 1] = true;
-        //            thisstashsort.InventoryColumn = (int)vFreeSlot.X;
-        //            thisstashsort.InventoryRow = (int)vFreeSlot.Y;
-        //            thisstashsort.StashOrPack = 1;
-        //        }
-        //        Thread.Sleep(150);
-        //    }
-
-        //    // Now sort the items by their score, highest to lowest
-        //    listSortMyStash.Sort((p1, p2) => p1.Score.CompareTo(p2.Score));
-        //    listSortMyStash.Reverse();
-
-        //    // Now fill the stash in ordered-order
-        //    foreach (StashSortItem thisstashsort in listSortMyStash)
-        //    {
-        //        vFreeSlot = SortingFindLocationStash(thisstashsort.IsTwoSlot, false);
-        //        if (vFreeSlot.X == -1 || vFreeSlot.Y == -1)
-        //        {
-        //            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Failure trying to put things back into stash, no stash slots free? Abandoning...");
-        //            return;
-        //        }
-        //        ZetaDia.Me.Inventory.MoveItem(thisstashsort.DynamicID, iPlayerDynamicID, InventorySlot.SharedStash, (int)vFreeSlot.X, (int)vFreeSlot.Y);
-        //        if (thisstashsort.StashOrPack == 1)
-        //        {
-        //            StashSlotBlocked[thisstashsort.InventoryColumn, thisstashsort.InventoryRow] = false;
-        //            if (thisstashsort.IsTwoSlot)
-        //                StashSlotBlocked[thisstashsort.InventoryColumn, thisstashsort.InventoryRow + 1] = false;
-        //        }
-        //        else
-        //        {
-        //            BackpackSlotBlocked[thisstashsort.InventoryColumn, thisstashsort.InventoryRow] = false;
-        //            if (thisstashsort.IsTwoSlot)
-        //                BackpackSlotBlocked[thisstashsort.InventoryColumn, thisstashsort.InventoryRow + 1] = false;
-        //        }
-        //        StashSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y] = true;
-        //        if (thisstashsort.IsTwoSlot)
-        //            StashSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y + 1] = true;
-        //        thisstashsort.StashOrPack = 1;
-        //        thisstashsort.InventoryRow = (int)vFreeSlot.Y;
-        //        thisstashsort.InventoryColumn = (int)vFreeSlot.X;
-        //        Thread.Sleep(150);
-        //    }
-        //    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Stash sorted!");
-        //}
 
     }
 }

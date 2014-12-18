@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Trinity.Items;
+using Trinity.Objects;
 using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
-using Trinity.Objects;
+
 namespace Trinity
 {
     /// <summary>

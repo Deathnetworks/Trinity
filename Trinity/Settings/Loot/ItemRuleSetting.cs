@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.Serialization;
+using Trinity.Settings.Loot;
 
 namespace Trinity.Config.Loot
 {
@@ -175,7 +176,7 @@ namespace Trinity.Config.Loot
         {
             this._PickupLogLevel = ItemRuleLogLevel.Rare;
             this._KeepLogLevel = ItemRuleLogLevel.Rare;
-            this._ItemRuleType = Loot.ItemRuleType.Soft;
+            this._ItemRuleType = ItemRuleType.Soft;
         }
 
         #endregion Methods
