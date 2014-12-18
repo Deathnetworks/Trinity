@@ -245,7 +245,6 @@
     <Compile Include="UI\UILoader.cs" />
     <Compile Include="Combat\Weighting.cs" />
     <Compile Include="Combat\TargetCheck.cs" />
-    <Compile Include="Items\ItemHandling.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Configuration\Variables.cs" />
     <Compile Include="Configuration\Enums.cs" />

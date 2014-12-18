@@ -135,7 +135,6 @@ namespace Trinity
                 // We have a target, start the target handler!
                 if (CurrentTarget != null)
                 {
-                    _isWholeNewTarget = true;
                     DontMoveMeIAmDoingShit = true;
                     _shouldPickNewAbilities = true;
                     return TargetCheckResult(true, "Current Target is not null");

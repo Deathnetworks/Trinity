@@ -215,7 +215,7 @@ namespace Trinity.UI.UIComponents
                     {
                         try
                         {
-                            Trinity.TestScoring();
+                            ItemValuation.TestScoring();
                             //UILoader.CloseWindow();
                         }
                         catch (Exception ex)

@@ -317,7 +317,7 @@ namespace Trinity.Items
             }
 
             // Ok now try to do some decent item scoring based on item types
-            double iNeedScore = Trinity.ScoreNeeded(item.ItemBaseType);
+            double iNeedScore = ItemValuation.ScoreNeeded(item.ItemBaseType);
             double iMyScore = ItemValuation.ValueThisItem(cItem, tItemType);
 
             if (evaluationType == ItemEvaluationType.Keep)

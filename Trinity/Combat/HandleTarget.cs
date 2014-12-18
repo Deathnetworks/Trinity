@@ -29,8 +29,6 @@ namespace Trinity
             get { return ZetaDia.Me; }
         }
 
-        private static bool _staleCache;
-
         /// <summary>
         /// Returns a RunStatus, if appropriate. Throws an exception if not.
         /// </summary>

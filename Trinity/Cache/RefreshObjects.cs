@@ -712,8 +712,6 @@ namespace Trinity
                 //AnyElitesPresent = false;
                 AnyMobsInRange = false;
 
-                _isAvoidingProjectiles = false;
-
                 // Clear our very short-term destructible blacklist within 3 seconds of last attacking a destructible
                 if (_needClearDestructibles && DateTime.UtcNow.Subtract(_lastDestroyedDestructible).TotalMilliseconds > 2500)
                 {

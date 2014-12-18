@@ -239,12 +239,6 @@ namespace Trinity
         private static bool _standingInAvoidance;
 
         /// <summary>
-        /// Whether or not there are projectiles to avoid
-        /// </summary>
-        private static bool _isAvoidingProjectiles;
-
-
-        /// <summary>
         /// This lets us know if there is a target but it's in avoidance so we can just "stay put" until avoidance goes
         /// </summary>
         private static bool _shouldStayPutDuringAvoidance;
@@ -446,11 +440,6 @@ namespace Trinity
         /// If our current target is in LoS for use in Behavior handling
         /// </summary>
         private static bool CurrentTargetIsInLoS;
-
-        /// <summary>
-        /// Special check to force re-buffing before castign archon
-        /// </summary>
-        private static bool CanCastArchon = false;
 
         // Darkfriend's Looting Rule
         public static Interpreter StashRule = null; // = new Interpreter();

@@ -428,7 +428,7 @@ namespace Trinity.DbProvider
                     {
                         if (!Trinity.Settings.Notification.LegendaryScoring)
                             shouldSendNotifications = true;
-                        else if (Trinity.Settings.Notification.LegendaryScoring && Trinity.CheckScoreForNotification(itemBaseType, itemValue))
+                        else if (Trinity.Settings.Notification.LegendaryScoring && ItemValuation.CheckScoreForNotification(itemBaseType, itemValue))
                             shouldSendNotifications = true;
                         if (shouldSendNotifications)
                             NotificationManager.AddNotificationToQueue(acdItem.RealName + " [" + itemType +
@@ -446,7 +446,7 @@ namespace Trinity.DbProvider
                     else
                     {
                         // Check for non-legendary notifications
-                        shouldSendNotifications = Trinity.CheckScoreForNotification(itemBaseType, itemValue);
+                        shouldSendNotifications = ItemValuation.CheckScoreForNotification(itemBaseType, itemValue);
                         if (shouldSendNotifications)
                             NotificationManager.AddNotificationToQueue(acdItem.RealName + " [" + itemType + "] (Score=" + itemValue + ". " + acdItem.AcdItem.Stats + ")",
                                 ZetaDia.Service.Hero.BattleTagName + " new item!", ProwlNotificationPriority.Normal);

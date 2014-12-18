@@ -199,6 +199,11 @@ namespace Trinity.Items
                 Item.Name == other.Name;
         }
 
+        public override int GetHashCode()
+        {
+            return Item.GetHashCode();
+        }
+
         public static bool operator ==(ItemWrapper item, ItemWrapper other)
         {
             return item.Equals(other);
