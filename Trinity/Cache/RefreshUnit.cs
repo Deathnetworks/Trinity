@@ -116,7 +116,7 @@ namespace Trinity
                 CurrentCacheObject.IsQuestGiver = c_diaUnit.IsQuestGiver;
 
                 // Interact with quest givers, except when doing town-runs
-                if (ZetaDia.CurrentAct == Act.OpenWorld && CurrentCacheObject.IsQuestGiver && !(IsReadyToTownRun || ForceVendorRunASAP || BrainBehavior.IsVendoring))
+                if (ZetaDia.CurrentAct == Act.OpenWorld && CurrentCacheObject.IsQuestGiver && !(WantToTownRun || ForceVendorRunASAP || BrainBehavior.IsVendoring))
                 {
                     CurrentCacheObject.Type = GObjectType.Interactable;
                     CurrentCacheObject.Type = GObjectType.Interactable;

@@ -1,5 +1,6 @@
 ﻿using System;
 using Trinity.DbProvider;
+using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Game.Internals.Actors;
 
@@ -43,7 +44,7 @@ namespace Trinity
             IsInvalidItem = true;
             ItemMaxStats = new double[Constants.TOTALSTATS];
             ItemMaxPoints = new double[Constants.TOTALSTATS];
-            baseItemType = Trinity.DetermineBaseType(itemType);
+            baseItemType = TrinityItemManager.DetermineBaseType(itemType);
             BestFinalBonus = 1d;
             HadStat = new double[Constants.TOTALSTATS] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             HadPoints = new double[Constants.TOTALSTATS] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };

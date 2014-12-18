@@ -84,10 +84,10 @@ namespace Trinity
                     }
 
                     // See if we should update the stats file
-                    if (DateTime.UtcNow.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)
+                    if (DateTime.UtcNow.Subtract(ItemDropStats.ItemStatsLastPostedReport).TotalSeconds > 10)
                     {
-                        ItemStatsLastPostedReport = DateTime.UtcNow;
-                        OutputReport();
+                        ItemDropStats.ItemStatsLastPostedReport = DateTime.UtcNow;
+                        ItemDropStats.OutputReport();
                     }
 
                     // Recording of all the XML's in use this run

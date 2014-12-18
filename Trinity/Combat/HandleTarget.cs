@@ -138,7 +138,7 @@ namespace Trinity
                         return GetRunStatus(RunStatus.Running);
                     }
 
-                    while (CurrentTarget == null && (ForceVendorRunASAP || IsReadyToTownRun) && !Zeta.Bot.Logic.BrainBehavior.IsVendoring && TownRun.TownRunTimerRunning())
+                    while (CurrentTarget == null && (ForceVendorRunASAP || WantToTownRun) && !Zeta.Bot.Logic.BrainBehavior.IsVendoring && TownRun.TownRunTimerRunning())
                     {
                         Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "CurrentTarget is null but we are ready to to Town Run, waiting... ");
                         return GetRunStatus(RunStatus.Running);
@@ -169,8 +169,7 @@ namespace Trinity
                         Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "Blacklisted Target, Returning Failure");
                         return GetRunStatus(RunStatus.Running);
                     }
-                    // This variable just prevents an instant 2-target update after coming here from the main decorator function above
-                    _isWholeNewTarget = false;
+
                     if (CurrentTarget != null)
                         AssignMonsterTargetPower();
 
@@ -852,77 +851,6 @@ namespace Trinity
         }
 
         /// <summary>
-        /// Determines if we need a cache refresh, or just a current target health check
-        /// </summary>
-        private static void CheckStaleCache()
-        {
-            using (new PerformanceLogger("HandleTarget.CheckStaleCache"))
-            {
-                // Let's calculate whether or not we want a new target list...
-                if (!_isWholeNewTarget && !_isWaitingForPower && !_isWaitingForPotion)
-                {
-                    // Update targets at least once every 80 milliseconds
-                    if (_forceTargetUpdate || _isAvoidingProjectiles || DateTime.UtcNow.Subtract(LastRefreshedCache).TotalMilliseconds > Settings.Advanced.CacheRefreshRate)
-                    {
-                        _staleCache = true;
-                    }
-                    // If we AREN'T getting new targets - find out if we SHOULD because the current unit has died etc.
-                    if (!_staleCache && CurrentTarget != null && CurrentTarget.IsUnit)
-                    {
-                        if (CurrentTarget.Unit == null || CurrentTarget.Unit.BaseAddress == IntPtr.Zero)
-                        {
-                            _staleCache = true;
-                        }
-                        else
-                        {
-                            // health calculations
-                            double dThisMaxHealth;
-                            // Get the max health of this unit, a cached version if available, if not cache it
-                            if (!CacheData.UnitMaxHealth.TryGetValue(CurrentCacheObject.RActorGuid, out dThisMaxHealth))
-                            {
-                                try
-                                {
-
-                                    dThisMaxHealth = CurrentTarget.Unit.HitpointsMax;
-                                    CacheData.UnitMaxHealth.Add(CurrentCacheObject.RActorGuid, CurrentTarget.Unit.HitpointsMax);
-                                }
-                                catch
-                                {
-                                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Safely handled exception getting attribute max health #2 for unit {0} [{1}]", CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
-                                    _staleCache = true;
-                                }
-                            }
-                            // Ok check we didn't fail getting the maximum health, now try to get live current health...
-                            if (!_staleCache)
-                            {
-                                try
-                                {
-                                    double dTempHitpoints = CurrentTarget.Unit.HitpointsCurrent / dThisMaxHealth;
-                                    if (dTempHitpoints <= 0d)
-                                    {
-                                        _staleCache = true;
-                                    }
-                                    else
-                                    {
-                                        CurrentTarget.HitPointsPct = dTempHitpoints;
-                                        CurrentTarget.Position = CurrentTarget.Unit.Position;
-                                    }
-                                }
-                                catch
-                                {
-                                    _staleCache = true;
-                                }
-                            }
-
-                            // force update of cached player data
-                            PlayerInfoCache.UpdateCachedPlayerData();
-                        }
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// If we can use special class movement abilities, this will use it and return true
         /// </summary>
         /// <returns></returns>
@@ -1414,27 +1342,27 @@ namespace Trinity
                 // Store item pickup stats
 
                 string itemSha1Hash = HashGenerator.GenerateItemHash(CurrentTarget.Position, CurrentTarget.ActorSNO, CurrentTarget.InternalName, CurrentWorldDynamicId, CurrentTarget.ItemQuality, CurrentTarget.ItemLevel);
-                if (!_hashsetItemPicksLookedAt.Contains(itemSha1Hash))
+                if (!ItemDropStats._hashsetItemPicksLookedAt.Contains(itemSha1Hash))
                 {
-                    _hashsetItemPicksLookedAt.Add(itemSha1Hash);
-                    GItemType itemType = DetermineItemType(CurrentTarget.InternalName, CurrentTarget.DBItemType, CurrentTarget.FollowerType);
-                    GItemBaseType itemBaseType = DetermineBaseType(itemType);
+                    ItemDropStats._hashsetItemPicksLookedAt.Add(itemSha1Hash);
+                    GItemType itemType = TrinityItemManager.DetermineItemType(CurrentTarget.InternalName, CurrentTarget.DBItemType, CurrentTarget.FollowerType);
+                    GItemBaseType itemBaseType = TrinityItemManager.DetermineBaseType(itemType);
                     if (itemBaseType == GItemBaseType.Armor || itemBaseType == GItemBaseType.WeaponOneHand || itemBaseType == GItemBaseType.WeaponTwoHand ||
                         itemBaseType == GItemBaseType.WeaponRange || itemBaseType == GItemBaseType.Jewelry || itemBaseType == GItemBaseType.FollowerItem ||
                         itemBaseType == GItemBaseType.Offhand)
                     {
                         int iQuality;
-                        ItemsPickedStats.Total++;
+                        ItemDropStats.ItemsPickedStats.Total++;
                         if (CurrentTarget.ItemQuality >= ItemQuality.Legendary)
-                            iQuality = QUALITYORANGE;
+                            iQuality = ItemDropStats.QUALITYORANGE;
                         else if (CurrentTarget.ItemQuality >= ItemQuality.Rare4)
-                            iQuality = QUALITYYELLOW;
+                            iQuality = ItemDropStats.QUALITYYELLOW;
                         else if (CurrentTarget.ItemQuality >= ItemQuality.Magic1)
-                            iQuality = QUALITYBLUE;
+                            iQuality = ItemDropStats.QUALITYBLUE;
                         else
-                            iQuality = QUALITYWHITE;
+                            iQuality = ItemDropStats.QUALITYWHITE;
                         //asserts	
-                        if (iQuality > QUALITYORANGE)
+                        if (iQuality > ItemDropStats.QUALITYORANGE)
                         {
                             Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ERROR: Item type (" + iQuality + ") out of range");
                         }
@@ -1442,41 +1370,41 @@ namespace Trinity
                         {
                             Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ERROR: Item level (" + CurrentTarget.ItemLevel + ") out of range");
                         }
-                        ItemsPickedStats.TotalPerQuality[iQuality]++;
-                        ItemsPickedStats.TotalPerLevel[CurrentTarget.ItemLevel]++;
-                        ItemsPickedStats.TotalPerQPerL[iQuality, CurrentTarget.ItemLevel]++;
+                        ItemDropStats.ItemsPickedStats.TotalPerQuality[iQuality]++;
+                        ItemDropStats.ItemsPickedStats.TotalPerLevel[CurrentTarget.ItemLevel]++;
+                        ItemDropStats.ItemsPickedStats.TotalPerQPerL[iQuality, CurrentTarget.ItemLevel]++;
                     }
                     else if (itemBaseType == GItemBaseType.Gem)
                     {
                         int iGemType = 0;
-                        ItemsPickedStats.TotalGems++;
+                        ItemDropStats.ItemsPickedStats.TotalGems++;
                         if (itemType == GItemType.Topaz)
-                            iGemType = GEMTOPAZ;
+                            iGemType = ItemDropStats.GEMTOPAZ;
                         if (itemType == GItemType.Ruby)
-                            iGemType = GEMRUBY;
+                            iGemType = ItemDropStats.GEMRUBY;
                         if (itemType == GItemType.Emerald)
-                            iGemType = GEMEMERALD;
+                            iGemType = ItemDropStats.GEMEMERALD;
                         if (itemType == GItemType.Amethyst)
-                            iGemType = GEMAMETHYST;
+                            iGemType = ItemDropStats.GEMAMETHYST;
                         if (itemType == GItemType.Diamond)
-                            iGemType = GEMDIAMOND;
+                            iGemType = ItemDropStats.GEMDIAMOND;
 
-                        ItemsPickedStats.GemsPerType[iGemType]++;
-                        ItemsPickedStats.GemsPerLevel[CurrentTarget.ItemLevel]++;
-                        ItemsPickedStats.GemsPerTPerL[iGemType, CurrentTarget.ItemLevel]++;
+                        ItemDropStats.ItemsPickedStats.GemsPerType[iGemType]++;
+                        ItemDropStats.ItemsPickedStats.GemsPerLevel[CurrentTarget.ItemLevel]++;
+                        ItemDropStats.ItemsPickedStats.GemsPerTPerL[iGemType, CurrentTarget.ItemLevel]++;
                     }
                     else if (itemType == GItemType.HealthPotion)
                     {
-                        ItemsPickedStats.TotalPotions++;
+                        ItemDropStats.ItemsPickedStats.TotalPotions++;
                         if ((CurrentTarget.ItemLevel < 0) || (CurrentTarget.ItemLevel > 63))
                         {
                             Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ERROR: Potion level ({0}) out of range", CurrentTarget.ItemLevel);
                         }
-                        ItemsPickedStats.PotionsPerLevel[CurrentTarget.ItemLevel]++;
+                        ItemDropStats.ItemsPickedStats.PotionsPerLevel[CurrentTarget.ItemLevel]++;
                     }
                     else if (c_item_GItemType == GItemType.InfernalKey)
                     {
-                        ItemsPickedStats.TotalInfernalKeys++;
+                        ItemDropStats.ItemsPickedStats.TotalInfernalKeys++;
                     }
                 }
 

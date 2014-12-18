@@ -54,11 +54,11 @@ namespace Trinity
             }
 
             ShouldRefreshHotbarAbilities = false;
-            if (!MaintainStatTracking)
+            if (!ItemDropStats.MaintainStatTracking)
             {
-                ItemStatsWhenStartedBot = DateTime.UtcNow;
-                ItemStatsLastPostedReport = DateTime.UtcNow;
-                MaintainStatTracking = true;
+                ItemDropStats.ItemStatsWhenStartedBot = DateTime.UtcNow;
+                ItemDropStats.ItemStatsLastPostedReport = DateTime.UtcNow;
+                ItemDropStats.MaintainStatTracking = true;
             }
             else
             {
@@ -133,7 +133,7 @@ namespace Trinity
             GoldInactivity.Instance.ResetCheckGold();
             XpInactivity.Instance.ResetCheckXp();
             // Issue final reports
-            OutputReport();
+            ItemDropStats.OutputReport();
             PlayerMover.TotalAntiStuckAttempts = 1;
             PlayerMover.vSafeMovementLocation = Vector3.Zero;
             PlayerMover.LastPosition = Vector3.Zero;
@@ -192,7 +192,7 @@ namespace Trinity
                 Logger.Log("New Game - resetting everything");
 
                 TrinityItemManager.ResetBackPackCheck();
-                IsReadyToTownRun = false;
+                WantToTownRun = false;
                 ForceVendorRunASAP = false;
                 TownRun.TownRunCheckTimer.Reset();
                 TownRun.SendEmailNotification();
@@ -205,9 +205,9 @@ namespace Trinity
 
                 DeathsThisRun = 0;
                 LastDeathTime = DateTime.UtcNow;
-                _hashsetItemStatsLookedAt = new HashSet<string>();
-                _hashsetItemPicksLookedAt = new HashSet<string>();
-                _hashsetItemFollowersIgnored = new HashSet<string>();
+                ItemDropStats._hashsetItemStatsLookedAt = new HashSet<string>();
+                ItemDropStats._hashsetItemPicksLookedAt = new HashSet<string>();
+                ItemDropStats._hashsetItemFollowersIgnored = new HashSet<string>();
 
                 Blacklist60Seconds = new HashSet<int>();
                 Blacklist90Seconds = new HashSet<int>();

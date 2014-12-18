@@ -11,7 +11,6 @@ namespace Trinity.Items
 {
     public class ItemWrapper : IComparable<ItemWrapper>, IEquatable<ItemWrapper>
     {
-
         public int ActorSNO { get; set; }
         public int GameBalanceId { get; set; }
         public int DynamicID { get; set; }

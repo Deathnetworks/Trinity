@@ -61,11 +61,6 @@ namespace Trinity
         internal static TrinityCacheObject CurrentTarget { get; set; }
 
         /// <summary>
-        /// A flag to indicate whether we have a new target from the overlord (decorator) or not, in which case don't refresh targets again this first loop
-        /// </summary>
-        private static bool _isWholeNewTarget;
-
-        /// <summary>
         /// A flag to indicate if we should pick a new power/ability to use or not
         /// </summary>
         private static bool _shouldPickNewAbilities;
@@ -266,9 +261,6 @@ namespace Trinity
         private static DateTime timeCancelledKiteMove = DateTime.MinValue;
         private static int cancelledKiteMoveForMilliseconds = 0;
 
-        // How many follower items were ignored, purely for item stat tracking
-        private static int totalFollowerItemsIgnored = 0;
-
         // Variable to let us force new target creations immediately after a root
         private static bool wasRootedLastTick = false;
 
@@ -343,37 +335,13 @@ namespace Trinity
         /// </summary>
         private const bool WAIT_FOR_ANIM = true;
 
-        // Constants and variables used by the item-stats stuff
-        private const int QUALITYWHITE = 0;
-        private const int QUALITYBLUE = 1;
-        private const int QUALITYYELLOW = 2;
-        private const int QUALITYORANGE = 3;
-        private static readonly string[] ItemQualityTypeStrings = new string[4] { "White", "Magic", "Rare", "Legendary" };
-        private const int GEMRUBY = 0;
-        private const int GEMTOPAZ = 1;
-        private const int GEMAMETHYST = 2;
-        private const int GEMEMERALD = 3;
-        private const int GEMDIAMOND = 4;
-        private static readonly string[] GemTypeStrings = new string[5] { "Ruby", "Topaz", "Amethyst", "Emerald", "Diamond" };
-        private static DateTime ItemStatsLastPostedReport = DateTime.MinValue;
-        private static DateTime ItemStatsWhenStartedBot = DateTime.MinValue;
-        private static bool MaintainStatTracking = false;
 
-        // Store items already logged by item-stats, to make sure no stats get doubled up by accident
-        private static HashSet<string> _hashsetItemStatsLookedAt = new HashSet<string>();
-        private static HashSet<string> _hashsetItemPicksLookedAt = new HashSet<string>();
-        private static HashSet<string> _hashsetItemFollowersIgnored = new HashSet<string>();
-
-        // These objects are instances of my stats class above, holding identical types of data for two different things - one holds item DROP stats, one holds item PICKUP stats
-        internal static ItemDropStats ItemsDroppedStats = new ItemDropStats(0, new double[4], new double[74], new double[4, 74], 0, new double[74], 0, new double[5], new double[74], new double[5, 74], 0);
-        internal static ItemDropStats ItemsPickedStats = new ItemDropStats(0, new double[4], new double[74], new double[4, 74], 0, new double[74], 0, new double[5], new double[74], new double[5, 74], 0);
 
 
         // Whether to try forcing a vendor-run for custom reasons
         public static bool ForceVendorRunASAP = false;
-        public static bool IsReadyToTownRun = false;
-        [Obsolete("Property bWantToTownRun is obsolete and will eventually be removed. Use IsReadyToTownRun instead.")]
-        public static bool WantToTownRun { get { return IsReadyToTownRun; } set { IsReadyToTownRun = value; } }
+        private static bool _wantToTownRun;
+        public static bool WantToTownRun { get { return _wantToTownRun; } set { _wantToTownRun = value; } }
 
         // Stash mapper - it's an array representing every slot in your stash, true or false dictating if the slot is free or not
         private static bool[,] StashSlotBlocked = new bool[7, 30];
@@ -419,7 +387,13 @@ namespace Trinity
 
         // On death, clear the timers for all abilities
         internal static DateTime LastDeathTime = DateTime.MinValue;
-        private static int TotalDeaths = 0;
+        private static int _totalDeaths = 0;
+
+        internal static int TotalDeaths
+        {
+            get { return Trinity._totalDeaths; }
+            set { Trinity._totalDeaths = value; }
+        }
 
         // When did we last send a move-power command?
         private static DateTime lastSentMovePower = DateTime.MinValue;
@@ -439,11 +413,11 @@ namespace Trinity
         /// <summary>
         /// The Grid Provider for Navigation checks
         /// </summary>
-        internal static Zeta.Bot.Navigation.MainGridProvider MainGridProvider
+        internal static MainGridProvider MainGridProvider
         {
             get
             {
-                return (Zeta.Bot.Navigation.MainGridProvider)Navigator.SearchGridProvider;
+                return (MainGridProvider)Navigator.SearchGridProvider;
 
                 //if (Navigator.SearchGridProvider.GetType() == typeof(MainGridProvider))
                 //    return (MainGridProvider)Navigator.SearchGridProvider;
@@ -498,16 +472,6 @@ namespace Trinity
         public static int TotalBountyCachesOpened = 0;
 
         // Xp Counter
-        private static long TotalXP = 0;
-        private static long LastXP = 0;
-        private static long NextLevelXP = 0;
-        // Gold counter
-        private static int TotalGold = 0;
-        private static int LastGold = 0;
-        // Level and ParagonLevel
-        private static int Level = 0;
-        private static int ParagonLevel = 0;
-
         private static Vector3 eventStartPosition = Vector3.Zero;
         public static Vector3 EventStartPosition
         {
@@ -516,6 +480,7 @@ namespace Trinity
         }
 
         private static DateTime eventStartTime = DateTime.MinValue;
+
         public static DateTime EventStartTime
         {
             get { return Trinity.eventStartTime; }

@@ -103,7 +103,7 @@ namespace Trinity
                 CurrentCacheObject.ActorType = freshObject.ActorType;
                 CurrentCacheObject.ACDGuid = freshObject.ACDGuid;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 c_IgnoreReason = "Error reading IDs";
                 return false;

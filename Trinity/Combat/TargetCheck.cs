@@ -171,7 +171,7 @@ namespace Trinity
 
                         bool isLoopingAnimation = ZetaDia.Me.LoopingAnimationEndTime > 0;
 
-                        if (!isLoopingAnimation && !IsReadyToTownRun && !ForceVendorRunASAP)
+                        if (!isLoopingAnimation && !WantToTownRun && !ForceVendorRunASAP)
                         {
                             BarbarianCombat.AllowSprintOOC = true;
                             DisableOutofCombatSprint = false;
@@ -201,7 +201,7 @@ namespace Trinity
                 }
                 CurrentTarget = null;
 
-                if ((Trinity.ForceVendorRunASAP || Trinity.IsReadyToTownRun) && TownRun.TownRunTimerRunning())
+                if ((Trinity.ForceVendorRunASAP || Trinity.WantToTownRun) && TownRun.TownRunTimerRunning())
                 {
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Waiting for town run timer (Target Check)", true);
                     return TargetCheckResult(true, "Waiting for TownRunTimer");

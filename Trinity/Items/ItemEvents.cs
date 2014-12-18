@@ -1,4 +1,5 @@
 ﻿using Trinity.DbProvider;
+using Trinity.Items;
 using Zeta.Bot;
 using Zeta.Game.Internals.Actors;
 
@@ -67,7 +68,7 @@ namespace Trinity
 
         internal static void TrinityOnOnItemIdentificationRequest(object sender, ItemIdentifyRequestEventArgs e)
         {
-            e.IgnoreIdentification = !Trinity.ItemRulesIdentifyValidation(e.Item);
+            e.IgnoreIdentification = !TrinityItemManager.ItemRulesIdentifyValidation(e.Item);
         }
 
         internal static void ResetTownRun()
@@ -75,7 +76,7 @@ namespace Trinity
             ItemValuation.ResetValuationStatStrings();
             TownRun.TownRunCheckTimer.Reset();
             Trinity.ForceVendorRunASAP = false;
-            Trinity.IsReadyToTownRun = false;
+            Trinity.WantToTownRun = false;
         }
 
 

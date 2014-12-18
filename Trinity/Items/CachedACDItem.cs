@@ -1,5 +1,6 @@
 ﻿using System;
 using Trinity.Helpers;
+using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Game;
 using Zeta.Game.Internals;
@@ -249,8 +250,8 @@ namespace Trinity
             WeaponMaxDamage = itemStats.WeaponMaxDamage;
             WeaponMinDamage = itemStats.WeaponMinDamage;
 
-            TrinityItemType = Trinity.DetermineItemType(internalName, itemType, followerType);
-            TrinityItemBaseType = Trinity.DetermineBaseType(TrinityItemType);
+            TrinityItemType = TrinityItemManager.DetermineItemType(internalName, itemType, followerType);
+            TrinityItemBaseType = TrinityItemManager.DetermineBaseType(TrinityItemType);
 
             ComputeUpgrade();
         }
@@ -297,8 +298,8 @@ namespace Trinity
                     Row = item.InventoryRow,
                     Column = item.InventoryColumn,
                     ItemLink = item.ItemLink,
-                    TrinityItemType = Trinity.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType),
-                    TrinityItemBaseType = Trinity.DetermineBaseType(Trinity.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType))
+                    TrinityItemType = TrinityItemManager.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType),
+                    TrinityItemBaseType = TrinityItemManager.DetermineBaseType(TrinityItemManager.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType))
                 };
 
                 cItem.ComputeUpgrade();
