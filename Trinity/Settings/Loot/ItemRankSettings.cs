@@ -4,9 +4,9 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Xml.Serialization;
 using JetBrains.Annotations;
 using Trinity.Config;
-using Trinity.Config.Loot;
 using Trinity.Helpers;
 using Trinity.Objects;
 using Trinity.Reference;
@@ -14,54 +14,47 @@ using Zeta.Game;
 
 namespace Trinity.Settings.Loot
 {
-    [DataContract]
-    public class ItemRankSettings : ITrinitySetting<ItemSetting>, INotifyPropertyChanged
+    [DataContract(Namespace = "")]
+    public class ItemRankSettings : ITrinitySetting<ItemRankSettings>, INotifyPropertyChanged
     {
-        [NotNull]
+        [IgnoreDataMember]
         public string CurrentItemsList
         {
             get
             {
-                if (Trinity.Settings.Loot.ItemFilterMode != ItemFilterMode.ItemRanks)
-                    return "Item ranking is currently disabled.";
-
-                StringBuilder sb = new StringBuilder();
-                if (ItemRankMode == ItemRankMode.AnyClass)
+                try
                 {
-                    List<ItemRank> ird = new List<ItemRank>();
-                    foreach (ActorClass actor in Enum.GetValues(typeof(ActorClass)).Cast<ActorClass>())
+                    if (Trinity.Settings.Loot.ItemFilterMode != ItemFilterMode.ItemRanks)
+                        return "Item ranking is currently disabled.";
+
+                    var ird = ItemRanks.GetRankedItemsFromSettings(this);
+
+                    StringBuilder sb = new StringBuilder();
+                    if ((ZetaDia.Me.IsFullyValid() && ZetaDia.Me.ActorClass != ActorClass.Invalid) || ItemRankMode == ItemRankMode.AnyClass)
                     {
-                        if (actor == ActorClass.Invalid)
-                            continue;
-                        foreach (ItemRank itemRank in ItemRanks.GetRankedItems(actor, _minimumPercent, _minimumSampleSize, _minimumRank))
+                        foreach (var itemRank in ird.OrderBy(i => i.Item.BaseType).ThenBy(i => i.Item.ItemType))
                         {
-                            ird.Add(itemRank);
+                            foreach (var rank in itemRank.SoftcoreRank)
+                            {
+                                sb.AppendLine(string.Format("{0}/{1} - {2} - pct={3} rank={4} ss={5}", itemRank.Item.BaseType, itemRank.Item.ItemType, itemRank.Item.Name,
+                                    rank.PercentUsed,
+                                    rank.Rank,
+                                    rank.SampleSize));
+                            }
                         }
                     }
-                    foreach (var itemRank in ird.OrderByDescending(i => i.Item.BaseType).ThenBy(i => i.Item.ItemType).ThenBy(i => i.SoftcoreRank.FirstOrDefault().PercentUsed))
+                    else
                     {
-                        sb.AppendLine(string.Format("{0}/{1} - {2} - pct={3} rank={4} ss={5}", itemRank.Item.BaseType, itemRank.Item.ItemType, itemRank.Item.Name,
-                            itemRank.SoftcoreRank.FirstOrDefault().PercentUsed,
-                            itemRank.SoftcoreRank.FirstOrDefault().Rank,
-                            itemRank.SoftcoreRank.FirstOrDefault().SampleSize));
+                        sb.AppendLine("Could not read Hero Class. Start the bot first?");
                     }
+                    return sb.ToString();
                 }
-                else if (ZetaDia.Me.IsFullyValid() && ZetaDia.Me.ActorClass != ActorClass.Invalid)
+                catch
                 {
-                    foreach (ItemRank itemRank in ItemRanks.GetRankedItems(ZetaDia.Me.ActorClass, _minimumPercent, _minimumSampleSize, _minimumRank))
-                    {
-                        sb.AppendLine(string.Format("{0}/{1} - {2} - pct={3} rank={4} ss={5}", itemRank.Item.BaseType, itemRank.Item.ItemType, itemRank.Item.Name,
-                            itemRank.SoftcoreRank.FirstOrDefault().PercentUsed,
-                            itemRank.SoftcoreRank.FirstOrDefault().Rank,
-                            itemRank.SoftcoreRank.FirstOrDefault().SampleSize));
-                    }
+                    return "Error reading Items List";
                 }
-                else
-                {
-                    sb.AppendLine("Could not read Hero Class.");
-                }
-                return sb.ToString();
             }
+            set { }
         }
 
         #region Fields
@@ -90,6 +83,7 @@ namespace Trinity.Settings.Loot
                 }
             }
         }
+
         [DataMember(IsRequired = false)]
         [DefaultValue(10)]
         public double MinimumPercent
@@ -108,6 +102,7 @@ namespace Trinity.Settings.Loot
                 }
             }
         }
+
         [DataMember(IsRequired = false)]
         [DefaultValue(10)]
         public int MinimumSampleSize
@@ -126,8 +121,9 @@ namespace Trinity.Settings.Loot
                 }
             }
         }
+
         [DataMember(IsRequired = false)]
-        [DefaultValue(10)]
+        [DefaultValue(4)]
         public int MinimumRank
         {
             get
@@ -145,6 +141,15 @@ namespace Trinity.Settings.Loot
             }
         }
         #endregion
+        #region Constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ItemRuleSetting" /> class.
+        /// </summary>
+        public ItemRankSettings()
+        {
+            Reset();
+        }
+        #endregion Constructors
 
         #region Events
         /// <summary>
@@ -159,12 +164,12 @@ namespace Trinity.Settings.Loot
             TrinitySetting.Reset(this);
         }
 
-        public void CopyTo(ItemSetting setting)
+        public void CopyTo(ItemRankSettings setting)
         {
             TrinitySetting.CopyTo(this, setting);
         }
 
-        public ItemSetting Clone()
+        public ItemRankSettings Clone()
         {
             return TrinitySetting.Clone(this);
         }
@@ -185,11 +190,10 @@ namespace Trinity.Settings.Loot
         {
             _itemRankMode = ItemRankMode.HeroOnly;
             _minimumPercent = 10;
-            _minimumRank = 10;
+            _minimumRank = 4;
             _minimumSampleSize = 10;
         }
 
         #endregion Methods
-
     }
 }

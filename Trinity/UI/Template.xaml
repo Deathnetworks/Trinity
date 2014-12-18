@@ -2,7 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:ut="clr-namespace:Trinity.UIComponents">
+             xmlns:ut="clr-namespace:Trinity.UIComponents"
+             xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=PresentationFramework">
     <ut:IntToStringConverter x:Key="intToStringConverter"/>
 
     <Style x:Key="LinkButton" TargetType="Button">
@@ -15,14 +16,32 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="Foreground" Value="Blue" />
+        <Setter Property="Foreground" Value="#FF00AAFF" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="true">
                 <Setter Property="Foreground" Value="Red" />
             </Trigger>
         </Style.Triggers>
     </Style>
-    
+    <!-- For Design Time Viewing in VS Dark Theme -->
+    <Style TargetType="{x:Type UserControl}">
+        <Style.Triggers>
+            <Trigger Property="componentModel:DesignerProperties.IsInDesignMode" Value="true">
+                <Setter Property="Background" Value="#FFAAAAAA" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="#FF666666" />
+    </Style>
+    <Style TargetType="{x:Type ComboBoxItem}" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="#FF666666" />
+    </Style>
+    <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource {x:Type CheckBox}}">
+        <Setter Property="Margin" Value="5" />
+    </Style>
     <ControlTemplate x:Key="Slider" TargetType="{x:Type Slider}">
         <Grid>
             <Grid.ColumnDefinitions>

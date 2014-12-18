@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel;
 using System.Runtime.Serialization;
-using Trinity.Settings.Loot;
+using Trinity.Config;
+using Trinity.Config.Loot;
 
-namespace Trinity.Config.Loot
+namespace Trinity.Settings.Loot
 {
     [DataContract(Namespace = "")]
     public class ItemRuleSetting : ITrinitySetting<ItemRuleSetting>, INotifyPropertyChanged
@@ -25,7 +26,7 @@ namespace Trinity.Config.Loot
 
         #region Constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="PickupSetting" /> class.
+        /// Initializes a new instance of the <see cref="ItemRuleSetting" /> class.
         /// </summary>
         public ItemRuleSetting()
         {

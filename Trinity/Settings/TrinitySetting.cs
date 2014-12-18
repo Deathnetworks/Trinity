@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 using System.Threading;
 using System.Xml;
 using Trinity.Config.Combat;
-using Trinity.Config.Loot;
+using Trinity.Settings.Loot;
 using Trinity.Technicals;
 using Zeta.Bot.Settings;
 

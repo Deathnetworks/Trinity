@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Buddy.Coroutines;
+using Trinity.Coroutines;
 using Trinity.DbProvider;
 using Trinity.Helpers;
 using Zeta.Bot;
@@ -321,8 +322,6 @@ namespace Trinity.Items
 
         private static async Task<bool> SortTask(InventorySlot inventorySlot)
         {
-            Logger.Log("Starting sort task for {0}", inventorySlot);
-
             if (!ZetaDia.IsInGame)
                 return false;
             if (ZetaDia.IsLoadingWorld)
@@ -330,9 +329,10 @@ namespace Trinity.Items
             if (!ZetaDia.Me.IsFullyValid())
                 return false;
 
-            await ReturnToStashTask(inventorySlot);
+            if (!await ReturnToStashTask(inventorySlot))
+                return true;
 
-            Logger.Log("Preparing sort task...");
+            Logger.Log("Starting sort task for {0}", inventorySlot);
 
             List<ItemWrapper> wrappedItems;
 
@@ -420,7 +420,7 @@ namespace Trinity.Items
                 if (_startedOutOfTown && ZetaDia.IsInTown)
                     await CommonBehaviors.TakeTownPortalBack().ExecuteCoroutine();
             }
-            else
+            else if (inventorySlot == InventorySlot.BackpackItems)
             {
                 await SortItems(inventorySlot);
                 await ReverseItems(inventorySlot);
@@ -438,27 +438,30 @@ namespace Trinity.Items
                 if (ZetaDia.Me.IsInCombat)
                     return false;
 
-                if (!ZetaDia.IsInTown)
+                if (!ZetaDia.IsInTown && ZetaDia.Me.IsFullyValid() && !ZetaDia.Me.IsInCombat && UIElements.BackgroundScreenPCButtonRecall.IsEnabled)
                 {
                     _startedOutOfTown = true;
                     await CommonCoroutines.UseTownPortal("Returning to stash");
+                    return false;
                 }
 
-                if (!GameUI.IsElementVisible(GameUI.StashDialogMainPage))
+                if (!GameUI.IsElementVisible(GameUI.StashDialogMainPage) && ZetaDia.IsInTown)
                 {
                     // Move to Stash
                     if (TownRun.StashLocation.Distance2D(ZetaDia.Me.Position) > 10f)
-                        await CommonCoroutines.MoveAndStop(TownRun.StashLocation, 10f, "Shared Stash");
-
+                    {
+                        await TrinityCoroutines.MoveTo(TownRun.StashLocation, "Shared Stash");
+                        return false;
+                    }
                     if (TownRun.StashLocation.Distance2D(ZetaDia.Me.Position) <= 10f && TownRun.SharedStash == null)
                     {
                         Logger.LogError("Shared Stash actor is null!");
                         RemoveBehavior();
-                        return true;
+                        return false;
                     }
 
                     // Open Stash
-                    if (TownRun.StashLocation.Distance2D(ZetaDia.Me.Position) <= 10f && TownRun.SharedStash != null && GameUI.IsElementVisible(GameUI.StashDialogMainPage))
+                    if (TownRun.StashLocation.Distance2D(ZetaDia.Me.Position) <= 10f && TownRun.SharedStash != null && !GameUI.IsElementVisible(GameUI.StashDialogMainPage))
                     {
                         while (ZetaDia.Me.Movement.IsMoving)
                         {
@@ -468,6 +471,10 @@ namespace Trinity.Items
                         Logger.Log("Opening Stash");
                         TownRun.SharedStash.Interact();
                         await Coroutine.Sleep(ItemMovementDelay);
+                        await Coroutine.Yield();
+                        if (GameUI.IsElementVisible(GameUI.StashDialogMainPage))
+                            return true;
+                        return false;
                     }
                 }
             }
@@ -632,8 +639,6 @@ namespace Trinity.Items
                         }
                         continue;
                     }
-
-
 
                     await ClearSpot(inventorySlot, currentCol, currentRow, i.IsTwoSquareItem, isForward: false);
 

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Trinity.Helpers;
 using Trinity.Objects;
+using Trinity.Settings.Loot;
+using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 
@@ -23,19 +25,60 @@ namespace Trinity.Reference
             }
         }
 
+
         public static IEnumerable<ItemRank> GetRankedItems(ActorClass actorClass, double minPercent = 10, int minSampleSize = 10, int betterThanRank = 5)
         {
-            return ToList().Where(i => i.SoftcoreRank.Any(ird =>
-                ird.Rank < betterThanRank &&
+            var list = ToList().Where(i => i.SoftcoreRank.Any(ird =>
+                ird.Rank <= betterThanRank &&
                 ird.Class == actorClass &&
                 ird.PercentUsed >= minPercent &&
-                ird.SampleSize >= minSampleSize))
-                .OrderByDescending(i => i.Item.BaseType).ThenBy(i => i.Item.ItemType).ThenBy(i => i.SoftcoreRank.FirstOrDefault().PercentUsed);
+                ird.SampleSize >= minSampleSize));
+
+            List<ItemRank> result = new List<ItemRank>();
+            foreach (var ir in list)
+            {
+                var newIr = new ItemRank { Item = ir.Item };
+                foreach (var ird in ir.SoftcoreRank.Where(ird => ird != null && ird.Rank <= betterThanRank && ird.Class == actorClass && ird.PercentUsed >= minPercent && ird.SampleSize >= minSampleSize))
+                {
+                    newIr.SoftcoreRank.Add(ird);
+                }
+                foreach (var ird in ir.HardcoreRank.Where(ird => ird != null && ird.Rank <= betterThanRank && ird.Class == actorClass && ird.PercentUsed >= minPercent && ird.SampleSize >= minSampleSize))
+                {
+                    newIr.HardcoreRank.Add(ird);
+                }
+                if (newIr.SoftcoreRank.Any())
+                    result.Add(newIr);
+            }
+
+            return result;
         }
 
         public static HashSet<int> GetRankedIds(ActorClass actorClass, double minPercent = 10, int minSampleSize = 10, int betterThanRank = 5)
         {
             return new HashSet<int>(GetRankedItems(actorClass, minPercent, minSampleSize, betterThanRank).Select(v => v.Item.Id));
+        }
+
+        public static List<ItemRank> GetRankedItemsFromSettings(ItemRankSettings irs)
+        {
+            List<ItemRank> ird = new List<ItemRank>();
+
+            if (irs.ItemRankMode == ItemRankMode.AnyClass)
+            {
+                foreach (ActorClass actor in Enum.GetValues(typeof(ActorClass)).Cast<ActorClass>())
+                {
+                    if (actor == ActorClass.Invalid)
+                        continue;
+                    foreach (ItemRank itemRank in GetRankedItems(actor, irs.MinimumPercent, irs.MinimumSampleSize, irs.MinimumRank))
+                    {
+                        ird.Add(itemRank);
+                    }
+                }
+            }
+            else if (ZetaDia.Me.IsFullyValid())
+            {
+                ird.AddRange(GetRankedItems(ZetaDia.Me.ActorClass, irs.MinimumPercent, irs.MinimumSampleSize, irs.MinimumRank));
+            }
+            return ird;
         }
 
         private static Dictionary<int, ItemRank> _itemRankDictionary = new Dictionary<int, ItemRank>();
@@ -63,8 +106,6 @@ namespace Trinity.Reference
             {
                 if (_highRankedIds != null)
                     return _highRankedIds;
-
-                var list = ToList();
 
                 _highRankedIds = new Dictionary<ActorClass, HashSet<int>>();
 

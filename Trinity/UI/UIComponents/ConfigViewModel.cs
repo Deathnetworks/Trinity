@@ -610,6 +610,11 @@ namespace Trinity.UI.UIComponents
             get { return _Model.Loot.Pickup; }
         }
 
+        public ItemRankSettings ItemRank
+        {
+            get { return _Model.Loot.ItemRank; }
+        }
+
         /// <summary>
         ///     Gets the Pickup Configuration Model.
         /// </summary>

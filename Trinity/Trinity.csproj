@@ -111,6 +111,7 @@
     <Compile Include="Configuration\TVar.cs" />
     <Compile Include="Configuration\TVars.cs" />
     <Compile Include="Coroutines\DeathBehavior.cs" />
+    <Compile Include="Coroutines\TrinityCoroutines.cs" />
     <Compile Include="DbProvider\DeathHandler.cs" />
     <Compile Include="DbProvider\SearchAreaProvider.cs" />
     <Compile Include="Helpers\Attributes\NoCopy.cs" />
