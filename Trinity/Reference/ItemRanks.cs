@@ -4,15 +4,35 @@ using System.Linq;
 using Trinity.Helpers;
 using Trinity.Objects;
 using Trinity.Settings.Loot;
-using Zeta.Common;
+using Trinity.Technicals;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.Reference
 {
     public class ItemRanks : FieldCollection<ItemRanks, ItemRank>
     {
         #region Methods
+        internal static bool ShouldStashItem(CachedACDItem cachedAcdItem)
+        {
+            if (cachedAcdItem.AcdItem != null && cachedAcdItem.AcdItem.IsValid)
+            {
+                var item = new Item(cachedAcdItem.AcdItem);
+                var result = ShouldStashItem(item);
+
+                string action = result ? "KEEP" : "TRASH";
+                Logger.Log(LogCategory.ItemValuation, "Ranked Item - {0} - {1}", action, item.Name);
+
+                return result;
+            }
+            return false;
+        }
+
+        internal static bool ShouldStashItem(Item item)
+        {
+            return GetRankedItemsFromSettings().Any( i => i.Item.Equals(item));
+        }
 
         private static HashSet<int> _itemIds;
 
@@ -24,7 +44,6 @@ namespace Trinity.Reference
                     .Select(i => i.Item.Id)));
             }
         }
-
 
         public static IEnumerable<ItemRank> GetRankedItems(ActorClass actorClass, double minPercent = 10, int minSampleSize = 10, int betterThanRank = 5)
         {
@@ -56,6 +75,20 @@ namespace Trinity.Reference
         public static HashSet<int> GetRankedIds(ActorClass actorClass, double minPercent = 10, int minSampleSize = 10, int betterThanRank = 5)
         {
             return new HashSet<int>(GetRankedItems(actorClass, minPercent, minSampleSize, betterThanRank).Select(v => v.Item.Id));
+        }
+
+        private static double lastSettingSignature;
+        private static List<ItemRank> LastRankedItemsList = new List<ItemRank>();
+        public static List<ItemRank> GetRankedItemsFromSettings()
+        {
+            var irs = Trinity.Settings.Loot.ItemRank;
+            var settingSignature = (int)Trinity.Player.ActorClass + (int)irs.ItemRankMode + irs.MinimumRank + irs.MinimumSampleSize + irs.MinimumPercent;
+            if (settingSignature == lastSettingSignature)
+                return LastRankedItemsList;
+
+            lastSettingSignature = settingSignature;
+            LastRankedItemsList = GetRankedItemsFromSettings(Trinity.Settings.Loot.ItemRank);
+            return LastRankedItemsList;
         }
 
         public static List<ItemRank> GetRankedItemsFromSettings(ItemRankSettings irs)

@@ -98,6 +98,7 @@
                         <CheckBox Content="Rift Keys" IsChecked="{Binding Path=Pickup.LootRunKey}" Margin="5" ToolTip="Pickup Rift Key Fragments"/>
                         <CheckBox Content="Trial Keys" IsChecked="{Binding Path=Pickup.TrialKeys}" Margin="5" ToolTip="Pickup Rift Key Fragments"/>
                         <CheckBox Content="Ramadalini's" IsChecked="{Binding Path=Pickup.RamadalinisGift}" Margin="5" ToolTip="Pickup Rift Key Fragments"/>
+                        <CheckBox Content="Legendary Potions" IsChecked="{Binding Path=Pickup.LegendaryPotions}" Margin="5" ToolTip="Pickup Rift Key Fragments"/>
                     </UniformGrid>
                     <Grid>
                         <Grid.ColumnDefinitions>

@@ -36,6 +36,7 @@ namespace Trinity.Config.Loot
         private bool _lootRunKey;
         private bool _trialKeys;
         private bool _ramadalinisGift;
+        private bool _legendaryPotions;
         private bool _bloodShards;
         private bool _ignoreTwoHandedWeapons;
 
@@ -547,6 +548,23 @@ namespace Trinity.Config.Loot
                 }
             }
         }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool LegendaryPotions
+        {
+            get
+            {
+                return _legendaryPotions;
+            }
+            set
+            {
+                if (_legendaryPotions != value)
+                {
+                    _legendaryPotions = value;
+                    OnPropertyChanged("LegendaryPotions");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
@@ -727,16 +745,17 @@ namespace Trinity.Config.Loot
             IgnoreTwoHandedWeapons = false;
             PickupGrayItems = true;
             PickupWhiteItems = true;
-            PickupBlueFollowerItems = true;
+            PickupBlueFollowerItems = false;
             PickupYellowFollowerItems = true;
             PickupUpgrades = true;
-            MiscItemQuality = TrinityItemQuality.Common;
+            MiscItemQuality = TrinityItemQuality.Legendary;
             BloodShards = true;
             LootRunKey = true;
             PickupGold = true;
             RamadalinisGift = true;
             TrialKeys = true;
             PickupLegendaries = true;
+            LegendaryPotions = true;
         }
         #endregion Methods
     }

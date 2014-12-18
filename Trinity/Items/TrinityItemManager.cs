@@ -7,6 +7,7 @@ using Trinity.Cache;
 using Trinity.DbProvider;
 using Trinity.Helpers;
 using Trinity.ItemRules;
+using Trinity.Reference;
 using Trinity.Settings.Loot;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -144,6 +145,11 @@ namespace Trinity.Items
         {
             ItemEvents.ResetTownRun();
 
+            if (Trinity.Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy)
+            {
+                return Current.ShouldStashItem(item);
+            }
+
             if (Current.ItemIsProtected(item))
                 return false;
 
@@ -158,11 +164,6 @@ namespace Trinity.Items
                 (Trinity.Settings.Loot.TownRun.KeepRiftKeysInBackpack && item.TieredLootRunKeyLevel <= -1))
                     return false;
                 return true;
-            } 
-
-            if (Trinity.Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy)
-            {
-                return Current.ShouldStashItem(item);
             }
 
             CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
@@ -309,6 +310,13 @@ namespace Trinity.Items
                 return false;
             }
 
+            if (cItem.Quality >= ItemQuality.Legendary && Trinity.Settings.Loot.ItemFilterMode == ItemFilterMode.ItemRanks && IsEquipment(cItem))
+            {
+                if (evaluationType == ItemEvaluationType.Keep)
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (Rank Equipment)", cItem.RealName, cItem.InternalName, tItemType);
+                return ItemRanks.ShouldStashItem(cItem);
+            }
+            
             if (cItem.Quality >= ItemQuality.Legendary)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
@@ -733,14 +741,14 @@ namespace Trinity.Items
 
                         if (row < 0 || row > 5)
                         {
-                            Logger.LogError("Item {0} ({1}) is reporting invalid backpack row of {2}!", 
+                            Logger.LogError("Item {0} ({1}) is reporting invalid backpack row of {2}!",
                                 item.Name, item.InternalName, item.InventoryRow);
                             continue;
                         }
 
                         if (col < 0 || col > 9)
                         {
-                            Logger.LogError("Item {0} ({1}) is reporting invalid backpack column of {2}!", 
+                            Logger.LogError("Item {0} ({1}) is reporting invalid backpack column of {2}!",
                                 item.Name, item.InternalName, item.InventoryColumn);
                             continue;
                         }
@@ -763,7 +771,7 @@ namespace Trinity.Items
                         }
                         catch (IndexOutOfRangeException)
                         {
-                            Logger.LogError("Error checking for next slot on item {0}, row={1} col={2} IsTwoSquare={3} ItemType={4}", 
+                            Logger.LogError("Error checking for next slot on item {0}, row={1} col={2} IsTwoSquare={3} ItemType={4}",
                                 item.Name, item.InventoryRow, item.InventoryColumn, item.ItemType);
                             continue;
                         }
@@ -868,7 +876,7 @@ namespace Trinity.Items
             // Pickup Ramaladni's Gift
             if (itemType == GItemType.ConsumableAddSockets)
             {
-                return true;
+                return Trinity.Settings.Loot.Pickup.RamadalinisGift;
             }
 
             // Tiered Rift Keys
@@ -880,7 +888,7 @@ namespace Trinity.Items
             // Pickup Legendary potions
             if (itemType == GItemType.HealthPotion && item.Quality >= ItemQuality.Legendary)
             {
-                return true;
+                return Trinity.Settings.Loot.Pickup.LegendaryPotions;
             }
 
             if (itemType == GItemType.InfernalKey)
@@ -917,15 +925,9 @@ namespace Trinity.Items
                 return false;
             }
 
-            // Always pickup Legendary plans
             if (itemType == GItemType.CraftingPlan && item.Quality >= ItemQuality.Legendary && Trinity.Settings.Loot.Pickup.LegendaryPlans)
             {
                 return true;
-            }
-            // If it's legendary, we always want it *IF* it's level is right
-            if (item.Quality >= ItemQuality.Legendary)
-            {
-                return Trinity.Settings.Loot.Pickup.PickupLegendaries;
             }
 
             if (item.IsUpgrade && Trinity.Settings.Loot.Pickup.PickupUpgrades)
@@ -938,17 +940,19 @@ namespace Trinity.Items
                 case GItemBaseType.WeaponTwoHand:
                 case GItemBaseType.WeaponOneHand:
                 case GItemBaseType.WeaponRange:
+                    if (item.Quality >= ItemQuality.Legendary)
+                        return Trinity.Settings.Loot.Pickup.PickupLegendaries;
                     return CheckLevelRequirements(item.Level, item.Quality, Trinity.Settings.Loot.Pickup.PickupBlueWeapons, Trinity.Settings.Loot.Pickup.PickupYellowWeapons);
                 case GItemBaseType.Armor:
-                case GItemBaseType.Offhand:
+                case GItemBaseType.Offhand: if (item.Quality >= ItemQuality.Legendary)
+                        return Trinity.Settings.Loot.Pickup.PickupLegendaries;
                     return CheckLevelRequirements(item.Level, item.Quality, Trinity.Settings.Loot.Pickup.PickupBlueArmor, Trinity.Settings.Loot.Pickup.PickupYellowArmor);
-                case GItemBaseType.Jewelry:
+                case GItemBaseType.Jewelry: if (item.Quality >= ItemQuality.Legendary)
+                        return Trinity.Settings.Loot.Pickup.PickupLegendaries;
                     return CheckLevelRequirements(item.Level, item.Quality, Trinity.Settings.Loot.Pickup.PickupBlueJewlery, Trinity.Settings.Loot.Pickup.PickupYellowJewlery);
                 case GItemBaseType.FollowerItem:
                     if (item.Quality >= ItemQuality.Legendary)
-                    {
                         return true;
-                    }
                     if (item.Quality >= ItemQuality.Magic1 && item.Quality <= ItemQuality.Magic3 && Trinity.Settings.Loot.Pickup.PickupBlueFollowerItems)
                         return true;
                     if (item.Quality >= ItemQuality.Rare4 && item.Quality <= ItemQuality.Rare6 && Trinity.Settings.Loot.Pickup.PickupYellowFollowerItems)
@@ -967,6 +971,8 @@ namespace Trinity.Items
                     }
                     break;
                 case GItemBaseType.Misc:
+                    if (item.ACDItem.GetTrinityItemQuality() < Trinity.Settings.Loot.Pickup.MiscItemQuality)
+                        return false;
 
                     // Potion filtering
                     if (itemType == GItemType.HealthPotion && item.Quality < ItemQuality.Legendary)
@@ -1056,10 +1062,6 @@ namespace Trinity.Items
         /// <returns></returns>
         internal static bool CheckLevelRequirements(int level, ItemQuality quality, bool pickupBlue, bool pickupYellow)
         {
-            // Always pick legendaries
-            if (quality >= ItemQuality.Legendary)
-                return true;
-
             // Gray Items
             if (quality < ItemQuality.Normal)
             {
@@ -1102,11 +1104,11 @@ namespace Trinity.Items
             }
 
             // Blue/Yellow get scored
-            if (quality >= ItemQuality.Magic1 && quality < ItemQuality.Rare4 && pickupBlue)
+            if (quality >= ItemQuality.Magic1 && quality < ItemQuality.Rare4 && !pickupBlue)
             {
                 return false;
             }
-            if (pickupYellow)
+            if (quality >= ItemQuality.Rare4 && quality < ItemQuality.Legendary && !pickupYellow)
             {
                 return false;
             }
@@ -1272,12 +1274,12 @@ namespace Trinity.Items
                 case GItemType.Spear:
                 case GItemType.Sword:
                 case GItemType.Wand:
-                {
+                    {
 
-                    itemBaseType = GItemBaseType.WeaponOneHand;
-                    break;
-                }
-                    // Two Handed Weapons
+                        itemBaseType = GItemBaseType.WeaponOneHand;
+                        break;
+                    }
+                // Two Handed Weapons
                 case GItemType.TwoHandDaibo:
                 case GItemType.TwoHandMace:
                 case GItemType.TwoHandFlail:
@@ -1286,29 +1288,29 @@ namespace Trinity.Items
                 case GItemType.TwoHandStaff:
                 case GItemType.TwoHandSword:
                 case GItemType.TwoHandAxe:
-                {
-                    itemBaseType = GItemBaseType.WeaponTwoHand;
-                    break;
-                }
-                    // Ranged Weapons
+                    {
+                        itemBaseType = GItemBaseType.WeaponTwoHand;
+                        break;
+                    }
+                // Ranged Weapons
                 case GItemType.TwoHandCrossbow:
                 case GItemType.HandCrossbow:
                 case GItemType.TwoHandBow:
-                {
-                    itemBaseType = GItemBaseType.WeaponRange;
-                    break;
-                }
-                    // Off-hands
+                    {
+                        itemBaseType = GItemBaseType.WeaponRange;
+                        break;
+                    }
+                // Off-hands
                 case GItemType.Mojo:
                 case GItemType.Orb:
                 case GItemType.CrusaderShield:
                 case GItemType.Quiver:
                 case GItemType.Shield:
-                {
-                    itemBaseType = GItemBaseType.Offhand;
-                    break;
-                }
-                    // Armors
+                    {
+                        itemBaseType = GItemBaseType.Offhand;
+                        break;
+                    }
+                // Armors
                 case GItemType.Boots:
                 case GItemType.Bracer:
                 case GItemType.Chest:
@@ -1322,26 +1324,26 @@ namespace Trinity.Items
                 case GItemType.WizardHat:
                 case GItemType.Belt:
                 case GItemType.MightyBelt:
-                {
-                    itemBaseType = GItemBaseType.Armor;
-                    break;
-                }
-                    // Jewlery
+                    {
+                        itemBaseType = GItemBaseType.Armor;
+                        break;
+                    }
+                // Jewlery
                 case GItemType.Amulet:
                 case GItemType.Ring:
-                {
-                    itemBaseType = GItemBaseType.Jewelry;
-                    break;
-                }
-                    // Follower Items
+                    {
+                        itemBaseType = GItemBaseType.Jewelry;
+                        break;
+                    }
+                // Follower Items
                 case GItemType.FollowerEnchantress:
                 case GItemType.FollowerScoundrel:
                 case GItemType.FollowerTemplar:
-                {
-                    itemBaseType = GItemBaseType.FollowerItem;
-                    break;
-                }
-                    // Misc Items
+                    {
+                        itemBaseType = GItemBaseType.FollowerItem;
+                        break;
+                    }
+                // Misc Items
                 case GItemType.CraftingMaterial:
                 case GItemType.CraftTome:
                 case GItemType.LootRunKey:
@@ -1355,36 +1357,36 @@ namespace Trinity.Items
                 case GItemType.InfernalKey:
                 case GItemType.ConsumableAddSockets:
                 case GItemType.TieredLootrunKey:
-                {
-                    itemBaseType = GItemBaseType.Misc;
-                    break;
-                }
-                    // Gems
+                    {
+                        itemBaseType = GItemBaseType.Misc;
+                        break;
+                    }
+                // Gems
                 case GItemType.Ruby:
                 case GItemType.Emerald:
                 case GItemType.Topaz:
                 case GItemType.Amethyst:
                 case GItemType.Diamond:
-                {
-                    itemBaseType = GItemBaseType.Gem;
-                    break;
-                }
-                    // Globes
+                    {
+                        itemBaseType = GItemBaseType.Gem;
+                        break;
+                    }
+                // Globes
                 case GItemType.HealthGlobe:
-                {
-                    itemBaseType = GItemBaseType.HealthGlobe;
-                    break;
-                }
+                    {
+                        itemBaseType = GItemBaseType.HealthGlobe;
+                        break;
+                    }
                 case GItemType.PowerGlobe:
-                {
-                    itemBaseType = GItemBaseType.PowerGlobe;
-                    break;
-                }
+                    {
+                        itemBaseType = GItemBaseType.PowerGlobe;
+                        break;
+                    }
                 case GItemType.ProgressionGlobe:
-                {
-                    itemBaseType = GItemBaseType.ProgressionGlobe;
-                    break;
-                }
+                    {
+                        itemBaseType = GItemBaseType.ProgressionGlobe;
+                        break;
+                    }
             }
             return itemBaseType;
         }

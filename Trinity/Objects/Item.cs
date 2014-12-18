@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Trinity.Cache;
 using Trinity.Combat.Abilities;
 using Trinity.Reference;
@@ -7,7 +8,7 @@ using Zeta.Game.Internals.Actors;
 
 namespace Trinity.Objects
 {
-    public class Item
+    public class Item : IEquatable<Item>
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -93,6 +94,11 @@ namespace Trinity.Objects
 
                 return false;
             }
+        }
+
+        public bool Equals(Item other)
+        {
+            return GetHashCode().Equals(other.GetHashCode());
         }
 
         /// <summary>
