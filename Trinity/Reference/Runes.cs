@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Trinity.Helpers;
 using Trinity.Objects;
-using Trinity.Combat;
 using Zeta.Game;
 
 // AUTO-GENERATED on Sat, 30 Aug 2014 08:53:54 GMT

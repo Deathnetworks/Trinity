@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
 using Trinity.Cache;
-using Trinity.Config.Loot;
 using Trinity.Helpers;
+using Trinity.Items;
+using Trinity.Settings.Loot;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Game;
@@ -47,10 +48,10 @@ namespace Trinity
                 c_IsTwoHandedItem = diaItem.CommonData.IsTwoHand;
                 c_item_tFollowerType = diaItem.CommonData.FollowerSpecialType;
                 // Calculate item type
-                c_item_GItemType = DetermineItemType(CurrentCacheObject.InternalName, c_DBItemType, c_item_tFollowerType);
+                c_item_GItemType = TrinityItemManager.DetermineItemType(CurrentCacheObject.InternalName, c_DBItemType, c_item_tFollowerType);
 
                 // And temporarily store the base type
-                GItemBaseType itemBaseType = DetermineBaseType(c_item_GItemType);
+                GItemBaseType itemBaseType = TrinityItemManager.DetermineBaseType(c_item_GItemType);
 
                 // Compute item quality from item link 
                 if (!CacheData.ItemLinkQuality.TryGetValue(CurrentCacheObject.ACDGuid, out c_ItemQuality))
@@ -159,17 +160,17 @@ namespace Trinity
                     }
                     else if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
                     {
-                        AddToCache = ItemRulesPickupValidation(pickupItem);
+                        AddToCache = TrinityItemManager.ItemRulesPickupValidation(pickupItem);
                     }
                     else // Trinity Scoring Only
                     {
-                        AddToCache = PickupItemValidation(pickupItem);
+                        AddToCache = TrinityItemManager.PickupItemValidation(pickupItem);
                     }
 
                     // Pickup low level enabled, and we're a low level
                     if (!AddToCache && Settings.Loot.Pickup.PickupLowLevel && Player.Level <= 10)
                     {
-                        AddToCache = PickupItemValidation(pickupItem);
+                        AddToCache = TrinityItemManager.PickupItemValidation(pickupItem);
                     }
 
                     CacheData.PickupItem.Add(CurrentCacheObject.RActorGuid, AddToCache);
@@ -229,7 +230,7 @@ namespace Trinity
 
             return true;
         }
-        private static bool RefreshItemStats(GItemBaseType tempbasetype)
+        private static bool RefreshItemStats(GItemBaseType baseType)
         {
             bool isNewLogItem = false;
 
@@ -242,50 +243,50 @@ namespace Trinity
                 try
                 {
                     isNewLogItem = true;
-                    if (tempbasetype == GItemBaseType.Armor || tempbasetype == GItemBaseType.WeaponOneHand || tempbasetype == GItemBaseType.WeaponTwoHand ||
-                        tempbasetype == GItemBaseType.WeaponRange || tempbasetype == GItemBaseType.Jewelry || tempbasetype == GItemBaseType.FollowerItem ||
-                        tempbasetype == GItemBaseType.Offhand)
+                    if (baseType == GItemBaseType.Armor || baseType == GItemBaseType.WeaponOneHand || baseType == GItemBaseType.WeaponTwoHand ||
+                        baseType == GItemBaseType.WeaponRange || baseType == GItemBaseType.Jewelry || baseType == GItemBaseType.FollowerItem ||
+                        baseType == GItemBaseType.Offhand)
                     {
                         try
                         {
                             int iThisQuality;
-                            ItemsDroppedStats.Total++;
+                            ItemDropStats.ItemsDroppedStats.Total++;
                             if (c_ItemQuality >= ItemQuality.Legendary)
-                                iThisQuality = QUALITYORANGE;
+                                iThisQuality = ItemDropStats.QUALITYORANGE;
                             else if (c_ItemQuality >= ItemQuality.Rare4)
-                                iThisQuality = QUALITYYELLOW;
+                                iThisQuality = ItemDropStats.QUALITYYELLOW;
                             else if (c_ItemQuality >= ItemQuality.Magic1)
-                                iThisQuality = QUALITYBLUE;
+                                iThisQuality = ItemDropStats.QUALITYBLUE;
                             else
-                                iThisQuality = QUALITYWHITE;
-                            ItemsDroppedStats.TotalPerQuality[iThisQuality]++;
-                            ItemsDroppedStats.TotalPerLevel[c_ItemLevel]++;
-                            ItemsDroppedStats.TotalPerQPerL[iThisQuality, c_ItemLevel]++;
+                                iThisQuality = ItemDropStats.QUALITYWHITE;
+                            ItemDropStats.ItemsDroppedStats.TotalPerQuality[iThisQuality]++;
+                            ItemDropStats.ItemsDroppedStats.TotalPerLevel[c_ItemLevel]++;
+                            ItemDropStats.ItemsDroppedStats.TotalPerQPerL[iThisQuality, c_ItemLevel]++;
                         }
                         catch (Exception ex)
                         {
                             Logger.LogError("Error Refreshing Item Stats for Equippable Item: " + ex.ToString());
                         }
                     }
-                    else if (tempbasetype == GItemBaseType.Gem)
+                    else if (baseType == GItemBaseType.Gem)
                     {
                         try
                         {
                             int iThisGemType = 0;
-                            ItemsDroppedStats.TotalGems++;
+                            ItemDropStats.ItemsDroppedStats.TotalGems++;
                             if (c_item_GItemType == GItemType.Topaz)
-                                iThisGemType = GEMTOPAZ;
+                                iThisGemType = ItemDropStats.GEMTOPAZ;
                             if (c_item_GItemType == GItemType.Ruby)
-                                iThisGemType = GEMRUBY;
+                                iThisGemType = ItemDropStats.GEMRUBY;
                             if (c_item_GItemType == GItemType.Emerald)
-                                iThisGemType = GEMEMERALD;
+                                iThisGemType = ItemDropStats.GEMEMERALD;
                             if (c_item_GItemType == GItemType.Amethyst)
-                                iThisGemType = GEMAMETHYST;
+                                iThisGemType = ItemDropStats.GEMAMETHYST;
                             if (c_item_GItemType == GItemType.Diamond)
-                                iThisGemType = GEMDIAMOND;
-                            ItemsDroppedStats.GemsPerType[iThisGemType]++;
-                            ItemsDroppedStats.GemsPerLevel[c_ItemLevel]++;
-                            ItemsDroppedStats.GemsPerTPerL[iThisGemType, c_ItemLevel]++;
+                                iThisGemType = ItemDropStats.GEMDIAMOND;
+                            ItemDropStats.ItemsDroppedStats.GemsPerType[iThisGemType]++;
+                            ItemDropStats.ItemsDroppedStats.GemsPerLevel[c_ItemLevel]++;
+                            ItemDropStats.ItemsDroppedStats.GemsPerTPerL[iThisGemType, c_ItemLevel]++;
                         }
                         catch (Exception ex)
                         {
@@ -296,7 +297,7 @@ namespace Trinity
                     {
                         try
                         {
-                            ItemsDroppedStats.TotalInfernalKeys++;
+                            ItemDropStats.ItemsDroppedStats.TotalInfernalKeys++;
                         }
                         catch (Exception ex)
                         {
@@ -304,12 +305,12 @@ namespace Trinity
                         }
                     }
                     // See if we should update the stats file
-                    if (DateTime.UtcNow.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)
+                    if (DateTime.UtcNow.Subtract(ItemDropStats.ItemStatsLastPostedReport).TotalSeconds > 10)
                     {
                         try
                         {
-                            ItemStatsLastPostedReport = DateTime.UtcNow;
-                            OutputReport();
+                            ItemDropStats.ItemStatsLastPostedReport = DateTime.UtcNow;
+                            ItemDropStats.OutputReport();
                         }
                         catch (Exception ex)
                         {

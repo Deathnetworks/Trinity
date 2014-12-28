@@ -1,6 +1,6 @@
-﻿using System.Collections;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.Serialization;
+using Trinity.Settings.Loot;
 
 namespace Trinity.Config.Loot
 {

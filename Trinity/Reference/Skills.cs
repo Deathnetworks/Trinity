@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Linq;
-using Trinity.Combat;
+using System.Collections.Generic;
 using Trinity.Helpers;
 using Trinity.Objects;
-using System.Collections.Generic;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 

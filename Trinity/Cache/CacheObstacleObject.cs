@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Zeta.Common;
 using Zeta.Game;
+
 namespace Trinity
 {
     // Obstacles for quick mapping of paths etc.

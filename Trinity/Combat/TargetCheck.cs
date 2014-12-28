@@ -4,12 +4,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Trinity.Combat.Abilities;
+using Trinity.DbProvider;
 using Trinity.Helpers;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Common.Plugins;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
+
 namespace Trinity
 {
     public partial class Trinity : IPlugin
@@ -41,9 +43,9 @@ namespace Trinity
                 }
 
                 // We keep dying because we're spawning in AoE and next to 50 elites and we need to just leave the game
-                if (DateTime.UtcNow.Subtract(Trinity.LastDeathTime).TotalSeconds < 30 &&
+                if (DateTime.UtcNow.Subtract(LastDeathTime).TotalSeconds < 30 &&
                     ZetaDia.Me.Inventory.Equipped.Any() &&
-                    ZetaDia.Me.Inventory.Equipped.Average(i => i.DurabilityPercent) < 0.05 && !ZetaDia.IsInTown)
+                    ZetaDia.Me.Inventory.Equipped.Where(i => i.IsValid).Average(i => i.DurabilityPercent) < 0.05 && !ZetaDia.IsInTown)
                 {
                     Logger.Log("Durability is zero, emergency leave game");
                     ZetaDia.Service.Party.LeaveGame(true);
@@ -133,7 +135,6 @@ namespace Trinity
                 // We have a target, start the target handler!
                 if (CurrentTarget != null)
                 {
-                    _isWholeNewTarget = true;
                     DontMoveMeIAmDoingShit = true;
                     _shouldPickNewAbilities = true;
                     return TargetCheckResult(true, "Current Target is not null");
@@ -169,7 +170,7 @@ namespace Trinity
 
                         bool isLoopingAnimation = ZetaDia.Me.LoopingAnimationEndTime > 0;
 
-                        if (!isLoopingAnimation && !IsReadyToTownRun && !ForceVendorRunASAP)
+                        if (!isLoopingAnimation && !WantToTownRun && !ForceVendorRunASAP)
                         {
                             BarbarianCombat.AllowSprintOOC = true;
                             DisableOutofCombatSprint = false;
@@ -199,7 +200,7 @@ namespace Trinity
                 }
                 CurrentTarget = null;
 
-                if ((Trinity.ForceVendorRunASAP || Trinity.IsReadyToTownRun) && TownRun.TownRunTimerRunning())
+                if ((Trinity.ForceVendorRunASAP || Trinity.WantToTownRun) && TownRun.TownRunTimerRunning())
                 {
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Waiting for town run timer (Target Check)", true);
                     return TargetCheckResult(true, "Waiting for TownRunTimer");

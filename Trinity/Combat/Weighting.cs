@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using JetBrains.Annotations;
 using Trinity.Cache;
 using Trinity.Combat;
 using Trinity.Combat.Abilities;
@@ -10,7 +9,6 @@ using Trinity.Items;
 using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
-using Zeta.Bot.Logic;
 using Zeta.Bot.Profile.Common;
 using Zeta.Bot.Settings;
 using Zeta.Common;
@@ -692,6 +690,7 @@ namespace Trinity
                             }
                         case GObjectType.HealthGlobe:
                             {
+                                // Weight Health Globes
                                 if (navBlocking)
                                 {
                                     objWeightInfo += " NavBlocking";
@@ -699,20 +698,34 @@ namespace Trinity
                                     break;
                                 }
 
-                                // Weight Health Globes
-
-                                //bool witchDoctorManaLow =
-                                //    Player.ActorClass == ActorClass.Witchdoctor &&
-                                //    Player.PrimaryResourcePct <= 0.15 &&
-                                //   HotbarSkills.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GruesomeFeast);
-
                                 if ((Player.CurrentHealthPct >= 1 || !Settings.Combat.Misc.CollectHealthGlobe))
                                 {
                                     cacheObject.Weight = 0;
                                 }
-                                // Give all globes super low weight if we don't urgently need them, but are not 100% health
-                                //else if (!witchDoctorManaLow && (Player.CurrentHealthPct > _playerEmergencyHealthGlobeLimit))
-                                else if (Player.CurrentHealthPct > _playerEmergencyHealthGlobeLimit)
+
+                                // WD's logic with Gruesome Feast passive,
+                                // mostly for intelligence stacks, 10% per globe
+                                // 1200 by default
+                                bool witchDoctorManaLow =
+                                    Player.ActorClass == ActorClass.Witchdoctor &&
+                                    Player.PrimaryResource <= V.F("WitchDoctor.ManaForHealthGlobes") &&
+                                    HotbarSkills.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GruesomeFeast);
+
+                                // DH's logic with Blood Vengeance passive
+                                // gain amount - 30 hatred per globe
+                                // 100 by default
+                                bool demonHunterHatredLow =
+                                    Player.ActorClass == ActorClass.DemonHunter &&
+                                    Player.PrimaryResource <= V.F("DemonHunter.HatredForHealthGlobes") &&
+                                    HotbarSkills.PassiveSkills.Contains(SNOPower.DemonHunter_Passive_Vengeance);
+
+                                if (demonHunterHatredLow)
+                                    cacheObject.Weight += 10000d; // 10k for DH's!
+
+                                if (witchDoctorManaLow)
+                                    cacheObject.Weight += 10000d; // 10k for WD's!
+
+                                else if (!demonHunterHatredLow && !witchDoctorManaLow && (Player.CurrentHealthPct > _playerEmergencyHealthGlobeLimit))
                                 {
                                     double myHealth = Player.CurrentHealthPct;
 
@@ -754,8 +767,6 @@ namespace Trinity
                                     {
                                         cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 17000d;
                                     }
-                                    //if (witchDoctorManaLow)
-                                    //    cacheObject.Weight += 10000d; // 10k for WD's!
 
                                     // Point-blank items get a weight increase
                                     if (cacheObject.Distance <= 15f)

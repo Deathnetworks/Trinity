@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Trinity.Config.Loot
+namespace Trinity.Settings.Loot
 {
     public enum SalvageOption
     {
@@ -23,7 +23,14 @@ namespace Trinity.Config.Loot
     {
         TrinityOnly,
         TrinityWithItemRules,
-        DemonBuddy
+        DemonBuddy,
+        ItemRanks
+    }
+
+    public enum ItemRankMode
+    {
+        AnyClass,
+        HeroOnly,
     }
 
     [Flags]

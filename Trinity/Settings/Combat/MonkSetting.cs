@@ -17,6 +17,7 @@ namespace Trinity.Config.Combat
         private bool _DisableMantraSpam;
         private bool _TargetBasedZigZag;
         private bool _UseDashingStrikeOOC;
+        private bool _EpiphanyOffCD;
         private int _MinCycloneTrashCount;
         private int _MinWoLTrashCount;
         private int _MinJawBreakerRange;
@@ -249,6 +250,24 @@ namespace Trinity.Config.Combat
                 {
                     _UseDashingStrikeOOC = value;
                     OnPropertyChanged("UseDashingStrikeOOC");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool EpiphanyOffCD
+        {
+            get
+            {
+                return _EpiphanyOffCD;
+            }
+            set
+            {
+                if (_EpiphanyOffCD != value)
+                {
+                    _EpiphanyOffCD = value;
+                    OnPropertyChanged("EpiphanyOffCD");
                 }
             }
         }

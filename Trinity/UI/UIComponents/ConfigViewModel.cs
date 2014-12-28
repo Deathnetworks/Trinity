@@ -1,34 +1,293 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
-using Trinity.Combat;
 using Trinity.Config;
 using Trinity.Config.Combat;
 using Trinity.Config.Loot;
 using Trinity.Helpers;
+using Trinity.ItemRules;
 using Trinity.Items;
-using Trinity.Reference;
+using Trinity.Settings.Loot;
 using Trinity.Technicals;
 using Trinity.UIComponents;
-using Trinity.Objects;
 using Zeta.Bot;
 using Zeta.Game;
-using Zeta.Common;
-using Logger = Trinity.Technicals.Logger;
+using Application = System.Windows.Application;
 
 namespace Trinity.UI.UIComponents
 {
     /// <summary>
-    /// ViewModel injected to Configuration Window 
+    ///     ViewModel injected to Configuration Window
     /// </summary>
     public class ConfigViewModel
     {
-        private TrinitySetting _Model;
-        private TrinitySetting _OriginalModel;
+        private readonly TrinitySetting _Model;
+        private readonly TrinitySetting _OriginalModel;
+
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ConfigViewModel" /> class.
+        /// </summary>
+        /// <param name="model">The model.</param>
+        public ConfigViewModel(TrinitySetting model)
+        {
+            try
+            {
+                _OriginalModel = model;
+                _Model = new TrinitySetting();
+                _OriginalModel.CopyTo(_Model);
+                InitializeResetCommand();
+                SaveCommand = new RelayCommand(
+                    parameter =>
+                    {
+                        try
+                        {
+                            if (Trinity.StashRule == null && _Model.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
+                            {
+                                // Load interpreter for the first time if needed
+                                Trinity.StashRule = new Interpreter();
+                            }
+
+                            _Model.CopyTo(_OriginalModel);
+                            _OriginalModel.Save();
+
+                            if (_Model.Advanced.TPSEnabled != _OriginalModel.Advanced.TPSEnabled)
+                                BotManager.SetBotTicksPerSecond();
+
+                            if (_Model.Advanced.UnstuckerEnabled != _OriginalModel.Advanced.UnstuckerEnabled)
+                                BotManager.SetUnstuckProvider();
+
+                            if (_Model.Loot.ItemFilterMode != _OriginalModel.Loot.ItemFilterMode)
+                                BotManager.SetItemManagerProvider();
+
+                            CacheData.FullClear();
+                            UsedProfileManager.SetProfileInWindowTitle();
+
+                            UILoader.CloseWindow();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log("Exception in UI SaveCommand {0}", ex);
+                        }
+                    });
+                DumpBackpackCommand = new RelayCommand(
+                    parameter =>
+                    {
+                        try
+                        {
+                            Logger.Log(
+                                "\n############################################\n"
+                                + "\nDumping Backpack Items. This will hang your client. Please wait....\n"
+                                + "##########################");
+                            UILoader.CloseWindow();
+                            TrinityItemManager.DumpItems(TrinityItemManager.DumpItemLocation.Backpack);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log(LogCategory.UserInformation, "Exception dumping Backpack: {0}", ex);
+                        }
+                    });
+                DumpQuickItemsCommand = new RelayCommand(
+                    parameter =>
+                    {
+                        try
+                        {
+                            Logger.Log(
+                                "\n############################################\n"
+                                + "\nQuick Dumping Items. This will hang your client. Please wait....\n"
+                                + "##########################");
+                            UILoader.CloseWindow();
+                            TrinityItemManager.DumpQuickItems();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log(LogCategory.UserInformation, "Exception Quick Dumping: {0}", ex);
+                        }
+                    });
+                DumpAllItemsCommand = new RelayCommand(
+                    parameter =>
+                    {
+                        try
+                        {
+                            Logger.Log(
+                                "\n############################################\n"
+                                + "\nDumping ALL Items. This will hang your client. Please wait....\n"
+                                + "##########################");
+                            UILoader.CloseWindow();
+                            TrinityItemManager.DumpItems(TrinityItemManager.DumpItemLocation.All);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log(LogCategory.UserInformation, "Exception Dumping ALL Items: {0}", ex);
+                        }
+                    });
+                DumpSkillsAndItemsCommand = new RelayCommand(
+                    parameter =>
+                    {
+                        try
+                        {
+                            UILoader.CloseWindow();
+                            BotMain.Stop(false, "Dumping Debug Information");
+                            ZetaDia.Actors.Update();
+                            using (ZetaDia.Memory.SaveCacheState())
+                            {
+                                ZetaDia.Memory.TemporaryCacheState(false);
+                                DebugUtil.LogBuildAndItems(TrinityLogLevel.Info);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log(LogCategory.UserInformation, "Exception Dumping Skill/Rune/Passive Items: {0}", ex);
+                        }
+                    });
+                DumpMerchantItemsCommand = new RelayCommand(
+                    parameter =>
+                    {
+                        try
+                        {
+                            Logger.Log(
+                                "\n############################################\n"
+                                + "\nDumping Merchant Items. This will hang your client. Please wait....\n"
+                                + "##########################");
+                            UILoader.CloseWindow();
+                            TrinityItemManager.DumpItems(TrinityItemManager.DumpItemLocation.Merchant);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log(LogCategory.UserInformation, "Exception dumping Merchant: {0}", ex);
+                        }
+                    });
+                DumpEquippedCommand = new RelayCommand(
+                    parameter =>
+                    {
+                        try
+                        {
+                            Logger.Log(
+                                "\n############################################\n"
+                                + "\nDumping Equipped Items. This will hang your client. Please wait....\n"
+                                + "##########################");
+                            UILoader.CloseWindow();
+                            TrinityItemManager.DumpItems(TrinityItemManager.DumpItemLocation.Equipped);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log(LogCategory.UserInformation, "Exception dumping Equipped: {0}", ex);
+                        }
+                    });
+                DumpGroundItemsCommand = new RelayCommand(
+                    parameter =>
+                    {
+                        try
+                        {
+                            Logger.Log(
+                                "\n############################################\n"
+                                + "\nDumping Ground Items. This will hang your client. Please wait....\n"
+                                + "##########################");
+                            UILoader.CloseWindow();
+                            TrinityItemManager.DumpItems(TrinityItemManager.DumpItemLocation.Ground);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log(LogCategory.UserInformation, "Exception dumping Ground: {0}", ex);
+                        }
+                    });
+                DumpStashCommand = new RelayCommand(
+                    parameter =>
+                    {
+                        try
+                        {
+                            Logger.Log(
+                                "\n############################################\n"
+                                + "\nDumping Stash Items. This will hang your client. Please wait....\n"
+                                + "##########################");
+                            UILoader.CloseWindow();
+                            TrinityItemManager.DumpItems(TrinityItemManager.DumpItemLocation.Stash);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log(LogCategory.UserInformation, "Exception dumping Stash: {0}", ex);
+                        }
+                    });
+                TestScoreCommand = new RelayCommand(
+                    parameter =>
+                    {
+                        try
+                        {
+                            ItemValuation.TestScoring();
+                            //UILoader.CloseWindow();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log(LogCategory.UserInformation, "{0}", ex);
+                        }
+                    });
+                HelpLinkCommand = new RelayCommand(
+                    parameter =>
+                    {
+                        var link = parameter as string;
+                        if (!string.IsNullOrWhiteSpace(link))
+                        {
+                            Process.Start(link);
+                        }
+                    });
+                ConfigureLootToHunting = new RelayCommand(
+                    parameter => ConfigHuntingLoot());
+                ConfigureLootToQuesting = new RelayCommand(
+                    parameter => ConfigQuestingLoot());
+                LoadItemRuleSetCommand = new RelayCommand(
+                    parameter =>
+                    {
+                        try
+                        {
+                            LoadItemRulesPath();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log("Exception in LoadItemRuleSetCommand: {0}", ex);
+                        }
+                    });
+                OpenTVarsCommand = new RelayCommand(
+                    parameter =>
+                    {
+                        try
+                        {
+                            V.ValidateLoad();
+                            TVarsViewModel.CreateWindow().Show();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log("Exception in OpenTVarsCommand: {0}", ex);
+                        }
+                    });
+                UseGlobalConfigFileCommand = new RelayCommand(
+                    parameter =>
+                    {
+                        DialogResult rusure = MessageBox.Show("This will force all bots running under this Demonbuddy directory to use a shared configuration file.\n"
+                                                              + "You can undo this by removing the Trinity.xml file under your Demonbuddy settings directory. \n"
+                                                              + "Are you sure?",
+                            "Confirm global settings",
+                            MessageBoxButtons.OKCancel);
+
+                        if (rusure == DialogResult.OK)
+                        {
+                            Trinity.Settings.Save(true);
+                        }
+                    });
+                DumpSkillsCommand = new RelayCommand(
+                    parameter =>
+                    {
+                        PlayerInfoCache.DumpPlayerSkills();
+
+                        UILoader.CloseWindow();
+                    });
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error creating Trinity View Model {0}", ex);
+            }
+        }
 
         public bool DebugVisibility
         {
@@ -41,924 +300,434 @@ namespace Trinity.UI.UIComponents
             }
         }
 
-        internal static Grid MainWindowGrid()
-        {
-            return (System.Windows.Application.Current.MainWindow.Content as Grid);
-        }
-
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConfigViewModel" /> class.
-        /// </summary>
-        /// <param name="model">The model.</param>
-        public ConfigViewModel(TrinitySetting model)
-        {
-            try
-            {
-                _OriginalModel = model;
-                _Model = new TrinitySetting();
-                _OriginalModel.CopyTo(_Model);
-                InitializeResetCommand();
-                SaveCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            try
-                                            {
-                                                if (Trinity.StashRule == null && _Model.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
-                                                {
-                                                    // Load interpreter for the first time if needed
-                                                    Trinity.StashRule = new ItemRules.Interpreter();
-                                                }
-
-                                                _Model.CopyTo(_OriginalModel);
-                                                _OriginalModel.Save();
-
-                                                if (_Model.Advanced.TPSEnabled != _OriginalModel.Advanced.TPSEnabled)
-                                                    BotManager.SetBotTicksPerSecond();
-
-                                                if (_Model.Advanced.UnstuckerEnabled != _OriginalModel.Advanced.UnstuckerEnabled)
-                                                    BotManager.SetUnstuckProvider();
-
-                                                if (_Model.Loot.ItemFilterMode != _OriginalModel.Loot.ItemFilterMode)
-                                                    BotManager.SetItemManagerProvider();
-
-                                                CacheData.FullClear();
-                                                UsedProfileManager.SetProfileInWindowTitle();
-
-                                                UILoader.CloseWindow();
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                Logger.Log("Exception in UI SaveCommand {0}", ex);
-                                            }
-                                        });
-                DumpBackpackCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            try
-                                            {
-                                                Logger.Log(
-                                                    "\n############################################\n"
-                                                    + "\nDumping Backpack Items. This will hang your client. Please wait....\n"
-                                                    + "##########################");
-                                                UILoader.CloseWindow();
-                                                TrinityItemManager.DumpItems(TrinityItemManager.DumpItemLocation.Backpack);
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                Logger.Log(LogCategory.UserInformation, "Exception dumping Backpack: {0}", ex);
-                                            }
-                                        });
-                DumpQuickItemsCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            try
-                                            {
-                                                Logger.Log(
-                                                    "\n############################################\n"
-                                                    + "\nQuick Dumping Items. This will hang your client. Please wait....\n"
-                                                    + "##########################");
-                                                UILoader.CloseWindow();
-                                                TrinityItemManager.DumpQuickItems();
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                Logger.Log(LogCategory.UserInformation, "Exception Quick Dumping: {0}", ex);
-                                            }
-                                        });
-                DumpAllItemsCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            try
-                                            {
-                                                Logger.Log(
-                                                    "\n############################################\n"
-                                                    + "\nDumping ALL Items. This will hang your client. Please wait....\n"
-                                                    + "##########################");
-                                                UILoader.CloseWindow();
-                                                TrinityItemManager.DumpItems(TrinityItemManager.DumpItemLocation.All);
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                Logger.Log(LogCategory.UserInformation, "Exception Dumping ALL Items: {0}", ex);
-                                            }
-                                        });
-                DumpSkillsAndItemsCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            try
-                                            {
-                                                UILoader.CloseWindow();
-                                                BotMain.Stop(false, "Dumping Debug Information");
-                                                ZetaDia.Actors.Update();
-                                                using (ZetaDia.Memory.SaveCacheState())
-                                                {
-                                                    ZetaDia.Memory.TemporaryCacheState(false);
-                                                    DebugUtil.LogBuildAndItems(TrinityLogLevel.Info);
-                                                }
-
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                Logger.Log(LogCategory.UserInformation, "Exception Dumping Skill/Rune/Passive Items: {0}", ex);
-                                            }
-                                        });
-                DumpMerchantItemsCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            try
-                                            {
-                                                Logger.Log(
-                                                    "\n############################################\n"
-                                                    + "\nDumping Merchant Items. This will hang your client. Please wait....\n"
-                                                    + "##########################");
-                                                UILoader.CloseWindow();
-                                                TrinityItemManager.DumpItems(TrinityItemManager.DumpItemLocation.Merchant);
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                Logger.Log(LogCategory.UserInformation, "Exception dumping Merchant: {0}", ex);
-                                            }
-                                        });
-                DumpEquippedCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            try
-                                            {
-                                                Logger.Log(
-                                                    "\n############################################\n"
-                                                    + "\nDumping Equipped Items. This will hang your client. Please wait....\n"
-                                                    + "##########################");
-                                                UILoader.CloseWindow();
-                                                TrinityItemManager.DumpItems(TrinityItemManager.DumpItemLocation.Equipped);
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                Logger.Log(LogCategory.UserInformation, "Exception dumping Equipped: {0}", ex);
-                                            }
-                                        });
-                DumpGroundItemsCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            try
-                                            {
-                                                Logger.Log(
-                                                    "\n############################################\n"
-                                                    + "\nDumping Ground Items. This will hang your client. Please wait....\n"
-                                                    + "##########################");
-                                                UILoader.CloseWindow();
-                                                TrinityItemManager.DumpItems(TrinityItemManager.DumpItemLocation.Ground);
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                Logger.Log(LogCategory.UserInformation, "Exception dumping Ground: {0}", ex);
-                                            }
-                                        });
-                DumpStashCommand = new RelayCommand(
-                                      (parameter) =>
-                                      {
-                                          try
-                                          {
-                                              Logger.Log(
-                                                  "\n############################################\n"
-                                                  + "\nDumping Stash Items. This will hang your client. Please wait....\n"
-                                                  + "##########################");
-                                              UILoader.CloseWindow();
-                                              TrinityItemManager.DumpItems(TrinityItemManager.DumpItemLocation.Stash);
-                                          }
-                                          catch (Exception ex)
-                                          {
-                                              Logger.Log(LogCategory.UserInformation, "Exception dumping Stash: {0}", ex);
-                                          }
-                                      });
-                TestScoreCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            try
-                                            {
-                                                Trinity.TestScoring();
-                                                //UILoader.CloseWindow();
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                Logger.Log(LogCategory.UserInformation, "{0}", ex);
-                                            }
-                                        });
-                OrderStashCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            try
-                                            {
-                                                //TownRun.SortStash();
-                                                UILoader.CloseWindow();
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                Logger.Log(LogCategory.UserInformation, "{0}", ex);
-                                            }
-
-                                        });
-                HelpLinkCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            string link = parameter as string;
-                                            if (!string.IsNullOrWhiteSpace(link))
-                                            {
-                                                Process.Start(link);
-                                            }
-                                        });
-                ConfigureLootToHunting = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            ConfigHuntingLoot();
-                                        });
-                ConfigureLootToQuesting = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            ConfigQuestingLoot();
-                                        });
-                LoadItemRuleSetCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            try
-                                            {
-                                                LoadItemRulesPath();
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                Logger.Log("Exception in LoadItemRuleSetCommand: {0}", ex);
-                                            }
-                                        });
-                OpenTVarsCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            try
-                                            {
-                                                V.ValidateLoad();
-                                                TVarsViewModel.CreateWindow().Show();
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                Logger.Log("Exception in OpenTVarsCommand: {0}", ex);
-                                            }
-                                        });
-                UseGlobalConfigFileCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            DialogResult rusure = MessageBox.Show("This will force all bots running under this Demonbuddy directory to use a shared configuration file.\n"
-                                                + "You can undo this by removing the Trinity.xml file under your Demonbuddy settings directory. \n"
-                                                + "Are you sure?",
-                                            "Confirm global settings",
-                                            MessageBoxButtons.OKCancel);
-
-                                            if (rusure == DialogResult.OK)
-                                            {
-                                                Trinity.Settings.Save(true);
-                                            }
-                                        });
-                DumpSkillsCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            PlayerInfoCache.DumpPlayerSkills();
-
-                                            UILoader.CloseWindow();
-                                        });
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError("Error creating Trinity View Model {0}", ex);
-            }
-        }
-
-        /// <summary>
-        /// Opens the TVars config window
+        ///     Opens the TVars config window
         /// </summary>
         /// <value>The save command.</value>
-        public ICommand DumpSkillsCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand DumpSkillsCommand { get; private set; }
 
 
         /// <summary>
-        /// Opens the TVars config window
+        ///     Opens the TVars config window
         /// </summary>
         /// <value>The save command.</value>
-        public ICommand OpenTVarsCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand OpenTVarsCommand { get; private set; }
 
         /// <summary>
-        /// Reloads item rules
+        ///     Reloads item rules
         /// </summary>
         /// <value>The save command.</value>
-        public ICommand LoadItemRuleSetCommand
-        {
-            get;
-            private set;
-        }
-        /// <summary>
-        /// Gets the HelpLink command.
-        /// </summary>
-        /// <value>The save command.</value>
-        public ICommand HelpLinkCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand LoadItemRuleSetCommand { get; private set; }
 
         /// <summary>
-        /// Gets the HelpLink command.
+        ///     Gets the HelpLink command.
         /// </summary>
         /// <value>The save command.</value>
-        public ICommand ConfigureLootToQuesting
-        {
-            get;
-            private set;
-        }
+        public ICommand HelpLinkCommand { get; private set; }
 
         /// <summary>
-        /// Gets the HelpLink command.
+        ///     Gets the HelpLink command.
         /// </summary>
         /// <value>The save command.</value>
-        public ICommand ConfigureLootToHunting
-        {
-            get;
-            private set;
-        }
+        public ICommand ConfigureLootToQuesting { get; private set; }
 
         /// <summary>
-        /// Gets the test score command.
+        ///     Gets the HelpLink command.
         /// </summary>
         /// <value>The save command.</value>
-        public ICommand TestScoreCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand ConfigureLootToHunting { get; private set; }
 
         /// <summary>
-        /// Gets the test score command.
+        ///     Gets the test score command.
         /// </summary>
         /// <value>The save command.</value>
-        public ICommand DumpBackpackCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand TestScoreCommand { get; private set; }
 
         /// <summary>
-        /// Gets the test score command.
+        ///     Gets the test score command.
         /// </summary>
         /// <value>The save command.</value>
-        public ICommand DumpQuickItemsCommand
-        {
-            get;
-            private set;
-        }
-        /// <summary>
-        /// Gets the test score command.
-        /// </summary>
-        /// <value>The save command.</value>
-        public ICommand DumpAllItemsCommand
-        {
-            get;
-            private set;
-        }
-        /// <summary>
-        /// Gets the test score command.
-        /// </summary>
-        /// <value>The save command.</value>
-        public ICommand DumpSkillsAndItemsCommand
-        {
-            get;
-            private set;
-        }
-        
-        /// <summary>
-        /// Gets the test score command.
-        /// </summary>
-        /// <value>The save command.</value>
-        public ICommand DumpEquippedLegendaryCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand DumpBackpackCommand { get; private set; }
 
         /// <summary>
-        /// Gets the test score command.
+        ///     Gets the test score command.
         /// </summary>
         /// <value>The save command.</value>
-        public ICommand DumpMerchantItemsCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand DumpQuickItemsCommand { get; private set; }
 
         /// <summary>
-        /// Gets the test score command.
+        ///     Gets the test score command.
         /// </summary>
         /// <value>The save command.</value>
-        public ICommand DumpEquippedCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand DumpAllItemsCommand { get; private set; }
 
         /// <summary>
-        /// Gets the test score command.
+        ///     Gets the test score command.
         /// </summary>
         /// <value>The save command.</value>
-        public ICommand DumpGroundItemsCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand DumpSkillsAndItemsCommand { get; private set; }
 
         /// <summary>
-        /// Gets the test score command.
+        ///     Gets the test score command.
         /// </summary>
         /// <value>The save command.</value>
-        public ICommand DumpStashCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand DumpEquippedLegendaryCommand { get; private set; }
 
         /// <summary>
-        /// Gets the order stash command.
+        ///     Gets the test score command.
         /// </summary>
         /// <value>The save command.</value>
-        public ICommand OrderStashCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand DumpMerchantItemsCommand { get; private set; }
 
         /// <summary>
-        /// Gets the save command.
+        ///     Gets the test score command.
         /// </summary>
         /// <value>The save command.</value>
-        public ICommand SaveCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand DumpEquippedCommand { get; private set; }
 
         /// <summary>
-        /// Gets the reset command for Misc Tab.
+        ///     Gets the test score command.
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand DumpGroundItemsCommand { get; private set; }
+
+        /// <summary>
+        ///     Gets the test score command.
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand DumpStashCommand { get; private set; }
+
+        /// <summary>
+        ///     Gets the save command.
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand SaveCommand { get; private set; }
+
+        /// <summary>
+        ///     Gets the reset command for Misc Tab.
         /// </summary>
         /// <value>The reset command for Misc Tab.</value>
-        public ICommand ResetMiscCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand ResetMiscCommand { get; private set; }
 
         /// <summary>
-        /// Gets the reset command for Barbarian Tab.
+        ///     Gets the reset command for Barbarian Tab.
         /// </summary>
         /// <value>The reset command for Barbarian Tab.</value>
-        public ICommand ResetBarbCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand ResetBarbCommand { get; private set; }
 
         /// <summary>
-        /// Gets the reset command for Crusader Tab.
+        ///     Gets the reset command for Crusader Tab.
         /// </summary>
         /// <value>The reset command for Barbarian Tab.</value>
-        public ICommand ResetCrusaderCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand ResetCrusaderCommand { get; private set; }
 
         /// <summary>
-        /// Gets the reset command for Monk Tab.
+        ///     Gets the reset command for Monk Tab.
         /// </summary>
         /// <value>The reset command for Monk Tab.</value>
-        public ICommand ResetMonkCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand ResetMonkCommand { get; private set; }
 
         /// <summary>
-        /// Gets the reset command for Wizard Tab.
+        ///     Gets the reset command for Wizard Tab.
         /// </summary>
         /// <value>The reset command for Wizard Tab.</value>
-        public ICommand ResetWizardCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand ResetWizardCommand { get; private set; }
 
         /// <summary>
-        /// Gets the reset command for Witch Doctor Tab.
+        ///     Gets the reset command for Witch Doctor Tab.
         /// </summary>
         /// <value>The reset command for Witch Doctor Tab.</value>
-        public ICommand ResetWitchDoctorCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand ResetWitchDoctorCommand { get; private set; }
 
         /// <summary>
-        /// Gets the reset command for Demon Hunter Tab.
+        ///     Gets the reset command for Demon Hunter Tab.
         /// </summary>
         /// <value>The reset command for Demon Hunter Tab.</value>
-        public ICommand ResetDemonHunterCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand ResetDemonHunterCommand { get; private set; }
 
         /// <summary>
-        /// Gets the reset command for World Object Tab.
+        ///     Gets the reset command for World Object Tab.
         /// </summary>
         /// <value>The reset command for World Object Tab.</value>
-        public ICommand ResetWorldObjectCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand ResetWorldObjectCommand { get; private set; }
 
         /// <summary>
-        /// Gets the reset command for Town Run Tab.
+        ///     Gets the reset command for Town Run Tab.
         /// </summary>
         /// <value>The reset command for Town Run Tab.</value>
-        public ICommand ResetTownRunCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand ResetTownRunCommand { get; private set; }
 
         /// <summary>
-        /// Gets the reset command for Items Tab.
+        ///     Gets the reset command for Items Tab.
         /// </summary>
         /// <value>The reset command for Items Tab.</value>
-        public ICommand ResetItemCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand ResetItemCommand { get; private set; }
 
         /// <summary>
-        /// Gets the reset command for Items Tab.
+        ///     Gets the reset command for Items Tab.
         /// </summary>
         /// <value>The reset command for Items Tab.</value>
-        public ICommand ResetItemRulesCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand ResetItemRulesCommand { get; private set; }
 
         /// <summary>
-        /// Reloads Script Rules
+        ///     Reloads Script Rules
         /// </summary>
-        public ICommand ReloadScriptRulesCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand ReloadScriptRulesCommand { get; private set; }
 
         /// <summary>
-        /// Gets the reset command for Advanced Tab.
+        ///     Gets the reset command for Advanced Tab.
         /// </summary>
         /// <value>The reset command for Advanced Tab.</value>
-        public ICommand ResetAdvancedCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand ResetAdvancedCommand { get; private set; }
 
         /// <summary>
-        /// Gets the reset command for Mobile Tab.
+        ///     Gets the reset command for Mobile Tab.
         /// </summary>
         /// <value>The reset command for Mobile Tab.</value>
-        public ICommand ResetNotificationCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand ResetNotificationCommand { get; private set; }
 
         /// <summary>
-        /// Gets the reset command for Logs Tab.
+        ///     Gets the reset command for Logs Tab.
         /// </summary>
         /// <value>The reset command for Logs Tab.</value>
-        public ICommand ResetLogCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand ResetLogCommand { get; private set; }
 
         /// <summary>
-        /// Gets the reset command for all settings.
+        ///     Gets the reset command for all settings.
         /// </summary>
         /// <value>The reset command for all settings.</value>
-        public ICommand ResetAllCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand ResetAllCommand { get; private set; }
 
         /// <summary>
-        /// Makes Trinity use a "Global" configuration file
+        ///     Makes Trinity use a "Global" configuration file
         /// </summary>
         /// <value>The reset command for all settings.</value>
-        public ICommand UseGlobalConfigFileCommand
-        {
-            get;
-            private set;
-        }
+        public ICommand UseGlobalConfigFileCommand { get; private set; }
 
         /// <summary>
-        /// Gets the Misc Configuration Model.
+        ///     Gets the Misc Configuration Model.
         /// </summary>
         /// <value>The Misc Configuration Model.</value>
         public MiscCombatSetting Misc
         {
-            get
-            {
-                return _Model.Combat.Misc;
-            }
+            get { return _Model.Combat.Misc; }
         }
 
         /// <summary>
-        /// Gets the Advanced Configuration Model.
+        ///     Gets the Advanced Configuration Model.
         /// </summary>
         /// <value>The Advanced Configuration Model.</value>
         public AdvancedSetting Advanced
         {
-            get
-            {
-                return _Model.Advanced;
-            }
+            get { return _Model.Advanced; }
         }
 
         /// <summary>
-        /// Gets the Avoidance Configuration Model.
+        ///     Gets the Avoidance Configuration Model.
         /// </summary>
         /// <value>The Avoidance Configuration Model.</value>
         public AvoidanceRadiusSetting Avoid
         {
-            get
-            {
-                return _Model.Combat.AvoidanceRadius;
-            }
+            get { return _Model.Combat.AvoidanceRadius; }
         }
 
         /// <summary>
-        /// Gets the Barbarian Configuration Model.
+        ///     Gets the Barbarian Configuration Model.
         /// </summary>
         /// <value>The Barbarian Configuration Model.</value>
         public BarbarianSetting Barb
         {
-            get
-            {
-                return _Model.Combat.Barbarian;
-            }
+            get { return _Model.Combat.Barbarian; }
         }
 
         /// <summary>
-        /// Gets the Barbarian Configuration Model.
+        ///     Gets the Barbarian Configuration Model.
         /// </summary>
         /// <value>The Barbarian Configuration Model.</value>
         public CrusaderSetting Crusader
         {
-            get
-            {
-                return _Model.Combat.Crusader;
-            }
+            get { return _Model.Combat.Crusader; }
         }
 
         /// <summary>
-        /// Gets the Demon Hunter Configuration Model.
+        ///     Gets the Demon Hunter Configuration Model.
         /// </summary>
         /// <value>The Demon Hunter Configuration Model.</value>
         public DemonHunterSetting DH
         {
-            get
-            {
-                return _Model.Combat.DemonHunter;
-            }
+            get { return _Model.Combat.DemonHunter; }
         }
 
         /// <summary>
-        /// Gets the Monk Configuration Model.
+        ///     Gets the Monk Configuration Model.
         /// </summary>
         /// <value>The Monk Configuration Model.</value>
         public MonkSetting Monk
         {
-            get
-            {
-                return _Model.Combat.Monk;
-            }
+            get { return _Model.Combat.Monk; }
         }
 
         /// <summary>
-        /// Gets the Witch Doctor Configuration Model.
+        ///     Gets the Witch Doctor Configuration Model.
         /// </summary>
         /// <value>The Witch Doctor Configuration Model.</value>
         public WitchDoctorSetting WD
         {
-            get
-            {
-                return _Model.Combat.WitchDoctor;
-            }
+            get { return _Model.Combat.WitchDoctor; }
         }
 
         /// <summary>
-        /// Gets the Wizard Configuration Model.
+        ///     Gets the Wizard Configuration Model.
         /// </summary>
         /// <value>The Wizard Configuration Model.</value>
         public WizardSetting Wiz
         {
-            get
-            {
-                return _Model.Combat.Wizard;
-            }
+            get { return _Model.Combat.Wizard; }
         }
 
         /// <summary>
-        /// Gets the World Object Configuration Model.
+        ///     Gets the World Object Configuration Model.
         /// </summary>
         /// <value>The World Object Configuration Model.</value>
         public WorldObjectSetting WorldObject
         {
-            get
-            {
-                return _Model.WorldObject;
-            }
+            get { return _Model.WorldObject; }
         }
 
         /// <summary>Gets the TownRun Configuration Model.</summary>
         /// <value>The TownRun Configuration Model.</value>
         public TownRunSetting TownRun
         {
-            get
-            {
-                return _Model.Loot.TownRun;
-            }
+            get { return _Model.Loot.TownRun; }
         }
 
         /// <summary>
-        /// Gets the Pickup Configuration Model.
+        ///     Gets the Pickup Configuration Model.
         /// </summary>
         /// <value>The Pickup Configuration Model.</value>
         public PickupSetting Pickup
         {
-            get
-            {
-                return _Model.Loot.Pickup;
-            }
+            get { return _Model.Loot.Pickup; }
+        }
+
+        public ItemRankSettings ItemRank
+        {
+            get { return _Model.Loot.ItemRank; }
         }
 
         /// <summary>
-        /// Gets the Pickup Configuration Model.
+        ///     Gets the Pickup Configuration Model.
         /// </summary>
         /// <value>The Pickup Configuration Model.</value>
         public ItemSetting Loot
         {
-            get
-            {
-                return _Model.Loot;
-            }
+            get { return _Model.Loot; }
         }
+
         /// <summary>
-        /// Gets the Pickup Configuration Model.
+        ///     Gets the Pickup Configuration Model.
         /// </summary>
         /// <value>The Pickup Configuration Model.</value>
         public ItemRuleSetting ItemRules
         {
-            get
-            {
-                return _Model.Loot.ItemRules;
-            }
+            get { return _Model.Loot.ItemRules; }
         }
 
         /// <summary>
-        /// Gets the Pickup Configuration Model.
+        ///     Gets the Pickup Configuration Model.
         /// </summary>
         /// <value>The Pickup Configuration Model.</value>
         public NotificationSetting Notification
         {
-            get
-            {
-                return _Model.Notification;
-            }
+            get { return _Model.Notification; }
+        }
+
+        internal static Grid MainWindowGrid()
+        {
+            return (Application.Current.MainWindow.Content as Grid);
         }
 
         /// <summary>
-        /// Initializes the Reset commands.
+        ///     Initializes the Reset commands.
         /// </summary>
         private void InitializeResetCommand()
         {
             try
             {
                 ResetMiscCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            _Model.Combat.Misc.Reset();
-                                        });
+                    parameter => _Model.Combat.Misc.Reset());
                 ResetBarbCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            _Model.Combat.Barbarian.Reset();
-                                            _Model.Combat.AvoidanceRadius.Reset();
-                                        });
+                    parameter =>
+                    {
+                        _Model.Combat.Barbarian.Reset();
+                        _Model.Combat.AvoidanceRadius.Reset();
+                    });
                 ResetCrusaderCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            _Model.Combat.Crusader.Reset();
-                                            _Model.Combat.AvoidanceRadius.Reset();
-                                        });
+                    parameter =>
+                    {
+                        _Model.Combat.Crusader.Reset();
+                        _Model.Combat.AvoidanceRadius.Reset();
+                    });
                 ResetMonkCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            _Model.Combat.Monk.Reset();
-                                            _Model.Combat.AvoidanceRadius.Reset();
-                                        });
+                    parameter =>
+                    {
+                        _Model.Combat.Monk.Reset();
+                        _Model.Combat.AvoidanceRadius.Reset();
+                    });
                 ResetWizardCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            _Model.Combat.Wizard.Reset();
-                                            _Model.Combat.AvoidanceRadius.Reset();
-                                        });
+                    parameter =>
+                    {
+                        _Model.Combat.Wizard.Reset();
+                        _Model.Combat.AvoidanceRadius.Reset();
+                    });
                 ResetWitchDoctorCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            _Model.Combat.WitchDoctor.Reset();
-                                            _Model.Combat.AvoidanceRadius.Reset();
-                                        });
+                    parameter =>
+                    {
+                        _Model.Combat.WitchDoctor.Reset();
+                        _Model.Combat.AvoidanceRadius.Reset();
+                    });
                 ResetDemonHunterCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            _Model.Combat.DemonHunter.Reset();
-                                            _Model.Combat.AvoidanceRadius.Reset();
-                                        });
+                    parameter =>
+                    {
+                        _Model.Combat.DemonHunter.Reset();
+                        _Model.Combat.AvoidanceRadius.Reset();
+                    });
                 ResetWorldObjectCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            _Model.WorldObject.Reset();
-                                        });
+                    parameter => _Model.WorldObject.Reset());
                 ResetItemCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            _Model.Loot.Pickup.Reset();
-                                        });
+                    parameter => _Model.Loot.Pickup.Reset());
                 ResetItemRulesCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            _Model.Loot.ItemRules.Reset();
-                                        });
+                    parameter => _Model.Loot.ItemRules.Reset());
                 ReloadScriptRulesCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            try
-                                            {
-                                                _Model.CopyTo(_OriginalModel);
-                                                _OriginalModel.Save();
-                                                if (Trinity.StashRule == null)
-                                                    Trinity.StashRule = new ItemRules.Interpreter();
+                    parameter =>
+                    {
+                        try
+                        {
+                            _Model.CopyTo(_OriginalModel);
+                            _OriginalModel.Save();
+                            if (Trinity.StashRule == null)
+                                Trinity.StashRule = new Interpreter();
 
-                                                if (Trinity.StashRule != null)
-                                                {
-                                                    BotMain.PauseWhile(Trinity.StashRule.reloadFromUI);
-                                                }
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                Logger.Log("Exception in ReloadScriptRulesCommand: {0}", ex);
-                                            }
-                                        }
-                                        );
+                            if (Trinity.StashRule != null)
+                            {
+                                BotMain.PauseWhile(Trinity.StashRule.reloadFromUI);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log("Exception in ReloadScriptRulesCommand: {0}", ex);
+                        }
+                    }
+                    );
                 ResetTownRunCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            _Model.Loot.TownRun.Reset();
-                                        });
+                    parameter => _Model.Loot.TownRun.Reset());
                 ResetAdvancedCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            _Model.Advanced.Reset();
-                                        });
+                    parameter => _Model.Advanced.Reset());
                 ResetNotificationCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            _Model.Notification.Reset();
-                                        });
+                    parameter => _Model.Notification.Reset());
 
                 ResetAllCommand = new RelayCommand(
-                                        (parameter) =>
-                                        {
-                                            _Model.Reset();
-                                        });
+                    parameter => _Model.Reset());
             }
             catch (Exception ex)
             {
@@ -971,13 +740,13 @@ namespace Trinity.UI.UIComponents
             try
             {
                 _Model.Loot.ItemFilterMode = ItemFilterMode.TrinityOnly;
-                _Model.Loot.Pickup.ArmorBlueLevel = 1;
-                _Model.Loot.Pickup.ArmorYellowLevel = 1;
-                _Model.Loot.Pickup.WeaponBlueLevel = 1;
-                _Model.Loot.Pickup.WeaponYellowLevel = 1;
-                _Model.Loot.Pickup.JewelryBlueLevel = 1;
-                _Model.Loot.Pickup.JewelryYellowLevel = 1;
-                _Model.Loot.Pickup.LegendaryLevel = 1;
+                _Model.Loot.Pickup.PickupBlueArmor = true;
+                _Model.Loot.Pickup.PickupYellowArmor = true;
+                _Model.Loot.Pickup.PickupBlueWeapons = true;
+                _Model.Loot.Pickup.PickupYellowWeapons = true;
+                _Model.Loot.Pickup.PickupBlueJewlery = true;
+                _Model.Loot.Pickup.PickupYellowJewlery = true;
+                _Model.Loot.Pickup.PickupLegendaries = true;
                 _Model.Loot.Pickup.GemLevel = 15;
                 _Model.Loot.Pickup.GemType = TrinityGemType.All;
                 _Model.Loot.Pickup.PickupBlueFollowerItems = false;
@@ -1001,13 +770,13 @@ namespace Trinity.UI.UIComponents
             try
             {
                 _Model.Loot.ItemFilterMode = ItemFilterMode.TrinityOnly;
-                _Model.Loot.Pickup.ArmorBlueLevel = 0;
-                _Model.Loot.Pickup.ArmorYellowLevel = 0;
-                _Model.Loot.Pickup.WeaponBlueLevel = 0;
-                _Model.Loot.Pickup.WeaponYellowLevel = 0;
-                _Model.Loot.Pickup.JewelryBlueLevel = 0;
-                _Model.Loot.Pickup.JewelryYellowLevel = 0;
-                _Model.Loot.Pickup.LegendaryLevel = 70;
+                _Model.Loot.Pickup.PickupBlueArmor = false;
+                _Model.Loot.Pickup.PickupYellowArmor = false;
+                _Model.Loot.Pickup.PickupBlueWeapons = false;
+                _Model.Loot.Pickup.PickupYellowWeapons = false;
+                _Model.Loot.Pickup.PickupBlueJewlery = false;
+                _Model.Loot.Pickup.PickupYellowJewlery = false;
+                _Model.Loot.Pickup.PickupLegendaries = true;
                 _Model.Loot.Pickup.GemLevel = 15;
                 _Model.Loot.Pickup.GemType = TrinityGemType.All;
                 _Model.Loot.Pickup.PickupBlueFollowerItems = false;
@@ -1026,17 +795,13 @@ namespace Trinity.UI.UIComponents
             {
                 Logger.LogError("Error configuring hunting settings {0}", ex);
             }
-
         }
 
         private void LoadItemRulesPath()
         {
             try
             {
-                var folderDialog = new FolderBrowserDialog();
-
-                folderDialog.ShowNewFolderButton = false;
-                folderDialog.SelectedPath = FileManager.ItemRulePath;
+                var folderDialog = new FolderBrowserDialog { ShowNewFolderButton = false, SelectedPath = FileManager.ItemRulePath };
 
                 DialogResult result = folderDialog.ShowDialog();
 

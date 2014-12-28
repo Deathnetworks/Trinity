@@ -111,6 +111,7 @@
     <Compile Include="Configuration\TVar.cs" />
     <Compile Include="Configuration\TVars.cs" />
     <Compile Include="Coroutines\DeathBehavior.cs" />
+    <Compile Include="Coroutines\TrinityCoroutines.cs" />
     <Compile Include="DbProvider\DeathHandler.cs" />
     <Compile Include="DbProvider\SearchAreaProvider.cs" />
     <Compile Include="Helpers\Attributes\NoCopy.cs" />
@@ -145,7 +146,10 @@
     <Compile Include="Cache\GameBalanceDataCache.cs" />
     <Compile Include="Items\ItemDropStats.cs" />
     <Compile Include="Items\ItemIds.cs" />
-    <Compile Include="Items\StashSortItem.cs" />
+    <Compile Include="Items\ItemSort.cs" />
+    <Compile Include="Items\ItemStatsData.cs" />
+    <Compile Include="Items\ItemStatsDataFactory.cs" />
+    <Compile Include="Items\ItemWrapper.cs" />
     <Compile Include="Helpers\GoldInactivity.cs" />
     <Compile Include="Cache\HashGenerator.cs" />
     <Compile Include="Combat\HotbarSkills.cs" />
@@ -177,6 +181,7 @@
     <Compile Include="Combat\CombatMovement.cs" />
     <Compile Include="Reference\SkillUtils.cs" />
     <Compile Include="Settings\Combat\CrusaderSetting.cs" />
+    <Compile Include="Settings\Loot\ItemRankSettings.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Combat\HandleTarget.cs" />
     <Compile Include="Combat\AbilitySelector.cs" />
@@ -226,6 +231,7 @@
     <Compile Include="Settings\TrinitySetting.cs" />
     <Compile Include="Settings\WorldObjectSetting.cs" />
     <Compile Include="Helpers\PerformanceLogger.cs" />
+    <Compile Include="UI\TabUI.cs" />
     <Compile Include="UI\UIComponents\BoolInverterConverter.cs" />
     <Compile Include="UI\UIComponents\ConfigViewModel.cs" />
     <Compile Include="UI\UIComponents\EnumVisibilityConverter.cs" />
@@ -239,7 +245,6 @@
     <Compile Include="UI\UILoader.cs" />
     <Compile Include="Combat\Weighting.cs" />
     <Compile Include="Combat\TargetCheck.cs" />
-    <Compile Include="Items\ItemHandling.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Configuration\Variables.cs" />
     <Compile Include="Configuration\Enums.cs" />
@@ -320,6 +325,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\ConfigCombat.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Items\ConfigItemRank.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

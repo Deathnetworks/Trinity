@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel;
 using System.Runtime.Serialization;
+using Trinity.Config;
+using Trinity.Config.Loot;
 
-namespace Trinity.Config.Loot
+namespace Trinity.Settings.Loot
 {
     [DataContract(Namespace = "")]
     public class ItemRuleSetting : ITrinitySetting<ItemRuleSetting>, INotifyPropertyChanged
@@ -24,7 +26,7 @@ namespace Trinity.Config.Loot
 
         #region Constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="PickupSetting" /> class.
+        /// Initializes a new instance of the <see cref="ItemRuleSetting" /> class.
         /// </summary>
         public ItemRuleSetting()
         {
@@ -175,7 +177,7 @@ namespace Trinity.Config.Loot
         {
             this._PickupLogLevel = ItemRuleLogLevel.Rare;
             this._KeepLogLevel = ItemRuleLogLevel.Rare;
-            this._ItemRuleType = Loot.ItemRuleType.Soft;
+            this._ItemRuleType = ItemRuleType.Soft;
         }
 
         #endregion Methods

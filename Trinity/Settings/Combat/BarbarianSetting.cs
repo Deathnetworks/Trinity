@@ -11,7 +11,6 @@ namespace Trinity.Config.Combat
         private float _HealthGlobeLevel;
         private float _HealthGlobeLevelResource;
         private int _KiteLimit;
-        private bool _SelectiveWirlwind;
         private bool _WaitWOTB;
         private bool _UseWOTBGoblin;
         private bool _FuryDumpWOTB;

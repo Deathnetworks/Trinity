@@ -1,5 +1,6 @@
 ﻿using Zeta.Common;
 using Zeta.Game.Internals.Actors;
+
 namespace Trinity.Cache
 {
     internal class PickupItem

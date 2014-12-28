@@ -7,7 +7,6 @@ using System.Threading;
 using Trinity.Combat;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
-using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Dungeons;

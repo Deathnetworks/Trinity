@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Linq;
 using Trinity.Config.Combat;
 using Trinity.DbProvider;
 using Trinity.Technicals;
-using Zeta.Bot.Navigation;
 using Zeta.Common.Plugins;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;

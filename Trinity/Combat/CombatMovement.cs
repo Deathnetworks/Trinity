@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.Linq;
-using Trinity.Configuration;
 using Trinity.DbProvider;
 using Trinity.Technicals;
 using Zeta.Bot;

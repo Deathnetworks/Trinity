@@ -1,4 +1,5 @@
 ﻿//!CompilerOption:AddRef:System.Management.dll
+
 using System;
 using System.IO;
 using System.Windows;
@@ -9,12 +10,13 @@ using Trinity.Configuration;
 using Trinity.DbProvider;
 using Trinity.Helpers;
 using Trinity.Items;
+using Trinity.Settings.Loot;
 using Trinity.Technicals;
+using Trinity.UI;
 using Zeta.Bot;
 using Zeta.Bot.Navigation;
 using Zeta.Common.Plugins;
 using Zeta.Game;
-using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
@@ -82,10 +84,10 @@ namespace Trinity
                     }
 
                     // See if we should update the stats file
-                    if (DateTime.UtcNow.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)
+                    if (DateTime.UtcNow.Subtract(ItemDropStats.ItemStatsLastPostedReport).TotalSeconds > 10)
                     {
-                        ItemStatsLastPostedReport = DateTime.UtcNow;
-                        OutputReport();
+                        ItemDropStats.ItemStatsLastPostedReport = DateTime.UtcNow;
+                        ItemDropStats.OutputReport();
                     }
 
                     // Recording of all the XML's in use this run
@@ -120,6 +122,7 @@ namespace Trinity
                 BotMain.OnStop += TrinityBotStop;
 
                 SetWindowTitle();
+                TabUi.InstallTab();
 
                 if (!Directory.Exists(FileManager.PluginPath))
                 {
@@ -152,7 +155,7 @@ namespace Trinity
                     LootTargeting.Instance.Provider = new BlankLootProvider();
                     ObstacleTargeting.Instance.Provider = new BlankObstacleProvider();
 
-                    if (Settings.Loot.ItemFilterMode != Config.Loot.ItemFilterMode.DemonBuddy)
+                    if (Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy)
                     {
                         ItemManager.Current = new TrinityItemManager();
                     }
@@ -165,9 +168,9 @@ namespace Trinity
                             TrinityOnJoinGame(null, null);
                     }
 
-                    BeginInvoke(BotManager.SetBotTicksPerSecond);
+                    BotManager.SetBotTicksPerSecond();
 
-                    UI.UILoader.PreLoadWindowContent();
+                    UILoader.PreLoadWindowContent();
 
                     Events.OnCacheUpdated += Enemies.Update;
 
@@ -195,6 +198,7 @@ namespace Trinity
         {
             _isPluginEnabled = false;
 
+            TabUi.RemoveTab();
             BotManager.ReplaceTreeHooks();
 
             Navigator.PlayerMover = new DefaultPlayerMover();

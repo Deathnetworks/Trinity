@@ -1,7 +1,7 @@
 ﻿﻿using System.IO;
-using System.Windows;
-using Trinity.Technicals;
-using Trinity.UI;
+﻿using System.Windows;
+﻿using Trinity.Technicals;
+﻿using Trinity.UI;
 
 namespace Trinity
 {

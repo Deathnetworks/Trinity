@@ -1,5 +1,4 @@
-﻿using System;
-using Trinity.Helpers;
+﻿using Trinity.Helpers;
 using Trinity.Objects;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;

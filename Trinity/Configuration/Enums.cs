@@ -178,5 +178,26 @@
         Spirit
     }
 
+    public enum ItemQualityColor
+    {
+        Grey,
+        White,
+        Blue,
+        Yellow,
+        Orange,
+        Green,
+        Other
+    }
+    public enum ItemQualityName
+    {
+        Inferior,
+        Normal,
+        Magic,
+        Rare,
+        Legendary,
+        Set,
+        Special
+    }
+
 
 }

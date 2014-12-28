@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Zeta.Game.Internals.Actors;
+
 namespace Trinity.ItemRules.Core
 {
 

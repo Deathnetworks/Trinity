@@ -4,13 +4,13 @@ using Trinity.Cache;
 using Trinity.Helpers;
 using Trinity.Items;
 using Trinity.Technicals;
-using Zeta.Bot;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 using Logger = Trinity.Technicals.Logger;
+
 namespace Trinity
 {
     public partial class Trinity
@@ -103,7 +103,7 @@ namespace Trinity
                 CurrentCacheObject.ActorType = freshObject.ActorType;
                 CurrentCacheObject.ACDGuid = freshObject.ACDGuid;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 c_IgnoreReason = "Error reading IDs";
                 return false;

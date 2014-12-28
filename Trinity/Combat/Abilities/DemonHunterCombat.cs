@@ -1,11 +1,9 @@
 ﻿using System;
+using System.Linq;
 using Trinity.Config.Combat;
 using Trinity.Reference;
 using Zeta.Common;
-using Zeta.Game;
 using Zeta.Game.Internals.Actors;
-using System.Linq;
-using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.Combat.Abilities
 {
@@ -88,6 +86,15 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.DemonHunter_ShadowPower);
             }
 
+            // Smoke Screen
+            if (CanCast(SNOPower.DemonHunter_SmokeScreen, CanCastFlags.NoTimer) &&
+                !GetHasBuff(SNOPower.DemonHunter_ShadowPower) &&
+                (Player.CurrentHealthPct <= 0.50 || Player.IsRooted || TargetUtil.AnyMobsInRange(15) ||
+                (Legendary.MeticulousBolts.IsEquipped && TargetUtil.AnyMobsInRange(60)) || Player.IsIncapacitated))
+            {
+                return new TrinityPower(SNOPower.DemonHunter_SmokeScreen);
+            }
+
 
             // Sentry Turret
             if (!Player.IsIncapacitated && CanCast(SNOPower.DemonHunter_Sentry, CanCastFlags.NoTimer) &&
@@ -150,15 +157,6 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
             }
 
-            // Smoke Screen
-            if (CanCast(SNOPower.DemonHunter_SmokeScreen, CanCastFlags.NoTimer) &&
-                !GetHasBuff(SNOPower.DemonHunter_ShadowPower) &&
-                (Player.CurrentHealthPct <= 0.50 || Player.IsRooted || TargetUtil.AnyMobsInRange(15) ||
-                (Legendary.MeticulousBolts.IsEquipped && TargetUtil.AnyMobsInRange(60)) || Player.IsIncapacitated))
-            {
-                return new TrinityPower(SNOPower.DemonHunter_SmokeScreen);
-            }
-
             int mfdResource = Hotbar.Contains(SNOPower.DemonHunter_SmokeScreen) ? (Runes.DemonHunter.MortalEnemy.IsActive ? 3 : 17) : 17;
             // Marked for Death
             if (CanCast(SNOPower.DemonHunter_MarkedForDeath, CanCastFlags.NoTimer) &&
@@ -181,23 +179,6 @@ namespace Trinity.Combat.Abilities
                 Vector3 vNewTarget = NavHelper.MainFindSafeZone(Player.Position, true);
 
                 return new TrinityPower(SNOPower.DemonHunter_Vault, 20f, vNewTarget);
-            }
-
-            // Rain of Vengeance
-            if (CanCast(SNOPower.DemonHunter_RainOfVengeance) && !Player.IsIncapacitated &&
-                (TargetUtil.ClusterExists(45f, 3) || TargetUtil.EliteOrTrashInRange(45f)) ||
-                (TargetUtil.AnyMobsInRange(45f) && Settings.Combat.DemonHunter.RainOfVengeanceOffCD))
-            {
-                var bestClusterPoint = TargetUtil.GetBestClusterPoint(45f, 65f, false);
-
-                return new TrinityPower(SNOPower.DemonHunter_RainOfVengeance, 0f, bestClusterPoint);
-            }
-
-            // Cluster Arrow
-            if (CanCast(SNOPower.DemonHunter_ClusterArrow) && !Player.IsIncapacitated &&
-                ((Player.PrimaryResource >= 50 && !IsWaitingForSpecial) || Player.PrimaryResource > MinEnergyReserve))
-            {
-                return new TrinityPower(SNOPower.DemonHunter_ClusterArrow, V.F("DemonHunter.ClusterArrow.UseRange"), CurrentTarget.ACDGuid);
             }
 
             // Multi Shot
@@ -272,6 +253,14 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 10f, bestTarget.Position);
                 return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 10f, CurrentTarget.Position);
             }
+
+            // Cluster Arrow
+            if (CanCast(SNOPower.DemonHunter_ClusterArrow) && !Player.IsIncapacitated &&
+                ((Player.PrimaryResource >= 50 && !IsWaitingForSpecial) || Player.PrimaryResource > MinEnergyReserve))
+            {
+                return new TrinityPower(SNOPower.DemonHunter_ClusterArrow, V.F("DemonHunter.ClusterArrow.UseRange"), CurrentTarget.ACDGuid);
+            }
+
             // Chakram normal attack
             if (Hotbar.Contains(SNOPower.DemonHunter_Chakram) && !Player.IsIncapacitated &&
                 !Runes.DemonHunter.ShurikenCloud.IsActive &&
@@ -356,6 +345,17 @@ namespace Trinity.Combat.Abilities
                 }
             }
 
+            // Rain of Vengeance
+            if (CanCast(SNOPower.DemonHunter_RainOfVengeance) && !Player.IsIncapacitated &&
+               (TargetUtil.ClusterExists(45f, 3) || TargetUtil.EliteOrTrashInRange(45f)) ||
+               (TargetUtil.AnyMobsInRange(55f) && Settings.Combat.DemonHunter.RainOfVengeanceOffCD && !Runes.DemonHunter.DarkCloud.IsActive))
+            {
+                var bestClusterPoint = TargetUtil.GetBestClusterPoint(45f, 65f, false);
+
+                return new TrinityPower(SNOPower.DemonHunter_RainOfVengeance, 0f, bestClusterPoint);
+            }
+
+
             return DefaultPower;
         }
         /// <summary>
@@ -412,6 +412,13 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.DemonHunter_Preparation);
             }
 
+            // Rain of Vengeance OffCD with Dark Cloud
+            if (!Player.IsInTown && CanCast(SNOPower.DemonHunter_RainOfVengeance, CanCastFlags.NoTimer) &&
+               !Player.IsIncapacitated && Runes.DemonHunter.DarkCloud.IsActive && Settings.Combat.DemonHunter.RainOfVengeanceOffCD)
+            {
+                return new TrinityPower(SNOPower.DemonHunter_RainOfVengeance);
+            } 
+            
             return null;
         }
 

@@ -4,6 +4,7 @@ using System.Text;
 using Trinity.Technicals;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
+
 namespace Trinity
 {
     public static class HashGenerator

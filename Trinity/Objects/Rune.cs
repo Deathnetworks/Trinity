@@ -2,7 +2,6 @@
 using System.Linq;
 using Trinity.Combat;
 using Trinity.Reference;
-using Zeta.Common;
 using Zeta.Game;
 
 namespace Trinity.Objects

@@ -1,16 +1,19 @@
 ﻿using System.ComponentModel;
 using System.Runtime.Serialization;
+using Trinity.Config;
+using Trinity.Config.Loot;
 
-namespace Trinity.Config.Loot
+namespace Trinity.Settings.Loot
 {
     [DataContract(Namespace = "")]
     public class ItemSetting : ITrinitySetting<ItemSetting>, INotifyPropertyChanged
     {
         #region Fields
-        private ItemFilterMode _ItemFilterMode;
-        private PickupSetting _Pickup;
-        private TownRunSetting _TownRun;
-        private ItemRuleSetting _ItemRules;
+        private ItemFilterMode _itemFilterMode;
+        private PickupSetting _pickup;
+        private TownRunSetting _townRun;
+        private ItemRuleSetting _itemRules;
+        private ItemRankSettings _itemRank;
         #endregion Fields
 
         #region Events
@@ -27,6 +30,7 @@ namespace Trinity.Config.Loot
             Pickup = new PickupSetting();
             TownRun = new TownRunSetting();
             ItemRules = new ItemRuleSetting();
+            ItemRank = new ItemRankSettings();
         }
         #endregion Constructors
 
@@ -37,13 +41,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _ItemFilterMode;
+                return _itemFilterMode;
             }
             set
             {
-                if (_ItemFilterMode != value)
+                if (_itemFilterMode != value)
                 {
-                    _ItemFilterMode = value;
+                    _itemFilterMode = value;
                     OnPropertyChanged("ItemFilterMode");
                 }
             }
@@ -54,13 +58,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _Pickup;
+                return _pickup;
             }
             set
             {
-                if (_Pickup != value)
+                if (_pickup != value)
                 {
-                    _Pickup = value;
+                    _pickup = value;
                     OnPropertyChanged("Pickup");
                 }
             }
@@ -71,13 +75,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _TownRun;
+                return _townRun;
             }
             set
             {
-                if (_TownRun != value)
+                if (_townRun != value)
                 {
-                    _TownRun = value;
+                    _townRun = value;
                     OnPropertyChanged("TownRun");
                 }
             }
@@ -87,14 +91,30 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _ItemRules;
+                return _itemRules;
             }
             set
             {
-                if (_ItemRules != value)
+                if (_itemRules != value)
                 {
-                    _ItemRules = value;
+                    _itemRules = value;
                     OnPropertyChanged("ItemRules");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        public ItemRankSettings ItemRank
+        {
+            get
+            {
+                return _itemRank;
+            }
+            set
+            {
+                if (_itemRank != value)
+                {
+                    _itemRank = value;
+                    OnPropertyChanged("ItemRank");
                 }
             }
         }
@@ -127,7 +147,7 @@ namespace Trinity.Config.Loot
         /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
         /// </summary>
         /// <param name="context"></param>
-        [OnDeserializing()]
+        [OnDeserializing]
         internal void OnDeserializingMethod(StreamingContext context)
         {
 

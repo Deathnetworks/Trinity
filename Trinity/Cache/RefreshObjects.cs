@@ -6,6 +6,7 @@ using Trinity.Cache;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Configuration;
+using Trinity.DbProvider;
 using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -418,7 +419,7 @@ namespace Trinity
             const int setItemMarkerTexture = 404424;
             const int legendaryItemMarkerTexture = 275968;
 
-            if (!IsReadyToTownRun && !ForceVendorRunASAP)
+            if (!WantToTownRun && !ForceVendorRunASAP)
             {
                 var legendaryItemMarkers = ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsValid &&
                     (m.MinimapTexture == setItemMarkerTexture || m.MinimapTexture == legendaryItemMarkerTexture) && !Blacklist60Seconds.Contains(m.NameHash)).ToList();
@@ -710,8 +711,6 @@ namespace Trinity
 
                 //AnyElitesPresent = false;
                 AnyMobsInRange = false;
-
-                _isAvoidingProjectiles = false;
 
                 // Clear our very short-term destructible blacklist within 3 seconds of last attacking a destructible
                 if (_needClearDestructibles && DateTime.UtcNow.Subtract(_lastDestroyedDestructible).TotalMilliseconds > 2500)

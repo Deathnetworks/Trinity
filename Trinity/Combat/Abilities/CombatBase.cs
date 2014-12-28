@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Trinity.Config;
 using Trinity.Config.Combat;
-using Trinity.Objects;
-using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Common;

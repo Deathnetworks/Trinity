@@ -4,8 +4,8 @@ using System.Linq;
 using Trinity.Combat;
 using Trinity.Combat.Abilities;
 using Trinity.Reference;
-using Zeta.Game;
 using Zeta.Common;
+using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 
 namespace Trinity.Objects

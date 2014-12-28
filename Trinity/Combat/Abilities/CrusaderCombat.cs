@@ -1,9 +1,9 @@
 ﻿
 using System.Linq;
+using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
-using Trinity.Reference;
 
 namespace Trinity.Combat.Abilities
 {

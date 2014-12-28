@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Trinity.Combat;
+using Trinity.DbProvider;
 using Trinity.Helpers;
 using Trinity.Technicals;
 using Zeta.Bot.Logic;
@@ -116,7 +116,7 @@ namespace Trinity
                 CurrentCacheObject.IsQuestGiver = c_diaUnit.IsQuestGiver;
 
                 // Interact with quest givers, except when doing town-runs
-                if (ZetaDia.CurrentAct == Act.OpenWorld && CurrentCacheObject.IsQuestGiver && !(IsReadyToTownRun || ForceVendorRunASAP || BrainBehavior.IsVendoring))
+                if (ZetaDia.CurrentAct == Act.OpenWorld && CurrentCacheObject.IsQuestGiver && !(WantToTownRun || ForceVendorRunASAP || BrainBehavior.IsVendoring))
                 {
                     CurrentCacheObject.Type = GObjectType.Interactable;
                     CurrentCacheObject.Type = GObjectType.Interactable;
@@ -425,7 +425,7 @@ namespace Trinity
         }
         private static bool RefreshStepCachedSummons()
         {
-            if (c_diaUnit != null && c_diaUnit.IsValid)
+            if (c_diaUnit.IsFullyValid())
             {
                 try
                 {

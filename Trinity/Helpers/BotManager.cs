@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Windows;
 using Trinity.Config;
+using Trinity.DbProvider;
 using Trinity.Items;
+using Trinity.Settings.Loot;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.TreeSharp;
-using Logger = Trinity.Technicals.Logger;
 using Action = Zeta.TreeSharp.Action;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.Helpers
 {
@@ -136,7 +138,7 @@ namespace Trinity.Helpers
 
         internal static void SetItemManagerProvider()
         {
-            if (Settings.Loot.ItemFilterMode != Config.Loot.ItemFilterMode.DemonBuddy)
+            if (Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy)
             {
                 ItemManager.Current = new TrinityItemManager();
             }
