@@ -1,4 +1,5 @@
-﻿using Zeta.Common;
+﻿using System.ComponentModel;
+using Zeta.Common;
 using Zeta.Game.Internals.Actors;
 
 namespace Trinity.Cache
@@ -22,7 +23,7 @@ namespace Trinity.Cache
         public int ActorSNO { get; set; }
         public int ACDGuid { get; set; }
         public int RActorGUID { get; set; }
-        public ACDItem ACDItem { get { return Zeta.Game.ZetaDia.Actors.GetACDItemByGuid(this.ACDGuid); } }
+        public ACDItem ACDItem { get { return Zeta.Game.ZetaDia.Actors.GetACDItemByGuid(ACDGuid); } }
         public bool IsUpgrade { get; set; }
         public float UpgradeDamage { get; set; }
         public float UpgradeToughness { get; set; }
@@ -30,21 +31,40 @@ namespace Trinity.Cache
 
         public PickupItem() { }
 
-        public PickupItem(string Name, string internalName, int level, ItemQuality quality, int balanceId, ItemBaseType dbItemBaseType, 
+        public PickupItem(ACDItem item, GItemBaseType gItemBaseType, GItemType gItemType)
+        {
+            Name = item.Name;
+            InternalName = item.InternalName;
+            Level = item.Level;
+            Quality = item.ItemQualityLevel;
+            BalanceID = item.GameBalanceId;
+            DBBaseType = item.ItemBaseType;
+            DBItemType = item.ItemType;
+            TBaseType = gItemBaseType;
+            TType = gItemType;
+            IsOneHand = item.IsOneHand;
+            IsTwoHand = item.IsTwoHand;
+            ItemFollowerType = item.FollowerSpecialType;
+            DynamicID = item.DynamicId;
+            ActorSNO = item.ActorSNO;
+            ACDGuid = item.ACDGuid;
+        }
+
+        public PickupItem(string name, string internalName, int level, ItemQuality quality, int balanceId, ItemBaseType dbItemBaseType, 
             ItemType dbItemType, bool isOneHand, bool isTwoHand, FollowerType followerType, int acdGuid, int dynamicID = 0)
         {
-            this.Name = Name;
-            this.InternalName = internalName;
-            this.Level = level;
-            this.Quality = quality;
-            this.BalanceID = balanceId;
-            this.DBBaseType = dbItemBaseType;
-            this.DBItemType = dbItemType;
-            this.IsOneHand = IsOneHand;
-            this.IsTwoHand = IsTwoHand;
-            this.ItemFollowerType = followerType;
-            this.ACDGuid = acdGuid;
-            this.DynamicID = dynamicID;
+            Name = name;
+            InternalName = internalName;
+            Level = level;
+            Quality = quality;
+            BalanceID = balanceId;
+            DBBaseType = dbItemBaseType;
+            DBItemType = dbItemType;
+            IsOneHand = isOneHand;
+            IsTwoHand = isTwoHand;
+            ItemFollowerType = followerType;
+            ACDGuid = acdGuid;
+            DynamicID = dynamicID;
         }
 
 

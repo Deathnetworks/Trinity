@@ -141,6 +141,12 @@ namespace Trinity.Items
             return action;
         }
 
+        /// <summary>
+        /// Trinity internal stashing checks
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <param name="evaluationType">Type of the evaluation.</param>
+        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
         public bool ShouldStashItem(ACDItem item, ItemEvaluationType evaluationType)
         {
             ItemEvents.ResetTownRun();
@@ -157,6 +163,24 @@ namespace Trinity.Items
             if (DataDictionary.VanityItems.Any(i => item.InternalName.StartsWith(i)))
                 return false;
 
+            CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
+            // Now look for Misc items we might want to keep
+            GItemType tItemType = cItem.TrinityItemType; // DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
+            GItemBaseType tBaseType = cItem.TrinityItemBaseType; // DetermineBaseType(trinityItemType);
+  
+            bool isEquipment = (tBaseType == GItemBaseType.Armor ||
+                tBaseType == GItemBaseType.Jewelry ||
+                tBaseType == GItemBaseType.Offhand ||
+                tBaseType == GItemBaseType.WeaponOneHand ||
+                tBaseType == GItemBaseType.WeaponRange ||
+                tBaseType == GItemBaseType.WeaponTwoHand);
+
+            // Check pickup (in case we accidentally picked it up)
+            var pItem = new PickupItem(item, tBaseType, tItemType);
+            var pickupCheck = PickupItemValidation(pItem);
+            if (!pickupCheck)
+                return false;
+
             if (item.ItemType == ItemType.KeystoneFragment)
             {
                 if ((Trinity.Settings.Loot.TownRun.KeepTieredLootRunKeysInBackpack && item.TieredLootRunKeyLevel >= 1) ||
@@ -166,18 +190,7 @@ namespace Trinity.Items
                 return true;
             }
 
-            CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
 
-            // Now look for Misc items we might want to keep
-            GItemType tItemType = cItem.TrinityItemType; // DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
-            GItemBaseType tBaseType = cItem.TrinityItemBaseType; // DetermineBaseType(trinityItemType);
-
-            bool isEquipment = (tBaseType == GItemBaseType.Armor ||
-                tBaseType == GItemBaseType.Jewelry ||
-                tBaseType == GItemBaseType.Offhand ||
-                tBaseType == GItemBaseType.WeaponOneHand ||
-                tBaseType == GItemBaseType.WeaponRange ||
-                tBaseType == GItemBaseType.WeaponTwoHand);
 
             if (cItem.TrinityItemType == GItemType.HoradricCache && Trinity.Settings.Loot.TownRun.OpenHoradricCaches)
             {
@@ -430,6 +443,11 @@ namespace Trinity.Items
         private static bool TrinitySell(ACDItem item)
         {
             CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
+
+            var pItem = new PickupItem(item, cItem.TrinityItemBaseType, cItem.TrinityItemType);
+            var pickupCheck = PickupItemValidation(pItem);
+            if (!pickupCheck)
+                return true;
 
             // Vanity Items
             if (DataDictionary.VanityItems.Any(i => item.InternalName.StartsWith(i)))
