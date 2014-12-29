@@ -21,7 +21,7 @@ namespace Trinity.Items
 {
     public static class ItemSort
     {
-        private const int ItemMovementDelay = 50;
+        private const int ItemMovementDelay = 100;
         const string HookName = "VendorRun";
 
         /// <summary>
@@ -135,17 +135,18 @@ namespace Trinity.Items
                  *  Equipment (Weapons, Armor, Jewlery)
                  */
 
+                // Two slots before one slots
+                if (!thisItem.IsTwoSquareItem && thatItem.IsTwoSquareItem)
+                    return -1;
+                if (thisItem.IsTwoSquareItem && !thatItem.IsTwoSquareItem)
+                    return 1;
+
                 // Sort Sets
-                if (thisItem.IsSetItem && thatItem.IsSetItem)
+                if (thisItem.IsSetItem && thatItem.IsSetItem && thisItem.IsTwoSquareItem)
                 {
                     bool isSameSet = thisItem.ItemSetName == thatItem.ItemSetName;
                     if (isSameSet)
                     {
-                        if (!thisItem.IsTwoSquareItem && thatItem.IsTwoSquareItem)
-                            return 1;
-                        if (thisItem.IsTwoSquareItem && !thatItem.IsTwoSquareItem)
-                            return -1;
-
                         return String.Compare(thisSortName, thatSortName, StringComparison.InvariantCulture);
                     }
 
