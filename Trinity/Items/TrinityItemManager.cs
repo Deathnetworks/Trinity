@@ -444,17 +444,17 @@ namespace Trinity.Items
         {
             CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
 
-            var pItem = new PickupItem(item, cItem.TrinityItemBaseType, cItem.TrinityItemType);
-            var pickupCheck = PickupItemValidation(pItem);
-            if (!pickupCheck)
-                return true;
-
             // Vanity Items
             if (DataDictionary.VanityItems.Any(i => item.InternalName.StartsWith(i)))
                 return false;
 
             if (item.ItemType == ItemType.KeystoneFragment && item.TieredLootRunKeyLevel >= 0)
                 return false;
+
+            var pItem = new PickupItem(item, cItem.TrinityItemBaseType, cItem.TrinityItemType);
+            var pickupCheck = PickupItemValidation(pItem);
+            if (!pickupCheck)
+                return true;
 
             switch (cItem.TrinityItemBaseType)
             {
