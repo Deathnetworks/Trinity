@@ -181,7 +181,7 @@ namespace Trinity
         private static readonly HashSet<int> neverTownPortalLevelAreaIds = new HashSet<int>()
         {
             202446, // A1 New Tristram "Attack Area"
-            19947, // A1 New Tristram "Attack Area"
+            //19947, // A1 New Tristram "Attack Area"
 
             284069, // A5 Westmarch Overlook
             308323, // A5 Westmarch Wolf Gate

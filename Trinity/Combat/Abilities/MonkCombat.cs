@@ -269,26 +269,26 @@ namespace Trinity.Combat.Abilities
             // 4 Mantra spam for the 4 second buff
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && !Settings.Combat.Monk.DisableMantraSpam)
             {
-                if (CanCast(SNOPower.X1_Monk_MantraOfConviction_v2) && (!GetHasBuff(SNOPower.X1_Monk_MantraOfConviction_v2) ||
+                if (CanCast(SNOPower.X1_Monk_MantraOfConviction_v2) && TimeSincePowerUse(SNOPower.X1_Monk_MantraOfConviction_v2) > 1000 && (!GetHasBuff(SNOPower.X1_Monk_MantraOfConviction_v2) ||
                     (hasSWK && TargetUtil.AnyMobsInRange(10f))) && (Player.PrimaryResource >= 80))
                 {
-                    return new TrinityPower(SNOPower.X1_Monk_MantraOfConviction_v2);
+                    return new TrinityPower(SNOPower.X1_Monk_MantraOfConviction_v2, 3);
                 }
 
-                if (CanCast(SNOPower.X1_Monk_MantraOfRetribution_v2) && (!GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) ||
+                if (CanCast(SNOPower.X1_Monk_MantraOfRetribution_v2) && TimeSincePowerUse(SNOPower.X1_Monk_MantraOfRetribution_v2) > 1000 && (!GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) ||
                     (hasSWK && TargetUtil.AnyMobsInRange(10f))) && (Player.PrimaryResource >= 80))
                 {
-                    return new TrinityPower(SNOPower.X1_Monk_MantraOfRetribution_v2);
+                    return new TrinityPower(SNOPower.X1_Monk_MantraOfRetribution_v2, 3);
                 }
-                if (CanCast(SNOPower.X1_Monk_MantraOfHealing_v2) && (!GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) ||
+                if (CanCast(SNOPower.X1_Monk_MantraOfHealing_v2) && TimeSincePowerUse(SNOPower.X1_Monk_MantraOfHealing_v2) > 1000 && (!GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) ||
                     (hasSWK && TargetUtil.AnyMobsInRange(10f))) && (Player.PrimaryResource >= 80))
                 {
-                    return new TrinityPower(SNOPower.X1_Monk_MantraOfHealing_v2);
+                    return new TrinityPower(SNOPower.X1_Monk_MantraOfHealing_v2, 3);
                 }
-                if (CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && (!GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) ||
+                if (CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && TimeSincePowerUse(SNOPower.X1_Monk_MantraOfEvasion_v2) > 1000 && (!GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) ||
                     (hasSWK && TargetUtil.AnyMobsInRange(10f))) && (Player.PrimaryResource >= 80))
                 {
-                    return new TrinityPower(SNOPower.X1_Monk_MantraOfEvasion_v2);
+                    return new TrinityPower(SNOPower.X1_Monk_MantraOfEvasion_v2, 3);
                 }
             }
 

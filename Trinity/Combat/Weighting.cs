@@ -526,6 +526,7 @@ namespace Trinity
                                 if (cacheObject.GoldAmount <= 0 && cacheObject.ItemQuality >= ItemQuality.Legendary)
                                 {
                                     cacheObject.Weight = MaxWeight;
+                                    objWeightInfo += " IsLegendary";
                                 }
 
                                 if (cacheObject.GoldAmount > 0 && cacheObject.Distance < 25f)
@@ -595,19 +596,21 @@ namespace Trinity
 
                                 // Point-blank items get a weight increase 
                                 if (cacheObject.GoldAmount <= 0 && cacheObject.Distance <= 9f)
+                                {
                                     cacheObject.Weight += 1000d;
+                                    objWeightInfo += " IsPointBlank";
+                                }
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                 if (cacheObject.RActorGuid == LastTargetRactorGUID)
+                                {
                                     cacheObject.Weight += 800;
-
-                                // Give yellows more weight
-                                if (cacheObject.GoldAmount <= 0 && cacheObject.ItemQuality >= ItemQuality.Rare4)
-                                    cacheObject.Weight += 100d;
-
-                                if (Player.ActorClass == ActorClass.Monk && TimeSinceUse(SNOPower.Monk_TempestRush) < 1000 && cacheObject.ItemQuality < ItemQuality.Legendary)
+                                    objWeightInfo += " PreviousTarget";
+                                }
+                                if (Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_TempestRush) && TimeSinceUse(SNOPower.Monk_TempestRush) < 1000 && cacheObject.ItemQuality < ItemQuality.Legendary)
                                 {
                                     cacheObject.Weight = 500;
+                                    objWeightInfo += " MonkTR Weight";
                                 }
 
                                 // If there's a monster in the path-line to the item, reduce the weight to 1, except legendaries
@@ -976,7 +979,7 @@ namespace Trinity
                             {
                                 if (DataDictionary.ForceDestructibles.Contains(cacheObject.ActorSNO))
                                 {
-                                    objWeightInfo += "ForceDestructibles";
+                                    objWeightInfo += " ForceDestructibles";
                                     cacheObject.Weight = 100;
                                     break;
                                 }
@@ -986,7 +989,7 @@ namespace Trinity
                                     cacheObject.RadiusDistance > 0 &&
                                     (DateTime.UtcNow.Subtract(PlayerMover.LastGeneratedStuckPosition).TotalSeconds > 3))
                                 {
-                                    objWeightInfo += "NotStuck";
+                                    objWeightInfo += " NotStuck";
                                     break;
                                 }
 
@@ -1130,7 +1133,7 @@ namespace Trinity
 
                     if (cacheObject.Weight > MaxWeight && !Double.IsNaN(cacheObject.Weight))
                     {
-                        objWeightInfo += "MaxWeight ";
+                        objWeightInfo += " MaxWeight ";
                         cacheObject.Weight = Math.Min(cacheObject.Weight, MaxWeight);
                     }
 
@@ -1139,7 +1142,7 @@ namespace Trinity
                     {
                         cacheObject.Weight = 0;
                         _shouldStayPutDuringAvoidance = true;
-                        objWeightInfo += "StayPutAoE ";
+                        objWeightInfo += " StayPutAoE ";
                     }
 
                     // Prevent current target dynamic ranged weighting flip-flop 

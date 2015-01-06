@@ -427,7 +427,7 @@ namespace Trinity
                 foreach (var marker in legendaryItemMarkers)
                 {
                     var name = (marker.MinimapTexture == setItemMarkerTexture ? "Set Item" : "Legendary Item") + " Minimap Marker";
-                    Logger.LogDebug(LogCategory.CacheManagement, "Adding Legendary minimap Marker {0} {1}", name, marker.NameHash);
+                    Logger.LogDebug(LogCategory.CacheManagement, "Adding {0} {1} at {2} distance {3}", name, marker.NameHash, marker.Position, marker.Position.Distance(Player.Position));
                     ObjectCache.Add(new TrinityCacheObject()
                     {
                         Position = marker.Position,
@@ -436,6 +436,7 @@ namespace Trinity
                         Distance = marker.Position.Distance(Player.Position),
                         ActorType = ActorType.Item,
                         Type = GObjectType.Item,
+                        ItemQuality = ItemQuality.Legendary,
                         Radius = 2f,
                         Weight = 50
                     });

@@ -381,6 +381,7 @@ namespace Trinity
                 }
 
                 HandleTargetBasicMovement(ForceNewMovement);
+                Logger.LogDebug(LogCategory.Behavior, "End of HandleTarget");
                 return GetRunStatus(RunStatus.Running);
             }
         }
