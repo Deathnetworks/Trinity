@@ -146,10 +146,12 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.Wizard_SlowTime);
 
                 if ((TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 40f)) &&
-                 (TimeSpanSincePowerUse(SNOPower.Wizard_SlowTime) > TimeSpan.FromSeconds(15) || SpellHistory.DistanceFromLastTarget(SNOPower.Wizard_SlowTime) > 30f))
+                 SpellHistory.DistanceFromLastTarget(SNOPower.Wizard_SlowTime) > 30f)
                 {
-                    if (TargetUtil.AnyMobsInRange(20f))
                         return new TrinityPower(SNOPower.Wizard_SlowTime); // cast of Self
+                }
+                if (TargetUtil.AnyMobsInRange(55f) && Runes.Wizard.TimeAndSpace.IsActive)
+                {
                     return new TrinityPower(SNOPower.Wizard_SlowTime, 55f, TargetUtil.GetBestClusterUnit(20f).Position);
                 }
             }

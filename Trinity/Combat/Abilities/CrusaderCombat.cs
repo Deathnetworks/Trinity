@@ -142,11 +142,15 @@ namespace Trinity.Combat.Abilities
                 // Phalanx
                 if (CanCastPhalanx())
                 {
-                    return new TrinityPower(SNOPower.x1_Crusader_Phalanx3, 45f, TargetUtil.GetBestClusterPoint(15f, 45f));
+                    var bestPierceTarget = TargetUtil.GetBestPierceTarget(45f);
+                    if (bestPierceTarget != null)
+                        return new TrinityPower(SNOPower.x1_Crusader_Phalanx3, 45f, bestPierceTarget.ACDGuid);
                 }
                 if (CanCastPhalanxStampede(hasAkkhan))
                 {
-                    return new TrinityPower(SNOPower.x1_Crusader_Phalanx3, 7f, CurrentTarget.ACDGuid);
+                    var bestPierceTarget = TargetUtil.GetBestPierceTarget(45f);
+                    if (bestPierceTarget != null)
+                        return new TrinityPower(SNOPower.x1_Crusader_Phalanx3, 7f, bestPierceTarget.ACDGuid);
                 }
 
                 // Blessed Shield : Piercing Shield
@@ -311,12 +315,12 @@ namespace Trinity.Combat.Abilities
 
         private static bool CanCastPhalanx()
         {
-            return CanCast(SNOPower.x1_Crusader_Phalanx3) && (TargetUtil.ClusterExists(15f, 3) || TargetUtil.EliteOrTrashInRange(15f));
+            return CanCast(SNOPower.x1_Crusader_Phalanx3) && (TargetUtil.ClusterExists(45f, 3) || TargetUtil.EliteOrTrashInRange(45f));
         }
 
         private static bool CanCastPhalanxStampede(bool hasAkkhan)
         {
-            return (hasAkkhan && CanCast(SNOPower.x1_Crusader_Phalanx3) && TargetUtil.AnyMobsInRange(15f, 1) && Runes.Crusader.Stampede.IsActive);
+            return (hasAkkhan && CanCast(SNOPower.x1_Crusader_Phalanx3) && TargetUtil.AnyMobsInRange(45f, 1) && Runes.Crusader.Stampede.IsActive);
         }
 
         private static bool CanCastSteedChargeOutOfCombat()
