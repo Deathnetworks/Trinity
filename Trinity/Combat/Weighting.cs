@@ -9,6 +9,7 @@ using Trinity.Items;
 using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
+using Zeta.Bot.Navigation;
 using Zeta.Bot.Profile.Common;
 using Zeta.Bot.Settings;
 using Zeta.Common;
@@ -1180,6 +1181,11 @@ namespace Trinity
                         // See if we can try attempting kiting later
                         NeedToKite = false;
                         KiteAvoidDestination = Vector3.Zero;
+
+                        // Hard-check paths to all targets in Pandemounium Fortress maps
+                        // THIS IS REALLY SLOW AND EXPENSIVE - do not turn this on "everywhere"
+                        if (Player.IsInPandemoniumFortress && !Navigator.GetNavigationProviderAs<DefaultNavigationProvider>().CanFullyClientPathTo(cacheObject.Position))
+                            continue;
 
                         // Kiting and Avoidance
                         if (CurrentTarget.IsUnit)

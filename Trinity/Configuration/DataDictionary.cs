@@ -17,6 +17,19 @@ namespace Trinity
 
         public const int PLAYER_HEADSTONE_SNO = 4860; // PlayerHeadstone
 
+        public static HashSet<int> PandemoniumFortressWorlds { get { return _pandemoniumFortressWorlds; } }
+        private static readonly HashSet<int> _pandemoniumFortressWorlds = new HashSet<int>
+        {
+            271233, // Adventure Pand Fortress 1
+            271235, // Adventure Pand Fortress 2
+        };
+
+        public static HashSet<int> PandemoniumFortressLevelAreaIds { get { return _pandemoniumFortressLevelAreaIds; } }
+        private static readonly HashSet<int> _pandemoniumFortressLevelAreaIds = new HashSet<int>
+        {
+            333758, //LevelArea: X1_LR_Tileset_Fortress
+        };
+
         public static HashSet<int> NoCheckKillRange { get { return _noCheckKillRange; } }
         private static readonly HashSet<int> _noCheckKillRange = new HashSet<int>
         {

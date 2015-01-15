@@ -66,6 +66,7 @@ namespace Trinity
         public float MovementSpeed { get; set; }
         public bool IsMoving { get; set; }
         public bool IsGhosted { get; set; }
+        public bool IsInPandemoniumFortress { get; set; }
         public GameDifficulty GameDifficulty { get; set; }
 
         public TrinityBountyInfo ActiveBounty { get; set; }
@@ -220,7 +221,7 @@ namespace Trinity
                     Player.LevelAreaId = ZetaDia.CurrentLevelAreaId;
 
                     Player.CooldownReductionPct = ZetaDia.Me.CommonData.GetAttribute<float>(ActorAttributeType.PowerCooldownReductionPercentAll);
-                    Player.ResourceCostReductionPct = ZetaDia.Me.CommonData.GetAttribute<float>(ActorAttributeType.ResourceCostReductionPercentAll);                        
+                    Player.ResourceCostReductionPct = ZetaDia.Me.CommonData.GetAttribute<float>(ActorAttributeType.ResourceCostReductionPercentAll);
 
                     Player.CurrentExperience = ZetaDia.Me.CurrentExperience;
                     Player.ExperienceNextLevel = ZetaDia.Me.ExperienceNextLevel;
@@ -235,6 +236,8 @@ namespace Trinity
 
                     Player.ParticipatingInTieredLootRun = ZetaDia.Me.CommonData.GetAttribute<int>(ActorAttributeType.ParticipatingInTieredLootRun) > 0;
 
+                    Player.IsInPandemoniumFortress = DataDictionary.PandemoniumFortressWorlds.Contains(ZetaDia.CurrentWorldId) ||
+                            DataDictionary.PandemoniumFortressLevelAreaIds.Contains(Player.LevelAreaId);
 
                     if (Player.CurrentHealthPct > 0)
                         Player.IsGhosted = ZetaDia.Me.CommonData.GetAttribute<int>(ActorAttributeType.Ghosted) > 0;
@@ -294,8 +297,8 @@ namespace Trinity
                         CacheData.AbilityLastUsed[power] = DateTime.MinValue;
                     }
                 }
-                
-                
+
+
 
                 // Special flag for detecting the activation and de-activation of archon
                 bool archonBuff = false;
