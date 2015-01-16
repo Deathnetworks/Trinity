@@ -880,6 +880,19 @@ namespace Trinity.ItemRules
             itemDic.Add("[MAXMANA]", item.Stats.MaxMana);
             itemDic.Add("[MANAREG]", item.Stats.ManaRegen);
 
+
+            var ancientRank = 0;
+            try
+            {
+                if (item.ItemQualityLevel == ItemQuality.Legendary)
+                    ancientRank = item.GetAttribute<int>(ActorAttributeType.AncientRank);
+            }
+            catch (Exception)
+            {
+            }
+            itemDic.Add("[ANCIENT]", ancientRank);
+            
+
             // - ROS & MORE STATS ADDED -------------------------------------------//
             // This include Splash Damage, Cooldown Reduction, Resource Cost
             // Reduction, +% damage to Physical damage skills, and specific Class

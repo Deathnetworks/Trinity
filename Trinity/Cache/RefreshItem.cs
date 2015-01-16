@@ -72,6 +72,12 @@ namespace Trinity
                     c_ItemQuality,
                     c_ItemLevel);
 
+                try
+                {
+                    c_IsAncient = c_ItemQuality == ItemQuality.Legendary && diaItem.CommonData.GetAttribute<int>(ActorAttributeType.AncientRank) > 0;
+                }
+                catch {}
+
                 float range = 0f;
 
                 // no range check on Legendaries
