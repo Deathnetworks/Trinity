@@ -120,6 +120,7 @@
     <Compile Include="Helpers\CloneExtension.cs" />
     <Compile Include="Helpers\Composites.cs" />
     <Compile Include="Helpers\LookupList.cs" />
+    <Compile Include="Helpers\MemoryHelper.cs" />
     <Compile Include="Helpers\SystemInformation.cs" />
     <Compile Include="Helpers\XpInactivity.cs" />
     <Compile Include="Helpers\DebugUtil.cs" />

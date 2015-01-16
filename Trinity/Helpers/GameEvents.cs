@@ -123,7 +123,7 @@ namespace Trinity
 
         static void GameEvents_OnWorldChanged(object sender, EventArgs e)
         {
-            CacheData.FullClear();
+            CacheData.WorldChangedClear();
             TrinityItemManager.ResetBackPackCheck();
         }
 
@@ -188,7 +188,6 @@ namespace Trinity
             // Out of thread Async stuff
             BeginInvoke(() =>
             {
-
                 Logger.Log("New Game - resetting everything");
 
                 TrinityItemManager.ResetBackPackCheck();

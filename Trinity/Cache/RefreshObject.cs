@@ -97,7 +97,7 @@ namespace Trinity
                 CurrentCacheObject.ACDGuid = freshObject.ACDGuid;
 
                 // Get Name
-                CurrentCacheObject.InternalName = nameNumberTrimRegex.Replace(freshObject.Name, "");
+                CurrentCacheObject.InternalName = NameNumberTrimRegex.Replace(freshObject.Name, "");
 
                 CurrentCacheObject.ActorSNO = freshObject.ActorSNO;
                 CurrentCacheObject.ActorType = freshObject.ActorType;

@@ -1,7 +1,11 @@
-﻿using Trinity.DbProvider;
+﻿using Trinity.Cache;
+using Trinity.DbProvider;
 using Trinity.Items;
+using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Game.Internals.Actors;
+using Zeta.Bot.Settings;
+using Trinity.Settings.Loot;
 
 namespace Trinity
 {
@@ -68,6 +72,9 @@ namespace Trinity
 
         internal static void TrinityOnOnItemIdentificationRequest(object sender, ItemIdentifyRequestEventArgs e)
         {
+            if (Trinity.Settings.Loot.TownRun.DropLegendaryInTown)
+                e.Item.Drop();
+
             e.IgnoreIdentification = !TrinityItemManager.ItemRulesIdentifyValidation(e.Item);
         }
 
@@ -79,6 +86,9 @@ namespace Trinity
             Trinity.WantToTownRun = false;
         }
 
-
+        internal static void TrinityOnItemDropped(object sender, ItemEventArgs e)
+        {
+            //Logger.Log("Dropped {0} ({1})", e.Item.Name, e.Item.ActorSNO);          
+        }
     }
 }

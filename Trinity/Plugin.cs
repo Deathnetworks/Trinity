@@ -146,6 +146,7 @@ namespace Trinity
                     GameEvents.OnGameLeft += TrinityOnLeaveGame;
                     GameEvents.OnItemSold += ItemEvents.TrinityOnItemSold;
                     GameEvents.OnItemSalvaged += ItemEvents.TrinityOnItemSalvaged;
+                    GameEvents.OnItemDropped += ItemEvents.TrinityOnItemDropped;
                     GameEvents.OnItemStashed += ItemEvents.TrinityOnItemStashed;
                     GameEvents.OnItemIdentificationRequest += ItemEvents.TrinityOnOnItemIdentificationRequest;
                     GameEvents.OnGameChanged += GameEvents_OnGameChanged;

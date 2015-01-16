@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Trinity.Cache;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
@@ -98,6 +99,11 @@ namespace Trinity
         internal static Dictionary<int, bool> HasBeenInLoS = new Dictionary<int, bool>();
 
         /// <summary>
+        /// Record of items that have been on the ground
+        /// </summary>
+        internal static HashSet<PickupItem> DroppedItems = new HashSet<PickupItem>();
+
+        /// <summary>
         /// Stores the computed ItemQuality from an ACDItem.ItemLink (ACDGuid based)
         /// </summary>
         internal static Dictionary<int, ItemQuality> ItemLinkQuality = new Dictionary<int, ItemQuality>();
@@ -162,7 +168,12 @@ namespace Trinity
         internal static void FullClear()
         {
             Clear();
+            WorldChangedClear();                       
+            DroppedItems.Clear();
+        }
 
+        internal static void WorldChangedClear()
+        {
             AbilityLastUsed = new Dictionary<SNOPower, DateTime>(DataDictionary.LastUseAbilityTimeDefaults);
             AvoidanceObstacles.Clear();
             GoldStack.Clear();
@@ -178,6 +189,5 @@ namespace Trinity
             TimeBoundAvoidance.Clear();
             BlacklistedEvents.Clear();
         }
-
     }
 }
