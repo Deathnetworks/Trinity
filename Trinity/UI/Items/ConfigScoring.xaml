@@ -37,6 +37,7 @@
                         <CheckBox ToolTip="Trash all Rares" IsChecked="{Binding Path=TownRun.ForceSalvageRares}" HorizontalAlignment="Left" Content="Sell/Salvage All Rares" />
                         <CheckBox ToolTip="Keep Legendaries Unidentified" IsChecked="{Binding Path=TownRun.KeepLegendaryUnid}" HorizontalAlignment="Left" Content="Keep Legendaries Unidentified" />
                         <CheckBox ToolTip="WARNING: Dropped items will not be picked up again" IsChecked="{Binding TownRun.DropLegendaryInTown}" HorizontalAlignment="Left" Content="Drop Legendaries in Town" />
+                        <CheckBox ToolTip="Apply Pickup Validation to Stashing" IsChecked="{Binding TownRun.ApplyPickupValidationToStashing}" HorizontalAlignment="Left" Content="Apply Pickup Validation to Stashing" />
                     </UniformGrid>
                     <UniformGrid Columns="1" HorizontalAlignment="Center">
                         <CheckBox Content="Keep Rift Keys in Backpack" IsChecked="{Binding Path=TownRun.KeepRiftKeysInBackpack}" />

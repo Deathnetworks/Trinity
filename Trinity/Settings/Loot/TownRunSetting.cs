@@ -27,6 +27,7 @@ namespace Trinity.Config.Loot
         private bool _KeepTieredLootRunKeysInBackpack;
         private bool _KeepRiftKeysInBackPack;
         private bool _DropLegendaryInTown;
+        private bool _ApplyPickupValidationToStashing;
         #endregion Fields
 
         #region Events
@@ -384,6 +385,24 @@ namespace Trinity.Config.Loot
                 }
             }
         }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool ApplyPickupValidationToStashing
+        {
+            get
+            {
+                return _ApplyPickupValidationToStashing;
+            }
+            set
+            {
+                if (_ApplyPickupValidationToStashing != value)
+                {
+                    _ApplyPickupValidationToStashing = value;
+                    OnPropertyChanged("ApplyPickupValidationToStashing");
+                }
+            }
+        }
         #endregion Properties
 
         #region Methods
@@ -429,6 +448,7 @@ namespace Trinity.Config.Loot
             SalvageBlueItemOption = SalvageOption.Salvage;
             SalvageYellowItemOption = SalvageOption.Salvage;
             SalvageLegendaryItemOption = SalvageOption.Salvage;
+            ApplyPickupValidationToStashing = true;
         }
 
         /// <summary>

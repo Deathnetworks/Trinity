@@ -89,9 +89,7 @@ namespace Trinity
         public int Row { get; set; }
         public int Column { get; set; }
         public string ItemLink { get; set; }
-        public float UpgradeDamage { get; set; }
-        public float UpgradeToughness { get; set; }
-        public float UpgradeHealing { get; set; }
+        public bool IsAncient { get; set; }
 
         public CachedACDItem(ItemStats stats)
         {
@@ -252,8 +250,7 @@ namespace Trinity
 
             TrinityItemType = TrinityItemManager.DetermineItemType(internalName, itemType, followerType);
             TrinityItemBaseType = TrinityItemManager.DetermineBaseType(TrinityItemType);
-
-            ComputeUpgrade();
+            IsAncient = acdItem.GetAttribute<int>(ActorAttributeType.AncientRank) > 0;
         }
 
 
@@ -299,10 +296,10 @@ namespace Trinity
                     Column = item.InventoryColumn,
                     ItemLink = item.ItemLink,
                     TrinityItemType = TrinityItemManager.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType),
-                    TrinityItemBaseType = TrinityItemManager.DetermineBaseType(TrinityItemManager.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType))
+                    TrinityItemBaseType = TrinityItemManager.DetermineBaseType(TrinityItemManager.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType)),
+                    IsAncient = item.GetAttribute<int>(ActorAttributeType.AncientRank) > 0
                 };
 
-                cItem.ComputeUpgrade();
                 return cItem;
             }
             catch (Exception ex)
@@ -311,40 +308,6 @@ namespace Trinity
                 return default(CachedACDItem);
             }
 
-        }
-
-        public void ComputeUpgrade()
-        {
-            float damage = 0, healing = 0, toughness = 0;
-
-            float altDamage = 0;
-            float altToughness = 0;
-
-            foreach (var slot in AcdItem.ValidInventorySlots)
-            {
-                float altHealing = 0;
-                if (slot == InventorySlot.RightFinger)
-                {
-                    AcdItem.GetStatChanges(out altDamage, out altHealing, out altToughness, true);
-                }
-                else if (slot == InventorySlot.RightHand)
-                {
-                    AcdItem.GetStatChanges(out altDamage, out altHealing, out altToughness, true);
-                }
-                else
-                {
-                    AcdItem.GetStatChanges(out damage, out healing, out toughness);
-                }
-            }
-            if ((altDamage + altToughness) > (damage + toughness))
-            {
-                damage = altDamage;
-                toughness = altToughness;
-            }
-
-            UpgradeDamage = damage;
-            UpgradeToughness = toughness;
-            UpgradeHealing = healing;
         }
     }
 }

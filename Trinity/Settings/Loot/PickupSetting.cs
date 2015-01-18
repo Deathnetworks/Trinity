@@ -20,6 +20,7 @@ namespace Trinity.Config.Loot
         private bool _pickupYellowJewlery;
         private bool _pickupblueFollowerItems;
         private bool _pickupYellowFollowerItems;
+        private bool _pickupLegendaryFollowerItems;
         private bool _pickupLegendaries;
         private int _potionCount;
         private TrinityGemType _gemType;
@@ -426,6 +427,24 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool PickupLegendaryFollowerItems
+        {
+            get
+            {
+                return _pickupLegendaryFollowerItems;
+            }
+            set
+            {
+                if (_pickupLegendaryFollowerItems != value)
+                {
+                    _pickupLegendaryFollowerItems = value;
+                    OnPropertyChanged("PickupLegendaryFollowerItems");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
         [DefaultValue(TrinityItemQuality.Rare)]
         public TrinityItemQuality MiscItemQuality
         {
@@ -756,6 +775,7 @@ namespace Trinity.Config.Loot
             TrialKeys = true;
             PickupLegendaries = true;
             LegendaryPotions = true;
+            PickupLegendaryFollowerItems = true;
         }
         #endregion Methods
     }

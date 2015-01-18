@@ -49,6 +49,7 @@
                     <UniformGrid HorizontalAlignment="Center">
                         <CheckBox Content="Magic Follower Items" IsChecked="{Binding Path=Pickup.PickupBlueFollowerItems}" VerticalAlignment="Center" />
                         <CheckBox Content="Rare Follower Items" IsChecked="{Binding Path=Pickup.PickupYellowFollowerItems}" VerticalAlignment="Center" />
+                        <CheckBox Content="Legendary Follower Items" IsChecked="{Binding Path=Pickup.PickupYellowFollowerItems}" VerticalAlignment="Center" />
                         <CheckBox Content="Pickup Gray Items" ToolTip="Gray Items" IsChecked="{Binding Path=Pickup.PickupGrayItems}" />
                         <CheckBox Content="Pickup White Items" ToolTip="White Items" IsChecked="{Binding Path=Pickup.PickupWhiteItems}" />
                     </UniformGrid>
@@ -133,7 +134,7 @@
                               IsChecked="{Binding Path=Pickup.GemType,Converter={StaticResource flagsEnumValueConverter}, ConverterParameter='Diamond'}" 
                               Margin="0" VerticalAlignment="Center"/>
                     </Grid>
-                    <Grid>
+                    <Grid Margin="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />

@@ -18,6 +18,9 @@ namespace Trinity.Reference
         {
             if (cachedAcdItem.AcdItem != null && cachedAcdItem.AcdItem.IsValid)
             {
+                if (cachedAcdItem.IsAncient)
+                    return true;
+                
                 var item = new Item(cachedAcdItem.AcdItem);
                 var result = ShouldStashItem(item);
 

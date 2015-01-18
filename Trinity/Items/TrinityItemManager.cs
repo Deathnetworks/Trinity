@@ -167,7 +167,7 @@ namespace Trinity.Items
             // Now look for Misc items we might want to keep
             GItemType tItemType = cItem.TrinityItemType; // DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
             GItemBaseType tBaseType = cItem.TrinityItemBaseType; // DetermineBaseType(trinityItemType);
-  
+
             bool isEquipment = (tBaseType == GItemBaseType.Armor ||
                 tBaseType == GItemBaseType.Jewelry ||
                 tBaseType == GItemBaseType.Offhand ||
@@ -189,8 +189,6 @@ namespace Trinity.Items
                     return false;
                 return true;
             }
-
-
 
             if (cItem.TrinityItemType == GItemType.HoradricCache && Trinity.Settings.Loot.TownRun.OpenHoradricCaches)
             {
@@ -323,13 +321,14 @@ namespace Trinity.Items
                 return false;
             }
 
+            // Item Ranks
             if (cItem.Quality >= ItemQuality.Legendary && Trinity.Settings.Loot.ItemFilterMode == ItemFilterMode.ItemRanks && IsEquipment(cItem))
             {
                 if (evaluationType == ItemEvaluationType.Keep)
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (Rank Equipment)", cItem.RealName, cItem.InternalName, tItemType);
                 return ItemRanks.ShouldStashItem(cItem);
             }
-            
+
             if (cItem.Quality >= ItemQuality.Legendary)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
@@ -454,11 +453,13 @@ namespace Trinity.Items
             if (item.ItemType == ItemType.HoradricCache)
                 return false;
 
-
-            var pItem = new PickupItem(item, cItem.TrinityItemBaseType, cItem.TrinityItemType);
-            var pickupCheck = PickupItemValidation(pItem);
-            if (!pickupCheck)
-                return true;
+            if (Trinity.Settings.Loot.TownRun.ApplyPickupValidationToStashing)
+            {
+                var pItem = new PickupItem(item, cItem.TrinityItemBaseType, cItem.TrinityItemType);
+                var pickupCheck = PickupItemValidation(pItem);
+                if (!pickupCheck)
+                    return true;
+            }
 
             switch (cItem.TrinityItemBaseType)
             {
@@ -973,7 +974,7 @@ namespace Trinity.Items
                         return Trinity.Settings.Loot.Pickup.PickupLegendaries;
                     return CheckLevelRequirements(item.Level, item.Quality, Trinity.Settings.Loot.Pickup.PickupBlueJewlery, Trinity.Settings.Loot.Pickup.PickupYellowJewlery);
                 case GItemBaseType.FollowerItem:
-                    if (item.Quality >= ItemQuality.Legendary)
+                    if (item.Quality >= ItemQuality.Legendary && Trinity.Settings.Loot.Pickup.PickupLegendaryFollowerItems)
                         return true;
                     if (item.Quality >= ItemQuality.Magic1 && item.Quality <= ItemQuality.Magic3 && Trinity.Settings.Loot.Pickup.PickupBlueFollowerItems)
                         return true;
