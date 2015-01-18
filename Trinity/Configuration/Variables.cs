@@ -374,7 +374,7 @@ namespace Trinity
         /// <summary>
         /// Used for trimming off numbers from object names in RefreshDiaObject
         /// </summary>
-        private static Regex nameNumberTrimRegex = new Regex(@"-\d+$", RegexOptions.Compiled);
+        internal static Regex NameNumberTrimRegex = new Regex(@"-\d+$", RegexOptions.Compiled);
 
         // The following 2 variables are used to clear the dictionaries out - clearing one dictionary out per maximum every 2 seconds, working through in sequential order
         private static DateTime lastClearedCacheDictionary = DateTime.MinValue;

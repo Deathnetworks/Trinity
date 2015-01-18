@@ -26,6 +26,7 @@ namespace Trinity.Config.Loot
         private bool _KeepTrialLootRunKeysInBackpack;
         private bool _KeepTieredLootRunKeysInBackpack;
         private bool _KeepRiftKeysInBackPack;
+        private bool _DropLegendaryInTown;
         #endregion Fields
 
         #region Events
@@ -362,6 +363,24 @@ namespace Trinity.Config.Loot
                 {
                     _KeepRiftKeysInBackPack = value;
                     OnPropertyChanged("KeepRiftKeysInBackpack");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool DropLegendaryInTown
+        {
+            get
+            {
+                return _DropLegendaryInTown;
+            }
+            set
+            {
+                if (_DropLegendaryInTown != value)
+                {
+                    _DropLegendaryInTown = value;
+                    OnPropertyChanged("DropLegendaryInTown");
                 }
             }
         }

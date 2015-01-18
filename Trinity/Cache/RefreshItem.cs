@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Trinity.Cache;
 using Trinity.Helpers;
 using Trinity.Items;
@@ -70,6 +71,12 @@ namespace Trinity
                     Player.WorldID,
                     c_ItemQuality,
                     c_ItemLevel);
+
+                try
+                {
+                    c_IsAncient = c_ItemQuality == ItemQuality.Legendary && diaItem.CommonData.GetAttribute<int>(ActorAttributeType.AncientRank) > 0;
+                }
+                catch {}
 
                 float range = 0f;
 
@@ -165,6 +172,22 @@ namespace Trinity
                     if (!AddToCache && Settings.Loot.Pickup.PickupLowLevel && Player.Level <= 10)
                     {
                         AddToCache = TrinityItemManager.PickupItemValidation(pickupItem);
+                    }
+
+                    // Ignore if item has existed before in this location
+                    if (Settings.Loot.TownRun.DropLegendaryInTown)
+                    {
+                        if (!CacheData.DroppedItems.Any(i => i.Equals(pickupItem)))
+                        {
+                            CacheData.DroppedItems.Add(pickupItem);
+                            AddToCache = true;
+                        }
+                        else
+                        {
+                            Logger.LogDebug("Ignoring Dropped Item = ItemPosition={0} Hashcode={1} DynId={2}", pickupItem.Position, pickupItem.GetHashCode(), pickupItem.DynamicID);
+                            AddToCache = false;
+                        }
+                            
                     }
 
                     CacheData.PickupItem.Add(CurrentCacheObject.RActorGuid, AddToCache);

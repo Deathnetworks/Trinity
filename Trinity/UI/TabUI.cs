@@ -1,14 +1,21 @@
-﻿using System.Windows;
+﻿using System;
+using System.Linq;
+using System.Threading;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using Trinity.Helpers;
 using Trinity.Items;
 using Zeta.Bot;
+using Zeta.Common;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 
 namespace Trinity.UI
 {
     class TabUi
     {
-        private static Button _btnSortBackpack, _btnSortStash, _btnReloadItemRules;
+        private static Button _btnSortBackpack, _btnSortStash, _btnReloadItemRules, _btnDropLegendaries;
 
         internal static void InstallTab()
         {
@@ -48,14 +55,24 @@ namespace Trinity.UI
                         Content = "Reload Item Rules"
                     };
 
+                    _btnDropLegendaries = new Button
+                    {
+                        Width = 120,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        VerticalAlignment = VerticalAlignment.Top,
+                        Margin = new Thickness(3),
+                        Content = "Drop Legendaries"
+                    };
+
 
                     Window mainWindow = Application.Current.MainWindow;
 
                     _btnSortBackpack.Click += _btnSortBackpack_Click;
                     _btnSortStash.Click += _btnSortStash_Click;
                     _btnReloadItemRules.Click += _btnReloadItemRules_Click;
+                    _btnDropLegendaries.Click += _btnDropLegendaries_Click;
 
-                    UniformGrid uniformGrid = new UniformGrid
+                    var uniformGrid = new UniformGrid
                     {
                         HorizontalAlignment = HorizontalAlignment.Stretch,
                         VerticalAlignment = VerticalAlignment.Top,
@@ -65,6 +82,7 @@ namespace Trinity.UI
                     uniformGrid.Children.Add(_btnSortBackpack);
                     uniformGrid.Children.Add(_btnSortStash);
                     uniformGrid.Children.Add(_btnReloadItemRules);
+                    uniformGrid.Children.Add(_btnDropLegendaries);
 
                     _tabItem = new TabItem
                     {
@@ -84,7 +102,18 @@ namespace Trinity.UI
 
         static void _btnSortBackpack_Click(object sender, RoutedEventArgs e)
         {
-            ItemSort.SortBackpack();
+            ItemSort.SortBackpack();         
+        }
+
+        static void _btnDropLegendaries_Click(object sender, RoutedEventArgs e)
+        {
+            using (new MemoryHelper())
+            {
+                ZetaDia.Me.Inventory.Backpack.Where(i => i.ItemQualityLevel == ItemQuality.Legendary).ForEach(i => i.Drop());
+
+                if (BotMain.IsRunning && !BotMain.IsPausedForStateExecution)
+                    BotMain.PauseFor(TimeSpan.FromSeconds(2));                
+            }
         }
 
         static void _btnSortStash_Click(object sender, RoutedEventArgs e)

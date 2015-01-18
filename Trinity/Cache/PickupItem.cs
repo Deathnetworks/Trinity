@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using Zeta.Common;
+﻿using Zeta.Common;
 using Zeta.Game.Internals.Actors;
 
 namespace Trinity.Cache
@@ -28,13 +27,14 @@ namespace Trinity.Cache
         public float UpgradeDamage { get; set; }
         public float UpgradeToughness { get; set; }
         public float UpgradeHealing { get; set; }
+        public int WorldId { get; set; }
 
         public PickupItem() { }
 
         public PickupItem(ACDItem item, GItemBaseType gItemBaseType, GItemType gItemType)
         {
             Name = item.Name;
-            InternalName = item.InternalName;
+            InternalName = Trinity.NameNumberTrimRegex.Replace(item.InternalName, ""); ;
             Level = item.Level;
             Quality = item.ItemQualityLevel;
             BalanceID = item.GameBalanceId;
@@ -48,13 +48,14 @@ namespace Trinity.Cache
             DynamicID = item.DynamicId;
             ActorSNO = item.ActorSNO;
             ACDGuid = item.ACDGuid;
+            WorldId = Trinity.Player.WorldID;
         }
 
         public PickupItem(string name, string internalName, int level, ItemQuality quality, int balanceId, ItemBaseType dbItemBaseType, 
             ItemType dbItemType, bool isOneHand, bool isTwoHand, FollowerType followerType, int acdGuid, int dynamicID = 0)
         {
             Name = name;
-            InternalName = internalName;
+            InternalName = Trinity.NameNumberTrimRegex.Replace(internalName, "");
             Level = level;
             Quality = quality;
             BalanceID = balanceId;
@@ -65,9 +66,25 @@ namespace Trinity.Cache
             ItemFollowerType = followerType;
             ACDGuid = acdGuid;
             DynamicID = dynamicID;
+            WorldId = Trinity.Player.WorldID;
         }
 
+        public virtual bool Equals(PickupItem other)
+        {
+            return DynamicID == other.DynamicID || GetHashCode() == other.GetHashCode();
+        }
 
+        public override int GetHashCode()
+        {            
+            return
+                Position.GetHashCode() ^
+                ActorSNO.GetHashCode() ^
+                InternalName.GetHashCode() ^
+                WorldId.GetHashCode() ^
+                Quality.GetHashCode() ^
+                Level.GetHashCode();
 
+        
+        }
     }
 }

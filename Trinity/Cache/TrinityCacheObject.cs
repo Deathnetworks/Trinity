@@ -188,6 +188,9 @@ namespace Trinity
         public bool IsBoss { get; set; }
 
         [DataMember]
+        public bool IsAncient { get; set; }
+
+        [DataMember]
         public bool HasAffixShielded { get; set; }
 
         [DataMember]

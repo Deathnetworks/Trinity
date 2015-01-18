@@ -31,6 +31,7 @@ namespace Trinity
         private static int c_GoldStackSize = 0;
         private static bool c_IsOneHandedItem = false;
         private static bool c_IsTwoHandedItem = false;
+        private static bool c_IsAncient = false;
         private static ItemQuality c_ItemQuality = ItemQuality.Invalid;
         private static ItemType c_DBItemType = ItemType.Unknown;
         private static ItemBaseType c_DBItemBaseType = ItemBaseType.None;
@@ -97,7 +98,7 @@ namespace Trinity
                 CurrentCacheObject.ACDGuid = freshObject.ACDGuid;
 
                 // Get Name
-                CurrentCacheObject.InternalName = nameNumberTrimRegex.Replace(freshObject.Name, "");
+                CurrentCacheObject.InternalName = NameNumberTrimRegex.Replace(freshObject.Name, "");
 
                 CurrentCacheObject.ActorSNO = freshObject.ActorSNO;
                 CurrentCacheObject.ActorType = freshObject.ActorType;
@@ -273,6 +274,7 @@ namespace Trinity
             CurrentCacheObject.TrinityItemType = c_item_GItemType;
             CurrentCacheObject.TwoHanded = c_IsTwoHandedItem;
             CurrentCacheObject.Type = CurrentCacheObject.Type;
+            CurrentCacheObject.IsAncient = c_IsAncient;
             ObjectCache.Add(CurrentCacheObject);
             return true;
         }
