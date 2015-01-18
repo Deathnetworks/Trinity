@@ -398,6 +398,13 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.Monk_CripplingWave, 30f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 3);
             }
 
+            // Wave of light as primary 
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight))
+            {
+                Monk_TickSweepingWindSpam();
+                return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, TargetUtil.GetBestClusterPoint(), -1, CurrentTarget.ACDGuid, 0, 1);
+            }
+
             // Default attacks
             return DefaultPower;
         }
