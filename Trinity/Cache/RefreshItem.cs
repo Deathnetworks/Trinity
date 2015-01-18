@@ -90,14 +90,6 @@ namespace Trinity
                     }
                 }
 
-                //float damage, toughness, healing = 0;
-                //bool isUpgrade = false;
-
-                //diaItem.CommonData.GetStatChanges(out damage, out healing, out toughness);
-
-                //if (damage > 0 && toughness > 0)
-                //    isUpgrade = true;
-
                 var pickupItem = new PickupItem
                 {
                     Name = c_ItemDisplayName,
@@ -117,11 +109,13 @@ namespace Trinity
                     ActorSNO = CurrentCacheObject.ActorSNO,
                     ACDGuid = CurrentCacheObject.ACDGuid,
                     RActorGUID = CurrentCacheObject.RActorGuid,
-                    //IsUpgrade = isUpgrade,
-                    //UpgradeDamage = damage,
-                    //UpgradeToughness = toughness,
-                    //UpgradeHealing = healing
                 };
+
+                // Blood Shards == HoradricRelic
+                if (c_item_GItemType == GItemType.HoradricRelic && ZetaDia.CPlayer.BloodshardCount >= 500)
+                {
+                    return false;
+                }
 
                 // Treat all globes as a yes
                 if (c_item_GItemType == GItemType.HealthGlobe)

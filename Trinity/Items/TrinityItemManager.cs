@@ -451,6 +451,10 @@ namespace Trinity.Items
             if (item.ItemType == ItemType.KeystoneFragment && item.TieredLootRunKeyLevel >= 0)
                 return false;
 
+            if (item.ItemType == ItemType.HoradricCache)
+                return false;
+
+
             var pItem = new PickupItem(item, cItem.TrinityItemBaseType, cItem.TrinityItemType);
             var pickupCheck = PickupItemValidation(pItem);
             if (!pickupCheck)
