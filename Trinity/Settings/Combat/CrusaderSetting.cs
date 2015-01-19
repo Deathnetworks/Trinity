@@ -7,7 +7,6 @@ namespace Trinity.Config.Combat
     public class CrusaderSetting : ITrinitySetting<CrusaderSetting>, IAvoidanceHealth, INotifyPropertyChanged
     {
         #region Fields
-        private bool _spamPhalanx;
         private bool _SpamAkarats;
         private bool _SpamLawsOfValor;
         private int _TauntAoECount;
@@ -81,23 +80,6 @@ namespace Trinity.Config.Combat
 
         #region Properties
 
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool SpamPhalanx
-        {
-            get
-            {
-                return _spamPhalanx;
-            }
-            set
-            {
-                if (_spamPhalanx != value)
-                {
-                    _spamPhalanx = value;
-                    OnPropertyChanged("SpamPhalanx");
-                }
-            }
-        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(false)]

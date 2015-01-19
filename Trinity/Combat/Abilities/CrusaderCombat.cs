@@ -146,7 +146,8 @@ namespace Trinity.Combat.Abilities
                     if (bestPierceTarget != null)
                         return new TrinityPower(SNOPower.x1_Crusader_Phalanx3, 45f, bestPierceTarget.ACDGuid);
                 }
-                if (CanCastPhalanxStampede(hasAkkhan))
+                bool hasUnrelentingPhalanx = Legendary.UnrelentingPhalanx.IsEquipped;
+                if (CanCastPhalanxStampede(hasUnrelentingPhalanx))
                 {
                     var bestPierceTarget = TargetUtil.GetBestPierceTarget(45f);
                     if (bestPierceTarget != null)
@@ -318,9 +319,9 @@ namespace Trinity.Combat.Abilities
             return CanCast(SNOPower.x1_Crusader_Phalanx3) && (TargetUtil.ClusterExists(45f, 3) || TargetUtil.EliteOrTrashInRange(45f));
         }
 
-        private static bool CanCastPhalanxStampede(bool hasAkkhan)
+        private static bool CanCastPhalanxStampede(bool hasUnrelentingPhalanx)
         {
-            return (hasAkkhan && CanCast(SNOPower.x1_Crusader_Phalanx3) && TargetUtil.AnyMobsInRange(45f, 1) && Runes.Crusader.Stampede.IsActive);
+            return (hasUnrelentingPhalanx && CanCast(SNOPower.x1_Crusader_Phalanx3) && TargetUtil.AnyMobsInRange(45f, 1) && Runes.Crusader.Stampede.IsActive);
         }
 
         private static bool CanCastSteedChargeOutOfCombat()
