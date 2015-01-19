@@ -95,6 +95,20 @@
                     <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
+                <!--BlackHoleAoECount-->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Black Hole AoE Count" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+                    <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                                Interval="1" Maximum="10" Minimum="1"
+                                SmallChange="1" LargeChange="10"
+                                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
+                                Value="{Binding Path=Wiz.BlackHoleAoECount}" 
+                                HorizontalAlignment="Stretch" Margin="2,0"/>
+                </Grid>
                 <TextBlock Grid.Column="0" Grid.Row="0" Text="Kite:" HorizontalAlignment="Right" VerticalAlignment="Center" FontWeight="Normal" />
                 <ComboBox Grid.Column="1" Grid.Row="0"  Width="150" SelectedValuePath="Tag" SelectedValue="{Binding Path=Wiz.KiteOption}" Margin="15,0,0,0">
                     <ComboBoxItem Content="Anytime" Tag="Anytime" ToolTip="Always Kite" />

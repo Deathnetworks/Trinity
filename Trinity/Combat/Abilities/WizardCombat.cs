@@ -117,7 +117,7 @@ namespace Trinity.Combat.Abilities
             // Wormhole / Black hole
             float blackholeRadius = Runes.Wizard.Supermassive.IsActive ? 20f : 15f;
             if (CanCast(SNOPower.X1_Wizard_Wormhole, CanCastFlags.NoTimer) &&
-                (TargetUtil.ClusterExists(blackholeRadius, 45f, 4) || CurrentTarget.IsBossOrEliteRareUnique))
+                (TargetUtil.ClusterExists(blackholeRadius, 45f, Trinity.Settings.Combat.Wizard.BlackHoleAoECount) || CurrentTarget.IsBossOrEliteRareUnique))
             {
                 return new TrinityPower(SNOPower.X1_Wizard_Wormhole, 65f, TargetUtil.GetBestClusterUnit(blackholeRadius, 45f, 1, false).Position);
             }

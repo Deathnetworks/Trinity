@@ -36,23 +36,6 @@ namespace Trinity
         {
             using (new PerformanceLogger("TargetCheck"))
             {
-                // If we aren't in the game or a world is loading, don't do anything yet
-                if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
-                {
-                    return TargetCheckResult(false, "Not in Game, Invalid, Or Loading World");
-                }
-
-                // We keep dying because we're spawning in AoE and next to 50 elites and we need to just leave the game
-                if (DateTime.UtcNow.Subtract(LastDeathTime).TotalSeconds < 30 &&
-                    ZetaDia.Me.Inventory.Equipped.Any() &&
-                    ZetaDia.Me.Inventory.Equipped.Where(i => i.IsValid).Average(i => i.DurabilityPercent) < 0.05 && !ZetaDia.IsInTown)
-                {
-                    Logger.Log("Durability is zero, emergency leave game");
-                    ZetaDia.Service.Party.LeaveGame(true);
-                    Thread.Sleep(11000);
-                    return TargetCheckResult(false, "Recently Died, zero durability");
-                }
-
                 if (ZetaDia.Me.IsDead)
                 {
                     return TargetCheckResult(false, "Is Dead");

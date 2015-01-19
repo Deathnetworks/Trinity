@@ -14,14 +14,17 @@ namespace Trinity.Reference
     public class ItemRanks : FieldCollection<ItemRanks, ItemRank>
     {
         #region Methods
-        internal static bool ShouldStashItem(CachedACDItem cachedAcdItem)
+        internal static bool ShouldStashItem(CachedACDItem cItem)
         {
-            if (cachedAcdItem.AcdItem != null && cachedAcdItem.AcdItem.IsValid)
+            if (cItem.AcdItem != null && cItem.AcdItem.IsValid)
             {
-                if (cachedAcdItem.IsAncient)
+                if (cItem.IsAncient)
                     return true;
-                
-                var item = new Item(cachedAcdItem.AcdItem);
+
+                if (Trinity.Settings.Loot.ItemRank.AncientItemsOnly && !cItem.IsAncient)
+                    return false;
+
+                var item = new Item(cItem.AcdItem);
                 var result = ShouldStashItem(item);
 
                 string action = result ? "KEEP" : "TRASH";

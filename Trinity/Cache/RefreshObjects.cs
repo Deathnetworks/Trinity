@@ -422,6 +422,7 @@ namespace Trinity
             if (!WantToTownRun && !ForceVendorRunASAP)
             {
                 var legendaryItemMarkers = ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsValid &&
+                    m.Position.Distance2D(Player.Position) >= 45f &&
                     (m.MinimapTexture == setItemMarkerTexture || m.MinimapTexture == legendaryItemMarkerTexture) && !Blacklist60Seconds.Contains(m.NameHash)).ToList();
 
                 foreach (var marker in legendaryItemMarkers)

@@ -62,6 +62,7 @@ namespace Trinity.Settings.Loot
         private double _minimumPercent;
         private int _minimumSampleSize;
         private int _minimumRank;
+        private bool _ancientItemsOnly;
         #endregion Fields
 
         #region Properties
@@ -136,6 +137,25 @@ namespace Trinity.Settings.Loot
                 {
                     _minimumRank = value;
                     OnPropertyChanged("MinimumRank");
+                    OnPropertyChanged("CurrentItemsList");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool AncientItemsOnly
+        {
+            get
+            {
+                return _ancientItemsOnly;
+            }
+            set
+            {
+                if (_ancientItemsOnly != value)
+                {
+                    _ancientItemsOnly = value;
+                    OnPropertyChanged("AncientItemsOnly");
                     OnPropertyChanged("CurrentItemsList");
                 }
             }
