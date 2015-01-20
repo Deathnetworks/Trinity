@@ -42,18 +42,18 @@ namespace Trinity.Items
                     _cleanBehavior = CreateCleanBehavior();
                     TreeHooks.Instance.InsertHook(HookName, 0, _cleanBehavior);
                     _hookInserted = true;
-                    BotMain.OnStop += bot => RemoveBehavior();
+                    BotMain.OnStop += bot => RemoveBehavior("Bot stopped");
                 }
             }
             catch (Exception ex)
             {
                 Logger.LogError("Error running clean stash: " + ex);
-                RemoveBehavior();
+                RemoveBehavior("Exception");
             }
 
         }
 
-        private static void RemoveBehavior()
+        private static void RemoveBehavior(string reason)
         {
             if (_cleanBehavior != null)
             {
@@ -61,6 +61,7 @@ namespace Trinity.Items
                 {
                     if (_hookInserted)
                     {
+                        Logger.LogDebug("Removing CleanStash Hook: " + reason);
                         TreeHooks.Instance.RemoveHook(HookName, _cleanBehavior);
                         _hookInserted = false;
                     }
@@ -90,7 +91,7 @@ namespace Trinity.Items
             if (ZetaDia.Me.IsParticipatingInTieredLootRun)
             {
                 Logger.LogNormal("Cannot clean stash while in trial/greater rift");
-                RemoveBehavior();
+                RemoveBehavior("Cannot clean stash while in trial/greater rift");
                 return false;
             }
 
@@ -135,7 +136,7 @@ namespace Trinity.Items
                     await CommonBehaviors.TakeTownPortalBack().ExecuteCoroutine();
             }
             if (_isFinished)
-                RemoveBehavior();
+                RemoveBehavior("finished!");
             return true;
 
         }

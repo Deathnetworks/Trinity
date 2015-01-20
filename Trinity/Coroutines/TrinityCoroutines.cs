@@ -65,8 +65,10 @@ namespace Trinity.Coroutines
         public static async Task<bool> ReturnToStashTask()
         {
             if (ZetaDia.Me.IsInCombat)
+            {
+                Logger.LogDebug("Cannot return to stash while in combat");
                 return false;
-
+            }
             if (!ZetaDia.IsInTown && ZetaDia.Me.IsFullyValid() && !ZetaDia.Me.IsInCombat && UIElements.BackgroundScreenPCButtonRecall.IsEnabled)
             {
                 StartedOutOfTown = true;
