@@ -48,7 +48,9 @@ namespace Trinity.Cache
             if (!ZetaDia.Me.IsValid)
                 return;
 
-            var itemsList = ZetaDia.Me.Inventory.Equipped.Where(i => i.IsValid).ToList();
+            var itemsList = ZetaDia.Me.Inventory.Equipped.Where(i => i.IsValid && i.ACDGuid > 0).ToList();
+            var gemsList = ZetaDia.Actors.GetActorsOfType<ACDItem>(true).Where(i => i.IsValid && i.ACDGuid > 0 && i.InventorySlot == InventorySlot.Socket);
+            itemsList.AddRange(gemsList);
             _lastUpdate = DateTime.UtcNow;
 
             if (!itemsList.Any())

@@ -1,7 +1,9 @@
 using System;
 using System.Linq;
+using Trinity.Cache;
 using Trinity.Config.Combat;
 using Trinity.DbProvider;
+using Trinity.Objects;
 using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -55,7 +57,7 @@ namespace Trinity.Combat.Abilities
             }
 
             // Air Ally
-            if (CanCast(SNOPower.X1_Monk_MysticAlly_v2) && Runes.Monk.AirAlly.IsActive && Player.PrimaryResource < 50)
+            if (CanCast(SNOPower.X1_Monk_MysticAlly_v2) && Runes.Monk.AirAlly.IsActive && Player.PrimaryResource < 150)
             {
                 return new TrinityPower(SNOPower.X1_Monk_MysticAlly_v2);
             }
@@ -119,10 +121,18 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.Monk_SevenSidedStrike, 16f, CurrentTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 3);
             }
 
+            int swMinTime = 4000;
+            int swMaxTime = 5400;
+            if (EquippedItemCache.Instance.ItemIds.Contains(405804)) // Taeguk gem refresh (3 seconds)
+            {
+                swMinTime = 2000;
+                swMaxTime = 2900;
+            }
+
             // Sweeping winds spam
-            if ((Player.PrimaryResource >= 75 || (hasInnaSet && Player.PrimaryResource >= 5)) && !hasSWK &&
+            if ((Player.PrimaryResource >= 75 || (hasInnaSet && Player.PrimaryResource >= 5)) && 
                 CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) && GetHasBuff(SNOPower.Monk_SweepingWind) &&
-                DateTime.UtcNow.Subtract(Trinity.SweepWindSpam).TotalMilliseconds >= 4000 && DateTime.UtcNow.Subtract(Trinity.SweepWindSpam).TotalMilliseconds <= 5400)
+                DateTime.UtcNow.Subtract(Trinity.SweepWindSpam).TotalMilliseconds >= swMinTime && DateTime.UtcNow.Subtract(Trinity.SweepWindSpam).TotalMilliseconds <= swMaxTime)
             {
                 Trinity.SweepWindSpam = DateTime.UtcNow;
                 return new TrinityPower(SNOPower.Monk_SweepingWind);
@@ -131,7 +141,7 @@ namespace Trinity.Combat.Abilities
             float minSweepingWindSpirit = hasInnaSet ? 5f : 75f;
 
             // Sweeping wind
-            if (!UseOOCBuff && CanCast(SNOPower.Monk_SweepingWind) && !GetHasBuff(SNOPower.Monk_SweepingWind) && !hasSWK &&
+            if (!UseOOCBuff && CanCast(SNOPower.Monk_SweepingWind) && !GetHasBuff(SNOPower.Monk_SweepingWind) && 
                 ((TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(20, 1) || hasInnaSet ||
                 (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 25f)) &&
                 // Check our mantras, if we have them, they are up first
@@ -215,11 +225,12 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.Monk_CycloneStrike, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 2, 2);
             }
 
-            var minWoLSpirit = Runes.Monk.EmpoweredWave.IsActive ? 40 : 75;
+            float wolRange = Legendary.TzoKrinsGaze.IsEquipped ? 55f : 16f;
+
             // Wave of light
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight) &&
-                (TargetUtil.AnyMobsInRange(16f, Settings.Combat.Monk.MinWoLTrashCount) || TargetUtil.IsEliteTargetInRange(20f)) &&
-                (Player.PrimaryResource >= minWoLSpirit && !IsWaitingForSpecial || Player.PrimaryResource > MinEnergyReserve) &&
+                (TargetUtil.AnyMobsInRange(wolRange, Settings.Combat.Monk.MinWoLTrashCount) || TargetUtil.IsEliteTargetInRange(wolRange)) &&
+                (Player.PrimaryResource >= 75 && !IsWaitingForSpecial || Player.PrimaryResource > MinEnergyReserve) &&
                 // optional check for SW stacks
                 (Settings.Combat.Monk.SWBeforeWoL && (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3) || !Settings.Combat.Monk.SWBeforeWoL) &&
                 Monk_HasMantraAbilityAndBuff())
@@ -298,14 +309,6 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.X1_Monk_MantraOfEvasion_v2);
             }
 
-            // Sunwuko set Sweeping Winds spirit dumping
-            if (!UseOOCBuff && TargetUtil.AnyMobsInRange(10f) && Player.PrimaryResource > 75 &&
-                CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) && hasSWK)
-            {
-                Trinity.SweepWindSpam = DateTime.UtcNow;
-                return new TrinityPower(SNOPower.Monk_SweepingWind);
-            }
-       
             /*
              * Dual/Trigen Monk section
              * 
