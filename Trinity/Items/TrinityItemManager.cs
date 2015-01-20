@@ -161,7 +161,7 @@ namespace Trinity.Items
 
             // Vanity Items
             if (DataDictionary.VanityItems.Any(i => item.InternalName.StartsWith(i)))
-                return false;
+                return Trinity.Settings.Loot.TownRun.StashVanityItems;
 
             CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
             // Now look for Misc items we might want to keep
@@ -175,11 +175,18 @@ namespace Trinity.Items
                 tBaseType == GItemBaseType.WeaponRange ||
                 tBaseType == GItemBaseType.WeaponTwoHand);
 
-            // Check pickup (in case we accidentally picked it up)
-            var pItem = new PickupItem(item, tBaseType, tItemType);
-            var pickupCheck = PickupItemValidation(pItem);
-            if (!pickupCheck)
-                return false;
+            if (Trinity.Settings.Loot.TownRun.ApplyPickupValidationToStashing)
+            {
+                // Check pickup (in case we accidentally picked it up)
+                var pItem = new PickupItem(item, tBaseType, tItemType);
+                var pickupCheck = PickupItemValidation(pItem);
+                if (!pickupCheck)
+                {
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] = (TRASHING: Pickup check failed)", cItem.RealName, cItem.InternalName);
+                    return false;
+                }
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] = (Pickup check passed)", cItem.RealName, cItem.InternalName);
+            }
 
             if (item.ItemType == ItemType.KeystoneFragment)
             {
@@ -235,7 +242,16 @@ namespace Trinity.Items
                 return true;
             }
 
-            if (tItemType == GItemType.HealthPotion)
+            if (tItemType == GItemType.HealthPotion && item.ItemQualityLevel >= ItemQuality.Legendary)
+            {
+                var shouldStash = Trinity.Settings.Loot.TownRun.StashLegendaryPotions;
+                if (evaluationType == ItemEvaluationType.Keep)
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = ({3} legendary potions)", cItem.RealName, cItem.InternalName, tItemType,
+                        shouldStash ? "stashing" : "ignoring");
+                return shouldStash;
+            }
+
+            if (tItemType == GItemType.HealthPotion && item.ItemQualityLevel < ItemQuality.Legendary)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
                     Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (ignoring potions)", cItem.RealName, cItem.InternalName, tItemType);
@@ -965,21 +981,28 @@ namespace Trinity.Items
                 case GItemBaseType.WeaponRange:
                     if (item.Quality >= ItemQuality.Legendary)
                         return Trinity.Settings.Loot.Pickup.PickupLegendaries;
+
                     return CheckLevelRequirements(item.Level, item.Quality, Trinity.Settings.Loot.Pickup.PickupBlueWeapons, Trinity.Settings.Loot.Pickup.PickupYellowWeapons);
                 case GItemBaseType.Armor:
-                case GItemBaseType.Offhand: if (item.Quality >= ItemQuality.Legendary)
+                case GItemBaseType.Offhand:
+                    if (item.Quality >= ItemQuality.Legendary)
                         return Trinity.Settings.Loot.Pickup.PickupLegendaries;
+
                     return CheckLevelRequirements(item.Level, item.Quality, Trinity.Settings.Loot.Pickup.PickupBlueArmor, Trinity.Settings.Loot.Pickup.PickupYellowArmor);
-                case GItemBaseType.Jewelry: if (item.Quality >= ItemQuality.Legendary)
+                case GItemBaseType.Jewelry:
+                    if (item.Quality >= ItemQuality.Legendary)
                         return Trinity.Settings.Loot.Pickup.PickupLegendaries;
+
                     return CheckLevelRequirements(item.Level, item.Quality, Trinity.Settings.Loot.Pickup.PickupBlueJewlery, Trinity.Settings.Loot.Pickup.PickupYellowJewlery);
                 case GItemBaseType.FollowerItem:
-                    if (item.Quality >= ItemQuality.Legendary && Trinity.Settings.Loot.Pickup.PickupLegendaryFollowerItems)
-                        return true;
-                    if (item.Quality >= ItemQuality.Magic1 && item.Quality <= ItemQuality.Magic3 && Trinity.Settings.Loot.Pickup.PickupBlueFollowerItems)
-                        return true;
-                    if (item.Quality >= ItemQuality.Rare4 && item.Quality <= ItemQuality.Rare6 && Trinity.Settings.Loot.Pickup.PickupYellowFollowerItems)
-                        return true;
+                    if (item.Quality >= ItemQuality.Legendary)
+                        return Trinity.Settings.Loot.Pickup.PickupLegendaryFollowerItems;
+
+                    if (item.Quality >= ItemQuality.Magic1 && item.Quality <= ItemQuality.Magic3)
+                        return Trinity.Settings.Loot.Pickup.PickupBlueFollowerItems;
+
+                    if (item.Quality >= ItemQuality.Rare4 && item.Quality <= ItemQuality.Rare6)
+                        return Trinity.Settings.Loot.Pickup.PickupYellowFollowerItems;
                     // not matched above, ignore it
                     return false;
                 case GItemBaseType.Gem:

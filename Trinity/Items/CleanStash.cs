@@ -87,6 +87,18 @@ namespace Trinity.Items
             if (!ZetaDia.Me.IsFullyValid())
                 return false;
 
+            if (ZetaDia.Me.IsParticipatingInTieredLootRun)
+            {
+                Logger.LogNormal("Cannot clean stash while in trial/greater rift");
+                RemoveBehavior();
+                return false;
+            }
+
+            if (TrinityItemManager.FindValidBackpackLocation(true) == new Vector2(-1, -1))
+            {
+                Trinity.ForceVendorRunASAP = true;
+                return false;
+            }
             if (!await TrinityCoroutines.ReturnToStashTask())
             {
                 _isFinished = true;
@@ -113,6 +125,7 @@ namespace Trinity.Items
                     }
                 }
 
+                Trinity.ForceVendorRunASAP = true;
                 _isFinished = true;
                 Logger.Log("Waiting 5 seconds...");
                 BotMain.StatusText = "Waiting 5 seconds...";

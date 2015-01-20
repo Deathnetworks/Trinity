@@ -23,11 +23,13 @@ namespace Trinity.Config.Loot
         private bool _ForceSalvageRares;
         private bool _KeepLegendaryUnid;
         private bool _SellExtraPotions;
+        private bool _StashLegendaryPotions;
         private bool _KeepTrialLootRunKeysInBackpack;
         private bool _KeepTieredLootRunKeysInBackpack;
         private bool _KeepRiftKeysInBackPack;
         private bool _DropLegendaryInTown;
         private bool _ApplyPickupValidationToStashing;
+        private bool _StashVanityItems;
         #endregion Fields
 
         #region Events
@@ -299,6 +301,7 @@ namespace Trinity.Config.Loot
                 }
             }
         }
+
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool SellExtraPotions
@@ -316,6 +319,25 @@ namespace Trinity.Config.Loot
                 }
             }
         }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool StashLegendaryPotions
+        {
+            get
+            {
+                return _StashLegendaryPotions;
+            }
+            set
+            {
+                if (_StashLegendaryPotions != value)
+                {
+                    _StashLegendaryPotions = value;
+                    OnPropertyChanged("StashLegendaryPotions");
+                }
+            }
+        }
+
         [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool KeepTrialLootRunKeysInBackpack
@@ -400,6 +422,23 @@ namespace Trinity.Config.Loot
                 {
                     _ApplyPickupValidationToStashing = value;
                     OnPropertyChanged("ApplyPickupValidationToStashing");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool StashVanityItems
+        {
+            get
+            {
+                return _StashVanityItems;
+            }
+            set
+            {
+                if (_StashVanityItems != value)
+                {
+                    _StashVanityItems = value;
+                    OnPropertyChanged("StashVanityItems");
                 }
             }
         }

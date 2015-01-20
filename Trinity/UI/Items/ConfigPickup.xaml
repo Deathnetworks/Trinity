@@ -46,7 +46,7 @@
                     <CheckBox IsChecked="{Binding Path=Pickup.PickupLegendaries}" VerticalAlignment="Center" HorizontalAlignment="Center">
                         <TextBlock FontSize="14" Text="Pickup Legendaries" ToolTip="Applies to ALL ITEMS - including Crafting Plans" FontWeight="Bold" Foreground="#FFA73B1E" />
                     </CheckBox>
-                    <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" Content="Legendary Follower Items" IsChecked="{Binding Path=Pickup.PickupYellowFollowerItems}" />
+                    <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" Content="Legendary Follower Items" IsChecked="{Binding Path=Pickup.PickupLegendaryFollowerItems}" />
                     <UniformGrid HorizontalAlignment="Center">
                         <CheckBox Content="Magic Follower Items" IsChecked="{Binding Path=Pickup.PickupBlueFollowerItems}" VerticalAlignment="Center" />
                         <CheckBox Content="Rare Follower Items" IsChecked="{Binding Path=Pickup.PickupYellowFollowerItems}" VerticalAlignment="Center" />

@@ -32,6 +32,8 @@
                     <UniformGrid Columns="2" HorizontalAlignment="Center">
                         <CheckBox Content="Open Horadric Cache's" IsChecked="{Binding Path=TownRun.OpenHoradricCaches}" />
                         <CheckBox ToolTip="Sell Extra Potions" IsChecked="{Binding Path=TownRun.SellExtraPotions}" HorizontalAlignment="Left" Content="Sell Extra Potions" />
+                        <CheckBox ToolTip="TIP: Use Protected Bag Slots" IsChecked="{Binding Path=TownRun.StashLegendaryPotions}" HorizontalAlignment="Left" Content="Stash Legendary Potions" />
+                        <CheckBox ToolTip="TIP: Use Protected Bag Slots" IsChecked="{Binding Path=TownRun.StashVanityItems}" HorizontalAlignment="Left" Content="Stash Vanity Items " />
                         <CheckBox ToolTip="Stash White Items" IsChecked="{Binding Path=TownRun.StashWhites}"  HorizontalAlignment="Left" Content="Stash Whites" />
                         <CheckBox ToolTip="Stash Blue Items" IsChecked="{Binding Path=TownRun.StashBlues}" HorizontalAlignment="Left" Content="Stash Blues" />
                         <CheckBox ToolTip="Trash all Rares" IsChecked="{Binding Path=TownRun.ForceSalvageRares}" HorizontalAlignment="Left" Content="Sell/Salvage All Rares" />

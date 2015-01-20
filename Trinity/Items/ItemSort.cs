@@ -330,6 +330,13 @@ namespace Trinity.Items
             if (!ZetaDia.Me.IsFullyValid())
                 return false;
 
+            if (ZetaDia.Me.IsParticipatingInTieredLootRun)
+            {
+                Logger.LogNormal("Cannot sort while in trial/greater rift");
+                RemoveBehavior();
+                return false;
+            }
+
             if (inventorySlot == InventorySlot.SharedStash && !await TrinityCoroutines.ReturnToStashTask())
             {
                 return true;
