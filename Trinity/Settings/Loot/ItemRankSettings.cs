@@ -63,6 +63,7 @@ namespace Trinity.Settings.Loot
         private int _minimumSampleSize;
         private int _minimumRank;
         private bool _ancientItemsOnly;
+        private bool _requireSocketsOnJewelry;
         #endregion Fields
 
         #region Properties
@@ -156,6 +157,24 @@ namespace Trinity.Settings.Loot
                 {
                     _ancientItemsOnly = value;
                     OnPropertyChanged("AncientItemsOnly");
+                    OnPropertyChanged("CurrentItemsList");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool RequireSocketsOnJewelry
+        {
+            get
+            {
+                return _requireSocketsOnJewelry;
+            }
+            set
+            {
+                if (_requireSocketsOnJewelry != value)
+                {
+                    _requireSocketsOnJewelry = value;
+                    OnPropertyChanged("RequireSocketsOnJewelry");
                     OnPropertyChanged("CurrentItemsList");
                 }
             }

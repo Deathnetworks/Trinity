@@ -133,6 +133,7 @@
     <Compile Include="Helpers\ObservableDictionary.cs" />
     <Compile Include="Helpers\PluginCheck.cs" />
     <Compile Include="Helpers\ZetaCacheHelper.cs" />
+    <Compile Include="Items\CleanStash.cs" />
     <Compile Include="Items\ItemEvents.cs" />
     <Compile Include="Cache\CacheUtils.cs" />
     <Compile Include="Cache\GenericBlacklist.cs" />

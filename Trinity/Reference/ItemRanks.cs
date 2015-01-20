@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Trinity.Helpers;
+using Trinity.Items;
 using Trinity.Objects;
 using Trinity.Settings.Loot;
 using Trinity.Technicals;
@@ -18,15 +19,22 @@ namespace Trinity.Reference
         {
             if (cItem.AcdItem != null && cItem.AcdItem.IsValid)
             {
-                if (cItem.IsAncient)
-                    return true;
+                bool result = false;
+                var item = new Item(cItem.AcdItem);
+                var wrappedItem = new ItemWrapper(cItem.AcdItem);
 
                 if (Trinity.Settings.Loot.ItemRank.AncientItemsOnly && !cItem.IsAncient)
-                    return false;
-
-                var item = new Item(cItem.AcdItem);
-                var result = ShouldStashItem(item);
-
+                {
+                    result = false;
+                }
+                else if (Trinity.Settings.Loot.ItemRank.RequireSocketsOnJewelry && wrappedItem.IsJewlery && cItem.AcdItem.NumSockets != 0)
+                {
+                    result = false;
+                }
+                else
+                {
+                    result = ShouldStashItem(item);
+                }
                 string action = result ? "KEEP" : "TRASH";
                 Logger.Log(LogCategory.ItemValuation, "Ranked Item - {0} - {1}", action, item.Name);
 
@@ -37,7 +45,7 @@ namespace Trinity.Reference
 
         internal static bool ShouldStashItem(Item item)
         {
-            return GetRankedItemsFromSettings().Any( i => i.Item.Equals(item));
+            return GetRankedItemsFromSettings().Any(i => i.Item.Equals(item));
         }
 
         private static HashSet<int> _itemIds;
@@ -148,7 +156,7 @@ namespace Trinity.Reference
 
                 _highRankedIds = new Dictionary<ActorClass, HashSet<int>>();
 
-                foreach (ActorClass actorClass in (ActorClass[]) Enum.GetValues(typeof (ActorClass)))
+                foreach (ActorClass actorClass in (ActorClass[])Enum.GetValues(typeof(ActorClass)))
                 {
                     var irs = GetRankedItems(actorClass, 15, 10, 4);
 

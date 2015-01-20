@@ -25,6 +25,7 @@
                 <GroupBox Header="Settings">
                     <UniformGrid>
                         <CheckBox IsChecked="{Binding Path=ItemRank.AncientItemsOnly}">Keep Ancient Items Only</CheckBox>
+                        <CheckBox IsChecked="{Binding Path=ItemRank.RequireSocketsOnJewelry}">Require Sockets on Jewelry</CheckBox>
                     </UniformGrid>
                 </GroupBox>
                 <GroupBox Header="Thresholds">

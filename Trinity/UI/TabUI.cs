@@ -15,7 +15,7 @@ namespace Trinity.UI
 {
     class TabUi
     {
-        private static Button _btnSortBackpack, _btnSortStash, _btnReloadItemRules, _btnDropLegendaries;
+        private static Button _btnSortBackpack, _btnSortStash, _btnReloadItemRules, _btnDropLegendaries, _btnCleanStash;
 
         internal static void InstallTab()
         {
@@ -46,6 +46,15 @@ namespace Trinity.UI
                         Content = "Sort Stash"
                     };
 
+                    _btnCleanStash = new Button
+                    {
+                        Width = 120,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        VerticalAlignment = VerticalAlignment.Top,
+                        Margin = new Thickness(3),
+                        Content = "Clean Stash"
+                    };
+
                     _btnReloadItemRules = new Button
                     {
                         Width = 120,
@@ -69,6 +78,7 @@ namespace Trinity.UI
 
                     _btnSortBackpack.Click += _btnSortBackpack_Click;
                     _btnSortStash.Click += _btnSortStash_Click;
+                    _btnCleanStash.Click += _btnCleanStash_Click;
                     _btnReloadItemRules.Click += _btnReloadItemRules_Click;
                     _btnDropLegendaries.Click += _btnDropLegendaries_Click;
 
@@ -81,6 +91,7 @@ namespace Trinity.UI
 
                     uniformGrid.Children.Add(_btnSortBackpack);
                     uniformGrid.Children.Add(_btnSortStash);
+                    uniformGrid.Children.Add(_btnCleanStash);
                     uniformGrid.Children.Add(_btnReloadItemRules);
                     uniformGrid.Children.Add(_btnDropLegendaries);
 
@@ -119,6 +130,17 @@ namespace Trinity.UI
         static void _btnSortStash_Click(object sender, RoutedEventArgs e)
         {
             ItemSort.SortStash();
+        }
+
+        static void _btnCleanStash_Click(object sender, RoutedEventArgs e)
+        {
+            var result = System.Windows.MessageBox.Show("Are you sure? This may remove and salvage/sell items from your stash! Permanently!", "Clean Stash Confirmation",
+                MessageBoxButton.OKCancel);
+
+            if (result == MessageBoxResult.OK)
+            {
+                CleanStash.RunCleanStash();
+            }
         }
 
         static void _btnReloadItemRules_Click(object sender, RoutedEventArgs e)
