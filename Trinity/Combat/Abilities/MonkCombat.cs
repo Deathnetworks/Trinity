@@ -21,8 +21,6 @@ namespace Trinity.Combat.Abilities
         private static float Monk_MaxDashingStrikeRange = 55f;
         internal static Vector3 LastTempestRushLocation = Vector3.Zero;
         private static DateTime _lastTargetChange = DateTime.MinValue;
-        private static bool hasInnaSet = Sets.Innas.IsThirdBonusActive;
-        private static bool hasSWK = Sets.MonkeyKingsGarb.IsSecondBonusActive;
 
         public static MonkSetting MonkSettings
         {
@@ -34,6 +32,9 @@ namespace Trinity.Combat.Abilities
             // Destructible objects
             if (UseDestructiblePower)
                 return GetMonkDestroyPower();
+
+            var hasInnaSet = Sets.Innas.IsThirdBonusActive;
+            var hasSWK = Sets.MonkeyKingsGarb.IsSecondBonusActive;
 
             // Epiphany: spirit regen, dash to targets
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.X1_Monk_Epiphany, CanCastFlags.NoTimer) && (Settings.Combat.Monk.EpiphanyOffCD ||
@@ -114,8 +115,8 @@ namespace Trinity.Combat.Abilities
             // Seven Sided Strike
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
                 (TargetUtil.AnyElitesInRange(15, 1) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f) || Player.CurrentHealthPct <= 0.55) &&
-                CanCast(SNOPower.Monk_SevenSidedStrike, CanCastFlags.NoTimer) && 
-                ((Player.PrimaryResource >= 50 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
+                CanCast(SNOPower.Monk_SevenSidedStrike, CanCastFlags.NoTimer) &&
+                ((Player.PrimaryResource >= 50 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 Monk_TickSweepingWindSpam();
                 return new TrinityPower(SNOPower.Monk_SevenSidedStrike, 16f, CurrentTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 3);
@@ -123,7 +124,7 @@ namespace Trinity.Combat.Abilities
 
             int swMinTime = 4000;
             int swMaxTime = 5400;
-            if (EquippedItemCache.Instance.ItemIds.Contains(405804)) // Taeguk gem refresh (3 seconds)
+            if (CacheData.Inventory.EquippedIds.Contains(405804)) // Taeguk gem refresh (3 seconds)
             {
                 swMinTime = 2000;
                 swMaxTime = 2900;
@@ -254,7 +255,7 @@ namespace Trinity.Combat.Abilities
 
             // Tempest rush at elites or groups of mobs
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && !Player.IsRooted && CanCast(SNOPower.Monk_TempestRush) &&
-                ((Player.PrimaryResource >= Settings.Combat.Monk.TR_MinSpirit && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve) &&
+                ((Player.PrimaryResource >= Settings.Combat.Monk.TR_MinSpirit && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve) &&
                 (Settings.Combat.Monk.TROption == TempestRushOption.Always ||
                 Settings.Combat.Monk.TROption == TempestRushOption.CombatOnly ||
                 (Settings.Combat.Monk.TROption == TempestRushOption.ElitesGroupsOnly && (TargetUtil.AnyElitesInRange(25) || TargetUtil.AnyMobsInRange(25, 2))) ||
@@ -271,7 +272,7 @@ namespace Trinity.Combat.Abilities
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Monk_LashingTailKick) && !Player.IsIncapacitated &&
                 // Either doesn't have sweeping wind, or does but the buff is already up
                 (!Hotbar.Contains(SNOPower.Monk_SweepingWind) || (Hotbar.Contains(SNOPower.Monk_SweepingWind) && GetHasBuff(SNOPower.Monk_SweepingWind))) &&
-                ((Player.PrimaryResource >= 65 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
+                ((Player.PrimaryResource >= 65 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 Monk_TickSweepingWindSpam();
                 return new TrinityPower(SNOPower.Monk_LashingTailKick, 10f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1);
@@ -311,7 +312,7 @@ namespace Trinity.Combat.Abilities
              * Keep Foresight and Blazing Fists buffs up every 30/5 seconds
              */
             bool hasCombinationStrike = Passives.Monk.CombinationStrike.IsActive;
-            bool isDualOrTriGen = HotbarSkills.AssignedSkills.Count(s =>
+            bool isDualOrTriGen = CacheData.Hotbar.ActiveSkills.Count(s =>
                 s.Power == SNOPower.Monk_DeadlyReach ||
                 s.Power == SNOPower.Monk_WayOfTheHundredFists ||
                 s.Power == SNOPower.Monk_FistsofThunder ||

@@ -65,7 +65,7 @@ namespace Trinity.Objects
             {
                 if (ZetaDia.IsInGame && ZetaDia.Me.IsValid && Class == ZetaDia.Me.ActorClass && Skill != null && RuneIndex >= 0)
                 {
-                    return HotbarSkills.BySNOPower(Skill.SNOPower).RuneIndex == RuneIndex || Skill.IsAllRuneBonusActive;
+                    return CacheData.Hotbar.GetSkill(Skill.SNOPower).RuneIndex == RuneIndex || Skill.IsAllRuneBonusActive;
                 }
                 return false;
             }

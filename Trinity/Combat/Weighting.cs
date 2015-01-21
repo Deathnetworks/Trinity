@@ -45,7 +45,7 @@ namespace Trinity
 
                 bool HiPriorityHealthGlobes = Settings.Combat.Misc.HiPriorityHG;
 
-                bool HealthGlobeEmergency = (Player.CurrentHealthPct <= _playerEmergencyHealthGlobeLimit || Player.PrimaryResourcePct <= _playerHealthGlobeResource) &&
+                bool HealthGlobeEmergency = (Player.CurrentHealthPct <= CombatBase.EmergencyHealthGlobeLimit || Player.PrimaryResourcePct <= CombatBase.HealthGlobeResource) &&
                      ObjectCache.Any(g => g.Type == GObjectType.HealthGlobe) && HiPriorityHealthGlobes;
 
                 bool HiPriorityShrine = Settings.WorldObject.HiPriorityShrines;
@@ -388,7 +388,7 @@ namespace Trinity
                                         }
 
                                         // If standing Molten, Arcane, or Poison Tree near unit, reduce weight
-                                        if (CombatBase.PlayerKiteDistance <= 0 &&
+                                        if (CombatBase.KiteDistance <= 0 &&
                                             CacheData.TimeBoundAvoidance.Any(aoe =>
                                             (aoe.AvoidanceType == AvoidanceType.Arcane ||
                                             aoe.AvoidanceType == AvoidanceType.MoltenCore ||
@@ -402,7 +402,7 @@ namespace Trinity
 
                                         // If any AoE between us and target, reduce weight, for melee only
                                         if (!Settings.Combat.Misc.KillMonstersInAoE &&
-                                            CombatBase.PlayerKiteDistance <= 0 && cacheObject.RadiusDistance > 3f &&
+                                            CombatBase.KiteDistance <= 0 && cacheObject.RadiusDistance > 3f &&
                                             CacheData.TimeBoundAvoidance.Any(aoe => aoe.AvoidanceType != AvoidanceType.PlagueCloud &&
                                                 MathUtil.IntersectsPath(aoe.Position, aoe.Radius, Player.Position, cacheObject.Position)))
                                         {
@@ -411,7 +411,7 @@ namespace Trinity
                                         }
                                         // See if there's any AOE avoidance in that spot, if so reduce the weight to 1, for melee only
                                         if (!Settings.Combat.Misc.KillMonstersInAoE &&
-                                            CombatBase.PlayerKiteDistance <= 0 && cacheObject.RadiusDistance > 3f &&
+                                            CombatBase.KiteDistance <= 0 && cacheObject.RadiusDistance > 3f &&
                                             CacheData.TimeBoundAvoidance.Any(aoe => aoe.AvoidanceType != AvoidanceType.PlagueCloud &&
                                                 cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius))
                                         {
@@ -713,7 +713,7 @@ namespace Trinity
                                 bool witchDoctorManaLow =
                                     Player.ActorClass == ActorClass.Witchdoctor &&
                                     Player.PrimaryResource <= V.F("WitchDoctor.ManaForHealthGlobes") &&
-                                    HotbarSkills.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GruesomeFeast);
+                                    CacheData.Hotbar.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GruesomeFeast);
 
                                 // DH's logic with Blood Vengeance passive
                                 // gain amount - 30 hatred per globe
@@ -721,7 +721,7 @@ namespace Trinity
                                 bool demonHunterHatredLow =
                                     Player.ActorClass == ActorClass.DemonHunter &&
                                     Player.PrimaryResource <= V.F("DemonHunter.HatredForHealthGlobes") &&
-                                    HotbarSkills.PassiveSkills.Contains(SNOPower.DemonHunter_Passive_Vengeance);
+                                    CacheData.Hotbar.PassiveSkills.Contains(SNOPower.DemonHunter_Passive_Vengeance);
 
                                 if (demonHunterHatredLow)
                                     cacheObject.Weight += 10000d; // 10k for DH's!
@@ -729,7 +729,7 @@ namespace Trinity
                                 if (witchDoctorManaLow)
                                     cacheObject.Weight += 10000d; // 10k for WD's!
 
-                                else if (!demonHunterHatredLow && !witchDoctorManaLow && (Player.CurrentHealthPct > _playerEmergencyHealthGlobeLimit))
+                                else if (!demonHunterHatredLow && !witchDoctorManaLow && (Player.CurrentHealthPct > CombatBase.EmergencyHealthGlobeLimit))
                                 {
                                     double myHealth = Player.CurrentHealthPct;
 
@@ -746,7 +746,7 @@ namespace Trinity
                                         }
                                         else
                                         {
-                                            if (myHealth > 0d && myHealth < V.D("Weight.Globe.MinPlayerHealthPct") || Player.PrimaryResourcePct <= _playerHealthGlobeResource)
+                                            if (myHealth > 0d && myHealth < V.D("Weight.Globe.MinPlayerHealthPct") || Player.PrimaryResourcePct <= CombatBase.HealthGlobeResource)
                                                 cacheObject.Weight = .9 * MaxWeight;
                                         }
                                     }
@@ -817,11 +817,11 @@ namespace Trinity
                                 }
 
                                 // do not collect health globes if we are kiting and health globe is too close to monster or avoidance
-                                if (CombatBase.PlayerKiteDistance > 0)
+                                if (CombatBase.KiteDistance > 0)
                                 {
-                                    if (CacheData.MonsterObstacles.Any(m => m.Position.Distance(cacheObject.Position) < CombatBase.PlayerKiteDistance))
+                                    if (CacheData.MonsterObstacles.Any(m => m.Position.Distance(cacheObject.Position) < CombatBase.KiteDistance))
                                         cacheObject.Weight = 0;
-                                    if (CacheData.TimeBoundAvoidance.Any(m => m.Position.Distance(cacheObject.Position) < CombatBase.PlayerKiteDistance))
+                                    if (CacheData.TimeBoundAvoidance.Any(m => m.Position.Distance(cacheObject.Position) < CombatBase.KiteDistance))
                                         cacheObject.Weight = 0;
                                 }
 

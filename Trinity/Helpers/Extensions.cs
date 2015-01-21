@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Trinity.Config.Combat;
 using Trinity.Reference;
@@ -161,6 +163,16 @@ namespace Trinity.Helpers
         public static bool IsFullyValid(this DiaObject diaObject)
         {
             return diaObject != null && diaObject.IsValid && diaObject.CommonData != null && diaObject.CommonData.IsValid;
+        }
+
+        /// <summary>
+        /// Removed duplicates from a list based on specified property .DistinctBy(o => o.property)
+        /// </summary>
+        public static IEnumerable<TSource> DistinctBy<TSource, TKey>
+            (this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+        {
+            var seenKeys = new HashSet<TKey>();
+            return source.Where(element => seenKeys.Add(keySelector(element)));
         }
     }
 }

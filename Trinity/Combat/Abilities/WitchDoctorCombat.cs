@@ -74,13 +74,13 @@ namespace Trinity.Combat.Abilities
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CurrentTarget != null)
             {
 
-				
-                bool hasGraveInjustice = HotbarSkills.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice);
 
-                bool hasAngryChicken = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Hex && s.RuneIndex == 1);
+                bool hasGraveInjustice = CacheData.Hotbar.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice);
+
+                bool hasAngryChicken = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Hex && s.RuneIndex == 1);
                 bool isChicken = hasAngryChicken && Player.IsHidden;
 
-                bool hasVisionQuest = HotbarSkills.PassiveSkills.Any(s => s == SNOPower.Witchdoctor_Passive_VisionQuest);
+                bool hasVisionQuest = CacheData.Hotbar.PassiveSkills.Any(s => s == SNOPower.Witchdoctor_Passive_VisionQuest);
 
                 // Set max ranged attack range, based on Grave Injustice, and current target NOT standing in avoidance, and health > 25%
                 float rangedAttackMaxRange = 30f;
@@ -107,19 +107,14 @@ namespace Trinity.Combat.Abilities
                 if (isChicken && (TargetUtil.AnyMobsInRange(12f, 1, false) || CurrentTarget.RadiusDistance <= 10f || UseDestructiblePower) &&
                     CanCast(SNOPower.Witchdoctor_Hex_Explode))
                 {
-                    Trinity.ShouldRefreshHotbarAbilities = true;
                     return new TrinityPower(SNOPower.Witchdoctor_Hex_Explode);
                 }
-                if (hasAngryChicken)
-                {
-                    Trinity.ShouldRefreshHotbarAbilities = true;
-                }
 
-                bool hasJaunt = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritWalk && s.RuneIndex == 1);
-                bool hasHonoredGuest = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritWalk && s.RuneIndex == 3);
-                bool hasUmbralShock = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritWalk && s.RuneIndex == 2);
-                bool hasSeverance = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritWalk && s.RuneIndex == 0);
-                bool hasHealingJourney = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritWalk && s.RuneIndex == 4);
+                bool hasJaunt = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritWalk && s.RuneIndex == 1);
+                bool hasHonoredGuest = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritWalk && s.RuneIndex == 3);
+                bool hasUmbralShock = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritWalk && s.RuneIndex == 2);
+                bool hasSeverance = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritWalk && s.RuneIndex == 0);
+                bool hasHealingJourney = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritWalk && s.RuneIndex == 4);
 
                 // Spirit Walk for Goblins chasing
                 if (CanCast(SNOPower.Witchdoctor_SpiritWalk) &&
@@ -174,8 +169,8 @@ namespace Trinity.Combat.Abilities
                     }
                 }
 
-                bool hasVengefulSpirit = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SoulHarvest && s.RuneIndex == 4);
-                bool hasSwallowYourSoul = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SoulHarvest && s.RuneIndex == 3);
+                bool hasVengefulSpirit = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_SoulHarvest && s.RuneIndex == 4);
+                bool hasSwallowYourSoul = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_SoulHarvest && s.RuneIndex == 3);
 				
                 // START Jade Harvester -----------------------------------------------------------------------
 
@@ -300,14 +295,14 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Sacrifice for Circle of Life
-                bool hasCircleofLife = HotbarSkills.PassiveSkills.Any(s => s == SNOPower.Witchdoctor_Passive_CircleOfLife);
+                bool hasCircleofLife = CacheData.Hotbar.PassiveSkills.Any(s => s == SNOPower.Witchdoctor_Passive_CircleOfLife);
                 if (CanCast(SNOPower.Witchdoctor_Sacrifice) && Trinity.PlayerOwnedZombieDogCount > 0 && hasCircleofLife && TargetUtil.AnyMobsInRange(15f))
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_Sacrifice);
                 }
 
-                bool hasRestlessGiant = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Gargantuan && s.RuneIndex == 0);
-                bool hasWrathfulProtector = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Gargantuan && s.RuneIndex == 3);
+                bool hasRestlessGiant = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Gargantuan && s.RuneIndex == 0);
+                bool hasWrathfulProtector = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Gargantuan && s.RuneIndex == 3);
 
                 if (CanCast(SNOPower.Witchdoctor_Gargantuan))
                 {
@@ -344,7 +339,6 @@ namespace Trinity.Combat.Abilities
                 if (CanCast(SNOPower.Witchdoctor_Hex) && (TargetUtil.AnyMobsInRange(12f, 1, false) || CurrentTarget.RadiusDistance <= 10f) &&
                     hasAngryChicken)
                 {
-                    Trinity.ShouldRefreshHotbarAbilities = true;
                     return new TrinityPower(SNOPower.Witchdoctor_Hex);
                 }
 
@@ -398,17 +392,17 @@ namespace Trinity.Combat.Abilities
 
                     return new TrinityPower(SNOPower.Witchdoctor_Piranhas, 25f, bestClusterPoint);
                 }
-				
-                bool hasPhobia = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 2);
-                bool hasStalker = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 4);
-                bool hasFaceOfDeath = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 1);
-                bool hasFrighteningAspect = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 0);
-                bool hasRuthlessTerror = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 3);
+
+                bool hasPhobia = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 2);
+                bool hasStalker = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 4);
+                bool hasFaceOfDeath = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 1);
+                bool hasFrighteningAspect = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 0);
+                bool hasRuthlessTerror = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 3);
 
                 float horrifyRadius = hasFaceOfDeath ? 24f : 12f;
 
                 // Horrify when low on health
-                if (CanCast(SNOPower.Witchdoctor_Horrify) && Player.CurrentHealthPct <= Trinity.PlayerEmergencyHealthPotionLimit && TargetUtil.AnyMobsInRange(horrifyRadius, 3))
+                if (CanCast(SNOPower.Witchdoctor_Horrify) && Player.CurrentHealthPct <= CombatBase.EmergencyHealthPotionLimit && TargetUtil.AnyMobsInRange(horrifyRadius, 3))
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_Horrify);
                 }
@@ -497,11 +491,11 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest);
                 }
 
-                bool hasDireBats = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 0);
-                bool hasVampireBats = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 3);
-                bool hasPlagueBats = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 2);
-                bool hasHungryBats = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 1);
-                bool hasCloudOfBats = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 4);
+                bool hasDireBats = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 0);
+                bool hasVampireBats = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 3);
+                bool hasPlagueBats = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 2);
+                bool hasHungryBats = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 1);
+                bool hasCloudOfBats = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 4);
 
                 int fireBatsChannelCost = hasVampireBats ? 0 : 75;
                 int fireBatsMana = TimeSincePowerUse(SNOPower.Witchdoctor_Firebats) < 125 ? fireBatsChannelCost : 225;
@@ -540,8 +534,8 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, rangedAttackMaxRange, bestClusterPoint);
                 }
 
-                bool hasWellOfSouls = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritBarrage && s.RuneIndex == 1);
-                bool hasRushOfEssence = HotbarSkills.PassiveSkills.Any(s => s == SNOPower.Witchdoctor_Passive_RushOfEssence);
+                bool hasWellOfSouls = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritBarrage && s.RuneIndex == 1);
+                bool hasRushOfEssence = CacheData.Hotbar.PassiveSkills.Any(s => s == SNOPower.Witchdoctor_Passive_RushOfEssence);
 
                 // Spirit Barrage + Rush of Essence
                 if (CanCast(SNOPower.Witchdoctor_SpiritBarrage) && Player.PrimaryResource >= 100 &&
@@ -623,8 +617,8 @@ namespace Trinity.Combat.Abilities
                 {
 					return new TrinityPower(SNOPower.Witchdoctor_Horrify);
                 }
-				
-				bool hasStalker = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 4);
+
+                bool hasStalker = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 4);
                 // Horrify Buff When not in combat for movement speed -- Stalker
                 if (CanCast(SNOPower.Witchdoctor_Horrify) && hasStalker)
                 {
@@ -639,8 +633,8 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog);
                 }
 
-                bool hasRestlessGiant = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Gargantuan && s.RuneIndex == 0);
-                bool hasWrathfulProtector = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Gargantuan && s.RuneIndex == 3);
+                bool hasRestlessGiant = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Gargantuan && s.RuneIndex == 0);
+                bool hasWrathfulProtector = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Gargantuan && s.RuneIndex == 3);
 
                 if (CanCast(SNOPower.Witchdoctor_Gargantuan) && !hasRestlessGiant && !hasWrathfulProtector && Trinity.PlayerOwnedGargantuanCount == 0)
                 {

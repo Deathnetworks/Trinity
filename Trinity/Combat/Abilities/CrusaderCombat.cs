@@ -84,7 +84,7 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Consecration
-                bool hasSGround = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_Crusader_Consecration && s.RuneIndex == 3);
+                bool hasSGround = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.X1_Crusader_Consecration && s.RuneIndex == 3);
                 if ((!hasSGround && CanCastConsecration()) ||
                    (hasSGround && CanCastConsecration() && (TargetUtil.AnyMobsInRange(15f, 5) || TargetUtil.IsEliteTargetInRange(15f))))
                 {
@@ -155,7 +155,7 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Blessed Shield : Piercing Shield
-                bool hasPiercingShield = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_Crusader_BlessedShield && s.RuneIndex == 5);
+                bool hasPiercingShield = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.X1_Crusader_BlessedShield && s.RuneIndex == 5);
                 if (CanCastBlessedShieldPiercingShield(hasPiercingShield))
                 {
                     var bestPierceTarget = TargetUtil.GetBestPierceTarget(45f);

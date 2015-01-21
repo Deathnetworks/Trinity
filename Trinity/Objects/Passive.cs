@@ -61,7 +61,7 @@ namespace Trinity.Objects
             {
                 if (ZetaDia.IsInGame && ZetaDia.Me.IsValid && Class == ZetaDia.Me.ActorClass)
                 {
-                    return HotbarSkills.PassiveSkills.Contains(SNOPower);
+                    return CacheData.Hotbar.PassiveSkills.Contains(SNOPower);
                 }
                 return false;
             }

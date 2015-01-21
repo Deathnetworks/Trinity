@@ -129,13 +129,7 @@ namespace Trinity.UI.UIComponents
                         try
                         {
                             UILoader.CloseWindow();
-                            BotMain.Stop(false, "Dumping Debug Information");
-                            ZetaDia.Actors.Update();
-                            using (ZetaDia.Memory.SaveCacheState())
-                            {
-                                ZetaDia.Memory.TemporaryCacheState(false);
-                                DebugUtil.LogBuildAndItems(TrinityLogLevel.Info);
-                            }
+                            DebugUtil.LogBuildAndItems(TrinityLogLevel.Info);                          
                         }
                         catch (Exception ex)
                         {
@@ -278,8 +272,7 @@ namespace Trinity.UI.UIComponents
                 DumpSkillsCommand = new RelayCommand(
                     parameter =>
                     {
-                        PlayerInfoCache.DumpPlayerSkills();
-
+                        CacheData.Hotbar.Dump();
                         UILoader.CloseWindow();
                     });
             }

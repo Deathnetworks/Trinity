@@ -7,7 +7,7 @@ using Zeta.Game.Internals.SNO;
 
 namespace Trinity
 {
-    public class CacheData
+    public partial class CacheData
     {
         /* 
          * This set of dictionaries are used for performance increases throughout, and a minimization of DB mis-read/null exception errors
@@ -144,6 +144,31 @@ namespace Trinity
         internal static HashSet<int> BlacklistedEvents = new HashSet<int>();
 
         /// <summary>
+        /// Cache for low weight/priority objects, so we dont have to refresh them every tick.
+        /// </summary>
+        internal static Dictionary<int, TrinityCacheObject> LowPriorityObjectCache = new Dictionary<int, TrinityCacheObject>();
+
+        public static InventoryCache Inventory
+        {
+            get { return InventoryCache.Instance; }            
+        }
+
+        public static PlayerCache Player
+        {
+            get { return PlayerCache.Instance; }
+        }
+
+        public static HotbarCache Hotbar
+        {
+            get { return HotbarCache.Instance; }
+        }
+
+        public static BuffsCache Buffs
+        {
+            get { return BuffsCache.Instance; }
+        }
+
+        /// <summary>
         /// Called every cache-refresh
         /// </summary>
         internal static void Clear()
@@ -168,8 +193,12 @@ namespace Trinity
         internal static void FullClear()
         {
             Clear();
-            WorldChangedClear();                       
+            WorldChangedClear();
             DroppedItems.Clear();
+            Inventory.Clear();
+            Player.Clear();
+            Hotbar.Clear();
+            Buffs.Clear();
         }
 
         internal static void WorldChangedClear()
@@ -188,6 +217,7 @@ namespace Trinity
             PrimaryTargetCount.Clear();
             TimeBoundAvoidance.Clear();
             BlacklistedEvents.Clear();
+            LowPriorityObjectCache.Clear();
         }
     }
 }

@@ -86,16 +86,6 @@ namespace Trinity
         private static string _statusText = "";
 
         /// <summary>
-        /// A flag to indicate if we just entered or just left archon form (and so to force-update the hotbar)
-        /// </summary>
-        internal static bool HasHadArchonbuff = false;
-
-        /// <summary>
-        /// A flag to see if we need to refresh hot bar abilities
-        /// </summary>
-        internal static bool ShouldRefreshHotbarAbilities = false;
-
-        /// <summary>
         /// Timestamp of when our position was last measured as changed
         /// </summary>
         private static DateTime _lastMovedDuringCombat = DateTime.MinValue;
@@ -113,7 +103,13 @@ namespace Trinity
         /// <summary>
         /// Holds all of the player's current info handily cached, updated once per loop with a minimum timer on updates to save D3 memory hits
         /// </summary>
-        public static PlayerInfoCache Player = new PlayerInfoCache(DateTime.MinValue, false, false, false, 0d, 0d, 0d, 0d, 0d, Vector3.Zero, false, 0, 1, ActorClass.Invalid, String.Empty);
+        public static CacheData.PlayerCache Player
+        {
+            get
+            {
+                return CacheData.Player;
+            }
+        }
 
         // Also storing a list of all profiles, for experimental reasons/incase I want to use them down the line
         public static List<string> ProfileHistory = new List<string>();
@@ -309,7 +305,6 @@ namespace Trinity
         internal static List<SNOPower> hashCachedPowerHotbarAbilities = new List<SNOPower>();
 
         // A list and a dictionary for quick buff checking and buff references
-        internal static List<Buff> listCachedBuffs = new List<Buff>();
         internal static Dictionary<int, int> PlayerBuffs = new Dictionary<int, int>();
 
         // For "position-shifting" to navigate around obstacle SNO's
@@ -351,7 +346,6 @@ namespace Trinity
         /// This contains the active cache of DiaObjects
         /// </summary>
         internal static List<TrinityCacheObject> ObjectCache;
-
 
         // From main RefreshDiaobjects
         /// <summary>

@@ -28,7 +28,9 @@ namespace Trinity
                 }
                 return _object;
             }
+            set { _object = value; }
         }
+
         [NoCopy]
         public DiaUnit Unit
         {
@@ -71,6 +73,7 @@ namespace Trinity
 
                 return Object.CommonData;
             }
+            set { throw new NotImplementedException(); }
         }
 
         public bool CommonDataIsValid

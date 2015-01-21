@@ -146,7 +146,14 @@ namespace Trinity
             TotalInfernalKeys = totalKeys;
         }
 
-        private static PlayerInfoCache Player { get { return Trinity.Player; } }
+        private static CacheData.PlayerCache Player
+        {
+            get
+            {
+                return CacheData.Player;
+            }
+        }
+
         /// <summary>
         ///     Full Output Of Item Stats
         /// </summary>
@@ -180,7 +187,7 @@ namespace Trinity
                 try
                 {
                     Level = Trinity.Player.Level;
-                    Player.ParagonLevel = Player.ParagonLevel;
+
                     if (Player.Level < 60)
                     {
                         if (!(TotalXP == 0 && LastXP == 0 && NextLevelXP == 0))

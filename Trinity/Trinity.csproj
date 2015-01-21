@@ -84,7 +84,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cache\EquippedItemCache.cs" />
+    <Compile Include="Cache\CacheData.Buffs.cs" />
+    <Compile Include="Cache\CacheData.Hotbar.cs" />
+    <Compile Include="Cache\CacheData.Inventory.cs" />
+    <Compile Include="Cache\CacheData.Player.cs" />
     <Compile Include="Cache\ItemStashSellAppender.cs" />
     <Compile Include="Cache\ItemDroppedAppender.cs" />
     <Compile Include="Cache\TrinityBountyInfo.cs" />
@@ -106,6 +109,7 @@
     <Compile Include="Combat\AvoidanceManager.cs" />
     <Compile Include="Combat\AvoidanceType.cs" />
     <Compile Include="Combat\Enemies.cs" />
+    <Compile Include="Combat\Routine\TrinityRoutine.cs" />
     <Compile Include="Combat\SpellTracker.cs" />
     <Compile Include="Configuration\Events.cs" />
     <Compile Include="Configuration\TVar.cs" />
@@ -154,7 +158,6 @@
     <Compile Include="Items\ItemWrapper.cs" />
     <Compile Include="Helpers\GoldInactivity.cs" />
     <Compile Include="Cache\HashGenerator.cs" />
-    <Compile Include="Combat\HotbarSkills.cs" />
     <Compile Include="Helpers\MathUtil.cs" />
     <Compile Include="Movement\Kite.cs" />
     <Compile Include="Movement\NavHelper.cs" />
@@ -250,7 +253,6 @@
     <Compile Include="Plugin.cs" />
     <Compile Include="Configuration\Variables.cs" />
     <Compile Include="Configuration\Enums.cs" />
-    <Compile Include="Cache\PlayerInfoCache.cs" />
     <Compile Include="Configuration\DataDictionary.cs" />
     <Compile Include="Movement\StuckHandler.cs" />
     <Compile Include="Movement\PlayerMover.cs" />

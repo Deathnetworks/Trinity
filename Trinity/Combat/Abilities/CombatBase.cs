@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Trinity.Config;
 using Trinity.Config.Combat;
+using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Common;
@@ -14,11 +15,17 @@ namespace Trinity.Combat.Abilities
 {
     public class CombatBase
     {
+        static CombatBase()
+		{
+            GameEvents.OnGameJoined += (sender, args) => LoadCombatSettings();
+            LoadCombatSettings();
+		}
+        
         private static TrinityPower _currentPower = new TrinityPower();
         private static Vector3 _lastZigZagLocation = Vector3.Zero;
         private static Vector3 _zigZagPosition = Vector3.Zero;
         private static bool _isCombatAllowed = true;
-        private static KiteMode _playerKiteMode = KiteMode.Never;
+        private static KiteMode _kiteMode = KiteMode.Never;
 
         public static CombatMovementManager CombatMovement = new CombatMovementManager();
         internal static DateTime LastChangedZigZag { get; set; }
@@ -33,29 +40,114 @@ namespace Trinity.Combat.Abilities
             NoPowerManager = 8
         }
 
-        private static int _playerKiteDistance;
+        internal static void LoadCombatSettings()
+        {
+            switch (Player.ActorClass)
+            {
+                case ActorClass.Barbarian:
+                    EmergencyHealthPotionLimit = Settings.Combat.Barbarian.PotionLevel;
+                    EmergencyHealthGlobeLimit = Settings.Combat.Barbarian.HealthGlobeLevel;
+                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
+                    KiteDistance = Settings.Combat.Barbarian.KiteLimit;
+                    KiteMode = KiteMode.Never;
+                    break;
+
+                case ActorClass.Crusader:
+                    EmergencyHealthPotionLimit = Settings.Combat.Crusader.PotionLevel;
+                    EmergencyHealthGlobeLimit = Settings.Combat.Crusader.HealthGlobeLevel;
+                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
+                    KiteDistance = 0;
+                    KiteMode = KiteMode.Never;
+                    break;
+
+                case ActorClass.Monk:
+                    EmergencyHealthPotionLimit = Settings.Combat.Monk.PotionLevel;
+                    EmergencyHealthGlobeLimit = Settings.Combat.Monk.HealthGlobeLevel;
+                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
+                    KiteDistance = 0;
+                    KiteMode = KiteMode.Never;
+                    break;
+
+                case ActorClass.Wizard:
+                    EmergencyHealthPotionLimit = Settings.Combat.Wizard.PotionLevel;
+                    EmergencyHealthGlobeLimit = Settings.Combat.Wizard.HealthGlobeLevel;
+                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
+                    KiteDistance = Settings.Combat.Wizard.KiteLimit;
+                    KiteMode = KiteMode.Always;
+                    break;
+
+                case ActorClass.Witchdoctor:
+                    EmergencyHealthPotionLimit = Settings.Combat.WitchDoctor.PotionLevel;
+                    EmergencyHealthGlobeLimit = Settings.Combat.WitchDoctor.HealthGlobeLevel;
+                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
+                    KiteDistance = Settings.Combat.WitchDoctor.KiteLimit;
+                    KiteMode = KiteMode.Always;
+                    break;
+
+                case ActorClass.DemonHunter:
+                    EmergencyHealthPotionLimit = Settings.Combat.DemonHunter.PotionLevel;
+                    EmergencyHealthGlobeLimit = Settings.Combat.DemonHunter.HealthGlobeLevel;
+                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
+                    KiteDistance = Settings.Combat.DemonHunter.KiteLimit;
+                    KiteMode = Settings.Combat.DemonHunter.KiteMode;
+                    break;
+            }
+
+            // Monk Seven Sided Strike: Sustained Attack
+            if (Player.ActorClass == ActorClass.Monk && CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Monk_SevenSidedStrike && s.RuneIndex == 3))
+                SetSNOPowerUseDelay(SNOPower.Monk_SevenSidedStrike, 17000);
+
+            if (Player.ActorClass == ActorClass.Witchdoctor && Passives.WitchDoctor.GraveInjustice.IsActive)
+            {
+                SetSNOPowerUseDelay(SNOPower.Witchdoctor_SoulHarvest, 1000);
+                SetSNOPowerUseDelay(SNOPower.Witchdoctor_SpiritWalk, 1000);
+                SetSNOPowerUseDelay(SNOPower.Witchdoctor_Horrify, 1000);
+                SetSNOPowerUseDelay(SNOPower.Witchdoctor_Gargantuan, 20000);
+                SetSNOPowerUseDelay(SNOPower.Witchdoctor_SummonZombieDog, 20000);
+                SetSNOPowerUseDelay(SNOPower.Witchdoctor_GraspOfTheDead, 500);
+                SetSNOPowerUseDelay(SNOPower.Witchdoctor_SpiritBarrage, 2000);
+                SetSNOPowerUseDelay(SNOPower.Witchdoctor_Locust_Swarm, 2000);
+                SetSNOPowerUseDelay(SNOPower.Witchdoctor_Haunt, 2000);
+                SetSNOPowerUseDelay(SNOPower.Witchdoctor_Hex, 3000);
+                SetSNOPowerUseDelay(SNOPower.Witchdoctor_MassConfusion, 15000);
+                SetSNOPowerUseDelay(SNOPower.Witchdoctor_FetishArmy, 20000);
+                SetSNOPowerUseDelay(SNOPower.Witchdoctor_BigBadVoodoo, 20000);
+            }
+            if (Player.ActorClass == ActorClass.Barbarian && CacheData.Hotbar.PassiveSkills.Contains(SNOPower.Barbarian_Passive_BoonOfBulKathos))
+            {
+                SetSNOPowerUseDelay(SNOPower.Barbarian_Earthquake, 90500);
+                SetSNOPowerUseDelay(SNOPower.Barbarian_CallOfTheAncients, 90500);
+                SetSNOPowerUseDelay(SNOPower.Barbarian_WrathOfTheBerserker, 90500);
+            }
+        }
+
+        private static int _kiteDistance;
         /// <summary>
         /// Distance to kite, read settings (class independant)
         /// </summary>
-        public static int PlayerKiteDistance
+        public static int KiteDistance
         {
             get
             {
                 // Conduit Pylon buff is active, no kite distance
-                if (GetHasBuff(SNOPower.Pages_Buff_Electrified))
+                if (GetBuffStacks(SNOPower.Pages_Buff_Electrified) > 0)
                     return 0;
-                return _playerKiteDistance;
+
+                return _kiteDistance;
             }
-            set { _playerKiteDistance = value; }
+            set { _kiteDistance = value; }
         }
+
+        public static float EmergencyHealthPotionLimit { get; set; }
+        public static float EmergencyHealthGlobeLimit { get; set; }
+        public static float HealthGlobeResource { get; set; }
 
         // When to Kite
-        public static KiteMode PlayerKiteMode
+        public static KiteMode KiteMode
         {
-            get { return _playerKiteMode; }
-            set { _playerKiteMode = value; }
+            get { return _kiteMode; }
+            set { _kiteMode = value; }
         }
-
 
         /// <summary>
         /// Allows for completely disabling combat. Settable through API only. 
@@ -84,66 +176,6 @@ namespace Trinity.Combat.Abilities
         {
             get { return _zigZagPosition; }
             internal set { _zigZagPosition = value; }
-        }
-
-        /// <summary>
-        /// Returns an appropriately selected TrinityPower and related information
-        /// </summary>
-        /// <returns></returns>
-        internal static TrinityPower AbilitySelector()
-        {
-            using (new PerformanceLogger("AbilitySelector"))
-            {
-                // See if archon just appeared/disappeared, so update the hotbar
-                if (Trinity.ShouldRefreshHotbarAbilities || Trinity.HotbarRefreshTimer.ElapsedMilliseconds > 5000)
-                    PlayerInfoCache.RefreshHotbar();
-
-                // Switch based on the cached character class
-
-                TrinityPower power = CurrentPower;
-
-                using (new PerformanceLogger("AbilitySelector.ClassAbility"))
-                {
-                    switch (Player.ActorClass)
-                    {
-                        // Barbs
-                        case ActorClass.Barbarian:
-                            power = BarbarianCombat.GetPower();
-                            break;
-                        case ActorClass.Crusader:
-                            power = CrusaderCombat.GetPower();
-                            break;
-                        // Monks
-                        //case ActorClass.Monk:
-                        //    power = GetMonkPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
-                        //    break;
-                        //// Wizards
-                        //case ActorClass.Wizard:
-                        //    power = GetWizardPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
-                        //    break;
-                        //// Witch Doctors
-                        //case ActorClass.Witchdoctor:
-                        //    power = GetWitchDoctorPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
-                        //    break;
-                        //// Demon Hunters
-                        //case ActorClass.DemonHunter:
-                        //    power = GetDemonHunterPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
-                        //    break;
-                    }
-                }
-                // use IEquatable to check if they're equal
-                if (CurrentPower == power)
-                {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Keeping {0}", CurrentPower.ToString());
-                    return CurrentPower;
-                }
-                if (power != null)
-                {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Selected new {0}", power.ToString());
-                    return power;
-                }
-                return DefaultPower;
-            }
         }
 
         /// <summary>
@@ -283,18 +315,18 @@ namespace Trinity.Combat.Abilities
             set { _currentPower = value; }
         }
 
-        public static List<SNOPower> Hotbar
+        public static HashSet<SNOPower> Hotbar
         {
             get
             {
-                return Trinity.Hotbar;
+                return CacheData.Hotbar.ActivePowers;
             }
         }
-        public static PlayerInfoCache Player
+        public static CacheData.PlayerCache Player
         {
             get
             {
-                return Trinity.Player;
+                return CacheData.Player;
             }
         }
 
@@ -317,8 +349,6 @@ namespace Trinity.Combat.Abilities
                         MonkCombat.Monk_TickSweepingWindSpam();
                     }
 
-                    Trinity.ShouldRefreshHotbarAbilities = true;
-
                     return new TrinityPower
                     {
                         SNOPower = DefaultWeaponPower,
@@ -338,7 +368,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                ACDItem lhItem = ZetaDia.Me.Inventory.Equipped.FirstOrDefault(i => i.InventorySlot == InventorySlot.LeftHand);
+                ACDItem lhItem = CacheData.Inventory.Equipped.FirstOrDefault(i => i.InventorySlot == InventorySlot.LeftHand);
                 if (lhItem == null)
                     return SNOPower.None;
 
@@ -424,8 +454,7 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         public static bool GetHasBuff(SNOPower power)
         {
-            int id = (int)power;
-            return Trinity.listCachedBuffs.Any(u => u.SNOId == id);
+            return CacheData.Buffs.HasBuff(power);
         }
 
         /// <summary>
@@ -435,12 +464,7 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         public static int GetBuffStacks(SNOPower power)
         {
-            int stacks;
-            if (Trinity.PlayerBuffs.TryGetValue((int)power, out stacks))
-            {
-                return stacks;
-            }
-            return 0;
+            return CacheData.Buffs.GetBuffStacks(power);
         }
 
         /// <summary>
@@ -494,7 +518,7 @@ namespace Trinity.Combat.Abilities
         internal static bool CheckAbilityAndBuff(SNOPower snoPower)
         {
             return
-                (!Trinity.Hotbar.Contains(snoPower) || (Trinity.Hotbar.Contains(snoPower) && GetHasBuff(snoPower)));
+                (!CacheData.Hotbar.ActivePowers.Contains(snoPower) || (CacheData.Hotbar.ActivePowers.Contains(snoPower) && GetHasBuff(snoPower)));
 
         }
 

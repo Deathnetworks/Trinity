@@ -50,7 +50,7 @@ namespace Trinity.Objects
         /// </summary>
         public bool IsEquipped
         {
-            get { return EquippedItemCache.Instance.ItemIds.Contains(Id); }
+            get { return CacheData.Inventory.EquippedIds.Contains(Id); }
         }
 
         /// <summary>

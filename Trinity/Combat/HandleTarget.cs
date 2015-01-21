@@ -83,7 +83,7 @@ namespace Trinity
                         Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "No longer in game world", true);
                         return GetRunStatus(RunStatus.Failure);
                     }
-                    if (ZetaDia.Me.IsDead)
+                    if (Player.IsDead)
                     {
                         Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Player is dead", true);
                         return GetRunStatus(RunStatus.Failure);
@@ -94,13 +94,6 @@ namespace Trinity
                     PlayerMover.vSafeMovementLocation = Vector3.Zero;
                     PlayerMover.TimeLastRecordedPosition = DateTime.UtcNow;
 
-                    // Whether we should refresh the target list or not
-                    // See if we should update hotbar abilities
-                    if (ShouldRefreshHotbarAbilities || HotbarRefreshTimer.ElapsedMilliseconds > 5000 ||
-                         (CombatBase.TimeSincePowerUse(SNOPower.Wizard_Archon) < 20000))
-                    {
-                        PlayerInfoCache.RefreshHotbar();
-                    }
                     if (!_isWaitingForPower && CombatBase.CurrentPower == null && CurrentTarget != null)
                         CombatBase.CurrentPower = AbilitySelector();
 
@@ -789,7 +782,6 @@ namespace Trinity
                             NoAbilitiesAvailableInARow++;
                             if (DateTime.UtcNow.Subtract(lastRemindedAboutAbilities).TotalSeconds > 60 && NoAbilitiesAvailableInARow >= 4)
                             {
-                                ShouldRefreshHotbarAbilities = true;
                                 lastRemindedAboutAbilities = DateTime.UtcNow;
                                 Logger.Log(TrinityLogLevel.Error, LogCategory.Behavior, "Fatal Error: Couldn't find a valid attack ability. Not enough resource for any abilities or all on cooldown");
                                 Logger.Log(TrinityLogLevel.Error, LogCategory.Behavior, "If you get this message frequently, you should consider changing your build");
@@ -816,12 +808,12 @@ namespace Trinity
             using (new PerformanceLogger("HandleTarget.UseHealthPotionIfNeeded"))
             {
                 if (!Player.IsIncapacitated && Player.CurrentHealthPct > 0 && SpellHistory.TimeSinceUse(SNOPower.DrinkHealthPotion) > TimeSpan.FromSeconds(30) &&
-                    Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit)
+                    Player.CurrentHealthPct <= CombatBase.EmergencyHealthPotionLimit)
                 {
-                    var legendaryPotions = ZetaDia.Me.Inventory.Backpack.Where(i => i.InternalName.ToLower()
+                    var legendaryPotions = CacheData.Inventory.Backpack.Where(i => i.InternalName.ToLower()
                         .Contains("healthpotion_legendary_")).ToList();
 
-                    var regularPotions = ZetaDia.Me.Inventory.Backpack.Where(i => i.InternalName.ToLower()
+                    var regularPotions = CacheData.Inventory.Backpack.Where(i => i.InternalName.ToLower()
                         .Contains("healthpotion_") && !i.InternalName.ToLower().Contains("legendary")).ToList();
 
 
@@ -879,8 +871,8 @@ namespace Trinity
 
                 // Vault for a Demon Hunter
                 if (CombatBase.CanCast(SNOPower.DemonHunter_Vault) && Settings.Combat.DemonHunter.VaultMode != DemonHunterVaultMode.MovementOnly &&
-                    (CombatBase.PlayerKiteDistance <= 0 || (!CacheData.MonsterObstacles.Any(a => a.Position.Distance(CurrentDestination) <= CombatBase.PlayerKiteDistance) &&
-                    !CacheData.TimeBoundAvoidance.Any(a => a.Position.Distance(CurrentDestination) <= CombatBase.PlayerKiteDistance))) &&
+                    (CombatBase.KiteDistance <= 0 || (!CacheData.MonsterObstacles.Any(a => a.Position.Distance(CurrentDestination) <= CombatBase.KiteDistance) &&
+                    !CacheData.TimeBoundAvoidance.Any(a => a.Position.Distance(CurrentDestination) <= CombatBase.KiteDistance))) &&
                     (!CacheData.TimeBoundAvoidance.Any(a => MathEx.IntersectsPath(a.Position, a.Radius, Player.Position, CurrentDestination))))
                 {
                     ZetaDia.Me.UsePower(SNOPower.DemonHunter_Vault, CurrentDestination, CurrentWorldDynamicId, -1);

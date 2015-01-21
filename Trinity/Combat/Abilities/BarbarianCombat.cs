@@ -340,7 +340,7 @@ namespace Trinity.Combat.Abilities
             get
             {
                 double minFury = 50f;
-                bool hasCaveIn = HotbarSkills.AssignedSkills.Any(p => p.Power == SNOPower.Barbarian_Earthquake && p.RuneIndex == 4);
+                bool hasCaveIn = CacheData.Hotbar.ActiveSkills.Any(p => p.Power == SNOPower.Barbarian_Earthquake && p.RuneIndex == 4);
                 float range = hasCaveIn ? 24f : 14f;
 
                 return
@@ -502,7 +502,7 @@ namespace Trinity.Combat.Abilities
                     // Spam with Bloodlust
                     (CanCast(SNOPower.Barbarian_Rend) &&
                      Player.CurrentHealthPct <= V.F("Barbarian.Rend.SpamBelowHealthPct") &&
-                     HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_Rend && s.RuneIndex == 3) &&
+                     CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Barbarian_Rend && s.RuneIndex == 3) &&
                      TargetUtil.AnyMobsInRange(V.F("Barbarian.Rend.MaxRange"), false)
                     ))
                     ;
@@ -600,7 +600,7 @@ namespace Trinity.Combat.Abilities
                 //runeDict.Add("Instigation", 3);
                 //runeDict.Add("Pulverize", 4);
 
-                bool hasPunish = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_Bash && s.RuneIndex == 1);
+                bool hasPunish = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Barbarian_Bash && s.RuneIndex == 1);
 
                 // for combo use with Frenzy or Cleave
                 if (hasPunish)
@@ -650,7 +650,7 @@ namespace Trinity.Combat.Abilities
             get
             {
                 return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.X1_Barbarian_WeaponThrow)
-                    && Player.PrimaryResourcePct >= 0.99 && (HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_Barbarian_WeaponThrow && s.RuneIndex == 3));
+                    && Player.PrimaryResourcePct >= 0.99 && (CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.X1_Barbarian_WeaponThrow && s.RuneIndex == 3));
             }
         }
         public static bool CanUseHammerOfTheAncients
@@ -712,7 +712,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                bool hasBerserker = HotbarSkills.PassiveSkills.Any(p => p == SNOPower.Barbarian_Passive_BerserkerRage);
+                bool hasBerserker = CacheData.Hotbar.PassiveSkills.Any(p => p == SNOPower.Barbarian_Passive_BerserkerRage);
                 double minFury = hasBerserker ? Player.PrimaryResourceMax * 0.99 : 0f;
 
                 return !UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.X1_Barbarian_Avalanche_v2, CanCastFlags.NoTimer) &&
@@ -756,7 +756,7 @@ namespace Trinity.Combat.Abilities
             get
             {
                 // For Call of Arreat rune. Will do all quakes on top of each other
-                bool hasCallOfArreat = HotbarSkills.AssignedSkills.Any(p => p.Power == SNOPower.Barbarian_Leap && p.RuneIndex == 0);
+                bool hasCallOfArreat = CacheData.Hotbar.ActiveSkills.Any(p => p.Power == SNOPower.Barbarian_Leap && p.RuneIndex == 0);
                 if (Legendary.LutSocks.IsEquipped && hasCallOfArreat)
                 {
                     Vector3 aoeTarget = TargetUtil.GetBestClusterPoint(7f, 9f, false);
@@ -792,7 +792,7 @@ namespace Trinity.Combat.Abilities
                     (DateTime.UtcNow.Subtract(LastChangedZigZag).TotalMilliseconds >= V.I("Barbarian.Whirlwind.ZigZagMaxTime") ||
                     CurrentTarget.ACDGuid != LastZigZagUnitAcdGuid ||
                     ZigZagPosition.Distance2D(Player.Position) <= 5f);
-                bool hasRLTW = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_Sprint && s.RuneIndex == 2);
+                bool hasRLTW = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Barbarian_Sprint && s.RuneIndex == 2);
 
                 if (shouldGetNewZigZag)
                 {

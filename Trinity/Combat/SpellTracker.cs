@@ -34,8 +34,9 @@ namespace Trinity
             {
                 if (CachedTrackedSpells.ContainsKey(power))
                 {
-                    HotbarSkills skill = HotbarSkills.AssignedSkills.FirstOrDefault(p => p.Power == power);
-                    TrackedSpell spell = TrackedSpells.FirstOrDefault(s => s.Equals(new TrackedSpell(power, skill.RuneIndex)));
+                    // Can't track a spell that isn't equipped
+                    var skill = CacheData.Hotbar.GetSkill(power);
+                    var spell = TrackedSpells.FirstOrDefault(s => s.Equals(new TrackedSpell(power, skill.RuneIndex)));
                     if (spell != null)
                         duration = spell.Duration;
                 }
@@ -148,7 +149,8 @@ namespace Trinity
         internal static void RefreshCachedSpells()
         {
             CachedTrackedSpells.Clear();
-            foreach (HotbarSkills skill in HotbarSkills.AssignedSkills)
+
+            foreach (var skill in CacheData.Hotbar.ActiveSkills)
             {
                 if (TrackedSpells.Any(s => s.Power == skill.Power && (s.RuneIndex == skill.RuneIndex || s.RuneIndex == -999)))
                 {

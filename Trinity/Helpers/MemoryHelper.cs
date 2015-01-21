@@ -10,6 +10,9 @@ namespace Trinity.Helpers
         private GreyMagic.FrameLockRelease _frameLockRelease;
         private GreyMagic.ExternalReadCache _externalReadCache;
 
+        /// <summary>
+        /// Enables reading DB data while bot is running or stopped
+        /// </summary>
         public MemoryHelper()
         {
             _frameLockRelease = ZetaDia.Memory.ReleaseFrame(true);

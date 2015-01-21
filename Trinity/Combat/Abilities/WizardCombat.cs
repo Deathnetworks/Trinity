@@ -110,7 +110,7 @@ namespace Trinity.Combat.Abilities
                 Player.CurrentHealthPct <= 0.50 &&
                 (CurrentTarget.IsBossOrEliteRareUnique || TargetUtil.IsEliteTargetInRange(75f)))
             {
-                var target = PlayerKiteDistance == 0 ? ZetaDia.Me.Position : NavHelper.FindSafeZone(false, 1, CurrentTarget.Position, true);
+                var target = KiteDistance == 0 ? ZetaDia.Me.Position : NavHelper.FindSafeZone(false, 1, CurrentTarget.Position, true);
                 return new TrinityPower(SNOPower.Wizard_Teleport, 65f, target);
             }
 
@@ -158,7 +158,7 @@ namespace Trinity.Combat.Abilities
 
             // Mirror Image  @ half health or 5+ monsters or rooted/incapacitated or last elite left @25% health
             if (CanCast(SNOPower.Wizard_MirrorImage, CanCastFlags.NoTimer) &&
-                (Player.CurrentHealthPct <= Trinity.PlayerEmergencyHealthPotionLimit || TargetUtil.AnyMobsInRange(30, 4) || Player.IsIncapacitated || Player.IsRooted ||
+                (Player.CurrentHealthPct <= CombatBase.EmergencyHealthPotionLimit || TargetUtil.AnyMobsInRange(30, 4) || Player.IsIncapacitated || Player.IsRooted ||
                 TargetUtil.AnyElitesInRange(30) || CurrentTarget.IsBossOrEliteRareUnique))
             {
                 return new TrinityPower(SNOPower.Wizard_MirrorImage);
@@ -202,14 +202,13 @@ namespace Trinity.Combat.Abilities
             // Archon
             if (CanCast(SNOPower.Wizard_Archon, CanCastFlags.NoTimer) && ShouldStartArchon())
             {
-                Player.WaitingForReserveEnergy = false;
-                Trinity.ShouldRefreshHotbarAbilities = true;
+                IsWaitingForSpecial = false;
                 return new TrinityPower(SNOPower.Wizard_Archon, 5, 5);
             }
 
             if (Hotbar.Contains(SNOPower.Wizard_Archon))
             {
-                Player.WaitingForReserveEnergy = true;
+                IsWaitingForSpecial = true;
             }
 
             // Explosive Blast
@@ -282,26 +281,26 @@ namespace Trinity.Combat.Abilities
             float disintegrateRange = Runes.Wizard.Entropy.IsActive ? 10f : 35f;
             // Disintegrate
             if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_Disintegrate) &&
-                ((Player.PrimaryResource >= 20 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
+                ((Player.PrimaryResource >= 20 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 return new TrinityPower(SNOPower.Wizard_Disintegrate, disintegrateRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0);
             }
             // Arcane Orb
             if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_ArcaneOrb) &&
-                ((Player.PrimaryResource >= 30 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
+                ((Player.PrimaryResource >= 30 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 return new TrinityPower(SNOPower.Wizard_ArcaneOrb, 35f, CurrentTarget.ACDGuid);
             }
             // Arcane Torrent
             if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_ArcaneTorrent) &&
-                ((Player.PrimaryResource >= 16 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
+                ((Player.PrimaryResource >= 16 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 return new TrinityPower(SNOPower.Wizard_ArcaneTorrent, 40f, CurrentTarget.ACDGuid);
             }
 
             // Ray of Frost
             if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_RayOfFrost) &&
-                (!Player.WaitingForReserveEnergy || (Player.PrimaryResource > MinEnergyReserve)))
+                (!IsWaitingForSpecial || (Player.PrimaryResource > MinEnergyReserve)))
             {
                 float range = 50f;
                 if (Runes.Wizard.SleetStorm.IsActive)
@@ -376,7 +375,7 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.Wizard_MagicWeapon);
             }
             // Diamond Skin off CD
-            bool hasSleekShell = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_DiamondSkin && s.RuneIndex == 0);
+            bool hasSleekShell = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Wizard_DiamondSkin && s.RuneIndex == 0);
             if (hasSleekShell && CanCast(SNOPower.Wizard_DiamondSkin))
             {
                 return new TrinityPower(SNOPower.Wizard_DiamondSkin);
@@ -417,7 +416,7 @@ namespace Trinity.Combat.Abilities
             }
             // Mirror Image  @ half health or 5+ monsters or rooted/incapacitated or last elite left @25% health
             if (CanCast(SNOPower.Wizard_MirrorImage, CanCastFlags.NoTimer) &&
-                (Player.CurrentHealthPct <= Trinity.PlayerEmergencyHealthPotionLimit || TargetUtil.AnyMobsInRange(30, 4) || Player.IsIncapacitated || Player.IsRooted))
+                (Player.CurrentHealthPct <= CombatBase.EmergencyHealthPotionLimit || TargetUtil.AnyMobsInRange(30, 4) || Player.IsIncapacitated || Player.IsRooted))
             {
                 return new TrinityPower(SNOPower.Wizard_MirrorImage);
             }
@@ -469,19 +468,19 @@ namespace Trinity.Combat.Abilities
                 strikePower = SNOPower.Wizard_Archon_ArcaneStrike,
                 blastPower = SNOPower.Wizard_Archon_DisintegrationWave;
 
-            HotbarSkills beamSkill = HotbarSkills.AssignedSkills
+            var beamSkill = CacheData.Hotbar.ActiveSkills
                 .FirstOrDefault(p => p.Power == SNOPower.Wizard_Archon_DisintegrationWave ||
                     p.Power == SNOPower.Wizard_Archon_DisintegrationWave_Cold ||
                     p.Power == SNOPower.Wizard_Archon_DisintegrationWave_Fire ||
                     p.Power == SNOPower.Wizard_Archon_DisintegrationWave_Lightning);
 
-            HotbarSkills strikeSkill = HotbarSkills.AssignedSkills
+            var strikeSkill = CacheData.Hotbar.ActiveSkills
                 .FirstOrDefault(p => p.Power == SNOPower.Wizard_Archon_ArcaneStrike ||
                     p.Power == SNOPower.Wizard_Archon_ArcaneStrike_Fire ||
                     p.Power == SNOPower.Wizard_Archon_ArcaneStrike_Cold ||
                     p.Power == SNOPower.Wizard_Archon_ArcaneStrike_Lightning);
 
-            HotbarSkills blastSkill = HotbarSkills.AssignedSkills
+            var blastSkill = CacheData.Hotbar.ActiveSkills
                 .FirstOrDefault(p => p.Power == SNOPower.Wizard_Archon_ArcaneBlast ||
                     p.Power == SNOPower.Wizard_Archon_ArcaneBlast_Cold ||
                     p.Power == SNOPower.Wizard_Archon_ArcaneBlast_Fire ||

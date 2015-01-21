@@ -1224,6 +1224,11 @@ namespace Trinity
             new Vector3(151.9562f, 104.8417f, 0), // Bottom Left
         };
 
+        public static HashSet<int> TownLevelAreaIds = new HashSet<int>()
+        {
+            332339,168314,92945,270011        
+        };
+
         public static Dictionary<int, Vector3> ButcherPanelPositions = new Dictionary<int, Vector3>
         {
             { 201426, new Vector3(121, 121, 0)}, // ButcherLair_FloorPanel_MidMiddle_Base

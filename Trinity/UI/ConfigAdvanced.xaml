@@ -40,7 +40,7 @@
                 </GroupBox>
                 <GroupBox Header="Unstucker">
                     <UniformGrid VerticalAlignment="Top">
-                        <CheckBox IsChecked="{Binding Advanced.UnstuckerEnabled}" Content="Enable Trinity unstucker"/>
+                        <CheckBox IsChecked="{Binding Advanced.UnstuckerEnabled}" Content="Enable Trinity Unstucker"/>
                         <CheckBox IsChecked="{Binding Advanced.AllowRestartGame}" Content="Allow game restarts"/>
                     </UniformGrid>
                 </GroupBox>
@@ -115,6 +115,22 @@
                     </StackPanel>
                 </GroupBox>
                 -->
+                <GroupBox Header="Low Priority Object Cache">
+                    <StackPanel Margin="10">
+                        <TextBlock Text="Refresh Rate (ms)" TextWrapping="Wrap" Margin="0" />
+                        <Slider Template="{DynamicResource Slider}" IsEnabled="True"
+                    Interval="50" Maximum="2000" Minimum="100" SmallChange="50" TickFrequency="50"  TickPlacement="BottomRight"
+                    Value="{Binding Path=Advanced.CacheLowPriorityRefreshRate}" IsSnapToTickEnabled="True"
+                    HorizontalAlignment="Stretch"
+                        ToolTip="Default 500."/>
+                        <TextBlock Text="Threshold (Percentage of current target's weight)" TextWrapping="Wrap" Width="341" HorizontalAlignment="Left" />
+                        <Slider Template="{DynamicResource Slider}" IsEnabled="True"
+                    Interval="5" Maximum="80" Minimum="20" SmallChange="5" TickFrequency="5"  TickPlacement="BottomRight"
+                    Value="{Binding Path=Advanced.CacheWeightThresholdPct}" IsSnapToTickEnabled="True"
+                    HorizontalAlignment="Stretch"
+                        ToolTip="Default 50."/>
+                    </StackPanel>
+                </GroupBox>                
             </StackPanel>
             <WrapPanel VerticalAlignment="Bottom" HorizontalAlignment="Center" DockPanel.Dock="Bottom">
                 <!--Reset Button-->

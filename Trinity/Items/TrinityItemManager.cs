@@ -749,7 +749,7 @@ namespace Trinity.Items
                 try
                 {
                     if (_lastBackPackLocation != new Vector2(-2, -2) &&
-                        _lastBackPackCount == ZetaDia.Me.Inventory.Backpack.Count(i => i.IsValid) &&
+                        _lastBackPackCount == CacheData.Inventory.Backpack.Count &&
                         _lastProtectedSlotsCount == CharacterSettings.Instance.ProtectedBagSlots.Count)
                     {
                         return _lastBackPackLocation;
@@ -760,7 +760,7 @@ namespace Trinity.Items
                     int freeBagSlots = 60;
 
                     _lastProtectedSlotsCount = CharacterSettings.Instance.ProtectedBagSlots.Count;
-                    _lastBackPackCount = ZetaDia.Me.Inventory.Backpack.Count(i => i.IsValid);
+                    _lastBackPackCount = CacheData.Inventory.Backpack.Count;
 
                     // Block off the entire of any "protected bag slots"
                     foreach (InventorySquare square in CharacterSettings.Instance.ProtectedBagSlots)

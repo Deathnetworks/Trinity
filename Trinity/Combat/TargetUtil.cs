@@ -24,11 +24,11 @@ namespace Trinity
                 return Trinity.ObjectCache;
             }
         }
-        private static PlayerInfoCache Player
+        private static CacheData.PlayerCache Player
         {
             get
             {
-                return Trinity.Player;
+                return CacheData.Player;
             }
         }
         private static bool AnyTreasureGoblinsPresent
@@ -48,11 +48,11 @@ namespace Trinity
                 return Trinity.CurrentTarget;
             }
         }
-        private static List<SNOPower> Hotbar
+        private static HashSet<SNOPower> Hotbar
         {
             get
             {
-                return Trinity.Hotbar;
+                return CacheData.Hotbar.ActivePowers;
             }
         }
         #endregion
@@ -759,11 +759,11 @@ namespace Trinity
                         targetCircle = 10f;
 
                     bool intersectsPath = MathUtil.IntersectsPath(CurrentTarget.Position, targetCircle, myPos, zigZagPoint);
-                    if (CombatBase.PlayerKiteDistance <= 0 && !intersectsPath)
+                    if (CombatBase.KiteDistance <= 0 && !intersectsPath)
                         continue;
 
                     // if we're kiting, lets not actualy run through monsters
-                    if (CombatBase.PlayerKiteDistance > 0 && CacheData.MonsterObstacles.Any(m => m.Position.Distance(zigZagPoint) <= CombatBase.PlayerKiteDistance))
+                    if (CombatBase.KiteDistance > 0 && CacheData.MonsterObstacles.Any(m => m.Position.Distance(zigZagPoint) <= CombatBase.KiteDistance))
                         continue;
 
                     // Ignore point if any AoE in this point position

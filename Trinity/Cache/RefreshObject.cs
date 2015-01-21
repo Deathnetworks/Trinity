@@ -400,11 +400,15 @@ namespace Trinity
             // begin with default... 
             CurrentCacheObject.Type = GObjectType.Unknown;
 
-            if (ignoreNames.Any(n => CurrentCacheObject.InternalName.ToLower().Contains(n.ToLower())))
+            var currentInternalName = CurrentCacheObject.InternalName.ToLower();
+            foreach (var ignoreName in ignoreNames)
             {
-                AddToCache = false;
-                c_IgnoreSubStep = "IgnoreNames";
-                return AddToCache;
+                if (currentInternalName.StartsWith(ignoreName, StringComparison.Ordinal))
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep = "IgnoreNames";
+                    return AddToCache;
+                }
             }
 
             // Either get the cached object type, or calculate it fresh

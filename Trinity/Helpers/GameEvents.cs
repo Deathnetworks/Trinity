@@ -53,7 +53,6 @@ namespace Trinity
             {
             }
 
-            ShouldRefreshHotbarAbilities = false;
             if (!ItemDropStats.MaintainStatTracking)
             {
                 ItemDropStats.ItemStatsWhenStartedBot = DateTime.UtcNow;
@@ -211,7 +210,7 @@ namespace Trinity
                 Blacklist60Seconds = new HashSet<int>();
                 Blacklist90Seconds = new HashSet<int>();
                 Blacklist15Seconds = new HashSet<int>();
-                ShouldRefreshHotbarAbilities = true;
+           
                 PlayerMover.TotalAntiStuckAttempts = 1;
                 PlayerMover.vSafeMovementLocation = Vector3.Zero;
                 PlayerMover.LastPosition = Vector3.Zero;

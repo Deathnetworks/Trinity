@@ -323,7 +323,7 @@ namespace Trinity
             if (AddToCache &&
                 ((Player.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_Rend)) ||
                 Player.ActorClass == ActorClass.Witchdoctor ||
-                (Player.ActorClass == ActorClass.Monk && HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_WayOfTheHundredFists && s.RuneIndex == 0)))
+                (Player.ActorClass == ActorClass.Monk && CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Monk_WayOfTheHundredFists && s.RuneIndex == 0)))
                 )
             {
                 bool hasdotDPS = CacheObjectHasDOTDPS();

@@ -66,7 +66,7 @@ namespace Trinity.Objects
         /// </summary>
         public List<Item> EquippedItems
         {
-            get { return Items.Where(i => EquippedItemCache.Instance.ItemIds.Contains(i.Id)).ToList(); }
+            get { return Items.Where(i => CacheData.Inventory.EquippedIds.Contains(i.Id)).ToList(); }
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace Trinity.Objects
         /// </summary>
         public List<ACDItem> EquippedACDItems
         {
-            get { return EquippedItemCache.Instance.Items.Where(i => ItemIds.Contains(i.ActorSNO)).ToList(); }
+            get { return CacheData.Inventory.Equipped.Where(i => ItemIds.Contains(i.ActorSNO)).ToList(); }
         }
 
         public bool IsFirstBonusActive

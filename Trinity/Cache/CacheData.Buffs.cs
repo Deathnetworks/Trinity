@@ -1,0 +1,165 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Trinity.Helpers;
+using Trinity.Technicals;
+using Zeta.Bot;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
+
+namespace Trinity
+{
+    public partial class CacheData
+    {
+        /// <summary>
+        /// Fast Inventory Cache, Self-Updating, Use instead of ZetaDia.Inventory
+        /// </summary>
+        public class BuffsCache
+        {
+            static BuffsCache()
+            {
+                Pulsator.OnPulse += (sender, args) => Instance.UpdateBuffsCache();                   
+            }
+
+            private static BuffsCache _instance;
+            public static BuffsCache Instance
+            {
+                get
+                {
+                    if (_instance != null) return _instance;
+                    _instance = new BuffsCache();
+                    _instance.UpdateBuffsCache();
+                    return _instance;
+                }
+                set { _instance = value; }
+            }
+
+            public class CachedBuff
+            {
+                public CachedBuff() { }
+
+                public CachedBuff(Buff buff)
+                {
+                    _buff = buff;
+                    InternalName = buff.InternalName;
+                    IsCancellable = buff.IsCancelable;
+                    StackCount = buff.StackCount;
+                    Id = buff.SNOId;
+                }
+
+                private readonly Buff _buff;
+                public string InternalName { get; set; }
+                public bool IsCancellable { get; set; }
+                public int StackCount { get; set; }
+                public int Id { get; set; }                
+
+                public void Cancel()
+                {
+                    if(IsCancellable && _buff.IsValid)
+                        _buff.Cancel();
+                }
+            }
+           
+            public List<CachedBuff> ActiveBuffs { get; private set; }
+            public bool HasBlessedShrine { get; private set; }
+            public bool HasFrenzyShrine { get; private set; }
+            public bool HasArchon { get; private set; }
+            public DateTime LastUpdated = DateTime.MinValue;
+
+            private Dictionary<int, CachedBuff> _buffsById = new Dictionary<int, CachedBuff>();
+
+            public void UpdateBuffsCache()
+            {
+                using (new PerformanceLogger("UpdateCachedBuffsData"))
+                {
+
+                    if (!Player.IsValid)
+                        return;
+
+                    if (DateTime.UtcNow.Subtract(LastUpdated).TotalMilliseconds < 500)
+                        return;
+
+                    Clear();
+
+                    foreach (var item in ZetaDia.Me.GetAllBuffs())
+                    {
+                        if (!item.IsValid)
+                            return;
+
+                        var cachedItem = new CachedBuff(item);
+
+                        if (cachedItem.Id == (int)SNOPower.Wizard_Archon)
+                            HasArchon = true;
+                        if (cachedItem.Id == 30476) //Blessed (+25% defence)
+                            HasBlessedShrine = true;
+                        if (cachedItem.Id == 30479) //Frenzy  (+25% atk speed)
+                            HasFrenzyShrine = true;
+
+                        _buffsById.Add(item.SNOId, cachedItem);
+                        ActiveBuffs.Add(cachedItem);
+                    }
+
+                    LastUpdated = DateTime.UtcNow;   
+
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
+                        "Refreshed Inventory: ActiveBuffs={0}", ActiveBuffs.Count);
+                }
+            }
+
+            public CachedBuff GetBuff(int id)
+            {
+                CachedBuff buff;
+                return _buffsById.TryGetValue(id, out buff) ? new CachedBuff() : new CachedBuff();
+            }
+
+            public CachedBuff GetBuff(SNOPower id)
+            {
+                return GetBuff((int)id);
+            }
+
+            public bool HasBuff(int id)
+            {
+                return _buffsById.ContainsKey(id);
+            }
+
+            public bool HasBuff(SNOPower id)
+            {
+                return HasBuff((int)id);
+            }
+
+            public int GetBuffStacks(int id)
+            {
+                return GetBuff(id).StackCount;
+            }
+
+            public int GetBuffStacks(SNOPower id)
+            {
+                return GetBuffStacks((int)id);
+            }
+
+            public void Dump()
+            {
+                using (new MemoryHelper())
+                {
+                    foreach (var hotbarskill in ActiveBuffs.ToList())
+                    {
+                        Logger.Log("Id={0} InternalName={1} Cancellable={2} StackCount={3}",
+                            hotbarskill.Id,
+                            hotbarskill.InternalName,
+                            hotbarskill.IsCancellable,
+                            hotbarskill.StackCount
+                        );
+                    }
+                }
+            }
+
+            public void Clear()
+            {
+                ActiveBuffs = new List<CachedBuff>();
+                _buffsById = new Dictionary<int, CachedBuff>();
+            }
+
+        }
+
+    }
+}

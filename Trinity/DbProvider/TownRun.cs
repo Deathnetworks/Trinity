@@ -512,7 +512,7 @@ namespace Trinity.DbProvider
         {
             get
             {
-                switch (ZetaDia.CurrentLevelAreaId)
+                switch (Trinity.Player.LevelAreaId)
                 {
                     case 19947: // Campaign A1 Hub
                         return new Vector3(2968.16f, 2789.63f, 23.94531f);
@@ -525,7 +525,7 @@ namespace Trinity.DbProvider
                     case 270011: // A5 Hub
                         return new Vector3(502.8296f, 739.7472f, 2.598635f);
                     default:
-                        throw new ValueUnavailableException("Unknown LevelArea Id " + ZetaDia.CurrentLevelAreaId);
+                        throw new ValueUnavailableException("Unknown LevelArea Id " + Trinity.Player.LevelAreaId);
                 }
             }
         }

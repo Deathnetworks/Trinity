@@ -14,6 +14,8 @@ namespace Trinity.Config
         private bool _TPSEnabled;
         private int _TPSLimit;
         private int _CacheRefreshRate;
+        private int? _cacheLowPriorityRefreshRate;
+        private int? _cacheWeightThresholdPct;
         private bool _LogStuckLocation;
         private bool _DebugInStatusBar;
         private LogCategory _LogCategories;
@@ -224,6 +226,45 @@ namespace Trinity.Config
                     _CacheRefreshRate = value;
                     OnPropertyChanged("CacheRefreshRate");
                 }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(500)]
+        public int CacheLowPriorityRefreshRate
+        {
+            get
+            {
+                if (!_cacheLowPriorityRefreshRate.HasValue)
+                    _cacheLowPriorityRefreshRate = 500;
+
+                return _cacheLowPriorityRefreshRate.Value;
+            }
+            set
+            {
+                if (_cacheLowPriorityRefreshRate.HasValue && _cacheLowPriorityRefreshRate.Value != value)
+                    OnPropertyChanged("CacheLowPriorityRefreshRate");
+
+                _cacheLowPriorityRefreshRate = value;          
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        public int CacheWeightThresholdPct
+        {
+            get
+            {
+                if (!_cacheWeightThresholdPct.HasValue)
+                    _cacheWeightThresholdPct = 50;
+                
+                return _cacheWeightThresholdPct.Value;
+            }
+            set
+            {
+                if (_cacheWeightThresholdPct.HasValue && _cacheWeightThresholdPct.Value != value)
+                    OnPropertyChanged("CacheWeightThresholdPct");
+
+                _cacheWeightThresholdPct = value;
             }
         }
 

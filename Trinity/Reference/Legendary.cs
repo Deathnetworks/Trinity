@@ -3983,7 +3983,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HwojWrap = new Item
         {
-            Id = 193670,
+            Id = 0, //193670//invalidSNO,
             Name = "Hwoj Wrap",
             Quality = ItemQuality.Legendary,
             Slug = "hwoj-wrap",
@@ -4143,13 +4143,13 @@ namespace Trinity.Reference
         /// </summary>
         public static Item TheWitchingHour = new Item
         {
-            Id = 0,
+            Id = 193670,
             Name = "The Witching Hour",
             Quality = ItemQuality.Legendary,
             Slug = "the-witching-hour",
             ItemType = ItemType.Belt,
             BaseType = ItemBaseType.Armor,
-            InternalName = "",
+            InternalName = "Belt_norm_unique_07-152",
             DataUrl = "https://us.battle.net/api/d3/data/item/the-witching-hour",
             Url = "https://us.battle.net/d3/en/item/the-witching-hour",
             RelativeUrl = "/d3/en/item/the-witching-hour",
@@ -4383,7 +4383,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HellfireAmuletIntelligence = new Item
         {
-            Id = 0,
+            Id = 298057,
             Name = "Hellfire Amulet Intelligence",
             Quality = ItemQuality.Legendary,
             Slug = "hellfire-amulet-of-intelligence",
@@ -12613,7 +12613,7 @@ namespace Trinity.Reference
         /// </summary>
         public static List<ACDItem> EquippedACDItems
         {
-            get { return EquippedItemCache.Instance.Items.Where(i => ItemIds.Contains(i.ActorSNO)).ToList(); }
+            get { return CacheData.Inventory.Equipped.Where(i => ItemIds.Contains(i.ActorSNO)).ToList(); }
         }
 
         #endregion

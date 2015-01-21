@@ -6,6 +6,7 @@ using System.Threading;
 using Trinity.Combat.Abilities;
 using Trinity.DbProvider;
 using Trinity.Helpers;
+using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Common.Plugins;
@@ -20,7 +21,6 @@ namespace Trinity
 
         internal static Stopwatch HotbarRefreshTimer = new Stopwatch();
 
-
         private static bool TargetCheckResult(bool result, string source)
         {
             Logger.LogDebug(LogCategory.GlobalHandler, "TargetCheck returning {0}, {1}", result, source);
@@ -28,7 +28,7 @@ namespace Trinity
         }
 
         /// <summary>
-        /// Find fresh targets, start main BehaviorTree if needed, cast any buffs needed etc.
+        /// Find fresh targets, start main BehaviorTree if needed, cast any buffs needed etc.        
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
@@ -36,66 +36,10 @@ namespace Trinity
         {
             using (new PerformanceLogger("TargetCheck"))
             {
-                if (ZetaDia.Me.IsDead)
+                if (Player.IsDead)
                 {
                     return TargetCheckResult(false, "Is Dead");
                 }
-
-                if (!HotbarRefreshTimer.IsRunning)
-                    HotbarRefreshTimer.Start();
-
-                if (HotbarRefreshTimer.ElapsedMilliseconds > 1000 || ShouldRefreshHotbarAbilities)
-                {
-                    PlayerInfoCache.RefreshHotbar();
-                    // Pick an appropriate health set etc. based on class
-                    switch (Player.ActorClass)
-                    {
-                        case ActorClass.Barbarian:
-                            PlayerEmergencyHealthPotionLimit = Settings.Combat.Barbarian.PotionLevel;
-                            _playerEmergencyHealthGlobeLimit = Settings.Combat.Barbarian.HealthGlobeLevel;
-                            _playerHealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
-                            CombatBase.PlayerKiteDistance = Settings.Combat.Barbarian.KiteLimit;
-                            CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Never;
-                            break;
-                        case ActorClass.Crusader:
-                            PlayerEmergencyHealthPotionLimit = Settings.Combat.Crusader.PotionLevel;
-                            _playerEmergencyHealthGlobeLimit = Settings.Combat.Crusader.HealthGlobeLevel;
-                            _playerHealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
-                            CombatBase.PlayerKiteDistance = 0;
-                            CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Never;
-                            break;
-                        case ActorClass.Monk:
-                            PlayerEmergencyHealthPotionLimit = Settings.Combat.Monk.PotionLevel;
-                            _playerEmergencyHealthGlobeLimit = Settings.Combat.Monk.HealthGlobeLevel;
-                            _playerHealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
-                            // Monks never kite :)
-                            CombatBase.PlayerKiteDistance = 0;
-                            CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Never;
-                            break;
-                        case ActorClass.Wizard:
-                            PlayerEmergencyHealthPotionLimit = Settings.Combat.Wizard.PotionLevel;
-                            _playerEmergencyHealthGlobeLimit = Settings.Combat.Wizard.HealthGlobeLevel;
-                            _playerHealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
-                            CombatBase.PlayerKiteDistance = Settings.Combat.Wizard.KiteLimit;
-                            CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Always;
-                            break;
-                        case ActorClass.Witchdoctor:
-                            PlayerEmergencyHealthPotionLimit = Settings.Combat.WitchDoctor.PotionLevel;
-                            _playerEmergencyHealthGlobeLimit = Settings.Combat.WitchDoctor.HealthGlobeLevel;
-                            _playerHealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
-                            CombatBase.PlayerKiteDistance = Settings.Combat.WitchDoctor.KiteLimit;
-                            CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Always;
-                            break;
-                        case ActorClass.DemonHunter:
-                            PlayerEmergencyHealthPotionLimit = Settings.Combat.DemonHunter.PotionLevel;
-                            _playerEmergencyHealthGlobeLimit = Settings.Combat.DemonHunter.HealthGlobeLevel;
-                            _playerHealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
-                            CombatBase.PlayerKiteDistance = Settings.Combat.DemonHunter.KiteLimit;
-                            CombatBase.PlayerKiteMode = Settings.Combat.DemonHunter.KiteMode;
-                            break;
-                    }
-                }
-                // Clear target current and reset key variables used during the target-handling function
 
                 //CurrentTarget = null;
                 DontMoveMeIAmDoingShit = false;
@@ -130,7 +74,7 @@ namespace Trinity
                 using (new PerformanceLogger("TargetCheck.OOCPotion"))
                 {
                     // Pop a potion when necessary
-                    if (Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit)
+                    if (Player.CurrentHealthPct <= CombatBase.EmergencyHealthPotionLimit)
                     {
                         Trinity.UsePotionIfNeededTask();
                     }

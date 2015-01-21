@@ -15,7 +15,7 @@ namespace Trinity.Reference
         public static Skill ById(SNOPower power)
         {
             if (!_allSkillBySnoPower.Any())
-                _allSkillBySnoPower = _all.ToDictionary(s => s.SNOPower, s => s);
+                _allSkillBySnoPower = All.ToDictionary(s => s.SNOPower, s => s);
             Skill skill;
             var result = _allSkillBySnoPower.TryGetValue(power, out skill);
             return result ? skill : new Skill();
@@ -71,8 +71,8 @@ namespace Trinity.Reference
         private static void UpdateActiveSkills()
         {
             _lastUpdatedActiveSkills = DateTime.UtcNow;
-            _active = CurrentClass.Where(s => HotbarSkills.AssignedSNOPowers.Contains(s.SNOPower)).ToList();
-            _activeIds = HotbarSkills.AssignedSNOPowers;
+            _active = CurrentClass.Where(s => CacheData.Hotbar.ActivePowers.Contains(s.SNOPower)).ToList();
+            _activeIds = CacheData.Hotbar.ActivePowers;
         }
 
         private static DateTime _lastUpdatedActiveSkills = DateTime.MinValue;

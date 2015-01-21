@@ -71,16 +71,16 @@ namespace Trinity.Combat.Abilities
 
             if (Player.PrimaryResource < MinEnergyReserve)
             {
-                Player.WaitingForReserveEnergy = IsWaitingForSpecial = true;
+                IsWaitingForSpecial = true;
             }
             else
             {
-                Player.WaitingForReserveEnergy = IsWaitingForSpecial = false;
+                IsWaitingForSpecial = false;
             }
 
             // NotSpam Shadow Power
             if (!Settings.Combat.DemonHunter.SpamShadowPower && CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
-                (!GetHasBuff(SNOPower.DemonHunter_ShadowPower) || Player.CurrentHealthPct <= Trinity.PlayerEmergencyHealthPotionLimit) && // if we don't have the buff or our health is low
+                (!GetHasBuff(SNOPower.DemonHunter_ShadowPower) || Player.CurrentHealthPct <= CombatBase.EmergencyHealthPotionLimit) && // if we don't have the buff or our health is low
                 (Player.CurrentHealthPct < 1f || Player.IsRooted || TargetUtil.AnyMobsInRange(15)))
             {
                 return new TrinityPower(SNOPower.DemonHunter_ShadowPower);
@@ -131,7 +131,7 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Ferrets used for picking up Health Globes when low on Health
-                if (Runes.DemonHunter.FerretCompanion.IsActive && Trinity.ObjectCache.Any(o => o.Type == GObjectType.HealthGlobe && o.Distance < 60f) && Player.CurrentHealthPct < Trinity.PlayerEmergencyHealthPotionLimit)
+                if (Runes.DemonHunter.FerretCompanion.IsActive && Trinity.ObjectCache.Any(o => o.Type == GObjectType.HealthGlobe && o.Distance < 60f) && Player.CurrentHealthPct < CombatBase.EmergencyHealthPotionLimit)
                 {
                     return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
                 }
@@ -404,7 +404,7 @@ namespace Trinity.Combat.Abilities
             // Chakram:Shuriken Cloud
             if (!Player.IsInTown && CanCast(SNOPower.DemonHunter_Chakram, CanCastFlags.NoTimer) && !Player.IsIncapacitated &&
                 Runes.DemonHunter.ShurikenCloud.IsActive && TimeSincePowerUse(SNOPower.DemonHunter_Chakram) >= 110000 &&
-                ((Player.PrimaryResource >= 10 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
+                ((Player.PrimaryResource >= 10 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 return new TrinityPower(SNOPower.DemonHunter_Chakram);
             }

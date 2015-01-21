@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows;
 using Trinity.Cache;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Configuration;
 using Trinity.DbProvider;
+using Trinity.Helpers;
 using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -66,6 +68,7 @@ namespace Trinity
 
             if (!ZetaDia.Me.IsValid)
                 return false;
+
             if (!ZetaDia.Me.CommonData.IsValid)
                 return false;
 
@@ -83,8 +86,6 @@ namespace Trinity
                     GenericCache.MaintainCache();
                     GenericBlacklist.MaintainBlacklist();
 
-                    // Update player-data cache, including buffs
-                    PlayerInfoCache.UpdateCachedPlayerData();
 
                     if (Player.CurrentHealthPct <= 0)
                     {
@@ -205,7 +206,7 @@ namespace Trinity
                             {
                                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting Avoidance: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}",
                                     safePosition, safePosition.Distance(Me.Position), MathUtil.GetHeading(MathUtil.FindDirectionDegree(Me.Position, safePosition)),
-                                    Player.CurrentHealthPct, CombatBase.PlayerKiteDistance);
+                                    Player.CurrentHealthPct, CombatBase.KiteDistance);
                             }
 
                             hasFoundSafePoint = true;
@@ -232,6 +233,7 @@ namespace Trinity
 
                     RefreshSetKiting(ref KiteAvoidDestination, NeedToKite);
                 }
+
                 // Not heading straight for a safe-spot?
                 // No valid targets but we were told to stay put?
                 if (CurrentTarget == null && _shouldStayPutDuringAvoidance && !_standingInAvoidance && Settings.Combat.Misc.AvoidAoEOutOfCombat)
@@ -405,6 +407,30 @@ namespace Trinity
                     }
                 }
 
+                // Store less important objects.
+                if (ObjectCache.Count > 1)
+                {
+                    var setting = Settings.Advanced.CacheWeightThresholdPct;
+                    var threshold = setting > 0 && CurrentTarget != null ? CurrentTarget.Weight * ((double)setting / 100) : 0;
+
+                    var cache = ObjectCache.DistinctBy(c => c.RActorGuid).Where(c =>
+                        c.Weight < threshold && c.Distance > 12f && !c.IsElite
+                        ||
+                        c.Type != GObjectType.Avoidance &&
+                        c.Type != GObjectType.HealthGlobe &&
+                        c.Type != GObjectType.Unit
+
+                        ).ToDictionary(x => x.RActorGuid, x => x);
+
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Cached {0}/{1} ({2:0}%) WeightThreshold={3}",
+                        cache.Count,
+                        ObjectCache.Count,
+                        cache.Count > 0 ? ((double)cache.Count / ObjectCache.Count) * 100 : 0,
+                        threshold);
+
+                    CacheData.LowPriorityObjectCache = cache;
+                }
+
                 // We have a target and the cached was refreshed
                 Events.OnCacheUpdatedHandler.Invoke();
                 return true;
@@ -422,8 +448,8 @@ namespace Trinity
             if (!WantToTownRun && !ForceVendorRunASAP)
             {
                 var legendaryItemMarkers = ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsValid &&
-                    m.Position.Distance2D(Player.Position) >= 45f &&
-                    (m.MinimapTexture == setItemMarkerTexture || m.MinimapTexture == legendaryItemMarkerTexture) && !Blacklist60Seconds.Contains(m.NameHash)).ToList();
+                                    m.Position.Distance2D(Player.Position) >= 45f &&
+                                    (m.MinimapTexture == setItemMarkerTexture || m.MinimapTexture == legendaryItemMarkerTexture) && !Blacklist60Seconds.Contains(m.NameHash)).ToList();
 
                 foreach (var marker in legendaryItemMarkers)
                 {
@@ -539,6 +565,22 @@ namespace Trinity
                     try
                     {
                         bool addToCache;
+
+                        // Objects deemed of low importance are stored from the last refresh
+                        TrinityCacheObject cachedObject;
+                        if (CacheData.LowPriorityObjectCache.TryGetValue(currentObject.RActorGuid, out cachedObject))
+                        {
+                            cachedObject.Distance = currentObject.Distance;
+                            var timeSinceRefresh = DateTime.UtcNow.Subtract(cachedObject.LastSeenTime).TotalMilliseconds;
+
+                            // Determine if we should use the stored object or not
+                            if (timeSinceRefresh < Settings.Advanced.CacheLowPriorityRefreshRate && cachedObject.Distance > 12f)
+                            {
+                                cachedObject.Position = currentObject.Position;
+                                ObjectCache.Add(cachedObject);           
+                                continue;
+                            }
+                        }
 
                         if (!Settings.Advanced.LogCategories.HasFlag(LogCategory.CacheManagement))
                         {
@@ -739,6 +781,7 @@ namespace Trinity
 
                 // Here's the list we'll use to store each object
                 ObjectCache = new List<TrinityCacheObject>();
+
             }
         }
 
@@ -795,7 +838,7 @@ namespace Trinity
             // End of backtracking check
             // Finally, a special check for waiting for wrath of the berserker cooldown before engaging Azmodan
             if (CurrentTarget == null && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && Settings.Combat.Barbarian.WaitWOTB && !SNOPowerUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) &&
-                ZetaDia.CurrentWorldId == 121214 &&
+                Player.WorldID == 121214 &&
                 (Vector3.Distance(Player.Position, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(Player.Position, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
                 DisableOutofCombatSprint = true;
@@ -812,7 +855,7 @@ namespace Trinity
                                     };
             }
             // And a special check for wizard archon
-            if (CurrentTarget == null && Hotbar.Contains(SNOPower.Wizard_Archon) && !SNOPowerUseTimer(SNOPower.Wizard_Archon) && Settings.Combat.Wizard.WaitArchon && ZetaDia.CurrentWorldId == 121214 &&
+            if (CurrentTarget == null && Hotbar.Contains(SNOPower.Wizard_Archon) && !SNOPowerUseTimer(SNOPower.Wizard_Archon) && Settings.Combat.Wizard.WaitArchon && Player.WorldID == 121214 &&
                 (Vector3.Distance(Player.Position, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(Player.Position, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Waiting for Wizard Archon cooldown before continuing to Azmodan.");
@@ -827,7 +870,7 @@ namespace Trinity
                                     };
             }
             // And a very sexy special check for WD BigBadVoodoo
-            if (CurrentTarget == null && Hotbar.Contains(SNOPower.Witchdoctor_BigBadVoodoo) && !PowerManager.CanCast(SNOPower.Witchdoctor_BigBadVoodoo) && ZetaDia.CurrentWorldId == 121214 &&
+            if (CurrentTarget == null && Hotbar.Contains(SNOPower.Witchdoctor_BigBadVoodoo) && !PowerManager.CanCast(SNOPower.Witchdoctor_BigBadVoodoo) && Player.WorldID == 121214 &&
                 (Vector3.Distance(Player.Position, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(Player.Position, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Waiting for WD BigBadVoodoo cooldown before continuing to Azmodan.");
