@@ -185,15 +185,20 @@ namespace Trinity
                 DirectionVector = _me.Movement.DirectionVector;
                 MovementSpeed = _me.Movement.SpeedXY;
                 IsMoving = _me.Movement.IsMoving;
-                IsInCombat = _me.IsInCombat;         
+                IsInCombat = _me.IsInCombat;       
+
+                // For WD Angry Chicken
+                IsHidden = _me.IsHidden;
 			}
 
 			internal void UpdateSlowChangingData()
 			{
-                IsHidden = _me.IsHidden;
                 BloodShards = ZetaDia.CPlayer.BloodshardCount;
                 MyDynamicID = _me.CommonData.DynamicId;
                 ParticipatingInTieredLootRun = _me.CommonData.GetAttribute<int>(ActorAttributeType.ParticipatingInTieredLootRun) > 0;
+
+                Coinage = _me.Inventory.Coinage;
+                CurrentExperience = ZetaDia.Me.CurrentExperience;
 
                 IsInPandemoniumFortress = DataDictionary.PandemoniumFortressWorlds.Contains(WorldID) ||
                         DataDictionary.PandemoniumFortressLevelAreaIds.Contains(LevelAreaId);
@@ -225,8 +230,6 @@ namespace Trinity
                 CooldownReductionPct = ZetaDia.Me.CommonData.GetAttribute<float>(ActorAttributeType.PowerCooldownReductionPercentAll);
                 ResourceCostReductionPct = ZetaDia.Me.CommonData.GetAttribute<float>(ActorAttributeType.ResourceCostReductionPercentAll);
                 GoldPickupRadius = _me.GoldPickupRadius;
-                Coinage = _me.Inventory.Coinage;
-                CurrentExperience = ZetaDia.Me.CurrentExperience;
                 ExperienceNextLevel = ZetaDia.Me.ExperienceNextLevel;
                 ParagonLevel = ZetaDia.Me.ParagonLevel;
                 ParagonCurrentExperience = ZetaDia.Me.ParagonCurrentExperience;

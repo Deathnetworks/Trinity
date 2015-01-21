@@ -18,7 +18,7 @@ namespace Trinity
         {
             static BuffsCache()
             {
-                Pulsator.OnPulse += (sender, args) => Instance.UpdateBuffsCache();                   
+                Pulsator.OnPulse += (sender, args) => Instance.UpdateBuffsCache();
             }
 
             private static BuffsCache _instance;
@@ -51,15 +51,20 @@ namespace Trinity
                 public string InternalName { get; set; }
                 public bool IsCancellable { get; set; }
                 public int StackCount { get; set; }
-                public int Id { get; set; }                
+                public int Id { get; set; }
 
                 public void Cancel()
                 {
-                    if(IsCancellable && _buff.IsValid)
+                    if (IsCancellable && _buff.IsValid)
                         _buff.Cancel();
                 }
+
+                public override string ToString()
+                {
+                    return ToStringReflector.GetObjectString(this);
+                }
             }
-           
+
             public List<CachedBuff> ActiveBuffs { get; private set; }
             public bool HasBlessedShrine { get; private set; }
             public bool HasFrenzyShrine { get; private set; }
@@ -81,25 +86,30 @@ namespace Trinity
 
                     Clear();
 
-                    foreach (var item in ZetaDia.Me.GetAllBuffs())
+                    foreach (var buff in ZetaDia.Me.GetAllBuffs())
                     {
-                        if (!item.IsValid)
+                        if (!buff.IsValid)
                             return;
 
-                        var cachedItem = new CachedBuff(item);
+                        var cachedBuff = new CachedBuff(buff);
 
-                        if (cachedItem.Id == (int)SNOPower.Wizard_Archon)
+                        if (cachedBuff.Id == (int)SNOPower.Wizard_Archon)
                             HasArchon = true;
-                        if (cachedItem.Id == 30476) //Blessed (+25% defence)
+                        if (cachedBuff.Id == 30476) //Blessed (+25% defence)
                             HasBlessedShrine = true;
-                        if (cachedItem.Id == 30479) //Frenzy  (+25% atk speed)
+                        if (cachedBuff.Id == 30479) //Frenzy  (+25% atk speed)
                             HasFrenzyShrine = true;
 
-                        _buffsById.Add(item.SNOId, cachedItem);
-                        ActiveBuffs.Add(cachedItem);
+                        if (!_buffsById.ContainsKey(buff.SNOId))
+                            _buffsById.Add(buff.SNOId, cachedBuff);
+                        else
+                        {
+                            Logger.LogDebug(LogCategory.CacheManagement, "Duplicate buff detected: {0}", cachedBuff);
+                        }
+                        ActiveBuffs.Add(cachedBuff);
                     }
 
-                    LastUpdated = DateTime.UtcNow;   
+                    LastUpdated = DateTime.UtcNow;
 
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                         "Refreshed Inventory: ActiveBuffs={0}", ActiveBuffs.Count);
