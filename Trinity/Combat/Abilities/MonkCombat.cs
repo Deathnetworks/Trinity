@@ -303,12 +303,6 @@ namespace Trinity.Combat.Abilities
                 }
             }
 
-            // Mantra Of Salvation With Taeguk Gem
-            if (UseOOCBuff && CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && GetHasBuff(SNOPower.ItemPassive_Unique_Gem_015_x1))
-            {
-                return new TrinityPower(SNOPower.X1_Monk_MantraOfEvasion_v2);
-            }
-
             /*
              * Dual/Trigen Monk section
              * 
