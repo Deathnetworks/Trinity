@@ -95,7 +95,6 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.DemonHunter_SmokeScreen);
             }
 
-
             // Sentry Turret
             if (!Player.IsIncapacitated && CanCast(SNOPower.DemonHunter_Sentry, CanCastFlags.NoTimer) &&
                TargetUtil.AnyMobsInRange(65))
@@ -236,9 +235,9 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.DemonHunter_SpikeTrap, 35f, vNewTarget, Trinity.Player.WorldDynamicID, -1, 1, 1);
             }
 
-            // Elemental Arrow
-            if (CanCast(SNOPower.DemonHunter_ElementalArrow) && !Player.IsIncapacitated &&
-                ((Player.PrimaryResource >= 10 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve || Legendary.Kridershot.IsEquipped))
+            // Elemental Arrow for non-kridershot
+            if (CanCast(SNOPower.DemonHunter_ElementalArrow) && !Player.IsIncapacitated && !Legendary.Kridershot.IsEquipped &&
+                ((Player.PrimaryResource >= 10 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 65f, CurrentTarget.ACDGuid);
             }
@@ -256,10 +255,17 @@ namespace Trinity.Combat.Abilities
 
             // Cluster Arrow
             if (CanCast(SNOPower.DemonHunter_ClusterArrow) && !Player.IsIncapacitated &&
-                ((Player.PrimaryResource >= 50 && !IsWaitingForSpecial) || Player.PrimaryResource > MinEnergyReserve))
+                ((Player.PrimaryResource >= 40 && !IsWaitingForSpecial) || Player.PrimaryResource > MinEnergyReserve))
             {
                 return new TrinityPower(SNOPower.DemonHunter_ClusterArrow, V.F("DemonHunter.ClusterArrow.UseRange"), CurrentTarget.ACDGuid);
             }
+
+            // Elemental Arrow for kridershot
+            if (CanCast(SNOPower.DemonHunter_ElementalArrow) && !Player.IsIncapacitated && Legendary.Kridershot.IsEquipped)
+            {
+                return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 65f, CurrentTarget.ACDGuid);
+            }
+
 
             // Chakram normal attack
             if (Hotbar.Contains(SNOPower.DemonHunter_Chakram) && !Player.IsIncapacitated &&
@@ -371,11 +377,19 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.X1_DemonHunter_Vengeance);
             }
 
+            // Shadow Power on low health (nospam)
+            if (CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
+                (TimeSincePowerUse(SNOPower.DemonHunter_ShadowPower) > 4500 || !GetHasBuff(SNOPower.DemonHunter_ShadowPower)) &&
+                Player.CurrentHealthPct <= Trinity.PlayerEmergencyHealthPotionLimit &&
+                Player.SecondaryResource >= 14) // When spamming Shadow Power, save some Discipline for emergencies
+            {
+                return new TrinityPower(SNOPower.DemonHunter_ShadowPower);
+            }
+
             // Spam Shadow Power
             if (Settings.Combat.DemonHunter.SpamShadowPower && CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
-                (!GetHasBuff(SNOPower.DemonHunter_ShadowPower) || Player.CurrentHealthPct <= Trinity.PlayerEmergencyHealthPotionLimit) && // if we don't have the buff or our health is low
-                ((!Runes.DemonHunter.Punishment.IsActive && Player.SecondaryResource >= 14) || (Runes.DemonHunter.Punishment.IsActive && Player.SecondaryResource >= 39)) && // Save some Discipline for Preparation
-                (Settings.Combat.DemonHunter.SpamShadowPower && Player.SecondaryResource >= 28)) // When spamming Shadow Power, save some Discipline for emergencies
+                TimeSincePowerUse(SNOPower.DemonHunter_ShadowPower) > 250 && !GetHasBuff(SNOPower.DemonHunter_ShadowPower) && 
+                Player.SecondaryResource >= 14)
             {
                 return new TrinityPower(SNOPower.DemonHunter_ShadowPower);
             }
@@ -406,8 +420,7 @@ namespace Trinity.Combat.Abilities
             }
 
             // Preparation: Punishment
-            if (CanCast(SNOPower.DemonHunter_Preparation, CanCastFlags.NoTimer) && 
-                Runes.DemonHunter.Punishment.IsActive && Player.PrimaryResourceMissing >= 75)
+            if (CanCast(SNOPower.DemonHunter_Preparation, CanCastFlags.NoTimer) && Runes.DemonHunter.Punishment.IsActive && Player.PrimaryResourceMissing >= 75)
             {
                 return new TrinityPower(SNOPower.DemonHunter_Preparation);
             }

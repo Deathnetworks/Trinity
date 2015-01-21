@@ -143,11 +143,11 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" DockPanel.Dock="Left" Text="Misc Item Level:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" />
                         <ComboBox Grid.Column="1" SelectedValuePath="Tag" SelectedValue="{Binding Path=Pickup.MiscItemQuality}">
-                            <ComboBoxItem Content="None" IsSelected="True" Tag="None" />
-                            <ComboBoxItem Content="Common+" IsSelected="True" Tag="Common" />
-                            <ComboBoxItem Content="Magic+" IsSelected="True" Tag="Magic" />
-                            <ComboBoxItem Content="Rare+" IsSelected="True" Tag="Rare" />
-                            <ComboBoxItem Content="Legendary" IsSelected="True" Tag="Legendary" />
+                            <ComboBoxItem Content="None" Tag="None" />
+                            <ComboBoxItem Content="Common+" Tag="Common" />
+                            <ComboBoxItem Content="Magic+" Tag="Magic" />
+                            <ComboBoxItem Content="Rare+" Tag="Rare" />
+                            <ComboBoxItem Content="Legendary" Tag="Legendary" />
                         </ComboBox>
                         <TextBlock Grid.Column="2" DockPanel.Dock="Left" FontWeight="Bold"  Text="Potion Cap:" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                         <ComboBox Grid.Column="3" SelectedValuePath="Tag" SelectedValue="{Binding Path=Pickup.PotionCount}" VerticalAlignment="Center">
