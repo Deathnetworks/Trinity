@@ -32,7 +32,7 @@ namespace Trinity
         {
             try
             {
-                if (CachedTrackedSpells.ContainsKey(power))
+                if (!CacheData.Hotbar.ActivePowers.Contains(power))
                 {
                     // Can't track a spell that isn't equipped
                     var skill = CacheData.Hotbar.GetSkill(power);
@@ -140,24 +140,6 @@ namespace Trinity
             return this.ACDGuid == other.ACDGuid && this.Power == other.Power;
         }
         #endregion
-
-        private static Dictionary<SNOPower, int> CachedTrackedSpells = new Dictionary<SNOPower, int>();
-
-        /// <summary>
-        /// Updates the cached tracked spells. Call only after updating HotbarSkills.
-        /// </summary>
-        internal static void RefreshCachedSpells()
-        {
-            CachedTrackedSpells.Clear();
-
-            foreach (var skill in CacheData.Hotbar.ActiveSkills)
-            {
-                if (TrackedSpells.Any(s => s.Power == skill.Power && (s.RuneIndex == skill.RuneIndex || s.RuneIndex == -999)))
-                {
-                    CachedTrackedSpells.Add(skill.Power, skill.RuneIndex);
-                }
-            }
-        }
 
         private static HashSet<TrackedSpell> TrackedSpells = new HashSet<TrackedSpell>();
 

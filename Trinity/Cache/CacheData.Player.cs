@@ -22,21 +22,22 @@ namespace Trinity
         /// </summary>
         public class PlayerCache
         {
-			static PlayerCache()
-			{
-				Pulsator.OnPulse += (sender, args) => Instance.UpdatePlayerCache();
-			}
+            static PlayerCache()
+            {
+                Pulsator.OnPulse += (sender, args) => Instance.UpdatePlayerCache();            
+            }
 
-            private static PlayerCache _instance;
+            public PlayerCache()
+            {
+                // Make sure data is immediately available 
+                // while bot is not running or before pulse starts
+                UpdatePlayerCache();                
+            }
+
+            private static PlayerCache _instance = null;
             public static PlayerCache Instance
             {
-                get
-                {
-                    if (_instance != null) return _instance;
-                    _instance = new PlayerCache();
-                    _instance.UpdatePlayerCache();
-                    return _instance;
-                }
+                get { return _instance ?? (_instance = new PlayerCache()); }
                 set { _instance = value; }
             }
 
@@ -107,10 +108,10 @@ namespace Trinity
 			private static DiaActivePlayer _me;
 
 			internal void UpdatePlayerCache()
-			{
+			{               
 				using (new PerformanceLogger("UpdateCachedPlayerData"))
 				{
-					if (DateTime.UtcNow.Subtract(Instance.LastUpdated).TotalMilliseconds <= 100)
+					if (DateTime.UtcNow.Subtract(LastUpdated).TotalMilliseconds <= 100)
 						return;
 
 					if (!ZetaDia.IsInGame)
@@ -130,7 +131,7 @@ namespace Trinity
 					_me = ZetaDia.Me;
 					if (_me == null || !_me.IsFullyValid())
 					{
-                        Instance.IsValid = false;
+                        IsValid = false;
 						return;
 					}
 
@@ -144,8 +145,8 @@ namespace Trinity
                         WorldDynamicID = ZetaDia.CurrentWorldDynamicId;
                         WorldID = ZetaDia.CurrentWorldId;
 
-                        Trinity.CurrentWorldDynamicId = Instance.WorldDynamicID;
-                        Trinity.CurrentWorldId = Instance.WorldID;
+                        Trinity.CurrentWorldDynamicId = WorldDynamicID;
+                        Trinity.CurrentWorldId = WorldID;
 
 						if (DateTime.UtcNow.Subtract(LastVerySlowUpdate).TotalMilliseconds > 5000)
 							UpdateVerySlowChangingData();
@@ -168,8 +169,8 @@ namespace Trinity
                 ACDGuid = _me.ACDGuid;
                 RActorGuid = _me.RActorGuid;
                 LastUpdated = DateTime.UtcNow;
-                IsInTown = DataDictionary.TownLevelAreaIds.Contains(Instance.LevelAreaId);
-                IsInRift = DataDictionary.RiftWorldIds.Contains(Instance.WorldID);
+                IsInTown = DataDictionary.TownLevelAreaIds.Contains(LevelAreaId);
+                IsInRift = DataDictionary.RiftWorldIds.Contains(WorldID);
                 IsDead = _me.IsDead;
                 IsIncapacitated = (_me.IsFeared || _me.IsStunned || _me.IsFrozen || _me.IsBlind);
                 IsRooted = _me.IsRooted;

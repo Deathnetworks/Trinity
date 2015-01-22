@@ -29,16 +29,17 @@ namespace Trinity
 				Pulsator.OnPulse += (sender, args) => Instance.UpdateHotbarCache();
 			}
 
-            private static HotbarCache _instance;
+            public HotbarCache()
+            {
+                // Make sure data is immediately available from
+                // calls while bot is not running or before pulse starts
+                UpdateHotbarCache();
+            }
+
+            private static HotbarCache _instance = null;
             public static HotbarCache Instance
             {
-                get
-                {
-                    if (_instance != null) return _instance;
-                    _instance = new HotbarCache();
-                    _instance.UpdateHotbarCache();
-                    return _instance;
-                }
+                get { return _instance ?? (_instance = new HotbarCache()); }
                 set { _instance = value; }
             }
 
@@ -59,12 +60,12 @@ namespace Trinity
 
             private static Dictionary<SNOPower,HotbarSkill> _skillBySNOPower = new Dictionary<SNOPower, HotbarSkill>();
             private static Dictionary<HotbarSlot, HotbarSkill> _skillBySlot = new Dictionary<HotbarSlot, HotbarSkill>();
-
+            
             internal void UpdateHotbarCache()
 			{
 				using (new PerformanceLogger("UpdateCachedHotbarData"))
 				{
-				    var lastUpdateMs = DateTime.UtcNow.Subtract(Instance.LastUpdated).TotalMilliseconds;
+				    var lastUpdateMs = DateTime.UtcNow.Subtract(LastUpdated).TotalMilliseconds;
 
 				    if (lastUpdateMs <= 250)
 				        return;
@@ -125,8 +126,6 @@ namespace Trinity
                             AbilityLastUsed.Add(power, DateTime.MinValue);
 
                     }
-
-					SpellTracker.RefreshCachedSpells();
 
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                         "Refreshed Hotbar: ActiveSkills={0} PassiveSkills={1}",

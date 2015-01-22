@@ -20,13 +20,29 @@ using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
+    public static class TrinityCacheObjectUtils
+    {
+        private static TrinityCacheObject _currentCacheObject;
+        
+        private static bool _isNavBlocking;
+        public static bool IsNavBlocking(this TrinityCacheObject o)
+        {
+            if (_currentCacheObject != null && _currentCacheObject.RActorGuid == o.RActorGuid)
+                return _isNavBlocking;
+
+            _isNavBlocking = Trinity.LastTargetACDGuid != o.ACDGuid && CacheData.NavigationObstacles.Any(ob => MathUtil.IntersectsPath(ob.Position, ob.Radius, CacheData.Player.Position, o.Position));
+            _currentCacheObject = o;
+            return _isNavBlocking;
+        }
+    }
+
     public partial class Trinity
     {
         private static double GetLastHadUnitsInSights()
         {
             return Math.Max(DateTime.UtcNow.Subtract(lastHadUnitInSights).TotalMilliseconds, DateTime.UtcNow.Subtract(lastHadEliteUnitInSights).TotalMilliseconds);
         }
-
+       
         private static void RefreshDiaGetWeights()
         {
             const double MaxWeight = 50000d;
@@ -41,19 +57,19 @@ namespace Trinity
                 bool avoidanceNearby = Settings.Combat.Misc.AvoidAOE && ObjectCache.Any(o => o.Type == GObjectType.Avoidance && o.Distance <= 15f);
 
                 bool prioritizeCloseRangeUnits = (avoidanceNearby || _forceCloseRangeTarget || Player.IsRooted || DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds < 1000 &&
-                    ObjectCache.Count(u => u.IsUnit && u.RadiusDistance < 10f) >= 3);
+                                                  ObjectCache.Count(u => u.IsUnit && u.RadiusDistance < 10f) >= 3);
 
                 bool HiPriorityHealthGlobes = Settings.Combat.Misc.HiPriorityHG;
 
                 bool HealthGlobeEmergency = (Player.CurrentHealthPct <= CombatBase.EmergencyHealthGlobeLimit || Player.PrimaryResourcePct <= CombatBase.HealthGlobeResource) &&
-                     ObjectCache.Any(g => g.Type == GObjectType.HealthGlobe) && HiPriorityHealthGlobes;
+                                            ObjectCache.Any(g => g.Type == GObjectType.HealthGlobe) && HiPriorityHealthGlobes;
 
                 bool HiPriorityShrine = Settings.WorldObject.HiPriorityShrines;
 
                 bool GetHiPriorityShrine = ObjectCache.Any(s => s.Type == GObjectType.Shrine) && HiPriorityShrine;
 
                 bool GetHiPriorityContainer = Settings.WorldObject.HiPriorityContainers && ObjectCache.Any(c => c.Type == GObjectType.Container) &&
-                     !(Legendary.HarringtonWaistguard.IsEquipped && Legendary.HarringtonWaistguard.IsBuffActive);
+                                              !(Legendary.HarringtonWaistguard.IsEquipped && Legendary.HarringtonWaistguard.IsBuffActive);
 
                 bool profileTagCheck = false;
 
@@ -63,8 +79,8 @@ namespace Trinity
                     Type behaviorType = ProfileManager.CurrentProfileBehavior.GetType();
                     behaviorName = behaviorType.Name;
                     if (!Settings.Combat.Misc.ProfileTagOverride && CombatBase.IsQuestingMode ||
-                        behaviorType == typeof(WaitTimerTag) ||
-                        behaviorType == typeof(UseTownPortalTag) ||
+                        behaviorType == typeof (WaitTimerTag) ||
+                        behaviorType == typeof (UseTownPortalTag) ||
                         behaviorName.ToLower().Contains("townrun") ||
                         behaviorName.ToLower().Contains("townportal"))
                     {
@@ -77,7 +93,7 @@ namespace Trinity
                     Player.ActiveBounty.Info.KillCount > 0;
 
                 bool shouldIgnoreElites =
-                     (!(isKillBounty || Player.InActiveEvent) &&
+                    (!(isKillBounty || Player.InActiveEvent) &&
                      !CombatBase.IsQuestingMode &&
                      !DataDictionary.RiftWorldIds.Contains(Player.WorldID) &&
                      !DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId) &&
@@ -95,24 +111,28 @@ namespace Trinity
 
                 bool shouldIgnoreTrashMobs =
                     (!(isKillBounty || Player.InActiveEvent) &&
-                        !CombatBase.IsQuestingMode &&
-                        !inQuestArea &&
-                        !DataDictionary.RiftWorldIds.Contains(Player.WorldID) &&
-                        !usingTownPortal &&
-                        !profileTagCheck &&
-                        movementSpeed > 1 &&
-                        Settings.Combat.Misc.TrashPackSize > 1 &&
-                        Player.Level >= 15 &&
-                        Player.CurrentHealthPct > 0.10 &&
-                        DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds > 500);
+                     !CombatBase.IsQuestingMode &&
+                     !inQuestArea &&
+                     !DataDictionary.RiftWorldIds.Contains(Player.WorldID) &&
+                     !usingTownPortal &&
+                     !profileTagCheck &&
+                     movementSpeed > 1 &&
+                     Settings.Combat.Misc.TrashPackSize > 1 &&
+                     Player.Level >= 15 &&
+                     Player.CurrentHealthPct > 0.10 &&
+                     DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds > 500);
 
                 bool shouldIgnoreBosses = HealthGlobeEmergency || GetHiPriorityShrine || GetHiPriorityContainer;
 
                 // Highest weight found as we progress through, so we can pick the best target at the end (the one with the highest weight)
                 HighestWeightFound = 0;
 
-                foreach (TrinityCacheObject cacheObject in ObjectCache.OrderBy(c => c.Distance))
-                {
+
+
+
+            foreach (TrinityCacheObject cacheObject in ObjectCache.OrderBy(c => c.Distance))
+            {
+
                     bool elitesInRangeOfUnit = !CombatBase.IgnoringElites &&
                         ObjectCache.Any(u => u.ACDGuid != cacheObject.ACDGuid && u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= 25f);
 
@@ -124,9 +144,6 @@ namespace Trinity
 
                     // Just to make sure each one starts at 0 weight...
                     cacheObject.Weight = 0d;
-
-                    bool navBlocking = LastTargetACDGuid != cacheObject.ACDGuid &&
-                        CacheData.NavigationObstacles.Any(ob => MathUtil.IntersectsPath(ob.Position, ob.Radius, Player.Position, cacheObject.Position));
 
                     // Now do different calculations based on the object type
                     switch (cacheObject.Type)
@@ -152,17 +169,14 @@ namespace Trinity
                                         ignoring = true;
                                     }
 
-                                    bool ignoreSummoner = true;
-                                    if (cacheObject.IsSummoner && Settings.Combat.Misc.ForceKillSummoners && !navBlocking)
-                                        ignoreSummoner = false;
+                                    bool ignoreSummoner = cacheObject.IsSummoner && !Settings.Combat.Misc.ForceKillSummoners || cacheObject.IsNavBlocking();
 
                                     // Ignore Solitary Trash mobs (no elites present)
                                     // Except if has been primary target or if already low on health (<= 20%)
                                     if (shouldIgnoreTrashMob && !isInHotSpot &&
                                         !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize) &&
-                                        ignoreSummoner && !cacheObject.IsQuestMonster &&
-                                        !cacheObject.IsMinimapActive && !cacheObject.IsBountyObjective ||
-                                        HealthGlobeEmergency || GetHiPriorityContainer || GetHiPriorityShrine || GoblinKamikaze)
+                                        !cacheObject.IsQuestMonster && !cacheObject.IsMinimapActive && ignoreSummoner &&
+                                        !cacheObject.IsBountyObjective || HealthGlobeEmergency || GetHiPriorityContainer || GetHiPriorityShrine || GoblinKamikaze)
                                     {
                                         objWeightInfo = "Ignoring ";
                                         ignoring = true;
@@ -275,7 +289,7 @@ namespace Trinity
                                         }
 
                                         // Bounty Objectives goooo
-                                        if (cacheObject.IsBountyObjective && !navBlocking)
+                                        if (cacheObject.IsBountyObjective && !cacheObject.IsNavBlocking())
                                         {
                                             objWeightInfo += "BountyObjective ";
                                             cacheObject.Weight += 15000d;
@@ -497,109 +511,145 @@ namespace Trinity
                                 break;
                             }
                         case GObjectType.Item:
+                        {
+                            // Default Weight
+                            cacheObject.Weight = Math.Max((175 - cacheObject.Distance) / 175 * MaxWeight, 100d);
+
+                            bool isTwoSquare = true;
+
+                            var item = cacheObject.Item;
+                            if (item != null)
+                            {
+                                var commonData = item.CommonData;
+                                if (commonData != null && commonData.IsValid)
+                                    isTwoSquare = commonData.IsTwoSquareItem;                                
+                            }
+
+                            // Don't pickup items if we're doing a TownRun
+                            if (TrinityItemManager.FindValidBackpackLocation(isTwoSquare) == new Vector2(-1, -1))
+                            {
+                                objWeightInfo += "TownRun";
+                                cacheObject.Weight = 0;
+                                break;
+                            }
+
+                            // Give legendaries max weight, always
+                            if (cacheObject.ItemQuality >= ItemQuality.Legendary)
+                            {
+                                cacheObject.Weight = MaxWeight;
+                                objWeightInfo += " IsLegendary";
+                            }
+
+                            if (cacheObject.GoldAmount > 0 && cacheObject.Distance < 25f)
+                            {
+                                cacheObject.Weight += MaxWeight * 0.25;
+                            }
+
+                            // ignore non-legendaries and gold near elites if we're ignoring elites
+                            // not sure how we should safely determine this distance
+                            if (cacheObject.ItemQuality < ItemQuality.Legendary && CombatBase.IgnoringElites &&
+                                ObjectCache.Any(u => u.IsUnit && u.IsEliteRareUnique &&
+                                    u.Position.Distance2D(cacheObject.Position) <= V.F("Weight.Items.IgnoreNonLegendaryNearEliteDistance")))
+                            {
+                                objWeightInfo += " IgnoringElites";
+                                cacheObject.Weight = 0;
+                                break;
+                            }
+
+                            // Ignore Legendaries in AoE
+                            if (Settings.Loot.Pickup.IgnoreLegendaryInAoE && cacheObject.ItemQuality >= ItemQuality.Legendary &&
+                                CacheData.TimeBoundAvoidance.Any(aoe => cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius))
+                            {
+                                cacheObject.Weight = 0;
+                                break;
+                            }
+
+                            // Ignore Non-Legendaries in AoE
+                            if (Settings.Loot.Pickup.IgnoreNonLegendaryInAoE && cacheObject.ItemQuality < ItemQuality.Legendary &&
+                                CacheData.TimeBoundAvoidance.Any(aoe => cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius))
+                            {
+                                cacheObject.Weight = 0;
+                                break;
+                            }
+
+                            // Ignore Legendaries near Elites
+                            if (Settings.Loot.Pickup.IgnoreLegendaryNearElites && cacheObject.ItemQuality >= ItemQuality.Legendary &&
+                                ObjectCache.Any(u => u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= V.F("Weight.Items.IgnoreLegendaryNearEliteDistance")))
+                            {
+                                cacheObject.Weight = 0;
+                                break;
+                            }
+                            // Ignore Non-Legendaries near Elites
+                            if (Settings.Loot.Pickup.IgnoreNonLegendaryNearElites && cacheObject.ItemQuality < ItemQuality.Legendary &&
+                                ObjectCache.Any(u => u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= V.F("Weight.Items.IgnoreNonLegendaryNearEliteDistance")))
+                            {
+                                cacheObject.Weight = 0;
+                                break;
+                            }
+
+                            // Point-blank items get a weight increase 
+                            if (cacheObject.Distance <= 9f)
+                            {
+                                cacheObject.Weight += 1000d;
+                                objWeightInfo += " IsPointBlank";
+                            }
+
+                            // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
+                            if (cacheObject.RActorGuid == LastTargetRactorGUID)
+                            {
+                                cacheObject.Weight += 800;
+                                objWeightInfo += " PreviousTarget";
+                            }
+
+                            if (Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_TempestRush) && TimeSinceUse(SNOPower.Monk_TempestRush) < 1000 && cacheObject.ItemQuality < ItemQuality.Legendary)
+                            {
+                                cacheObject.Weight = 500;
+                                objWeightInfo += " MonkTR Weight";
+                            }
+
+                            // If there's a monster in the path-line to the item, reduce the weight to 1, except legendaries
+                            if (cacheObject.ItemQuality < ItemQuality.Legendary &&
+                                CacheData.MonsterObstacles.Any(cp => MathUtil.IntersectsPath(cp.Position, cp.Radius * 1.2f, Player.Position, cacheObject.Position)))
+                            {
+                                objWeightInfo += " MonsterObstacles";
+                                cacheObject.Weight = 1;
+                            }
+
+                            // ignore any items/gold if there is mobs in kill radius and we aren't combat looting
+                            if (CharacterSettings.Instance.CombatLooting && CurrentTarget != null && AnyMobsInRange && cacheObject.ItemQuality < ItemQuality.Legendary)
+                            {
+                                objWeightInfo += " NoCombatLooting";
+                                cacheObject.Weight = 1;
+                            }
+
+                            // See if there's any AOE avoidance in that spot or inbetween us, if so reduce the weight to 1
+                            if (cacheObject.ItemQuality < ItemQuality.Legendary &&
+                                CacheData.TimeBoundAvoidance.Any(a => MathUtil.IntersectsPath(a.Position, a.Radius + 5f, Player.Position, cacheObject.Position)))
+                            {
+                                objWeightInfo += " TimeBoundAvoidance";
+                                cacheObject.Weight = 1;
+                            }
+
+                            break;
+                        }
                         case GObjectType.Gold:
                             {
-                                bool isTwoSquare = true;
-
-                                if (cacheObject.Item != null && cacheObject.Item.CommonData != null)
-                                    isTwoSquare = cacheObject.Item.CommonData.IsTwoSquareItem;
-
-                                // Don't pickup items if we're doing a TownRun
-                                if (cacheObject.Type == GObjectType.Item &&
-                                    TrinityItemManager.FindValidBackpackLocation(isTwoSquare) == new Vector2(-1, -1))
-                                {
-                                    objWeightInfo += "TownRun";
-                                    cacheObject.Weight = 0;
-                                    break;
-                                }
-
-                                if (cacheObject.Type == GObjectType.Gold && navBlocking && cacheObject.ItemQuality < ItemQuality.Legendary)
-                                {
-                                    objWeightInfo += " NavBlocking";
-                                    cacheObject.Weight = 0;
-                                    break;
-                                }
 
                                 // Default Weight
                                 cacheObject.Weight = Math.Max((175 - cacheObject.Distance) / 175 * MaxWeight, 100d);
-
-                                // Give legendaries max weight, always
-                                if (cacheObject.GoldAmount <= 0 && cacheObject.ItemQuality >= ItemQuality.Legendary)
-                                {
-                                    cacheObject.Weight = MaxWeight;
-                                    objWeightInfo += " IsLegendary";
-                                }
-
-                                if (cacheObject.GoldAmount > 0 && cacheObject.Distance < 25f)
-                                {
-                                    cacheObject.Weight += MaxWeight * 0.25;
-                                }
-
-                                // ignore non-legendaries and gold near elites if we're ignoring elites
-                                // not sure how we should safely determine this distance
-                                if (cacheObject.ItemQuality < ItemQuality.Legendary && CombatBase.IgnoringElites &&
-                                    ObjectCache.Any(u => u.IsUnit && u.IsEliteRareUnique &&
-                                        u.Position.Distance2D(cacheObject.Position) <= V.F("Weight.Items.IgnoreNonLegendaryNearEliteDistance")))
-                                {
-                                    objWeightInfo += " IgnoringElites";
-                                    cacheObject.Weight = 0;
-                                    break;
-                                }
-
-                                #region Ignore Settings
-                                // Ignore Legendaries in AoE
-                                if (Settings.Loot.Pickup.IgnoreLegendaryInAoE && cacheObject.Type == GObjectType.Item && cacheObject.ItemQuality >= ItemQuality.Legendary &&
-                                    CacheData.TimeBoundAvoidance.Any(aoe => cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius))
-                                {
-                                    cacheObject.Weight = 0;
-                                    break;
-                                }
-
-                                // Ignore Non-Legendaries in AoE
-                                if (Settings.Loot.Pickup.IgnoreNonLegendaryInAoE && cacheObject.Type == GObjectType.Item && cacheObject.ItemQuality < ItemQuality.Legendary &&
-                                    CacheData.TimeBoundAvoidance.Any(aoe => cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius))
-                                {
-                                    cacheObject.Weight = 0;
-                                    break;
-                                }
-
-                                // Ignore Legendaries near Elites
-                                if (Settings.Loot.Pickup.IgnoreLegendaryNearElites && cacheObject.Type == GObjectType.Item && cacheObject.ItemQuality >= ItemQuality.Legendary &&
-                                    ObjectCache.Any(u => u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= V.F("Weight.Items.IgnoreLegendaryNearEliteDistance")))
-                                {
-                                    cacheObject.Weight = 0;
-                                    break;
-                                }
-                                // Ignore Non-Legendaries near Elites
-                                if (Settings.Loot.Pickup.IgnoreNonLegendaryNearElites && cacheObject.Type == GObjectType.Item && cacheObject.ItemQuality < ItemQuality.Legendary &&
-                                    ObjectCache.Any(u => u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= V.F("Weight.Items.IgnoreNonLegendaryNearEliteDistance")))
-                                {
-                                    cacheObject.Weight = 0;
-                                    break;
-                                }
-
+               
                                 // Ignore gold near Elites
-                                if (Settings.Loot.Pickup.IgnoreGoldNearElites && cacheObject.Type == GObjectType.Gold &&
-                                    ObjectCache.Any(u => u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= V.F("Weight.Items.IgnoreGoldNearEliteDistance")))
+                                if (Settings.Loot.Pickup.IgnoreGoldNearElites && ObjectCache.Any(u => u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= V.F("Weight.Items.IgnoreGoldNearEliteDistance")))
                                 {
                                     cacheObject.Weight = 0;
                                     break;
                                 }
 
                                 // Ignore gold in AoE
-                                if (Settings.Loot.Pickup.IgnoreGoldInAoE && cacheObject.Type == GObjectType.Gold &&
-                                    CacheData.TimeBoundAvoidance.Any(aoe => cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius))
+                                if (Settings.Loot.Pickup.IgnoreGoldInAoE && CacheData.TimeBoundAvoidance.Any(aoe => cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius))
                                 {
                                     cacheObject.Weight = 0;
                                     break;
-                                }
-                                #endregion
-
-                                // Point-blank items get a weight increase 
-                                if (cacheObject.GoldAmount <= 0 && cacheObject.Distance <= 9f)
-                                {
-                                    cacheObject.Weight += 1000d;
-                                    objWeightInfo += " IsPointBlank";
                                 }
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
@@ -607,11 +657,6 @@ namespace Trinity
                                 {
                                     cacheObject.Weight += 800;
                                     objWeightInfo += " PreviousTarget";
-                                }
-                                if (Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_TempestRush) && TimeSinceUse(SNOPower.Monk_TempestRush) < 1000 && cacheObject.ItemQuality < ItemQuality.Legendary)
-                                {
-                                    cacheObject.Weight = 500;
-                                    objWeightInfo += " MonkTR Weight";
                                 }
 
                                 // If there's a monster in the path-line to the item, reduce the weight to 1, except legendaries
@@ -621,12 +666,14 @@ namespace Trinity
                                     objWeightInfo += " MonsterObstacles";
                                     cacheObject.Weight = 1;
                                 }
+
                                 // ignore any items/gold if there is mobs in kill radius and we aren't combat looting
                                 if (CharacterSettings.Instance.CombatLooting && CurrentTarget != null && AnyMobsInRange && cacheObject.ItemQuality < ItemQuality.Legendary)
                                 {
                                     objWeightInfo += " NoCombatLooting";
                                     cacheObject.Weight = 1;
                                 }
+
                                 // See if there's any AOE avoidance in that spot or inbetween us, if so reduce the weight to 1
                                 if (cacheObject.ItemQuality < ItemQuality.Legendary &&
                                     CacheData.TimeBoundAvoidance.Any(a => MathUtil.IntersectsPath(a.Position, a.Radius + 5f, Player.Position, cacheObject.Position)))
@@ -634,6 +681,13 @@ namespace Trinity
                                     objWeightInfo += " TimeBoundAvoidance";
                                     cacheObject.Weight = 1;
                                 }
+
+                                //if (cacheObject.IsNavBlocking())
+                                //{
+                                //    objWeightInfo += " NavBlocking";
+                                //    cacheObject.Weight = 0;
+                                //}
+
                                 break;
                             }
                         case GObjectType.PowerGlobe:
@@ -655,7 +709,7 @@ namespace Trinity
                                 if (CacheData.TimeBoundAvoidance.Any(a => MathUtil.IntersectsPath(a.Position, a.Radius + 5f, Player.Position, cacheObject.Position)))
                                     cacheObject.Weight = 1;
 
-                                if (navBlocking)
+                                if (cacheObject.IsNavBlocking())
                                 {
                                     objWeightInfo += " NavBlocking";
                                     cacheObject.Weight = 0;
@@ -683,7 +737,7 @@ namespace Trinity
                                 if (CacheData.TimeBoundAvoidance.Any(a => MathUtil.IntersectsPath(a.Position, a.Radius + 5f, Player.Position, cacheObject.Position)))
                                     cacheObject.Weight = 1;
 
-                                if (navBlocking)
+                                if (cacheObject.IsNavBlocking())
                                 {
                                     objWeightInfo += " NavBlocking";
                                     cacheObject.Weight = 0;
@@ -695,7 +749,7 @@ namespace Trinity
                         case GObjectType.HealthGlobe:
                             {
                                 // Weight Health Globes
-                                if (navBlocking)
+                                if (cacheObject.IsNavBlocking())
                                 {
                                     objWeightInfo += " NavBlocking";
                                     cacheObject.Weight = 0;
@@ -852,7 +906,7 @@ namespace Trinity
                                         objWeightInfo += "TimeBoundAvoidance";
                                         break;
                                     }
-                                    if (navBlocking)
+                                    if (cacheObject.IsNavBlocking())
                                     {
                                         objWeightInfo += " NavBlocking";
                                         cacheObject.Weight = 0;
@@ -1090,7 +1144,7 @@ namespace Trinity
                                 if (cacheObject.InternalName.ToLower().Contains("chest_rare"))
                                     maxRange = 250f;
 
-                                if (navBlocking)
+                                if (cacheObject.IsNavBlocking())
                                 {
                                     objWeightInfo += " NavBlocking";
                                     cacheObject.Weight = 0;
@@ -1147,7 +1201,7 @@ namespace Trinity
                     }
 
                     // Prevent current target dynamic ranged weighting flip-flop 
-                    if (LastTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight <= 1 && !navBlocking)
+                    if (LastTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight <= 1 && !cacheObject.IsNavBlocking())
                     {
                         cacheObject.Weight = 100;
                     }
@@ -1175,7 +1229,8 @@ namespace Trinity
                          */
 
                         // Clone the current CacheObject
-                        CurrentTarget = cacheObject.Copy();
+                        //CurrentTarget = cacheObject.Copy();
+                        CurrentTarget = cacheObject;
                         HighestWeightFound = cacheObject.Weight;
 
                         // See if we can try attempting kiting later

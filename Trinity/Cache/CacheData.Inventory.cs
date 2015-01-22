@@ -18,20 +18,20 @@ namespace Trinity
         {
             static InventoryCache()
             {
-                Instance.Clear();
-                Pulsator.OnPulse += (sender, args) => Instance.UpdateInventoryCache();    
+                Pulsator.OnPulse += (sender, args) => Instance.UpdateInventoryCache();
             }
 
-            private static InventoryCache _instance;
+            public InventoryCache()
+            {
+                // Make sure data is immediately available 
+                // while bot is not running or before pulse starts
+                UpdateInventoryCache();
+            }
+
+            private static InventoryCache _instance = null;
             public static InventoryCache Instance
             {
-                get
-                {
-                    if (_instance != null) return _instance;
-                    _instance = new InventoryCache();
-                    _instance.UpdateInventoryCache();
-                    return _instance;
-                }
+                get { return _instance ?? (_instance = new InventoryCache()); }
                 set { _instance = value; }
             }
 
@@ -40,8 +40,6 @@ namespace Trinity
             public List<ACDItem> Stash { get; private set; }
             public List<ACDItem> Equipped { get; private set; }
             public HashSet<int> EquippedIds { get; private set; }
-            public ILookup<int, ACDItem> BackpackByActorId { get; private set; }
-            public ILookup<int, ACDItem> StashByActorId { get; private set; }
 
             public void UpdateInventoryCache()
             {
@@ -61,11 +59,11 @@ namespace Trinity
                         switch (item.InventorySlot)
                         {
                             case InventorySlot.BackpackItems:
-                                Instance.Backpack.Add(item);
+                                Backpack.Add(item);
                                 break;
 
                             case InventorySlot.SharedStash:
-                                Instance.Stash.Add(item);
+                                Stash.Add(item);
                                 break;
 
                             case InventorySlot.Bracers:
@@ -82,14 +80,11 @@ namespace Trinity
                             case InventorySlot.Legs:
                             case InventorySlot.Neck:
                             case InventorySlot.Socket:
-                                Instance.Equipped.Add(item);
-                                Instance.EquippedIds.Add(item.ActorSNO);
+                                Equipped.Add(item);
+                                EquippedIds.Add(item.ActorSNO);
                                 break;
                         }
                     }
-
-                    Instance.BackpackByActorId = Instance.Backpack.ToLookup(k => k.ActorSNO, v => v);
-                    Instance.StashByActorId = Instance.Stash.ToLookup(k => k.ActorSNO, v => v);
 
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, 
                         "Refreshed Inventory: Backpack={0} Stash={1} Equipped={2}",
@@ -105,8 +100,6 @@ namespace Trinity
                 Stash = new List<ACDItem>();
                 Equipped = new List<ACDItem>();
                 EquippedIds = new HashSet<int>();
-                BackpackByActorId = new LookupList<int, ACDItem>();
-                StashByActorId = new LookupList<int, ACDItem>();
             }
 
         }

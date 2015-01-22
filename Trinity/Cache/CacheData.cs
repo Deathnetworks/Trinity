@@ -195,10 +195,6 @@ namespace Trinity
             Clear();
             WorldChangedClear();
             DroppedItems.Clear();
-            Inventory.Clear();
-            Player.Clear();
-            Hotbar.Clear();
-            Buffs.Clear();
         }
 
         internal static void WorldChangedClear()

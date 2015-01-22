@@ -269,7 +269,7 @@ namespace Trinity.DbProvider
 
         internal static bool TownRunTimerFinished()
         {
-            return ZetaDia.IsInTown || (TownRunCheckTimer.IsRunning && TownRunCheckTimer.ElapsedMilliseconds > 2000);
+            return CacheData.Player.IsInTown || (TownRunCheckTimer.IsRunning && TownRunCheckTimer.ElapsedMilliseconds > 2000);
         }
 
         internal static bool TownRunTimerRunning()

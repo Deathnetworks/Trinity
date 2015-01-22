@@ -17,20 +17,21 @@ namespace Trinity
         public class BuffsCache
         {
             static BuffsCache()
-            {
+            {                
                 Pulsator.OnPulse += (sender, args) => Instance.UpdateBuffsCache();
             }
 
-            private static BuffsCache _instance;
+            public BuffsCache()
+            {
+                // Make sure data is immediately available from
+                // calls while bot is not running or before pulse starts
+                UpdateBuffsCache();                
+            }
+
+            private static BuffsCache _instance = null;
             public static BuffsCache Instance
             {
-                get
-                {
-                    if (_instance != null) return _instance;
-                    _instance = new BuffsCache();
-                    _instance.UpdateBuffsCache();
-                    return _instance;
-                }
+                get { return _instance ?? (_instance = new BuffsCache()); }
                 set { _instance = value; }
             }
 

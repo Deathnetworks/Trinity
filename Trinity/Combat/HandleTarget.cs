@@ -78,11 +78,12 @@ namespace Trinity
             {
                 try
                 {
-                    if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
+                    if (!Player.IsValid)
                     {
                         Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "No longer in game world", true);
                         return GetRunStatus(RunStatus.Failure);
                     }
+
                     if (Player.IsDead)
                     {
                         Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Player is dead", true);
