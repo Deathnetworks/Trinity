@@ -64,12 +64,12 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         private static TrinityPower GetCombatPower()
         {
-            int MinEnergyReserve = 25;
+            int minEnergyReserve = 25;
 
             if (Sets.EmbodimentOfTheMarauder.IsFullyEquipped)
-                MinEnergyReserve = 70;
+                minEnergyReserve = 20;
 
-            if (Player.PrimaryResource < MinEnergyReserve)
+            if (Player.PrimaryResource < minEnergyReserve)
             {
                 IsWaitingForSpecial = true;
             }
@@ -80,7 +80,7 @@ namespace Trinity.Combat.Abilities
 
             // NotSpam Shadow Power
             if (!Settings.Combat.DemonHunter.SpamShadowPower && CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
-                (!GetHasBuff(SNOPower.DemonHunter_ShadowPower) || Player.CurrentHealthPct <= CombatBase.EmergencyHealthPotionLimit) && // if we don't have the buff or our health is low
+                (!GetHasBuff(SNOPower.DemonHunter_ShadowPower) || Player.CurrentHealthPct <= EmergencyHealthPotionLimit) && // if we don't have the buff or our health is low
                 (Player.CurrentHealthPct < 1f || Player.IsRooted || TargetUtil.AnyMobsInRange(15)))
             {
                 return new TrinityPower(SNOPower.DemonHunter_ShadowPower);
@@ -131,7 +131,7 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Ferrets used for picking up Health Globes when low on Health
-                if (Runes.DemonHunter.FerretCompanion.IsActive && Trinity.ObjectCache.Any(o => o.Type == GObjectType.HealthGlobe && o.Distance < 60f) && Player.CurrentHealthPct < CombatBase.EmergencyHealthPotionLimit)
+                if (Runes.DemonHunter.FerretCompanion.IsActive && Trinity.ObjectCache.Any(o => o.Type == GObjectType.HealthGlobe && o.Distance < 60f) && Player.CurrentHealthPct < EmergencyHealthPotionLimit)
                 {
                     return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
                 }
@@ -182,7 +182,7 @@ namespace Trinity.Combat.Abilities
 
             // Multi Shot
             if (CanCast(SNOPower.DemonHunter_Multishot) && !Player.IsIncapacitated &&
-                ((Player.PrimaryResource >= 30 && !IsWaitingForSpecial) || Player.PrimaryResource > MinEnergyReserve) &&
+                ((Player.PrimaryResource >= 30 && !IsWaitingForSpecial) || Player.PrimaryResource > minEnergyReserve) &&
                 (TargetUtil.AnyMobsInRange(40, 2) || CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.IsTreasureGoblin))
             {
                 return new TrinityPower(SNOPower.DemonHunter_Multishot, 30f, CurrentTarget.Position);
@@ -237,7 +237,7 @@ namespace Trinity.Combat.Abilities
 
             // Elemental Arrow for non-kridershot
             if (CanCast(SNOPower.DemonHunter_ElementalArrow) && !Player.IsIncapacitated && !Legendary.Kridershot.IsEquipped &&
-                ((Player.PrimaryResource >= 10 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
+                ((Player.PrimaryResource >= 10 && !IsWaitingForSpecial) || Player.PrimaryResource >= minEnergyReserve))
             {
                 return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 65f, CurrentTarget.ACDGuid);
             }
@@ -255,7 +255,7 @@ namespace Trinity.Combat.Abilities
 
             // Cluster Arrow
             if (CanCast(SNOPower.DemonHunter_ClusterArrow) && !Player.IsIncapacitated &&
-                ((Player.PrimaryResource >= 40 && !IsWaitingForSpecial) || Player.PrimaryResource > MinEnergyReserve))
+                ((Player.PrimaryResource >= 40 && !IsWaitingForSpecial) || Player.PrimaryResource > minEnergyReserve))
             {
                 return new TrinityPower(SNOPower.DemonHunter_ClusterArrow, V.F("DemonHunter.ClusterArrow.UseRange"), CurrentTarget.ACDGuid);
             }
@@ -270,14 +270,14 @@ namespace Trinity.Combat.Abilities
             // Chakram normal attack
             if (Hotbar.Contains(SNOPower.DemonHunter_Chakram) && !Player.IsIncapacitated &&
                 !Runes.DemonHunter.ShurikenCloud.IsActive &&
-                ((Player.PrimaryResource >= 10 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
+                ((Player.PrimaryResource >= 10 && !IsWaitingForSpecial) || Player.PrimaryResource >= minEnergyReserve))
             {
                 return new TrinityPower(SNOPower.DemonHunter_Chakram, 50f, CurrentTarget.ACDGuid);
             }
 
             // Rapid Fire
             if (CanCast(SNOPower.DemonHunter_RapidFire, CanCastFlags.NoTimer) &&
-                !Player.IsIncapacitated && ((Player.PrimaryResource >= 16 && !IsWaitingForSpecial) || (Player.PrimaryResource > MinEnergyReserve)) &&
+                !Player.IsIncapacitated && ((Player.PrimaryResource >= 16 && !IsWaitingForSpecial) || (Player.PrimaryResource > minEnergyReserve)) &&
                 (Player.PrimaryResource >= Settings.Combat.DemonHunter.RapidFireMinHatred || LastPowerUsed == SNOPower.DemonHunter_RapidFire))
             {
                 // Players with grenades *AND* rapid fire should spam grenades at close-range instead
@@ -291,7 +291,7 @@ namespace Trinity.Combat.Abilities
 
             // Impale
             if (CanCast(SNOPower.DemonHunter_Impale) && !TargetUtil.AnyMobsInRange(12, 4) &&
-                ((Player.PrimaryResource >= 25 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve) &&
+                ((Player.PrimaryResource >= 25 && !IsWaitingForSpecial) || Player.PrimaryResource >= minEnergyReserve) &&
                 CurrentTarget.RadiusDistance <= 75f)
             {
                 return new TrinityPower(SNOPower.DemonHunter_Impale, 75f, CurrentTarget.ACDGuid);

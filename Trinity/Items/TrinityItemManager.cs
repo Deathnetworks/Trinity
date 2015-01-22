@@ -285,7 +285,7 @@ namespace Trinity.Items
 
                 if (evaluationType == ItemEvaluationType.Keep)
 
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", cItem.AcdItem.Name, cItem.AcdItem.InternalName, cItem.AcdItem.ItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "IR2 {0} [{1}] [{2}] = (" + action + ")", cItem.AcdItem.Name, cItem.AcdItem.InternalName, cItem.AcdItem.ItemType);
                 switch (action)
                 {
                     case Interpreter.InterpreterAction.KEEP:

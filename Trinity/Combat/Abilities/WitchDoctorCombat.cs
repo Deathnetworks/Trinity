@@ -215,14 +215,14 @@ namespace Trinity.Combat.Abilities
                     if (CanCast(SNOPower.Witchdoctor_Locust_Swarm) && Player.PrimaryResource >= 300 &&
                         !CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Locust_Swarm))
                     {
-                        return new TrinityPower(SNOPower.Witchdoctor_Locust_Swarm, 5f, CurrentTarget.ACDGuid);
+                        return new TrinityPower(SNOPower.Witchdoctor_Locust_Swarm, 20f, CurrentTarget.ACDGuid);
                     }
 
                     // Haunt 
                     if (Skills.WitchDoctor.Haunt.CanCast() && Player.PrimaryResource >= 50 &&
                         !CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Haunt))
                     {
-                        return new TrinityPower(SNOPower.Witchdoctor_Haunt, 21f, CurrentTarget.ACDGuid);
+                        return new TrinityPower(SNOPower.Witchdoctor_Haunt, 45f, CurrentTarget.ACDGuid);
                     }
 
                     // Acid Cloud
