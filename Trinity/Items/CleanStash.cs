@@ -109,7 +109,7 @@ namespace Trinity.Items
             {
                 Logger.Log("Cleaning stash...");
 
-                foreach (var item in ZetaDia.Me.Inventory.StashItems.Where(i => i.ACDGuid > 0 && i.IsValid).ToList())
+                foreach (var item in ZetaDia.Me.Inventory.StashItems.Where(i => i.ACDGuid != 0 && i.IsValid).ToList())
                 {
                     if (!ItemManager.Current.ShouldStashItem(item))
                     {

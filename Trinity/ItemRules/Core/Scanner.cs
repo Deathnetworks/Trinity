@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
@@ -123,7 +124,7 @@ namespace Trinity.ItemRules.Core
 
         public void Init(string input)
         {
-            this.Input = input;
+            Input = input;
             StartPos = 0;
             EndPos = 0;
             CurrentLine = 0;
@@ -139,7 +140,7 @@ namespace Trinity.ItemRules.Core
             return t;
         }
 
-         /// <summary>
+        /// <summary>
         /// executes a lookahead of the next token
         /// and will advance the scan on the input string
         /// </summary>
@@ -167,8 +168,8 @@ namespace Trinity.ItemRules.Core
 
             // this prevents double scanning and matching
             // increased performance
-            if (LookAheadToken != null 
-                && LookAheadToken.Type != TokenType._UNDETERMINED_ 
+            if (LookAheadToken != null
+                && LookAheadToken.Type != TokenType._UNDETERMINED_
                 && LookAheadToken.Type != TokenType._NONE_) return LookAheadToken;
 
             // if no scantokens specified, then scan for all of them (= backward compatible)
@@ -193,10 +194,10 @@ namespace Trinity.ItemRules.Core
                 {
                     Regex r = Patterns[scantokens[i]];
                     Match m = r.Match(input);
-                    if (m.Success && m.Index == 0 && ((m.Length > len) || (scantokens[i] < index && m.Length == len )))
+                    if (m.Success && m.Index == 0 && ((m.Length > len) || (scantokens[i] < index && m.Length == len)))
                     {
                         len = m.Length;
-                        index = scantokens[i];  
+                        index = scantokens[i];
                     }
                 }
 
@@ -237,104 +238,87 @@ namespace Trinity.ItemRules.Core
     public enum TokenType
     {
 
-            //Non terminal tokens:
-            _NONE_  = 0,
-            _UNDETERMINED_= 1,
+        //Non terminal tokens:
+        _NONE_ = 0,
+        _UNDETERMINED_ = 1,
 
-            //Non terminal tokens:
-            Start   = 2,
-            Expr    = 3,
-            SepExpr = 4,
-            OrExpr  = 5,
-            AndExpr = 6,
-            CompExpr= 7,
-            AddExpr = 8,
-            MultExpr= 9,
-            Atom    = 10,
+        //Non terminal tokens:
+        Start = 2,
+        Expr = 3,
+        SepExpr = 4,
+        OrExpr = 5,
+        AndExpr = 6,
+        CompExpr = 7,
+        AddExpr = 8,
+        MultExpr = 9,
+        Atom = 10,
 
-            //Terminal tokens:
-            EOF     = 11,
-            VARIABLE= 12,
-            STRING  = 13,
-            NUMBER  = 14,
-            BOOLEAN = 15,
-            SEPARATOR= 16,
-            OR      = 17,
-            AND     = 18,
-            EQUAL   = 19,
-            NOTEQUAL= 20,
-            SMALLEQ = 21,
-            GREATEQ = 22,
-            SMALLTH = 23,
-            GREATTH = 24,
-            PLUS    = 25,
-            MINUS   = 26,
-            MULT    = 27,
-            DIV     = 28,
-            BROPEN  = 29,
-            BRCLOSE = 30,
-            WHITESPACE= 31
+        //Terminal tokens:
+        EOF = 11,
+        VARIABLE = 12,
+        STRING = 13,
+        NUMBER = 14,
+        BOOLEAN = 15,
+        SEPARATOR = 16,
+        OR = 17,
+        AND = 18,
+        EQUAL = 19,
+        NOTEQUAL = 20,
+        SMALLEQ = 21,
+        GREATEQ = 22,
+        SMALLTH = 23,
+        GREATTH = 24,
+        PLUS = 25,
+        MINUS = 26,
+        MULT = 27,
+        DIV = 28,
+        BROPEN = 29,
+        BRCLOSE = 30,
+        WHITESPACE = 31
     }
 
     public class Token
     {
-        private int startpos;
-        private int endpos;
-        private string text;
-        private object value;
-
         // contains all prior skipped symbols
-        private List<Token> skipped;
 
-        public int StartPos { 
-            get { return startpos;} 
-            set { startpos = value; }
-        }
+        public int StartPos { get; set; }
 
-        public int Length { 
-            get { return endpos - startpos;} 
+        public int Length
+        {
+            get { return EndPos - StartPos; }
         }
 
-        public int EndPos { 
-            get { return endpos;} 
-            set { endpos = value; }
-        }
+        public int EndPos { get; set; }
 
-        public string Text { 
-            get { return text;} 
-            set { text = value; }
-        }
+        public string Text { get; set; }
 
-        public List<Token> Skipped { 
-            get { return skipped;} 
-            set { skipped = value; }
-        }
-        public object Value { 
-            get { return value;} 
-            set { this.value = value; }
-        }
+        public List<Token> Skipped { get; set; }
+
+        public object Value { get; set; }
 
         [XmlAttribute]
         public TokenType Type;
 
+        [DebuggerStepThrough]
         public Token()
             : this(0, 0)
         {
         }
-
+        [DebuggerStepThrough]
         public Token(int start, int end)
         {
             Type = TokenType._UNDETERMINED_;
-            startpos = start;
-            endpos = end;
+            StartPos = start;
+            EndPos = end;
             Text = ""; // must initialize with empty string, may cause null reference exceptions otherwise
             Value = null;
         }
 
+        [DebuggerStepThrough]
         public void UpdateRange(Token token)
         {
-            if (token.StartPos < startpos) startpos = token.StartPos;
-            if (token.EndPos > endpos) endpos = token.EndPos;
+            if (token.StartPos < StartPos) StartPos = token.StartPos;
+            if (token.EndPos > EndPos) EndPos = token.EndPos;
         }
 
         public override string ToString()

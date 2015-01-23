@@ -151,7 +151,7 @@ namespace Trinity.Combat.Abilities
                 {
                     var bestPierceTarget = TargetUtil.GetBestPierceTarget(45f);
                     if (bestPierceTarget != null)
-                        return new TrinityPower(SNOPower.x1_Crusader_Phalanx3, 7f, bestPierceTarget.ACDGuid);
+                        return new TrinityPower(SNOPower.x1_Crusader_Phalanx3, 45f, bestPierceTarget.ACDGuid);
                 }
 
                 // Blessed Shield : Piercing Shield

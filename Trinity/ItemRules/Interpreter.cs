@@ -426,6 +426,14 @@ namespace Trinity.ItemRules
                         + SEP + e.ToString()
                         , InterpreterAction.NULL, LogType.ERROR);
                 }
+                if (parseErrors != null && parseErrors.Count > 0)
+                {
+                    if (parseErrors.Count > 0)
+                        logOut("Have errors in rule! "
+                            + SEP + "last use rule: " + str
+                            + SEP + getParseErrors(parseErrors)
+                            + SEP + getFullItem(), InterpreterAction.NULL, LogType.ERROR);
+                }
             }
 
             logOut(evaluationType, validRule, action);
@@ -880,18 +888,7 @@ namespace Trinity.ItemRules
             itemDic.Add("[MAXMANA]", item.Stats.MaxMana);
             itemDic.Add("[MANAREG]", item.Stats.ManaRegen);
 
-
-            var ancientRank = 0;
-            try
-            {
-                if (item.ItemQualityLevel == ItemQuality.Legendary)
-                    ancientRank = item.GetAttribute<int>(ActorAttributeType.AncientRank);
-            }
-            catch (Exception)
-            {
-            }
-            itemDic.Add("[ANCIENT]", ancientRank);
-            
+            itemDic.Add("[ANCIENT]", item.AncientRank);
 
             // - ROS & MORE STATS ADDED -------------------------------------------//
             // This include Splash Damage, Cooldown Reduction, Resource Cost

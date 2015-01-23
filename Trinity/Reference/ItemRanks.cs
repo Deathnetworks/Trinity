@@ -23,7 +23,7 @@ namespace Trinity.Reference
                 var item = new Item(cItem.AcdItem);
                 var wrappedItem = new ItemWrapper(cItem.AcdItem);
 
-                if (Trinity.Settings.Loot.ItemRank.AncientItemsOnly && !cItem.IsAncient)
+                if (Trinity.Settings.Loot.ItemRank.AncientItemsOnly && wrappedItem.IsEquipment && !cItem.IsAncient)
                 {
                     result = false;
                 }
