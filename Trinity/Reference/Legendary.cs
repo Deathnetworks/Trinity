@@ -1643,7 +1643,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item ReapersWraps = new Item
         {
-            Id = 0,
+            Id = 298118,
             Name = "Reaper's Wraps",
             Quality = ItemQuality.Legendary,
             Slug = "reapers-wraps",
