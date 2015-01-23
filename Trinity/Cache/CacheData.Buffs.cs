@@ -70,6 +70,9 @@ namespace Trinity
             public bool HasBlessedShrine { get; private set; }
             public bool HasFrenzyShrine { get; private set; }
             public bool HasArchon { get; private set; }
+            public bool HasInvulnerableShrine { get; private set; }
+            public bool HasCastingShrine { get; set; }
+            public bool HasConduitPylon { get; set; }
             public DateTime LastUpdated = DateTime.MinValue;
 
             private Dictionary<int, CachedBuff> _buffsById = new Dictionary<int, CachedBuff>();
@@ -78,10 +81,6 @@ namespace Trinity
             {
                 using (new PerformanceLogger("UpdateCachedBuffsData"))
                 {
-
-                    if (!Player.IsValid)
-                        return;
-
                     if (DateTime.UtcNow.Subtract(LastUpdated).TotalMilliseconds < 500)
                         return;
 
@@ -100,6 +99,12 @@ namespace Trinity
                             HasBlessedShrine = true;
                         if (cachedBuff.Id == 30479) //Frenzy  (+25% atk speed)
                             HasFrenzyShrine = true;
+                        if (cachedBuff.Id == (int)SNOPower.Pages_Buff_Invulnerable)
+                            HasInvulnerableShrine = true;
+                        if (cachedBuff.Id == (int)SNOPower.Pages_Buff_Infinite_Casting)
+                            HasCastingShrine = true;
+                        if (cachedBuff.Id == (int)SNOPower.Pages_Buff_Electrified)
+                            HasCastingShrine = true;                        
 
                         if (!_buffsById.ContainsKey(buff.SNOId))
                             _buffsById.Add(buff.SNOId, cachedBuff);

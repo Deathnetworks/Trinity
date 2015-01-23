@@ -130,7 +130,7 @@ namespace Trinity.Combat.Abilities
             get
             {
                 // Conduit Pylon buff is active, no kite distance
-                if (GetBuffStacks(SNOPower.Pages_Buff_Electrified) > 0)
+                if (CacheData.Buffs.HasConduitPylon)
                     return 0;
 
                 return _kiteDistance;

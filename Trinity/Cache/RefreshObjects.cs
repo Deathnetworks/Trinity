@@ -413,22 +413,18 @@ namespace Trinity
                     var setting = Settings.Advanced.CacheWeightThresholdPct;
                     var threshold = setting > 0 && CurrentTarget != null ? CurrentTarget.Weight * ((double)setting / 100) : 0;
 
-                    var cache = ObjectCache.DistinctBy(c => c.RActorGuid).Where(c =>
+                    var lowPriorityObjects = ObjectCache.DistinctBy(c => c.RActorGuid).Where(c =>
+                        c.Type != GObjectType.Avoidance && c.Type != GObjectType.Unit ||
                         c.Weight < threshold && c.Distance > 12f && !c.IsElite
-                        ||
-                        c.Type != GObjectType.Avoidance &&
-                        c.Type != GObjectType.HealthGlobe &&
-                        c.Type != GObjectType.Unit
-
                         ).ToDictionary(x => x.RActorGuid, x => x);
 
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Cached {0}/{1} ({2:0}%) WeightThreshold={3}",
-                        cache.Count,
+                        lowPriorityObjects.Count,
                         ObjectCache.Count,
-                        cache.Count > 0 ? ((double)cache.Count / ObjectCache.Count) * 100 : 0,
+                        lowPriorityObjects.Count > 0 ? ((double)lowPriorityObjects.Count / ObjectCache.Count) * 100 : 0,
                         threshold);
 
-                    CacheData.LowPriorityObjectCache = cache;
+                    CacheData.LowPriorityObjectCache = lowPriorityObjects;
                 }
 
                 // We have a target and the cached was refreshed

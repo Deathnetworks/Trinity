@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
+using Org.BouncyCastle.Asn1.Esf;
 using Trinity.Helpers;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -36,10 +37,13 @@ namespace Trinity
             }
 
             public List<ACDItem> Backpack { get; private set; }
-
             public List<ACDItem> Stash { get; private set; }
             public List<ACDItem> Equipped { get; private set; }
+            public List<ACDItem> Ground { get; private set; }
+            public List<ACDItem> Buyback { get; private set; }
+            public List<ACDItem> Other { get; private set; }
             public HashSet<int> EquippedIds { get; private set; }
+            public bool IsGroundItemOverload { get; private set; }
 
             public void UpdateInventoryCache()
             {
@@ -83,14 +87,30 @@ namespace Trinity
                                 Equipped.Add(item);
                                 EquippedIds.Add(item.ActorSNO);
                                 break;
+
+                            case InventorySlot.Buyback:
+                                Buyback.Add(item);
+                                break;
+
+                            case InventorySlot.None:
+                                Ground.Add(item);
+                                break;
+
+                            default:
+                                    Other.Add(item);
+                                break;
+
                         }
                     }
 
+                    IsGroundItemOverload = (Ground.Count > 50);
+
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, 
-                        "Refreshed Inventory: Backpack={0} Stash={1} Equipped={2}",
+                        "Refreshed Inventory: Backpack={0} Stash={1} Equipped={2} Ground={3}",
                         Backpack.Count,
                         Stash.Count,
-                        Equipped.Count);
+                        Equipped.Count,
+                        Ground.Count);
                 }
             }
 
@@ -100,6 +120,9 @@ namespace Trinity
                 Stash = new List<ACDItem>();
                 Equipped = new List<ACDItem>();
                 EquippedIds = new HashSet<int>();
+                Ground = new List<ACDItem>();
+                Buyback = new List<ACDItem>();
+                Other = new List<ACDItem>();
             }
 
         }
