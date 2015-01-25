@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Buddy.Coroutines;
 using Trinity.Coroutines;
@@ -23,6 +24,8 @@ namespace Trinity.Items
     {
         private const int ItemMovementDelay = 100;
         const string HookName = "VendorRun";
+
+        public static bool IsSorting { get; private set; }
 
         /// <summary>
         /// Compares items for sorting. Returns -1 if item1 comes before item2. Returns 0 if items are of equal sort. Returns 1 if item1 should come after item2.
@@ -239,7 +242,7 @@ namespace Trinity.Items
         {
             if (!BotMain.IsRunning)
             {
-                Logger.LogError("Unable to sort backpack while bot is not running");
+                TaskDispatcher.Start(ret => SortTask(InventorySlot.BackpackItems), ret => !IsSorting);
                 return;
             }
 
@@ -268,7 +271,7 @@ namespace Trinity.Items
         {
             if (!BotMain.IsRunning)
             {
-                Logger.LogError("Unable to sort stash while bot is not running");
+                TaskDispatcher.Start(ret => SortTask(InventorySlot.SharedStash), ret => !IsSorting);
                 return;
             }
 
@@ -295,6 +298,8 @@ namespace Trinity.Items
 
         private static void RemoveBehavior()
         {
+            IsSorting = false;
+
             if (_sortBehavior != null)
             {
                 try
@@ -317,12 +322,15 @@ namespace Trinity.Items
         /// </summary>
         /// <returns>Composite.</returns>
         public static Composite CreateSortBehavior(InventorySlot inventorySlot)
-        {
+        {            
             return new ActionRunCoroutine(ret => SortTask(inventorySlot));
         }
 
-        private static async Task<bool> SortTask(InventorySlot inventorySlot)
-        {
+        internal static async Task<bool> SortTask(InventorySlot inventorySlot)
+        {            
+
+            IsSorting = true;
+
             if (!ZetaDia.IsInGame)
                 return false;
             if (ZetaDia.IsLoadingWorld)
@@ -362,7 +370,7 @@ namespace Trinity.Items
             {
                 wrappedItems = ZetaDia.Me.Inventory.StashItems.Where(i => i.IsValid).Select(i => new ItemWrapper(i)).ToList();
 
-                int maxStashRow = ZetaDia.Me.Inventory.NumSharedStashSlots / 7;
+                int maxStashRow = ZetaDia.Me.Inventory.NumSharedStashSlots/7;
                 // 7 columns, 10 rows x 5 pages
                 _usedGrid = new bool[7, maxStashRow];
             }
@@ -437,6 +445,7 @@ namespace Trinity.Items
 
             RemoveBehavior();
             return true;
+         
         }
 
         public static async Task<bool> SortItems(InventorySlot inventorySlot)

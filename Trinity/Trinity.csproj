@@ -126,7 +126,9 @@
     <Compile Include="Helpers\LookupList.cs" />
     <Compile Include="Helpers\MemoryHelper.cs" />
     <Compile Include="Helpers\SystemInformation.cs" />
+    <Compile Include="Helpers\TaskDispatcher.cs" />
     <Compile Include="Helpers\ToStringReflector.cs" />
+    <Compile Include="Helpers\Worker.cs" />
     <Compile Include="Helpers\XpInactivity.cs" />
     <Compile Include="Helpers\DebugUtil.cs" />
     <Compile Include="Helpers\DoubleInt.cs" />
