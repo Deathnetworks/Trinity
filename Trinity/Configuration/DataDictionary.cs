@@ -1003,7 +1003,7 @@ namespace Trinity
             211861, // Pinata
 			196945, // a2dun_Spider_EggSack__Chest
             70534,  // a2dun_Spider_Chest
-       
+            289794, // Weaponracks on battlefields of eternity --> best place to farm white crafting materials
             103919, // Demonic Vessels         
             78030,  // GizmoType: Chest Name: trOut_Wilderness_Scarecrow_A-3924 ActorSNO: 78030 
             173325, // Anvil of Fury

@@ -12,6 +12,26 @@ namespace Trinity.Reference
         // Load static version of sets class
         public class Sets : Reference.Sets { }
 
+        /// <summary>
+        /// Bane of the Powerful - Gain 20% increased damage for 30.0 seconds after killing an elite pack. Increases damage against elites by 15.0% (Requires Rank 25)
+        /// </summary>
+        public static Item BaneOfThePowerful = new Item
+        {
+            Id = 405775,
+            Name = "Bane of the Powerful",
+            Quality = ItemQuality.Legendary,
+            Slug = "bane-of-the-powerful",
+            ItemType = ItemType.LegendaryGem,
+            BaseType = ItemBaseType.Misc,
+            InternalName = "Unique_Gem_001_x1",
+            DataUrl = "https://us.battle.net/api/d3/data/item/bane-of-the-powerful",
+            Url = "https://us.battle.net/d3/en/item/bane-of-the-powerful",
+            RelativeUrl = "/d3/en/item/bane-of-the-powerful",
+            IsCrafted = false,
+            LegendaryAffix = "Gain 20% increased damage for 30.0 seconds after killing an elite pack. Increases damage against elites by 15.0% (Requires Rank 25)",
+            SetName = "",
+        };
+
         // The following items are not listed on the game guide index pages (dafuq blizzard? update your guide already)
 
         /// <summary>
