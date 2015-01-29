@@ -167,6 +167,19 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.Monk_SweepingWind);
             }
 
+            float wolRange = Legendary.TzoKrinsGaze.IsEquipped ? 55f : 16f;
+            // Wave of light
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight) &&
+                (TargetUtil.AnyMobsInRange(wolRange, Settings.Combat.Monk.MinWoLTrashCount) || TargetUtil.IsEliteTargetInRange(wolRange)) &&
+                (Player.PrimaryResource >= 75 && !IsWaitingForSpecial || Player.PrimaryResource > MinEnergyReserve) &&
+                // optional check for SW stacks
+                (Settings.Combat.Monk.SWBeforeWoL && (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3) || !Settings.Combat.Monk.SWBeforeWoL) &&
+                Monk_HasMantraAbilityAndBuff())
+            {
+                Monk_TickSweepingWindSpam();
+                return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, TargetUtil.GetBestClusterPoint(), -1, CurrentTarget.ACDGuid, 0, 1);
+            }
+
             // Exploding Palm
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
                 CanCast(SNOPower.Monk_ExplodingPalm, CanCastFlags.NoTimer) &&
@@ -226,19 +239,7 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.Monk_CycloneStrike, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 2, 2);
             }
 
-            float wolRange = Legendary.TzoKrinsGaze.IsEquipped ? 55f : 16f;
 
-            // Wave of light
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight) &&
-                (TargetUtil.AnyMobsInRange(wolRange, Settings.Combat.Monk.MinWoLTrashCount) || TargetUtil.IsEliteTargetInRange(wolRange)) &&
-                (Player.PrimaryResource >= 75 && !IsWaitingForSpecial || Player.PrimaryResource > MinEnergyReserve) &&
-                // optional check for SW stacks
-                (Settings.Combat.Monk.SWBeforeWoL && (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3) || !Settings.Combat.Monk.SWBeforeWoL) &&
-                Monk_HasMantraAbilityAndBuff())
-            {
-                Monk_TickSweepingWindSpam();
-                return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, TargetUtil.GetBestClusterPoint(), -1, CurrentTarget.ACDGuid, 0, 1);
-            }
 
             // For tempest rush re-use
             if (!UseOOCBuff && Player.PrimaryResource >= 15 && CanCast(SNOPower.Monk_TempestRush) &&
