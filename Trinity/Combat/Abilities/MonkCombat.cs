@@ -122,8 +122,8 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.Monk_SevenSidedStrike, 16f, CurrentTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 3);
             }
 
-            int swMinTime = 4000;
-            int swMaxTime = 5400;
+            var swMinTime = 4000;
+            var swMaxTime = 5400;
             if (CacheData.Inventory.EquippedIds.Contains(405804)) // Taeguk gem refresh (3 seconds)
             {
                 swMinTime = 2000;
@@ -166,25 +166,31 @@ namespace Trinity.Combat.Abilities
                 Trinity.SweepWindSpam = DateTime.UtcNow;
                 return new TrinityPower(SNOPower.Monk_SweepingWind);
             }
+            
+            var cycloneStrikeRange = Runes.Monk.Implosion.IsActive ? 34f : 24f;
+            var cycloneStrikeSpirit = Runes.Monk.EyeOfTheStorm.IsActive ? 30 : 50;
 
-            float wolRange = Legendary.TzoKrinsGaze.IsEquipped ? 55f : 16f;
-            // Wave of light
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight) &&
-                (TargetUtil.AnyMobsInRange(wolRange, Settings.Combat.Monk.MinWoLTrashCount) || TargetUtil.IsEliteTargetInRange(wolRange)) &&
-                (Player.PrimaryResource >= 75 && !IsWaitingForSpecial || Player.PrimaryResource > MinEnergyReserve) &&
-                // optional check for SW stacks
-                (Settings.Combat.Monk.SWBeforeWoL && (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3) || !Settings.Combat.Monk.SWBeforeWoL) &&
-                Monk_HasMantraAbilityAndBuff())
+            // Cyclone Strike
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_CycloneStrike) &&
+                (
+                 TargetUtil.AnyElitesInRange(cycloneStrikeRange, 1) ||
+                 TargetUtil.AnyMobsInRange(cycloneStrikeRange, Settings.Combat.Monk.MinCycloneTrashCount) ||
+                 (CurrentTarget.RadiusDistance >= 15f && CurrentTarget.RadiusDistance <= cycloneStrikeRange) // pull the current target into attack range
+                ) && TimeSincePowerUse(SNOPower.Monk_CycloneStrike) > 3000 &&
+
+                // Cyclone if more than 25% of monsters within cyclone range are at least 10f away
+                TargetUtil.IsPercentUnitsWithinBand(10f, cycloneStrikeRange, 0.25) &&
+
+                (Player.PrimaryResource >= (cycloneStrikeSpirit + MinEnergyReserve)))
             {
                 Monk_TickSweepingWindSpam();
-                return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, TargetUtil.GetBestClusterPoint(), -1, CurrentTarget.ACDGuid, 0, 1);
+                return new TrinityPower(SNOPower.Monk_CycloneStrike, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 2, 2);
             }
 
             // Exploding Palm
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
                 CanCast(SNOPower.Monk_ExplodingPalm, CanCastFlags.NoTimer) &&
-                !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.Monk_ExplodingPalm) &&
-                Player.PrimaryResource >= 40)
+                !Skills.Monk.ExplodingPalm.IsTrackedOnUnit(CurrentTarget))
             {
                 return new TrinityPower(SNOPower.Monk_ExplodingPalm, 2f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 3);
             }
@@ -218,29 +224,19 @@ namespace Trinity.Combat.Abilities
                
             }
 
-            
-            var cycloneStrikeRange = Runes.Monk.Implosion.IsActive ? 34f : 24f;
-            var cycloneStrikeSpirit = Runes.Monk.EyeOfTheStorm.IsActive ? 30 : 50;
-
-            // Cyclone Strike
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_CycloneStrike) &&
-                (
-                 TargetUtil.AnyElitesInRange(cycloneStrikeRange, 1) ||
-                 TargetUtil.AnyMobsInRange(cycloneStrikeRange, Settings.Combat.Monk.MinCycloneTrashCount) ||
-                 (CurrentTarget.RadiusDistance >= 15f && CurrentTarget.RadiusDistance <= cycloneStrikeRange) // pull the current target into attack range
-                ) &&
-
-                // Cyclone if more than 25% of monsters within cyclone range are at least 10f away
-                TargetUtil.IsPercentUnitsWithinBand(10f, cycloneStrikeRange, 0.25) &&
-
-                (Player.PrimaryResource >= (cycloneStrikeSpirit + MinEnergyReserve)))
+            var wolRange = Legendary.TzoKrinsGaze.IsEquipped ? 55f : 16f;
+            // Wave of light
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight) && !MonkHasNoPrimary &&
+                (TargetUtil.AnyMobsInRange(wolRange, Settings.Combat.Monk.MinWoLTrashCount) || TargetUtil.IsEliteTargetInRange(wolRange)) &&
+                (Player.PrimaryResource >= 75 && !IsWaitingForSpecial || Player.PrimaryResource > MinEnergyReserve) &&
+                // optional check for SW stacks
+                (Settings.Combat.Monk.SWBeforeWoL && (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3) || !Settings.Combat.Monk.SWBeforeWoL) &&
+                Monk_HasMantraAbilityAndBuff())
             {
                 Monk_TickSweepingWindSpam();
-                return new TrinityPower(SNOPower.Monk_CycloneStrike, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 2, 2);
+                return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, TargetUtil.GetBestClusterPoint(), -1, CurrentTarget.ACDGuid, 0, 1);
             }
-
-
-
+            
             // For tempest rush re-use
             if (!UseOOCBuff && Player.PrimaryResource >= 15 && CanCast(SNOPower.Monk_TempestRush) &&
                 Trinity.TimeSinceUse(SNOPower.Monk_TempestRush) <= 150 &&
@@ -398,7 +394,8 @@ namespace Trinity.Combat.Abilities
             }
 
             // Wave of light as primary 
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight))
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight) && MonkHasNoPrimary &&
+                (!hasSWK || Skills.Monk.ExplodingPalm.IsTrackedOnUnit(CurrentTarget)))
             {
                 Monk_TickSweepingWindSpam();
                 return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, TargetUtil.GetBestClusterPoint(), -1, CurrentTarget.ACDGuid, 0, 1);
@@ -668,6 +665,16 @@ namespace Trinity.Combat.Abilities
             return (GetHasBuff(SNOPower.Monk_SweepingWind) || !Hotbar.Contains(SNOPower.Monk_SweepingWind));
         }
 
+        private static bool MonkHasNoPrimary
+        {
+            get
+            {
+                return !(Hotbar.Contains(SNOPower.Monk_CripplingWave) ||
+                    Hotbar.Contains(SNOPower.Monk_FistsofThunder) ||
+                    Hotbar.Contains(SNOPower.Monk_DeadlyReach) ||
+                    Hotbar.Contains(SNOPower.Monk_WayOfTheHundredFists));
+            }
+        }
 
     }
 }
