@@ -450,6 +450,14 @@ namespace Trinity
                 foreach (var marker in legendaryItemMarkers)
                 {
                     var name = (marker.MinimapTexture == setItemMarkerTexture ? "Set Item" : "Legendary Item") + " Minimap Marker";
+                    var hash = marker.NameHash + marker.Position.ToString();
+
+                    if (GenericBlacklist.ContainsKey(hash))
+                    {
+                        Logger.LogDebug(LogCategory.CacheManagement, "Ignoring Marker because it's blacklisted {0} {1} at {2} distance {3}", name, marker.NameHash, marker.Position, marker.Position.Distance(Player.Position));
+                        continue;
+                    }
+
                     Logger.LogDebug(LogCategory.CacheManagement, "Adding {0} {1} at {2} distance {3}", name, marker.NameHash, marker.Position, marker.Position.Distance(Player.Position));
                     ObjectCache.Add(new TrinityCacheObject()
                     {
@@ -460,8 +468,10 @@ namespace Trinity
                         ActorType = ActorType.Item,
                         Type = GObjectType.Item,
                         ItemQuality = ItemQuality.Legendary,
+                        ObjectHash = hash,
                         Radius = 2f,
-                        Weight = 50
+                        Weight = 50,
+                        IsMarker = true
                     });
                 }
 

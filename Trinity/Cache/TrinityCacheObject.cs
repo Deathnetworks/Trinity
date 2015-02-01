@@ -406,5 +406,7 @@ namespace Trinity
         {
             return string.Format("{0}, Type={1} Dist={2} IsBossOrEliteRareUnique={3} IsAttackable={4}", InternalName, Type, RadiusDistance, IsBossOrEliteRareUnique, IsAttackable);
         }
+
+        public bool IsMarker { get; set; }
     }
 }

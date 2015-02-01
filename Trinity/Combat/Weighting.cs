@@ -1268,7 +1268,7 @@ namespace Trinity
                 }
 
                 // Loop through all the objects and give them a weight
-                if (CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0 && CurrentTarget.RActorGuid != LastTargetRactorGUID)
+            if (CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0 && CurrentTarget.RActorGuid != LastTargetRactorGUID || CurrentTarget != null && CurrentTarget.IsMarker)
                 {
                     RecordTargetHistory();
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Target changed to {0} // {1} ({2}) {3}", CurrentTarget.ActorSNO, CurrentTarget.InternalName, CurrentTarget.Type, CurrentTarget.WeightInfo);
@@ -1294,7 +1294,8 @@ namespace Trinity
 
                 bool isHoradricRelic = (CurrentTarget.InternalName.ToLower().StartsWith("horadricrelic") && CurrentTarget.TimesBeenPrimaryTarget > 5);
 
-                if ((!CurrentTarget.IsBoss && CurrentTarget.TimesBeenPrimaryTarget > 50 && !isEliteLowHealth && !isLegendaryItem) || isHoradricRelic)
+                if ((!CurrentTarget.IsBoss && CurrentTarget.TimesBeenPrimaryTarget > 50 && !isEliteLowHealth && !isLegendaryItem) || isHoradricRelic ||
+                    (CurrentTarget.TimesBeenPrimaryTarget > 100 && isLegendaryItem))
                 {
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Blacklisting target {0} ActorSNO={1} RActorGUID={2} due to possible stuck/flipflop!",
                         CurrentTarget.InternalName, CurrentTarget.ActorSNO, CurrentTarget.RActorGuid);
