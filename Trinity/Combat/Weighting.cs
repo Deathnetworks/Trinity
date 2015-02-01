@@ -1295,10 +1295,12 @@ namespace Trinity
                 bool isHoradricRelic = (CurrentTarget.InternalName.ToLower().StartsWith("horadricrelic") && CurrentTarget.TimesBeenPrimaryTarget > 5);
 
                 if ((!CurrentTarget.IsBoss && CurrentTarget.TimesBeenPrimaryTarget > 50 && !isEliteLowHealth && !isLegendaryItem) || isHoradricRelic ||
-                    (CurrentTarget.TimesBeenPrimaryTarget > 100 && isLegendaryItem))
+                    (CurrentTarget.TimesBeenPrimaryTarget > 200 && isLegendaryItem))
                 {
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Blacklisting target {0} ActorSNO={1} RActorGUID={2} due to possible stuck/flipflop!",
                         CurrentTarget.InternalName, CurrentTarget.ActorSNO, CurrentTarget.RActorGuid);
+
+                    var expires = CurrentTarget.IsMarker ? DateTime.UtcNow.AddSeconds(60) : DateTime.UtcNow.AddSeconds(30);
 
                     // Add to generic blacklist for safety, as the RActorGUID on items and gold can change as we move away and get closer to the items (while walking around corners)
                     // So we can't use any ID's but rather have to use some data which never changes (actorSNO, position, type, worldID)
@@ -1306,7 +1308,7 @@ namespace Trinity
                     {
                         Key = CurrentTarget.ObjectHash,
                         Value = null,
-                        Expires = DateTime.UtcNow.AddSeconds(30)
+                        Expires = expires
                     });
                 }
             }
