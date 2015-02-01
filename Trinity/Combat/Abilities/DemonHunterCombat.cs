@@ -58,6 +58,9 @@ namespace Trinity.Combat.Abilities
 
             return null;
         }
+
+        private static int _maxSentryCount = 2 + (Legendary.BombadiersRucksack.IsEquipped ? 2 : 0) + (Passives.DemonHunter.CustomEngineering.IsActive ? 1 : 0);
+
         /// <summary>
         /// Gets the best combat power for the current conditions
         /// </summary>
@@ -96,10 +99,12 @@ namespace Trinity.Combat.Abilities
             }
 
             // Sentry Turret
-            if (!Player.IsIncapacitated && CanCast(SNOPower.DemonHunter_Sentry, CanCastFlags.NoTimer) &&
-               TargetUtil.AnyMobsInRange(65))
+            if (!Player.IsIncapacitated && CanCast(SNOPower.DemonHunter_Sentry, CanCastFlags.NoTimer) && TargetUtil.AnyMobsInRange(65))
             {
-                return new TrinityPower(SNOPower.DemonHunter_Sentry, 75f, TargetUtil.GetBestClusterPoint(35f, 75f, false));
+                if (Trinity.PlayerOwnedDHSentryCount < _maxSentryCount)
+                {
+                    return new TrinityPower(SNOPower.DemonHunter_Sentry, 75f, TargetUtil.GetBestClusterPoint(35f, 75f, false));
+                }
             }
 
             // Caltrops

@@ -481,9 +481,9 @@ namespace Trinity
                 {
                     if (DataDictionary.DemonHunterSentryIds.Contains(CurrentCacheObject.ActorSNO))
                     {
-                        if (CurrentCacheObject.IsSummonedByPlayer)
+                        if (CurrentCacheObject.IsSummonedByPlayer && CurrentCacheObject.Distance < 60f)
                         {
-                            PlayerOwnedDHSentryCount++;
+                            PlayerOwnedDHSentryCount++;                           
                             c_IgnoreSubStep = "IsPlayerSummoned";
                         }
                         return false;
@@ -527,6 +527,7 @@ namespace Trinity
             }
             return true;
         }
+
 
     }
 }
