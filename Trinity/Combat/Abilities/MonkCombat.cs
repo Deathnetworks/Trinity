@@ -64,7 +64,7 @@ namespace Trinity.Combat.Abilities
             }
 
             // InnerSanctuary 
-            if (!UseOOCBuff && TargetUtil.EliteOrTrashInRange(16f) && CanCast(SNOPower.X1_Monk_InnerSanctuary))
+            if (!UseOOCBuff && (TargetUtil.EliteOrTrashInRange(16f) || hasSWK && hasInnaSet && TargetUtil.AnyMobsInRange(15f)) && CanCast(SNOPower.X1_Monk_InnerSanctuary))
             {
                 return new TrinityPower(SNOPower.X1_Monk_InnerSanctuary, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 1, 1);
             }
@@ -187,20 +187,6 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.Monk_CycloneStrike, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 2, 2);
             }
 
-            // Exploding Palm
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
-                CanCast(SNOPower.Monk_ExplodingPalm, CanCastFlags.NoTimer) &&
-                !Skills.Monk.ExplodingPalm.IsTrackedOnUnit(CurrentTarget))
-            {
-                return new TrinityPower(SNOPower.Monk_ExplodingPalm, 2f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 3);
-            }
-
-            // Make a mega-splosion
-            if (ShouldSpreadExplodingPalm())
-            {
-                ChangeTarget();
-            }
-
             // Dashing Strike
             if (CanCastDashingStrike)
             {
@@ -221,8 +207,22 @@ namespace Trinity.Combat.Abilities
                     }
                     return new TrinityPower(SNOPower.X1_Monk_DashingStrike, Monk_MaxDashingStrikeRange, CurrentTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 2);
                 }
-               
             }
+
+            // Exploding Palm
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
+                CanCast(SNOPower.Monk_ExplodingPalm, CanCastFlags.NoTimer) &&
+                !Skills.Monk.ExplodingPalm.IsTrackedOnUnit(CurrentTarget))
+            {
+                return new TrinityPower(SNOPower.Monk_ExplodingPalm, 2f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 3);
+            }
+
+            // Make a mega-splosion
+            if (ShouldSpreadExplodingPalm())
+            {
+                ChangeTarget();
+            }
+
 
             var wolRange = Legendary.TzoKrinsGaze.IsEquipped ? 55f : 16f;
             // Wave of light
@@ -395,7 +395,7 @@ namespace Trinity.Combat.Abilities
 
             // Wave of light as primary 
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight) && MonkHasNoPrimary &&
-                (!hasSWK || Skills.Monk.ExplodingPalm.IsTrackedOnUnit(CurrentTarget)))
+                (Skills.Monk.ExplodingPalm.IsTrackedOnUnit(CurrentTarget) || !Hotbar.Contains(SNOPower.Monk_ExplodingPalm)))
             {
                 Monk_TickSweepingWindSpam();
                 return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, TargetUtil.GetBestClusterPoint(), -1, CurrentTarget.ACDGuid, 0, 1);
@@ -412,11 +412,11 @@ namespace Trinity.Combat.Abilities
                 // enough resources and mobs nearby
                 Player.PrimaryResourcePct > 0.30 && TargetUtil.AnyMobsInRange(15f, 4) &&
 
-                // Don't bother if 3 or more targets already have EP
-                !TargetUtil.IsUnitWithDebuffInRangeOfPosition(15f, TargetUtil.GetBestClusterPoint(), SNOPower.Monk_ExplodingPalm, 3) &&
+                // Don't bother if 10 or more targets already have EP
+                !TargetUtil.IsUnitWithDebuffInRangeOfPosition(15f, TargetUtil.GetBestClusterPoint(), SNOPower.Monk_ExplodingPalm, 10) &&
 
                 // Avoid rapidly changing targets
-                DateTime.UtcNow.Subtract(_lastTargetChange).TotalMilliseconds > 1500 &&
+                DateTime.UtcNow.Subtract(_lastTargetChange).TotalMilliseconds > 500 &&
 
                 // Current target is valid
                 CurrentTarget != null && CurrentTarget.IsUnit && !CurrentTarget.IsTreasureGoblin;
