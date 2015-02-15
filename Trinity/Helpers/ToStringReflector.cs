@@ -20,7 +20,7 @@ namespace Trinity.Helpers
             }
             foreach (var field in t.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
             {
-                output += field.Name + "=" + t.GetProperty(field.Name).GetValue(obj, null) + " ";
+                output += field.Name + "=" + t.GetField(field.Name).GetValue(obj) + " ";
             }
             return output;
         }

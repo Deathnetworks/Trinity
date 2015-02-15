@@ -36,7 +36,7 @@ namespace Trinity
         /// <returns></returns>
         private static RunStatus GetRunStatus(RunStatus status)
         {
-            MonkCombat.Monk_MaintainTempestRush();
+            MonkCombat.MaintainTempestRush();
 
             string extras = "";
             if (_isWaitingForPower)
@@ -119,7 +119,7 @@ namespace Trinity
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget was passed as null! Continuing...");
                     }
 
-                    MonkCombat.Monk_MaintainTempestRush();
+                    MonkCombat.MaintainTempestRush();
 
                     // Refresh the object Cache every time
                     RefreshDiaObjectCache();
@@ -163,7 +163,7 @@ namespace Trinity
                     }
 
                     if (CurrentTarget != null)
-                        AssignMonsterTargetPower();
+                        AssignPower();
 
                     // Pop a potion when necessary
 
@@ -309,7 +309,7 @@ namespace Trinity
                         bool Monk_SpecialMovement = ((CurrentTarget.Type == GObjectType.Gold ||
                             CurrentTarget.IsUnit ||
                             CurrentTarget.Type == GObjectType.Barricade ||
-                            CurrentTarget.Type == GObjectType.Destructible) && MonkCombat.Monk_TempestRushReady());
+                            CurrentTarget.Type == GObjectType.Destructible) && MonkCombat.IsTempestRushReady());
 
                         // If we're doing avoidance, globes or backtracking, try to use special abilities to move quicker
                         if ((CurrentTarget.Type == GObjectType.Avoidance ||
@@ -765,7 +765,7 @@ namespace Trinity
         /// <summary>
         /// Checks to see if we need a new monster power and will assign it to <see cref="CurrentPower"/>, distinguishes destructables/barricades from units
         /// </summary>
-        private static void AssignMonsterTargetPower()
+        private static void AssignPower()
         {
             using (new PerformanceLogger("HandleTarget.AssignMonsterTargetPower"))
             {
@@ -776,8 +776,8 @@ namespace Trinity
                     if (CurrentTarget.IsUnit)
                     {
                         // Pick a suitable ability
-                        if (CurrentTarget != null)
-                            CombatBase.CurrentPower = AbilitySelector();
+                        CombatBase.CurrentPower = AbilitySelector();
+
                         if (Player.IsInCombat && CombatBase.CurrentPower.SNOPower == SNOPower.None && !Player.IsIncapacitated)
                         {
                             NoAbilitiesAvailableInARow++;
@@ -796,7 +796,14 @@ namespace Trinity
                     }
                     // Select an ability for destroying a destructible with in advance
                     if (CurrentTarget.Type == GObjectType.Destructible || CurrentTarget.Type == GObjectType.Barricade)
-                        CombatBase.CurrentPower = AbilitySelector(false, false, true);
+                        CombatBase.CurrentPower = AbilitySelector(UseDestructiblePower: true);
+
+                    // Return since we should have assigned a power
+                    return;
+                }
+                if (!_isWaitingForPower && CombatBase.CurrentPower == null)
+                {
+                    CombatBase.CurrentPower = AbilitySelector(UseOOCBuff: true);
                 }
             }
         }
@@ -914,7 +921,7 @@ namespace Trinity
                 if (CombatBase.CanCast(SNOPower.Monk_TempestRush) && Player.PrimaryResource >= Settings.Combat.Monk.TR_MinSpirit &&
                     ((CurrentTarget.Type == GObjectType.Item && CurrentTarget.Distance > 20f) || CurrentTarget.Type != GObjectType.Item) &&
                     Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly &&
-                    MonkCombat.Monk_TempestRushReady())
+                    MonkCombat.IsTempestRushReady())
                 {
                     ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, CurrentDestination, CurrentWorldDynamicId, -1);
                     CacheData.AbilityLastUsed[SNOPower.Monk_TempestRush] = DateTime.UtcNow;
@@ -1278,10 +1285,17 @@ namespace Trinity
                     string powerResultInfo = CombatBase.CurrentPower.TargetPosition != Vector3.Zero ? "at " + NavHelper.PrettyPrintVector3(CombatBase.CurrentPower.TargetPosition) + " dist=" + (int)dist : "";
                     powerResultInfo += CombatBase.CurrentPower.TargetACDGUID != -1 ? " on " + CombatBase.CurrentPower.TargetACDGUID : "";
                     Logger.LogDebug("Used Power {0} " + powerResultInfo, CombatBase.CurrentPower.SNOPower);
-                    if (CombatBase.CurrentPower.SNOPower == SNOPower.Monk_TempestRush)
-                        MonkCombat.LastTempestRushLocation = CombatBase.CurrentPower.TargetPosition;
 
-                    MonkCombat.Monk_MaintainTempestRush();
+                    // Monk Stuffs get special attention
+                    {
+                        if (CombatBase.CurrentPower.SNOPower == SNOPower.Monk_TempestRush)
+                            MonkCombat.LastTempestRushLocation = CombatBase.CurrentPower.TargetPosition;
+                        if (CombatBase.CurrentPower.SNOPower == SNOPower.Monk_SweepingWind)
+                            MonkCombat.LastSweepingWindRefresh = DateTime.UtcNow;
+
+                        MonkCombat.MaintainTempestRush();
+                    }
+
                     SpellTracker.TrackSpellOnUnit(CombatBase.CurrentPower.TargetACDGUID, CombatBase.CurrentPower.SNOPower);
                     SpellHistory.RecordSpell(CombatBase.CurrentPower);
 
@@ -1291,11 +1305,7 @@ namespace Trinity
 
                     // See if we should force a long wait AFTERWARDS, too
                     // Force waiting AFTER power use for certain abilities
-                    _isWaitingAfterPower = false;
-                    if (CombatBase.CurrentPower.ShouldWaitAfterUse)
-                    {
-                        _isWaitingAfterPower = true;
-                    }
+                    _isWaitingAfterPower = CombatBase.CurrentPower.ShouldWaitAfterUse;
                 }
 
                 _shouldPickNewAbilities = true;

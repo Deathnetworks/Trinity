@@ -1,23 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading;
 using Trinity.Combat.Abilities;
 using Trinity.DbProvider;
 using Trinity.Helpers;
-using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Bot;
-using Zeta.Common.Plugins;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 
 namespace Trinity
 {
-    public partial class Trinity : IPlugin
+    public partial class Trinity 
     {
-        internal static int lastSceneId = -1;
+        internal static int LastSceneId = -1;
 
         internal static Stopwatch HotbarRefreshTimer = new Stopwatch();
 
@@ -76,7 +72,7 @@ namespace Trinity
                     // Pop a potion when necessary
                     if (Player.CurrentHealthPct <= CombatBase.EmergencyHealthPotionLimit)
                     {
-                        Trinity.UsePotionIfNeededTask();
+                        UsePotionIfNeededTask();
                     }
                 }
                 _statusText = "[Trinity] No more targets - DemonBuddy/profile management is now in control";
@@ -89,11 +85,11 @@ namespace Trinity
 
                 // Nothing to do... do we have some maintenance we can do instead, like out of combat buffing?
 
-                if (DateTime.UtcNow.Subtract(lastMaintenanceCheck).TotalMilliseconds > 150)
+                if (DateTime.UtcNow.Subtract(_lastMaintenanceCheck).TotalMilliseconds > 150)
                 {
                     using (new PerformanceLogger("TargetCheck.OOCBuff"))
                     {
-                        lastMaintenanceCheck = DateTime.UtcNow;
+                        _lastMaintenanceCheck = DateTime.UtcNow;
 
                         bool isLoopingAnimation = ZetaDia.Me.LoopingAnimationEndTime > 0;
 
@@ -102,19 +98,15 @@ namespace Trinity
                             BarbarianCombat.AllowSprintOOC = true;
                             DisableOutofCombatSprint = false;
 
-                            powerBuff = AbilitySelector(false, true, false);
+                            powerBuff = AbilitySelector(false, true);
 
                             if (powerBuff.SNOPower != SNOPower.None)
                             {
 
                                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Using OOC Buff: {0}", powerBuff.SNOPower.ToString());
-                                if (powerBuff.WaitTicksBeforeUse > 0)
-                                    BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitBeforeUseDelay));
                                 ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetACDGUID);
                                 LastPowerUsed = powerBuff.SNOPower;
                                 CacheData.AbilityLastUsed[powerBuff.SNOPower] = DateTime.UtcNow;
-                                if (powerBuff.WaitTicksAfterUse > 0)
-                                    BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitAfterUseDelay));
 
                             }
                         }
@@ -127,7 +119,7 @@ namespace Trinity
                 }
                 CurrentTarget = null;
 
-                if ((Trinity.ForceVendorRunASAP || Trinity.WantToTownRun) && TownRun.TownRunTimerRunning())
+                if ((ForceVendorRunASAP || WantToTownRun) && TownRun.TownRunTimerRunning())
                 {
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Waiting for town run timer (Target Check)", true);
                     return TargetCheckResult(true, "Waiting for TownRunTimer");
@@ -136,7 +128,7 @@ namespace Trinity
                 return TargetCheckResult(false, "End of TargetCheck");
             }
         }
-        private static DateTime lastMaintenanceCheck = DateTime.UtcNow;
+        private static DateTime _lastMaintenanceCheck = DateTime.UtcNow;
 
         private static void ClearBlacklists()
         {

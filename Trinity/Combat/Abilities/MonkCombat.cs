@@ -1,12 +1,11 @@
 using System;
 using System.Linq;
-using Trinity.Cache;
 using Trinity.Config.Combat;
 using Trinity.DbProvider;
-using Trinity.Objects;
 using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
+using Zeta.Bot.Logic;
 using Zeta.Bot.Profile.Common;
 using Zeta.Common;
 using Zeta.Game;
@@ -17,10 +16,18 @@ namespace Trinity.Combat.Abilities
 {
     public class MonkCombat : CombatBase
     {
-
-        private static float Monk_MaxDashingStrikeRange = 55f;
+        private const float MaxDashingStrikeRange = 55f;
         internal static Vector3 LastTempestRushLocation = Vector3.Zero;
         private static DateTime _lastTargetChange = DateTime.MinValue;
+        internal static DateTime LastSweepingWindRefresh = DateTime.MinValue;
+
+        static int _swMinTime = 4000;
+        const int SwMaxTime = 5400;
+        const int SwMaxTaegukTime = 3000;
+
+        static bool _hasInnaSet;
+        static bool _hasSwk;
+        static float _minSweepingWindSpirit;
 
         public static MonkSetting MonkSettings
         {
@@ -28,17 +35,37 @@ namespace Trinity.Combat.Abilities
         }
 
         public static TrinityPower GetPower()
-        {     
+        {
+            // Locally scoped dynamic variables
+            if (IsTaegukEquipped()) // Taeguk gem refresh (3 seconds)
+            {
+                _swMinTime = 2000;
+            }
+
+            _hasInnaSet = Sets.Innas.IsThirdBonusActive;
+            _hasSwk = Sets.MonkeyKingsGarb.IsSecondBonusActive;
+            _minSweepingWindSpirit = _hasInnaSet ? 5f : 75f;
+
             // Destructible objects
             if (UseDestructiblePower)
-                return GetMonkDestroyPower();
+            {
+                // Sweeping Winds Refresh
+                if (Player.PrimaryResource >= _minSweepingWindSpirit &&
+                   CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) && (GetHasBuff(SNOPower.Monk_SweepingWind) || IsTaegukEquipped()) &&
+                   TimeSinceLastSweepingWind >= _swMinTime &&
+                    // First one is for Taeguk                       This one is for regular SW Stacks
+                   (TimeSinceLastSweepingWind <= SwMaxTaegukTime || TimeSinceLastSweepingWind <= SwMaxTime))
+                {
+                    // LastSweepingWindRefresh = DateTime.UtcNow; // Now set through HandleTarget primary spell usage
+                    return new TrinityPower(SNOPower.Monk_SweepingWind);
+                }
 
-            var hasInnaSet = Sets.Innas.IsThirdBonusActive;
-            var hasSWK = Sets.MonkeyKingsGarb.IsSecondBonusActive;
+                return GetMonkDestroyPower();
+            }
 
             // Epiphany: spirit regen, dash to targets
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.X1_Monk_Epiphany, CanCastFlags.NoTimer) && (Settings.Combat.Monk.EpiphanyOffCD ||
-                (TargetUtil.EliteOrTrashInRange(15f) || TargetUtil.AnyMobsInRange(15f, 5)) && 
+                (TargetUtil.EliteOrTrashInRange(15f) || TargetUtil.AnyMobsInRange(15f, 5)) &&
                 (Player.PrimaryResourcePct < 0.50 || ((Runes.Monk.DesertShroud.IsActive || Runes.Monk.SoothingMist.IsActive) && Player.CurrentHealthPct < 0.50)))
                 )
             {
@@ -64,7 +91,7 @@ namespace Trinity.Combat.Abilities
             }
 
             // InnerSanctuary 
-            if (!UseOOCBuff && (TargetUtil.EliteOrTrashInRange(16f) || hasSWK && hasInnaSet && TargetUtil.AnyMobsInRange(15f)) && CanCast(SNOPower.X1_Monk_InnerSanctuary))
+            if (!UseOOCBuff && TargetUtil.EliteOrTrashInRange(16f) && CanCast(SNOPower.X1_Monk_InnerSanctuary))
             {
                 return new TrinityPower(SNOPower.X1_Monk_InnerSanctuary, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 1, 1);
             }
@@ -76,8 +103,8 @@ namespace Trinity.Combat.Abilities
                     Player.CurrentHealthPct <= 0.4 ||
                     (TargetUtil.AnyMobsInRange(15, 3)) ||
                     (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f) ||
-                    // as pre-sweeping wind buff
-                    (TargetUtil.AnyMobsInRange(15, 1) && CanCast(SNOPower.Monk_SweepingWind) && !GetHasBuff(SNOPower.Monk_SweepingWind) && hasInnaSet)
+                // as pre-sweeping wind buff
+                    (TargetUtil.AnyMobsInRange(15, 1) && CanCast(SNOPower.Monk_SweepingWind) && !GetHasBuff(SNOPower.Monk_SweepingWind) && _hasInnaSet)
                 ) &&
                 // Check if either we don't have sweeping winds, or we do and it's ready to cast in a moment
                 (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) ||
@@ -118,55 +145,41 @@ namespace Trinity.Combat.Abilities
                 CanCast(SNOPower.Monk_SevenSidedStrike, CanCastFlags.NoTimer) &&
                 ((Player.PrimaryResource >= 50 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
             {
-                Monk_TickSweepingWindSpam();
+                RefreshSweepingWind(true);
                 return new TrinityPower(SNOPower.Monk_SevenSidedStrike, 16f, CurrentTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 3);
             }
 
-            var swMinTime = 4000;
-            var swMaxTime = 5400;
-            if (CacheData.Inventory.EquippedIds.Contains(405804)) // Taeguk gem refresh (3 seconds)
-            {
-                swMinTime = 2000;
-                swMaxTime = 2900;
-            }
 
-            // Sweeping winds spam
-            if ((Player.PrimaryResource >= 75 || (hasInnaSet && Player.PrimaryResource >= 5)) && 
-                CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) && GetHasBuff(SNOPower.Monk_SweepingWind) &&
-                DateTime.UtcNow.Subtract(Trinity.SweepWindSpam).TotalMilliseconds >= swMinTime && DateTime.UtcNow.Subtract(Trinity.SweepWindSpam).TotalMilliseconds <= swMaxTime)
+            // Sweeping Winds Refresh
+            if (Player.PrimaryResource >= _minSweepingWindSpirit &&
+               CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) && (GetHasBuff(SNOPower.Monk_SweepingWind) || IsTaegukEquipped()) &&
+               TimeSinceLastSweepingWind >= _swMinTime &&
+                // First one is for Taeguk                       This one is for regular SW Stacks
+               (TimeSinceLastSweepingWind <= SwMaxTaegukTime || TimeSinceLastSweepingWind <= SwMaxTime))
             {
-                Trinity.SweepWindSpam = DateTime.UtcNow;
+                // LastSweepingWindRefresh = DateTime.UtcNow; // Now set through HandleTarget primary spell usage
                 return new TrinityPower(SNOPower.Monk_SweepingWind);
             }
 
-            float minSweepingWindSpirit = hasInnaSet ? 5f : 75f;
-
-            // Sweeping wind
-            if (!UseOOCBuff && CanCast(SNOPower.Monk_SweepingWind) && !GetHasBuff(SNOPower.Monk_SweepingWind) && 
-                ((TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(20, 1) || hasInnaSet ||
-                (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 25f)) &&
-                // Check our mantras, if we have them, they are up first
-                (Monk_HasMantraAbilityAndBuff() &&
-                // Check if either we don't have blinding flash, or we do and it's been cast in the last 8000ms
-                (Trinity.TimeSinceUse(SNOPower.Monk_BlindingFlash) <= 8000 || CheckAbilityAndBuff(SNOPower.Monk_BlindingFlash) ||
-                TargetUtil.AnyElitesInRange(25, 1) && Trinity.TimeSinceUse(SNOPower.Monk_BlindingFlash) <= 12500))) &&
-                Player.PrimaryResource >= minSweepingWindSpirit)
+            // Start Sweeping Wind if not up 
+            if (CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.Timer) && !GetHasBuff(SNOPower.Monk_SweepingWind) &&
+               (TargetUtil.AnyMobsInRange(30, 1) || _hasInnaSet || IsTaegukEquipped()) && Player.PrimaryResource >= _minSweepingWindSpirit)
             {
-                Trinity.SweepWindSpam = DateTime.UtcNow;
+                // LastSweepingWindRefresh = DateTime.UtcNow; // Now set through HandleTarget primary spell usage
                 return new TrinityPower(SNOPower.Monk_SweepingWind);
             }
 
             // Sweeping Wind for Transcendance Health Regen
             if (CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) &&
-                Player.PrimaryResource >= minSweepingWindSpirit &&
+                Player.PrimaryResource >= _minSweepingWindSpirit &&
                 Passives.Monk.Transcendence.IsActive && Settings.Combat.Monk.SpamSweepingWindOnLowHP &&
                 Player.CurrentHealthPct <= V.F("Monk.SweepingWind.SpamOnLowHealthPct") &&
                 Trinity.TimeSinceUse(SNOPower.Monk_SweepingWind) > 500)
             {
-                Trinity.SweepWindSpam = DateTime.UtcNow;
+                // LastSweepingWindRefresh = DateTime.UtcNow; // Now set through HandleTarget primary spell usage
                 return new TrinityPower(SNOPower.Monk_SweepingWind);
             }
-            
+
             var cycloneStrikeRange = Runes.Monk.Implosion.IsActive ? 34f : 24f;
             var cycloneStrikeSpirit = Runes.Monk.EyeOfTheStorm.IsActive ? 30 : 50;
 
@@ -183,7 +196,7 @@ namespace Trinity.Combat.Abilities
 
                 (Player.PrimaryResource >= (cycloneStrikeSpirit + MinEnergyReserve)))
             {
-                Monk_TickSweepingWindSpam();
+                RefreshSweepingWind(true);
                 return new TrinityPower(SNOPower.Monk_CycloneStrike, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 2, 2);
             }
 
@@ -197,15 +210,15 @@ namespace Trinity.Combat.Abilities
 
                 if (CurrentTarget.IsEliteRareUnique || TargetUtil.ClusterExists(15f, 3) &&
                     TargetUtil.IsUnitWithDebuffInRangeOfPosition(15f, TargetUtil.GetBestClusterPoint(), SNOPower.Monk_ExplodingPalm) ||
-                    TargetUtil.AnyMobsInRangeOfPosition(CurrentTarget.Position, 20f, 3) && Skills.Monk.ExplodingPalm.IsTrackedOnUnit(CurrentTarget) || 
-                    hasSWK && TargetUtil.AnyMobsInRange(50f))
+                    TargetUtil.AnyMobsInRangeOfPosition(CurrentTarget.Position, 20f, 3) && Skills.Monk.ExplodingPalm.IsTrackedOnUnit(CurrentTarget) ||
+                    _hasSwk && TargetUtil.AnyMobsInRange(50f))
                 {
-                    Monk_TickSweepingWindSpam();
+                    RefreshSweepingWind(true);
                     if (TargetUtil.ClusterExists(15f, 3) && Sets.ThousandStorms.IsMaxBonusActive)
                     {
-                        return new TrinityPower(SNOPower.X1_Monk_DashingStrike, Monk_MaxDashingStrikeRange, TargetUtil.GetBestClusterPoint(), Trinity.CurrentWorldDynamicId, -1, 2, 2);
+                        return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, TargetUtil.GetBestClusterPoint(), Trinity.CurrentWorldDynamicId, -1, 2, 2);
                     }
-                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, Monk_MaxDashingStrikeRange, CurrentTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 2);
+                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 2);
                 }
             }
 
@@ -231,12 +244,12 @@ namespace Trinity.Combat.Abilities
                 (Player.PrimaryResource >= 75 && !IsWaitingForSpecial || Player.PrimaryResource > MinEnergyReserve) &&
                 // optional check for SW stacks
                 (Settings.Combat.Monk.SWBeforeWoL && (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3) || !Settings.Combat.Monk.SWBeforeWoL) &&
-                Monk_HasMantraAbilityAndBuff())
+                HasMantraAbilityAndBuff())
             {
-                Monk_TickSweepingWindSpam();
+                RefreshSweepingWind(true);
                 return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, TargetUtil.GetBestClusterPoint(), -1, CurrentTarget.ACDGuid, 0, 1);
             }
-            
+
             // For tempest rush re-use
             if (!UseOOCBuff && Player.PrimaryResource >= 15 && CanCast(SNOPower.Monk_TempestRush) &&
                 Trinity.TimeSinceUse(SNOPower.Monk_TempestRush) <= 150 &&
@@ -246,7 +259,7 @@ namespace Trinity.Combat.Abilities
                 GenerateMonkZigZag();
                 Trinity.MaintainTempestRush = true;
                 const string trUse = "Continuing Tempest Rush for Combat";
-                Monk_TempestRushStatus(trUse);
+                LogTempestRushStatus(trUse);
                 return new TrinityPower(SNOPower.Monk_TempestRush, 23f, ZigZagPosition, Trinity.CurrentWorldDynamicId, -1, 0, 0);
             }
 
@@ -261,7 +274,7 @@ namespace Trinity.Combat.Abilities
                 GenerateMonkZigZag();
                 Trinity.MaintainTempestRush = true;
                 const string trUse = "Starting Tempest Rush for Combat";
-                Monk_TempestRushStatus(trUse);
+                LogTempestRushStatus(trUse);
                 return new TrinityPower(SNOPower.Monk_TempestRush, 23f, ZigZagPosition, Trinity.CurrentWorldDynamicId, -1, 0, 0);
             }
 
@@ -271,7 +284,7 @@ namespace Trinity.Combat.Abilities
                 (!Hotbar.Contains(SNOPower.Monk_SweepingWind) || (Hotbar.Contains(SNOPower.Monk_SweepingWind) && GetHasBuff(SNOPower.Monk_SweepingWind))) &&
                 ((Player.PrimaryResource >= 65 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
             {
-                Monk_TickSweepingWindSpam();
+                RefreshSweepingWind(true);
                 return new TrinityPower(SNOPower.Monk_LashingTailKick, 10f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1);
             }
 
@@ -279,23 +292,23 @@ namespace Trinity.Combat.Abilities
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && !Settings.Combat.Monk.DisableMantraSpam)
             {
                 if (CanCast(SNOPower.X1_Monk_MantraOfConviction_v2) && TimeSincePowerUse(SNOPower.X1_Monk_MantraOfConviction_v2) > 1000 && (!GetHasBuff(SNOPower.X1_Monk_MantraOfConviction_v2) ||
-                    (hasSWK && TargetUtil.AnyMobsInRange(10f))) && (Player.PrimaryResource >= 80))
+                    (_hasSwk && TargetUtil.AnyMobsInRange(10f))) && (Player.PrimaryResource >= 80))
                 {
                     return new TrinityPower(SNOPower.X1_Monk_MantraOfConviction_v2, 3);
                 }
 
                 if (CanCast(SNOPower.X1_Monk_MantraOfRetribution_v2) && TimeSincePowerUse(SNOPower.X1_Monk_MantraOfRetribution_v2) > 1000 && (!GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) ||
-                    (hasSWK && TargetUtil.AnyMobsInRange(10f))) && (Player.PrimaryResource >= 80))
+                    (_hasSwk && TargetUtil.AnyMobsInRange(10f))) && (Player.PrimaryResource >= 80))
                 {
                     return new TrinityPower(SNOPower.X1_Monk_MantraOfRetribution_v2, 3);
                 }
                 if (CanCast(SNOPower.X1_Monk_MantraOfHealing_v2) && TimeSincePowerUse(SNOPower.X1_Monk_MantraOfHealing_v2) > 1000 && (!GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) ||
-                    (hasSWK && TargetUtil.AnyMobsInRange(10f))) && (Player.PrimaryResource >= 80))
+                    (_hasSwk && TargetUtil.AnyMobsInRange(10f))) && (Player.PrimaryResource >= 80))
                 {
                     return new TrinityPower(SNOPower.X1_Monk_MantraOfHealing_v2, 3);
                 }
                 if (CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && TimeSincePowerUse(SNOPower.X1_Monk_MantraOfEvasion_v2) > 1000 && (!GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) ||
-                    (hasSWK && TargetUtil.AnyMobsInRange(10f))) && (Player.PrimaryResource >= 80))
+                    (_hasSwk && TargetUtil.AnyMobsInRange(10f))) && (Player.PrimaryResource >= 80))
                 {
                     return new TrinityPower(SNOPower.X1_Monk_MantraOfEvasion_v2, 3);
                 }
@@ -335,7 +348,7 @@ namespace Trinity.Combat.Abilities
             // Fists of Thunder:Thunder Clap - Fly to Target
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Monk_FistsofThunder) && Runes.Monk.Thunderclap.IsActive && CurrentTarget.Distance > 16f)
             {
-                Monk_TickSweepingWindSpam();
+                RefreshSweepingWind();
                 return new TrinityPower(SNOPower.Monk_FistsofThunder, 30f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 3);
             }
 
@@ -344,7 +357,7 @@ namespace Trinity.Combat.Abilities
                 (SpellHistory.TimeSinceUse(SNOPower.Monk_DeadlyReach) > TimeSpan.FromMilliseconds(drInterval) ||
                 (SpellHistory.SpellUseCountInTime(SNOPower.Monk_DeadlyReach, TimeSpan.FromMilliseconds(27000)) < 3) && Runes.Monk.Foresight.IsActive))
             {
-                Monk_TickSweepingWindSpam();
+                RefreshSweepingWind();
                 return new TrinityPower(SNOPower.Monk_DeadlyReach, 16f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 3);
             }
 
@@ -353,7 +366,7 @@ namespace Trinity.Combat.Abilities
                 (GetBuffStacks(SNOPower.Monk_WayOfTheHundredFists) < 3 ||
                 SpellHistory.TimeSinceUse(SNOPower.Monk_WayOfTheHundredFists) > TimeSpan.FromMilliseconds(wothfInterval)))
             {
-                Monk_TickSweepingWindSpam();
+                RefreshSweepingWind();
                 return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 16f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 3);
             }
 
@@ -361,35 +374,35 @@ namespace Trinity.Combat.Abilities
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Monk_CripplingWave) &&
                 SpellHistory.TimeSinceUse(SNOPower.Monk_CripplingWave) > TimeSpan.FromMilliseconds(cwInterval))
             {
-                Monk_TickSweepingWindSpam();
+                RefreshSweepingWind();
                 return new TrinityPower(SNOPower.Monk_CripplingWave, 20f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 3);
             }
 
             // Fists of Thunder
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Monk_FistsofThunder))
             {
-                Monk_TickSweepingWindSpam();
+                RefreshSweepingWind();
                 return new TrinityPower(SNOPower.Monk_FistsofThunder, 30f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 3);
             }
 
             // Deadly Reach normal
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Monk_DeadlyReach))
             {
-                Monk_TickSweepingWindSpam();
+                RefreshSweepingWind();
                 return new TrinityPower(SNOPower.Monk_DeadlyReach, 16f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 3);
             }
 
             // Way of the Hundred Fists normal
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Monk_WayOfTheHundredFists))
             {
-                Monk_TickSweepingWindSpam();
+                RefreshSweepingWind();
                 return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 16f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 3);
             }
 
             // Crippling Wave Normal
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Monk_CripplingWave))
             {
-                Monk_TickSweepingWindSpam();
+                RefreshSweepingWind();
                 return new TrinityPower(SNOPower.Monk_CripplingWave, 30f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 3);
             }
 
@@ -397,7 +410,7 @@ namespace Trinity.Combat.Abilities
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight) && MonkHasNoPrimary &&
                 (Skills.Monk.ExplodingPalm.IsTrackedOnUnit(CurrentTarget) || !Hotbar.Contains(SNOPower.Monk_ExplodingPalm)))
             {
-                Monk_TickSweepingWindSpam();
+                RefreshSweepingWind(true);
                 return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, TargetUtil.GetBestClusterPoint(), -1, CurrentTarget.ACDGuid, 0, 1);
             }
 
@@ -405,10 +418,32 @@ namespace Trinity.Combat.Abilities
             return DefaultPower;
         }
 
+
+        /// <summary>
+        /// Gets the time since last sweeping wind.
+        /// </summary>
+        /// <value>The time since last sweeping wind.</value>
+        private static double TimeSinceLastSweepingWind
+        {
+            get
+            {
+                return DateTime.UtcNow.Subtract(LastSweepingWindRefresh).TotalMilliseconds;
+            }
+        }
+
+        /// <summary>
+        /// Determines whether [is taeguk equipped].
+        /// </summary>
+        /// <returns><c>true</c> if [is taeguk equipped]; otherwise, <c>false</c>.</returns>
+        private static bool IsTaegukEquipped()
+        {
+            return CacheData.Inventory.EquippedIds.Contains(405804);
+        }
+
         internal static bool ShouldSpreadExplodingPalm()
         {
-            return Skills.Monk.ExplodingPalm.IsActive && 
-                
+            return Skills.Monk.ExplodingPalm.IsActive &&
+
                 // enough resources and mobs nearby
                 Player.PrimaryResourcePct > 0.30 && TargetUtil.AnyMobsInRange(15f, 4) &&
 
@@ -461,40 +496,44 @@ namespace Trinity.Combat.Abilities
             {
                 if (farthestTarget != null) // found a target within 33-49 yards.
                 {
-                    Monk_TickSweepingWindSpam();
-                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, Monk_MaxDashingStrikeRange, farthestTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 2);
+                    RefreshSweepingWind();
+                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, farthestTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 2);
                 }
                 // no free target found, get a nearby cluster point instead.
                 var bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, procDistance);
-                Monk_TickSweepingWindSpam();
-                return new TrinityPower(SNOPower.X1_Monk_DashingStrike, Monk_MaxDashingStrikeRange, bestClusterPoint, Trinity.CurrentWorldDynamicId, -1, 2, 2);
+                RefreshSweepingWind();
+                return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, bestClusterPoint, Trinity.CurrentWorldDynamicId, -1, 2, 2);
             }
 
             //usually this trigger after dash to the farthest target. dash a single mobs >30 yards, trying to dash back the cluster
-            if (TargetUtil.ClusterExists(20, 50, 3)) 
+            if (TargetUtil.ClusterExists(20, 50, 3))
             {
                 var dashStrikeBestClusterPoint = TargetUtil.GetDashStrikeBestClusterPoint(20f, 50f);
                 if (dashStrikeBestClusterPoint != Trinity.Player.Position)
                 {
-                    Monk_TickSweepingWindSpam();
-                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, Monk_MaxDashingStrikeRange, dashStrikeBestClusterPoint, Trinity.CurrentWorldDynamicId, -1, 2, 2);
+                    RefreshSweepingWind();
+                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, dashStrikeBestClusterPoint, Trinity.CurrentWorldDynamicId, -1, 2, 2);
                 }
             }
-                
+
             // dash to anything which is free.               
             if (farthestTarget != null)
             {
-                Monk_TickSweepingWindSpam();
-                return new TrinityPower(SNOPower.X1_Monk_DashingStrike, Monk_MaxDashingStrikeRange, farthestTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 2);
+                RefreshSweepingWind();
+                return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, farthestTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 2);
             }
 
-            return new TrinityPower(SNOPower.X1_Monk_DashingStrike, Monk_MaxDashingStrikeRange, CurrentTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 2);
+            return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 2);
         }
 
-        internal static void Monk_TickSweepingWindSpam()
+        internal static void RefreshSweepingWind(bool spendsSpirit = false)
         {
-            if (GetHasBuff(SNOPower.Monk_SweepingWind) && DateTime.UtcNow.Subtract(Trinity.SweepWindSpam).TotalMilliseconds < 5500)
-                Trinity.SweepWindSpam = DateTime.UtcNow;
+            // Don't refresh timer if we have Taeguk Legendary Gem equipped and not spending spirit
+            if (!spendsSpirit && IsTaegukEquipped())
+                return;
+
+            if (GetHasBuff(SNOPower.Monk_SweepingWind))
+                LastSweepingWindRefresh = DateTime.UtcNow;
         }
 
         internal static void GenerateMonkZigZag()
@@ -510,10 +549,10 @@ namespace Trinity.Combat.Abilities
 
         internal static TrinityPower GetMonkDestroyPower()
         {
-            if (Monk_TempestRushReady())
+            if (IsTempestRushReady())
                 return new TrinityPower(SNOPower.Monk_TempestRush, 5f, Vector3.Zero, -1, -1, 0, 0);
             if (CanCast(SNOPower.X1_Monk_DashingStrike))
-                return new TrinityPower(SNOPower.X1_Monk_DashingStrike, Monk_MaxDashingStrikeRange, Vector3.Zero, -1, -1, 0, 0);
+                return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, Vector3.Zero, -1, -1, 0, 0);
             if (CanCast(SNOPower.Monk_FistsofThunder))
                 return new TrinityPower(SNOPower.Monk_FistsofThunder, 5f, Vector3.Zero, -1, -1, 0, 0);
             if (CanCast(SNOPower.Monk_DeadlyReach))
@@ -529,7 +568,7 @@ namespace Trinity.Combat.Abilities
         /// Returns true if we have a mantra and it's up, or if we don't have a Mantra at all
         /// </summary>
         /// <returns></returns>
-        internal static bool Monk_HasMantraAbilityAndBuff()
+        internal static bool HasMantraAbilityAndBuff()
         {
             return
                 (CheckAbilityAndBuff(SNOPower.X1_Monk_MantraOfConviction_v2) ||
@@ -538,28 +577,18 @@ namespace Trinity.Combat.Abilities
                 CheckAbilityAndBuff(SNOPower.X1_Monk_MantraOfRetribution_v2));
         }
 
-        internal static bool Monk_TempestRushReady()
+        internal static bool IsTempestRushReady()
         {
-            if (Player.ActorClass != ActorClass.Monk)
+            if (!CanCastRecurringPower())
                 return false;
 
             if (!Hotbar.Contains(SNOPower.Monk_TempestRush))
                 return false;
 
-            if (ProfileManager.CurrentProfileBehavior != null)
-            {
-                Type profileBehaviorType = ProfileManager.CurrentProfileBehavior.GetType();
-                if (profileBehaviorType == typeof(UseObjectTag) ||
-                    profileBehaviorType == typeof(UsePortalTag) ||
-                    profileBehaviorType == typeof(UseWaypointTag) ||
-                    profileBehaviorType == typeof(UseTownPortalTag))
-                    return false;
-            }
-
             if (!Hotbar.Contains(SNOPower.Monk_TempestRush))
                 return false;
 
-            if (!Monk_HasMantraAbilityAndBuff())
+            if (!HasMantraAbilityAndBuff())
                 return false;
 
             double currentSpirit = ZetaDia.Me.CurrentPrimaryResource;
@@ -575,12 +604,61 @@ namespace Trinity.Combat.Abilities
             return false;
         }
 
-        internal static void Monk_MaintainTempestRush()
+        internal static bool CanCastRecurringPower()
         {
-            if (!Monk_TempestRushReady())
+            if (Player.ActorClass != ActorClass.Monk)
+                return false;
+
+            if (ProfileManager.CurrentProfileBehavior != null)
+            {
+                Type profileBehaviorType = ProfileManager.CurrentProfileBehavior.GetType();
+                if (profileBehaviorType == typeof(UseObjectTag) ||
+                    profileBehaviorType == typeof(UsePortalTag) ||
+                    profileBehaviorType == typeof(UseWaypointTag) ||
+                    profileBehaviorType == typeof(UseTownPortalTag))
+                    return false;
+            }
+
+            if (ZetaDia.Me.LoopingAnimationEndTime > 0)
+                return false;
+
+            return true;
+        }
+
+        internal static void RunOngoingPowers()
+        {
+            MaintainTempestRush();
+
+            MaintainSweepingWind();
+        }
+
+        private static void MaintainSweepingWind()
+        {
+            if (!CanCastRecurringPower())
                 return;
 
-            if (Player.IsInTown || Zeta.Bot.Logic.BrainBehavior.IsVendoring)
+            // Sweeping Winds Refresh
+            if (Player.PrimaryResource >= _minSweepingWindSpirit &&
+                CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) && (GetHasBuff(SNOPower.Monk_SweepingWind) || IsTaegukEquipped()) &&
+                TimeSinceLastSweepingWind >= _swMinTime &&
+                // First one is for Taeguk                       This one is for regular SW Stacks
+                (TimeSinceLastSweepingWind <= SwMaxTaegukTime || TimeSinceLastSweepingWind <= SwMaxTime))
+            {
+                var usePowerResult = ZetaDia.Me.UsePower(SNOPower.Monk_SweepingWind, Vector3.Zero, Trinity.CurrentWorldDynamicId);
+                if (usePowerResult)
+                {
+                    LastSweepingWindRefresh = DateTime.UtcNow;
+                    CacheData.AbilityLastUsed[SNOPower.Monk_SweepingWind] = DateTime.UtcNow;
+                }
+            }
+        }
+
+        internal static void MaintainTempestRush()
+        {
+            if (!IsTempestRushReady())
+                return;
+
+            if (Player.IsInTown || BrainBehavior.IsVendoring)
                 return;
 
             if (TownRun.IsTryingToTownPortal())
@@ -606,10 +684,9 @@ namespace Trinity.Combat.Abilities
                     case GObjectType.ProgressionGlobe:
                         {
                             if (Settings.Combat.Monk.TROption == TempestRushOption.TrashOnly &&
-                                (TargetUtil.AnyElitesInRange(40f) || CurrentTarget.IsBossOrEliteRareUnique))
-                                shouldMaintain = false;
-                            else
-                                shouldMaintain = true;
+                                    (TargetUtil.AnyElitesInRange(40f) || CurrentTarget.IsBossOrEliteRareUnique))
+                                break;
+                            shouldMaintain = true;
                         }
                         break;
                 }
@@ -634,15 +711,15 @@ namespace Trinity.Combat.Abilities
                 if (target == Vector3.Zero)
                     return;
 
-                float DestinationDistance = target.Distance2D(ZetaDia.Me.Position);
+                float destinationDistance = target.Distance2D(ZetaDia.Me.Position);
 
                 target = TargetUtil.FindTempestRushTarget();
 
-                if (DestinationDistance > 10f && NavHelper.CanRayCast(ZetaDia.Me.Position, target))
+                if (destinationDistance > 10f && NavHelper.CanRayCast(ZetaDia.Me.Position, target))
                 {
-                    Monk_TempestRushStatus(String.Format("Using Tempest Rush to maintain channeling, source={0}, V3={1} dist={2:0}", locationSource, target, DestinationDistance));
+                    LogTempestRushStatus(String.Format("Using Tempest Rush to maintain channeling, source={0}, V3={1} dist={2:0}", locationSource, target, destinationDistance));
 
-                    var usePowerResult = ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, target, Trinity.CurrentWorldDynamicId, -1);
+                    var usePowerResult = ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, target, Trinity.CurrentWorldDynamicId);
                     if (usePowerResult)
                     {
                         CacheData.AbilityLastUsed[SNOPower.Monk_TempestRush] = DateTime.UtcNow;
@@ -651,7 +728,7 @@ namespace Trinity.Combat.Abilities
             }
         }
 
-        internal static void Monk_TempestRushStatus(string trUse)
+        internal static void LogTempestRushStatus(string trUse)
         {
 
             Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "{0}, xyz={4} spirit={1:0} cd={2} lastUse={3:0}",
@@ -660,7 +737,7 @@ namespace Trinity.Combat.Abilities
                 Trinity.TimeSinceUse(SNOPower.Monk_TempestRush), ZigZagPosition);
         }
 
-        public static bool hasSweepingWindBuffUp()
+        public static bool HasSweepingWindBuffUp()
         {
             return (GetHasBuff(SNOPower.Monk_SweepingWind) || !Hotbar.Contains(SNOPower.Monk_SweepingWind));
         }
@@ -675,6 +752,5 @@ namespace Trinity.Combat.Abilities
                     Hotbar.Contains(SNOPower.Monk_WayOfTheHundredFists));
             }
         }
-
     }
 }

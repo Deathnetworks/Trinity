@@ -95,7 +95,7 @@ namespace Trinity
 
                     DebugUtil.LogOnPulse();
 
-                    MonkCombat.Monk_MaintainTempestRush();
+                    MonkCombat.RunOngoingPowers();
                 }
                 catch (AccessViolationException)
                 {

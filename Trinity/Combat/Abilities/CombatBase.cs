@@ -37,7 +37,8 @@ namespace Trinity.Combat.Abilities
         {
             All = 2,
             NoTimer = 4,
-            NoPowerManager = 8
+            NoPowerManager = 8,
+            Timer = 16
         }
 
         internal static void LoadCombatSettings()
@@ -346,7 +347,7 @@ namespace Trinity.Combat.Abilities
                 {
                     if (Trinity.Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_SweepingWind))
                     {
-                        MonkCombat.Monk_TickSweepingWindSpam();
+                        MonkCombat.RefreshSweepingWind();
                     }
 
                     return new TrinityPower
@@ -419,7 +420,7 @@ namespace Trinity.Combat.Abilities
         }
 
         /// <summary>
-        /// Performs basic checks to see if we have and can cast a power (hotbar, power manager). Checks use timer for Wiz, DH, Monk
+        /// Performs basic checks to see if we have and can cast a power (hotbar, power manager). Checks use timer for Wiz, DH
         /// </summary>
         /// <param name="power"></param>
         /// <param name="flags"></param>
@@ -430,8 +431,8 @@ namespace Trinity.Combat.Abilities
             if (!hasPower)
                 return false;
 
-            // Skip this for Barb, Crusader, WD, Monk
-            if (Player.ActorClass == ActorClass.Wizard || Player.ActorClass == ActorClass.DemonHunter)
+            // Skip this for Barb, Crusader, WD, Monk, except when specifically requested
+            if (Player.ActorClass == ActorClass.Wizard || Player.ActorClass == ActorClass.DemonHunter || flags.HasFlag(CanCastFlags.Timer))
             {
                 bool timer = flags.HasFlag(CanCastFlags.NoTimer) || SNOPowerUseTimer(power);
 

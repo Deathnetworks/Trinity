@@ -1239,8 +1239,8 @@ namespace Trinity
 
                         // Hard-check paths to all targets in Pandemounium Fortress maps
                         // THIS IS REALLY SLOW AND EXPENSIVE - do not turn this on "everywhere"
-                        if (Player.IsInPandemoniumFortress && !Navigator.GetNavigationProviderAs<DefaultNavigationProvider>().CanFullyClientPathTo(cacheObject.Position))
-                            continue;
+                        //if (Player.IsInPandemoniumFortress && !Navigator.GetNavigationProviderAs<DefaultNavigationProvider>().CanFullyClientPathTo(cacheObject.Position))
+                        //    continue;
 
                         // Kiting and Avoidance
                         if (CurrentTarget.IsUnit)

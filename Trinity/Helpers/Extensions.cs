@@ -162,7 +162,7 @@ namespace Trinity.Helpers
         /// <returns></returns>
         public static bool IsFullyValid(this DiaObject diaObject)
         {
-            return diaObject != null && diaObject.IsValid && diaObject.CommonData != null && diaObject.CommonData.IsValid;
+            return diaObject != null && diaObject.IsValid && diaObject.ACDGuid != 0 && diaObject.CommonData != null && diaObject.CommonData.IsValid;
         }
 
         /// <summary>

@@ -291,7 +291,6 @@ namespace Trinity
         private static int TotalNumberGoblins = 0;
         private static DateTime lastGoblinTime = DateTime.MinValue;
 
-        internal static DateTime SweepWindSpam = DateTime.MinValue;
 
         private static bool IsAlreadyMoving = false;
         private static Vector3 LastMoveToTarget;

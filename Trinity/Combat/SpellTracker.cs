@@ -157,7 +157,7 @@ namespace Trinity
             // TBD, maybe Rend is a good candidate?
 
             // Monk
-            TrackedSpells.Add(new TrackedSpell(SNOPower.Monk_ExplodingPalm, -999, 7000f));
+            TrackedSpells.Add(new TrackedSpell(SNOPower.Monk_ExplodingPalm, -999, 9000f));
 
             // Wizard
             // TBD

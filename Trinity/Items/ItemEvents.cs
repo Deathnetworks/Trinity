@@ -1,13 +1,8 @@
-﻿using Trinity.Cache;
-using Trinity.DbProvider;
-using Trinity.Items;
-using Trinity.Technicals;
+﻿using Trinity.DbProvider;
 using Zeta.Bot;
 using Zeta.Game.Internals.Actors;
-using Zeta.Bot.Settings;
-using Trinity.Settings.Loot;
 
-namespace Trinity
+namespace Trinity.Items
 {
     public class ItemEvents
     {
@@ -15,7 +10,7 @@ namespace Trinity
         {
             ACDItem i = e.Item;
 
-            if (!i.IsValid)
+            if (i == null || !i.IsValid)
                 return;
 
             var cachedItem = CachedACDItem.GetCachedItem(i);
