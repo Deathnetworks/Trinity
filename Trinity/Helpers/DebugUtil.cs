@@ -12,11 +12,11 @@ namespace Trinity.Helpers
     class DebugUtil
     {
 
-        private static DateTime _lastCacheClear = DateTime.MinValue;    
+        private static DateTime _lastCacheClear = DateTime.MinValue;
 
         private static Dictionary<string, DateTime> _seenAnimationCache = new Dictionary<string, DateTime>();
         private static Dictionary<int, DateTime> _seenUnknownCache = new Dictionary<int, DateTime>();
-    
+
 
         public static void LogAnimation(TrinityCacheObject cacheObject)
         {
@@ -26,16 +26,16 @@ namespace Trinity.Helpers
             var state = cacheObject.CommonData.AnimationState.ToString();
             var name = cacheObject.CommonData.CurrentAnimation.ToString();
 
-            
+
 
             // Log Animation
             if (!_seenAnimationCache.ContainsKey(name))
             {
                 Logger.Log(LogCategory.Animation, "{0} State={1} By: {2} ({3})", name, state, cacheObject.InternalName, cacheObject.ActorSNO);
-                _seenAnimationCache.Add(name,DateTime.UtcNow);
+                _seenAnimationCache.Add(name, DateTime.UtcNow);
             }
 
-            CacheMaintenance();          
+            CacheMaintenance();
         }
 
         internal static void LogUnknown(DiaObject diaObject)
@@ -46,7 +46,7 @@ namespace Trinity.Helpers
             // Log Object
             if (!_seenUnknownCache.ContainsKey(diaObject.ActorSNO))
             {
-           
+
 
                 Logger.Log(LogCategory.UnknownObjects, "{0} ({1}) Type={2}", diaObject.Name, diaObject.ActorSNO, diaObject.ActorType);
                 _seenUnknownCache.Add(diaObject.ActorSNO, DateTime.UtcNow);
@@ -60,13 +60,13 @@ namespace Trinity.Helpers
             var age = DateTime.UtcNow.Subtract(TimeSpan.FromSeconds(15));
             if (DateTime.UtcNow.Subtract(_lastCacheClear) > TimeSpan.FromSeconds(15))
             {
-                if(_seenAnimationCache.Any())
+                if (_seenAnimationCache.Any())
                     _seenAnimationCache = _seenAnimationCache.Where(p => p.Value < age).ToDictionary(p => p.Key, p => p.Value);
 
-                if(_seenUnknownCache.Any())
+                if (_seenUnknownCache.Any())
                     _seenUnknownCache = _seenUnknownCache.Where(p => p.Value < age).ToDictionary(p => p.Key, p => p.Value);
-                
-            }   
+
+            }
             _lastCacheClear = DateTime.UtcNow;
         }
 
@@ -77,7 +77,8 @@ namespace Trinity.Helpers
 
         internal static void LogOnPulse()
         {
-            CacheData.Buffs.ActiveBuffs.ForEach(b => Logger.Log(LogCategory.ActiveBuffs,"Buff '{0}' is Active", b.InternalName));
+            if (CacheData.Buffs != null && CacheData.Buffs.ActiveBuffs != null)
+                CacheData.Buffs.ActiveBuffs.ForEach(b => Logger.Log(LogCategory.ActiveBuffs, "Buff '{0}' is Active", b.InternalName));
         }
 
         public static void LogBuildAndItems(TrinityLogLevel level = TrinityLogLevel.Debug)

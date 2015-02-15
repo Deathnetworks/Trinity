@@ -73,7 +73,6 @@ namespace Trinity.UI
                         Content = "Drop Legendaries"
                     };
 
-
                     Window mainWindow = Application.Current.MainWindow;
 
                     _btnSortBackpack.Click += _btnSortBackpack_Click;

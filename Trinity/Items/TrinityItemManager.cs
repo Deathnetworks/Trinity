@@ -748,12 +748,12 @@ namespace Trinity.Items
             {
                 try
                 {
-                    if (_lastBackPackLocation != new Vector2(-2, -2) &&
-                        _lastBackPackCount == CacheData.Inventory.Backpack.Count &&
-                        _lastProtectedSlotsCount == CharacterSettings.Instance.ProtectedBagSlots.Count)
-                    {
-                        return _lastBackPackLocation;
-                    }
+                    //if (_lastBackPackLocation != new Vector2(-2, -2) &&
+                    //    _lastBackPackCount == CacheData.Inventory.Backpack.Count &&
+                    //    _lastProtectedSlotsCount == CharacterSettings.Instance.ProtectedBagSlots.Count)
+                    //{
+                    //    return _lastBackPackLocation;
+                    //}
 
                     bool[,] backpackSlotBlocked = new bool[10, 6];
 
@@ -769,12 +769,19 @@ namespace Trinity.Items
                         freeBagSlots--;
                     }
 
+                    var allItems = ZetaDia.Actors.GetActorsOfType<ACDItem>(true);
+                    var backpackItems = allItems.Where(i => i.InventorySlot == InventorySlot.BackpackItems);
+                    var blueItems = allItems.Where(i => i.ItemQualityLevel >= ItemQuality.Magic1 && i.ItemQualityLevel <= ItemQuality.Magic3);
+
                     // Map out all the items already in the backpack
                     foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
                     {
                         if (!item.IsValid)
+                        {
+                            Logger.LogError("Invalid backpack item detetected! marking down two slots!");
+                            freeBagSlots -= 2;
                             continue;
-
+                        }
                         int row = item.InventoryRow;
                         int col = item.InventoryColumn;
 
