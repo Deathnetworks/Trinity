@@ -23,7 +23,7 @@ namespace Trinity.Combat.Abilities
 
         static int _swMinTime = 4000;
         const int SwMaxTime = 5400;
-        const int SwMaxTaegukTime = 3000;
+        const int SwMaxTaegukTime = 2950;
 
         static bool _hasInnaSet;
         static bool _hasSwk;
@@ -39,7 +39,7 @@ namespace Trinity.Combat.Abilities
             // Locally scoped dynamic variables
             if (IsTaegukEquipped()) // Taeguk gem refresh (3 seconds)
             {
-                _swMinTime = 2000;
+                _swMinTime = 1800;
             }
 
             _hasInnaSet = Sets.Innas.IsThirdBonusActive;
@@ -644,7 +644,8 @@ namespace Trinity.Combat.Abilities
                 // First one is for Taeguk                       This one is for regular SW Stacks
                 (TimeSinceLastSweepingWind <= SwMaxTaegukTime || TimeSinceLastSweepingWind <= SwMaxTime))
             {
-                var usePowerResult = ZetaDia.Me.UsePower(SNOPower.Monk_SweepingWind, Vector3.Zero, Trinity.CurrentWorldDynamicId);
+                var usePowerResult = ZetaDia.Me.UsePower(SNOPower.Monk_SweepingWind, Vector3.Zero, ZetaDia.CurrentWorldDynamicId);
+                Logger.Log("Sweeping Wind Out of Band Refresh {0}", usePowerResult ? "succeeded" : "failed");
                 if (usePowerResult)
                 {
                     LastSweepingWindRefresh = DateTime.UtcNow;

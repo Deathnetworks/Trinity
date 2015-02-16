@@ -36,7 +36,7 @@ namespace Trinity
         /// <returns></returns>
         private static RunStatus GetRunStatus(RunStatus status)
         {
-            MonkCombat.MaintainTempestRush();
+            MonkCombat.RunOngoingPowers();
 
             string extras = "";
             if (_isWaitingForPower)
@@ -119,7 +119,7 @@ namespace Trinity
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget was passed as null! Continuing...");
                     }
 
-                    MonkCombat.MaintainTempestRush();
+                    MonkCombat.RunOngoingPowers();
 
                     // Refresh the object Cache every time
                     RefreshDiaObjectCache();
@@ -1293,7 +1293,7 @@ namespace Trinity
                         if (CombatBase.CurrentPower.SNOPower == SNOPower.Monk_SweepingWind)
                             MonkCombat.LastSweepingWindRefresh = DateTime.UtcNow;
 
-                        MonkCombat.MaintainTempestRush();
+                        MonkCombat.RunOngoingPowers();
                     }
 
                     SpellTracker.TrackSpellOnUnit(CombatBase.CurrentPower.TargetACDGUID, CombatBase.CurrentPower.SNOPower);

@@ -11,7 +11,7 @@ using Zeta.Game.Internals.Actors;
 
 namespace Trinity
 {
-    public partial class Trinity 
+    public partial class Trinity
     {
         internal static int LastSceneId = -1;
 
@@ -63,6 +63,8 @@ namespace Trinity
                     return TargetCheckResult(true, "Current Target is not null");
                 }
 
+                MonkCombat.RunOngoingPowers();
+
                 // if we just opened a horadric cache, wait around to open it
                 if (DateTime.UtcNow.Subtract(Composites.LastFoundHoradricCache).TotalSeconds < 5)
                     return TargetCheckResult(true, "Recently opened Horadric Cache");
@@ -98,7 +100,7 @@ namespace Trinity
                             BarbarianCombat.AllowSprintOOC = true;
                             DisableOutofCombatSprint = false;
 
-                            powerBuff = AbilitySelector(false, true);
+                            powerBuff = AbilitySelector(UseOOCBuff: true);
 
                             if (powerBuff.SNOPower != SNOPower.None)
                             {
@@ -107,6 +109,14 @@ namespace Trinity
                                 ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetACDGUID);
                                 LastPowerUsed = powerBuff.SNOPower;
                                 CacheData.AbilityLastUsed[powerBuff.SNOPower] = DateTime.UtcNow;
+
+                                // Monk Stuffs get special attention
+                                {
+                                    if (powerBuff.SNOPower == SNOPower.Monk_TempestRush)
+                                        MonkCombat.LastTempestRushLocation = CombatBase.CurrentPower.TargetPosition;
+                                    if (powerBuff.SNOPower == SNOPower.Monk_SweepingWind)
+                                        MonkCombat.LastSweepingWindRefresh = DateTime.UtcNow;
+                                }
 
                             }
                         }
