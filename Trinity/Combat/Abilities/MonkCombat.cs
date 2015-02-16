@@ -609,6 +609,12 @@ namespace Trinity.Combat.Abilities
             if (Player.ActorClass != ActorClass.Monk)
                 return false;
 
+            if (BrainBehavior.IsVendoring)
+                return false;
+
+            if (Player.IsInTown)
+                return false;
+
             if (ProfileManager.CurrentProfileBehavior != null)
             {
                 Type profileBehaviorType = ProfileManager.CurrentProfileBehavior.GetType();

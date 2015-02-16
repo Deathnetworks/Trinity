@@ -29,7 +29,7 @@ namespace Trinity
         {
             get
             {
-                return new Version(2, 3, 4);
+                return new Version(2, 4, 0);
             }
         }
 
@@ -37,7 +37,7 @@ namespace Trinity
         {
             get
             {
-                return "rrrix, xzjv, many community devs";
+                return "rrrix, xzjv, jubisman, and many more";
             }
         }
 

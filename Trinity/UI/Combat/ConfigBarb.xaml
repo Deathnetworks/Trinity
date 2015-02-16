@@ -139,6 +139,7 @@
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.ThreatShoutOOC}" ToolTip="Use Threating Shout Out of Combat to generate Fury">Use Threating Shout OOC</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.UseLeapOOC}" ToolTip="Leap Out Of Combat">Leap OOC</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.UseChargeOOC}" ToolTip="Furious Charge Out Of Combat">Furious Charge OOC</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.IgnorePainOffCooldown}" ToolTip="Use Ignore Pain as soon as it's available">Spam Ignore Pain</CheckBox>
             </UniformGrid>
             <GroupBox Grid.Row="2">
                 <GroupBox.Header>Sprint</GroupBox.Header>

@@ -182,6 +182,9 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
+                if (Settings.Combat.Barbarian.IgnorePainOffCooldown && CanCast(SNOPower.Barbarian_IgnorePain))
+                    return true;
+
                 return
                     !UseOOCBuff &&
                     CanCast(SNOPower.Barbarian_IgnorePain) &&

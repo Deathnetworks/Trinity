@@ -145,7 +145,7 @@ namespace Trinity.DbProvider
                     CancelUnstuckerForSeconds = 20;
                 LastCancelledUnstucker = DateTime.UtcNow;
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Clearing old route and trying new path find to: " + LastMoveToTarget.ToString());
-                Navigator.MoveTo(LastMoveToTarget, "original destination", false);
+                NavigateTo(LastMoveToTarget, "original destination");
                 return vSafeMovementLocation;
             }
             // Only try an unstuck 10 times maximum in XXX period of time
@@ -469,7 +469,7 @@ namespace Trinity.DbProvider
                         LastCancelledUnstucker = DateTime.UtcNow;
 
                         Navigator.Clear();
-                        Navigator.MoveTo(LastMoveToTarget, "original destination", false);
+                        PlayerMover.NavigateTo(LastMoveToTarget, "original destination");
 
                         return;
                     }
@@ -764,8 +764,8 @@ namespace Trinity.DbProvider
                 else
                     lc = LogCategory.Navigator;
 
-                Logger.Log(lc, "Navigator {0} dest={1} ({2}) duration={3:0} distance={4:0} {5}",
-                    result, NavHelper.PrettyPrintVector3(destination), destinationName, t1.ElapsedMilliseconds, destination.Distance2D(Trinity.Player.Position), pathCheck);
+                Logger.Log(lc, "{0} in {1:0}ms {2} dist={3:0} {4}",
+                    result, t1.ElapsedMilliseconds, destinationName, destination.Distance2D(Trinity.Player.Position), pathCheck);
             }
             catch (OutOfMemoryException)
             {

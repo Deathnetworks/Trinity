@@ -26,7 +26,7 @@ namespace Trinity.Coroutines
             while (ZetaDia.Me.IsFullyValid() && !ZetaDia.Me.IsInCombat && location.Distance2D(ZetaDia.Me.Position) > range)
             {
                 Logger.LogVerbose("Moving to " + destinationName);
-                Navigator.MoveTo(location, destinationName);
+                PlayerMover.NavigateTo(location, destinationName);
                 await Coroutine.Yield();
             }
             if (location.Distance2D(ZetaDia.Me.Position) <= range)

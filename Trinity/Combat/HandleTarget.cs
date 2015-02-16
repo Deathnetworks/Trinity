@@ -1087,9 +1087,9 @@ namespace Trinity
                 {
                     bool straightLinePathing = DataDictionary.StraightLinePathingLevelAreaIds.Contains(Player.LevelAreaId);
 
-                    string destname = String.Format("Name={0} Dist={1:0} IsElite={2} LoS={3} HP={4:0.00} Dir={5}",
+                    string destname = String.Format("{0} {1:0} yds Elite={2} LoS={3} HP={4:0.00} Dir={5}",
                         CurrentTarget.InternalName,
-                        CurrentTarget.RadiusDistance,
+                        CurrentTarget.Distance,
                         CurrentTarget.IsBossOrEliteRareUnique,
                         CurrentTarget.HasBeenInLoS,
                         CurrentTarget.HitPointsPct,

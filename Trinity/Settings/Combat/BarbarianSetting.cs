@@ -21,6 +21,7 @@ namespace Trinity.Config.Combat
         private int _MinThreatShoutMobCount;
         private bool _IgnoreAvoidanceInWOTB;
         private bool _IgnoreGoldInWOTB;
+        private bool _ignorePainOffCooldown;
         private float _MinHotaHealth;
         private BarbarianWOTBMode _WOTBMode;
         private BarbarianSprintMode _SprintMode;
@@ -1009,6 +1010,24 @@ namespace Trinity.Config.Combat
                 {
                     _UseChargeOOC = value;
                     OnPropertyChanged("UseChargeOOC");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool IgnorePainOffCooldown
+        {
+            get
+            {
+                return _ignorePainOffCooldown;
+            }
+            set
+            {
+                if (_ignorePainOffCooldown != value)
+                {
+                    _ignorePainOffCooldown = value;
+                    OnPropertyChanged("IgnorePainOffCooldown");
                 }
             }
         }
