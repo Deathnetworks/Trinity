@@ -79,6 +79,11 @@ namespace Trinity
 
             public void UpdateBuffsCache()
             {
+                if (ZetaDia.Me == null)
+                    return;
+                if (!ZetaDia.Me.IsFullyValid())
+                    return;
+
                 using (new PerformanceLogger("UpdateCachedBuffsData"))
                 {
                     if (DateTime.UtcNow.Subtract(LastUpdated).TotalMilliseconds < 500)

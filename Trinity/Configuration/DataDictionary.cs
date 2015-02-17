@@ -891,6 +891,7 @@ namespace Trinity
             332923, // x1_Bog_bloodSpring_large     
             321855, // x1_Pand_Ext_Ordnance_Mine
             355898, // x1_Bog_Family_Guard_Tower_Stump
+            376917, // [1FA3B814] Type: ServerProp Name: x1_Westm_Hub_Stool_A-381422 ActorSNO: 376917, Distance: 2.337004
         };
 
         /// <summary>
@@ -904,6 +905,7 @@ namespace Trinity
             {105303, 15}, // trOut_FesteringWoods_Neph_Column_C_Broken_Base_Bottom
             {104827, 15}, // trOut_FesteringWoods_Neph_Column_C_Broken_Base 
             {355898, 12}, // x1_Bog_Family_Guard_Tower_Stump
+            {376917, 10}, 
             
          };
 

@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using Trinity.Cache;
-using Trinity.Combat;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.DbProvider;
@@ -9,7 +8,6 @@ using Trinity.Items;
 using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
-using Zeta.Bot.Navigation;
 using Zeta.Bot.Profile.Common;
 using Zeta.Bot.Settings;
 using Zeta.Common;
@@ -43,9 +41,10 @@ namespace Trinity
             return Math.Max(DateTime.UtcNow.Subtract(lastHadUnitInSights).TotalMilliseconds, DateTime.UtcNow.Subtract(lastHadEliteUnitInSights).TotalMilliseconds);
         }
 
+        const double MaxWeight = 50000d;
+
         private static void RefreshDiaGetWeights()
         {
-            const double MaxWeight = 50000d;
 
             using (new PerformanceLogger("RefreshDiaObjectCache.Weighting"))
             {
@@ -59,16 +58,16 @@ namespace Trinity
                 bool prioritizeCloseRangeUnits = (avoidanceNearby || _forceCloseRangeTarget || Player.IsRooted || DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds < 1000 &&
                                                   ObjectCache.Count(u => u.IsUnit && u.RadiusDistance < 10f) >= 3);
 
-                bool HiPriorityHealthGlobes = Settings.Combat.Misc.HiPriorityHG;
+                bool hiPriorityHealthGlobes = Settings.Combat.Misc.HiPriorityHG;
 
-                bool HealthGlobeEmergency = (Player.CurrentHealthPct <= CombatBase.EmergencyHealthGlobeLimit || Player.PrimaryResourcePct <= CombatBase.HealthGlobeResource) &&
-                                            ObjectCache.Any(g => g.Type == GObjectType.HealthGlobe) && HiPriorityHealthGlobes;
+                bool healthGlobeEmergency = (Player.CurrentHealthPct <= CombatBase.EmergencyHealthGlobeLimit || Player.PrimaryResourcePct <= CombatBase.HealthGlobeResource) &&
+                                            ObjectCache.Any(g => g.Type == GObjectType.HealthGlobe) && hiPriorityHealthGlobes;
 
-                bool HiPriorityShrine = Settings.WorldObject.HiPriorityShrines;
+                bool hiPriorityShrine = Settings.WorldObject.HiPriorityShrines;
 
-                bool GetHiPriorityShrine = ObjectCache.Any(s => s.Type == GObjectType.Shrine) && HiPriorityShrine;
+                bool getHiPriorityShrine = ObjectCache.Any(s => s.Type == GObjectType.Shrine) && hiPriorityShrine;
 
-                bool GetHiPriorityContainer = Settings.WorldObject.HiPriorityContainers && ObjectCache.Any(c => c.Type == GObjectType.Container) &&
+                bool getHiPriorityContainer = Settings.WorldObject.HiPriorityContainers && ObjectCache.Any(c => c.Type == GObjectType.Container) &&
                                               !(Legendary.HarringtonWaistguard.IsEquipped && Legendary.HarringtonWaistguard.IsBuffActive);
 
                 bool profileTagCheck = false;
@@ -89,6 +88,7 @@ namespace Trinity
                 }
 
                 bool isKillBounty =
+                    !Player.ParticipatingInTieredLootRun &&
                     Player.ActiveBounty != null &&
                     Player.ActiveBounty.Info.KillCount > 0;
 
@@ -102,9 +102,9 @@ namespace Trinity
                      CombatBase.IgnoringElites);
 
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight,
-                    "Starting weights: packSize={0} packRadius={1} MovementSpeed={2:0.0} Elites={3} AoEs={4} disableIgnoreTag={5} ({6}) closeRangePriority={7} townRun={8} questingArea={9} level={10} isQuestingMode={11}",
+                    "Starting weights: packSize={0} packRadius={1} MovementSpeed={2:0.0} Elites={3} AoEs={4} disableIgnoreTag={5} ({6}) closeRangePriority={7} townRun={8} questingArea={9} level={10} isQuestingMode={11} healthGlobeEmerg={12} hiPriHG={13} hiPriShrine={14}",
                     Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius, movementSpeed, eliteCount, avoidanceCount, profileTagCheck, behaviorName,
-                    prioritizeCloseRangeUnits, TownRun.IsTryingToTownPortal(), DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId), Player.Level, CombatBase.IsQuestingMode);
+                    prioritizeCloseRangeUnits, TownRun.IsTryingToTownPortal(), DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId), Player.Level, CombatBase.IsQuestingMode, healthGlobeEmergency, hiPriorityHealthGlobes, hiPriorityShrine);
 
                 bool inQuestArea = DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId);
                 bool usingTownPortal = TownRun.IsTryingToTownPortal();
@@ -113,32 +113,22 @@ namespace Trinity
                     (!(isKillBounty || Player.InActiveEvent) &&
                      !CombatBase.IsQuestingMode &&
                      !inQuestArea &&
-                     !DataDictionary.RiftWorldIds.Contains(Player.WorldID) &&
+                     Player.TieredLootRunlevel != 0 && // Rift Trials
                      !usingTownPortal &&
                      !profileTagCheck &&
-                     movementSpeed > 1 &&
+                     movementSpeed >= 1 &&
                      Settings.Combat.Misc.TrashPackSize > 1 &&
                      Player.Level >= 15 &&
                      Player.CurrentHealthPct > 0.10 &&
                      DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds > 500);
 
-                bool shouldIgnoreBosses = HealthGlobeEmergency || GetHiPriorityShrine || GetHiPriorityContainer;
+                bool shouldIgnoreBosses = healthGlobeEmergency || getHiPriorityShrine || getHiPriorityContainer;
 
                 // Highest weight found as we progress through, so we can pick the best target at the end (the one with the highest weight)
                 HighestWeightFound = 0;
 
-
-
-
                 foreach (TrinityCacheObject cacheObject in ObjectCache.OrderBy(c => c.Distance))
                 {
-
-                    bool elitesInRangeOfUnit = !CombatBase.IgnoringElites &&
-                        ObjectCache.Any(u => u.ACDGuid != cacheObject.ACDGuid && u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= 25f);
-
-                    bool shouldIgnoreTrashMob = shouldIgnoreTrashMobs && !elitesInRangeOfUnit;
-
-                    bool GoblinKamikaze = cacheObject.IsTreasureGoblin && Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze;
 
                     string objWeightInfo = "";
 
@@ -151,8 +141,7 @@ namespace Trinity
                         // Weight Units
                         case GObjectType.Unit:
                             {
-                                int nearbyMonsterCount = ObjectCache.Count(u => u.ACDGuid != cacheObject.ACDGuid && u.IsTrashMob && u.HitPoints > 0 &&
-                                    cacheObject.Position.Distance2D(u.Position) <= Settings.Combat.Misc.TrashPackClusterRadius);
+                                bool goblinKamikaze = cacheObject.IsTreasureGoblin && Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze;
 
                                 bool isInHotSpot = GroupHotSpots.CacheObjectIsInHotSpot(cacheObject);
 
@@ -160,12 +149,20 @@ namespace Trinity
 
                                 if (cacheObject.IsTrashMob)
                                 {
+                                    bool elitesInRangeOfUnit = !CombatBase.IgnoringElites &&
+                                        ObjectCache.Any(u => u.ACDGuid != cacheObject.ACDGuid && u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= 15f);
+
+                                    int nearbyMonsterCount = ObjectCache.Count(u => u.ACDGuid != cacheObject.ACDGuid && u.IsTrashMob && u.HitPoints > 0 &&
+                                        cacheObject.Position.Distance2D(u.Position) <= Settings.Combat.Misc.TrashPackClusterRadius);
+
+                                    bool shouldIgnoreTrashMob = shouldIgnoreTrashMobs && nearbyMonsterCount < Settings.Combat.Misc.TrashPackSize && !elitesInRangeOfUnit;
+
                                     // Ignore trash mobs < 15% health or 50% health with a DoT
                                     if (cacheObject.IsTrashMob && shouldIgnoreTrashMob &&
                                         (cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealth ||
                                          cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealthDoT && cacheObject.HasDotDPS) && !cacheObject.IsQuestMonster && !cacheObject.IsMinimapActive)
                                     {
-                                        objWeightInfo = "Ignoring Health/DoT ";
+                                        objWeightInfo += "Ignoring Health/DoT ";
                                         ignoring = true;
                                     }
 
@@ -173,20 +170,19 @@ namespace Trinity
 
                                     // Ignore Solitary Trash mobs (no elites present)
                                     // Except if has been primary target or if already low on health (<= 20%)
-                                    if (shouldIgnoreTrashMob && !isInHotSpot &&
-                                        !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize) &&
-                                        !cacheObject.IsQuestMonster && !cacheObject.IsMinimapActive && ignoreSummoner &&
-                                        !cacheObject.IsBountyObjective || HealthGlobeEmergency || GetHiPriorityContainer || GetHiPriorityShrine || GoblinKamikaze)
+                                    if ((shouldIgnoreTrashMob && !isInHotSpot &&
+                                        !cacheObject.IsQuestMonster && !cacheObject.IsMinimapActive && !ignoreSummoner &&
+                                        !cacheObject.IsBountyObjective) || healthGlobeEmergency || getHiPriorityContainer || getHiPriorityShrine || goblinKamikaze)
                                     {
-                                        objWeightInfo = "Ignoring ";
+                                        objWeightInfo += "Ignoring ";
                                         ignoring = true;
                                     }
                                     else
                                     {
-                                        objWeightInfo = "Adding ";
+                                        objWeightInfo += "Adding ";
                                     }
-                                    objWeightInfo += String.Format("nearbyCount={0} radiusDistance={1:0} hotspot={2} ShouldIgnore={3} elitesInRange={4} hitPointsPc={5:0.0} summoner={6} quest:{7} minimap={8} ",
-                                        nearbyMonsterCount, cacheObject.RadiusDistance, isInHotSpot, shouldIgnoreTrashMob, elitesInRangeOfUnit, cacheObject.HitPointsPct, ignoreSummoner, cacheObject.IsQuestMonster, cacheObject.IsMinimapActive);
+                                    objWeightInfo += String.Format("ShouldIgnore={3} nearbyCount={0} radiusDistance={1:0} hotspot={2} elitesInRange={4} hitPointsPc={5:0.0} summoner={6} quest={7} minimap={8} bounty={9} ",
+                                        nearbyMonsterCount, cacheObject.RadiusDistance, isInHotSpot, shouldIgnoreTrashMob, elitesInRangeOfUnit, cacheObject.HitPointsPct, ignoreSummoner, cacheObject.IsQuestMonster, cacheObject.IsMinimapActive, cacheObject.IsBountyObjective);
 
                                     if (ignoring)
                                         break;
@@ -198,14 +194,14 @@ namespace Trinity
                                     if ((!cacheObject.IsBoss || shouldIgnoreBosses) && !cacheObject.IsBountyObjective &&
                                         shouldIgnoreElites && cacheObject.IsEliteRareUnique && !isInHotSpot &&
                                         !(cacheObject.HitPointsPct <= (Settings.Combat.Misc.ForceKillElitesHealth / 100))
-                                        || HealthGlobeEmergency || GetHiPriorityShrine || GetHiPriorityContainer || GoblinKamikaze)
+                                        || healthGlobeEmergency || getHiPriorityShrine || getHiPriorityContainer || goblinKamikaze)
                                     {
-                                        objWeightInfo = "Ignoring ";
+                                        objWeightInfo += "Ignoring ";
                                         ignoring = true;
                                     }
                                     else if (cacheObject.IsEliteRareUnique && !shouldIgnoreElites)
                                     {
-                                        objWeightInfo = "Adding ";
+                                        objWeightInfo += "Adding ";
                                     }
                                     objWeightInfo += String.Format("shouldIgnore={0} hitPointsPct={1:0} ", shouldIgnoreElites, cacheObject.HitPointsPct * 100);
 
@@ -713,7 +709,6 @@ namespace Trinity
                                 {
                                     objWeightInfo += " NavBlocking";
                                     cacheObject.Weight = 0;
-                                    break;
                                 }
 
                                 break;
@@ -741,7 +736,6 @@ namespace Trinity
                                 {
                                     objWeightInfo += " NavBlocking";
                                     cacheObject.Weight = 0;
-                                    break;
                                 }
 
                                 break;
@@ -791,7 +785,7 @@ namespace Trinity
                                     if (ObjectCache.Any(p => p.Type == GObjectType.Player && p.RActorGuid != Player.RActorGuid))
                                         minPartyHealth = ObjectCache.Where(p => p.Type == GObjectType.Player && p.RActorGuid != Player.RActorGuid).Min(p => p.HitPointsPct);
                                     // If we're giving high priority to health globes, give it higher weight and check for resource level
-                                    if (HiPriorityHealthGlobes)
+                                    if (hiPriorityHealthGlobes)
                                     {
                                         if (!Legendary.ReapersWraps.IsEquipped)
                                         {
@@ -817,7 +811,7 @@ namespace Trinity
                                 else
                                 {
                                     // Ok we have globes enabled, and our health is low
-                                    if (HiPriorityHealthGlobes)
+                                    if (hiPriorityHealthGlobes)
                                     {
                                         cacheObject.Weight = MaxWeight;
                                     }
@@ -848,7 +842,7 @@ namespace Trinity
                                 foreach (CacheObstacleObject tempobstacle in CacheData.MonsterObstacles.Where(cp =>
                                     MathUtil.IntersectsPath(cp.Position, cp.Radius, Player.Position, point)))
                                 {
-                                    if (HiPriorityHealthGlobes)
+                                    if (hiPriorityHealthGlobes)
                                         cacheObject.Weight *= 1;
                                     else
                                         cacheObject.Weight *= 0.85;
@@ -857,7 +851,7 @@ namespace Trinity
                                 if (cacheObject.Distance > 10f)
                                 {
                                     // See if there's any AOE avoidance in that spot, if so reduce the weight by 10%
-                                    if (HiPriorityHealthGlobes)
+                                    if (hiPriorityHealthGlobes)
                                     {
                                         if (CacheData.TimeBoundAvoidance.Any(cp => MathUtil.IntersectsPath(cp.Position, cp.Radius, Player.Position, cacheObject.Position)))
                                             cacheObject.Weight *= 1;
@@ -928,7 +922,7 @@ namespace Trinity
                                 }
 
                                 // As a percentage of health with typical maximum weight
-                                cacheObject.Weight = MaxWeight * (1 - Trinity.Player.CurrentHealthPct);
+                                cacheObject.Weight = MaxWeight * (1 - Player.CurrentHealthPct);
 
                                 break;
                             }
@@ -1167,7 +1161,7 @@ namespace Trinity
 
                                 // Open container for the damage buff
                                 if (Legendary.HarringtonWaistguard.IsEquipped && !Legendary.HarringtonWaistguard.IsBuffActive &&
-                                    ZetaDia.Me.IsInCombat && cacheObject.Distance < 80f || GetHiPriorityContainer)
+                                    ZetaDia.Me.IsInCombat && cacheObject.Distance < 80f || getHiPriorityContainer)
                                     cacheObject.Weight += 20000d;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
@@ -1247,7 +1241,7 @@ namespace Trinity
                         // Kiting and Avoidance
                         if (CurrentTarget.IsUnit)
                         {
-                            var AvoidanceList = CacheData.TimeBoundAvoidance.Where(o =>
+                            var avoidanceList = CacheData.TimeBoundAvoidance.Where(o =>
                                 // Distance from avoidance to target is less than avoidance radius
                                 o.Position.Distance(CurrentTarget.Position) <= (GetAvoidanceRadius(o.ActorSNO) * 1.2) &&
                                     // Distance from obstacle to me is <= cacheObject.RadiusDistance
@@ -1255,9 +1249,9 @@ namespace Trinity
                                 );
 
                             // if there's any obstacle within a specified distance of the avoidance radius *1.2 
-                            if (AvoidanceList.Any())
+                            if (avoidanceList.Any())
                             {
-                                foreach (CacheObstacleObject o in AvoidanceList)
+                                foreach (CacheObstacleObject o in avoidanceList)
                                 {
                                     Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Avoidance: Id={0} Weight={1} Loc={2} Radius={3} Name={4}", o.ActorSNO, o.Weight, o.Position, o.Radius, o.Name);
                                 }
@@ -1306,7 +1300,7 @@ namespace Trinity
 
                     // Add to generic blacklist for safety, as the RActorGUID on items and gold can change as we move away and get closer to the items (while walking around corners)
                     // So we can't use any ID's but rather have to use some data which never changes (actorSNO, position, type, worldID)
-                    GenericBlacklist.AddToBlacklist(new GenericCacheObject()
+                    GenericBlacklist.AddToBlacklist(new GenericCacheObject
                     {
                         Key = CurrentTarget.ObjectHash,
                         Value = null,

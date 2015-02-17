@@ -214,6 +214,7 @@ namespace Trinity
             TimeBoundAvoidance.Clear();
             BlacklistedEvents.Clear();
             LowPriorityObjectCache.Clear();
+            Player.ForceUpdates();
         }
     }
 }

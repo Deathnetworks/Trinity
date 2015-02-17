@@ -96,6 +96,7 @@ namespace Trinity
             public int BloodShards { get; private set; }
             public bool IsRanged { get; private set; }
             public bool IsValid { get; private set; }
+            public int TieredLootRunlevel { get; private set; }
 
             public class SceneInfo
             {
@@ -103,9 +104,9 @@ namespace Trinity
                 public int SceneId { get; set; }
             }
 
-            private static DateTime LastSlowUpdate = DateTime.MinValue;
-            private static DateTime LastVerySlowUpdate = DateTime.MinValue;
-			private static DiaActivePlayer _me;
+            internal static DateTime LastSlowUpdate = DateTime.MinValue;
+            internal static DateTime LastVerySlowUpdate = DateTime.MinValue;
+			internal static DiaActivePlayer _me;
 
 			internal void UpdatePlayerCache()
 			{               
@@ -196,7 +197,8 @@ namespace Trinity
 			{
                 BloodShards = ZetaDia.CPlayer.BloodshardCount;
                 MyDynamicID = _me.CommonData.DynamicId;
-                ParticipatingInTieredLootRun = _me.CommonData.GetAttribute<int>(ActorAttributeType.ParticipatingInTieredLootRun) > 0;
+                ParticipatingInTieredLootRun = _me.IsParticipatingInTieredLootRun;
+                TieredLootRunlevel = _me.InTieredLootRunLevel;
 
                 Coinage = _me.Inventory.Coinage;
                 CurrentExperience = ZetaDia.Me.CurrentExperience;
@@ -245,6 +247,8 @@ namespace Trinity
 			public void Clear()
 			{
                 LastUpdated = DateTime.MinValue;
+                LastSlowUpdate = DateTime.MinValue;
+                LastVerySlowUpdate = DateTime.MinValue;
                 IsIncapacitated = false;
                 IsRooted = false;
                 IsInTown = false;
@@ -266,6 +270,13 @@ namespace Trinity
 					LastUpdate = DateTime.UtcNow
 				};
 			}
+
+            public void ForceUpdates()
+            {
+                LastUpdated = DateTime.MinValue;
+                LastSlowUpdate = DateTime.MinValue;
+                LastVerySlowUpdate = DateTime.MinValue;
+            }
 
 			public bool IsFacing(Vector3 targetPosition, float arcDegrees = 70f)
 			{

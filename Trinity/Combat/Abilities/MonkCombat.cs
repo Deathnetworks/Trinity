@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Trinity.Config.Combat;
 using Trinity.DbProvider;
+using Trinity.Objects;
 using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -141,14 +142,13 @@ namespace Trinity.Combat.Abilities
 
             // Seven Sided Strike
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
-                (TargetUtil.AnyElitesInRange(15, 1) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f) || Player.CurrentHealthPct <= 0.55) &&
+                (TargetUtil.AnyElitesInRange(15, 1) || Player.CurrentHealthPct <= 0.55 || Legendary.Madstone.IsEquipped) &&
                 CanCast(SNOPower.Monk_SevenSidedStrike, CanCastFlags.NoTimer) &&
                 ((Player.PrimaryResource >= 50 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 RefreshSweepingWind(true);
                 return new TrinityPower(SNOPower.Monk_SevenSidedStrike, 16f, CurrentTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 3);
             }
-
 
             // Sweeping Winds Refresh
             if (Player.PrimaryResource >= _minSweepingWindSpirit &&
@@ -222,22 +222,22 @@ namespace Trinity.Combat.Abilities
                 }
             }
 
-            // Exploding Palm
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
-                CanCast(SNOPower.Monk_ExplodingPalm, CanCastFlags.NoTimer) &&
-                !Skills.Monk.ExplodingPalm.IsTrackedOnUnit(CurrentTarget))
-            {
-                return new TrinityPower(SNOPower.Monk_ExplodingPalm, 2f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 3);
-            }
-
             // Make a mega-splosion
             if (ShouldSpreadExplodingPalm())
             {
                 ChangeTarget();
             }
-
+          
+            // Exploding Palm
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
+                CanCast(SNOPower.Monk_ExplodingPalm, CanCastFlags.NoTimer) && 
+                (Runes.Monk.EssenceBurn.IsActive ? !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.Monk_ExplodingPalm) : !Skills.Monk.ExplodingPalm.IsTrackedOnUnit(CurrentTarget)))
+            {
+                return new TrinityPower(SNOPower.Monk_ExplodingPalm, 10f, CurrentTarget.ACDGuid);
+            }
 
             var wolRange = Legendary.TzoKrinsGaze.IsEquipped ? 55f : 16f;
+
             // Wave of light
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight) && !MonkHasNoPrimary &&
                 (TargetUtil.AnyMobsInRange(wolRange, Settings.Combat.Monk.MinWoLTrashCount) || TargetUtil.IsEliteTargetInRange(wolRange)) &&
@@ -247,7 +247,15 @@ namespace Trinity.Combat.Abilities
                 HasMantraAbilityAndBuff())
             {
                 RefreshSweepingWind(true);
-                return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, TargetUtil.GetBestClusterPoint(), -1, CurrentTarget.ACDGuid, 0, 1);
+                return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, TargetUtil.GetBestClusterPoint());
+            }
+
+            // Lashing Tail Kick
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_LashingTailKick) &&
+                ((Player.PrimaryResource >= 50 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
+            {
+                RefreshSweepingWind(true);
+                return new TrinityPower(SNOPower.Monk_LashingTailKick, 10f, CurrentTarget.ACDGuid);
             }
 
             // For tempest rush re-use
@@ -276,16 +284,6 @@ namespace Trinity.Combat.Abilities
                 const string trUse = "Starting Tempest Rush for Combat";
                 LogTempestRushStatus(trUse);
                 return new TrinityPower(SNOPower.Monk_TempestRush, 23f, ZigZagPosition, Trinity.CurrentWorldDynamicId, -1, 0, 0);
-            }
-
-            // Lashing Tail Kick
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Monk_LashingTailKick) && !Player.IsIncapacitated &&
-                // Either doesn't have sweeping wind, or does but the buff is already up
-                (!Hotbar.Contains(SNOPower.Monk_SweepingWind) || (Hotbar.Contains(SNOPower.Monk_SweepingWind) && GetHasBuff(SNOPower.Monk_SweepingWind))) &&
-                ((Player.PrimaryResource >= 65 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
-            {
-                RefreshSweepingWind(true);
-                return new TrinityPower(SNOPower.Monk_LashingTailKick, 10f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1);
             }
 
             // 4 Mantra spam for the 4 second buff
@@ -407,11 +405,10 @@ namespace Trinity.Combat.Abilities
             }
 
             // Wave of light as primary 
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight) && MonkHasNoPrimary &&
-                (Skills.Monk.ExplodingPalm.IsTrackedOnUnit(CurrentTarget) || !Hotbar.Contains(SNOPower.Monk_ExplodingPalm)))
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight))
             {
                 RefreshSweepingWind(true);
-                return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, TargetUtil.GetBestClusterPoint(), -1, CurrentTarget.ACDGuid, 0, 1);
+                return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, TargetUtil.GetBestClusterPoint());
             }
 
             // Default attacks
@@ -440,21 +437,25 @@ namespace Trinity.Combat.Abilities
             return CacheData.Inventory.EquippedIds.Contains(405804);
         }
 
+        /// <summary>
+        /// Determines if we should change targets to apply Exploading Palm to another target
+        /// </summary>
         internal static bool ShouldSpreadExplodingPalm()
         {
-            return Skills.Monk.ExplodingPalm.IsActive &&
+            return CurrentTarget != null && Skills.Monk.ExplodingPalm.IsActive &&
 
-                // enough resources and mobs nearby
-                Player.PrimaryResourcePct > 0.30 && TargetUtil.AnyMobsInRange(15f, 4) &&
-
-                // Don't bother if 10 or more targets already have EP
-                !TargetUtil.IsUnitWithDebuffInRangeOfPosition(15f, TargetUtil.GetBestClusterPoint(), SNOPower.Monk_ExplodingPalm, 10) &&
+                // Current target is valid
+                 CurrentTarget.IsUnit && !CurrentTarget.IsTreasureGoblin &&
 
                 // Avoid rapidly changing targets
                 DateTime.UtcNow.Subtract(_lastTargetChange).TotalMilliseconds > 500 &&
 
-                // Current target is valid
-                CurrentTarget != null && CurrentTarget.IsUnit && !CurrentTarget.IsTreasureGoblin;
+                // enough resources and mobs nearby
+                Player.PrimaryResource > 40 && TargetUtil.AnyMobsInRange(15f, 4) &&
+
+                // Don't bother if X or more targets already have EP
+                !TargetUtil.IsUnitWithDebuffInRangeOfPosition(15f, TargetUtil.GetBestClusterPoint(), SNOPower.Monk_ExplodingPalm, Settings.Combat.Monk.ExploadingPalmMaxMobCount);
+
         }
 
         /// <summary>
@@ -471,7 +472,7 @@ namespace Trinity.Combat.Abilities
             Trinity.Blacklist3Seconds.Add(CurrentTarget.RActorGuid);
 
             // Would like the new target to be different than the one we just blacklisted, or be very close to dead.
-            if (lowestHealthTarget.ACDGuid == currentTarget.ACDGuid && !(lowestHealthTarget.HitPointsPct > 0.2)) return;
+            if (lowestHealthTarget.ACDGuid == currentTarget.ACDGuid && lowestHealthTarget.HitPointsPct < 0.2) return;
 
             Trinity.CurrentTarget = lowestHealthTarget;
             //Logger.LogNormal("Found lowest health target {0} {1} ({2:0.##}%)", CurrentTarget.InternalName, CurrentTarget.CommonData.ACDGuid, lowestHealthTarget.HitPointsPct * 100);

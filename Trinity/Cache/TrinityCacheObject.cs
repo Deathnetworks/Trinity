@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.Serialization;
+using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
@@ -408,5 +409,14 @@ namespace Trinity
         }
 
         public bool IsMarker { get; set; }
+
+        /// <summary>
+        /// Determines whether [is in line of sight].
+        /// </summary>
+        /// <returns><c>true</c> if [is in line of sight]; otherwise, <c>false</c>.</returns>
+        public bool IsInLineOfSight()
+        {
+            return !Navigator.Raycast(Trinity.Player.Position, Position);
+        }
     }
 }

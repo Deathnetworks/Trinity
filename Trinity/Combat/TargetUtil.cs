@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Trinity.Combat;
 using Trinity.Combat.Abilities;
 using Trinity.DbProvider;
 using Trinity.Technicals;
@@ -853,11 +854,11 @@ namespace Trinity
                                    select u).ToList();
 
             // Make sure units exist
-            unitsWithDebuff.RemoveAll(u =>
-            {
-                var acd = ZetaDia.Actors.GetACDByGuid(u.ACDGuid);
-                return acd == null || !acd.IsValid;
-            });
+            //unitsWithDebuff.RemoveAll(u =>
+            //{
+            //    var acd = ZetaDia.Actors.GetACDByGuid(u.ACDGuid);
+            //    return acd == null || !acd.IsValid;
+            //});
 
             return unitsWithDebuff.Count >= unitsRequiredWithDebuff;
         }
@@ -992,7 +993,34 @@ namespace Trinity
                                  where u.IsUnit && u.CommonDataIsValid &&
                                         u.Weight > 0 &&
                                         u.Position.Distance2D(position) <= range &&
-                                        (debuff == SNOPower.None || !SpellTracker.IsUnitTracked(u.ACDGuid, debuff))
+                                        (debuff == SNOPower.None || !SpellTracker.IsUnitTracked(u.ACDGuid, debuff)) &&
+                                        !CacheData.MonsterObstacles.Any(m => MathUtil.IntersectsPath(m.Position, m.Radius, u.Position, Player.Position))
+                                 orderby u.HitPoints ascending
+                                 select u).ToList();
+
+            if (unitsByHealth.Any())
+                lowestHealthTarget = unitsByHealth.FirstOrDefault();
+            else if (Trinity.CurrentTarget != null)
+                lowestHealthTarget = Trinity.CurrentTarget;
+            else
+                lowestHealthTarget = default(TrinityCacheObject);
+
+            return lowestHealthTarget;
+        }
+
+        internal static TrinityCacheObject BestExploadingPalmTarget(float range, Vector3 position = new Vector3())
+        {
+            if (position == new Vector3())
+                position = Player.Position;
+
+            TrinityCacheObject lowestHealthTarget;
+            var unitsByHealth = (from u in ObjectCache
+                                 where u.IsUnit && u.CommonDataIsValid &&
+                                        u.Weight > 0 &&
+                                        u.Position.Distance2D(position) <= range &&
+                                        !SpellTracker.IsUnitTracked(u.ACDGuid, SNOPower.Monk_ExplodingPalm) &&
+                                        !CacheData.MonsterObstacles.Any(m => MathUtil.IntersectsPath(m.Position, m.Radius, u.Position, Player.Position)) &&
+                                        u.IsInLineOfSight()
                                  orderby u.HitPoints ascending
                                  select u).ToList();
 

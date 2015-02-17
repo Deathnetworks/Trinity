@@ -7,6 +7,7 @@ namespace Trinity.Config.Combat
     public class MonkSetting : ITrinitySetting<MonkSetting>, IAvoidanceHealth, INotifyPropertyChanged
     {
         #region Fields
+        private int _exploadingPalmMaxMobMobCount;
         private TempestRushOption _TROption;
         private float _PotionLevel;
         private float _HealthGlobeLevel;
@@ -900,6 +901,24 @@ namespace Trinity.Config.Combat
             }
         }
 
+        [DataMember(IsRequired = false)]
+        [DefaultValue(2)]
+        public int ExploadingPalmMaxMobCount
+        {
+            get
+            {
+                return _exploadingPalmMaxMobMobCount;
+            }
+            set
+            {
+                if (_exploadingPalmMaxMobMobCount != value)
+                {
+                    _exploadingPalmMaxMobMobCount = value;
+                    OnPropertyChanged("ExploadingPalmMaxMobCount");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -932,16 +951,17 @@ namespace Trinity.Config.Combat
         [OnDeserializing()]
         internal void OnDeserializingMethod(StreamingContext context)
         {
-            this.TR_MinSpirit = 60;
-            this.TR_MinDist = 10;
-            this.TargetBasedZigZag = true;
-            this.TROption = TempestRushOption.Always;
-            this.MinCycloneTrashCount = 2;
-            this.MinWoLTrashCount = 2;
-            this.SpamSweepingWindOnLowHP = false;
-            this.AvoidGrotesqueHealth = 1;
-            this.AvoidOrbiterHealth = 1;
-            this.AvoidWormholeHealth = 0.50f;
+            TR_MinSpirit = 60;
+            TR_MinDist = 10;
+            TargetBasedZigZag = true;
+            TROption = TempestRushOption.Always;
+            MinCycloneTrashCount = 2;
+            MinWoLTrashCount = 2;
+            SpamSweepingWindOnLowHP = false;
+            AvoidGrotesqueHealth = 1;
+            AvoidOrbiterHealth = 1;
+            AvoidWormholeHealth = 0.50f;
+            ExploadingPalmMaxMobCount = 2;
         }
         #endregion Methods
     }
