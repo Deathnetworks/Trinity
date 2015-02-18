@@ -117,17 +117,13 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.X1_Crusader_FallingSword, 16f, TargetUtil.GetBestClusterPoint(15f, 65f, false));
                 }
 
-                if (Legendary.FateOfTheFell.IsEquipped && Player.PrimaryResourcePct > 0.5)
-                {
-                    return new TrinityPower(SNOPower.X1_Crusader_HeavensFury3, 65f, TargetUtil.GetBestPierceTarget(65f).Position);
-                }
-
                 // HeavensFury
                 bool hasAkkhan = (Sets.ArmorOfAkkhan.IsThirdBonusActive);
                 if (CanCastHeavensFury() && !hasAkkhan)
                 {
                     return new TrinityPower(SNOPower.X1_Crusader_HeavensFury3, 65f, TargetUtil.GetBestClusterPoint());
                 }
+
                 if (CanCastHeavensFuryHolyShotgun() && hasAkkhan)
                 {
                     return new TrinityPower(SNOPower.X1_Crusader_HeavensFury3, 15f, CurrentTarget.Position);
@@ -146,8 +142,7 @@ namespace Trinity.Combat.Abilities
                     if (bestPierceTarget != null)
                         return new TrinityPower(SNOPower.x1_Crusader_Phalanx3, 45f, bestPierceTarget.ACDGuid);
                 }
-                bool hasUnrelentingPhalanx = Legendary.UnrelentingPhalanx.IsEquipped;
-                if (CanCastPhalanxStampede(hasUnrelentingPhalanx))
+                if (CanCastPhalanxStampede())
                 {
                     var bestPierceTarget = TargetUtil.GetBestPierceTarget(45f);
                     if (bestPierceTarget != null)
@@ -319,9 +314,9 @@ namespace Trinity.Combat.Abilities
             return CanCast(SNOPower.x1_Crusader_Phalanx3) && (TargetUtil.ClusterExists(45f, 3) || TargetUtil.EliteOrTrashInRange(45f));
         }
 
-        private static bool CanCastPhalanxStampede(bool hasUnrelentingPhalanx)
+        private static bool CanCastPhalanxStampede()
         {
-            return (hasUnrelentingPhalanx && CanCast(SNOPower.x1_Crusader_Phalanx3) && TargetUtil.AnyMobsInRange(45f, 1) && Runes.Crusader.Stampede.IsActive);
+            return (Legendary.UnrelentingPhalanx.IsEquipped && CanCast(SNOPower.x1_Crusader_Phalanx3) && TargetUtil.AnyMobsInRange(45f, 1) && Runes.Crusader.Stampede.IsActive);
         }
 
         private static bool CanCastSteedChargeOutOfCombat()
