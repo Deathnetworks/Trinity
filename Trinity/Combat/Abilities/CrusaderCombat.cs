@@ -119,7 +119,7 @@ namespace Trinity.Combat.Abilities
 
                 if (Legendary.FateOfTheFell.IsEquipped && Player.PrimaryResourcePct > 0.5)
                 {
-                    return new TrinityPower(SNOPower.X1_Crusader_HeavensFury3, 65f, TargetUtil.GetBestPierceTarget(65f,45).Position);
+                    return new TrinityPower(SNOPower.X1_Crusader_HeavensFury3, 65f, TargetUtil.GetBestPierceTarget(65f).Position);
                 }
 
                 // HeavensFury

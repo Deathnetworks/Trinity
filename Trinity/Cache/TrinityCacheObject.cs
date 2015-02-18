@@ -375,9 +375,9 @@ namespace Trinity
         {
             return
                 (from u in Trinity.ObjectCache
-                 where u.RActorGuid != this.RActorGuid &&
+                 where u.RActorGuid != RActorGuid &&
                  u.IsUnit &&
-                 MathUtil.IntersectsPath(u.Position, u.Radius, Trinity.Player.Position, this.Position)
+                 MathUtil.IntersectsPath(u.Position, u.Radius, Trinity.Player.Position, Position)
                  select u).Count();
         }
 

@@ -183,7 +183,7 @@ namespace Trinity
             return clusterUnit.Position;
         }
 
-        internal static TrinityCacheObject GetBestPierceTarget(float maxRange, int arcDegrees = 0, bool ignoreUnitsInAoE = false)
+        internal static TrinityCacheObject GetBestPierceTarget(float maxRange, bool ignoreUnitsInAoE = false)
         {
             var result =
                 (from u in ObjectCache
