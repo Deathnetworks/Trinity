@@ -30,6 +30,13 @@ namespace Trinity.Config
         /// Occurs when property changed.
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public delegate void SettingsEvent();
+        public static event SettingsEvent OnSave = () => { };
+        public static event SettingsEvent OnLoaded = () => { };
+        public static event SettingsEvent OnReset = () => { };
+        public static event SettingsEvent OnUserRequestedReset = () => { };
+
         #endregion Events
 
         #region Constructors
@@ -179,6 +186,13 @@ namespace Trinity.Config
             Thread.Sleep(250);
             Load();
         }
+        public void UserRequestedReset()
+        {
+            Logger.Log("UserRequestedReset called");
+            Reset(this);
+            OnUserRequestedReset();
+        }
+
         public void Reset()
         {
             Reset(this);
@@ -209,7 +223,8 @@ namespace Trinity.Config
             lock (this)
             {
                 try
-                {
+                {                    
+
                     if (File.Exists(GlobalSettingsFile))
                     {
                         Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Loading Global Settings, You can use per-battletag settings by removing the Trinity.xml file under your Demonbuddy settings directory");
@@ -250,7 +265,9 @@ namespace Trinity.Config
                             // this tests to make sure we didn't load anything null, and our load was succesful
                             if (Advanced != null && Combat != null && Combat.Misc != null)
                             {
+                                Logger.Log("Configuration loaded successfully.");
                                 loadSuccessful = true;
+                                OnLoaded();
                             }
                         }
 
@@ -260,6 +277,8 @@ namespace Trinity.Config
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Configuration file not found.");
                         Reset();
                     }
+
+                    
                 }
                 catch (Exception ex)
                 {
@@ -275,13 +294,15 @@ namespace Trinity.Config
                     File.Delete(OldBattleTagSettingsFile);
                 }
 
-            }
+            }            
         }
 
         public void Save(bool useGlobal = false)
         {
             lock (this)
             {
+                OnSave();
+
                 GlobalSettings.Instance.Save();
                 CharacterSettings.Instance.Save();
 
@@ -328,6 +349,7 @@ namespace Trinity.Config
         {
             if (PropertyChanged != null)
             {
+                Logger.Log("TrinitySettings Property Changed. {0}", propertyName);
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
@@ -342,6 +364,9 @@ namespace Trinity.Config
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "Starting Reset Object {0}", type.Name);
                 foreach (PropertyInfo prop in type.GetProperties(BindingFlags.SetProperty | BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance))
                 {
+                    if (Attribute.IsDefined(prop, typeof (IgnoreDataMemberAttribute)))
+                        continue;                        
+
                     if (prop.PropertyType.IsValueType || prop.PropertyType == typeof(string))
                     {
                         Attribute[] decorators = prop.GetCustomAttributes(typeof(DefaultValueAttribute), true) as Attribute[];
@@ -367,6 +392,9 @@ namespace Trinity.Config
                         }
                     }
                 }
+
+                OnReset();
+                    
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "End Reset Object {0}", type.Name);
             }
             catch (Exception ex)
@@ -385,6 +413,9 @@ namespace Trinity.Config
                 {
                     try
                     {
+                        if (Attribute.IsDefined(prop, typeof(IgnoreDataMemberAttribute)))
+                            continue;     
+
                         if (prop.PropertyType.IsValueType || prop.PropertyType == typeof(string))
                         {
                             prop.SetValue(destination, prop.GetValue(source, null), null);

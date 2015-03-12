@@ -26,7 +26,6 @@ namespace Trinity.UI.UIComponents
         private readonly TrinitySetting _Model;
         private readonly TrinitySetting _OriginalModel;
 
-
         /// <summary>
         ///     Initializes a new instance of the <see cref="ConfigViewModel" /> class.
         /// </summary>
@@ -39,6 +38,7 @@ namespace Trinity.UI.UIComponents
                 _Model = new TrinitySetting();
                 _OriginalModel.CopyTo(_Model);
                 InitializeResetCommand();
+
                 SaveCommand = new RelayCommand(
                     parameter =>
                     {
@@ -608,6 +608,11 @@ namespace Trinity.UI.UIComponents
             get { return _Model.Loot.ItemRank; }
         }
 
+        public ItemListSettings ItemList
+        {
+            get { return _Model.Loot.ItemList; }
+        }
+
         /// <summary>
         ///     Gets the Pickup Configuration Model.
         /// </summary>
@@ -720,7 +725,7 @@ namespace Trinity.UI.UIComponents
                     parameter => _Model.Notification.Reset());
 
                 ResetAllCommand = new RelayCommand(
-                    parameter => _Model.Reset());
+                    parameter => _Model.UserRequestedReset());
             }
             catch (Exception ex)
             {

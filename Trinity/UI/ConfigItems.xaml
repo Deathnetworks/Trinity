@@ -21,6 +21,9 @@
             <TabItem Header="Item Ranks" Foreground="{DynamicResource TextBrush}">
                 <Border Tag="Items\ConfigItemRank.xaml"/>
             </TabItem>
+            <TabItem Header="Item List" Foreground="{DynamicResource TextBrush}">
+                <Border Tag="Items\ConfigItemList.xaml"/>
+            </TabItem>            
             <TabItem Header="ItemRules" Foreground="{DynamicResource TextBrush}">
                 <Border Tag="Items\ConfigItemRules.xaml"/>
             </TabItem>

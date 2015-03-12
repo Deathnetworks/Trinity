@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.Serialization;
 using Trinity.Cache;
 using Trinity.Combat.Abilities;
 using Trinity.Reference;
@@ -8,8 +9,10 @@ using Zeta.Game.Internals.Actors;
 
 namespace Trinity.Objects
 {
+    [DataContract(Namespace = "")]
     public class Item : IEquatable<Item>
     {
+        [DataMember]
         public int Id { get; set; }
         public string Name { get; set; }
 

@@ -28,6 +28,17 @@ namespace Trinity.UI
             return GetDisplayWindow(Path.Combine(FileManager.PluginPath, "UI"));
         }
 
+        #region Events
+
+        public delegate void LoaderEvent();
+
+        /// <summary>
+        /// Occurs when settings window is open and properly loaded
+        /// </summary>
+        public static event LoaderEvent OnSettingsWindowOpened = () => { };
+
+        #endregion
+
         public static Window GetDisplayWindow(string uiPath)
         {
             using (new PerformanceLogger("GetDisplayWindow"))
@@ -69,6 +80,7 @@ namespace Trinity.UI
 
                     Application.Current.Exit += WindowClosed;
 
+                    ConfigWindow.ContentRendered += (sender, args) => OnSettingsWindowOpened();
 
                     Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Window build finished.");
                 }
@@ -146,6 +158,8 @@ namespace Trinity.UI
 
                 // Change reference to custom Trinity class
                 filecontent = filecontent.Replace("xmlns:ut=\"clr-namespace:Trinity.UIComponents\"", "xmlns:ut=\"clr-namespace:Trinity.UIComponents;assembly=" + Assembly.GetExecutingAssembly().GetName().Name + "\"");
+                filecontent = filecontent.Replace("xmlns:objects=\"clr-namespace:Trinity.Objects\"", "xmlns:objects=\"clr-namespace:Trinity.Objects;assembly=" + Assembly.GetExecutingAssembly().GetName().Name + "\"");
+                filecontent = filecontent.Replace("xmlns:mock=\"clr-namespace:Trinity.Settings.Mock\"", "xmlns:mock=\"clr-namespace:Trinity.Settings.Mock;assembly=" + Assembly.GetExecutingAssembly().GetName().Name + "\"");
 
                 // Remove Template designer reference
                 //filecontent = filecontent.Replace("<ResourceDictionary.MergedDictionaries><ResourceDictionary Source=\"..\\Template.xaml\"/></ResourceDictionary.MergedDictionaries>", string.Empty);

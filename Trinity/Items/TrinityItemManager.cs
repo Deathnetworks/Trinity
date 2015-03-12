@@ -345,6 +345,14 @@ namespace Trinity.Items
                 return ItemRanks.ShouldStashItem(cItem);
             }
 
+            // Item List
+            if (cItem.Quality >= ItemQuality.Legendary && Trinity.Settings.Loot.ItemFilterMode == ItemFilterMode.ItemList && IsEquipment(cItem))
+            {
+                var result = ItemList.ShouldStashItem(cItem);
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = {3}", cItem.RealName, cItem.InternalName, tItemType, "ItemListCheck=" + (result ? "KEEP" : "TRASH"));
+                return result;
+            }
+
             if (cItem.Quality >= ItemQuality.Legendary)
             {
                 if (evaluationType == ItemEvaluationType.Keep)

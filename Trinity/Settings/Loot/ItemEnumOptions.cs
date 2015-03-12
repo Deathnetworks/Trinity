@@ -24,7 +24,8 @@ namespace Trinity.Settings.Loot
         TrinityOnly,
         TrinityWithItemRules,
         DemonBuddy,
-        ItemRanks
+        ItemRanks,
+        ItemList
     }
 
     public enum ItemRankMode
