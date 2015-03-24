@@ -25,6 +25,7 @@
                         <ComboBoxItem Content="File Based Script Rules" Tag="TrinityWithItemRules" ToolTip="Utilizes Item Rulesets (see ItemRules directory)" />
                         <ComboBoxItem Content="Demonbuddy Loot Rules" Tag="DemonBuddy" ToolTip="Use the Built-in Demonbuddy loot rule logic (see Demonbuddy Settings tab)" />
                         <ComboBoxItem Content="Item Ranking" Tag="ItemRanks" ToolTip="Use Top 1000 Greater Rift popular items" />
+                        <ComboBoxItem Content="Item List" Tag="ItemList" ToolTip="Use custom list of items" />
                     </ComboBox>
                     <Button HorizontalAlignment="Center"
                         Style="{DynamicResource LinkButton}"

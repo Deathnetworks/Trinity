@@ -1,0 +1,268 @@
+﻿<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ut="clr-namespace:Trinity.UIComponents"
+             xmlns:themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero"             
+             xmlns:objects="clr-namespace:Trinity.Objects"
+             xmlns:mock="clr-namespace:Trinity.Settings.Mock"
+             mc:Ignorable="d" Foreground="{DynamicResource TextBrush}" Background="DarkGray"             
+             d:DesignHeight="372" d:DesignWidth="390">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="..\Template.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <ut:EmptyStringToVisibilityConverter x:Key="EmptyStringToVisibilityConverter"/>
+            <ut:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" />
+            
+            <mock:MockData x:Key="DesignViewModel"/>
+
+            <Style x:Key="StatusLabelStyle" TargetType="{x:Type Label}">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Foreground" Value="White" />
+                <Setter Property="FontWeight" Value="Normal"/>
+            </Style>
+
+            <Style x:Key="GroupHeaderPrimaryLabelStyle" TargetType="{x:Type Label}">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Foreground" Value="White" />
+                <Setter Property="FontWeight" Value="Normal"/>
+                <Setter Property="FontSize" Value="12"></Setter>
+                <Setter Property="Padding" Value="0,0,0,0"></Setter>
+                <Setter Property="Margin" Value="0"></Setter>                
+            </Style>
+
+            <Style x:Key="GroupHeaderSecondaryLabelStyle" TargetType="{x:Type Label}">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Foreground" Value="White" />
+                <Setter Property="FontWeight" Value="Normal"/>
+            </Style>
+
+            <Style x:Key="TitleLabelStyle" TargetType="{x:Type Label}">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Foreground" Value="White" />
+                <Setter Property="Margin" Value="0"></Setter>
+                <Setter Property="FontSize" Value="14"></Setter>
+                <Setter Property="Padding" Value="0,0,0,0"></Setter>
+                <Setter Property="FontWeight" Value="Bold"></Setter>
+                <Setter Property="Height" Value="Auto"></Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Path=IsSetItem}" Value="True">
+                        <Setter Property="Foreground" Value="#8bd442"></Setter>
+                    </DataTrigger>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding Path=IsSetItem}" Value="False" />
+                            <Condition Binding="{Binding Path=Quality}" Value="Legendary" />
+                        </MultiDataTrigger.Conditions>
+                        <Setter Property="Foreground" Value="#bf642f"/>
+                    </MultiDataTrigger>
+                </Style.Triggers>                
+            </Style>
+
+            <Style x:Key="UnselectedTitleLabelStyle" TargetType="{x:Type Label}">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Margin" Value="0,0,0,0"></Setter>
+                <Setter Property="FontSize" Value="12"></Setter>
+                <Setter Property="Padding" Value="0,0,0,0"></Setter>
+                <Setter Property="FontWeight" Value="Normal"></Setter>
+                <Setter Property="Height" Value="Auto"></Setter>
+                <Setter Property="Foreground" Value="#cccccc"></Setter>
+            </Style>
+
+            <Style x:Key="SubtleInformationStyle" TargetType="{x:Type Label}">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Margin" Value="0,0,0,0"></Setter>
+                <Setter Property="FontSize" Value="11"></Setter>
+                <Setter Property="Padding" Value="0,2,2,0"></Setter>
+                <Setter Property="FontWeight" Value="Normal"></Setter>
+                <Setter Property="Height" Value="Auto"></Setter>
+                <Setter Property="Foreground" Value="#cccccc"></Setter>
+            </Style>
+
+            <Style x:Key="QualityLabelStyle" TargetType="{x:Type Label}">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Foreground" Value="White" />
+                <Setter Property="Margin" Value="0"></Setter>
+                <Setter Property="Padding" Value="0,0,0,0"></Setter>
+                <Setter Property="FontSize" Value="11"></Setter>
+                <Setter Property="FontWeight" Value="Normal"></Setter>
+                <Setter Property="Height" Value="Auto"></Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Path=IsSetItem}" Value="True">
+                        <Setter Property="Foreground" Value="#8bd442"></Setter>
+                    </DataTrigger>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding Path=IsSetItem}" Value="False" />
+                            <Condition Binding="{Binding Path=Quality}" Value="Legendary" />
+                        </MultiDataTrigger.Conditions>
+                        <Setter Property="Foreground" Value="#bf642f"/>
+                    </MultiDataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <DataTemplate x:Key="SelectedRowTemplate">
+                <Border Margin="0" Background="#444444" Padding="5,0,5,2">
+                    <Border Padding="0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="15" MinWidth="15"/>
+                                <ColumnDefinition MinWidth="54" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Column="0" Orientation="Vertical">
+                                <CheckBox x:Name="SelectedCheckBox" IsChecked="{Binding Path=IsSelected}" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <Border Grid.Column="1" Background="#333333" CornerRadius="3" Padding="14,0,2,2" >
+                                <StackPanel Orientation="Vertical" Margin="0,0,0,2">
+                                    <DockPanel>
+                                        <Label DockPanel.Dock="Left" Style="{StaticResource TitleLabelStyle}" Content="{Binding Name}"/>
+                                        <Label DockPanel.Dock="Right" Style="{StaticResource SubtleInformationStyle}" HorizontalAlignment="Right" Content="{Binding Id}"/>
+                                    </DockPanel>                                    
+                                    <Label Style="{StaticResource QualityLabelStyle}" Content="{Binding QualityTypeLabel}"/>
+                                    <WrapPanel Visibility="{Binding LegendaryAffix, Converter={StaticResource EmptyStringToVisibilityConverter}, Mode=OneWay}">
+                                        <Label Style="{StaticResource SubtleInformationStyle}" Content="{Binding LegendaryAffix}" />
+                                    </WrapPanel>
+                                </StackPanel>
+                            </Border>
+
+                        </Grid>
+                    </Border>
+                </Border>
+            </DataTemplate>
+
+            <DataTemplate x:Key="NormalRowTemplate">
+                <StackPanel Orientation="Horizontal" Margin="5,2,5,2">
+                    <CheckBox x:Name="SelectedCheckBox" IsChecked="{Binding Path=IsSelected}" Margin="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <Label Style="{StaticResource UnselectedTitleLabelStyle}" Margin="6,0,0,0" Content="{Binding Name}"/>
+                    <!--<Label Style="{StaticResource UnselectedTitleLabelStyle}" Margin="6,0,0,0" Content="{Binding InvalidReason, Mode=OneWay}" Visibility="{Binding InvalidReason, Converter={StaticResource EmptyStringToVisibilityConverter}, Mode=OneWay}"/>-->
+                </StackPanel>
+            </DataTemplate>
+
+            <Style x:Key="ListViewItemStyle" TargetType="{x:Type ListViewItem}">
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="Transparent"/>
+                <Setter Property="Margin" Value="0"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Path=IsSelected}" Value="True">
+                        <Setter Property="ContentTemplate" Value="{DynamicResource SelectedRowTemplate}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Path=IsSelected}" Value="False">
+                        <Setter Property="ContentTemplate" Value="{DynamicResource NormalRowTemplate}"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+            
+            <LinearGradientBrush x:Key="TextBoxBorder" EndPoint="0,20" MappingMode="Absolute" StartPoint="0,0">
+                <GradientStop Color="#ABADB3" Offset="0.05"/>
+                <GradientStop Color="#E2E3EA" Offset="0.07"/>
+                <GradientStop Color="#E3E9EF" Offset="1"/>
+            </LinearGradientBrush>
+            
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <DockPanel LastChildFill="True" VerticalAlignment="Stretch">
+        
+        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,0" Orientation="Horizontal" Background="#FF6A6A6A" Height="38" VerticalAlignment="Center">
+            <Label Style="{StaticResource StatusLabelStyle}" VerticalContentAlignment="Center" Margin="5,0,0,0" Content="Search:"></Label>
+            <TextBox Width="165" Height="22" Text="{Binding ItemList.FilterText, UpdateSourceTrigger=PropertyChanged}" Margin="0,8"/>
+            <Button Content=" X " Height="21" Width="25" Margin="-27,-1,0,0" Background="Transparent" Command="{Binding ItemList.ResetFilterCommand}" BorderBrush="Transparent" FontWeight="Heavy" BorderThickness="1" Visibility="{Binding ItemList.IsFiltered, Converter={StaticResource BoolToVisibilityConverter}}" />
+            <Label Style="{StaticResource StatusLabelStyle}" VerticalContentAlignment="Center" Margin="5,0,0,0" Content="Group By:"></Label>
+            <ComboBox SelectedValuePath="Tag" x:Name="GroupingDropdown" MaxHeight="25" SelectedValue="{Binding ItemList.Grouping}" Padding="0,0,15,0">
+                <ComboBoxItem Content="None" Tag="None" Foreground="White" Background="Black" />
+                <ComboBoxItem Content="ItemType" Tag="ItemType" Foreground="White" Background="Black" />
+                <ComboBoxItem Content="Sets" Tag="SetName" Foreground="White" Background="Black" />
+                <ComboBoxItem Content="IsValid" Tag="IsValid" Foreground="White" Background="Black" />
+            </ComboBox>            
+        </StackPanel>
+
+        <ScrollViewer 
+            HorizontalContentAlignment="Stretch" 
+            VerticalContentAlignment="Stretch"             
+            CanContentScroll="True"
+            Margin="0,0,0,0">
+            <ListView x:Name="ListView1"                      
+                d:DataContext="{Binding Source={StaticResource DesignViewModel}}"
+                SelectionMode="Multiple"
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+                ScrollViewer.VerticalScrollBarVisibility="Disabled"                               
+                ItemContainerStyle="{DynamicResource ListViewItemStyle}"                    
+                Background="#FF474747"                          
+                ItemsSource="{Binding ItemList.Collection.View}"                      
+                VerticalContentAlignment="Stretch"
+                Style="{DynamicResource ListViewStyle1}">
+                <ListView.Resources>
+                    <Style x:Key="ListViewStyle1" TargetType="{x:Type ListView}">
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+                        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+                        <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
+                        <Setter Property="ScrollViewer.PanningMode" Value="Both"/>
+                        <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type ListView}">
+                                    <themes:ListBoxChrome x:Name="Bd" 
+                                        BorderBrush="{TemplateBinding BorderBrush}" 
+                                        BorderThickness="{TemplateBinding BorderThickness}" 
+                                        Background="{TemplateBinding Background}" 
+                                        RenderMouseOver="{TemplateBinding IsMouseOver}" 
+                                        RenderFocused="{TemplateBinding IsKeyboardFocusWithin}" 
+                                        SnapsToDevicePixels="False">
+                                        <ItemsPresenter SnapsToDevicePixels="False"/>
+                                    </themes:ListBoxChrome>
+                                    <ControlTemplate.Triggers>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsGrouping" Value="true"/>
+                                                <Condition Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="false"/>
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                                        </MultiTrigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListView.Resources>                   
+                <ListView.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.ContainerStyle>                            
+                            <Style TargetType="{x:Type GroupItem}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate>
+                                            <Expander FontWeight="Bold" Foreground="LightSkyBlue" Header="{Binding Name}" IsExpanded="{Binding ItemList.GroupsExpandedByDefault, FallbackValue=True}">
+                                                <Expander.HeaderTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Label Style="{StaticResource GroupHeaderPrimaryLabelStyle}" Content="{Binding}"></Label>
+                                                        </StackPanel>                                                        
+                                                    </DataTemplate>                                                    
+                                                </Expander.HeaderTemplate>
+                                                <ItemsPresenter />
+                                            </Expander>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </GroupStyle.ContainerStyle>
+                    </GroupStyle>
+                </ListView.GroupStyle>
+            </ListView>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

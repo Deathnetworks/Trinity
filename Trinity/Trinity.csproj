@@ -69,6 +69,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="PresentationFramework.Aero" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -123,6 +124,7 @@
     <Compile Include="Helpers\Bounties\Extensions.cs" />
     <Compile Include="Helpers\CloneExtension.cs" />
     <Compile Include="Helpers\Composites.cs" />
+    <Compile Include="Helpers\FullyObservableCollection.cs" />
     <Compile Include="Helpers\LookupList.cs" />
     <Compile Include="Helpers\MemoryHelper.cs" />
     <Compile Include="Helpers\SystemInformation.cs" />
@@ -155,6 +157,7 @@
     <Compile Include="Cache\GameBalanceDataCache.cs" />
     <Compile Include="Items\ItemDropStats.cs" />
     <Compile Include="Items\ItemIds.cs" />
+    <Compile Include="Items\ItemList.cs" />
     <Compile Include="Items\ItemSort.cs" />
     <Compile Include="Items\ItemStatsData.cs" />
     <Compile Include="Items\ItemStatsDataFactory.cs" />
@@ -190,7 +193,10 @@
     <Compile Include="Combat\CombatMovement.cs" />
     <Compile Include="Reference\SkillUtils.cs" />
     <Compile Include="Settings\Combat\CrusaderSetting.cs" />
+    <Compile Include="Settings\Loot\ItemListSettings.cs" />
     <Compile Include="Settings\Loot\ItemRankSettings.cs" />
+    <Compile Include="Settings\Mock\ItemListMockData.cs" />
+    <Compile Include="Settings\Mock\MockData.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Combat\HandleTarget.cs" />
     <Compile Include="Combat\AbilitySelector.cs" />
@@ -242,13 +248,17 @@
     <Compile Include="Helpers\PerformanceLogger.cs" />
     <Compile Include="UI\TabUI.cs" />
     <Compile Include="UI\UIComponents\BoolInverterConverter.cs" />
+    <Compile Include="UI\UIComponents\BoolToTypeConverters.cs" />
     <Compile Include="UI\UIComponents\ConfigViewModel.cs" />
+    <Compile Include="UI\UIComponents\DeferredAction.cs" />
+    <Compile Include="UI\UIComponents\EmptyStringToVisibilityConverter.cs" />
     <Compile Include="UI\UIComponents\EnumVisibilityConverter.cs" />
     <Compile Include="UI\UIComponents\IntToStringConverter.cs" />
     <Compile Include="UI\UIComponents\FlagEnumValueConverter.cs" />
     <Compile Include="UI\UIComponents\PercentConverter.cs" />
     <Compile Include="UI\UIComponents\EnumBooleanConverter.cs" />
     <Compile Include="UI\UIComponents\RelayCommand.cs" />
+    <Compile Include="UI\UIComponents\SettingsItem.cs" />
     <Compile Include="UI\UIComponents\TVarsViewModel.cs" />
     <Compile Include="UI\UIComponents\TVarValidationRule.cs" />
     <Compile Include="UI\UILoader.cs" />
@@ -305,6 +315,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\DebugTab.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Items\ConfigItemList.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
