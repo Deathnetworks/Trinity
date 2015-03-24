@@ -37,15 +37,18 @@ namespace Trinity.Combat.Abilities
 
         public static TrinityPower GetPower()
         {
-            // Locally scoped dynamic variables
-            if (IsTaegukEquipped()) // Taeguk gem refresh (3 seconds)
-            {
-                _swMinTime = 1800;
-            }
-
             _hasInnaSet = Sets.Innas.IsThirdBonusActive;
             _hasSwk = Sets.MonkeyKingsGarb.IsSecondBonusActive;
             _minSweepingWindSpirit = _hasInnaSet ? 5f : 75f;
+
+            // Locally scoped dynamic variables
+            if (IsTaegukEquipped()) // Taeguk gem refresh (3 seconds)
+            {
+                if (_hasInnaSet)
+                    _swMinTime = 500;
+                _swMinTime = 1800;
+            }
+
 
             // Destructible objects
             if (UseDestructiblePower)

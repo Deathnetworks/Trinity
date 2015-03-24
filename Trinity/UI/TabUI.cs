@@ -133,7 +133,7 @@ namespace Trinity.UI
 
         static void _btnCleanStash_Click(object sender, RoutedEventArgs e)
         {
-            var result = System.Windows.MessageBox.Show("Are you sure? This may remove and salvage/sell items from your stash! Permanently!", "Clean Stash Confirmation",
+            var result = MessageBox.Show("Are you sure? This may remove and salvage/sell items from your stash! Permanently!", "Clean Stash Confirmation",
                 MessageBoxButton.OKCancel);
 
             if (result == MessageBoxResult.OK)

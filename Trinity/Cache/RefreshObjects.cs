@@ -54,11 +54,11 @@ namespace Trinity
                 return false;
             }
 
-            if (!ZetaDia.Service.Hero.IsValid)
-            {
-                Logger.LogError("Hero is invalid!");
-                return false;
-            }
+            //if (!ZetaDia.Service.Hero.IsValid)
+            //{
+            //    Logger.LogError("Hero is invalid!");
+            //    return false;
+            //}
 
             if (!ZetaDia.IsInGame)
                 return false;

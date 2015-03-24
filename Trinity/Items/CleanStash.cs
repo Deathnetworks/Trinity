@@ -23,12 +23,13 @@ namespace Trinity.Items
 
         private static Composite _cleanBehavior;
         private static bool _hookInserted;
+        public static bool IsCleaning { get; private set; }
 
         public static void RunCleanStash()
         {
             if (!BotMain.IsRunning)
             {
-                Logger.LogError("Unable to clean stash while bot is not running");
+                TaskDispatcher.Start(ret => CleanTask(), ret => !IsCleaning);
                 return;
             }
 
@@ -55,6 +56,8 @@ namespace Trinity.Items
 
         private static void RemoveBehavior(string reason)
         {
+            IsCleaning = false;
+
             if (_cleanBehavior != null)
             {
                 try

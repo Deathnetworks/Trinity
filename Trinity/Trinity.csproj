@@ -177,6 +177,7 @@
     <Compile Include="Objects\Rune.cs" />
     <Compile Include="Objects\Set.cs" />
     <Compile Include="Objects\Skill.cs" />
+    <Compile Include="Reference\ItemRankData.cs" />
     <Compile Include="Reference\ItemRanks.cs" />
     <Compile Include="Reference\SkillBySlot.cs" />
     <Compile Include="Reference\Legendary.cs" />
