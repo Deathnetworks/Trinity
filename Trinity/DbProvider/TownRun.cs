@@ -356,7 +356,7 @@ namespace Trinity.DbProvider
 
         internal static SalvageOption GetSalvageOption(ItemQuality qualityLevel)
         {
-            if (qualityLevel >= ItemQuality.Normal && qualityLevel <= ItemQuality.Superior)
+            if (qualityLevel >= ItemQuality.Inferior && qualityLevel <= ItemQuality.Superior)
             {
                 return Trinity.Settings.Loot.TownRun.SalvageWhiteItemOption;
             }

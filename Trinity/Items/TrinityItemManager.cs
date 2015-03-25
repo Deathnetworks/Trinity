@@ -540,7 +540,7 @@ namespace Trinity.Items
 
         private static SalvageOption GetSalvageOption(ItemQuality quality)
         {
-            if (quality >= ItemQuality.Normal && quality <= ItemQuality.Superior)
+            if (quality >= ItemQuality.Inferior && quality <= ItemQuality.Superior)
             {
                 return Trinity.Settings.Loot.TownRun.SalvageWhiteItemOption;
             }
