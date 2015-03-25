@@ -422,13 +422,6 @@ namespace Trinity.Items
             if (item.ItemType == ItemType.KeystoneFragment && item.TieredLootRunKeyLevel >= 0)
                 return false;
 
-
-            GItemType trinityItemType = DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
-            GItemBaseType trinityItemBaseType = DetermineBaseType(trinityItemType);
-
-            // Take Salvage Option corresponding to ItemLevel
-            SalvageOption salvageOption = GetSalvageOption(cItem.Quality);
-
             // Stashing Whites
             if (Trinity.Settings.Loot.TownRun.StashWhites && cItem.Quality < ItemQuality.Magic1)
                 return false;
@@ -436,6 +429,15 @@ namespace Trinity.Items
             // Stashing Blues
             if (Trinity.Settings.Loot.TownRun.StashBlues && cItem.Quality > ItemQuality.Superior && cItem.Quality < ItemQuality.Rare4)
                 return false;
+
+            GItemType trinityItemType = DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
+            GItemBaseType trinityItemBaseType = DetermineBaseType(trinityItemType);
+
+            // Take Salvage Option corresponding to ItemLevel
+            SalvageOption salvageOption = GetSalvageOption(cItem.Quality);
+
+            if (salvageOption == SalvageOption.Salvage)
+                return true;
 
             switch (trinityItemBaseType)
             {

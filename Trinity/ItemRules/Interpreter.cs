@@ -888,7 +888,7 @@ namespace Trinity.ItemRules
             itemDic.Add("[MAXMANA]", item.Stats.MaxMana);
             itemDic.Add("[MANAREG]", item.Stats.ManaRegen);
 
-            itemDic.Add("[ANCIENT]", item.AncientRank);
+            itemDic.Add("[ANCIENT]", (float)item.AncientRank);
 
             // - ROS & MORE STATS ADDED -------------------------------------------//
             // This include Splash Damage, Cooldown Reduction, Resource Cost
