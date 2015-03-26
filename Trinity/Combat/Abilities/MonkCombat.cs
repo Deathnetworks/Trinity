@@ -250,7 +250,7 @@ namespace Trinity.Combat.Abilities
                 HasMantraAbilityAndBuff())
             {
                 RefreshSweepingWind(true);
-                return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, TargetUtil.GetBestClusterPoint());
+                return new TrinityPower(SNOPower.Monk_WaveOfLight, wolRange, TargetUtil.GetBestClusterPoint());
             }
 
             // Lashing Tail Kick
