@@ -97,6 +97,9 @@ namespace Trinity
             public bool IsRanged { get; private set; }
             public bool IsValid { get; private set; }
             public int TieredLootRunlevel { get; private set; }
+            public int CurrentQuestSNO { get; private set; }
+            public int CurrentQuestStep { get; private set; }
+            public Act WorldType { get; private set; }
 
             public class SceneInfo
             {
@@ -212,15 +215,20 @@ namespace Trinity
                 if (Trinity.Settings.Combat.Misc.UseNavMeshTargeting)
                     SceneId = _me.SceneId;
 
-				using (new PerformanceLogger("BountyInfo"))
-				{
-					// Step 13 is used when the player needs to go "Inspect the cursed shrine"
-					// Step 1 is event in progress, kill stuff
-					// Step 2 is event completed
-					// Step -1 is not started
-                    InActiveEvent = ZetaDia.ActInfo.ActiveQuests.Any(q => DataDictionary.EventQuests.Contains(q.QuestSNO) && q.QuestStep != 13);
-                    HasEventInspectionTask = ZetaDia.ActInfo.ActiveQuests.Any(q => DataDictionary.EventQuests.Contains(q.QuestSNO) && q.QuestStep == 13);
-				}
+				// Step 13 is used when the player needs to go "Inspect the cursed shrine"
+				// Step 1 is event in progress, kill stuff
+				// Step 2 is event completed
+				// Step -1 is not started
+                InActiveEvent = ZetaDia.ActInfo.ActiveQuests.Any(q => DataDictionary.EventQuests.Contains(q.QuestSNO) && q.QuestStep != 13);
+                HasEventInspectionTask = ZetaDia.ActInfo.ActiveQuests.Any(q => DataDictionary.EventQuests.Contains(q.QuestSNO) && q.QuestStep == 13);
+
+                WorldType = ZetaDia.WorldType;
+                if (WorldType != Act.OpenWorld)
+                {
+                    // Update these only with campaign
+                    CurrentQuestSNO = ZetaDia.CurrentQuest.QuestSNO;
+                    CurrentQuestStep = ZetaDia.CurrentQuest.StepId;
+                }
 
 				LastSlowUpdate = DateTime.UtcNow;            
 			}

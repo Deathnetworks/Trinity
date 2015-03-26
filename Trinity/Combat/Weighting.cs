@@ -508,6 +508,15 @@ namespace Trinity
                             }
                         case GObjectType.Item:
                             {
+                                // Campaign A5 Quest "Lost Treasure of the Nephalem" - have to interact with nephalem switches first... 
+                                // Quest: x1_Adria, Id: 257120, Step: 108 - disable all looting, pickup, and objects
+                                if (Player.WorldType != Act.OpenWorld && Player.CurrentQuestSNO == 257120 && Player.CurrentQuestStep == 108)
+                                {
+                                    cacheObject.Weight = 0;
+                                    objWeightInfo += " DisableForQuest";
+                                    break;
+                                }
+
                                 // Default Weight
                                 cacheObject.Weight = Math.Max((175 - cacheObject.Distance) / 175 * MaxWeight, 100d);
 
@@ -630,6 +639,15 @@ namespace Trinity
                             }
                         case GObjectType.Gold:
                             {
+                                // Campaign A5 Quest "Lost Treasure of the Nephalem" - have to interact with nephalem switches first... 
+                                // Quest: x1_Adria, Id: 257120, Step: 108 - disable all looting, pickup, and objects
+                                if (Player.WorldType != Act.OpenWorld && Player.CurrentQuestSNO == 257120 && Player.CurrentQuestStep == 108)
+                                {
+                                    cacheObject.Weight = 0;
+                                    objWeightInfo += " DisableForQuest";
+                                    break;
+                                }
+
 
                                 // Default Weight
                                 cacheObject.Weight = Math.Max((175 - cacheObject.Distance) / 175 * MaxWeight, 100d);
@@ -935,6 +953,15 @@ namespace Trinity
                             }
                         case GObjectType.Shrine:
                             {
+                                // Campaign A5 Quest "Lost Treasure of the Nephalem" - have to interact with nephalem switches first... 
+                                // Quest: x1_Adria, Id: 257120, Step: 108 - disable all looting, pickup, and objects
+                                if (Player.WorldType != Act.OpenWorld && Player.CurrentQuestSNO == 257120 && Player.CurrentQuestStep == 108)
+                                {
+                                    cacheObject.Weight = 0;
+                                    objWeightInfo += " DisableForQuest";
+                                    break;
+                                }
+
                                 float maxRange = Player.IsInRift ? 300f : 75f;
                                 double maxWeight = Player.IsInRift ? MaxWeight * 0.75d : 100d;
 
@@ -1077,6 +1104,15 @@ namespace Trinity
                             }
                         case GObjectType.Interactable:
                             {
+                                // Campaign A5 Quest "Lost Treasure of the Nephalem" - have to interact with nephalem switches first... 
+                                // Quest: x1_Adria, Id: 257120, Step: 108 - disable all looting, pickup, and objects
+                                if (Player.WorldType != Act.OpenWorld && Player.CurrentQuestSNO == 257120 && Player.CurrentQuestStep == 108)
+                                {
+                                    cacheObject.Weight = MaxWeight/3;
+                                    objWeightInfo += " PrioritizeForQuest";
+                                    break;
+                                }
+
                                 // Need to Prioritize, forget it!
                                 if (prioritizeCloseRangeUnits)
                                     break;
