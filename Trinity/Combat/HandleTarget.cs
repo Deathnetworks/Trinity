@@ -871,7 +871,7 @@ namespace Trinity
                 }
 
                 // Furious Charge movement for a barb
-                if (CombatBase.CanCast(SNOPower.Barbarian_FuriousCharge))
+                if (CombatBase.CanCast(SNOPower.Barbarian_FuriousCharge) && Settings.Combat.Barbarian.UseChargeOOC)
                 {
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_FuriousCharge, CurrentDestination, CurrentWorldDynamicId, -1);
                     SpellHistory.RecordSpell(SNOPower.Barbarian_FuriousCharge);

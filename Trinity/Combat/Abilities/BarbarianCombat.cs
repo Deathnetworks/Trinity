@@ -878,7 +878,10 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return (!Passives.Barbarian.BerserkerRage.IsActive && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) &&
+                bool berserkerRage = !Passives.Barbarian.BerserkerRage.IsActive;
+                bool ignoranceIsBliss = Runes.Barbarian.IgnoranceIsBliss.IsActive && GetHasBuff(SNOPower.Barbarian_IgnorePain) && Trinity.Player.CurrentHealthPct <= 1;
+
+                return ((berserkerRage || ignoranceIsBliss) && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) &&
                         ((Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")) ||
                          Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")));
             }
