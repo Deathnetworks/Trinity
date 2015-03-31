@@ -6,11 +6,14 @@
              xmlns:themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero"             
              xmlns:objects="clr-namespace:Trinity.Objects"
              xmlns:mock="clr-namespace:Trinity.Settings.Mock"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:uiComponents="clr-namespace:Trinity.UI.UIComponents"
              mc:Ignorable="d" Foreground="{DynamicResource TextBrush}" Background="DarkGray"             
-             d:DesignHeight="372" d:DesignWidth="390">
+             d:DesignHeight="500" d:DesignWidth="390">
 
     <UserControl.Resources>
         <ResourceDictionary>
+            
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="..\Template.xaml"/>
             </ResourceDictionary.MergedDictionaries>
@@ -19,6 +22,12 @@
             <ut:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" />
             
             <mock:MockData x:Key="DesignViewModel"/>
+
+            <ObjectDataProvider MethodName="GetValues" ObjectType="{x:Type sys:Enum}" x:Key="ItemPropertyProvider">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="ut:ItemProperty" />
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
 
             <Style x:Key="StatusLabelStyle" TargetType="{x:Type Label}">
                 <Setter Property="Background" Value="Transparent" />
@@ -120,7 +129,7 @@
                                 <CheckBox x:Name="SelectedCheckBox" IsChecked="{Binding Path=IsSelected}" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                             </StackPanel>
                             <Border Grid.Column="1" Background="#333333" CornerRadius="3" Padding="14,0,2,2" >
-                                <StackPanel Orientation="Vertical" Margin="0,0,0,2">
+                                <StackPanel Orientation="Vertical" Margin="0,0,1,1">
                                     <DockPanel>
                                         <Label DockPanel.Dock="Left" Style="{StaticResource TitleLabelStyle}" Content="{Binding Name}"/>
                                         <Label DockPanel.Dock="Right" Style="{StaticResource SubtleInformationStyle}" HorizontalAlignment="Right" Content="{Binding Id}"/>
@@ -129,11 +138,115 @@
                                     <WrapPanel Visibility="{Binding LegendaryAffix, Converter={StaticResource EmptyStringToVisibilityConverter}, Mode=OneWay}">
                                         <Label Style="{StaticResource SubtleInformationStyle}" Content="{Binding LegendaryAffix}" />
                                     </WrapPanel>
+                                    <Border Background="#55171717" BorderBrush="#55666666" BorderThickness="0,0,1,1" Margin="-10,5,0,0">
+                                        <Border Padding="10,5,10,10" Background="Transparent" BorderBrush="#FF222222" BorderThickness="1,1,0,0">
+                                            <StackPanel>
+                                                <Grid Background="Transparent" >
+                                                <!--<Label HorizontalAlignment="Left" FontWeight="Bold" Style="{StaticResource SubtleInformationStyle}" Content="Rules" />-->
+                                                    <TextBlock TextWrapping="Wrap" Text="Rules" Foreground="White" FontWeight="Bold" HorizontalAlignment="Left">
+                                                        <Run Text="  (" FontWeight="Normal" Foreground="Gray" />
+                                                        <Run Text="{Binding Mode=OneWay, Path=Rules.Count }" FontWeight="Normal" Foreground="Gray" />
+                                                        <Run Text=") " FontWeight="Normal" Foreground="Gray" />
+                                                    </TextBlock>                                       
+                                                <ComboBox 
+                                                    Background="Transparent" 
+                                                   HorizontalAlignment="Right"
+                                                  Name="AddRuleComboBox" 
+                                                    FontWeight="Normal"
+                                                  ut:SelectionChangedBehaviour.Command="{Binding AddRuleCommand}"
+                                                                                                  
+                                                  Width="Auto"
+                                                  Height="23" IsSynchronizedWithCurrentItem="False" Template="{DynamicResource ActionsComboBoxControlTemplate}"
+                                                  Tag="Add Rule"
+                                                  >
+                                                        <!--ItemsSource="{Binding Source={StaticResource ItemPropertyProvider}}"-->
+                                                    <ComboBox.Items>
+                                                        <ComboBoxItem Content="Ancient" />
+                                                    </ComboBox.Items>
+                                                </ComboBox>
+                                            </Grid>
+                                                <WrapPanel x:Name="rulesContentContainer" Background="Transparent" Width="Auto">
+                                                    <ItemsControl 
+                                                        Width="{Binding ActualWidth, ElementName=rulesContentContainer}"
+                                                              HorizontalContentAlignment="Stretch" 
+                                                              HorizontalAlignment="Stretch" 
+                                                              ItemsSource="{Binding Rules}" 
+                                                              ItemContainerStyle="{DynamicResource ItemsControlSelector}"
+   
+                                                        >
+                                                        <ItemsControl.ItemsPanel>
+                                                            <ItemsPanelTemplate>
+                                                                <DockPanel />
+                                                                <!--<StackPanel Width="*">
+                                                                   
+                                                                </StackPanel>-->
+                                                                <!--<Grid Width="Auto" IsItemsHost="True" HorizontalAlignment="Stretch">
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto" />
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <Grid.RowDefinitions>
+                                                                        <RowDefinition Height="Auto" />
+                                                                    </Grid.RowDefinitions>
+                                                                </Grid>-->                                                              
+                                                            </ItemsPanelTemplate>
+                                                        </ItemsControl.ItemsPanel>
+                                                        <!--<ItemsControl.ItemContainerStyle>
+                                                            <Style TargetType="ContentPresenter">
+                                                                <Setter Property="DockPanel.Dock" Value="Top"/>
+                                                            </Style>
+                                                        </ItemsControl.ItemContainerStyle>-->
+                                                    </ItemsControl>                        
+                                            </WrapPanel>
+                                        </StackPanel>
+                                        </Border>
+                                    </Border>
                                 </StackPanel>
                             </Border>
-
                         </Grid>
                     </Border>
+                </Border>
+            </DataTemplate>
+
+            <Style x:Key="ItemsControlSelector" TargetType="{x:Type ContentPresenter}">
+                <Setter Property="Margin" Value="0"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Width" Value="Auto"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="ContentTemplate" Value="{DynamicResource DefaultFormTemplate}"/>
+                <Setter Property="DockPanel.Dock" Value="Top"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="Ancient">
+                        <Setter Property="ContentTemplate" Value="{DynamicResource CheckboxFormTemplate}"/>
+                    </DataTrigger>                  
+                </Style.Triggers>
+            </Style>
+
+            <DataTemplate x:Key="CheckboxFormTemplate">
+                <Border Background="#55999999" BorderBrush="#CC999999" CornerRadius="1" Padding="2" BorderThickness="1,1,0,0">
+                    <Grid Width="Auto" HorizontalAlignment="Stretch">                    
+                        <WrapPanel HorizontalAlignment="Stretch" Width="Auto">
+                            <CheckBox IsChecked="{Binding Path=Value}" Margin="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Label Foreground="White" Style="{StaticResource UnselectedTitleLabelStyle}" Content="{Binding Name}"/>
+                        </WrapPanel>
+                        <Button HorizontalAlignment="Right" Content=" X " Height="21" Width="25" Margin="10,-1,0,0" Background="Transparent" 
+                                Command="{Binding Path=DataContext.RemoveRuleCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" 
+                                CommandParameter="{Binding ItemProperty}"
+                                BorderBrush="Transparent" FontWeight="Heavy" BorderThickness="0" />
+                    </Grid>
+                </Border>
+            </DataTemplate>
+
+            <DataTemplate x:Key="DefaultFormTemplate">
+                <Border Background="#55999999" BorderBrush="#CC999999" CornerRadius="1" Padding="2" BorderThickness="1,1,0,0">
+                    <Grid Width="Auto" HorizontalAlignment="Stretch">
+                        <WrapPanel HorizontalAlignment="Stretch" Width="Auto">
+                            <Label Foreground="White" Style="{StaticResource UnselectedTitleLabelStyle}" Content="{Binding Name}"/>
+                        </WrapPanel>
+                        <Button HorizontalAlignment="Right" Content=" X " Height="21" Width="25" Margin="10,-1,0,0" Background="Transparent" 
+                                Command="{Binding Path=DataContext.RemoveRuleCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" 
+                                CommandParameter="{Binding ItemProperty}"
+                                BorderBrush="Transparent" FontWeight="Heavy" BorderThickness="0" />
+                    </Grid>
                 </Border>
             </DataTemplate>
 
@@ -141,7 +254,6 @@
                 <StackPanel Orientation="Horizontal" Margin="5,2,5,2">
                     <CheckBox x:Name="SelectedCheckBox" IsChecked="{Binding Path=IsSelected}" Margin="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <Label Style="{StaticResource UnselectedTitleLabelStyle}" Margin="6,0,0,0" Content="{Binding Name}"/>
-                    <!--<Label Style="{StaticResource UnselectedTitleLabelStyle}" Margin="6,0,0,0" Content="{Binding InvalidReason, Mode=OneWay}" Visibility="{Binding InvalidReason, Converter={StaticResource EmptyStringToVisibilityConverter}, Mode=OneWay}"/>-->
                 </StackPanel>
             </DataTemplate>
 
@@ -163,13 +275,13 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-            
+
             <LinearGradientBrush x:Key="TextBoxBorder" EndPoint="0,20" MappingMode="Absolute" StartPoint="0,0">
                 <GradientStop Color="#ABADB3" Offset="0.05"/>
                 <GradientStop Color="#E2E3EA" Offset="0.07"/>
                 <GradientStop Color="#E3E9EF" Offset="1"/>
             </LinearGradientBrush>
-            
+
         </ResourceDictionary>
     </UserControl.Resources>
     <DockPanel LastChildFill="True" VerticalAlignment="Stretch">
@@ -179,7 +291,7 @@
             <TextBox Width="165" Height="22" Text="{Binding ItemList.FilterText, UpdateSourceTrigger=PropertyChanged}" Margin="0,8"/>
             <Button Content=" X " Height="21" Width="25" Margin="-27,-1,0,0" Background="Transparent" Command="{Binding ItemList.ResetFilterCommand}" BorderBrush="Transparent" FontWeight="Heavy" BorderThickness="1" Visibility="{Binding ItemList.IsFiltered, Converter={StaticResource BoolToVisibilityConverter}}" />
             <Label Style="{StaticResource StatusLabelStyle}" VerticalContentAlignment="Center" Margin="5,0,0,0" Content="Group By:"></Label>
-            <ComboBox SelectedValuePath="Tag" x:Name="GroupingDropdown" MaxHeight="25" SelectedValue="{Binding ItemList.Grouping}" Padding="0,0,15,0">
+            <ComboBox Tag="" SelectedValuePath="Tag" x:Name="GroupingDropdown" MaxHeight="25" SelectedValue="{Binding ItemList.Grouping}" Padding="0,0,15,0">
                 <ComboBoxItem Content="None" Tag="None" Foreground="White" Background="Black" />
                 <ComboBoxItem Content="ItemType" Tag="ItemType" Foreground="White" Background="Black" />
                 <ComboBoxItem Content="Sets" Tag="SetName" Foreground="White" Background="Black" />

@@ -112,5 +112,6 @@ namespace Trinity.Objects
             return Id.GetHashCode() ^ Name.GetHashCode();
         }
 
+
     }
 }

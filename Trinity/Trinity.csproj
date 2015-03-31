@@ -78,6 +78,7 @@
     <Reference Include="System.Management" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
@@ -120,10 +121,12 @@
     <Compile Include="DbProvider\DeathHandler.cs" />
     <Compile Include="DbProvider\SearchAreaProvider.cs" />
     <Compile Include="Helpers\Attributes\NoCopy.cs" />
+    <Compile Include="Resources\Battle.Net API\BNetDataObjects.cs" />
     <Compile Include="Helpers\Bounties\BountyType.cs" />
     <Compile Include="Helpers\Bounties\Extensions.cs" />
     <Compile Include="Helpers\CloneExtension.cs" />
     <Compile Include="Helpers\Composites.cs" />
+    <Compile Include="Resources\Battle.Net API\BNetDataProvider.cs" />
     <Compile Include="Helpers\FullyObservableCollection.cs" />
     <Compile Include="Helpers\LookupList.cs" />
     <Compile Include="Helpers\MemoryHelper.cs" />
@@ -249,6 +252,9 @@
     <Compile Include="UI\TabUI.cs" />
     <Compile Include="UI\UIComponents\BoolInverterConverter.cs" />
     <Compile Include="UI\UIComponents\BoolToTypeConverters.cs" />
+    <Compile Include="UI\UIComponents\ItemProperty.cs" />
+    <Compile Include="UI\UIComponents\ItemRule.cs" />
+    <Compile Include="UI\UIComponents\SelectionChangedBehaviour.cs" />
     <Compile Include="UI\UIComponents\ConfigViewModel.cs" />
     <Compile Include="UI\UIComponents\DeferredAction.cs" />
     <Compile Include="UI\UIComponents\EmptyStringToVisibilityConverter.cs" />
@@ -258,7 +264,7 @@
     <Compile Include="UI\UIComponents\PercentConverter.cs" />
     <Compile Include="UI\UIComponents\EnumBooleanConverter.cs" />
     <Compile Include="UI\UIComponents\RelayCommand.cs" />
-    <Compile Include="UI\UIComponents\SettingsItem.cs" />
+    <Compile Include="UI\UIComponents\ItemListItem.cs" />
     <Compile Include="UI\UIComponents\TVarsViewModel.cs" />
     <Compile Include="UI\UIComponents\TVarValidationRule.cs" />
     <Compile Include="UI\UILoader.cs" />

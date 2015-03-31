@@ -1,4 +1,5 @@
 ﻿//!CompilerOption:AddRef:System.Management.dll
+//!CompilerOption:AddRef:System.Web.Extensions.dll
 
 using System;
 using System.IO;
