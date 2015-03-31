@@ -63,9 +63,6 @@ namespace Trinity
             {
                 try
                 {
-                    if (ZetaDia.Memory.CacheEnabled)
-                        ZetaDia.Memory.DisableCache(); 
-                    
                     if (ZetaDia.Me == null)
                         return;
 
