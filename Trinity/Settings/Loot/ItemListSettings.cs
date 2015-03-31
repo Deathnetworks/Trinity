@@ -25,9 +25,9 @@ namespace Trinity.Settings.Loot
     {
         #region Fields
 
-        private static List<SettingsItem> _cachedItems;
-        private FullyObservableCollection<SettingsItem> _displayItems = new FullyObservableCollection<SettingsItem>();
-        private List<SettingsItem> _selectedItems = new List<SettingsItem>();
+        private static List<ItemListItem> _cachedItems;
+        private FullyObservableCollection<ItemListItem> _displayItems = new FullyObservableCollection<ItemListItem>();
+        private List<ItemListItem> _selectedItems = new List<ItemListItem>();
         private GroupingType _grouping;
         private string _filterText;
         private DeferredAction _deferredAction;
@@ -132,7 +132,7 @@ namespace Trinity.Settings.Loot
         /// Main collection for all items, underlies CollectionViewSource
         /// </summary>
         [IgnoreDataMember]
-        public FullyObservableCollection<SettingsItem> DisplayItems
+        public FullyObservableCollection<ItemListItem> DisplayItems
         {
             get
             {
@@ -152,10 +152,10 @@ namespace Trinity.Settings.Loot
         /// The source of truth - currently selected items, this is persisted to the settings file.
         /// </summary>
         [DataMember(IsRequired = false)]
-        public List<SettingsItem> SelectedItems
+        public List<ItemListItem> SelectedItems
         {
             get
-            {
+            {                
                 return _selectedItems;
             }
             set
@@ -181,12 +181,24 @@ namespace Trinity.Settings.Loot
         #region Commands
 
         public ICommand ResetFilterCommand { get; set; }
+        public ICommand ExportRulesCommand { get; set; }
+        public ICommand ImportRulesCommand { get; set; }
 
         public void LoadCommands()
         {
             ResetFilterCommand = new RelayCommand(parameter =>
             {
                 FilterText = string.Empty;
+            });
+
+            ImportRulesCommand = new RelayCommand(parameter =>
+            {
+                Logger.Log("ImportRulesCommand Fired");
+            });
+
+            ExportRulesCommand = new RelayCommand(parameter =>
+            {
+                Logger.Log("ExportRulesCommand Fired");
             });
         }
 
@@ -200,7 +212,7 @@ namespace Trinity.Settings.Loot
         private void Initialization()
         {
             CacheReferenceItems();
-            DisplayItems = new FullyObservableCollection<SettingsItem>(_cachedItems, true);            
+            DisplayItems = new FullyObservableCollection<ItemListItem>(_cachedItems, true);            
             BindEvents();
             LoadCommands();
             GroupsExpandedByDefault = false;
@@ -234,7 +246,7 @@ namespace Trinity.Settings.Loot
         public static void CacheReferenceItems()
         {
             if (_cachedItems == null)
-                _cachedItems = Legendary.ToList().Select(i => new SettingsItem(i)).ToList();
+                _cachedItems = Legendary.ToList().Select(i => new ItemListItem(i)).ToList();
         }
 
         /// <summary>
@@ -311,7 +323,7 @@ namespace Trinity.Settings.Loot
             if (string.IsNullOrEmpty(FilterText))
                 e.Accepted = true;
 
-            var item = e.Item as SettingsItem;
+            var item = e.Item as ItemListItem;
 
             if (item == null || string.IsNullOrEmpty(item.Name))
                 e.Accepted = false;
@@ -325,7 +337,7 @@ namespace Trinity.Settings.Loot
         /// <param name="args"></param>
         public void SyncSelectedItem(ChildElementPropertyChangedEventArgs args)
         {
-            var item = args.ChildElement as SettingsItem;
+            var item = args.ChildElement as ItemListItem;
             if (item != null && args.PropertyName.ToString() == "IsSelected")
             {
                 var match = _selectedItems.FirstOrDefault(i => i.Id == item.Id);
@@ -350,16 +362,20 @@ namespace Trinity.Settings.Loot
             if (_selectedItems == null || _displayItems == null || _collection == null || _collection.View == null || _collection.View.SourceCollection == null)
                 return;
 
-            var selectedIds = new HashSet<int>(_selectedItems.Select(i => i.Id));
-            var castView = _collection.View.SourceCollection.Cast<SettingsItem>();
+            //var selectedIds = new HashSet<int>(_selectedItems.Select(i => i.Id));
+            var selectedIdsRulesDict = _selectedItems.ToDictionary(k => k.Id, v => v.Rules);
+            var castView = _collection.View.SourceCollection.Cast<ItemListItem>();
 
             // Prevent the collection from updating until outside of the using block.
             using (Collection.DeferRefresh())
             {
                 castView.ForEach(item =>
                 {
-                    if (selectedIds.Contains(item.Id))
+                    if (selectedIdsRulesDict.ContainsKey(item.Id))
+                    {
                         item.IsSelected = true;
+                        item.Rules = selectedIdsRulesDict[item.Id];
+                    }                        
                 });
             }
         }
