@@ -22,8 +22,7 @@ namespace Trinity.UIComponents
         private int _min;
         private int _max;
 
-        [DataMember]
-        public string Name { get; set; }
+        public string Name { get { return ItemProperty.ToString(); }}
 
         [DataMember]
         public int ItemPropertyId { get; set; }

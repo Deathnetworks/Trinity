@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
 using System.Threading;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -10,6 +13,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Xml;
+using System.Xml.Serialization;
 using Trinity.Config;
 using Trinity.Reference;
 using Trinity.UI;
@@ -17,6 +22,11 @@ using Trinity.UI.UIComponents;
 using Trinity.UIComponents;
 using Zeta.Common;
 using Logger = Trinity.Technicals.Logger;
+using System.IO.Compression;
+using System.Text;
+using System.IO;
+using Org.BouncyCastle.Ocsp;
+using Trinity.Helpers;
 
 namespace Trinity.Settings.Loot
 {
@@ -31,7 +41,11 @@ namespace Trinity.Settings.Loot
         private GroupingType _grouping;
         private string _filterText;
         private DeferredAction _deferredAction;
-        private CollectionViewSource _collection;
+        private CollectionViewSource _collection = new CollectionViewSource();
+        private string _exportCode;
+        private string _validationMessage;
+        private ModalPage _selectedModalPage;
+        private bool _isModalVisible;
 
         #endregion
 
@@ -56,6 +70,13 @@ namespace Trinity.Settings.Loot
             IsSetItem,
             IsCrafted,
             IsValid
+        }
+
+        public enum ModalPage
+        {
+            None,
+            Import,
+            Export
         }
 
         #endregion
@@ -162,11 +183,11 @@ namespace Trinity.Settings.Loot
             {
                 if (_selectedItems != value)
                 {
-                    if (_selectedItems == null || value != null)
-                    {
+                    //if (_selectedItems == null || value != null)
+                    //{
                         _selectedItems = value;
                         OnPropertyChanged("SelectedItems");
-                    }
+                    //}
                 }
             }
         }
@@ -176,13 +197,79 @@ namespace Trinity.Settings.Loot
         /// </summary>
         public bool GroupsExpandedByDefault { get; set; }
 
+        /// <summary>
+        /// Compressed/Encoded string of selected items and their rules
+        /// </summary>
+        public string ExportCode
+        {
+            get { return _exportCode; }
+            set
+            {
+                if (_exportCode != value)
+                {
+                    _exportCode = value;
+                    OnPropertyChanged("ExportCode");
+                }                
+            }
+        }
+
+        /// <summary>
+        /// Message for Import/Export user information
+        /// </summary>
+        public string ValidationMessage
+        {
+            get { return _validationMessage; }
+            set
+            {
+                if (_validationMessage != value)
+                {
+                    _validationMessage = value;
+                    OnPropertyChanged("ValidationMessage");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Selected panel for the import/export modal
+        /// </summary>
+        public ModalPage SelectedModalPage
+        {
+            get { return _selectedModalPage; }
+            set
+            {
+                if (_selectedModalPage != value)
+                {
+                    _selectedModalPage = value;
+                    OnPropertyChanged("SelectedModalPage");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Hides/Shows the modal
+        /// </summary>
+        public bool IsModalVisible
+        {
+            get { return _isModalVisible; }
+            set
+            {
+                if (_isModalVisible != value)
+                {
+                    _isModalVisible = value;
+                    OnPropertyChanged("IsModalVisible");
+                }
+            }
+        }
+
         #endregion
 
         #region Commands
 
         public ICommand ResetFilterCommand { get; set; }
-        public ICommand ExportRulesCommand { get; set; }
-        public ICommand ImportRulesCommand { get; set; }
+        public ICommand ExportCommand { get; set; }
+        public ICommand ImportCommand { get; set; }
+        public ICommand LoadModalCommand { get; set; }
+        public ICommand CloseModalCommand { get; set; }
 
         public void LoadCommands()
         {
@@ -190,21 +277,93 @@ namespace Trinity.Settings.Loot
             {
                 FilterText = string.Empty;
             });
-
-            ImportRulesCommand = new RelayCommand(parameter =>
+            
+            LoadModalCommand = new RelayCommand(parameter =>
             {
-                Logger.Log("ImportRulesCommand Fired");
+                if (parameter == null)
+                    return;
+
+                ModalPage page;
+                if (Enum.TryParse(parameter.ToString(),out page))
+                {
+                    if (page != ModalPage.None)
+                    {
+                        SelectedModalPage = page;
+                        IsModalVisible = true;
+                    }
+
+                    ExportCode = string.Empty;
+
+                    if(page == ModalPage.Export)
+                        ExportCommand.Execute(parameter);
+                }
+
+                Logger.Log("Selecting modal content... {0}", parameter.ToString());
             });
 
-            ExportRulesCommand = new RelayCommand(parameter =>
+            CloseModalCommand = new RelayCommand(parameter =>
             {
-                Logger.Log("ExportRulesCommand Fired");
+                IsModalVisible = false;
             });
+
+            ImportCommand = new RelayCommand(parameter =>
+            {
+                Logger.Log("Importing ItemList...");
+
+                var oldSlected = _selectedItems.Count;
+
+                ImportFromCode(ExportCode);
+
+                Logger.Log("Selected Before = {0} After = {1}", oldSlected, _selectedItems.Count);
+
+                IsModalVisible = false;
+            });
+
+            ExportCommand = new RelayCommand(parameter =>
+            {
+                Logger.Log("Exporting ItemList... {0}", parameter);
+                ExportCode = CreateExportCode();
+            });
+
         }
 
         #endregion
 
         #region Methods
+
+        public string CreateExportCode()
+        {
+            var settingsXml = TrinitySetting.GetSettingsXml(this);
+            return ExportHelper.Compress(settingsXml);
+        }
+
+        public ItemListSettings ImportFromCode(string code)
+        {
+            if (string.IsNullOrEmpty(code) || string.IsNullOrWhiteSpace(code))
+            {
+                ValidationMessage = "You must enter an import/export code";
+                Logger.Log("You must enter an import/export code");
+            }
+            try
+            {
+                var decompressedXml = ExportHelper.Decompress(ExportCode);
+                var newSettings = TrinitySetting.GetSettingsInstance<ItemListSettings>(decompressedXml);
+
+                Grouping = newSettings.Grouping;
+
+                using (Collection.DeferRefresh())
+                {
+                    SelectedItems = newSettings.SelectedItems;
+                    UpdateSelectedItems();
+                }
+            }
+            catch (Exception ex)
+            {
+                ValidationMessage = string.Format("Error importing itemlist. {0} {1}", ex.Message, ex.InnerException);
+                Logger.Log("Error importing itemlist. {0} {1}", ex.Message, ex.InnerException);
+            }
+            return this;
+        }
 
         /// <summary>
         /// Setup work called on Construction / Reset
@@ -337,6 +496,9 @@ namespace Trinity.Settings.Loot
         /// <param name="args"></param>
         public void SyncSelectedItem(ChildElementPropertyChangedEventArgs args)
         {
+            if (IsUpdatingCollection)
+                return;
+
             var item = args.ChildElement as ItemListItem;
             if (item != null && args.PropertyName.ToString() == "IsSelected")
             {
@@ -354,28 +516,43 @@ namespace Trinity.Settings.Loot
             }
         }
 
+        private bool IsUpdatingCollection { get; set; }
+
         /// <summary>
         /// Updates the DisplayItems collection to match the Selected collection
         /// </summary>
         public void UpdateSelectedItems()
         {
             if (_selectedItems == null || _displayItems == null || _collection == null || _collection.View == null || _collection.View.SourceCollection == null)
+            {
+                Logger.Log("Skipping UpdateSelectedItems due to Null");
                 return;
-
-            //var selectedIds = new HashSet<int>(_selectedItems.Select(i => i.Id));
-            var selectedIdsRulesDict = _selectedItems.ToDictionary(k => k.Id, v => v.Rules);
-            var castView = _collection.View.SourceCollection.Cast<ItemListItem>();
+            }
 
             // Prevent the collection from updating until outside of the using block.
             using (Collection.DeferRefresh())
             {
+                var selectedIdsRulesDict = _selectedItems.ToDictionary(k => k.Id, v => v.Rules);
+                var castView = _collection.View.SourceCollection.Cast<ItemListItem>();
+
                 castView.ForEach(item =>
                 {
                     if (selectedIdsRulesDict.ContainsKey(item.Id))
                     {
+                        if(!item.IsSelected)
+                            Logger.LogVerbose("Update: Selecting {0} ({1}) with {2} rules", item.Name, item.Id, item.Rules.Count);
+
                         item.IsSelected = true;
                         item.Rules = selectedIdsRulesDict[item.Id];
-                    }                        
+                    }
+                    else
+                    {
+                        if (item.IsSelected)
+                        {
+                            Logger.LogVerbose("Update: Deselecting {0}", item.Name);
+                            item.IsSelected = false;
+                        }                            
+                    }
                 });
             }
         }

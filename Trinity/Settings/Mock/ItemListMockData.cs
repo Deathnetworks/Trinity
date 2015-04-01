@@ -33,12 +33,10 @@ namespace Trinity.Settings.Mock
                     {
                         new ItemRule
                         {
-                            Name = "Ancient really long name",
                             ItemPropertyId = (int)ItemProperty.Ancient                            
                         },
                         new ItemRule
                         {
-                            Name = "Armor",
                             ItemPropertyId = (int)ItemProperty.Armor                            
                         }
                     }

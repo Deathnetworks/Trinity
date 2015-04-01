@@ -9,13 +9,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Xml.Serialization;
 using JetBrains.Annotations;
 using Microsoft.Win32.SafeHandles;
 using Trinity.Items;
 using Trinity.Objects;
 using Trinity.UIComponents;
 using Zeta.Common;
-using Zeta.XmlEngine;
 using Trinity.Technicals;
 using Logger = Trinity.Technicals.Logger;
 
@@ -86,10 +86,13 @@ namespace Trinity.UI.UIComponents
                 return _isSelected;                 
             }
             set
-            {
-                //Logger.Log("{0} Property: IsSelected set to {1}",Name,value);
-                _isSelected = value;
-                OnPropertyChanged();
+            {                
+                if (_isSelected != value)
+                {
+                    //Logger.Log("{0} Property: IsSelected set to {1}",Name,value);
+                    _isSelected = value;
+                    OnPropertyChanged();                    
+                }
             }
         }
 
@@ -114,6 +117,7 @@ namespace Trinity.UI.UIComponents
                 IsSelected = IsSelected,
             };
         }
+
 
         [DataMember]
         public ObservableCollection<ItemRule> Rules
@@ -148,8 +152,7 @@ namespace Trinity.UI.UIComponents
                 {
                     Rules.Add(new ItemRule
                     {
-                        ItemPropertyId = (int)property,
-                        Name = property.ToString()                        
+                        ItemPropertyId = (int)property,                     
                     });
                 }                
             });

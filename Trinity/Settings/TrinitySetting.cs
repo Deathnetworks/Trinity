@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Text;
 using System.Threading;
 using System.Xml;
 using Trinity.Config.Combat;
@@ -479,6 +480,46 @@ namespace Trinity.Config
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "End Clone Object {0}", typeof(T).Name);
             }
         }
+
+        /// <summary>
+        /// Converts a settings object to Xml
+        /// </summary>
+        /// <typeparam name="T">Type of settings instance</typeparam>
+        /// <param name="instance">Settings instance to be serialized to Xml</param>
+        /// <param name="rootName">Name of the base node in resulting Xml</param>
+        /// <returns>string of settings as Xml</returns>
+        internal static string GetSettingsXml<T>(T instance, string rootName = "") where T : ITrinitySetting<T>
+        {
+            if (string.IsNullOrEmpty(rootName))
+                rootName = typeof (T).Name;
+
+            var serializer = new DataContractSerializer(typeof(T), rootName, "");
+            var sb = new StringBuilder();
+            var settings = new XmlWriterSettings();
+            using (var writer = XmlWriter.Create(sb, settings))
+            {
+                serializer.WriteObject(writer, instance);
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Converts Xml of settings to a settings object
+        /// </summary>
+        /// <typeparam name="T">Type of the settings you want</typeparam>
+        /// <param name="xml">Xml string of settings</param>
+        /// <returns>Instance of Settings Class</returns>
+        internal static T GetSettingsInstance<T>(string xml) where T : ITrinitySetting<T>
+        {
+            var serializer = new DataContractSerializer(typeof(T));
+            using (var reader = XmlReader.Create(new StringReader(xml)))
+            {
+                XmlReader migrator = new SettingsMigrator(reader);
+                var loadedSetting = (T)serializer.ReadObject(migrator);
+                return loadedSetting;
+            }           
+        }
+
         #endregion Static Methods
     }
 }

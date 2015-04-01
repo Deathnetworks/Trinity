@@ -9,7 +9,7 @@
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:uiComponents="clr-namespace:Trinity.UI.UIComponents"
              mc:Ignorable="d" Foreground="{DynamicResource TextBrush}" Background="DarkGray"             
-             d:DesignHeight="500" d:DesignWidth="390">
+             d:DesignHeight="500" d:DesignWidth="420">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -20,6 +20,7 @@
             
             <ut:EmptyStringToVisibilityConverter x:Key="EmptyStringToVisibilityConverter"/>
             <ut:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" />
+            <ut:EnumVisibilityConverter x:Key="EnumVisibilityConverter" />
             
             <mock:MockData x:Key="DesignViewModel"/>
 
@@ -138,7 +139,7 @@
                                     <WrapPanel Visibility="{Binding LegendaryAffix, Converter={StaticResource EmptyStringToVisibilityConverter}, Mode=OneWay}">
                                         <Label Style="{StaticResource SubtleInformationStyle}" Content="{Binding LegendaryAffix}" />
                                     </WrapPanel>
-                                    <Border Background="#55171717" BorderBrush="#55666666" BorderThickness="0,0,1,1" Margin="-10,5,0,0">
+                                    <Border ut:CancelMouseBubbling.Active="True" Background="#55171717" BorderBrush="#55666666" BorderThickness="0,0,1,1" Margin="-10,5,0,0">
                                         <Border Padding="10,5,10,10" Background="Transparent" BorderBrush="#FF222222" BorderThickness="1,1,0,0">
                                             <StackPanel>
                                                 <Grid Background="Transparent" >
@@ -284,11 +285,14 @@
 
         </ResourceDictionary>
     </UserControl.Resources>
-    <DockPanel LastChildFill="True" VerticalAlignment="Stretch">
+
+    <ut:ModalContentPresenter x:Name="modalPresenter" IsModal="{Binding ItemList.IsModalVisible}" OpenCommand="{Binding ItemList.LoadModalCommand}">
+
+        <DockPanel LastChildFill="True" VerticalAlignment="Stretch">
         
         <StackPanel DockPanel.Dock="Top" Margin="0,0,0,0" Orientation="Horizontal" Background="#FF6A6A6A" Height="38" VerticalAlignment="Center">
             <Label Style="{StaticResource StatusLabelStyle}" VerticalContentAlignment="Center" Margin="5,0,0,0" Content="Search:"></Label>
-            <TextBox Width="165" Height="22" Text="{Binding ItemList.FilterText, UpdateSourceTrigger=PropertyChanged}" Margin="0,8"/>
+            <TextBox Width="140" Height="22" Text="{Binding ItemList.FilterText, UpdateSourceTrigger=PropertyChanged}" Margin="0,8"/>
             <Button Content=" X " Height="21" Width="25" Margin="-27,-1,0,0" Background="Transparent" Command="{Binding ItemList.ResetFilterCommand}" BorderBrush="Transparent" FontWeight="Heavy" BorderThickness="1" Visibility="{Binding ItemList.IsFiltered, Converter={StaticResource BoolToVisibilityConverter}}" />
             <Label Style="{StaticResource StatusLabelStyle}" VerticalContentAlignment="Center" Margin="5,0,0,0" Content="Group By:"></Label>
             <ComboBox Tag="" SelectedValuePath="Tag" x:Name="GroupingDropdown" MaxHeight="25" SelectedValue="{Binding ItemList.Grouping}" Padding="0,0,15,0">
@@ -296,8 +300,17 @@
                 <ComboBoxItem Content="ItemType" Tag="ItemType" Foreground="White" Background="Black" />
                 <ComboBoxItem Content="Sets" Tag="SetName" Foreground="White" Background="Black" />
                 <ComboBoxItem Content="IsValid" Tag="IsValid" Foreground="White" Background="Black" />
-            </ComboBox>            
-        </StackPanel>
+            </ComboBox>
+
+                <Button Command="{Binding Source={x:Static ut:ModalContentCommands.ShowModalContent}}" CommandParameter="Export" Width="Auto" Padding="7,0" Margin="10,7,5,7">
+                    Export
+                </Button>
+
+                <Button Command="{Binding Source={x:Static ut:ModalContentCommands.ShowModalContent}}" CommandParameter="Import" Width="Auto" Padding="7,0" Margin="0,7,5,7">
+                    Import
+                </Button>
+
+            </StackPanel>
 
         <ScrollViewer 
             HorizontalContentAlignment="Stretch" 
@@ -306,10 +319,10 @@
             Margin="0,0,0,0">
             <ListView x:Name="ListView1"                      
                 d:DataContext="{Binding Source={StaticResource DesignViewModel}}"
-                SelectionMode="Multiple"
+                SelectionMode="Multiple"                          
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
                 ScrollViewer.VerticalScrollBarVisibility="Disabled"                               
-                ItemContainerStyle="{DynamicResource ListViewItemStyle}"                    
+                ItemContainerStyle="{DynamicResource ListViewItemStyle}"                         
                 Background="#FF474747"                          
                 ItemsSource="{Binding ItemList.Collection.View}"                      
                 VerticalContentAlignment="Stretch"
@@ -377,4 +390,34 @@
             </ListView>
         </ScrollViewer>
     </DockPanel>
+
+        <!-- Import/Export Modal -->
+        <ut:ModalContentPresenter.ModalContent>
+            <Grid Margin="45,45,45,45">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="45" />
+                </Grid.RowDefinitions>            
+            
+                <!-- Import -->      
+                <TextBox Grid.Row="0" Visibility="{Binding Path=ItemList.SelectedModalPage, Converter={StaticResource EnumVisibilityConverter}, ConverterParameter=Import}" 
+                         Text="{Binding ItemList.ExportCode, FallbackValue='Export Code Error'}" MinHeight="200" Height="Auto" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" IsReadOnly="False" />              
+                
+                <UniformGrid Grid.Row="1" Visibility="{Binding Path=ItemList.SelectedModalPage, Converter={StaticResource EnumVisibilityConverter}, ConverterParameter=Import}">
+                    <Button Content="Import" Margin="0,0,0,-22.5" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Width="Auto" Height="Auto" Command="{Binding ItemList.ImportCommand}" />
+                    <Button Content="Close" Margin="0,0,0,-22.5" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Width="Auto" Height="Auto" Command="{Binding Source={x:Static ut:ModalContentCommands.HideModalContent}}" />
+                </UniformGrid>                
+
+                <!-- Export -->               
+                <TextBox Grid.Row="0" Visibility="{Binding Path=ItemList.SelectedModalPage, Converter={StaticResource EnumVisibilityConverter}, ConverterParameter=Export}" 
+                         Text="{Binding ItemList.ExportCode, FallbackValue='Export Code Error'}" MinHeight="200" Height="Auto" TextWrapping="Wrap" ut:SelectTextOnFocus.Active="True" VerticalScrollBarVisibility="Auto" IsReadOnly="True" />               
+                
+                <StackPanel Grid.Row="1" Visibility="{Binding Path=ItemList.SelectedModalPage, Converter={StaticResource EnumVisibilityConverter}, ConverterParameter=Export}">
+                    <Button Content="Close" Margin="0" Padding="10" Height="45" Command="{Binding Source={x:Static ut:ModalContentCommands.HideModalContent}}" />
+                </StackPanel>
+
+            </Grid>
+        </ut:ModalContentPresenter.ModalContent>
+
+    </ut:ModalContentPresenter>
 </UserControl>

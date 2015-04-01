@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
+using System.Windows.Controls.Primitives;
+using System.Windows.Controls;
 
 namespace Trinity.UIComponents
 {
-    using System.Windows.Input;
-    using System.Windows.Controls.Primitives;
-    using System.Windows.Controls;
-
     public class SelectionChangedBehaviour
     {
         public static readonly DependencyProperty CommandProperty = DependencyProperty.RegisterAttached("Command", typeof(ICommand),
@@ -48,4 +47,5 @@ namespace Trinity.UIComponents
             }
         }
     }
+
 }

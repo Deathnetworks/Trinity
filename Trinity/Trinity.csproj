@@ -121,6 +121,7 @@
     <Compile Include="DbProvider\DeathHandler.cs" />
     <Compile Include="DbProvider\SearchAreaProvider.cs" />
     <Compile Include="Helpers\Attributes\NoCopy.cs" />
+    <Compile Include="Helpers\ExportHelper.cs" />
     <Compile Include="Resources\Battle.Net API\BNetDataObjects.cs" />
     <Compile Include="Helpers\Bounties\BountyType.cs" />
     <Compile Include="Helpers\Bounties\Extensions.cs" />
@@ -254,6 +255,10 @@
     <Compile Include="UI\UIComponents\BoolToTypeConverters.cs" />
     <Compile Include="UI\UIComponents\ItemProperty.cs" />
     <Compile Include="UI\UIComponents\ItemRule.cs" />
+    <Compile Include="UI\UIComponents\CancelMouseBubbling.cs" />
+    <Compile Include="UI\UIComponents\ModalContentCommands.cs" />
+    <Compile Include="UI\UIComponents\ModalContentPresenter.cs" />
+    <Compile Include="UI\UIComponents\SelectTextOnFocus.cs" />
     <Compile Include="UI\UIComponents\SelectionChangedBehaviour.cs" />
     <Compile Include="UI\UIComponents\ConfigViewModel.cs" />
     <Compile Include="UI\UIComponents\DeferredAction.cs" />
