@@ -48,15 +48,42 @@ namespace Trinity.Items
                 foreach (var itemRule in itemSetting.Rules)
                 {
                     var result = true;
+                    double itemValue = 0;
+                    double ruleValue = 0;
 
                     switch (itemRule.ItemProperty)
                     {
                         case ItemProperty.Ancient:
+                            itemValue = cItem.IsAncient ? 1 : 0;
+                            ruleValue = itemRule.Value;
                             result = cItem.IsAncient == (itemRule.Value == 1);   
                             break;
+
+                        case ItemProperty.PrimaryStat:
+                            itemValue = ItemDataUtils.GetMainStatValue(cItem.AcdItem);
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
+                            break;
+
+                        case ItemProperty.CriticalHitChance:
+                            itemValue = cItem.CritPercent;
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
+                            break;
+
+                        case ItemProperty.CriticalHitDamage:
+                            itemValue = cItem.CritDamagePercent;
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
+                            break;   
                     }
 
-                    Logger.LogDebug("  >>  Evaluated {0} -- {1} = {2}", cItem.RealName, itemRule.ItemProperty, result);
+                    Logger.LogDebug("  >>  Evaluated {0} -- {1} (Item: {2} -v- Rule: {3}) = {4}", 
+                        cItem.RealName, 
+                        itemRule.ItemProperty, 
+                        itemValue,
+                        ruleValue,
+                        result);
 
                     if (!result)
                         return false;

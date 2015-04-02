@@ -3,20 +3,29 @@ using System.Linq;
 using Trinity.Helpers;
 using Trinity.Objects;
 using Trinity.Technicals;
+using Trinity.UIComponents;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 
 namespace Trinity.Reference
 {
-    class SkillBySlot
+    class ItemDataUtils
     {
 
-        private static StatType GetMainStatType(ACDItem item)
+        public static StatType GetMainStatType(ACDItem item)
         {
             if (item.Stats.Strength > 0) return StatType.Strength;
             if (item.Stats.Intelligence > 0) return StatType.Intelligence;
             if (item.Stats.Dexterity > 0) return StatType.Dexterity;
             return StatType.Unknown;
+        }
+
+        public static int GetMainStatValue(ACDItem item)
+        {
+            if (item.Stats.Strength > 0) return (int)item.Stats.Strength;
+            if (item.Stats.Intelligence > 0) return (int)item.Stats.Intelligence;
+            if (item.Stats.Dexterity > 0) return (int)item.Stats.Dexterity;
+            return 0;
         }
 
         public enum StatType
@@ -79,6 +88,225 @@ namespace Trinity.Reference
 
             return 0;
         }
+
+        public static ItemStatRange GetItemStatRange(GItemType itemType, ItemProperty prop)
+        {
+            ItemStatRange statRange;
+            
+            if(ItemPropertyLimitsByItemType.TryGetValue(new KeyValuePair<GItemType, ItemProperty>(itemType,prop), out statRange))
+                return statRange;
+            
+            if (ItemPropertyLimitsByItemType.TryGetValue(new KeyValuePair<GItemType, ItemProperty>(GItemType.Unknown, prop), out statRange))
+                return statRange;
+            
+            return new ItemStatRange();
+        }
+
+
+        public static readonly Dictionary<KeyValuePair<GItemType, ItemProperty>, ItemStatRange> ItemPropertyLimitsByItemType = new Dictionary<KeyValuePair<GItemType, ItemProperty>, ItemStatRange>
+        {
+
+            // PrimaryStat by GItemType
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Ring, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Amulet, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Helm, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1000, AncientMin = 750, Max = 750, Min = 626 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.VoodooMask, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1000, AncientMin = 750, Max = 750, Min = 626 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.WizardHat, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1000, AncientMin = 750, Max = 750, Min = 626 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.SpiritStone, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1000, AncientMin = 750, Max = 750, Min = 626 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Gloves, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Quiver, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 650 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Orb, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 650 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mojo, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 650 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Shoulder, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Chest, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Cloak, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Belt, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyBelt, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Bracer, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Legs, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Boots, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyWeapon, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Wand, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Flail, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Axe, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.HandCrossbow, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.CeremonialKnife, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.FistWeapon, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 61000, AncientMin = 825, Max = 750, Min = 626 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mace, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Sword, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandDaibo, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandCrossbow, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 500, Min = 416 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandAxe, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandBow, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 500, Min = 416 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandFlail, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMace, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMighty, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandPolearm, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandStaff, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandSword, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Spear, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Shield, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Dagger, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.CrusaderShield, ItemProperty.PrimaryStat), 
+                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Unknown, ItemProperty.PrimaryStat), 
+                new ItemStatRange { Max = 1000, Min = 0 }},
+
+
+            // CriticalDamage by GItemType
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Ring, ItemProperty.CriticalHitDamage), new ItemStatRange { Max = 50, Min = 26 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Amulet, ItemProperty.CriticalHitDamage), new ItemStatRange { Max = 100, Min = 51 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Gloves, ItemProperty.CriticalHitDamage), new ItemStatRange { Max = 50, Min = 26 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Belt, ItemProperty.CriticalHitDamage), new ItemStatRange { Max = 50, Min = 25 }}, // WitchingHour
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mace, ItemProperty.CriticalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Sword, ItemProperty.CriticalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandBow, ItemProperty.CriticalHitDamage), new ItemStatRange { Max = 35, Min = 31 }}, //UnboundBolt
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Unknown, ItemProperty.CriticalHitDamage), new ItemStatRange { Max = 100, Min = 0 }},
+
+            // CriticalChance by GItemType
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Ring, ItemProperty.CriticalHitChance), new ItemStatRange { Max = 6, Min = 4.5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Amulet, ItemProperty.CriticalHitChance), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Helm, ItemProperty.CriticalHitChance), new ItemStatRange { Max = 6, Min = 4.5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.VoodooMask, ItemProperty.CriticalHitChance), new ItemStatRange { Max = 6, Min = 4.5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.WizardHat, ItemProperty.CriticalHitChance), new ItemStatRange { Max = 6, Min = 4.5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.SpiritStone, ItemProperty.CriticalHitChance), new ItemStatRange { Max = 6, Min = 4.5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Gloves, ItemProperty.CriticalHitChance), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Quiver, ItemProperty.CriticalHitChance), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Orb, ItemProperty.CriticalHitChance), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mojo, ItemProperty.CriticalHitChance), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Bracer, ItemProperty.CriticalHitChance), new ItemStatRange { Max = 6, Min = 4.5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Shield, ItemProperty.CriticalHitChance), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.CrusaderShield, ItemProperty.CriticalHitChance), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Unknown, ItemProperty.CriticalHitChance), new ItemStatRange { Max = 10, Min = 0 }},
+
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Ring, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 50, Min = 26 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Amulet, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 100, Min = 51 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Helm, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.VoodooMask, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.WizardHat, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.SpiritStone, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Gloves, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 50, Min = 26 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Quiver, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 10, Min = 8 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Orb, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 10, Min = 8 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Mojo, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 10, Min = 8 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Shoulder, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Chest, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Cloak, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Belt, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyBelt, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Bracer, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Legs, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Boots, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyWeapon, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Wand, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Flail, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Axe, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.HandCrossbow, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.CeremonialKnife, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.FistWeapon, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Mace, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Sword, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandDaibo, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandCrossbow, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandAxe, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandBow, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandFlail, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMace, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMighty, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandPolearm, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandStaff, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandSword, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Spear, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Shield, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Dagger, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.CrusaderShield, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
+
+    
+        };
 
         public static readonly LookupList<KeyValuePair<ItemType, ActorClass>, Skill> SkillDamageByItemTypeAndClass = new LookupList<KeyValuePair<ItemType, ActorClass>, Skill>
         {

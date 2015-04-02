@@ -7,6 +7,8 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using Trinity.Objects;
+using Trinity.Reference;
 
 namespace Trinity.UIComponents
 {
@@ -18,22 +20,20 @@ namespace Trinity.UIComponents
             Value = 1;
         }
 
-        private int _value;
-        private int _min;
-        private int _max;
+        private double _value;
 
         public string Name { get { return ItemProperty.ToString(); }}
 
         [DataMember]
-        public int ItemPropertyId { get; set; }
+        public int Id { get; set; }
 
         public ItemProperty ItemProperty
         {
-            get { return (ItemProperty)ItemPropertyId; }
+            get { return (ItemProperty)Id; }
         }
 
         [DataMember]        
-        public int Value
+        public double Value
         {
             get { return _value; }
             set
@@ -46,32 +46,19 @@ namespace Trinity.UIComponents
             }
         }
 
-        [DataMember]
-        public int Min
+        public double Min
         {
-            get { return _min; }
-            set
-            {
-                if (_min != value)
-                {
-                    _min = value;
-                    OnPropertyChanged();
-                }
-            }
+            get { return ItemStatRange.AbsMin; }
         }
 
-        [DataMember]
-        public int Max
+        public double Max
         {
-            get { return _max; }
-            set
-            {
-                if (_max != value)
-                {
-                    _max = value;
-                    OnPropertyChanged();
-                }
-            }
+            get { return ItemStatRange.AbsMax; }
+        }
+
+        public double Step
+        {
+            get { return ItemStatRange.AbsStep; }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -82,5 +69,7 @@ namespace Trinity.UIComponents
             var handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public ItemStatRange ItemStatRange { get; set; }
     }
 }

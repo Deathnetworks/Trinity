@@ -59,7 +59,7 @@ namespace Trinity.Combat.Abilities
             return null;
         }
 
-        private static int _maxSentryCount = 2 + (Legendary.BombadiersRucksack.IsEquipped ? 2 : 0) + (Passives.DemonHunter.CustomEngineering.IsActive ? 1 : 0);
+        private static int _maxSentryCount = 2 + (Legendary.BombardiersRucksack.IsEquipped ? 2 : 0) + (Passives.DemonHunter.CustomEngineering.IsActive ? 1 : 0);
 
         /// <summary>
         /// Gets the best combat power for the current conditions

@@ -925,7 +925,7 @@ namespace Trinity.ItemRules
                                                     item.Stats.HolySkillDamagePercentBonus,
                                                     item.Stats.PhysicalSkillDamagePercentBonus }.Max());
 
-            itemDic.Add("[SKILLDMG%]", SkillBySlot.GetSkillDamagePercent(item));
+            itemDic.Add("[SKILLDMG%]", ItemDataUtils.GetSkillDamagePercent(item));
 
              float damage, healing, toughness;
              item.GetStatChanges(out damage, out healing, out toughness);

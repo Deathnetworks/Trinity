@@ -120,10 +120,13 @@ var Items = function() {
             Name: "",
             DataUrl: "",
             Url: "",
+            IconUrl: "",
             RelativeUrl: "",
             IsCrafted: false,
             LegendaryText: "",
-            IsSet: false
+            IsSet: false,
+            IsTwoHanded: false,
+            GItemType: "Unknown"
     }
 
         var request = function(itemTypeSlug, callback) {            
@@ -134,13 +137,28 @@ var Items = function() {
 
             $.get("http://us.battle.net/d3/en/item/" + itemTypeSlug + "/", {}, function (response) {
 
+                var raw = response.responseText.replace('&#39;', "'");
+
                 // Origin bypass with YQL wraps as a HTML document
                 // So we have to strip it all out again.
-                var doc = $("<div>").html(response.responseText);
+                var doc = $("<div>").html(raw);
 
                 // Find all item records
                 var items = doc.find(".table-items table tr");
                 var staffofherding = false;
+
+                // Find Regex Match Group Function
+                function getMatches(string, regex, index) {
+                    index || (index = 1);
+                    var matches = [];
+                    var match;
+                    while (match = regex.exec(string)) {
+                        matches.push(match[index]);
+                    }
+                    return matches;
+                }
+
+                var urlRegex = /\burl\s*\(\s*["']?([^"'\r\n\)\(]+)?\s*/g;
 
                 // Process each item
                 $.each(items, function () {
@@ -153,7 +171,7 @@ var Items = function() {
 
                     var itemDetailsLink = itemDetails.find(".item-details-text a");
                     
-                    item.Name = itemDetailsLink.text();
+                    item.Name = itemDetailsLink.text().replace('&#39;', "'");
                     if (item.Name == "")
                         return;
 
@@ -179,7 +197,7 @@ var Items = function() {
                     }
 
                     // Quality
-                    var qualityClassName = itemType.find("span").attr("class")
+                    var qualityClassName = itemType.find("span").attr("class");
                     switch (qualityClassName) {
                         case "d3-color-green": item.Quality = "Legendary"; break;
                         case "d3-color-default": item.Quality = "Normal"; break;
@@ -188,6 +206,11 @@ var Items = function() {
                         case "d3-color-blue": item.Quality = "Magic"; break;
                     }
 
+
+                    var imageElement = itemDetails.find("span.icon-item-inner");
+                    item.IconUrl = getMatches(imageElement.css('backgroundImage'), urlRegex, 1)[0];
+                        //getMatches(imageElement.css('Background'), urlRegex, 1);
+                        
                     // Hellfire Variants
                     if (item.Slug.contains("hellfire")) {
                         var hellfireSlugParts = item.Slug.split("-");
@@ -213,18 +236,18 @@ var Items = function() {
 
                     var legText = itemHtml.find(".d3-color-orange.d3-item-property-default");
                     if (legText.length !== 0) {
-                        item.LegendaryText = legText.text().trim();
+                        item.LegendaryText = legText.text().trim().replace('&#39;', "'");
                     }
 
                     var setNameHtml = itemHtml.find(".item-itemset-name");
                     if (setNameHtml.length !== 0) {
-                        item.SetName = setNameHtml.text().trim();
+                        item.SetName = setNameHtml.text().trim().replace('&#39;', "'");
                         item.IsSet = true;
                     }
-                    
+                                        
+                    var itemTypeName = itemType.text();
 
                     // Zeta Type
-                    var itemTypeName = itemType.text();                    
                     if(itemTypeName.contains("Bracers"))
                         item.ZetaType = "Bracer";
                     else if(itemTypeName.contains("Chest"))
@@ -303,8 +326,103 @@ var Items = function() {
                         item.ZetaType = "Bow";
                     else if (itemTypeName.contains("Wand"))
                         item.ZetaType = "Wand";
-                    else 
-                        item.ZetaType = "Unknown"
+                    else
+                        item.ZetaType = "Unknown";
+
+
+                    if (itemTypeName.contains("Bracers"))
+                        item.GItemType = "Bracer";
+                    else if (itemTypeName.contains("Chest"))
+                        item.GItemType = "Chest";
+                    else if (itemTypeName.contains("Cloak"))
+                        item.GItemType = "Chest";
+                    else if (itemTypeName.contains("Shoulders"))
+                        item.GItemType = "Shoulder";
+                    else if (itemTypeName.contains("Helm"))
+                        item.GItemType = "Helm";
+                    else if (itemTypeName.contains("Spirit"))
+                        item.GItemType = "SpiritStone";
+                    else if (itemTypeName.contains("Voodoo"))
+                        item.GItemType = "VoodooMask";
+                    else if (itemTypeName.contains("Wizard Hat"))
+                        item.GItemType = "WizardHat";
+                    else if (itemTypeName.contains("Gloves"))
+                        item.GItemType = "Gloves";
+                    else if (itemTypeName.contains("Belt"))
+                        item.GItemType = "Belt";
+                    else if (itemTypeName.contains("Mighty Belt"))
+                        item.GItemType = "MightyBelt";
+                    else if (itemTypeName.contains("Pants"))
+                        item.GItemType = "Legs";
+                    else if (itemTypeName.contains("Boots"))
+                        item.GItemType = "Boots";
+                    else if (itemTypeName.contains("Amulet"))
+                        item.GItemType = "Amulet";
+                    else if (itemTypeName.contains("Ring"))
+                        item.GItemType = "Ring";
+                    else if (itemTypeName.contains("Shield"))
+                        item.GItemType = "Shield";
+                    else if (itemTypeName.contains("Crusader"))
+                        item.GItemType = "CrusaderShield";
+                    else if (itemTypeName.contains("Mojo"))
+                        item.GItemType = "Mojo";
+                    else if (itemTypeName.contains("Source"))
+                        item.GItemType = "Orb";
+                    else if (itemTypeName.contains("Quiver"))
+                        item.GItemType = "Quiver";
+                    else if (itemTypeName.contains("Focus"))
+                        item.GItemType = "FollowerEnchantress";
+                    else if (itemTypeName.contains("Token"))
+                        item.GItemType = "FollowerScoundrel";
+                    else if (itemTypeName.contains("Relic"))
+                        item.GItemType = "FollowerTemplar";
+                    else if (itemTypeName.contains("Two-Handed Flail"))
+                        item.GItemType = "TwoHandFlail";
+                    else if (itemTypeName.contains("Two-Handed Mace"))
+                        item.GItemType = "TwoHandMace";
+                    else if (itemTypeName.contains("Two-Handed Sword"))
+                        item.GItemType = "TwoHandSword";
+                    else if (itemTypeName.contains("Two-Handed Axe"))
+                        item.GItemType = "TwoHandAxe";
+                    else if (itemTypeName.contains("Two-Handed Mighty"))
+                        item.GItemType = "TwoHandMighty";
+                    else if (itemTypeName.contains("Axe"))
+                        item.GItemType = "Axe";
+                    else if (itemTypeName.contains("Dagger"))
+                        item.GItemType = "Dagger";
+                    else if (itemTypeName.contains("Mace"))
+                        item.GItemType = "Mace";
+                    else if (itemTypeName.contains("Spear"))
+                        item.GItemType = "Spear";
+                    else if (itemTypeName.contains("Sword"))
+                        item.GItemType = "Sword";
+                    else if (itemTypeName.contains("Knife"))
+                        item.GItemType = "CeremonialKnife";
+                    else if (itemTypeName.contains("Fist"))
+                        item.GItemType = "FistWeapon";
+                    else if (itemTypeName.contains("Flail"))
+                        item.GItemType = "Flail";
+                    else if (itemTypeName.contains("Mighty Weapon"))
+                        item.GItemType = "MightyWeapon";
+                    else if (itemTypeName.contains("Hand Crossbow"))
+                        item.GItemType = "HandCrossbow";
+                    else if (itemTypeName.contains("Wand"))
+                        item.GItemType = "Wand";
+                    else if (itemTypeName.contains("Crossbow"))
+                        item.GItemType = "TwoHandCrossbow";
+                    else if (itemTypeName.contains("Bow"))
+                        item.GItemType = "TwoHandBow";
+                    else if (itemTypeName.contains("Polearm"))
+                        item.GItemType = "TwoHandPolearm";
+                    else if (itemTypeName.contains("Staff"))
+                        item.GItemType = "TwoHandStaff";
+                    else if (itemTypeName.contains("Daibo"))
+                        item.GItemType = "TwoHandDaibo";
+                    else
+                        item.GItemType = "Unknown";
+
+                    item.IsTwoHanded = item.GItemType.contains("TwoHand");
+
 
                     data[ItemTypeKey].push(item);
                 });

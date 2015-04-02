@@ -3,7 +3,9 @@ using System.Linq;
 using System.Runtime.Serialization;
 using Trinity.Cache;
 using Trinity.Combat.Abilities;
+using Trinity.Items;
 using Trinity.Reference;
+using Trinity.UIComponents;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 
@@ -17,6 +19,7 @@ namespace Trinity.Objects
         public string Name { get; set; }
 
         public ItemType ItemType { get; set; }
+
         public ItemQuality Quality { get; set; }
         public ItemBaseType BaseType { get; set; }
 
@@ -46,6 +49,11 @@ namespace Trinity.Objects
             Id = acdItem.ActorSNO;
             Name = acdItem.Name;
             ItemType = acdItem.ItemType;
+        }
+
+        public ItemStatRange GetItemStatRange(ItemProperty property)
+        {
+            return ItemDataUtils.GetItemStatRange(GItemType, property);
         }
 
         /// <summary>
@@ -112,6 +120,10 @@ namespace Trinity.Objects
             return Id.GetHashCode() ^ Name.GetHashCode();
         }
 
+        public bool IsTwoHanded { get; set; }
 
+        public GItemType GItemType { get; set; }
+
+        public string IconUrl { get; set; }
     }
 }

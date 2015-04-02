@@ -26,27 +26,32 @@ namespace Trinity.Settings.Mock
         {
             DisplayItems = new List<ItemListItem>
             {
-                new ItemListItem(Legendary.BombadiersRucksack)
-                {
+                new ItemListItem(Legendary.BombardiersRucksack)
+                {             
                     IsSelected = true,
                     Rules = new ObservableCollection<ItemRule>
                     {
                         new ItemRule
                         {
-                            ItemPropertyId = (int)ItemProperty.Ancient                            
+                            Id = (int)ItemProperty.Ancient                            
                         },
                         new ItemRule
                         {
-                            ItemPropertyId = (int)ItemProperty.Armor                            
+                            Id = (int)ItemProperty.PrimaryStat,
+                            Value = 445
+                        },
+                        new ItemRule
+                        {
+                            Id = (int)ItemProperty.SkillDamage                            
                         }
                     }
                 },
                 new ItemListItem(Legendary.BoardWalkers),
                 new ItemListItem(Legendary.LutSocks),
-                new ItemListItem(Legendary.BreastplateOfAkkhan)
-                {
-                    IsSelected = true
-                },
+                //new ItemListItem(Legendary.BreastplateOfAkkhan)
+                //{
+                //    IsSelected = true
+                //},
                 new ItemListItem(Legendary.Cindercoat),
                 new ItemListItem(Legendary.FlyingDragon), 
             };

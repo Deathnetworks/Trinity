@@ -382,8 +382,8 @@ namespace Trinity.Settings.Loot
         /// But we only care about the UI Control being properly populated if the settings window is open.
         /// </summary>
         private void SettingsWindowOpened()
-        {            
-            CreateView();
+        {
+            CreateView();            
             UpdateSelectedItems();
         }
 
@@ -543,7 +543,14 @@ namespace Trinity.Settings.Loot
                             Logger.LogVerbose("Update: Selecting {0} ({1}) with {2} rules", item.Name, item.Id, item.Rules.Count);
 
                         item.IsSelected = true;
-                        item.Rules = selectedIdsRulesDict[item.Id];
+
+                        // Rules are not saved with min/max/step etc to save payload
+                        // So this needs to be populated based on the GItemType
+                        var rules = selectedIdsRulesDict[item.Id];
+                        rules.ForEach(r => r.ItemStatRange = item.GetItemStatRange(r.ItemProperty));
+
+                        item.Rules = rules;
+                        
                     }
                     else
                     {

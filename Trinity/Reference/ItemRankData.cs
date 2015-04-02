@@ -3690,7 +3690,7 @@ new ItemRankData { Class = ActorClass.DemonHunter, SampleSize = 27, PercentUsed 
         };
         public static ItemRank BombadiersRucksack = new ItemRank
         {
-            Item = Legendary.BombadiersRucksack,
+            Item = Legendary.BombardiersRucksack,
 
             HardcoreRank = new List<ItemRankData>
 {
@@ -3982,23 +3982,7 @@ new ItemRankData { Class = ActorClass.DemonHunter, SampleSize = 12, PercentUsed 
 
 }
         };
-        public static ItemRank BandOfUntoldSecrets = new ItemRank
-        {
-            Item = Legendary.BandOfUntoldSecrets,
 
-            HardcoreRank = new List<ItemRankData>
-{
-new ItemRankData { Class = ActorClass.Wizard, SampleSize = 21, PercentUsed = 2.12, Rank = 8, }, 
-new ItemRankData { Class = ActorClass.Crusader, SampleSize = 18, PercentUsed = 1.82, Rank = 9, }, 
-
-},
-            SoftcoreRank = new List<ItemRankData>
-{
-new ItemRankData { Class = ActorClass.DemonHunter, SampleSize = 8, PercentUsed = 0.80, Rank = 9, }, 
-new ItemRankData { Class = ActorClass.Crusader, SampleSize = 23, PercentUsed = 2.30, Rank = 7, }, 
-
-}
-        };
         public static ItemRank LitanyOfTheUndaunted = new ItemRank
         {
             Item = Legendary.LitanyOfTheUndaunted,

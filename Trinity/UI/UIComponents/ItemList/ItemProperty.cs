@@ -11,8 +11,8 @@ namespace Trinity.UIComponents
         Unknown = 0,
         LifePercent = 1,
         Armor = 2,
-        CritcalHitChance = 3,
-        CritcalHitDamage = 4,
+        CriticalHitChance = 3,
+        CriticalHitDamage = 4,
         SkillDamage = 5,
         LifePerSpirit = 6,
         Dexterity = 7,
@@ -81,5 +81,6 @@ namespace Trinity.UIComponents
         ManaRegen,
         PercentDamage,
         Ancient,
+        PrimaryStat,
     }
 }

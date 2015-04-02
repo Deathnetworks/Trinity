@@ -21,6 +21,7 @@
             <ut:EmptyStringToVisibilityConverter x:Key="EmptyStringToVisibilityConverter"/>
             <ut:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" />
             <ut:EnumVisibilityConverter x:Key="EnumVisibilityConverter" />
+            <ut:UrlToImageConverter x:Key="UrlToImageConverter" />
             
             <mock:MockData x:Key="DesignViewModel"/>
 
@@ -93,6 +94,16 @@
                 <Setter Property="Foreground" Value="#cccccc"></Setter>
             </Style>
 
+            <Style x:Key="TextBlockSubtleInformationStyle" TargetType="{x:Type TextBlock}">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Margin" Value="0,0,0,0"></Setter>
+                <Setter Property="FontSize" Value="11"></Setter>
+                <Setter Property="Padding" Value="0,2,2,0"></Setter>
+                <Setter Property="FontWeight" Value="Normal"></Setter>
+                <Setter Property="Height" Value="Auto"></Setter>
+                <Setter Property="Foreground" Value="#cccccc"></Setter>
+            </Style>
+
             <Style x:Key="QualityLabelStyle" TargetType="{x:Type Label}">
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="Foreground" Value="White" />
@@ -115,6 +126,19 @@
                 </Style.Triggers>
             </Style>
 
+            <Style x:Key="SelfAdjustingHeightImageStyle" TargetType="{x:Type Image}">
+                <Setter Property="Width" Value="64" />
+                <Setter Property="Height" Value="64" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding BaseType}" Value="Weapon">
+                        <Setter Property="Height" Value="128"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding BaseType}" Value="Armor">
+                        <Setter Property="Height" Value="128"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
             <DataTemplate x:Key="SelectedRowTemplate">
                 <Border Margin="0" Background="#444444" Padding="5,0,5,2">
                     <Border Padding="0">
@@ -123,33 +147,59 @@
                                 <ColumnDefinition Width="15" MinWidth="15"/>
                                 <ColumnDefinition MinWidth="54" />
                             </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
+
                             <StackPanel Grid.Column="0" Orientation="Vertical">
                                 <CheckBox x:Name="SelectedCheckBox" IsChecked="{Binding Path=IsSelected}" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                             </StackPanel>
-                            <Border Grid.Column="1" Background="#333333" CornerRadius="3" Padding="14,0,2,2" >
+                            <Border Grid.Column="1" Background="#333333" CornerRadius="3" Padding="10" >
                                 <StackPanel Orientation="Vertical" Margin="0,0,1,1">
-                                    <DockPanel>
-                                        <Label DockPanel.Dock="Left" Style="{StaticResource TitleLabelStyle}" Content="{Binding Name}"/>
-                                        <Label DockPanel.Dock="Right" Style="{StaticResource SubtleInformationStyle}" HorizontalAlignment="Right" Content="{Binding Id}"/>
-                                    </DockPanel>                                    
-                                    <Label Style="{StaticResource QualityLabelStyle}" Content="{Binding QualityTypeLabel}"/>
-                                    <WrapPanel Visibility="{Binding LegendaryAffix, Converter={StaticResource EmptyStringToVisibilityConverter}, Mode=OneWay}">
-                                        <Label Style="{StaticResource SubtleInformationStyle}" Content="{Binding LegendaryAffix}" />
-                                    </WrapPanel>
-                                    <Border ut:CancelMouseBubbling.Active="True" Background="#55171717" BorderBrush="#55666666" BorderThickness="0,0,1,1" Margin="-10,5,0,0">
-                                        <Border Padding="10,5,10,10" Background="Transparent" BorderBrush="#FF222222" BorderThickness="1,1,0,0">
-                                            <StackPanel>
-                                                <Grid Background="Transparent" >
-                                                <!--<Label HorizontalAlignment="Left" FontWeight="Bold" Style="{StaticResource SubtleInformationStyle}" Content="Rules" />-->
-                                                    <TextBlock TextWrapping="Wrap" Text="Rules" Foreground="White" FontWeight="Bold" HorizontalAlignment="Left">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="80" />
+                                            <ColumnDefinition Width="10" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <Border Grid.RowSpan="3" CornerRadius="4" Padding="5" BorderThickness="1" BorderBrush="#b07b38">
+                                            <Border.Background>
+                                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                    <GradientStop Color="Black" Offset="0"/>
+                                                    <GradientStop Color="#FF331F0D" Offset="1"/>
+                                                </LinearGradientBrush>
+                                            </Border.Background>                                            
+                                            <Image Style="{StaticResource SelfAdjustingHeightImageStyle}" Height="128"
+                                                   Source="{Binding IconUrl, Mode=OneWay, Converter={StaticResource UrlToImageConverter}, IsAsync=true}"/>
+                                        </Border>
+                                        <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,10">
+                                            <DockPanel>
+                                                <Label DockPanel.Dock="Left" Style="{StaticResource TitleLabelStyle}" Content="{Binding Name}" />
+                                                <Label DockPanel.Dock="Right" Style="{StaticResource SubtleInformationStyle}" HorizontalAlignment="Right" Content="{Binding Id}"/>
+                                            </DockPanel>
+                                            <Label Style="{StaticResource QualityLabelStyle}" Content="{Binding QualityTypeLabel}"/>
+                                            <WrapPanel Visibility="{Binding LegendaryAffix, Converter={StaticResource EmptyStringToVisibilityConverter}, Mode=OneWay}">
+                                                <TextBlock ToolTip="{Binding LegendaryAffix}" Style="{StaticResource TextBlockSubtleInformationStyle}" Text="{Binding LegendaryAffix}" TextTrimming="CharacterEllipsis" />
+                                            </WrapPanel>
+                                        </StackPanel>
+   
+                                        
+                                        <Border Grid.Row="1" Grid.Column="2" Grid.RowSpan="2"  ut:CancelMouseBubbling.Active="True" Background="#55171717" BorderBrush="#55666666" BorderThickness="0,0,1,1" Margin="0,5,0,0">
+                                            <Border Padding="10,5,10,10" Background="Transparent" BorderBrush="#FF222222" BorderThickness="1,1,0,0">
+                                                <StackPanel>
+                                                    <Grid Background="Transparent" >
+                                                        <!--<Label HorizontalAlignment="Left" FontWeight="Bold" Style="{StaticResource SubtleInformationStyle}" Content="Rules" />-->
+                                                        <TextBlock TextWrapping="Wrap" Text="Rules" Foreground="White" FontWeight="Bold" HorizontalAlignment="Left">
                                                         <Run Text="  (" FontWeight="Normal" Foreground="Gray" />
                                                         <Run Text="{Binding Mode=OneWay, Path=Rules.Count }" FontWeight="Normal" Foreground="Gray" />
                                                         <Run Text=") " FontWeight="Normal" Foreground="Gray" />
-                                                    </TextBlock>                                       
-                                                <ComboBox 
+                                                        </TextBlock>
+                                                        <ComboBox 
                                                     Background="Transparent" 
                                                    HorizontalAlignment="Right"
                                                   Name="AddRuleComboBox" 
@@ -160,14 +210,17 @@
                                                   Height="23" IsSynchronizedWithCurrentItem="False" Template="{DynamicResource ActionsComboBoxControlTemplate}"
                                                   Tag="Add Rule"
                                                   >
-                                                        <!--ItemsSource="{Binding Source={StaticResource ItemPropertyProvider}}"-->
-                                                    <ComboBox.Items>
-                                                        <ComboBoxItem Content="Ancient" />
-                                                    </ComboBox.Items>
-                                                </ComboBox>
-                                            </Grid>
-                                                <WrapPanel x:Name="rulesContentContainer" Background="Transparent" Width="Auto">
-                                                    <ItemsControl 
+                                                            <!--ItemsSource="{Binding Source={StaticResource ItemPropertyProvider}}"-->
+                                                            <ComboBox.Items>
+                                                                <ComboBoxItem Content="Ancient" />
+                                                                <ComboBoxItem Content="PrimaryStat" />
+                                                                <ComboBoxItem Content="CriticalHitChance" />
+                                                                <ComboBoxItem Content="CriticalHitDamage" />                                                                
+                                                            </ComboBox.Items>
+                                                        </ComboBox>
+                                                    </Grid>
+                                                    <WrapPanel x:Name="rulesContentContainer" Background="Transparent" Width="Auto">
+                                                        <ItemsControl 
                                                         Width="{Binding ActualWidth, ElementName=rulesContentContainer}"
                                                               HorizontalContentAlignment="Stretch" 
                                                               HorizontalAlignment="Stretch" 
@@ -175,32 +228,34 @@
                                                               ItemContainerStyle="{DynamicResource ItemsControlSelector}"
    
                                                         >
-                                                        <ItemsControl.ItemsPanel>
-                                                            <ItemsPanelTemplate>
-                                                                <DockPanel />
-                                                                <!--<StackPanel Width="*">
+                                                            <ItemsControl.ItemsPanel>
+                                                                <ItemsPanelTemplate>
+                                                                    <DockPanel />
+                                                                    <!--<StackPanel Width="*">
                                                                    
                                                                 </StackPanel>-->
-                                                                <!--<Grid Width="Auto" IsItemsHost="True" HorizontalAlignment="Stretch">
+                                                                    <!--<Grid Width="Auto" IsItemsHost="True" HorizontalAlignment="Stretch">
                                                                     <Grid.ColumnDefinitions>
                                                                         <ColumnDefinition Width="Auto" />
                                                                     </Grid.ColumnDefinitions>
                                                                     <Grid.RowDefinitions>
                                                                         <RowDefinition Height="Auto" />
                                                                     </Grid.RowDefinitions>
-                                                                </Grid>-->                                                              
-                                                            </ItemsPanelTemplate>
-                                                        </ItemsControl.ItemsPanel>
-                                                        <!--<ItemsControl.ItemContainerStyle>
+                                                                </Grid>-->
+                                                                </ItemsPanelTemplate>
+                                                            </ItemsControl.ItemsPanel>
+                                                            <!--<ItemsControl.ItemContainerStyle>
                                                             <Style TargetType="ContentPresenter">
                                                                 <Setter Property="DockPanel.Dock" Value="Top"/>
                                                             </Style>
                                                         </ItemsControl.ItemContainerStyle>-->
-                                                    </ItemsControl>                        
-                                            </WrapPanel>
-                                        </StackPanel>
+                                                        </ItemsControl>
+                                                    </WrapPanel>
+                                                </StackPanel>
+                                            </Border>
                                         </Border>
-                                    </Border>
+
+                                    </Grid>
                                 </StackPanel>
                             </Border>
                         </Grid>
@@ -218,7 +273,16 @@
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Path=ItemProperty}" Value="Ancient">
                         <Setter Property="ContentTemplate" Value="{DynamicResource CheckboxFormTemplate}"/>
-                    </DataTrigger>                  
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="PrimaryStat">
+                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="CriticalHitChance">
+                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="CriticalHitDamage">
+                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
+                    </DataTrigger>
                 </Style.Triggers>
             </Style>
 
@@ -229,6 +293,56 @@
                             <CheckBox IsChecked="{Binding Path=Value}" Margin="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                             <Label Foreground="White" Style="{StaticResource UnselectedTitleLabelStyle}" Content="{Binding Name}"/>
                         </WrapPanel>
+                        <Button HorizontalAlignment="Right" Content=" X " Height="21" Width="25" Margin="10,-1,0,0" Background="Transparent" 
+                                Command="{Binding Path=DataContext.RemoveRuleCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" 
+                                CommandParameter="{Binding ItemProperty}"
+                                BorderBrush="Transparent" FontWeight="Heavy" BorderThickness="0" />
+                    </Grid>
+                </Border>
+            </DataTemplate>
+
+            <DataTemplate x:Key="SliderFormTemplate">
+                <Border Background="#55999999" BorderBrush="#CC999999" CornerRadius="1" Padding="2" BorderThickness="1,1,0,0">
+                    <Grid Width="Auto" HorizontalAlignment="Stretch">
+                        <Grid Margin="0,0,10,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="3*" />
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Row="0"  Foreground="White" VerticalContentAlignment="Center" Style="{StaticResource UnselectedTitleLabelStyle}" Content="{Binding Name}"/>
+                            <Slider Grid.Row="0" Grid.Column="1" Template="{DynamicResource Slider}" 
+                                Interval="25" 
+                                Maximum="{Binding Max, Mode=OneWay}" 
+                                Minimum="{Binding Min, Mode=OneWay}" 
+                                SmallChange="{Binding Step, Mode=OneWay}" 
+                                TickFrequency="{Binding Step, Mode=OneWay}" 
+                                IsSnapToTickEnabled="True"                                
+                                TickPlacement="BottomRight" 
+                                Value="{Binding Value}" 
+                                HorizontalAlignment="Stretch" Margin="25,0,25,0" />
+
+                            
+                        </Grid>
+                        <!--<WrapPanel HorizontalAlignment="Stretch" Width="Auto">
+                            <Slider x:Name="EnchantSlider"
+        					                Interval="25" 
+                                            Margin="-8,0,-4,0"
+                                            Maximum="{Binding Maximum, Mode=OneWay}" 
+                                            Minimum="{Binding Minimum, Mode=OneWay}" 
+                                            SmallChange="{Binding Step, Mode=OneWay}" 
+                                            TickFrequency="{Binding Step, Mode=OneWay}" 
+                                            IsSnapToTickEnabled="True" 
+                                            TickPlacement="BottomRight" 
+        					                Value="{Binding Value}"
+        					                HorizontalAlignment="Stretch" 
+                                            Width="{Binding Path=ActualWidth, ElementName=GoalHeader1}" 
+                                            Style="{x:Null}"/>
+                        </WrapPanel>-->
                         <Button HorizontalAlignment="Right" Content=" X " Height="21" Width="25" Margin="10,-1,0,0" Background="Transparent" 
                                 Command="{Binding Path=DataContext.RemoveRuleCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" 
                                 CommandParameter="{Binding ItemProperty}"
@@ -362,8 +476,13 @@
                             </Setter.Value>
                         </Setter>
                     </Style>
-                </ListView.Resources>                   
-                <ListView.GroupStyle>
+                </ListView.Resources>
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel/>
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.GroupStyle>
                     <GroupStyle>
                         <GroupStyle.ContainerStyle>                            
                             <Style TargetType="{x:Type GroupItem}">

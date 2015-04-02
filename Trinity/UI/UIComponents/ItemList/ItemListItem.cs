@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Xml.Serialization;
 using JetBrains.Annotations;
 using Microsoft.Win32.SafeHandles;
@@ -50,7 +52,9 @@ namespace Trinity.UI.UIComponents
             IsCrafted = item.IsCrafted;
             Slug = item.Slug;
             Url = item.Url;
-
+            IconUrl = item.IconUrl;
+            IsTwoHanded = item.IsTwoHanded;
+            GItemType = item.GItemType;
             IsSetItem = item.IsSetItem;
             SetName = item.IsSetItem ? item.Set.Name : "None";
         }
@@ -95,6 +99,25 @@ namespace Trinity.UI.UIComponents
                 }
             }
         }
+
+        //public ImageSource Icon
+        //{
+        //    get
+        //    {
+        //        return new BitmapImage(IconUri);
+        //        //Image img = new Image();
+        //        //BitmapImage bitmapImage = new BitmapImage();
+        //        //Uri uri = new Uri("ms-appx:///Assets/Logo.png");
+        //        //bitmapImage.UriSource = uri;
+        //        //img.Source = bitmapImage;
+        //        //return img;
+        //    }
+        //}
+
+        //public Uri IconUri
+        //{
+        //    get { return new Uri(IconUrl, UriKind.Absolute); }
+        //}
 
         public void Reset()
         {
@@ -150,9 +173,16 @@ namespace Trinity.UI.UIComponents
                 ItemProperty property;
                 if (Enum.TryParse(selectedPropertyName, out property) && property != ItemProperty.Unknown && !Rules.Any(r => r.ItemProperty == property))
                 {
+                    var statRange = GetItemStatRange(property);
+                    if (statRange != null)
+                    {
+                        Logger.Log("Stats Min = {0} Max = {1} Step = {3}", statRange.AbsMin, statRange.AbsMax, statRange.AbsStep);
+                    }
+                    
                     Rules.Add(new ItemRule
                     {
-                        ItemPropertyId = (int)property,                     
+                        Id = (int)property,
+                        ItemStatRange = statRange
                     });
                 }                
             });
