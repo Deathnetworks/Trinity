@@ -252,9 +252,9 @@
     <Compile Include="Settings\WorldObjectSetting.cs" />
     <Compile Include="Helpers\PerformanceLogger.cs" />
     <Compile Include="UI\TabUI.cs" />
-    <Compile Include="UI\UIComponents\Behaviors\ImageAsyncHelper.cs" />
     <Compile Include="UI\UIComponents\Converters\BoolInverterConverter.cs" />
     <Compile Include="UI\UIComponents\Converters\BoolToTypeConverters.cs" />
+    <Compile Include="UI\UIComponents\Converters\UrlToCachedImageConverter.cs" />
     <Compile Include="UI\UIComponents\Converters\UrlToImageConverter.cs" />
     <Compile Include="UI\UIComponents\ItemList\ItemProperty.cs" />
     <Compile Include="UI\UIComponents\ItemList\ItemRule.cs" />

@@ -15,12 +15,24 @@ namespace Trinity.Objects
 
         public double AbsMax
         {
-            get { return Math.Max(AncientMax, Max); }
+            get
+            {
+                if (AncientMax == 0) 
+                    return Max;
+
+                return Math.Max(AncientMax, Max);
+            }
         }
 
         public double AbsMin
         {
-            get { return Math.Min(AncientMin, Min); }
+            get
+            {
+                if (AncientMin == 0) 
+                    return Min;
+
+                return Math.Min(AncientMin, Min);
+            }
         }
 
         public double AbsStep

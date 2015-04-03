@@ -485,9 +485,18 @@ namespace Trinity.Settings.Loot
             var item = e.Item as ItemListItem;
 
             if (item == null || string.IsNullOrEmpty(item.Name))
+            {
                 e.Accepted = false;
+            }
             else
+            {
                 e.Accepted = item.Name.ToLowerInvariant().Contains(FilterText.ToLowerInvariant());
+
+                if (!e.Accepted)
+                    e.Accepted = item.Id.ToString().Equals(FilterText);
+            }
+                
+
         }
 
         /// <summary>

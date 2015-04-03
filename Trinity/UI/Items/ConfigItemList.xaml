@@ -21,7 +21,7 @@
             <ut:EmptyStringToVisibilityConverter x:Key="EmptyStringToVisibilityConverter"/>
             <ut:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" />
             <ut:EnumVisibilityConverter x:Key="EnumVisibilityConverter" />
-            <ut:UrlToImageConverter x:Key="UrlToImageConverter" />
+            <ut:UriToCachedImageConverter x:Key="UrlToCachedImageConverter" />
             
             <mock:MockData x:Key="DesignViewModel"/>
 
@@ -175,7 +175,7 @@
                                                 </LinearGradientBrush>
                                             </Border.Background>                                            
                                             <Image Style="{StaticResource SelfAdjustingHeightImageStyle}" Height="128"
-                                                   Source="{Binding IconUrl, Mode=OneWay, Converter={StaticResource UrlToImageConverter}, IsAsync=true}"/>
+                                                   Source="{Binding IconUrl, Mode=OneWay, Converter={StaticResource UrlToCachedImageConverter}, IsAsync=true}"/>
                                         </Border>
                                         <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,10">
                                             <DockPanel>
@@ -406,7 +406,7 @@
         
         <StackPanel DockPanel.Dock="Top" Margin="0,0,0,0" Orientation="Horizontal" Background="#FF6A6A6A" Height="38" VerticalAlignment="Center">
             <Label Style="{StaticResource StatusLabelStyle}" VerticalContentAlignment="Center" Margin="5,0,0,0" Content="Search:"></Label>
-            <TextBox Width="140" Height="22" Text="{Binding ItemList.FilterText, UpdateSourceTrigger=PropertyChanged}" Margin="0,8"/>
+            <TextBox Width="140" Height="22" Text="{Binding ItemList.FilterText, UpdateSourceTrigger=PropertyChanged}" Margin="0,8" ToolTip="Search by Item Name or Id"/>
             <Button Content=" X " Height="21" Width="25" Margin="-27,-1,0,0" Background="Transparent" Command="{Binding ItemList.ResetFilterCommand}" BorderBrush="Transparent" FontWeight="Heavy" BorderThickness="1" Visibility="{Binding ItemList.IsFiltered, Converter={StaticResource BoolToVisibilityConverter}}" />
             <Label Style="{StaticResource StatusLabelStyle}" VerticalContentAlignment="Center" Margin="5,0,0,0" Content="Group By:"></Label>
             <ComboBox Tag="" SelectedValuePath="Tag" x:Name="GroupingDropdown" MaxHeight="25" SelectedValue="{Binding ItemList.Grouping}" Padding="0,0,15,0">
