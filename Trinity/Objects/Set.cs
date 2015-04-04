@@ -161,6 +161,5 @@ namespace Trinity.Objects
         {
             get { return IsThirdBonusActive || IsSecondBonusActive || IsFirstBonusActive; }
         }
-
     }
 }

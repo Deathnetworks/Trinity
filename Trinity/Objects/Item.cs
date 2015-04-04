@@ -12,7 +12,7 @@ using Zeta.Game.Internals.Actors;
 namespace Trinity.Objects
 {
     [DataContract(Namespace = "")]
-    public class Item : IEquatable<Item>
+    public class Item : IUnique, IEquatable<Item>
     {
         [DataMember]
         public int Id { get; set; }
@@ -49,11 +49,6 @@ namespace Trinity.Objects
             Id = acdItem.ActorSNO;
             Name = acdItem.Name;
             ItemType = acdItem.ItemType;
-        }
-
-        public ItemStatRange GetItemStatRange(ItemProperty property)
-        {
-            return ItemDataUtils.GetItemStatRange(GItemType, property);
         }
 
         /// <summary>
@@ -105,6 +100,49 @@ namespace Trinity.Objects
 
                 return false;
             }
+        }
+
+        public ActorClass ClassRestriction
+        {
+            get { return GetClassRestriction(GItemType); }
+        }
+
+        public static ActorClass GetClassRestriction(GItemType type)
+        {
+            switch (type)
+            {
+                case GItemType.Flail:
+                case GItemType.CrusaderShield:
+                case GItemType.TwoHandFlail:
+                    return ActorClass.Crusader;
+
+                case GItemType.FistWeapon:
+                case GItemType.SpiritStone:
+                case GItemType.TwoHandDaibo:
+                    return ActorClass.Monk;
+
+                case GItemType.VoodooMask:
+                case GItemType.Mojo:
+                case GItemType.CeremonialKnife:
+                    return ActorClass.Witchdoctor;
+
+                case GItemType.MightyBelt:
+                case GItemType.MightyWeapon:
+                    return ActorClass.Barbarian;
+
+                case GItemType.WizardHat:
+                case GItemType.Orb:
+                    return ActorClass.Wizard;
+
+                case GItemType.HandCrossbow:
+                case GItemType.Cloak:
+                case GItemType.Quiver:
+                case GItemType.TwoHandBow:
+                case GItemType.TwoHandCrossbow:
+                    return ActorClass.DemonHunter;   
+            }
+            
+            return ActorClass.Invalid;            
         }
 
         public bool Equals(Item other)

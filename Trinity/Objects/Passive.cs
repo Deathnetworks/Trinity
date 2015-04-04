@@ -8,7 +8,7 @@ namespace Trinity.Objects
     /// <summary>
     /// Contains information about a Passive
     /// </summary>
-    public class Passive
+    public class Passive : IUnique
     {
         public Passive()
         {
@@ -91,5 +91,9 @@ namespace Trinity.Objects
             return Index.GetHashCode() ^ Name.GetHashCode();
         }
 
+        public int Id
+        {
+            get { return (int)SNOPower; }
+        }
     }
 }

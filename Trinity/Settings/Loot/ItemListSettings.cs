@@ -35,9 +35,9 @@ namespace Trinity.Settings.Loot
     {
         #region Fields
 
-        private static List<ItemListItem> _cachedItems;
-        private FullyObservableCollection<ItemListItem> _displayItems = new FullyObservableCollection<ItemListItem>();
-        private List<ItemListItem> _selectedItems = new List<ItemListItem>();
+        private static List<LItem> _cachedItems;
+        private FullyObservableCollection<LItem> _displayItems = new FullyObservableCollection<LItem>();
+        private List<LItem> _selectedItems = new List<LItem>();
         private GroupingType _grouping;
         private string _filterText;
         private DeferredAction _deferredAction;
@@ -153,7 +153,7 @@ namespace Trinity.Settings.Loot
         /// Main collection for all items, underlies CollectionViewSource
         /// </summary>
         [IgnoreDataMember]
-        public FullyObservableCollection<ItemListItem> DisplayItems
+        public FullyObservableCollection<LItem> DisplayItems
         {
             get
             {
@@ -173,7 +173,7 @@ namespace Trinity.Settings.Loot
         /// The source of truth - currently selected items, this is persisted to the settings file.
         /// </summary>
         [DataMember(IsRequired = false)]
-        public List<ItemListItem> SelectedItems
+        public List<LItem> SelectedItems
         {
             get
             {                
@@ -371,7 +371,7 @@ namespace Trinity.Settings.Loot
         private void Initialization()
         {
             CacheReferenceItems();
-            DisplayItems = new FullyObservableCollection<ItemListItem>(_cachedItems, true);            
+            DisplayItems = new FullyObservableCollection<LItem>(_cachedItems, true);            
             BindEvents();
             LoadCommands();
             GroupsExpandedByDefault = false;
@@ -405,7 +405,7 @@ namespace Trinity.Settings.Loot
         public static void CacheReferenceItems()
         {
             if (_cachedItems == null)
-                _cachedItems = Legendary.ToList().Select(i => new ItemListItem(i)).ToList();
+                _cachedItems = Legendary.ToList().Select(i => new LItem(i)).ToList();
         }
 
         /// <summary>
@@ -482,7 +482,7 @@ namespace Trinity.Settings.Loot
             if (string.IsNullOrEmpty(FilterText))
                 e.Accepted = true;
 
-            var item = e.Item as ItemListItem;
+            var item = e.Item as LItem;
 
             if (item == null || string.IsNullOrEmpty(item.Name))
             {
@@ -508,7 +508,7 @@ namespace Trinity.Settings.Loot
             if (IsUpdatingCollection)
                 return;
 
-            var item = args.ChildElement as ItemListItem;
+            var item = args.ChildElement as LItem;
             if (item != null && args.PropertyName.ToString() == "IsSelected")
             {
                 var match = _selectedItems.FirstOrDefault(i => i.Id == item.Id);
@@ -542,7 +542,7 @@ namespace Trinity.Settings.Loot
             using (Collection.DeferRefresh())
             {
                 var selectedIdsRulesDict = _selectedItems.ToDictionary(k => k.Id, v => v.Rules);
-                var castView = _collection.View.SourceCollection.Cast<ItemListItem>();
+                var castView = _collection.View.SourceCollection.Cast<LItem>();
 
                 castView.ForEach(item =>
                 {
@@ -556,7 +556,11 @@ namespace Trinity.Settings.Loot
                         // Rules are not saved with min/max/step etc to save payload
                         // So this needs to be populated based on the GItemType
                         var rules = selectedIdsRulesDict[item.Id];
-                        rules.ForEach(r => r.ItemStatRange = item.GetItemStatRange(r.ItemProperty));
+                        rules.ForEach(r =>
+                        {
+                            r.GItemType = item.GItemType;
+                            r.ItemStatRange = item.GetItemStatRange(r.ItemProperty);
+                        });
 
                         item.Rules = rules;
                         

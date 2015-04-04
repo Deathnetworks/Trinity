@@ -47,7 +47,7 @@ namespace Trinity.Items
                 
                 foreach (var itemRule in itemSetting.Rules)
                 {
-                    var result = true;
+                    var result = false;
                     double itemValue = 0;
                     double ruleValue = 0;
 
@@ -75,7 +75,35 @@ namespace Trinity.Items
                             itemValue = cItem.CritDamagePercent;
                             ruleValue = itemRule.Value;
                             result = itemValue >= ruleValue;
-                            break;   
+                            break;
+
+                        case ItemProperty.AttackSpeed:
+                            itemValue = cItem.AttackSpeedPercent;
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
+                            break;
+
+                        case ItemProperty.BaseDamage:
+                            itemValue = cItem.MaxDamage;
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
+                            break;
+
+                        case ItemProperty.SkillDamage:
+
+                            var skill = ItemDataUtils.GetSkillsForItemType(cItem.TrinityItemType, Trinity.Player.ActorClass).FirstOrDefault(s => s.Id == itemRule.Variant);
+                            if (skill != null)
+                                itemValue = cItem.AcdItem.GetSkillDamageIncrease(skill.SNOPower);
+                            
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
+                            break;
+
+                        case ItemProperty.PercentDamage:
+                            //itemValue = cItem.;
+                            //ruleValue = itemRule.Value;
+                            //result = itemValue >= ruleValue;
+                            break;
                     }
 
                     Logger.LogDebug("  >>  Evaluated {0} -- {1} (Item: {2} -v- Rule: {3}) = {4}", 

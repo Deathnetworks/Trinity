@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Trinity.Helpers;
+using Trinity.Items;
 using Trinity.Objects;
 using Trinity.Technicals;
 using Trinity.UIComponents;
@@ -44,7 +46,7 @@ namespace Trinity.Reference
 
             var statType = GetMainStatType(item);
             var actorClasses = new List<ActorClass>();
-            var itemType = item.ItemType;
+            var itemType = TrinityItemManager.DetermineItemType(item);
 
             switch (statType)
             {
@@ -69,184 +71,181 @@ namespace Trinity.Reference
 
             foreach (var actorClass in actorClasses)
             {
-                var kvp = new KeyValuePair<ItemType, ActorClass>(itemType, actorClass);
+                var kvp = new KeyValuePair<GItemType, ActorClass>(itemType, actorClass);
 
                 foreach (var skill in SkillDamageByItemTypeAndClass[kvp])
                 {
-                    //Logger.Log(string.Format("Skill for {0}/{1} is {2} ({3})", itemType, actorClass, skill.Name, skill.SNOPower));
-
                     var skillDamageIncrease = item.GetSkillDamageIncrease(skill.SNOPower);
-
                     if (skillDamageIncrease > 0)
                     {
                         Logger.Log(string.Format("SkillDamage +{0}% {1}", skillDamageIncrease, skill.Name));
                         return (int)skillDamageIncrease;
-                    }
-                        
+                    }                        
                 }
             }
 
             return 0;
         }
 
-        public static ItemStatRange GetItemStatRange(GItemType itemType, ItemProperty prop)
+        public static List<Skill> GetSkillsForItemType(GItemType itemType, ActorClass actorClass = ActorClass.Invalid)
+        {
+            var result = new List<Skill>();
+            if (actorClass != ActorClass.Invalid)
+            {
+                var kvp = new KeyValuePair<GItemType, ActorClass>(itemType, actorClass);
+                result.AddRange(SkillDamageByItemTypeAndClass[kvp]);
+            }
+            else
+            {
+                var actorClasses = new List<ActorClass>
+                {
+                        ActorClass.Monk,
+                        ActorClass.DemonHunter,
+                        ActorClass.Witchdoctor,
+                        ActorClass.Wizard,
+                        ActorClass.Crusader,
+                        ActorClass.Barbarian               
+                };
+                foreach (var ac in actorClasses)
+                {
+                    var kvp = new KeyValuePair<GItemType, ActorClass>(itemType, ac);
+                    result.AddRange(SkillDamageByItemTypeAndClass[kvp]);
+                }             
+            }
+            return result;
+        }
+
+        public static ItemStatRange GetItemStatRange(Item item, ItemProperty prop)
         {
             ItemStatRange statRange;
             
-            if(ItemPropertyLimitsByItemType.TryGetValue(new KeyValuePair<GItemType, ItemProperty>(itemType,prop), out statRange))
+            if (ItemPropertyLimitsByItemType.TryGetValue(new KeyValuePair<GItemType, ItemProperty>(item.GItemType,prop), out statRange))
                 return statRange;
-            
-            if (ItemPropertyLimitsByItemType.TryGetValue(new KeyValuePair<GItemType, ItemProperty>(GItemType.Unknown, prop), out statRange))
+
+            if (SpecialItemsPropertyCases.TryGetValue(new Tuple<Item, ItemProperty>(item, prop), out statRange))
                 return statRange;
             
             return new ItemStatRange();
         }
 
+        public static bool IsValidPropertyForItem(Item item, ItemProperty prop)
+        {
+            ItemStatRange statRange;
 
+            if (prop == ItemProperty.Ancient)
+                return true;
+
+            if (ItemPropertyLimitsByItemType.TryGetValue(new KeyValuePair<GItemType, ItemProperty>(item.GItemType, prop), out statRange))
+                return true;
+
+            if (SpecialItemsPropertyCases.ContainsKey(new Tuple<Item, ItemProperty>(item, prop)))
+                return true;
+
+            return false;
+        }
+
+        public static List<ItemProperty> GetPropertiesForItem(Item item)
+        {
+            var props = ItemPropertyLimitsByItemType.Where(pair => pair.Key.Key == item.GItemType).Select(pair => pair.Key.Value).ToList();
+            var specialProps = SpecialItemsPropertyCases.Where(pair => pair.Key.Item1 == item).Select(pair => pair.Key.Item2).ToList();
+            props = props.Concat(specialProps).Distinct().ToList();
+            props.Add(ItemProperty.Ancient);
+            props.Sort();
+            return props;
+        }
+
+        public static List<object> GetItemPropertyVariants(ItemProperty prop, GItemType itemType)
+        {
+            var result = new List<object>();
+            switch (prop)
+            {
+                case ItemProperty.SkillDamage:
+                    var classRestriction = (Item.GetClassRestriction(itemType));
+                    result = GetSkillsForItemType(itemType, classRestriction).Cast<object>().ToList();
+                    break;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Items with unusual properties are listed here
+        /// </summary>
+        public static readonly Dictionary<Tuple<Item,ItemProperty>, ItemStatRange> SpecialItemsPropertyCases = new Dictionary<Tuple<Item,ItemProperty>, ItemStatRange>
+        {
+            { new Tuple<Item, ItemProperty>(Legendary.HellcatWaistguard, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 6, Min = 3}},
+            { new Tuple<Item, ItemProperty>(Legendary.HellcatWaistguard, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            { new Tuple<Item, ItemProperty>(Legendary.TheWitchingHour, ItemProperty.CriticalHitDamage), new ItemStatRange { Max = 50, Min = 26 }},
+            { new Tuple<Item, ItemProperty>(Legendary.TheWitchingHour, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            { new Tuple<Item, ItemProperty>(Legendary.Magefist, ItemProperty.FireSkills), new ItemStatRange { Max = 20, Min = 15 }},
+            { new Tuple<Item, ItemProperty>(Legendary.Cindercoat, ItemProperty.FireSkills), new ItemStatRange { Max = 20, Min = 15 }},
+            { new Tuple<Item, ItemProperty>(Legendary.UnboundBolt, ItemProperty.CriticalHitDamage), new ItemStatRange { Max = 35, Min = 31 }},
+            { new Tuple<Item, ItemProperty>(Legendary.LacuniProwlers, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            { new Tuple<Item, ItemProperty>(Legendary.SteadyStrikers, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            { new Tuple<Item, ItemProperty>(Legendary.MempoOfTwilight, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            { new Tuple<Item, ItemProperty>(Legendary.AndarielsVisage, ItemProperty.FireSkills), new ItemStatRange { Max = 20, Min = 15 }},
+            { new Tuple<Item, ItemProperty>(Legendary.AndarielsVisage, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            { new Tuple<Item, ItemProperty>(Legendary.SunKeeper, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 30, Min = 15 }},
+            { new Tuple<Item, ItemProperty>(Legendary.Frostburn, ItemProperty.ColdSkills), new ItemStatRange { Max = 15, Min = 10 }},
+            { new Tuple<Item, ItemProperty>(Legendary.ThundergodsVigor, ItemProperty.LightningSkills), new ItemStatRange { Max = 15, Min = 10 }},
+        };
+
+        /// <summary>
+        /// Properties that are ALWAYS available to the ItemType are listed here.
+        /// </summary>
         public static readonly Dictionary<KeyValuePair<GItemType, ItemProperty>, ItemStatRange> ItemPropertyLimitsByItemType = new Dictionary<KeyValuePair<GItemType, ItemProperty>, ItemStatRange>
         {
 
-            // PrimaryStat by GItemType
+            // PrimaryStat
 
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Ring, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Ring, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Amulet, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Helm, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 750, Max = 750, Min = 626 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.VoodooMask, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 750, Max = 750, Min = 626 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.WizardHat, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 750, Max = 750, Min = 626 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.SpiritStone, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 750, Max = 750, Min = 626 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Gloves, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Quiver, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 650 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Orb, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 650 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mojo, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 650 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Shoulder, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Chest, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Cloak, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Belt, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyBelt, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Bracer, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Legs, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Boots, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyWeapon, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Wand, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Flail, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Axe, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.HandCrossbow, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.CeremonialKnife, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.FistWeapon, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mace, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Sword, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandDaibo, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandCrossbow, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 500, Min = 416 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandAxe, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandBow, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 500, Min = 416 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandFlail, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMace, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMighty, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandPolearm, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandStaff, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandSword, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Spear, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Shield, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Dagger, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.CrusaderShield, ItemProperty.PrimaryStat), new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
 
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Amulet, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Helm, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1000, AncientMin = 750, Max = 750, Min = 626 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.VoodooMask, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1000, AncientMin = 750, Max = 750, Min = 626 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.WizardHat, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1000, AncientMin = 750, Max = 750, Min = 626 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.SpiritStone, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1000, AncientMin = 750, Max = 750, Min = 626 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Gloves, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Quiver, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 650 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Orb, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 650 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mojo, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 650 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Shoulder, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Chest, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Cloak, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Belt, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyBelt, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Bracer, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Legs, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Boots, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyWeapon, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Wand, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Flail, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Axe, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.HandCrossbow, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.CeremonialKnife, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.FistWeapon, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 61000, AncientMin = 825, Max = 750, Min = 626 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mace, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Sword, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandDaibo, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandCrossbow, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 500, Min = 416 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandAxe, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandBow, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 500, Min = 416 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandFlail, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMace, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMighty, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandPolearm, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandStaff, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandSword, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1465, AncientMin = 1237, Max = 1125, Min = 946 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Spear, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Shield, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Dagger, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 1000, AncientMin = 825, Max = 750, Min = 626 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.CrusaderShield, ItemProperty.PrimaryStat), 
-                new ItemStatRange {AncientMax = 650, AncientMin = 550, Max = 500, Min = 416 }},
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Unknown, ItemProperty.PrimaryStat), 
-                new ItemStatRange { Max = 1000, Min = 0 }},
-
-
-            // CriticalDamage by GItemType
+            // CriticalDamage
 
             {new KeyValuePair<GItemType, ItemProperty>(GItemType.Ring, ItemProperty.CriticalHitDamage), new ItemStatRange { Max = 50, Min = 26 }},
             {new KeyValuePair<GItemType, ItemProperty>(GItemType.Amulet, ItemProperty.CriticalHitDamage), new ItemStatRange { Max = 100, Min = 51 }},
             {new KeyValuePair<GItemType, ItemProperty>(GItemType.Gloves, ItemProperty.CriticalHitDamage), new ItemStatRange { Max = 50, Min = 26 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Belt, ItemProperty.CriticalHitDamage), new ItemStatRange { Max = 50, Min = 25 }}, // WitchingHour
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mace, ItemProperty.CriticalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Sword, ItemProperty.CriticalHitDamage), new ItemStatRange { Max = 500, Min = 416 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandBow, ItemProperty.CriticalHitDamage), new ItemStatRange { Max = 35, Min = 31 }}, //UnboundBolt
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Unknown, ItemProperty.CriticalHitDamage), new ItemStatRange { Max = 100, Min = 0 }},
 
-            // CriticalChance by GItemType
+            // CriticalChance
 
             {new KeyValuePair<GItemType, ItemProperty>(GItemType.Ring, ItemProperty.CriticalHitChance), new ItemStatRange { Max = 6, Min = 4.5 }},
             {new KeyValuePair<GItemType, ItemProperty>(GItemType.Amulet, ItemProperty.CriticalHitChance), new ItemStatRange { Max = 10, Min = 8 }},
@@ -261,7 +260,111 @@ namespace Trinity.Reference
             {new KeyValuePair<GItemType, ItemProperty>(GItemType.Bracer, ItemProperty.CriticalHitChance), new ItemStatRange { Max = 6, Min = 4.5 }},
             {new KeyValuePair<GItemType, ItemProperty>(GItemType.Shield, ItemProperty.CriticalHitChance), new ItemStatRange { Max = 10, Min = 8 }},
             {new KeyValuePair<GItemType, ItemProperty>(GItemType.CrusaderShield, ItemProperty.CriticalHitChance), new ItemStatRange { Max = 10, Min = 8 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Unknown, ItemProperty.CriticalHitChance), new ItemStatRange { Max = 10, Min = 0 }},
+
+            // IAS
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Ring, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Amulet, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Gloves, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Quiver, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyWeapon, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Wand, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Flail, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Axe, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.HandCrossbow, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.CeremonialKnife, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.FistWeapon, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mace, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Sword, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandDaibo, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandCrossbow, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandAxe, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandBow, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandFlail, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMace, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMighty, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandPolearm, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandStaff, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandSword, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Spear, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Dagger, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
+
+            // Skill Damage
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Helm, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.VoodooMask, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.WizardHat, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.SpiritStone, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Quiver, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Orb, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mojo, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Shoulder, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Chest, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Cloak, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Belt, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyBelt, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Legs, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Boots, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyWeapon, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Wand, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Flail, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.HandCrossbow, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.FistWeapon, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandDaibo, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMighty, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+
+            // Base Damage
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Orb, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 600, AncientMin = 400, Max = 500, Min = 340 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mojo, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 600, AncientMin = 400, Max = 500, Min = 340 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyWeapon, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Wand, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Flail, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Axe, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.HandCrossbow, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1304, Min = 856 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.CeremonialKnife, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.FistWeapon, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mace, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Sword, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Spear, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Dagger, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandDaibo, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandCrossbow, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1788, Min = 1177 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandAxe, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandBow, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1788, Min = 1177 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandFlail, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMace, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMighty, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandPolearm, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandStaff, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandSword, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
+
+            // Percent Damage
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyWeapon, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Wand, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Flail, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Axe, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.HandCrossbow, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.CeremonialKnife, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.FistWeapon, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mace, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Sword, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Spear, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Dagger, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandDaibo, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandCrossbow, ItemProperty.PercentDamage), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandAxe, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},,
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandBow, ItemProperty.PercentDamage), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandFlail, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMace, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMighty, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandPolearm, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandStaff, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandSword, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
+
+
+
 
             //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Ring, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 50, Min = 26 }},
             //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Amulet, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 100, Min = 51 }},
@@ -308,315 +411,313 @@ namespace Trinity.Reference
     
         };
 
-        public static readonly LookupList<KeyValuePair<ItemType, ActorClass>, Skill> SkillDamageByItemTypeAndClass = new LookupList<KeyValuePair<ItemType, ActorClass>, Skill>
+        public static readonly LookupList<KeyValuePair<GItemType, ActorClass>, Skill> SkillDamageByItemTypeAndClass = new LookupList<KeyValuePair<GItemType, ActorClass>, Skill>
         {
             // Head Slot
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.ClusterArrow},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.Multishot},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.ElementalArrow},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.Strafe},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.Chakram},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.RapidFire},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.Impale},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.ClusterArrow},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.Multishot},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.ElementalArrow},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.Strafe},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.Chakram},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.RapidFire},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.Impale},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Barbarian), Skills.Barbarian.Whirlwind},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Barbarian), Skills.Barbarian.SeismicSlam},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Barbarian), Skills.Barbarian.AncientSpear},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Barbarian), Skills.Barbarian.HammerOfTheAncients},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Barbarian), Skills.Barbarian.Whirlwind},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Barbarian), Skills.Barbarian.SeismicSlam},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Barbarian), Skills.Barbarian.AncientSpear},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Barbarian), Skills.Barbarian.HammerOfTheAncients},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Wizard), Skills.Wizard.Meteor},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Wizard), Skills.Wizard.Disintegrate},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Wizard), Skills.Wizard.EnergyTwister},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Wizard), Skills.Wizard.ArcaneTorrent},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Wizard), Skills.Wizard.WaveOfForce},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Wizard), Skills.Wizard.ArcaneOrb},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Wizard), Skills.Wizard.RayOfFrost},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Wizard), Skills.Wizard.Meteor},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Wizard), Skills.Wizard.Disintegrate},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Wizard), Skills.Wizard.EnergyTwister},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Wizard), Skills.Wizard.ArcaneTorrent},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Wizard), Skills.Wizard.WaveOfForce},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Wizard), Skills.Wizard.ArcaneOrb},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Wizard), Skills.Wizard.RayOfFrost},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Witchdoctor), Skills.WitchDoctor.AcidCloud},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Witchdoctor), Skills.WitchDoctor.SpiritBarrage},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Witchdoctor), Skills.WitchDoctor.ZombieCharger},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Witchdoctor), Skills.WitchDoctor.Sacrifice},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Witchdoctor), Skills.WitchDoctor.Firebats},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Witchdoctor), Skills.WitchDoctor.AcidCloud},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Witchdoctor), Skills.WitchDoctor.SpiritBarrage},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Witchdoctor), Skills.WitchDoctor.ZombieCharger},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Witchdoctor), Skills.WitchDoctor.Sacrifice},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Witchdoctor), Skills.WitchDoctor.Firebats},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.VoodooMask, ActorClass.Witchdoctor), Skills.WitchDoctor.AcidCloud},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.VoodooMask, ActorClass.Witchdoctor), Skills.WitchDoctor.SpiritBarrage},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.VoodooMask, ActorClass.Witchdoctor), Skills.WitchDoctor.ZombieCharger},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.VoodooMask, ActorClass.Witchdoctor), Skills.WitchDoctor.Sacrifice},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.VoodooMask, ActorClass.Witchdoctor), Skills.WitchDoctor.Firebats},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.VoodooMask, ActorClass.Witchdoctor), Skills.WitchDoctor.AcidCloud},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.VoodooMask, ActorClass.Witchdoctor), Skills.WitchDoctor.SpiritBarrage},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.VoodooMask, ActorClass.Witchdoctor), Skills.WitchDoctor.ZombieCharger},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.VoodooMask, ActorClass.Witchdoctor), Skills.WitchDoctor.Sacrifice},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.VoodooMask, ActorClass.Witchdoctor), Skills.WitchDoctor.Firebats},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Monk), Skills.Monk.TempestRush},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Monk), Skills.Monk.ExplodingPalm},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Monk), Skills.Monk.WaveOfLight},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Monk), Skills.Monk.LashingTailKick},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Monk), Skills.Monk.TempestRush},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Monk), Skills.Monk.ExplodingPalm},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Monk), Skills.Monk.WaveOfLight},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Monk), Skills.Monk.LashingTailKick},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.SpiritStone, ActorClass.Monk), Skills.Monk.TempestRush},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.SpiritStone, ActorClass.Monk), Skills.Monk.ExplodingPalm},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.SpiritStone, ActorClass.Monk), Skills.Monk.WaveOfLight},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.SpiritStone, ActorClass.Monk), Skills.Monk.LashingTailKick},  
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.SpiritStone, ActorClass.Monk), Skills.Monk.TempestRush},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.SpiritStone, ActorClass.Monk), Skills.Monk.ExplodingPalm},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.SpiritStone, ActorClass.Monk), Skills.Monk.WaveOfLight},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.SpiritStone, ActorClass.Monk), Skills.Monk.LashingTailKick},  
 
             // Shoulders
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.DemonHunter), Skills.DemonHunter.Companion},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.DemonHunter), Skills.DemonHunter.RainOfVengeance},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.DemonHunter), Skills.DemonHunter.Sentry},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.DemonHunter), Skills.DemonHunter.SpikeTrap},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.DemonHunter), Skills.DemonHunter.FanOfKnives},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.DemonHunter), Skills.DemonHunter.Companion},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.DemonHunter), Skills.DemonHunter.RainOfVengeance},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.DemonHunter), Skills.DemonHunter.Sentry},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.DemonHunter), Skills.DemonHunter.SpikeTrap},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.DemonHunter), Skills.DemonHunter.FanOfKnives},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Barbarian), Skills.Barbarian.Avalanche},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Barbarian), Skills.Barbarian.Earthquake},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Barbarian), Skills.Barbarian.Overpower},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Barbarian), Skills.Barbarian.Rend},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Barbarian), Skills.Barbarian.Revenge},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Barbarian), Skills.Barbarian.Avalanche},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Barbarian), Skills.Barbarian.Earthquake},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Barbarian), Skills.Barbarian.Overpower},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Barbarian), Skills.Barbarian.Rend},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Barbarian), Skills.Barbarian.Revenge},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Wizard), Skills.Wizard.BlackHole},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Wizard), Skills.Wizard.Blizzard},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Wizard), Skills.Wizard.Familiar},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Wizard), Skills.Wizard.ExplosiveBlast},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Wizard), Skills.Wizard.Hydra},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Wizard), Skills.Wizard.BlackHole},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Wizard), Skills.Wizard.Blizzard},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Wizard), Skills.Wizard.Familiar},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Wizard), Skills.Wizard.ExplosiveBlast},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Wizard), Skills.Wizard.Hydra},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Witchdoctor), Skills.WitchDoctor.FetishArmy},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Witchdoctor), Skills.WitchDoctor.Gargantuan},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Witchdoctor), Skills.WitchDoctor.WallOfZombies},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Witchdoctor), Skills.WitchDoctor.GraspOfTheDead},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Witchdoctor), Skills.WitchDoctor.Haunt},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Witchdoctor), Skills.WitchDoctor.LocustSwarm},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Witchdoctor), Skills.WitchDoctor.Piranhas},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Witchdoctor), Skills.WitchDoctor.SummonZombieDogs},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Witchdoctor), Skills.WitchDoctor.FetishArmy},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Witchdoctor), Skills.WitchDoctor.Gargantuan},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Witchdoctor), Skills.WitchDoctor.WallOfZombies},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Witchdoctor), Skills.WitchDoctor.GraspOfTheDead},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Witchdoctor), Skills.WitchDoctor.Haunt},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Witchdoctor), Skills.WitchDoctor.LocustSwarm},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Witchdoctor), Skills.WitchDoctor.Piranhas},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Witchdoctor), Skills.WitchDoctor.SummonZombieDogs},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Monk), Skills.Monk.DashingStrike},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Monk), Skills.Monk.SevensidedStrike},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Monk), Skills.Monk.MysticAlly},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Monk), Skills.Monk.SweepingWind},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Monk), Skills.Monk.CycloneStrike},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Monk), Skills.Monk.DashingStrike},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Monk), Skills.Monk.SevensidedStrike},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Monk), Skills.Monk.MysticAlly},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Monk), Skills.Monk.SweepingWind},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Monk), Skills.Monk.CycloneStrike},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Crusader), Skills.Crusader.FallingSword},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Shoulder, ActorClass.Crusader), Skills.Crusader.HeavensFury},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Crusader), Skills.Crusader.FallingSword},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Shoulder, ActorClass.Crusader), Skills.Crusader.HeavensFury},
 
             // Chest
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.DemonHunter), Skills.DemonHunter.Companion},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.DemonHunter), Skills.DemonHunter.RainOfVengeance},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.DemonHunter), Skills.DemonHunter.Sentry},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.DemonHunter), Skills.DemonHunter.SpikeTrap},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.DemonHunter), Skills.DemonHunter.FanOfKnives},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.DemonHunter), Skills.DemonHunter.Companion},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.DemonHunter), Skills.DemonHunter.RainOfVengeance},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.DemonHunter), Skills.DemonHunter.Sentry},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.DemonHunter), Skills.DemonHunter.SpikeTrap},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.DemonHunter), Skills.DemonHunter.FanOfKnives},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Cloak, ActorClass.DemonHunter), Skills.DemonHunter.Companion},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Cloak, ActorClass.DemonHunter), Skills.DemonHunter.RainOfVengeance},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Cloak, ActorClass.DemonHunter), Skills.DemonHunter.Sentry},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Cloak, ActorClass.DemonHunter), Skills.DemonHunter.SpikeTrap},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Cloak, ActorClass.DemonHunter), Skills.DemonHunter.FanOfKnives},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Cloak, ActorClass.DemonHunter), Skills.DemonHunter.Companion},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Cloak, ActorClass.DemonHunter), Skills.DemonHunter.RainOfVengeance},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Cloak, ActorClass.DemonHunter), Skills.DemonHunter.Sentry},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Cloak, ActorClass.DemonHunter), Skills.DemonHunter.SpikeTrap},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Cloak, ActorClass.DemonHunter), Skills.DemonHunter.FanOfKnives},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Barbarian), Skills.Barbarian.Avalanche},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Barbarian), Skills.Barbarian.Earthquake},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Barbarian), Skills.Barbarian.Overpower},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Barbarian), Skills.Barbarian.Rend},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Barbarian), Skills.Barbarian.Revenge},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Barbarian), Skills.Barbarian.Avalanche},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Barbarian), Skills.Barbarian.Earthquake},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Barbarian), Skills.Barbarian.Overpower},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Barbarian), Skills.Barbarian.Rend},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Barbarian), Skills.Barbarian.Revenge},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Wizard), Skills.Wizard.BlackHole},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Wizard), Skills.Wizard.Blizzard},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Wizard), Skills.Wizard.Familiar},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Wizard), Skills.Wizard.ExplosiveBlast},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Wizard), Skills.Wizard.Hydra},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Wizard), Skills.Wizard.BlackHole},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Wizard), Skills.Wizard.Blizzard},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Wizard), Skills.Wizard.Familiar},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Wizard), Skills.Wizard.ExplosiveBlast},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Wizard), Skills.Wizard.Hydra},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Witchdoctor), Skills.WitchDoctor.FetishArmy},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Witchdoctor), Skills.WitchDoctor.Gargantuan},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Witchdoctor), Skills.WitchDoctor.WallOfZombies},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Witchdoctor), Skills.WitchDoctor.GraspOfTheDead},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Witchdoctor), Skills.WitchDoctor.Haunt},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Witchdoctor), Skills.WitchDoctor.LocustSwarm},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Witchdoctor), Skills.WitchDoctor.Piranhas},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Witchdoctor), Skills.WitchDoctor.SummonZombieDogs},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Witchdoctor), Skills.WitchDoctor.FetishArmy},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Witchdoctor), Skills.WitchDoctor.Gargantuan},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Witchdoctor), Skills.WitchDoctor.WallOfZombies},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Witchdoctor), Skills.WitchDoctor.GraspOfTheDead},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Witchdoctor), Skills.WitchDoctor.Haunt},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Witchdoctor), Skills.WitchDoctor.LocustSwarm},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Witchdoctor), Skills.WitchDoctor.Piranhas},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Witchdoctor), Skills.WitchDoctor.SummonZombieDogs},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Monk), Skills.Monk.DashingStrike},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Monk), Skills.Monk.SevensidedStrike},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Monk), Skills.Monk.MysticAlly},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Monk), Skills.Monk.SweepingWind},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Monk), Skills.Monk.CycloneStrike},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Monk), Skills.Monk.DashingStrike},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Monk), Skills.Monk.SevensidedStrike},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Monk), Skills.Monk.MysticAlly},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Monk), Skills.Monk.SweepingWind},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Monk), Skills.Monk.CycloneStrike},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Crusader), Skills.Crusader.FallingSword},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Chest, ActorClass.Crusader), Skills.Crusader.HeavensFury},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Crusader), Skills.Crusader.FallingSword},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Chest, ActorClass.Crusader), Skills.Crusader.HeavensFury},
 
             // Belt
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.DemonHunter), Skills.DemonHunter.Grenade},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.DemonHunter), Skills.DemonHunter.EvasiveFire},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.DemonHunter), Skills.DemonHunter.Bolas},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.DemonHunter), Skills.DemonHunter.EntanglingShot},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.DemonHunter), Skills.DemonHunter.HungeringArrow},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.DemonHunter), Skills.DemonHunter.Grenade},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.DemonHunter), Skills.DemonHunter.EvasiveFire},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.DemonHunter), Skills.DemonHunter.Bolas},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.DemonHunter), Skills.DemonHunter.EntanglingShot},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.DemonHunter), Skills.DemonHunter.HungeringArrow},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.Barbarian), Skills.Barbarian.Frenzy},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.Barbarian), Skills.Barbarian.Cleave},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.Barbarian), Skills.Barbarian.Bash},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.Barbarian), Skills.Barbarian.WeaponThrow},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.Barbarian), Skills.Barbarian.Frenzy},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.Barbarian), Skills.Barbarian.Cleave},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.Barbarian), Skills.Barbarian.Bash},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.Barbarian), Skills.Barbarian.WeaponThrow},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.MightyBelt, ActorClass.Barbarian), Skills.Barbarian.Frenzy},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.MightyBelt, ActorClass.Barbarian), Skills.Barbarian.Cleave},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.MightyBelt, ActorClass.Barbarian), Skills.Barbarian.Bash},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.MightyBelt, ActorClass.Barbarian), Skills.Barbarian.WeaponThrow},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.MightyBelt, ActorClass.Barbarian), Skills.Barbarian.Frenzy},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.MightyBelt, ActorClass.Barbarian), Skills.Barbarian.Cleave},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.MightyBelt, ActorClass.Barbarian), Skills.Barbarian.Bash},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.MightyBelt, ActorClass.Barbarian), Skills.Barbarian.WeaponThrow},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.Wizard), Skills.Wizard.Electrocute},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.Wizard), Skills.Wizard.SpectralBlade},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.Wizard), Skills.Wizard.ShockPulse},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.Wizard), Skills.Wizard.MagicMissile},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.Wizard), Skills.Wizard.Electrocute},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.Wizard), Skills.Wizard.SpectralBlade},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.Wizard), Skills.Wizard.ShockPulse},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.Wizard), Skills.Wizard.MagicMissile},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.Witchdoctor), Skills.WitchDoctor.Firebomb},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.Witchdoctor), Skills.WitchDoctor.PlagueOfToads},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.Witchdoctor), Skills.WitchDoctor.CorpseSpiders},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.Witchdoctor), Skills.WitchDoctor.PoisonDart},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.Witchdoctor), Skills.WitchDoctor.Firebomb},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.Witchdoctor), Skills.WitchDoctor.PlagueOfToads},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.Witchdoctor), Skills.WitchDoctor.CorpseSpiders},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.Witchdoctor), Skills.WitchDoctor.PoisonDart},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.Monk), Skills.Monk.WayOfTheHundredFists},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.Monk), Skills.Monk.CripplingWave},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.Monk), Skills.Monk.DeadlyReach},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.Monk), Skills.Monk.FistsOfThunder},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.Monk), Skills.Monk.WayOfTheHundredFists},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.Monk), Skills.Monk.CripplingWave},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.Monk), Skills.Monk.DeadlyReach},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.Monk), Skills.Monk.FistsOfThunder},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Belt, ActorClass.Crusader), Skills.Crusader.Punish},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Belt, ActorClass.Crusader), Skills.Crusader.Punish},
 
             // Pants
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.DemonHunter), Skills.DemonHunter.Grenade},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.DemonHunter), Skills.DemonHunter.EvasiveFire},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.DemonHunter), Skills.DemonHunter.Bolas},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.DemonHunter), Skills.DemonHunter.EntanglingShot},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.DemonHunter), Skills.DemonHunter.HungeringArrow},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.DemonHunter), Skills.DemonHunter.Grenade},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.DemonHunter), Skills.DemonHunter.EvasiveFire},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.DemonHunter), Skills.DemonHunter.Bolas},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.DemonHunter), Skills.DemonHunter.EntanglingShot},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.DemonHunter), Skills.DemonHunter.HungeringArrow},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.Barbarian), Skills.Barbarian.Frenzy},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.Barbarian), Skills.Barbarian.Cleave},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.Barbarian), Skills.Barbarian.Bash},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.Barbarian), Skills.Barbarian.WeaponThrow},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.Barbarian), Skills.Barbarian.Frenzy},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.Barbarian), Skills.Barbarian.Cleave},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.Barbarian), Skills.Barbarian.Bash},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.Barbarian), Skills.Barbarian.WeaponThrow},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.Wizard), Skills.Wizard.Electrocute},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.Wizard), Skills.Wizard.SpectralBlade},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.Wizard), Skills.Wizard.ShockPulse},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.Wizard), Skills.Wizard.MagicMissile},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.Wizard), Skills.Wizard.Electrocute},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.Wizard), Skills.Wizard.SpectralBlade},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.Wizard), Skills.Wizard.ShockPulse},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.Wizard), Skills.Wizard.MagicMissile},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.Witchdoctor), Skills.WitchDoctor.Firebomb},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.Witchdoctor), Skills.WitchDoctor.PlagueOfToads},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.Witchdoctor), Skills.WitchDoctor.CorpseSpiders},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.Witchdoctor), Skills.WitchDoctor.PoisonDart},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.Witchdoctor), Skills.WitchDoctor.Firebomb},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.Witchdoctor), Skills.WitchDoctor.PlagueOfToads},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.Witchdoctor), Skills.WitchDoctor.CorpseSpiders},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.Witchdoctor), Skills.WitchDoctor.PoisonDart},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.Monk), Skills.Monk.WayOfTheHundredFists},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.Monk), Skills.Monk.CripplingWave},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.Monk), Skills.Monk.DeadlyReach},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.Monk), Skills.Monk.FistsOfThunder},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.Monk), Skills.Monk.WayOfTheHundredFists},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.Monk), Skills.Monk.CripplingWave},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.Monk), Skills.Monk.DeadlyReach},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.Monk), Skills.Monk.FistsOfThunder},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Legs, ActorClass.Crusader), Skills.Crusader.Punish},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Legs, ActorClass.Crusader), Skills.Crusader.Punish},
             
             // Boots
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.ClusterArrow},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.Multishot},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.ElementalArrow},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.Strafe},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.Chakram},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.RapidFire},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.Impale},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.ClusterArrow},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.Multishot},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.ElementalArrow},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.Strafe},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.Chakram},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.RapidFire},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.DemonHunter), Skills.DemonHunter.Impale},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Barbarian), Skills.Barbarian.Whirlwind},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Barbarian), Skills.Barbarian.SeismicSlam},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Barbarian), Skills.Barbarian.AncientSpear},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Barbarian), Skills.Barbarian.HammerOfTheAncients},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Barbarian), Skills.Barbarian.Whirlwind},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Barbarian), Skills.Barbarian.SeismicSlam},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Barbarian), Skills.Barbarian.AncientSpear},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Barbarian), Skills.Barbarian.HammerOfTheAncients},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Wizard), Skills.Wizard.Meteor},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Wizard), Skills.Wizard.Disintegrate},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Wizard), Skills.Wizard.EnergyTwister},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Wizard), Skills.Wizard.ArcaneTorrent},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Wizard), Skills.Wizard.WaveOfForce},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Wizard), Skills.Wizard.ArcaneOrb},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Wizard), Skills.Wizard.RayOfFrost},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Wizard), Skills.Wizard.Meteor},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Wizard), Skills.Wizard.Disintegrate},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Wizard), Skills.Wizard.EnergyTwister},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Wizard), Skills.Wizard.ArcaneTorrent},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Wizard), Skills.Wizard.WaveOfForce},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Wizard), Skills.Wizard.ArcaneOrb},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Wizard), Skills.Wizard.RayOfFrost},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Witchdoctor), Skills.WitchDoctor.AcidCloud},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Witchdoctor), Skills.WitchDoctor.SpiritBarrage},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Witchdoctor), Skills.WitchDoctor.ZombieCharger},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Witchdoctor), Skills.WitchDoctor.Sacrifice},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Witchdoctor), Skills.WitchDoctor.Firebats},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Witchdoctor), Skills.WitchDoctor.AcidCloud},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Witchdoctor), Skills.WitchDoctor.SpiritBarrage},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Witchdoctor), Skills.WitchDoctor.ZombieCharger},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Witchdoctor), Skills.WitchDoctor.Sacrifice},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Witchdoctor), Skills.WitchDoctor.Firebats},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Monk), Skills.Monk.TempestRush},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Monk), Skills.Monk.ExplodingPalm},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Monk), Skills.Monk.WaveOfLight},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Helm, ActorClass.Monk), Skills.Monk.LashingTailKick},  
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Monk), Skills.Monk.TempestRush},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Monk), Skills.Monk.ExplodingPalm},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Monk), Skills.Monk.WaveOfLight},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Helm, ActorClass.Monk), Skills.Monk.LashingTailKick},  
 
             // Offhand
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Quiver, ActorClass.DemonHunter), Skills.DemonHunter.ClusterArrow},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Quiver, ActorClass.DemonHunter), Skills.DemonHunter.Multishot},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Quiver, ActorClass.DemonHunter), Skills.DemonHunter.ElementalArrow},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Quiver, ActorClass.DemonHunter), Skills.DemonHunter.Strafe},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Quiver, ActorClass.DemonHunter), Skills.DemonHunter.Chakram},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Quiver, ActorClass.DemonHunter), Skills.DemonHunter.RapidFire},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Quiver, ActorClass.DemonHunter), Skills.DemonHunter.Impale},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Quiver, ActorClass.DemonHunter), Skills.DemonHunter.Sentry},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Quiver, ActorClass.DemonHunter), Skills.DemonHunter.RainOfVengeance},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Quiver, ActorClass.DemonHunter), Skills.DemonHunter.FanOfKnives},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Quiver, ActorClass.DemonHunter), Skills.DemonHunter.ClusterArrow},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Quiver, ActorClass.DemonHunter), Skills.DemonHunter.Multishot},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Quiver, ActorClass.DemonHunter), Skills.DemonHunter.ElementalArrow},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Quiver, ActorClass.DemonHunter), Skills.DemonHunter.Strafe},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Quiver, ActorClass.DemonHunter), Skills.DemonHunter.Chakram},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Quiver, ActorClass.DemonHunter), Skills.DemonHunter.RapidFire},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Quiver, ActorClass.DemonHunter), Skills.DemonHunter.Impale},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Quiver, ActorClass.DemonHunter), Skills.DemonHunter.Sentry},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Quiver, ActorClass.DemonHunter), Skills.DemonHunter.RainOfVengeance},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Quiver, ActorClass.DemonHunter), Skills.DemonHunter.FanOfKnives},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Orb, ActorClass.Wizard), Skills.Wizard.EnergyTwister},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Orb, ActorClass.Wizard), Skills.Wizard.Electrocute},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Orb, ActorClass.Wizard), Skills.Wizard.ArcaneOrb},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Orb, ActorClass.Wizard), Skills.Wizard.Hydra},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Orb, ActorClass.Wizard), Skills.Wizard.MagicMissile},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Orb, ActorClass.Wizard), Skills.Wizard.Familiar},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Orb, ActorClass.Wizard), Skills.Wizard.RayOfFrost},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Orb, ActorClass.Wizard), Skills.Wizard.Meteor},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Orb, ActorClass.Wizard), Skills.Wizard.SpectralBlade},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Orb, ActorClass.Wizard), Skills.Wizard.WaveOfForce},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Orb, ActorClass.Wizard), Skills.Wizard.Disintegrate},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Orb, ActorClass.Wizard), Skills.Wizard.ArcaneTorrent},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Orb, ActorClass.Wizard), Skills.Wizard.ExplosiveBlast},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Orb, ActorClass.Wizard), Skills.Wizard.Blizzard},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Orb, ActorClass.Wizard), Skills.Wizard.BlackHole},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Orb, ActorClass.Wizard), Skills.Wizard.EnergyTwister},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Orb, ActorClass.Wizard), Skills.Wizard.Electrocute},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Orb, ActorClass.Wizard), Skills.Wizard.ArcaneOrb},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Orb, ActorClass.Wizard), Skills.Wizard.Hydra},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Orb, ActorClass.Wizard), Skills.Wizard.MagicMissile},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Orb, ActorClass.Wizard), Skills.Wizard.Familiar},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Orb, ActorClass.Wizard), Skills.Wizard.RayOfFrost},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Orb, ActorClass.Wizard), Skills.Wizard.Meteor},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Orb, ActorClass.Wizard), Skills.Wizard.SpectralBlade},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Orb, ActorClass.Wizard), Skills.Wizard.WaveOfForce},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Orb, ActorClass.Wizard), Skills.Wizard.Disintegrate},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Orb, ActorClass.Wizard), Skills.Wizard.ArcaneTorrent},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Orb, ActorClass.Wizard), Skills.Wizard.ExplosiveBlast},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Orb, ActorClass.Wizard), Skills.Wizard.Blizzard},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Orb, ActorClass.Wizard), Skills.Wizard.BlackHole},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.SpiritBarrage},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.LocustSwarm},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.PlagueOfToads},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.Haunt},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.Firebats},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.GraspOfTheDead},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.Sacrifice},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.FetishArmy},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.ZombieCharger},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.CorpseSpiders},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.AcidCloud},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.PoisonDart},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.WallOfZombies},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.SpiritBarrage},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.LocustSwarm},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.PlagueOfToads},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.Haunt},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.Firebats},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.GraspOfTheDead},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.Sacrifice},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.FetishArmy},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.ZombieCharger},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.CorpseSpiders},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.AcidCloud},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.PoisonDart},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Mojo, ActorClass.Witchdoctor), Skills.WitchDoctor.WallOfZombies},
 
             // One Hand Weapon
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.MightyWeapon, ActorClass.Barbarian), Skills.Barbarian.WeaponThrow},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.MightyWeapon, ActorClass.Barbarian), Skills.Barbarian.AncientSpear},
-
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Wand, ActorClass.Wizard), Skills.Wizard.Disintegrate},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Wand, ActorClass.Wizard), Skills.Wizard.SpectralBlade},
-
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Flail, ActorClass.Crusader), Skills.Crusader.BlessedHammer},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.MightyWeapon, ActorClass.Barbarian), Skills.Barbarian.WeaponThrow},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.MightyWeapon, ActorClass.Barbarian), Skills.Barbarian.AncientSpear},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Wand, ActorClass.Wizard), Skills.Wizard.Disintegrate},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Wand, ActorClass.Wizard), Skills.Wizard.SpectralBlade},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.Flail, ActorClass.Crusader), Skills.Crusader.BlessedHammer},
 
             // Two Hand Weapon
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.MightyWeapon, ActorClass.Barbarian), Skills.Barbarian.Whirlwind},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.MightyWeapon, ActorClass.Barbarian), Skills.Barbarian.SeismicSlam},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.MightyWeapon, ActorClass.Barbarian), Skills.Barbarian.AncientSpear},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.MightyWeapon, ActorClass.Barbarian), Skills.Barbarian.HammerOfTheAncients},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.MightyWeapon, ActorClass.Barbarian), Skills.Barbarian.Avalanche},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.MightyWeapon, ActorClass.Barbarian), Skills.Barbarian.Earthquake},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.MightyWeapon, ActorClass.Barbarian), Skills.Barbarian.Overpower},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.MightyWeapon, ActorClass.Barbarian), Skills.Barbarian.Rend},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.MightyWeapon, ActorClass.Barbarian), Skills.Barbarian.Revenge},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.MightyWeapon, ActorClass.Barbarian), Skills.Barbarian.Frenzy},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.MightyWeapon, ActorClass.Barbarian), Skills.Barbarian.Cleave},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.MightyWeapon, ActorClass.Barbarian), Skills.Barbarian.Bash},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.MightyWeapon, ActorClass.Barbarian), Skills.Barbarian.WeaponThrow},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandMighty, ActorClass.Barbarian), Skills.Barbarian.Whirlwind},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandMighty, ActorClass.Barbarian), Skills.Barbarian.SeismicSlam},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandMighty, ActorClass.Barbarian), Skills.Barbarian.AncientSpear},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandMighty, ActorClass.Barbarian), Skills.Barbarian.HammerOfTheAncients},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandMighty, ActorClass.Barbarian), Skills.Barbarian.Avalanche},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandMighty, ActorClass.Barbarian), Skills.Barbarian.Earthquake},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandMighty, ActorClass.Barbarian), Skills.Barbarian.Overpower},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandMighty, ActorClass.Barbarian), Skills.Barbarian.Rend},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandMighty, ActorClass.Barbarian), Skills.Barbarian.Revenge},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandMighty, ActorClass.Barbarian), Skills.Barbarian.Frenzy},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandMighty, ActorClass.Barbarian), Skills.Barbarian.Cleave},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandMighty, ActorClass.Barbarian), Skills.Barbarian.Bash},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandMighty, ActorClass.Barbarian), Skills.Barbarian.WeaponThrow},
 
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Daibo, ActorClass.Monk), Skills.Monk.SevensidedStrike},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Daibo, ActorClass.Monk), Skills.Monk.LashingTailKick},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Daibo, ActorClass.Monk), Skills.Monk.WaveOfLight},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Daibo, ActorClass.Monk), Skills.Monk.ExplodingPalm},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Daibo, ActorClass.Monk), Skills.Monk.TempestRush},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Daibo, ActorClass.Monk), Skills.Monk.FistsOfThunder},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Daibo, ActorClass.Monk), Skills.Monk.CripplingWave},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Daibo, ActorClass.Monk), Skills.Monk.WayOfTheHundredFists},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Daibo, ActorClass.Monk), Skills.Monk.DeadlyReach},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Daibo, ActorClass.Monk), Skills.Monk.DashingStrike},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Daibo, ActorClass.Monk), Skills.Monk.MysticAlly},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Daibo, ActorClass.Monk), Skills.Monk.SweepingWind},
-            {new KeyValuePair<ItemType, ActorClass>(ItemType.Daibo, ActorClass.Monk), Skills.Monk.CycloneStrike},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandDaibo, ActorClass.Monk), Skills.Monk.SevensidedStrike},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandDaibo, ActorClass.Monk), Skills.Monk.LashingTailKick},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandDaibo, ActorClass.Monk), Skills.Monk.WaveOfLight},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandDaibo, ActorClass.Monk), Skills.Monk.ExplodingPalm},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandDaibo, ActorClass.Monk), Skills.Monk.TempestRush},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandDaibo, ActorClass.Monk), Skills.Monk.FistsOfThunder},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandDaibo, ActorClass.Monk), Skills.Monk.CripplingWave},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandDaibo, ActorClass.Monk), Skills.Monk.WayOfTheHundredFists},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandDaibo, ActorClass.Monk), Skills.Monk.DeadlyReach},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandDaibo, ActorClass.Monk), Skills.Monk.DashingStrike},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandDaibo, ActorClass.Monk), Skills.Monk.MysticAlly},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandDaibo, ActorClass.Monk), Skills.Monk.SweepingWind},
+            {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandDaibo, ActorClass.Monk), Skills.Monk.CycloneStrike},
 
         };
 

@@ -16,6 +16,7 @@ using JetBrains.Annotations;
 using Microsoft.Win32.SafeHandles;
 using Trinity.Items;
 using Trinity.Objects;
+using Trinity.Reference;
 using Trinity.UIComponents;
 using Zeta.Common;
 using Trinity.Technicals;
@@ -27,13 +28,14 @@ namespace Trinity.UI.UIComponents
     /// Item Object with wrapped for use in SettingsUI
     /// </summary>
     [DataContract(Namespace = "")]
-    public class ItemListItem : Item, INotifyPropertyChanged, ICloneable
+    public class LItem : Item, INotifyPropertyChanged, ICloneable
     {
         private bool _isSelected;
         private readonly Item _item;
-        private ObservableCollection<ItemRule> _rules = new ObservableCollection<ItemRule>();
+        private List<ItemProperty> _itemProperties;
+        private ObservableCollection<LRule> _rules = new ObservableCollection<LRule>();
 
-        public ItemListItem(Item item)
+        public LItem(Item item)
         {
             LoadCommands();
 
@@ -84,40 +86,29 @@ namespace Trinity.UI.UIComponents
 
         public bool IsSelected
         {
-            get
-            {
-                //Logger.Log("{0} Property: IsSelected get ({1})", Name, _isSelected);
-                return _isSelected;                 
-            }
+            get { return _isSelected; }
             set
             {                
                 if (_isSelected != value)
                 {
-                    //Logger.Log("{0} Property: IsSelected set to {1}",Name,value);
                     _isSelected = value;
                     OnPropertyChanged();                    
                 }
             }
         }
 
-        //public ImageSource Icon
-        //{
-        //    get
-        //    {
-        //        return new BitmapImage(IconUri);
-        //        //Image img = new Image();
-        //        //BitmapImage bitmapImage = new BitmapImage();
-        //        //Uri uri = new Uri("ms-appx:///Assets/Logo.png");
-        //        //bitmapImage.UriSource = uri;
-        //        //img.Source = bitmapImage;
-        //        //return img;
-        //    }
-        //}
-
-        //public Uri IconUri
-        //{
-        //    get { return new Uri(IconUrl, UriKind.Absolute); }
-        //}
+        public List<ItemProperty> ItemProperties
+        {
+            get { return _itemProperties ?? (_itemProperties = ItemDataUtils.GetPropertiesForItem(_item)); }
+            set
+            {
+                if (_itemProperties != value)
+                {
+                    _itemProperties = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public void Reset()
         {
@@ -135,15 +126,15 @@ namespace Trinity.UI.UIComponents
 
         public object Clone()
         {
-            return new ItemListItem(_item)
+            return new LItem(_item)
             {
                 IsSelected = IsSelected,
             };
         }
 
 
-        [DataMember]
-        public ObservableCollection<ItemRule> Rules
+        [DataMember(EmitDefaultValue = false, IsRequired = false)]
+        public ObservableCollection<LRule> Rules
         {
             get { return _rules; }
             set 
@@ -156,6 +147,11 @@ namespace Trinity.UI.UIComponents
             }
         }
 
+        public ItemStatRange GetItemStatRange(ItemProperty property)
+        {
+            return ItemDataUtils.GetItemStatRange(_item, property);
+        }
+
         #region Commands
 
         public ICommand AddRuleCommand { get; set; }
@@ -165,7 +161,10 @@ namespace Trinity.UI.UIComponents
         {
             AddRuleCommand = new RelayCommand(parameter =>
             {
-                Logger.Log("Selected {0}", parameter.ToString());
+                if (parameter == null)
+                    return;
+
+                Logger.Log("AddRuleCommand {0}", parameter.ToString());
 
                 var item = parameter as ComboBoxItem;
                 var selectedPropertyName = item != null ? item.Content.ToString() : parameter.ToString();
@@ -176,13 +175,15 @@ namespace Trinity.UI.UIComponents
                     var statRange = GetItemStatRange(property);
                     if (statRange != null)
                     {
-                        Logger.Log("Stats Min = {0} Max = {1} Step = {3}", statRange.AbsMin, statRange.AbsMax, statRange.AbsStep);
+                        Logger.LogVerbose(string.Format("Stats Min = {0} Max = {1} Step = {2}", 
+                            statRange.AbsMin.ToString(), statRange.AbsMax.ToString(), statRange.AbsStep.ToString()));
                     }
                     
-                    Rules.Add(new ItemRule
+                    Rules.Add(new LRule
                     {
                         Id = (int)property,
-                        ItemStatRange = statRange
+                        ItemStatRange = statRange,
+                        GItemType = GItemType
                     });
                 }                
             });
@@ -192,7 +193,7 @@ namespace Trinity.UI.UIComponents
                 if (parameter == null)
                     return;
 
-                Logger.Log("1) Clicked Remove Rule Button: {0}", parameter.ToString());
+                Logger.Log("RemoveRuleCommand: {0}", parameter.ToString());
 
                 ItemProperty property;
                 if (Enum.TryParse(parameter.ToString(), out property))

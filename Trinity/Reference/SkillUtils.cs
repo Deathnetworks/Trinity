@@ -9,7 +9,8 @@ using Zeta.Game.Internals.Actors;
 namespace Trinity.Reference
 {
     public class SkillUtils
-    {       /// <summary>
+    {       
+        /// <summary>
         /// Fast lookup for a Skill by SNOPower
         /// </summary>
         public static Skill ById(SNOPower power)
@@ -20,8 +21,21 @@ namespace Trinity.Reference
             var result = _allSkillBySnoPower.TryGetValue(power, out skill);
             return result ? skill : new Skill();
         }
-
         private static Dictionary<SNOPower, Skill> _allSkillBySnoPower = new Dictionary<SNOPower, Skill>();
+
+        /// <summary>
+        /// Fast lookup for a Skill by SNOPower
+        /// </summary>
+        public static Skill ByName(string name)
+        {
+            if (!_allSkillByName.Any())
+                _allSkillByName = All.ToDictionary(s => s.Name.ToLowerInvariant(), s => s);
+
+            Skill skill;
+            var result = _allSkillByName.TryGetValue(name.ToLowerInvariant(), out skill);
+            return result ? skill : new Skill();
+        }
+        private static Dictionary<string, Skill> _allSkillByName = new Dictionary<string, Skill>();
 
         /// <summary>
         /// All SNOPowers

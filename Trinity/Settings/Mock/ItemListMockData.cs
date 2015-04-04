@@ -17,43 +17,43 @@ namespace Trinity.Settings.Mock
     public class ItemListMockData
     {
         public CollectionViewSource Collection { get; set; }   
-        public List<ItemListItem> DisplayItems { get; set; }
+        public List<LItem> DisplayItems { get; set; }
 
         /// <summary>
         /// Mock Data for viewing ItemList controls in DesignTime
         /// </summary>
         public ItemListMockData()
         {
-            DisplayItems = new List<ItemListItem>
+            DisplayItems = new List<LItem>
             {
-                new ItemListItem(Legendary.BombardiersRucksack)
+                new LItem(Legendary.BombardiersRucksack)
                 {             
                     IsSelected = true,
-                    Rules = new ObservableCollection<ItemRule>
+                    Rules = new ObservableCollection<LRule>
                     {
-                        new ItemRule
+                        new LRule
                         {
                             Id = (int)ItemProperty.Ancient                            
                         },
-                        new ItemRule
+                        new LRule
                         {
                             Id = (int)ItemProperty.PrimaryStat,
                             Value = 445
                         },
-                        new ItemRule
+                        new LRule
                         {
                             Id = (int)ItemProperty.SkillDamage                            
                         }
                     }
                 },
-                new ItemListItem(Legendary.BoardWalkers),
-                new ItemListItem(Legendary.LutSocks),
+                new LItem(Legendary.BoardWalkers),
+                new LItem(Legendary.LutSocks),
                 //new ItemListItem(Legendary.BreastplateOfAkkhan)
                 //{
                 //    IsSelected = true
                 //},
-                new ItemListItem(Legendary.Cindercoat),
-                new ItemListItem(Legendary.FlyingDragon), 
+                new LItem(Legendary.Cindercoat),
+                new LItem(Legendary.FlyingDragon), 
             };
 
             Collection = new CollectionViewSource();

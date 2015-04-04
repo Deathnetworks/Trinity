@@ -1178,7 +1178,10 @@ namespace Trinity.Items
             return true;
         }
 
-        // private static Regex x1Regex = new Regex("^x1_", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        internal static GItemType DetermineItemType(ACDItem item)
+        {
+            return DetermineItemType(item.InternalName, item.ItemType);
+        }
 
         /// <summary>
         ///     DetermineItemType - Calculates what kind of item it is from D3 internalnames
@@ -1452,6 +1455,117 @@ namespace Trinity.Items
                     }
             }
             return itemBaseType;
+        }
+
+        internal static ItemType GItemTypeToItemType(GItemType itemType)
+        {           
+            switch (itemType)
+            {
+                case GItemType.Axe:
+                    return ItemType.Axe;
+
+                case GItemType.Dagger:
+                    return ItemType.Dagger;
+
+                case GItemType.Flail:
+                    return ItemType.Flail;
+
+                case GItemType.FistWeapon:
+                    return ItemType.FistWeapon;
+
+                case GItemType.Mace:
+                    return ItemType.Mace;
+
+                case GItemType.MightyWeapon:
+                    return ItemType.MightyWeapon;
+
+                case GItemType.Spear:
+                    return ItemType.Spear;
+
+                case GItemType.Sword:
+                    return ItemType.Sword;
+
+                case GItemType.Wand:
+                    return ItemType.Wand;
+
+                case GItemType.HandCrossbow:
+                    return ItemType.HandCrossbow;
+
+                case GItemType.CeremonialKnife:
+                    return ItemType.CeremonialDagger;
+
+                case GItemType.TwoHandDaibo:
+                    return ItemType.Daibo;
+
+                case GItemType.TwoHandMace:
+                    return ItemType.Mace;
+
+                case GItemType.TwoHandFlail:
+                    return ItemType.Flail;
+
+                case GItemType.TwoHandMighty:
+                    return ItemType.MightyWeapon;
+
+                case GItemType.TwoHandPolearm:
+                    return ItemType.Polearm;
+
+                case GItemType.TwoHandStaff:
+                    return ItemType.Staff;
+
+                case GItemType.TwoHandSword:
+                    return ItemType.Sword;
+
+                case GItemType.TwoHandAxe:
+                    return ItemType.Axe;
+
+                case GItemType.TwoHandCrossbow:
+                    return ItemType.Crossbow;
+
+                case GItemType.TwoHandBow:
+                    return ItemType.Bow;
+
+                case GItemType.FollowerEnchantress:
+                case GItemType.FollowerScoundrel:
+                case GItemType.FollowerTemplar:
+                    return ItemType.FollowerSpecial;
+
+                case GItemType.CraftingMaterial:
+                    return ItemType.CraftingReagent;
+
+                case GItemType.CraftTome:
+                    return ItemType.CraftingPlan;
+
+                case GItemType.HealthPotion:
+                case GItemType.Dye:
+                case GItemType.ConsumableAddSockets:
+                case GItemType.ProgressionGlobe:
+                case GItemType.PowerGlobe:
+                case GItemType.HealthGlobe:
+                    return ItemType.Consumable;
+
+                case GItemType.Ruby:
+                case GItemType.Emerald:
+                case GItemType.Topaz:
+                case GItemType.Amethyst:
+                case GItemType.Diamond:
+                    return ItemType.Gem;
+
+                case GItemType.LootRunKey:
+                case GItemType.HoradricRelic:
+                case GItemType.SpecialItem:
+                case GItemType.CraftingPlan:
+                case GItemType.HoradricCache:
+                case GItemType.StaffOfHerding:
+                case GItemType.InfernalKey:
+                case GItemType.TieredLootrunKey:
+                    return ItemType.Unknown;
+            }
+
+            ItemType newType;
+            if(Enum.TryParse(itemType.ToString(), true, out newType))
+                return newType;
+
+            return ItemType.Unknown;
         }
 
         internal static bool IsEquipment(CachedACDItem i)

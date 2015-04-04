@@ -122,6 +122,7 @@
     <Compile Include="DbProvider\SearchAreaProvider.cs" />
     <Compile Include="Helpers\Attributes\NoCopy.cs" />
     <Compile Include="Helpers\ExportHelper.cs" />
+    <Compile Include="Objects\IUnique.cs" />
     <Compile Include="Objects\ItemStatRange.cs" />
     <Compile Include="Resources\Battle.Net API\BNetDataObjects.cs" />
     <Compile Include="Helpers\Bounties\BountyType.cs" />
@@ -252,12 +253,13 @@
     <Compile Include="Settings\WorldObjectSetting.cs" />
     <Compile Include="Helpers\PerformanceLogger.cs" />
     <Compile Include="UI\TabUI.cs" />
+    <Compile Include="UI\UIComponents\Behaviors\InputBindingBehavior.cs" />
     <Compile Include="UI\UIComponents\Converters\BoolInverterConverter.cs" />
     <Compile Include="UI\UIComponents\Converters\BoolToTypeConverters.cs" />
     <Compile Include="UI\UIComponents\Converters\UrlToCachedImageConverter.cs" />
     <Compile Include="UI\UIComponents\Converters\UrlToImageConverter.cs" />
     <Compile Include="UI\UIComponents\ItemList\ItemProperty.cs" />
-    <Compile Include="UI\UIComponents\ItemList\ItemRule.cs" />
+    <Compile Include="UI\UIComponents\ItemList\LRule.cs" />
     <Compile Include="UI\UIComponents\Behaviors\CancelMouseBubbling.cs" />
     <Compile Include="UI\UIComponents\Controls\ModalContentCommands.cs" />
     <Compile Include="UI\UIComponents\Controls\ModalContentPresenter.cs" />
@@ -272,7 +274,7 @@
     <Compile Include="UI\UIComponents\Converters\PercentConverter.cs" />
     <Compile Include="UI\UIComponents\Converters\EnumBooleanConverter.cs" />
     <Compile Include="UI\UIComponents\RelayCommand.cs" />
-    <Compile Include="UI\UIComponents\ItemList\ItemListItem.cs" />
+    <Compile Include="UI\UIComponents\ItemList\LItem.cs" />
     <Compile Include="UI\UIComponents\TVarsViewModel.cs" />
     <Compile Include="UI\UIComponents\TVarValidationRule.cs" />
     <Compile Include="UI\UILoader.cs" />

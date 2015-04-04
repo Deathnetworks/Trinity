@@ -13,14 +13,16 @@ using Trinity.Reference;
 namespace Trinity.UIComponents
 {
     [DataContract(Namespace = "")]
-    public class ItemRule : INotifyPropertyChanged
+    public class LRule : INotifyPropertyChanged
     {
-        public ItemRule()
+        public LRule()
         {
             Value = 1;
         }
 
         private double _value;
+        private int _variant;
+        private List<object> _variants = new List<object>();
 
         public string Name { get { return ItemProperty.ToString(); }}
 
@@ -41,6 +43,48 @@ namespace Trinity.UIComponents
                 if (_value != value)
                 {
                     _value = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        [DataMember(EmitDefaultValue = false)]
+        public int Variant
+        {
+            get { return _variant; }
+            set
+            {
+                if (_variant != value)
+                {
+                    _variant = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public List<object> Variants
+        {
+            get
+            {
+                if (_variants == null || !_variants.Any())
+                {
+                    _variants = ItemDataUtils.GetItemPropertyVariants(ItemProperty, GItemType);
+
+                    if (_variant == 0)
+                    {
+                        var firstVariant = (_variants.FirstOrDefault() as IUnique);         
+                        if(firstVariant!=null)
+                            _variant = firstVariant.Id;
+                    }
+                        
+                }
+                return _variants;
+            }
+            set
+            {
+                if (_variants != value)
+                {
+                    _variants = value;
                     OnPropertyChanged();
                 }
             }
@@ -71,5 +115,7 @@ namespace Trinity.UIComponents
         }
 
         public ItemStatRange ItemStatRange { get; set; }
+
+        public GItemType GItemType { get; set; }
     }
 }

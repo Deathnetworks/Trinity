@@ -29,7 +29,7 @@
                 <ObjectDataProvider.MethodParameters>
                     <x:Type TypeName="ut:ItemProperty" />
                 </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
+            </ObjectDataProvider>                   
 
             <Style x:Key="StatusLabelStyle" TargetType="{x:Type Label}">
                 <Setter Property="Background" Value="Transparent" />
@@ -205,18 +205,21 @@
                                                   Name="AddRuleComboBox" 
                                                     FontWeight="Normal"
                                                   ut:SelectionChangedBehaviour.Command="{Binding AddRuleCommand}"
-                                                                                                  
+                                                             ItemsSource="{Binding ItemProperties}"                                     
                                                   Width="Auto"
                                                   Height="23" IsSynchronizedWithCurrentItem="False" Template="{DynamicResource ActionsComboBoxControlTemplate}"
                                                   Tag="Add Rule"
                                                   >
-                                                            <!--ItemsSource="{Binding Source={StaticResource ItemPropertyProvider}}"-->
-                                                            <ComboBox.Items>
+                                                      
+                                                            <!--<ComboBox.Items>
                                                                 <ComboBoxItem Content="Ancient" />
-                                                                <ComboBoxItem Content="PrimaryStat" />
+                                                                <ComboBoxItem Content="AttackSpeed" />
+                                                                <ComboBoxItem Content="BaseDamage" />
                                                                 <ComboBoxItem Content="CriticalHitChance" />
                                                                 <ComboBoxItem Content="CriticalHitDamage" />                                                                
-                                                            </ComboBox.Items>
+                                                                <ComboBoxItem Content="PrimaryStat" />
+                                                                <ComboBoxItem Content="SkillDamage" />                                                                                                                                
+                                                            </ComboBox.Items>-->
                                                         </ComboBox>
                                                     </Grid>
                                                     <WrapPanel x:Name="rulesContentContainer" Background="Transparent" Width="Auto">
@@ -283,6 +286,15 @@
                     <DataTrigger Binding="{Binding Path=ItemProperty}" Value="CriticalHitDamage">
                         <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
                     </DataTrigger>
+                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="SkillDamage">
+                        <Setter Property="ContentTemplate" Value="{DynamicResource DropdownSliderFormTemplate}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="BaseDamage">
+                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="AttackSpeed">
+                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
+                    </DataTrigger>
                 </Style.Triggers>
             </Style>
 
@@ -311,11 +323,11 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="1*" />
-                                <ColumnDefinition Width="3*" />
+                                <ColumnDefinition Width="20*" />
+                                <ColumnDefinition Width="37*" />
                             </Grid.ColumnDefinitions>
                             <Label Grid.Row="0"  Foreground="White" VerticalContentAlignment="Center" Style="{StaticResource UnselectedTitleLabelStyle}" Content="{Binding Name}"/>
-                            <Slider Grid.Row="0" Grid.Column="1" Template="{DynamicResource Slider}" 
+                            <Slider Grid.Row="0" Grid.Column="1" Template="{DynamicResource SliderEditable}" 
                                 Interval="25" 
                                 Maximum="{Binding Max, Mode=OneWay}" 
                                 Minimum="{Binding Min, Mode=OneWay}" 
@@ -324,25 +336,52 @@
                                 IsSnapToTickEnabled="True"                                
                                 TickPlacement="BottomRight" 
                                 Value="{Binding Value}" 
-                                HorizontalAlignment="Stretch" Margin="25,0,25,0" />
-
-                            
+                                HorizontalAlignment="Stretch" Margin="5,0,25,0" />                            
                         </Grid>
-                        <!--<WrapPanel HorizontalAlignment="Stretch" Width="Auto">
-                            <Slider x:Name="EnchantSlider"
-        					                Interval="25" 
-                                            Margin="-8,0,-4,0"
-                                            Maximum="{Binding Maximum, Mode=OneWay}" 
-                                            Minimum="{Binding Minimum, Mode=OneWay}" 
-                                            SmallChange="{Binding Step, Mode=OneWay}" 
-                                            TickFrequency="{Binding Step, Mode=OneWay}" 
-                                            IsSnapToTickEnabled="True" 
-                                            TickPlacement="BottomRight" 
-        					                Value="{Binding Value}"
-        					                HorizontalAlignment="Stretch" 
-                                            Width="{Binding Path=ActualWidth, ElementName=GoalHeader1}" 
-                                            Style="{x:Null}"/>
-                        </WrapPanel>-->
+                        <Button HorizontalAlignment="Right" Content=" X " Height="21" Width="25" Margin="10,-1,0,0" Background="Transparent" 
+                                Command="{Binding Path=DataContext.RemoveRuleCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" 
+                                CommandParameter="{Binding ItemProperty}"
+                                BorderBrush="Transparent" FontWeight="Heavy" BorderThickness="0" />
+                    </Grid>
+                </Border>
+            </DataTemplate>
+
+            <DataTemplate x:Key="DropdownSliderFormTemplate">
+                <Border Background="#55999999" BorderBrush="#CC999999" CornerRadius="1" Padding="2" BorderThickness="1,1,0,0">
+                    <Grid Width="Auto" HorizontalAlignment="Stretch">
+                        <Grid Margin="0,0,10,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="27*" />
+                                <ColumnDefinition Width="49*" />
+                            </Grid.ColumnDefinitions>
+                            <!--<Label Grid.Row="0" Foreground="White" VerticalContentAlignment="Center" Style="{StaticResource UnselectedTitleLabelStyle}" Content="{Binding Name}"/>-->
+
+                            <ComboBox Grid.Column="0" FontWeight="Normal"
+                                      ItemsSource="{Binding Variants}" 
+                                      SelectedValue="{Binding Variant, Mode=TwoWay}" 
+                                      SelectedValuePath="Id" 
+                                      DisplayMemberPath="Name"                                       
+                                    
+                                      Margin="0,0,0,0" />
+                            <!--ItemsSource="{Binding Variants}" 
+                                      SelectedItem="{Binding Variant}"-->
+
+                            <Slider Grid.Row="0" Grid.Column="1" Template="{DynamicResource SliderEditable}" 
+                                Interval="25" 
+                                Maximum="{Binding Max, Mode=OneWay}" 
+                                Minimum="{Binding Min, Mode=OneWay}" 
+                                SmallChange="{Binding Step, Mode=OneWay}" 
+                                TickFrequency="{Binding Step, Mode=OneWay}" 
+                                IsSnapToTickEnabled="True"                                
+                                TickPlacement="BottomRight" 
+                                Value="{Binding Value}" 
+                                HorizontalAlignment="Stretch" Margin="5,0,25,0" />
+                         
+
+                        </Grid>
                         <Button HorizontalAlignment="Right" Content=" X " Height="21" Width="25" Margin="10,-1,0,0" Background="Transparent" 
                                 Command="{Binding Path=DataContext.RemoveRuleCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" 
                                 CommandParameter="{Binding ItemProperty}"

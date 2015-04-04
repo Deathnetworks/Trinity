@@ -16,7 +16,7 @@ namespace Trinity.UIComponents
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var url = value as string;
-            if (url == null)
+            if (string.IsNullOrEmpty(url))
                 return null;
 
             var webUri = new Uri(url, UriKind.Absolute);

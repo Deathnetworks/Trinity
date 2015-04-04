@@ -13,7 +13,7 @@ namespace Trinity.Objects
     /// <summary>
     /// Contains information about a Skill
     /// </summary>
-    public class Skill
+    public class Skill : IUnique
     {
         private int _cost;
         private TimeSpan _duration;
@@ -311,6 +311,10 @@ namespace Trinity.Objects
             return Index.GetHashCode() ^ Name.GetHashCode();
         }
 
+        public int Id
+        {
+            get { return (int)SNOPower; }
+        }
     }
 }
 
