@@ -4,32 +4,29 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ut="clr-namespace:Trinity.UIComponents"
              xmlns:themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero"             
-             xmlns:objects="clr-namespace:Trinity.Objects"
              xmlns:mock="clr-namespace:Trinity.Settings.Mock"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             xmlns:uiComponents="clr-namespace:Trinity.UI.UIComponents"
              mc:Ignorable="d" Foreground="{DynamicResource TextBrush}" Background="DarkGray"             
              d:DesignHeight="500" d:DesignWidth="420">
-
     <UserControl.Resources>
         <ResourceDictionary>
             
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="..\Template.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            
+
             <ut:EmptyStringToVisibilityConverter x:Key="EmptyStringToVisibilityConverter"/>
             <ut:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" />
             <ut:EnumVisibilityConverter x:Key="EnumVisibilityConverter" />
             <ut:UriToCachedImageConverter x:Key="UrlToCachedImageConverter" />
-            
+
             <mock:MockData x:Key="DesignViewModel"/>
 
             <ObjectDataProvider MethodName="GetValues" ObjectType="{x:Type sys:Enum}" x:Key="ItemPropertyProvider">
                 <ObjectDataProvider.MethodParameters>
                     <x:Type TypeName="ut:ItemProperty" />
                 </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>                   
+            </ObjectDataProvider>
 
             <Style x:Key="StatusLabelStyle" TargetType="{x:Type Label}">
                 <Setter Property="Background" Value="Transparent" />
@@ -43,13 +40,7 @@
                 <Setter Property="FontWeight" Value="Normal"/>
                 <Setter Property="FontSize" Value="12"></Setter>
                 <Setter Property="Padding" Value="0,0,0,0"></Setter>
-                <Setter Property="Margin" Value="0"></Setter>                
-            </Style>
-
-            <Style x:Key="GroupHeaderSecondaryLabelStyle" TargetType="{x:Type Label}">
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="Foreground" Value="White" />
-                <Setter Property="FontWeight" Value="Normal"/>
+                <Setter Property="Margin" Value="0"></Setter>
             </Style>
 
             <Style x:Key="TitleLabelStyle" TargetType="{x:Type Label}">
@@ -71,7 +62,7 @@
                         </MultiDataTrigger.Conditions>
                         <Setter Property="Foreground" Value="#bf642f"/>
                     </MultiDataTrigger>
-                </Style.Triggers>                
+                </Style.Triggers>
             </Style>
 
             <Style x:Key="UnselectedTitleLabelStyle" TargetType="{x:Type Label}">
@@ -147,7 +138,6 @@
                                 <ColumnDefinition Width="15" MinWidth="15"/>
                                 <ColumnDefinition MinWidth="54" />
                             </Grid.ColumnDefinitions>
-
                             <StackPanel Grid.Column="0" Orientation="Vertical">
                                 <CheckBox x:Name="SelectedCheckBox" IsChecked="{Binding Path=IsSelected}" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                             </StackPanel>
@@ -173,7 +163,7 @@
                                                     <GradientStop Color="Black" Offset="0"/>
                                                     <GradientStop Color="#FF331F0D" Offset="1"/>
                                                 </LinearGradientBrush>
-                                            </Border.Background>                                            
+                                            </Border.Background>
                                             <Image Style="{StaticResource SelfAdjustingHeightImageStyle}" Height="128"
                                                    Source="{Binding IconUrl, Mode=OneWay, Converter={StaticResource UrlToCachedImageConverter}, IsAsync=true}"/>
                                         </Border>
@@ -187,13 +177,10 @@
                                                 <TextBlock ToolTip="{Binding LegendaryAffix}" Style="{StaticResource TextBlockSubtleInformationStyle}" Text="{Binding LegendaryAffix}" TextTrimming="CharacterEllipsis" />
                                             </WrapPanel>
                                         </StackPanel>
-   
-                                        
                                         <Border Grid.Row="1" Grid.Column="2" Grid.RowSpan="2"  ut:CancelMouseBubbling.Active="True" Background="#55171717" BorderBrush="#55666666" BorderThickness="0,0,1,1" Margin="0,5,0,0">
                                             <Border Padding="10,5,10,10" Background="Transparent" BorderBrush="#FF222222" BorderThickness="1,1,0,0">
                                                 <StackPanel>
                                                     <Grid Background="Transparent" >
-                                                        <!--<Label HorizontalAlignment="Left" FontWeight="Bold" Style="{StaticResource SubtleInformationStyle}" Content="Rules" />-->
                                                         <TextBlock TextWrapping="Wrap" Text="Rules" Foreground="White" FontWeight="Bold" HorizontalAlignment="Left">
                                                         <Run Text="  (" FontWeight="Normal" Foreground="Gray" />
                                                         <Run Text="{Binding Mode=OneWay, Path=Rules.Count }" FontWeight="Normal" Foreground="Gray" />
@@ -209,18 +196,7 @@
                                                   Width="Auto"
                                                   Height="23" IsSynchronizedWithCurrentItem="False" Template="{DynamicResource ActionsComboBoxControlTemplate}"
                                                   Tag="Add Rule"
-                                                  >
-                                                      
-                                                            <!--<ComboBox.Items>
-                                                                <ComboBoxItem Content="Ancient" />
-                                                                <ComboBoxItem Content="AttackSpeed" />
-                                                                <ComboBoxItem Content="BaseDamage" />
-                                                                <ComboBoxItem Content="CriticalHitChance" />
-                                                                <ComboBoxItem Content="CriticalHitDamage" />                                                                
-                                                                <ComboBoxItem Content="PrimaryStat" />
-                                                                <ComboBoxItem Content="SkillDamage" />                                                                                                                                
-                                                            </ComboBox.Items>-->
-                                                        </ComboBox>
+                                                  />
                                                     </Grid>
                                                     <WrapPanel x:Name="rulesContentContainer" Background="Transparent" Width="Auto">
                                                         <ItemsControl 
@@ -228,36 +204,12 @@
                                                               HorizontalContentAlignment="Stretch" 
                                                               HorizontalAlignment="Stretch" 
                                                               ItemsSource="{Binding Rules}" 
-                                                              ItemContainerStyle="{DynamicResource ItemsControlSelector}"
-   
-                                                        >
-                                                            <ItemsControl.ItemsPanel>
-                                                                <ItemsPanelTemplate>
-                                                                    <DockPanel />
-                                                                    <!--<StackPanel Width="*">
-                                                                   
-                                                                </StackPanel>-->
-                                                                    <!--<Grid Width="Auto" IsItemsHost="True" HorizontalAlignment="Stretch">
-                                                                    <Grid.ColumnDefinitions>
-                                                                        <ColumnDefinition Width="Auto" />
-                                                                    </Grid.ColumnDefinitions>
-                                                                    <Grid.RowDefinitions>
-                                                                        <RowDefinition Height="Auto" />
-                                                                    </Grid.RowDefinitions>
-                                                                </Grid>-->
-                                                                </ItemsPanelTemplate>
-                                                            </ItemsControl.ItemsPanel>
-                                                            <!--<ItemsControl.ItemContainerStyle>
-                                                            <Style TargetType="ContentPresenter">
-                                                                <Setter Property="DockPanel.Dock" Value="Top"/>
-                                                            </Style>
-                                                        </ItemsControl.ItemContainerStyle>-->
+                                                              ItemContainerStyle="{DynamicResource ItemsControlSelector}">             
                                                         </ItemsControl>
                                                     </WrapPanel>
                                                 </StackPanel>
                                             </Border>
                                         </Border>
-
                                     </Grid>
                                 </StackPanel>
                             </Border>
@@ -300,7 +252,7 @@
 
             <DataTemplate x:Key="CheckboxFormTemplate">
                 <Border Background="#55999999" BorderBrush="#CC999999" CornerRadius="1" Padding="2" BorderThickness="1,1,0,0">
-                    <Grid Width="Auto" HorizontalAlignment="Stretch">                    
+                    <Grid Width="Auto" HorizontalAlignment="Stretch">
                         <WrapPanel HorizontalAlignment="Stretch" Width="Auto">
                             <CheckBox IsChecked="{Binding Path=Value}" Margin="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                             <Label Foreground="White" Style="{StaticResource UnselectedTitleLabelStyle}" Content="{Binding Name}"/>
@@ -327,6 +279,7 @@
                                 <ColumnDefinition Width="37*" />
                             </Grid.ColumnDefinitions>
                             <Label Grid.Row="0"  Foreground="White" VerticalContentAlignment="Center" Style="{StaticResource UnselectedTitleLabelStyle}" Content="{Binding Name}"/>
+                       
                             <Slider Grid.Row="0" Grid.Column="1" Template="{DynamicResource SliderEditable}" 
                                 Interval="25" 
                                 Maximum="{Binding Max, Mode=OneWay}" 
@@ -334,9 +287,9 @@
                                 SmallChange="{Binding Step, Mode=OneWay}" 
                                 TickFrequency="{Binding Step, Mode=OneWay}" 
                                 IsSnapToTickEnabled="True"                                
-                                TickPlacement="BottomRight" 
+                                TickPlacement="BottomRight"                                
                                 Value="{Binding Value}" 
-                                HorizontalAlignment="Stretch" Margin="5,0,25,0" />                            
+                                HorizontalAlignment="Stretch" Margin="5,0,25,0" />
                         </Grid>
                         <Button HorizontalAlignment="Right" Content=" X " Height="21" Width="25" Margin="10,-1,0,0" Background="Transparent" 
                                 Command="{Binding Path=DataContext.RemoveRuleCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" 
@@ -357,18 +310,12 @@
                                 <ColumnDefinition Width="27*" />
                                 <ColumnDefinition Width="49*" />
                             </Grid.ColumnDefinitions>
-                            <!--<Label Grid.Row="0" Foreground="White" VerticalContentAlignment="Center" Style="{StaticResource UnselectedTitleLabelStyle}" Content="{Binding Name}"/>-->
-
                             <ComboBox Grid.Column="0" FontWeight="Normal"
                                       ItemsSource="{Binding Variants}" 
                                       SelectedValue="{Binding Variant, Mode=TwoWay}" 
                                       SelectedValuePath="Id" 
-                                      DisplayMemberPath="Name"                                       
-                                    
+                                      DisplayMemberPath="Name"                                                                           
                                       Margin="0,0,0,0" />
-                            <!--ItemsSource="{Binding Variants}" 
-                                      SelectedItem="{Binding Variant}"-->
-
                             <Slider Grid.Row="0" Grid.Column="1" Template="{DynamicResource SliderEditable}" 
                                 Interval="25" 
                                 Maximum="{Binding Max, Mode=OneWay}" 
@@ -379,8 +326,6 @@
                                 TickPlacement="BottomRight" 
                                 Value="{Binding Value}" 
                                 HorizontalAlignment="Stretch" Margin="5,0,25,0" />
-                         
-
                         </Grid>
                         <Button HorizontalAlignment="Right" Content=" X " Height="21" Width="25" Margin="10,-1,0,0" Background="Transparent" 
                                 Command="{Binding Path=DataContext.RemoveRuleCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" 
@@ -429,48 +374,39 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-
-            <LinearGradientBrush x:Key="TextBoxBorder" EndPoint="0,20" MappingMode="Absolute" StartPoint="0,0">
-                <GradientStop Color="#ABADB3" Offset="0.05"/>
-                <GradientStop Color="#E2E3EA" Offset="0.07"/>
-                <GradientStop Color="#E3E9EF" Offset="1"/>
-            </LinearGradientBrush>
-
+            
         </ResourceDictionary>
     </UserControl.Resources>
 
     <ut:ModalContentPresenter x:Name="modalPresenter" IsModal="{Binding ItemList.IsModalVisible}" OpenCommand="{Binding ItemList.LoadModalCommand}">
 
         <DockPanel LastChildFill="True" VerticalAlignment="Stretch">
-        
-        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,0" Orientation="Horizontal" Background="#FF6A6A6A" Height="38" VerticalAlignment="Center">
-            <Label Style="{StaticResource StatusLabelStyle}" VerticalContentAlignment="Center" Margin="5,0,0,0" Content="Search:"></Label>
-            <TextBox Width="140" Height="22" Text="{Binding ItemList.FilterText, UpdateSourceTrigger=PropertyChanged}" Margin="0,8" ToolTip="Search by Item Name or Id"/>
-            <Button Content=" X " Height="21" Width="25" Margin="-27,-1,0,0" Background="Transparent" Command="{Binding ItemList.ResetFilterCommand}" BorderBrush="Transparent" FontWeight="Heavy" BorderThickness="1" Visibility="{Binding ItemList.IsFiltered, Converter={StaticResource BoolToVisibilityConverter}}" />
-            <Label Style="{StaticResource StatusLabelStyle}" VerticalContentAlignment="Center" Margin="5,0,0,0" Content="Group By:"></Label>
-            <ComboBox Tag="" SelectedValuePath="Tag" x:Name="GroupingDropdown" MaxHeight="25" SelectedValue="{Binding ItemList.Grouping}" Padding="0,0,15,0">
-                <ComboBoxItem Content="None" Tag="None" Foreground="White" Background="Black" />
-                <ComboBoxItem Content="ItemType" Tag="ItemType" Foreground="White" Background="Black" />
-                <ComboBoxItem Content="Sets" Tag="SetName" Foreground="White" Background="Black" />
-                <ComboBoxItem Content="IsValid" Tag="IsValid" Foreground="White" Background="Black" />
-            </ComboBox>
 
+            <StackPanel DockPanel.Dock="Top" Margin="0,0,0,0" Orientation="Horizontal" Background="#FF6A6A6A" Height="38" VerticalAlignment="Center">
+                <Label Style="{StaticResource StatusLabelStyle}" VerticalContentAlignment="Center" Margin="5,0,0,0" Content="Search:"></Label>
+                <TextBox Width="140" Height="22" Text="{Binding ItemList.FilterText, UpdateSourceTrigger=PropertyChanged}" Margin="0,8" ToolTip="Search by Item Name or Id"/>
+                <Button Content=" X " Height="21" Width="25" Margin="-27,-1,0,0" Background="Transparent" Command="{Binding ItemList.ResetFilterCommand}" BorderBrush="Transparent" FontWeight="Heavy" BorderThickness="1" Visibility="{Binding ItemList.IsFiltered, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <Label Style="{StaticResource StatusLabelStyle}" VerticalContentAlignment="Center" Margin="5,0,0,0" Content="Group By:"></Label>
+                <ComboBox Tag="" SelectedValuePath="Tag" x:Name="GroupingDropdown" MaxHeight="25" SelectedValue="{Binding ItemList.Grouping}" Padding="0,0,15,0">
+                    <ComboBoxItem Content="None" Tag="None" Foreground="White" Background="Black" />
+                    <ComboBoxItem Content="ItemType" Tag="ItemType" Foreground="White" Background="Black" />
+                    <ComboBoxItem Content="Sets" Tag="SetName" Foreground="White" Background="Black" />
+                    <ComboBoxItem Content="IsValid" Tag="IsValid" Foreground="White" Background="Black" />
+                </ComboBox>
                 <Button Command="{Binding Source={x:Static ut:ModalContentCommands.ShowModalContent}}" CommandParameter="Export" Width="Auto" Padding="7,0" Margin="10,7,5,7">
                     Export
                 </Button>
-
                 <Button Command="{Binding Source={x:Static ut:ModalContentCommands.ShowModalContent}}" CommandParameter="Import" Width="Auto" Padding="7,0" Margin="0,7,5,7">
                     Import
                 </Button>
-
             </StackPanel>
 
-        <ScrollViewer 
+            <ScrollViewer 
             HorizontalContentAlignment="Stretch" 
             VerticalContentAlignment="Stretch"             
             CanContentScroll="True"
             Margin="0,0,0,0">
-            <ListView x:Name="ListView1"                      
+                <ListView x:Name="ListView1"                      
                 d:DataContext="{Binding Source={StaticResource DesignViewModel}}"
                 SelectionMode="Multiple"                          
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
@@ -480,74 +416,74 @@
                 ItemsSource="{Binding ItemList.Collection.View}"                      
                 VerticalContentAlignment="Stretch"
                 Style="{DynamicResource ListViewStyle1}">
-                <ListView.Resources>
-                    <Style x:Key="ListViewStyle1" TargetType="{x:Type ListView}">
-                        <Setter Property="BorderThickness" Value="0"/>
-                        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
-                        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
-                        <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
-                        <Setter Property="ScrollViewer.PanningMode" Value="Both"/>
-                        <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
-                        <Setter Property="VerticalContentAlignment" Value="Center"/>
-                        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type ListView}">
-                                    <themes:ListBoxChrome x:Name="Bd" 
+                    <ListView.Resources>
+                        <Style x:Key="ListViewStyle1" TargetType="{x:Type ListView}">
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+                            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+                            <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
+                            <Setter Property="ScrollViewer.PanningMode" Value="Both"/>
+                            <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type ListView}">
+                                        <themes:ListBoxChrome x:Name="Bd" 
                                         BorderBrush="{TemplateBinding BorderBrush}" 
                                         BorderThickness="{TemplateBinding BorderThickness}" 
                                         Background="{TemplateBinding Background}" 
                                         RenderMouseOver="{TemplateBinding IsMouseOver}" 
                                         RenderFocused="{TemplateBinding IsKeyboardFocusWithin}" 
                                         SnapsToDevicePixels="False">
-                                        <ItemsPresenter SnapsToDevicePixels="False"/>
-                                    </themes:ListBoxChrome>
-                                    <ControlTemplate.Triggers>
-                                        <MultiTrigger>
-                                            <MultiTrigger.Conditions>
-                                                <Condition Property="IsGrouping" Value="true"/>
-                                                <Condition Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="false"/>
-                                            </MultiTrigger.Conditions>
-                                            <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
-                                        </MultiTrigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ListView.Resources>
+                                            <ItemsPresenter SnapsToDevicePixels="False"/>
+                                        </themes:ListBoxChrome>
+                                        <ControlTemplate.Triggers>
+                                            <MultiTrigger>
+                                                <MultiTrigger.Conditions>
+                                                    <Condition Property="IsGrouping" Value="true"/>
+                                                    <Condition Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="false"/>
+                                                </MultiTrigger.Conditions>
+                                                <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                                            </MultiTrigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListView.Resources>
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel/>
                         </ItemsPanelTemplate>
                     </ListView.ItemsPanel>
                     <ListView.GroupStyle>
-                    <GroupStyle>
-                        <GroupStyle.ContainerStyle>                            
-                            <Style TargetType="{x:Type GroupItem}">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate>
-                                            <Expander FontWeight="Bold" Foreground="LightSkyBlue" Header="{Binding Name}" IsExpanded="{Binding ItemList.GroupsExpandedByDefault, FallbackValue=True}">
-                                                <Expander.HeaderTemplate>
-                                                    <DataTemplate>
-                                                        <StackPanel Orientation="Horizontal">
-                                                            <Label Style="{StaticResource GroupHeaderPrimaryLabelStyle}" Content="{Binding}"></Label>
-                                                        </StackPanel>                                                        
-                                                    </DataTemplate>                                                    
-                                                </Expander.HeaderTemplate>
-                                                <ItemsPresenter />
-                                            </Expander>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </GroupStyle.ContainerStyle>
-                    </GroupStyle>
-                </ListView.GroupStyle>
-            </ListView>
-        </ScrollViewer>
-    </DockPanel>
+                        <GroupStyle>
+                            <GroupStyle.ContainerStyle>
+                                <Style TargetType="{x:Type GroupItem}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <Expander FontWeight="Bold" Foreground="LightSkyBlue" Header="{Binding Name}" IsExpanded="{Binding ItemList.GroupsExpandedByDefault, FallbackValue=True}">
+                                                    <Expander.HeaderTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <Label Style="{StaticResource GroupHeaderPrimaryLabelStyle}" Content="{Binding}"></Label>
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </Expander.HeaderTemplate>
+                                                    <ItemsPresenter />
+                                                </Expander>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </GroupStyle.ContainerStyle>
+                        </GroupStyle>
+                    </ListView.GroupStyle>
+                </ListView>
+            </ScrollViewer>
+        </DockPanel>
 
         <!-- Import/Export Modal -->
         <ut:ModalContentPresenter.ModalContent>
@@ -555,27 +491,26 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="45" />
-                </Grid.RowDefinitions>            
-            
-                <!-- Import -->      
+                </Grid.RowDefinitions>
+
+                <!-- Import -->
                 <TextBox Grid.Row="0" Visibility="{Binding Path=ItemList.SelectedModalPage, Converter={StaticResource EnumVisibilityConverter}, ConverterParameter=Import}" 
-                         Text="{Binding ItemList.ExportCode, FallbackValue='Export Code Error'}" MinHeight="200" Height="Auto" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" IsReadOnly="False" />              
-                
+                         Text="{Binding ItemList.ExportCode, FallbackValue='Export Code Error'}" MinHeight="200" Height="Auto" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" IsReadOnly="False" />
+
                 <UniformGrid Grid.Row="1" Visibility="{Binding Path=ItemList.SelectedModalPage, Converter={StaticResource EnumVisibilityConverter}, ConverterParameter=Import}">
                     <Button Content="Import" Margin="0,0,0,-22.5" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Width="Auto" Height="Auto" Command="{Binding ItemList.ImportCommand}" />
                     <Button Content="Close" Margin="0,0,0,-22.5" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Width="Auto" Height="Auto" Command="{Binding Source={x:Static ut:ModalContentCommands.HideModalContent}}" />
-                </UniformGrid>                
+                </UniformGrid>
 
-                <!-- Export -->               
+                <!-- Export -->
                 <TextBox Grid.Row="0" Visibility="{Binding Path=ItemList.SelectedModalPage, Converter={StaticResource EnumVisibilityConverter}, ConverterParameter=Export}" 
-                         Text="{Binding ItemList.ExportCode, FallbackValue='Export Code Error'}" MinHeight="200" Height="Auto" TextWrapping="Wrap" ut:SelectTextOnFocus.Active="True" VerticalScrollBarVisibility="Auto" IsReadOnly="True" />               
-                
+                         Text="{Binding ItemList.ExportCode, FallbackValue='Export Code Error'}" MinHeight="200" Height="Auto" TextWrapping="Wrap" ut:SelectTextOnFocus.Active="True" VerticalScrollBarVisibility="Auto" IsReadOnly="True" />
+
                 <StackPanel Grid.Row="1" Visibility="{Binding Path=ItemList.SelectedModalPage, Converter={StaticResource EnumVisibilityConverter}, ConverterParameter=Export}">
                     <Button Content="Close" Margin="0" Padding="10" Height="45" Command="{Binding Source={x:Static ut:ModalContentCommands.HideModalContent}}" />
                 </StackPanel>
 
             </Grid>
         </ut:ModalContentPresenter.ModalContent>
-
     </ut:ModalContentPresenter>
 </UserControl>
