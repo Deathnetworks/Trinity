@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using Trinity.Combat;
 using Trinity.Combat.Abilities;
 using Trinity.DbProvider;
 using Trinity.Helpers;
 using Trinity.Technicals;
 using Zeta.Bot;
+using Zeta.Bot.Navigation;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
@@ -43,7 +47,7 @@ namespace Trinity
                 IsAlreadyMoving = false;
                 lastMovementCommand = DateTime.MinValue;
                 _isWaitingForPower = false;
-                _isWaitingAfterPower = false;
+                IsWaitingAfterPower = false;
                 _isWaitingForPotion = false;
                 wasRootedLastTick = false;
 
@@ -62,8 +66,6 @@ namespace Trinity
                     _shouldPickNewAbilities = true;
                     return TargetCheckResult(true, "Current Target is not null");
                 }
-
-                MonkCombat.RunOngoingPowers();
 
                 // if we just opened a horadric cache, wait around to open it
                 if (DateTime.UtcNow.Subtract(Composites.LastFoundHoradricCache).TotalSeconds < 5)
@@ -86,7 +88,6 @@ namespace Trinity
                 }
 
                 // Nothing to do... do we have some maintenance we can do instead, like out of combat buffing?
-
                 if (DateTime.UtcNow.Subtract(_lastMaintenanceCheck).TotalMilliseconds > 150)
                 {
                     using (new PerformanceLogger("TargetCheck.OOCBuff"))
@@ -100,24 +101,10 @@ namespace Trinity
                             BarbarianCombat.AllowSprintOOC = true;
                             DisableOutofCombatSprint = false;
 
-                            powerBuff = AbilitySelector(UseOOCBuff: true);
-
-                            if (powerBuff.SNOPower != SNOPower.None)
+                            PowerBuff = AbilitySelector(UseOOCBuff: true);
+                            if (CombatBase.Cast(PowerBuff))
                             {
-
-                                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Using OOC Buff: {0}", powerBuff.SNOPower.ToString());
-                                ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetACDGUID);
-                                LastPowerUsed = powerBuff.SNOPower;
-                                CacheData.AbilityLastUsed[powerBuff.SNOPower] = DateTime.UtcNow;
-
-                                // Monk Stuffs get special attention
-                                {
-                                    if (powerBuff.SNOPower == SNOPower.Monk_TempestRush)
-                                        MonkCombat.LastTempestRushLocation = CombatBase.CurrentPower.TargetPosition;
-                                    if (powerBuff.SNOPower == SNOPower.Monk_SweepingWind)
-                                        MonkCombat.LastSweepingWindRefresh = DateTime.UtcNow;
-                                }
-
+                                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Using OOC Buff: {0}", PowerBuff.SNOPower.ToString());
                             }
                         }
                         else if (isLoopingAnimation)
@@ -170,7 +157,12 @@ namespace Trinity
                 NeedToClearBlacklist3 = false;
                 Blacklist3Seconds = new HashSet<int>();
             }
-
+            // Clear our very short-term ignore-monster blacklist (from not being able to raycast on them or already dead units)
+            if (DateTime.UtcNow.Subtract(Blacklist1LastClear).TotalMilliseconds > 1000)
+            {
+                Blacklist1LastClear = DateTime.UtcNow;
+                Blacklist1Second = new HashSet<int>();
+            }
         }
     }
 }

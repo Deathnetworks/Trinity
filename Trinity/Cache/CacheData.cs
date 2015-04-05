@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Trinity.Cache;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
@@ -86,17 +87,17 @@ namespace Trinity
         /// <summary>
         /// If a unit, item, or other object has been navigable/visible before, this will contain true value and will be considered for targetting, otherwise we will continue to check
         /// </summary>
-        internal static Dictionary<int, bool> HasBeenNavigable = new Dictionary<int, bool>();
+        internal static Dictionary<int, float> HasBeenNavigable = new Dictionary<int, float>();
 
         /// <summary>
         /// If a unit, item, or other object has been raycastable before, this will contain true value and will be considered for targetting, otherwise we will continue to check
         /// </summary>
-        internal static Dictionary<int, bool> HasBeenRayCasted = new Dictionary<int, bool>();
+        internal static Dictionary<int, float> HasBeenRayCasted = new Dictionary<int, float>();
 
         /// <summary>
         /// If a unit, item, or other object has been in LoS before, this will contain true value and will be considered for targetting, otherwise we will continue to check
         /// </summary>
-        internal static Dictionary<int, bool> HasBeenInLoS = new Dictionary<int, bool>();
+        internal static Dictionary<int, float> HasBeenInLoS = new Dictionary<int, float>();
 
         /// <summary>
         /// Record of items that have been on the ground
@@ -114,9 +115,24 @@ namespace Trinity
         internal static Dictionary<int, bool> IsSummoner = new Dictionary<int, bool>();
 
         /// <summary>
+        /// A list of sentry on area
+        /// </summary>
+        internal static HashSet<CacheObstacleObject> SentryTurret = new HashSet<CacheObstacleObject>();
+
+        /// <summary>
+        /// A list of bbv on area
+        /// </summary>
+        internal static HashSet<CacheObstacleObject> Voodoo = new HashSet<CacheObstacleObject>();
+
+        /// <summary>
         /// Obstacle cache, things we can't or shouldn't move through
         /// </summary>
         internal static HashSet<CacheObstacleObject> NavigationObstacles = new HashSet<CacheObstacleObject>();
+        internal static Dictionary<int, float> DictionaryObstacles = new Dictionary<int, float>();
+
+        internal static Dictionary<Vector3, float> NavRayCastObstacles = new Dictionary<Vector3, float>();
+
+        internal static Dictionary<Vector3, Vector3> UnRaycastedLines = new Dictionary<Vector3, Vector3>();
 
         /// <summary>
         /// A list of all monsters and their positions, so we don't try to walk through them during avoidance
@@ -132,6 +148,7 @@ namespace Trinity
         /// A set of Avoidances that appear then disappear from the object manager, but can still hurt our player. We need to expire these based on a Timespan from the obstacle object.
         /// </summary>
         internal static HashSet<CacheObstacleObject> TimeBoundAvoidance = new HashSet<CacheObstacleObject>();
+        internal static Dictionary<int, Tuple<Vector3, float>> Avoidances = new Dictionary<int, Tuple<Vector3, float>>();
 
         /// <summary>
         /// Contains an RActorGUID and count of the number of times we've switched to this target
@@ -147,6 +164,24 @@ namespace Trinity
         /// Cache for low weight/priority objects, so we dont have to refresh them every tick.
         /// </summary>
         internal static Dictionary<int, TrinityCacheObject> LowPriorityObjectCache = new Dictionary<int, TrinityCacheObject>();
+
+        /// <summary>
+        /// Dictionary of PositionCache.Cache
+        /// </summary>
+        internal static Dictionary<Vector3, int> VisitedZones = new Dictionary<Vector3, int>();
+
+        // <summary>
+        /// Unsafe boss area
+        /// </summary>
+        internal static Dictionary<Vector3, float> UnSafeZones = new Dictionary<Vector3, float>();
+
+        /// <summary>
+        /// To set avoidance at player just one time
+        /// </summary>
+        internal static HashSet<int> ObsoleteAvoidancesAtPlayer = new HashSet<int>();
+
+        internal static Dictionary<int, int> NearbyUnitsRecorded = new Dictionary<int, int>();
+        internal static Dictionary<Tuple<int, int>, int> NearbyUnitsWithinDistanceRecorded = new Dictionary<Tuple<int, int>, int>();
 
         public static InventoryCache Inventory
         {
@@ -168,11 +203,74 @@ namespace Trinity
             get { return BuffsCache.Instance; }
         }
 
+        internal static void SetDictionary()
+        {
+            foreach (CacheObstacleObject _a in CacheData.TimeBoundAvoidance)
+            {
+                if (_a.IsAvoidanceAnimations && !CacheData.Avoidances.ContainsKey((int)_a.Animation))
+                {
+                    CacheData.Avoidances.Add((int)_a.Animation, new Tuple<Vector3, float>(_a.Position, _a.Radius));
+                }
+                else if (!CacheData.Avoidances.ContainsKey(_a.RActorGUID))
+                {
+                    CacheData.Avoidances.Add(_a.RActorGUID, new Tuple<Vector3, float>(_a.Position, _a.Radius));
+                }
+            }
+
+            if (!Trinity.Player.IsInRift)
+            {
+                foreach (UnSafeZone a in UnSafeZone.UnsafeKiteAreas)
+                {
+                    if (!CacheData.UnSafeZones.ContainsKey(a.Position) &&
+                        a.WorldId == Trinity.Player.WorldID && a.Position.Distance2D(Trinity.Player.Position) <= a.Radius + 40f)
+                    {
+                        CacheData.UnSafeZones.Add(MainGrid.VectorToGrid(a.Position), a.Radius);
+                    }
+                }
+            }
+        }
+
+        internal static bool AddToNavigationObstacles(CacheObstacleObject cacheObject)
+        {
+            if (cacheObject.Position.Distance2D(Trinity.Player.Position) < 150f && !DictionaryObstacles.ContainsKey(cacheObject.RActorGUID))
+            {
+                NavigationObstacles.Add(cacheObject);
+                DictionaryObstacles.Add(cacheObject.RActorGUID, cacheObject.ActorSNO);
+                NavRayCastObstacles.Add(cacheObject.Position, cacheObject.Radius);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        internal static void ClearNavigationObstacles()
+        {
+            foreach (CacheObstacleObject cacheObject in NavigationObstacles.Where(o => o.Position.Distance2D(Trinity.Player.Position) >= 150).ToList())
+            {
+                NavigationObstacles.Remove(cacheObject);
+                DictionaryObstacles.Remove(cacheObject.RActorGUID);
+                NavRayCastObstacles.Remove(cacheObject.Position);
+            }
+        }
+
+        private static int Tick = 0;
         /// <summary>
         /// Called every cache-refresh
         /// </summary>
         internal static void Clear()
         {
+            if (Tick > 10)
+                Tick = 0;
+
+            Tick++;
+
+            if (Tick % 3 == 0)
+            {
+                NearbyUnitsRecorded.Clear();
+                NearbyUnitsWithinDistanceRecorded.Clear();
+            }
+
             CurrentUnitHealth.Clear();
             LastCheckedUnitHealth.Clear();
             MonsterObstacles.Clear();
@@ -183,8 +281,15 @@ namespace Trinity
             UnitIsBurrowed.Clear();
             UnitMaxHealth.Clear();
             UnitMonsterAffix.Clear();
-            TimeBoundAvoidance.RemoveWhere(aoe => aoe.Expires < DateTime.UtcNow);
-            NavigationObstacles.RemoveWhere(o => o.Position.Distance2DSqr(Trinity.Player.Position) > 90f * 90f);
+            TimeBoundAvoidance.Clear();
+
+            // fork
+            ClearNavigationObstacles();
+            UnRaycastedLines.Clear();
+            Avoidances.Clear();
+            UnSafeZones.Clear();
+            SentryTurret.Clear();
+            Voodoo.Clear();
         }
 
         /// <summary>
@@ -193,8 +298,21 @@ namespace Trinity
         internal static void FullClear()
         {
             Clear();
+            ClearObsolete();
             WorldChangedClear();
             DroppedItems.Clear();
+        }
+
+        internal static void ClearObsolete()
+        {
+            if (Tick % 3 == 0 && Trinity.ObjectCache != null)
+            {
+                ObsoleteAvoidancesAtPlayer.RemoveWhere(a => !Trinity.ObjectCache.Any(o => o.ActorSNO == a));
+                HasBeenInLoS.ToList()
+                    .Where(i => !Trinity.ObjectCache.Any(o => o.RActorGuid == i.Key))
+                    .ToList()
+                    .ForEach(i => CacheData.HasBeenInLoS.Remove(i.Key));
+            }
         }
 
         internal static void WorldChangedClear()
@@ -214,6 +332,7 @@ namespace Trinity
             TimeBoundAvoidance.Clear();
             BlacklistedEvents.Clear();
             LowPriorityObjectCache.Clear();
+            ObsoleteAvoidancesAtPlayer.Clear();
             Player.ForceUpdates();
         }
     }

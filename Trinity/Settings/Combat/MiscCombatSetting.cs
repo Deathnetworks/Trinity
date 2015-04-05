@@ -34,6 +34,7 @@ namespace Trinity.Config.Combat
         private bool _ProfileTagOverride;
         private bool _AvoidAoEOutOfCombat;
         private bool _FleeInGhostMode;
+        private bool _KeepMovingInCombat;
         #endregion Fields
 
         #region Events
@@ -547,6 +548,24 @@ namespace Trinity.Config.Combat
                 {
                     _FleeInGhostMode = value;
                     OnPropertyChanged("FleeInGhostMode");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool KeepMovingInCombat
+        {
+            get
+            {
+                return _KeepMovingInCombat;
+            }
+            set
+            {
+                if (_KeepMovingInCombat != value)
+                {
+                    _KeepMovingInCombat = value;
+                    OnPropertyChanged("KeepKiting");
                 }
             }
         }

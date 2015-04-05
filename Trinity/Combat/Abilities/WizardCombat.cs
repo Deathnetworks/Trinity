@@ -57,7 +57,7 @@ namespace Trinity.Combat.Abilities
             // Defensive Teleport: SafePassage
             if (CanCast(SNOPower.Wizard_Teleport, CanCastFlags.NoTimer) && Runes.Wizard.SafePassage.IsActive && Player.CurrentHealthPct <= 0.75)
             {
-                var target = NavHelper.FindSafeZone(false, 1, CurrentTarget.Position, true);
+                var target = GridMap.GetBestMoveNode(35f).Position;
                 return new TrinityPower(SNOPower.Wizard_Teleport, 65f, target);
             }
 
@@ -110,7 +110,7 @@ namespace Trinity.Combat.Abilities
                 Player.CurrentHealthPct <= 0.50 &&
                 (CurrentTarget.IsBossOrEliteRareUnique || TargetUtil.IsEliteTargetInRange(75f)))
             {
-                var target = KiteDistance == 0 ? ZetaDia.Me.Position : NavHelper.FindSafeZone(false, 1, CurrentTarget.Position, true);
+                var target = KiteDistance == 0 ? ZetaDia.Me.Position : GridMap.GetBestMoveNode(KiteDistance).Position;
                 return new TrinityPower(SNOPower.Wizard_Teleport, 65f, target);
             }
 
@@ -231,10 +231,10 @@ namespace Trinity.Combat.Abilities
             // Blizzard
             float blizzardRadius = Runes.Wizard.Apocalypse.IsActive ? 30f : 12f;
             if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_Blizzard, CanCastFlags.NoTimer) &&
-                (TargetUtil.ClusterExists(blizzardRadius, 90f, 2, false) || CurrentTarget.IsBossOrEliteRareUnique || !HasPrimarySkill) &&
+                (TargetUtil.ClusterExists(blizzardRadius, 90f, 2) || CurrentTarget.IsBossOrEliteRareUnique || !HasPrimarySkill) &&
                 (Player.PrimaryResource >= 40 || (Runes.Wizard.Snowbound.IsActive && Player.PrimaryResource >= 20)))
             {
-                var bestClusterPoint = TargetUtil.GetBestClusterPoint(blizzardRadius, 65f, false);
+                var bestClusterPoint = TargetUtil.GetBestClusterPoint(blizzardRadius, 65f);
                 return new TrinityPower(SNOPower.Wizard_Blizzard, 65f, bestClusterPoint);
             }
 

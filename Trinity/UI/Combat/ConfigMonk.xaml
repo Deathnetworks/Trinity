@@ -77,6 +77,7 @@
                 <CheckBox Margin="2" IsChecked="{Binding Path=Monk.SpamSweepingWindOnLowHP}" ToolTip="Use with Transcendance Passive for Health Regen">Spam Sweeping Wind on Low HP</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Monk.UseDashingStrikeOOC}" ToolTip="Use Dashing Strike for OOC Movement">Use Dashing Strike OOC</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Monk.EpiphanyOffCD}" ToolTip="Use Epiphany Off Cooldown">Use Epiphany Off CD</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=Monk.SerenityOffCD}" ToolTip="Use Serenity Off Cooldown">Use Serenity Off CD</CheckBox>
             </UniformGrid>
         </Grid>
 

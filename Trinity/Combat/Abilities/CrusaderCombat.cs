@@ -66,9 +66,7 @@ namespace Trinity.Combat.Abilities
                 // Shield Glare
                 if (CanCastShieldGlare())
                 {
-                    var arcTarget = TargetUtil.GetBestArcTarget(45f, 70f);
-                    if (arcTarget != null && arcTarget.Position != Vector3.Zero)
-                        return new TrinityPower(SNOPower.X1_Crusader_ShieldGlare, 15f, arcTarget.Position);
+                    return new TrinityPower(SNOPower.X1_Crusader_ShieldGlare, 15f, TargetUtil.GetBestPiercePoint(15f));
                 }
 
                 // Iron Skin
@@ -114,7 +112,7 @@ namespace Trinity.Combat.Abilities
                 // FallingSword
                 if (CanCastFallingSword())
                 {
-                    return new TrinityPower(SNOPower.X1_Crusader_FallingSword, 16f, TargetUtil.GetBestClusterPoint(15f, 65f, false));
+                    return new TrinityPower(SNOPower.X1_Crusader_FallingSword, 16f, TargetUtil.GetBestClusterPoint(15f, 65f));
                 }
 
                 // HeavensFury
@@ -144,9 +142,9 @@ namespace Trinity.Combat.Abilities
                 }
                 if (CanCastPhalanxStampede())
                 {
-                    var bestPierceTarget = TargetUtil.GetBestPierceTarget(45f);
+                    var bestPierceTarget = TargetUtil.GetBestPierceTarget(35f);
                     if (bestPierceTarget != null)
-                        return new TrinityPower(SNOPower.x1_Crusader_Phalanx3, 45f, bestPierceTarget.ACDGuid);
+                        return new TrinityPower(SNOPower.x1_Crusader_Phalanx3, 35f, bestPierceTarget.ACDGuid);
                 }
 
                 // Blessed Shield : Piercing Shield
@@ -189,9 +187,7 @@ namespace Trinity.Combat.Abilities
                 // Shield Bash
                 if (CanCast(SNOPower.X1_Crusader_ShieldBash2))
                 {
-                    var bestPierceTarget = TargetUtil.GetBestClusterUnit(15f, 65f, 1, false, false);
-                    if (bestPierceTarget != null)
-                        return new TrinityPower(SNOPower.X1_Crusader_ShieldBash2, 65f, bestPierceTarget.ACDGuid);
+                    return new TrinityPower(SNOPower.X1_Crusader_ShieldBash2, 65f, TargetUtil.GetBestPiercePoint(65f));
                 }
 
                 // Blessed Hammer, spin outwards 
@@ -316,7 +312,7 @@ namespace Trinity.Combat.Abilities
 
         private static bool CanCastPhalanxStampede()
         {
-            return (Legendary.UnrelentingPhalanx.IsEquipped && CanCast(SNOPower.x1_Crusader_Phalanx3) && TargetUtil.AnyMobsInRange(45f, 1) && Runes.Crusader.Stampede.IsActive);
+            return (Legendary.UnrelentingPhalanx.IsEquipped && CanCast(SNOPower.x1_Crusader_Phalanx3) && TargetUtil.AnyMobsInRange(35f, 1) && Runes.Crusader.Stampede.IsActive);
         }
 
         private static bool CanCastSteedChargeOutOfCombat()

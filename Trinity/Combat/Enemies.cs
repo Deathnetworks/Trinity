@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Trinity.Configuration;
+using Trinity.Config.Combat;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
@@ -14,15 +15,15 @@ namespace Trinity.Combat
         public static List<TrinityCacheObject> Dead = new List<TrinityCacheObject>();
         public static HashSet<int> DeadGuids = new HashSet<int>();
         public static HashSet<int> AliveGuids = new HashSet<int>();
-        public static TargetArea Nearby = new TargetArea(80f);
-        public static TargetArea CloseNearby = new TargetArea(16f);
+        public static TargetArea Nearby = new TargetArea(70f);
+        public static TargetArea CloseNearby = new TargetArea(15f);
         public static TargetCluster BestCluster = new TargetCluster(20f);
         public static TargetCluster BestLargeCluster = new TargetCluster(24f, 8);
 
         public static void Update()
         {
 
-            if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid)
+            if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || !Trinity.ObjectCache.Any())
                 return;
 
             List<TrinityCacheObject> units = Trinity.ObjectCache.Where(o => o.IsUnit && o.CommonDataIsValid || o.IsBossOrEliteRareUnique).ToList();
@@ -68,6 +69,7 @@ namespace Trinity.Combat
         public int EliteCount { get; set; }
         public int BossCount { get; set; }
         public int UnitCount { get; set; }
+        public int UnitInLosCount { get; set; }
         public bool NearMe { get; set; }
         public List<TrinityCacheObject> Units { get; set; }
         public HashSet<int> UnitsACDGuid { get; set; }
@@ -85,10 +87,14 @@ namespace Trinity.Combat
             if (Position == Vector3.Zero)
                 return;
 
+            if (!Trinity.ObjectCache.Any())
+                return;
+
             Units = TargetUtil.ListUnitsInRangeOfPosition(Position, Range);
             UnitsACDGuid = new HashSet<int>(Units.Select(u => u.ACDGuid));
             EliteCount = TargetUtil.NumElitesInRangeOfPosition(Position, Range);
             UnitCount = TargetUtil.NumMobsInRangeOfPosition(Position, Range);
+            UnitInLosCount = TargetUtil.NumMobsInLosInRangeOfPosition(Position, Range);
             BossCount = TargetUtil.NumBossInRangeOfPosition(Position, Range);
         }
 
@@ -106,14 +112,19 @@ namespace Trinity.Combat
         {
             return Units.Any() ? DebuffedCount(powers)/Units.Count : 0;
         }
+
+        internal TrinityCacheObject GetTargetWithoutDebuffs(IEnumerable<SNOPower> debuffs)
+        {
+            return TargetUtil.BestTargetWithoutDebuffs(Range, debuffs, Position);
+        }
     }
 
     public class TargetCluster : TargetArea
     {
-        public TargetCluster (float radiusOfCluster = 20f, int minUnitsInCluster = 1)
+        public TargetCluster (float radiusOfCluster = 50f, int minUnitsInCluster = 1)
         {
-            Radius = radiusOfCluster > 5 ? radiusOfCluster : 5;
-            Size = minUnitsInCluster > 1 ? minUnitsInCluster : 1;
+            Radius = Math.Min(Trinity.Settings.Combat.Misc.TrashPackClusterRadius, radiusOfCluster > 5 ? radiusOfCluster : 5);
+            Size = Math.Max(Trinity.Settings.Combat.Misc.TrashPackSize, minUnitsInCluster < 1 ? minUnitsInCluster : 1);
             Update();
         }
 
@@ -126,12 +137,14 @@ namespace Trinity.Combat
             get { return TargetUtil.ClusterExists(Radius, Size); }
         }
 
+        public bool GridLocExists
+        {
+            get { return GridMap.ClusterNodeExist;  }
+        }
+
         public new void Update()
         {
-            Position = Exists ?
-                TargetUtil.GetClusterPoint(Radius, Size) :
-                TargetUtil.GetBestClusterPoint(Radius);
-
+            Position = GridMap.GetBestClusterNode(new Vector3(), Radius, Size).Position;
             NearMe = false;
             Range = Radius;
             base.Update();
@@ -139,7 +152,7 @@ namespace Trinity.Combat
             TargetArea = new TargetArea(Radius, Position);
         }
 
-        internal TrinityCacheObject GetTargetWithoutDebuffs (IEnumerable<SNOPower> debuffs)
+        internal TrinityCacheObject GetTargetWithoutDebuffs(IEnumerable<SNOPower> debuffs)
         {
             return TargetUtil.BestTargetWithoutDebuffs(Range, debuffs, Position);
         }

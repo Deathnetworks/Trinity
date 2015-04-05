@@ -43,7 +43,7 @@ namespace Trinity
                 {
                     ProfileHistory.Add(sThisProfile);
                     CurrentProfile = sThisProfile;
-                    if (FirstProfile == "")
+                    if (FirstProfile == string.Empty)
                         FirstProfile = sThisProfile;
                 }
 
@@ -220,7 +220,7 @@ namespace Trinity
                 PlayerMover.TimesReachedMaxUnstucks = 0;
                 PlayerMover.CancelUnstuckerForSeconds = 0;
                 PlayerMover.LastCancelledUnstucker = DateTime.MinValue;
-                NavHelper.UsedStuckSpots = new List<GridPoint>();
+                NavHelper.UsedStuckSpots = new List<GridNode>();
 
                 CacheData.FullClear();
 

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.Serialization;
+using Trinity.Combat.Abilities;
+using Trinity.Config.Combat;
+using Trinity.DbProvider;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Game;
@@ -77,6 +80,7 @@ namespace Trinity
             set { throw new NotImplementedException(); }
         }
 
+        [NoCopy]
         public bool CommonDataIsValid
         {
             get
@@ -112,16 +116,33 @@ namespace Trinity
         public string WeightInfo { get; set; }
 
         [DataMember]
+        public double SpecialWeight { get; set; }
+
+        [DataMember]
         public Vector3 Position { get; set; }
 
         [DataMember]
         public AABB AABBBounds { get; set; }
 
         [DataMember]
-        public float Distance { get; set; }
+        private float distance = -1f;
+        public float Distance
+        {
+            get
+            {
+                if (distance >= 0f)
+                    return distance;
+                distance = Trinity.Player.Position.Distance2D(Position);
+                return Distance;
+            }
+            set { distance = value; }
+        }
 
         [NoCopy]
         public float RadiusDistance { get { return Math.Max(Distance - Radius, 0f); } }
+
+        [DataMember]
+        public float RequiredRange { get; set; }
 
         [DataMember]
         public string InternalName { get; set; }
@@ -272,10 +293,19 @@ namespace Trinity
         public bool IsSummoner { get; set; }
 
         [DataMember]
+        public bool IsAlly { get; set; }
+
+        [DataMember]
         public int SummonedByACDId { get; set; }
 
         [NoCopy]
         public bool IsUnit { get { return this.Type == GObjectType.Unit; } }
+
+        [NoCopy]
+        public bool IsAvoidance { get { return this.Type == GObjectType.Avoidance; } }
+
+        [DataMember]
+        public bool IsKite { get; set; }
 
         [DataMember]
         public bool IsNPC { get; set; }
@@ -349,18 +379,84 @@ namespace Trinity
                 this.RActorGuid = _DiaObject.RActorGuid;
         }
 
+        [NoCopy]
+        public Vector3 ClusterPosition(float range = 20f)
+        {
+            var cluster = GridMap.GetBestClusterNode(Position, _range: range, _useDefault: false);
+            if (cluster != null)
+                return cluster.Position;
+
+            return Position;
+        }
+
+        [NoCopy]
         public int NearbyUnitsWithinDistance(float range = 5f)
         {
-            using (new Technicals.PerformanceLogger("CacheObject.UnitsNear"))
+            if (range == Trinity.Settings.Combat.Misc.TrashPackClusterRadius)
+                return NearbyUnits;
+
+            if (range == 5f)
+                return NearbyUnits;
+
+            if (this.Type != GObjectType.Unit)
+                return 0;
+
+            int count = 0;
+            if (CacheData.NearbyUnitsWithinDistanceRecorded.TryGetValue(new Tuple<int, int>(RActorGuid, (int)range), out count))
+            {
+                return count;
+            }
+
+            foreach (var u in CacheData.MonsterObstacles)
+            {
+                if (count >= 8)
+                    break;
+
+                if (u.RActorGUID == this.RActorGuid)
+                    continue;
+                if (u.Position.Distance2D(this.Position) >= range)
+                    continue;
+
+                count++;
+            }
+
+            try { CacheData.NearbyUnitsWithinDistanceRecorded.Add(new Tuple<int, int>(RActorGuid, (int)range), count); } catch { }
+            return count;
+        }
+
+        [NoCopy]
+        public int NearbyUnits
+        {
+            get
             {
                 if (this.Type != GObjectType.Unit)
                     return 0;
 
-                return Trinity.ObjectCache
-                    .Count(u => u.RActorGuid != this.RActorGuid && u.IsUnit && u.Position.Distance2D(this.Position) <= range && u.HasBeenInLoS);
+                int count = 0;
+                if (CacheData.NearbyUnitsRecorded.TryGetValue(RActorGuid, out count))
+                {
+                    return count;
+                }
+
+                foreach (var u in CacheData.MonsterObstacles)
+                {
+                    if (count >= 8)
+                        break;
+
+                    if (u.RActorGUID == this.RActorGuid)
+                        continue;
+                    if (u.Position.Distance2D(this.Position) >= Trinity.Settings.Combat.Misc.TrashPackClusterRadius)
+                        continue;
+
+                    count++;
+                }
+
+                try { CacheData.NearbyUnitsRecorded.Add(RActorGuid, count); } catch { }
+                return count;
             }
         }
 
+        [NoCopy]
         public int CountUnitsBehind(float range)
         {
             return
@@ -371,6 +467,7 @@ namespace Trinity
                  select u).Count();
         }
 
+        [NoCopy]
         public int CountUnitsInFront()
         {
             return
@@ -381,6 +478,63 @@ namespace Trinity
                  select u).Count();
         }
 
+        [NoCopy]
+        public int CountFCObjectsInFront()
+        {
+            int _count = 0;
+            Vector3 _locAway = MathEx.CalculatePointFrom(Position, Trinity.Player.Position, 40f);
+            string _dir = MathUtil.GetHeadingToPoint(Position);
+
+            foreach (var _o in Trinity.ObjectCache)
+            {
+                if (_o.Type == GObjectType.Destructible || _o.IsUnit)
+                {
+                    if (_o.Position.Distance2D(Position) > 40f)
+                        continue;
+
+                    if (_o.IsUnit && (!_o.CommonDataIsValid || _o.HitPointsPct <= 0f))
+                        continue;
+
+                    if (!_dir.Equals(MathUtil.GetHeadingToPoint(_o.Position)))
+                        continue;
+
+                    float _radius = Math.Min(_o.Radius, 8f);
+                    if (NavHelper.CanRayCast(_o.Position, Trinity.Player.Position) && MathUtil.IntersectsPath(_o.Position, _radius, Trinity.Player.Position, _locAway))
+                    {
+                        if (_o.IsBoss || (_o.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze))
+                            _count += 3;
+                        else if (_o.Type == GObjectType.Destructible || _o.IsEliteRareUnique || (_o.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Prioritize))
+                            _count += 2;
+                        else
+                            _count++;
+
+                        if (TownRun.IsTryingToTownPortal())
+                            _count++;
+                    }
+                }
+            }
+            return _count;
+        }
+
+        [NoCopy]
+        public bool IsInTrashPackCluster
+        {
+            get
+            {
+                return this.NearbyUnits <= Trinity.Settings.Combat.Misc.TrashPackSize;
+            }
+        }
+
+        [NoCopy]
+        public bool IsTrashPackOrBossEliteRareUnique
+        {
+            get
+            {
+                return this.IsBossOrEliteRareUnique || this.IsInTrashPackCluster;
+            }
+        }
+
+        [NoCopy]
         public bool HasDebuff(SNOPower debuffSNO)
         {
             try
@@ -403,20 +557,135 @@ namespace Trinity
             return false;
         }
 
+        [NoCopy]
         public override string ToString()
         {
             return string.Format("{0}, Type={1} Dist={2} IsBossOrEliteRareUnique={3} IsAttackable={4}", InternalName, Type, RadiusDistance, IsBossOrEliteRareUnique, IsAttackable);
         }
 
+        [DataMember]
         public bool IsMarker { get; set; }
 
-        /// <summary>
-        /// Determines whether [is in line of sight].
-        /// </summary>
-        /// <returns><c>true</c> if [is in line of sight]; otherwise, <c>false</c>.</returns>
-        public bool IsInLineOfSight()
+        [DataMember]
+        public bool InLineOfSight { get; set; }
+
+        [NoCopy]
+        public bool IsInLineOfSight(bool forceUpdate = false)
         {
-            return !Navigator.Raycast(Trinity.Player.Position, Position);
+            if (this.InLineOfSight || this.HasBeenRaycastable || this.HasBeenInLoS)
+                return true;
+
+            if (forceUpdate)
+                InLineOfSight = NavHelper.ObjectIsInLos(this);
+
+            return InLineOfSight;
+        }
+
+        [NoCopy]
+        public bool IsInLineOfSightOfPoint(Vector3 pos)
+        {
+            return NavHelper.ObjectIsInLosOfPoint(pos, this);
+        }
+
+        [NoCopy]
+        public bool HasAnimationToAvoid
+        {
+            get
+            {
+                try
+                {
+                    return DataDictionary.AvoidAnimationsTitles.Any(n => this.Animation.ToString().Contains(n));
+                }
+                catch (Exception) { }
+                return false;
+            }
+        }
+
+        [NoCopy]
+        public bool HasAnimationToAvoidAtPlayer
+        {
+            get
+            {
+                try
+                {
+                    return this.Distance < 50f && (DataDictionary.AvoidancesAtPlayerTitles.Any(n => this.Animation.ToString().Contains(n)) ||
+                        (this.InternalName.Contains("dash") || this.Animation.ToString().Contains("dash")) && this.IsFacingPlayer && this.IsInLineOfSight());
+                }
+                catch (Exception) { }
+                return false;
+            }
+        }
+
+        [NoCopy]
+        public bool IsAvoidanceAtPlayer
+        {
+            get
+            {
+                try
+                {
+                    return this.Distance < 50f && this.Type == GObjectType.Avoidance && DataDictionary.AvoidancesAtPlayerTitles.Any(n => this.InternalName.Contains(n));
+                }
+                catch (Exception) { }
+                return false;
+            }
+        }
+
+        [NoCopy]
+        public bool IsCharging
+        {
+            get
+            {
+                try
+                {
+                    return this.IsUnit && this.IsFacingPlayer &&
+                        (this.Animation.ToString().Contains("charge") || this.Animation.ToString().Contains("Charge"));
+                }
+                catch (Exception) { }
+                return false;
+            }
+        }
+
+        [NoCopy]
+        public bool HasBasicAttackAnimation
+        {
+            get
+            {
+                try
+                {
+                    return this.IsUnit && 
+                        (this.Animation.ToString().Contains("attack") || this.Animation.ToString().Contains("Attack") ||
+                        this.Animation.ToString().Contains("knockback") || this.Animation.ToString().Contains("Knockback") ||
+                        this.Animation.ToString().Contains("cast") || this.Animation.ToString().Contains("Cast"));
+                }
+                catch (Exception) { }
+                return false;
+            }
+        }
+
+        [NoCopy]
+        public string Infos
+        {
+            get
+            {
+                if (IsUnit)
+                    return String.Format("{0} {1:0}/{2} yds Power={3} Type={4} Elite={5} LoS={6} HP={7:0.00} Weight={8:0}",
+                        InternalName,
+                        RadiusDistance,
+                        RequiredRange,
+                        CombatBase.CurrentPower.SNOPower,
+                        Type,
+                        IsBossOrEliteRareUnique,
+                        IsInLineOfSight(),
+                        HitPointsPct,
+                        Weight);
+
+                return String.Format("{0} {1:0}/{2} yds Type={3} Weight={4:0}",
+                    InternalName,
+                    RadiusDistance,
+                    RequiredRange,
+                    Type,
+                    Weight);
+            }
         }
     }
 }
