@@ -354,7 +354,7 @@ namespace Trinity.Reference
             {new KeyValuePair<GItemType, ItemProperty>(GItemType.Dagger, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
             {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandDaibo, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
             {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandCrossbow, ItemProperty.PercentDamage), new ItemStatRange { Max = 10, Min = 6 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandAxe, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},,
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandAxe, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
             {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandBow, ItemProperty.PercentDamage), new ItemStatRange { Max = 10, Min = 6 }},
             {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandFlail, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
             {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMace, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},

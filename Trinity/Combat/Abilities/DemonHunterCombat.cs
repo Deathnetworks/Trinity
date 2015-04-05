@@ -30,7 +30,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return 2 + (Legendary.BombadiersRucksack.IsEquipped ? 2 : 0) + (Passives.DemonHunter.CustomEngineering.IsActive ? 1 : 0);
+                return 2 + (Legendary.BombardiersRucksack.IsEquipped ? 2 : 0) + (Passives.DemonHunter.CustomEngineering.IsActive ? 1 : 0);
             }
         }
         private static bool IsSentryOnTarget(int minCount = 1, float range = 55f)

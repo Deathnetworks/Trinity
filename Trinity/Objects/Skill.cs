@@ -95,6 +95,16 @@ namespace Trinity.Objects
         }
 
         /// <summary>
+        /// Check if skill spend primary ressource
+        /// </summary>
+        public bool IsCostPrimary
+        {
+            get { return SNOPower != null && SNOPower > 0 && Resource != null && 
+                Resource != Resource.None && Resource != Resource.Discipline && Resource != Resource.Unknown && 
+                Cost > 0;  }
+        }
+
+        /// <summary>
         /// How long this spell or its effect will last; uses rune value when applicable.
         /// </summary>
         public TimeSpan Duration
@@ -252,50 +262,41 @@ namespace Trinity.Objects
         /// <summary>
         /// Cast this skill at the current position
         /// </summary>
-        public void Cast()
+        public bool Cast()
         {
-            Cast(Trinity.Player.Position, -1);
+            return Cast(Trinity.Player.Position, -1);
         }
 
         /// <summary>
         /// Cast this skill at the specified position
         /// </summary>
-        public void Cast(Vector3 position)
+        public bool Cast(Vector3 position)
         {
-            Cast(position, -1);
+            return Cast(position, -1);
         }
 
         /// <summary>
         /// Cast this skill at the specified target
         /// </summary>
-        public void Cast (TrinityCacheObject target)
+        public bool Cast (TrinityCacheObject target)
         {
-            Cast(target.Position, target.ACDGuid);
+            return Cast(target.Position, target.ACDGuid);
         }
 
         /// <summary>
         /// Cast this speed using TrinityPower
         /// </summary>
-        public void Cast(TrinityPower power)
+        public bool Cast(TrinityPower power)
         {
-            Cast(power.TargetPosition, power.TargetACDGUID);
+            return Cast(power.TargetPosition, power.TargetACDGUID);
         }
 
         /// <summary>
         /// Cast this skill
         /// </summary>
-        public void Cast(Vector3 clickPosition, int targetAcdGuid)
+        public bool Cast(Vector3 clickPosition, int targetAcdGuid)
         {
-            if (SNOPower != SNOPower.None && clickPosition != Vector3.Zero && IsActive && GameIsReady)
-            {
-                if (ZetaDia.Me.UsePower(SNOPower, clickPosition, Trinity.CurrentWorldDynamicId, targetAcdGuid))
-                {
-                    Trinity.LastPowerUsed = SNOPower;
-                    CacheData.AbilityLastUsed[SNOPower] = DateTime.UtcNow;
-                    SpellTracker.TrackSpellOnUnit(CombatBase.CurrentTarget.ACDGuid, SNOPower);
-                    SpellHistory.RecordSpell(SNOPower);
-                }
-            }
+            return CombatBase.Cast(new TrinityPower(SNOPower, 0f, clickPosition, targetAcdGuid));
         }
 
         private bool GameIsReady
