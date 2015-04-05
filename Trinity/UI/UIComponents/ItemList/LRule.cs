@@ -17,7 +17,7 @@ namespace Trinity.UIComponents
     {
         public LRule()
         {
-            Value = 1;
+            //Value = 1;
         }
 
         private double _value;
@@ -37,7 +37,11 @@ namespace Trinity.UIComponents
         [DataMember]        
         public double Value
         {
-            get { return _value; }
+            get
+            {
+                _value = CoerceValue(_value);
+                return _value;
+            }
             set
             {
                 if (_value != value)
@@ -46,6 +50,15 @@ namespace Trinity.UIComponents
                     OnPropertyChanged();
                 }
             }
+        }
+
+        private double CoerceValue(double value)
+        {
+            if (value < Min)
+                value = Min;
+            else if (value > Max)
+                value = Max;
+            return value;            
         }
 
         [DataMember(EmitDefaultValue = false)]
