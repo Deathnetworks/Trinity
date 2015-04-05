@@ -83,7 +83,6 @@ namespace Trinity
                     {
                         // Barbs
                         case ActorClass.Barbarian:
-                            //power = GetBarbarianPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
                             power = BarbarianCombat.GetPower();
                             break;
                         // Crusader
@@ -110,6 +109,10 @@ namespace Trinity
                             break;
                     }
                 }
+
+                if (power != null && power.MinimumRange > 0)
+                    CombatBase.LastPowerRange = power.MinimumRange;
+
                 // use IEquatable to check if they're equal
                 if (CombatBase.CurrentPower == power)
                 {

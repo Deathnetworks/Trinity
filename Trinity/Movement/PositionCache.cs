@@ -16,10 +16,15 @@ namespace Trinity
         {
             if (ZetaDia.Me != null && ZetaDia.Me.IsValid)
             {
-                Position = Trinity.Player.Position;
+                Vector3 playerLoc = MainGrid.VectorToGrid(Trinity.Player.Position);
+                if (!CacheData.VisitedZones.ContainsKey(playerLoc))
+                {
+                    CacheData.VisitedZones.Add(playerLoc, Trinity.Player.WorldID);
+                    Position = playerLoc;
                 RecordedAt = DateTime.UtcNow;
                 WorldId = Trinity.Player.WorldID;
             }
+        }
         }
 
         public static HashSet<PositionCache> Cache = new HashSet<PositionCache>();
@@ -37,6 +42,7 @@ namespace Trinity
 
             foreach (PositionCache p in Cache.Where(p => p.Position.Distance2D(Trinity.Player.Position) < distance).ToList())
             {
+                CacheData.VisitedZones.Remove(p.Position);
                 Cache.Remove(p);
             }
             Cache.Add(new PositionCache());
@@ -47,9 +53,25 @@ namespace Trinity
         /// </summary>
         public static void MaintainCache()
         {
+            try
+            {
             int worldId = ZetaDia.CurrentWorldId;
-            Cache.RemoveWhere(p => DateTime.UtcNow.Subtract(p.RecordedAt).TotalMilliseconds > 10000);
-            Cache.RemoveWhere(p => p.WorldId != worldId);
+                /*foreach (PositionCache p in Cache.Where(p => p.Position.Distance2D(Trinity.Player.Position) > 200))
+                {
+                    CacheData.VisitedZone.Remove(p.Position);
+                    Cache.Remove(p);
+                }*/
+                foreach (PositionCache p in Cache.Where(p => p.WorldId != worldId))
+                {
+                    CacheData.VisitedZones.Remove(p.Position);
+                    Cache.Remove(p);
+                }
+            }
+            catch { }
+
+            //Cache.RemoveWhere(p => p.Position.Distance2D(Trinity.Player.Position) > 200);
+            //Cache.RemoveWhere(p => DateTime.UtcNow.Subtract(p.RecordedAt).TotalMilliseconds > 15000);
+            //Cache.RemoveWhere(p => p.WorldId != worldId);
         }
 
         public bool Equals(PositionCache other)

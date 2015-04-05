@@ -188,6 +188,7 @@
         Green,
         Other
     }
+
     public enum ItemQualityName
     {
         Inferior,
@@ -199,5 +200,13 @@
         Special
     }
 
-
+    public enum MoveType
+    {
+        Avoidance = 5,
+        Kite = 4,
+        SpecialCombat = 3,
+        KeepMoving = 2,
+        BasicCombat = 1,
+        TargetAttempt = 0
+    }
 }

@@ -41,8 +41,10 @@ namespace Trinity
                 set { _instance = value; }
             }
 
+            public int ActorSNO { get; private set; }
 			public int ACDGuid { get; private set; }
             public int RActorGuid { get; private set; }
+            public ACD CommonData { get; private set; }
             public DateTime LastUpdated { get; private set; }
             public bool IsIncapacitated { get; private set; }
             public bool IsRooted { get; private set; }
@@ -100,6 +102,32 @@ namespace Trinity
             public int CurrentQuestSNO { get; private set; }
             public int CurrentQuestStep { get; private set; }
             public Act WorldType { get; private set; }
+            public bool StandingInAvoidance { get; set; }
+            public bool TryToAvoidProjectile { get; set; }
+            public bool AvoidDeath { get; set; }
+            public bool NeedToKite { get; set; }
+
+            public bool HasDebuff(SNOPower debuffSNO)
+            {
+                try
+                {
+                    if (CommonData.GetAttribute<int>(((int)debuffSNO << 12) + ((int)ActorAttributeType.PowerBuff0VisualEffect & 0xFFF)) == 1)
+                        return true;
+                    if (CommonData.GetAttribute<int>(((int)debuffSNO << 12) + ((int)ActorAttributeType.PowerBuff0VisualEffectA & 0xFFF)) == 1)
+                        return true;
+                    if (CommonData.GetAttribute<int>(((int)debuffSNO << 12) + ((int)ActorAttributeType.PowerBuff0VisualEffectB & 0xFFF)) == 1)
+                        return true;
+                    if (CommonData.GetAttribute<int>(((int)debuffSNO << 12) + ((int)ActorAttributeType.PowerBuff0VisualEffectC & 0xFFF)) == 1)
+                        return true;
+                    if (CommonData.GetAttribute<int>(((int)debuffSNO << 12) + ((int)ActorAttributeType.PowerBuff0VisualEffectD & 0xFFF)) == 1)
+                        return true;
+                    if (CommonData.GetAttribute<int>(((int)debuffSNO << 12) + ((int)ActorAttributeType.PowerBuff0VisualEffectE & 0xFFF)) == 1)
+                        return true;
+
+                }
+                catch (Exception) { }
+                return false;
+            }
 
             public class SceneInfo
             {
@@ -170,8 +198,10 @@ namespace Trinity
 
 			internal void UpdateFastChangingData()
 			{
+                ActorSNO = _me.ActorSNO;
                 ACDGuid = _me.ACDGuid;
                 RActorGuid = _me.RActorGuid;
+                CommonData = _me.CommonData;
                 LastUpdated = DateTime.UtcNow;
                 IsInTown = DataDictionary.TownLevelAreaIds.Contains(LevelAreaId);
                 IsInRift = DataDictionary.RiftWorldIds.Contains(WorldID);
@@ -248,8 +278,23 @@ namespace Trinity
                 GameDifficulty = ZetaDia.Service.Hero.CurrentDifficulty;
                 SecondaryResourceMax = _me.MaxSecondaryResource;
                 PrimaryResourceMax = _me.MaxPrimaryResource;
-			    IsRanged = ActorClass == ActorClass.Witchdoctor || ActorClass == ActorClass.Wizard || ActorClass == ActorClass.DemonHunter;
 				LastVerySlowUpdate = DateTime.UtcNow;			    
+                switch (ActorClass)
+                {
+                    case ActorClass.Witchdoctor:
+                        IsRanged = !Sets.RaimentOfTheJadeHarvester.IsMaxBonusActive;
+                        break;
+                    case ActorClass.DemonHunter:
+                    case ActorClass.Wizard:
+                        IsRanged = true;
+                        break;
+                    case ActorClass.Monk:
+                        IsRanged = Legendary.TzoKrinsGaze.IsEquipped;
+                        break;
+                    default:
+                        IsRanged = false;
+                        break;
+                }
 			}
 
 			public void Clear()

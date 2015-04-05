@@ -19,6 +19,7 @@ namespace Trinity.Config.Combat
         private bool _TargetBasedZigZag;
         private bool _UseDashingStrikeOOC;
         private bool _EpiphanyOffCD;
+        private bool _SerenityOffCD;
         private int _MinCycloneTrashCount;
         private int _MinWoLTrashCount;
         private bool _SpamSweepingWindOnLowHP;
@@ -268,6 +269,24 @@ namespace Trinity.Config.Combat
                 {
                     _EpiphanyOffCD = value;
                     OnPropertyChanged("EpiphanyOffCD");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool SerenityOffCD
+        {
+            get
+            {
+                return _SerenityOffCD;
+            }
+            set
+            {
+                if (_SerenityOffCD != value)
+                {
+                    _SerenityOffCD = value;
+                    OnPropertyChanged("SerenityOffCD");
                 }
             }
         }

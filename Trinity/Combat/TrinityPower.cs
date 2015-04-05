@@ -26,6 +26,10 @@ namespace Trinity
         /// </summary>
         public Vector3 TargetPosition { get; set; }
         /// <summary>
+        /// For movement before cast
+        /// </summary>
+        public Vector3 MovePosition { get; set; }
+        /// <summary>
         /// Always the CurrentDynamicWorldID
         /// </summary>
         public int TargetDynamicWorldId { get; set; }
@@ -137,6 +141,7 @@ namespace Trinity
             SNOPower = SNOPower.None;
             MinimumRange = 0f;
             TargetPosition = Vector3.Zero;
+            MovePosition = Vector3.Zero;
             TargetDynamicWorldId = -1;
             TargetACDGUID = -1;
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
@@ -152,6 +157,7 @@ namespace Trinity
             SNOPower = snoPower;
             MinimumRange = 0f;
             TargetPosition = Vector3.Zero;
+            MovePosition = Vector3.Zero;
             TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
             TargetACDGUID = -1;
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
@@ -170,6 +176,7 @@ namespace Trinity
             SNOPower = snoPower;
             MinimumRange = 0f;
             TargetPosition = Vector3.Zero;
+            MovePosition = Vector3.Zero;
             TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
             TargetACDGUID = -1;
             WaitTicksBeforeUse = waitTicksBeforeuse;
@@ -188,6 +195,7 @@ namespace Trinity
             SNOPower = snoPower;
             MinimumRange = minimumRange;
             TargetPosition = Vector3.Zero;
+            MovePosition = Vector3.Zero;
             TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
             TargetACDGUID = targetAcdGuid;
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
@@ -205,6 +213,7 @@ namespace Trinity
             SNOPower = snoPower;
             MinimumRange = minimumRange;
             TargetPosition = Vector3.Zero;
+            MovePosition = Vector3.Zero;
             TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
             TargetACDGUID = -1;
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
@@ -223,6 +232,45 @@ namespace Trinity
             SNOPower = snoPower;
             MinimumRange = minimumRange;
             TargetPosition = position;
+            MovePosition = position;
+            TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
+            TargetACDGUID = -1;
+            WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
+            WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
+            PowerAssignmentTime = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Create a TrinityPower for use at a specific location with specific ACDGuid
+        /// </summary>
+        /// <param name="snoPower"></param>
+        /// <param name="minimumRange"></param>
+        /// <param name="position"></param>
+        public TrinityPower(SNOPower snoPower, float minimumRange, Vector3 movePosition, int targetACDGUID)
+        {
+            SNOPower = snoPower;
+            MinimumRange = minimumRange;
+            TargetPosition = targetACDGUID != -1 ? Vector3.Zero : movePosition;
+            MovePosition = movePosition;
+            TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
+            TargetACDGUID = targetACDGUID;
+            WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
+            WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
+            PowerAssignmentTime = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Create a TrinityPower for use at a specific location with specific ACDGuid
+        /// </summary>
+        /// <param name="snoPower"></param>
+        /// <param name="minimumRange"></param>
+        /// <param name="position"></param>
+        public TrinityPower(SNOPower snoPower, float minimumRange, Vector3 movePosition, Vector3 position)
+        {
+            SNOPower = snoPower;
+            MinimumRange = minimumRange;
+            TargetPosition = position;
+            MovePosition = movePosition;
             TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
             TargetACDGUID = -1;
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
@@ -245,6 +293,30 @@ namespace Trinity
             SNOPower = snoPower;
             MinimumRange = minimumRange;
             TargetPosition = position;
+            MovePosition = position;
+            TargetDynamicWorldId = targetDynamicWorldId;
+            TargetACDGUID = targetACDGUID;
+            WaitTicksBeforeUse = waitTicksBeforeUse;
+            WaitTicksAfterUse = waitTicksAfterUse;
+            PowerAssignmentTime = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TrinityPower" /> class.
+        /// </summary>
+        /// <param name="snoPower">The SNOPower to be used</param>
+        /// <param name="minimumRange">The minimum range required from the Position or Target to be used</param>
+        /// <param name="position">The Position to use the power at</param>
+        /// <param name="targetDynamicWorldId">Usually the CurrentDynamicWorlID</param>
+        /// <param name="targetACDGUID">The Unit we are targetting</param>
+        /// <param name="waitTicksBeforeUse">The number of "ticks" to wait before using a power - logically 1/10th of a second</param>
+        /// <param name="waitTicksAfterUse">The number of "ticks" to wait after using a power - logically 1/10th of a second</param>
+        public TrinityPower(SNOPower snoPower, float minimumRange, Vector3 position, Vector3 movePosition, int targetDynamicWorldId, int targetACDGUID, float waitTicksBeforeUse, float waitTicksAfterUse)
+        {
+            SNOPower = snoPower;
+            MinimumRange = minimumRange;
+            TargetPosition = position;
+            MovePosition = movePosition;
             TargetDynamicWorldId = targetDynamicWorldId;
             TargetACDGUID = targetACDGUID;
             WaitTicksBeforeUse = waitTicksBeforeUse;

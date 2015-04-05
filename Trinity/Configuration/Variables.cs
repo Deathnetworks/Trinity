@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Trinity.Config;
 using Trinity.ItemRules;
@@ -60,6 +62,8 @@ namespace Trinity
         /// </summary>
         internal static TrinityCacheObject CurrentTarget { get; set; }
 
+        public static Stopwatch[] TaskTimers = Enumerable.Range(0, 21).Select(i => new Stopwatch()).ToArray();
+
         /// <summary>
         /// A flag to indicate if we should pick a new power/ability to use or not
         /// </summary>
@@ -73,7 +77,7 @@ namespace Trinity
         /// <summary>
         /// A special post power use pause, causes targetHandler to wait on any new decisions
         /// </summary>
-        private static bool _isWaitingAfterPower;
+        internal static bool IsWaitingAfterPower;
 
         /// <summary>
         /// If TargetHandle is waiting waiting before popping a potion - we won't refresh cache/change targets/unstuck/etc
@@ -130,6 +134,7 @@ namespace Trinity
         internal static int PlayerOwnedMysticAllyCount = 0;
         internal static int PlayerOwnedGargantuanCount = 0;
         internal static int PlayerOwnedZombieDogCount = 0;
+        internal static int PlayerOwnedFetishCount = 0;
         internal static int PlayerOwnedDHPetsCount = 0;
         internal static int PlayerOwnedDHSentryCount = 0;
         internal static int PlayerOwnedHydraCount = 0;
@@ -139,6 +144,8 @@ namespace Trinity
         // After so many, give the player a friendly warning to check their skill/build setup
         private static int NoAbilitiesAvailableInARow = 0;
         private static DateTime lastRemindedAboutAbilities = DateTime.MinValue;
+
+        private static DateTime lastPickNewAbilitiesForced = DateTime.MinValue;
 
         // Last had any mob in range, for loot-waiting
         internal static DateTime lastHadUnitInSights = DateTime.MinValue;
@@ -186,17 +193,21 @@ namespace Trinity
 
         // These values below are set on a per-class basis later on, so don't bother changing them here! These are the old default values
         public static double PlayerEmergencyHealthPotionLimit = 0.35;
-        private static double _playerEmergencyHealthGlobeLimit = 0.35;
-        private static double _playerHealthGlobeResource = 0.35;
 
         /*
          *  Blacklists
          */
         internal static bool NeedToClearBlacklist3 = false;
+        internal static DateTime Blacklist1LastClear = DateTime.MinValue;
         internal static DateTime Blacklist3LastClear = DateTime.MinValue;
         internal static DateTime Blacklist15LastClear = DateTime.MinValue;
         internal static DateTime Blacklist60LastClear = DateTime.MinValue;
         internal static DateTime Blacklist90LastClear = DateTime.MinValue;
+
+        /// <summary>
+        /// Use RActorGUID to blacklist an object/monster for 1 second
+        /// </summary>
+        internal static HashSet<int> Blacklist1Second = new HashSet<int>();
 
         /// <summary>
         /// Use RActorGUID to blacklist an object/monster for 3 seconds
@@ -230,11 +241,6 @@ namespace Trinity
         // Some avoidance related variables
 
         /// <summary>
-        /// Whether or not we need avoidance this target-search-loop
-        /// </summary>
-        private static bool _standingInAvoidance;
-
-        /// <summary>
         /// This lets us know if there is a target but it's in avoidance so we can just "stay put" until avoidance goes
         /// </summary>
         private static bool _shouldStayPutDuringAvoidance;
@@ -255,7 +261,7 @@ namespace Trinity
         private static bool wasRootedLastTick = false;
 
         // Variables used to actually hold powers the power-selector has picked to use, for buffing and main power use
-        private static TrinityPower powerBuff;
+        private static TrinityPower PowerBuff;
 
         private static SNOPower lastPowerUsed = SNOPower.None;
         public static SNOPower LastPowerUsed
@@ -363,8 +369,6 @@ namespace Trinity
         /// </summary>
         private static double HighestWeightFound;
 
-        private static bool NeedToKite = false;
-
         /// <summary>
         /// Used for trimming off numbers from object names in RefreshDiaObject
         /// </summary>
@@ -434,6 +438,11 @@ namespace Trinity
         /// If our current target is in LoS for use in Behavior handling
         /// </summary>
         private static bool CurrentTargetIsInLoS;
+
+        /// <summary>
+        /// Los & Required range or no range required
+        /// </summary>
+        private static bool CurrentTargetIsInRange;
 
         // Darkfriend's Looting Rule
         public static Interpreter StashRule = null; // = new Interpreter();

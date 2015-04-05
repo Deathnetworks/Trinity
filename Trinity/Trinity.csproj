@@ -111,6 +111,7 @@
     <Compile Include="Combat\AvoidanceManager.cs" />
     <Compile Include="Combat\AvoidanceType.cs" />
     <Compile Include="Combat\Enemies.cs" />
+	<Compile Include="Combat\QueuedMovement.cs" />
     <Compile Include="Combat\Routine\TrinityRoutine.cs" />
     <Compile Include="Combat\SpellTracker.cs" />
     <Compile Include="Configuration\Events.cs" />
@@ -171,6 +172,10 @@
     <Compile Include="Helpers\GoldInactivity.cs" />
     <Compile Include="Cache\HashGenerator.cs" />
     <Compile Include="Helpers\MathUtil.cs" />
+    <Compile Include="Movement\Grid\GridMap.cs" />
+    <Compile Include="Movement\Grid\GridResults.cs" />
+    <Compile Include="Movement\Grid\GridPoint.cs" />
+    <Compile Include="Movement\Grid\MainGrid.cs" />
     <Compile Include="Movement\Kite.cs" />
     <Compile Include="Movement\NavHelper.cs" />
     <Compile Include="Movement\PositionCache.cs" />
@@ -196,7 +201,6 @@
     <Compile Include="Reference\Runes.cs" />
     <Compile Include="Reference\Sets.cs" />
     <Compile Include="Reference\Skills.cs" />
-    <Compile Include="Combat\CombatMovement.cs" />
     <Compile Include="Reference\SkillUtils.cs" />
     <Compile Include="Settings\Combat\CrusaderSetting.cs" />
     <Compile Include="Settings\Loot\ItemListSettings.cs" />

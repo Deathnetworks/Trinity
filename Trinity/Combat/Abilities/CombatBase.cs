@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Trinity.Config;
 using Trinity.Config.Combat;
+using Trinity.Objects;
 using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
+using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
@@ -18,6 +20,8 @@ namespace Trinity.Combat.Abilities
         static CombatBase()
 		{
             GameEvents.OnGameJoined += (sender, args) => LoadCombatSettings();
+            GameEvents.OnWorldChanged += (sender, args) => LoadCombatSettings();
+            Pulsator.OnPulse += (sender, args) => MonkCombat.RunOngoingPowers();
             LoadCombatSettings();
 		}
         
@@ -27,7 +31,7 @@ namespace Trinity.Combat.Abilities
         private static bool _isCombatAllowed = true;
         private static KiteMode _kiteMode = KiteMode.Never;
 
-        public static CombatMovementManager CombatMovement = new CombatMovementManager();
+        public static QueuedMovementManager QueuedMovement = new QueuedMovementManager();
         internal static DateTime LastChangedZigZag { get; set; }
         internal static Vector3 PositionLastZigZagCheck { get; set; }
         // Unique ID of mob last targetting when using whirlwind/strafe
@@ -39,6 +43,63 @@ namespace Trinity.Combat.Abilities
             NoTimer = 4,
             NoPowerManager = 8,
             Timer = 16
+        }
+
+        internal static bool Cast(TrinityPower _power)
+        {
+            if (IsNull(_power))
+                return false;
+
+            if (_power.SNOPower == SNOPower.Walk && _power.TargetPosition == Vector3.Zero)
+            {
+                Navigator.PlayerMover.MoveStop();
+                return true;
+            }
+
+            if (ZetaDia.Me.UsePower(_power.SNOPower, _power.TargetPosition, _power.TargetDynamicWorldId, _power.TargetACDGUID))
+            {
+                float _distToTarget = 0;
+                if (_power.TargetPosition != Vector3.Zero)
+                    _distToTarget = CombatBase.CurrentPower.TargetPosition.Distance2D(Player.Position);
+                else if (CurrentTarget != null)
+                    _distToTarget = CurrentTarget.Position.Distance2D(Player.Position);
+
+                string powerResultInfo = _power.TargetPosition != Vector3.Zero ? "at " + NavHelper.PrettyPrintVector3(_power.TargetPosition) + " dist=" + (int)_distToTarget : "";
+                powerResultInfo += _power.TargetACDGUID != -1 ? " on " + _power.TargetACDGUID : "";
+                Logger.Log(TrinityLogLevel.Info, LogCategory.Movement, "Used Power {0} " + powerResultInfo, _power.SNOPower);
+
+                SpellTracker.TrackSpellOnUnit(_power.TargetACDGUID, _power.SNOPower);
+                SpellHistory.RecordSpell(_power);
+
+                CacheData.AbilityLastUsed[_power.SNOPower] = DateTime.UtcNow;
+
+                Trinity.lastGlobalCooldownUse = DateTime.UtcNow;
+                Trinity.LastPowerUsed = _power.SNOPower;
+
+                Trinity.IsWaitingAfterPower = _power.ShouldWaitAfterUse;
+
+                if (IsTaegukEquipped)
+                {
+                    Skill _currentSkill = new Skill();
+                    switch (Player.ActorClass)
+                    {
+                        case ActorClass.Barbarian: _currentSkill = Skills.Barbarian.Where(s => s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
+                        case ActorClass.Crusader: _currentSkill = Skills.Crusader.Where(s => s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
+                        case ActorClass.Monk: _currentSkill = Skills.Monk.Where(s => s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
+                        case ActorClass.Wizard: _currentSkill = Skills.Wizard.Where(s => s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
+                        case ActorClass.Witchdoctor: _currentSkill = Skills.WitchDoctor.Where(s => s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
+                        case ActorClass.DemonHunter: _currentSkill = Skills.DemonHunter.Where(s => s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
+                    }
+
+                    if (_currentSkill != null && _currentSkill.IsCostPrimary)
+                        LastTaegukDebuffedTime = DateTime.UtcNow;
+                }
+                
+                
+                return true;
+            }
+
+            return false;
         }
 
         internal static void LoadCombatSettings()
@@ -56,7 +117,7 @@ namespace Trinity.Combat.Abilities
                 case ActorClass.Crusader:
                     EmergencyHealthPotionLimit = Settings.Combat.Crusader.PotionLevel;
                     EmergencyHealthGlobeLimit = Settings.Combat.Crusader.HealthGlobeLevel;
-                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
+                    HealthGlobeResource = Settings.Combat.Crusader.HealthGlobeLevelResource;
                     KiteDistance = 0;
                     KiteMode = KiteMode.Never;
                     break;
@@ -64,7 +125,7 @@ namespace Trinity.Combat.Abilities
                 case ActorClass.Monk:
                     EmergencyHealthPotionLimit = Settings.Combat.Monk.PotionLevel;
                     EmergencyHealthGlobeLimit = Settings.Combat.Monk.HealthGlobeLevel;
-                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
+                    HealthGlobeResource = Settings.Combat.Monk.HealthGlobeLevelResource;
                     KiteDistance = 0;
                     KiteMode = KiteMode.Never;
                     break;
@@ -72,7 +133,7 @@ namespace Trinity.Combat.Abilities
                 case ActorClass.Wizard:
                     EmergencyHealthPotionLimit = Settings.Combat.Wizard.PotionLevel;
                     EmergencyHealthGlobeLimit = Settings.Combat.Wizard.HealthGlobeLevel;
-                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
+                    HealthGlobeResource = Settings.Combat.Wizard.HealthGlobeLevelResource;
                     KiteDistance = Settings.Combat.Wizard.KiteLimit;
                     KiteMode = KiteMode.Always;
                     break;
@@ -80,7 +141,7 @@ namespace Trinity.Combat.Abilities
                 case ActorClass.Witchdoctor:
                     EmergencyHealthPotionLimit = Settings.Combat.WitchDoctor.PotionLevel;
                     EmergencyHealthGlobeLimit = Settings.Combat.WitchDoctor.HealthGlobeLevel;
-                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
+                    HealthGlobeResource = Settings.Combat.WitchDoctor.HealthGlobeLevelResource;
                     KiteDistance = Settings.Combat.WitchDoctor.KiteLimit;
                     KiteMode = KiteMode.Always;
                     break;
@@ -88,7 +149,7 @@ namespace Trinity.Combat.Abilities
                 case ActorClass.DemonHunter:
                     EmergencyHealthPotionLimit = Settings.Combat.DemonHunter.PotionLevel;
                     EmergencyHealthGlobeLimit = Settings.Combat.DemonHunter.HealthGlobeLevel;
-                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
+                    HealthGlobeResource = Settings.Combat.DemonHunter.HealthGlobeLevelResource;
                     KiteDistance = Settings.Combat.DemonHunter.KiteLimit;
                     KiteMode = Settings.Combat.DemonHunter.KiteMode;
                     break;
@@ -122,6 +183,15 @@ namespace Trinity.Combat.Abilities
             }
         }
 
+        internal static void RefreshValues()
+        {
+            PlayerIsSurrounded = Trinity.ObjectCache != null && Trinity.ObjectCache.Count(o => o.IsUnit && o.Weight > 0 && o.RadiusDistance < 16f) > 4;
+            PlayerShouldNotFight = Player.StandingInAvoidance || Player.AvoidDeath || Player.NeedToKite;
+            PlayerIsImmune = false;// GetHasBuff(SNOPower.Witchdoctor_SpiritWalk) || GetHasBuff(SNOPower.DemonHunter_SmokeScreen);
+
+            DemonHunterCombat.ResetArea();
+        }
+
         private static int _kiteDistance;
         /// <summary>
         /// Distance to kite, read settings (class independant)
@@ -139,9 +209,15 @@ namespace Trinity.Combat.Abilities
             set { _kiteDistance = value; }
         }
 
+        public static bool PlayerShouldNotFight { get; set; }
+        public static bool PlayerIsSurrounded { get; set; }
+        public static bool PlayerIsImmune { get; set; }
+
         public static float EmergencyHealthPotionLimit { get; set; }
         public static float EmergencyHealthGlobeLimit { get; set; }
         public static float HealthGlobeResource { get; set; }
+
+        public static float LastPowerRange = 0f;
 
         // When to Kite
         public static KiteMode KiteMode
@@ -169,6 +245,20 @@ namespace Trinity.Combat.Abilities
         }
 
         public static bool IsQuestingMode { get; set; }
+
+        /// <summary>
+        /// Determines whether [is taeguk equipped].
+        /// </summary>
+        /// <returns><c>true</c> if [is taeguk equipped]; otherwise, <c>false</c>.</returns>
+        private static DateTime LastTaegukDebuffedTime = DateTime.MinValue;
+        private static bool IsTaegukEquipped
+        {
+            get { return CacheData.Inventory.EquippedIds.Contains(405804); }
+        }
+        public static bool IsTaegukBuffWillExpire
+        {
+            get { return IsTaegukEquipped && DateTime.UtcNow.Subtract(LastTaegukDebuffedTime).TotalMilliseconds >= 2500; }
+        }
 
         /// <summary>
         /// The last "ZigZag" position, used with Barb Whirlwind, Monk Tempest Rush, etc.
@@ -410,6 +500,8 @@ namespace Trinity.Combat.Abilities
                 {
                     case SNOPower.Weapon_Ranged_Instant:
                     case SNOPower.Weapon_Ranged_Projectile:
+                        if (Player.ActorClass == ActorClass.DemonHunter)
+                            return Trinity.Settings.Combat.DemonHunter.RangedAttackRange;
                         return 65f;
                     case SNOPower.Weapon_Ranged_Wand:
                         return 55f;
@@ -551,13 +643,9 @@ namespace Trinity.Combat.Abilities
         /// Check if a power is null
         /// </summary>
         /// <param name="power"></param>
-        protected static bool IsNull(TrinityPower power)
+        public static bool IsNull(TrinityPower power)
         {
-            return power == null;
+            return power == null || power.SNOPower == SNOPower.None;
         }
-
-
-
     }
-
 }

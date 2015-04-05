@@ -48,7 +48,7 @@ namespace Trinity.Helpers
                     if (_frameLockRelease != null)
                         _frameLockRelease.Dispose();
                 }
-                catch (Exception ex)
+                catch
                 {
                     Logger.LogDebug("Exception disposing of MemoryHelper._frameLockRelease");
                 }
@@ -58,7 +58,7 @@ namespace Trinity.Helpers
                     if (_externalReadCache != null)
                         _externalReadCache.Dispose();
                 }
-                catch (Exception ex)
+                catch
                 {
                     Logger.LogDebug("Exception disposing of MemoryHelper._externalReadCache");
                 }

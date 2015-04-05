@@ -47,7 +47,6 @@ namespace Trinity
             return new Vector2((float)Math.Cos(rotation), (float)Math.Sin(rotation));
         }
 
-
         #region Angle Finding
         /// <summary>
         /// Find the angle between two vectors. This will not only give the angle difference, but the direction.
@@ -122,15 +121,22 @@ namespace Trinity
         }
         #endregion
 
-
-        public static bool IntersectsPath(Vector3 obstacle, float radius, Vector3 start, Vector3 destination)
+        public static bool IntersectsPath(Vector3 obstacle, float radius, Vector3 origin, Vector3 destination, bool outOfLocation = false, bool twoDim = true)
         {
-            // fake-it to 2D
-            obstacle.Z = 0;
-            start.Z = 0;
-            destination.Z = 0;
+            if (twoDim)
+            {
+                origin.Z = 0;
+                obstacle.Z = 0;
+                destination.Z = 0;
+            }
 
-            return MathEx.IntersectsPath(obstacle, radius, start, destination);
+            if (origin.Distance2D(obstacle) <= radius)
+                return !outOfLocation;
+
+            if (destination.Distance2D(obstacle) <= radius)
+                return !outOfLocation;
+
+            return MathEx.IntersectsPath(obstacle, radius, origin, destination);
         }
 
         #region Angular Measure Unit Conversion
@@ -155,9 +161,12 @@ namespace Trinity
         }
         public static double RadianToDegree(double angle)
         {
-            return angle * (180.0 / Math.PI);
+            return angle * (180 / Math.PI);
         }
-
+        public static double DegreeToRadian(double angle)
+        {
+            return (angle / 180) * Math.PI;
+        }
 
         #endregion
         public static double GetRelativeAngularVariance(Vector3 origin, Vector3 destA, Vector3 destB)
@@ -175,6 +184,10 @@ namespace Trinity
         public static string GetHeadingToPoint(Vector3 TargetPoint)
         {
             return GetHeading(FindDirectionDegree(Trinity.Player.Position, TargetPoint));
+        }
+        public static string GetHeadingToPoint(Vector3 Origin, Vector3 TargetPoint)
+        {
+            return GetHeading(FindDirectionDegree(Origin, TargetPoint));
         }
         public static string GetHeading(float heading)
         {

@@ -60,7 +60,7 @@ namespace Trinity.Config.Combat
 
         #region Properties
         [DataMember(IsRequired = false)]
-        [DefaultValue(10)]
+        [DefaultValue(40)]
         public int Arcane
         {
             get
@@ -258,7 +258,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(5)]
+        [DefaultValue(30)]
         public int FrozenPulse
         {
             get
@@ -312,7 +312,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(20)]
+        [DefaultValue(25)]
         public int IceBalls
         {
             get
@@ -330,7 +330,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(6)]
+        [DefaultValue(10)]
         public int IceTrail
         {
             get
@@ -438,7 +438,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(6)]
+        [DefaultValue(15)]
         public int MoltenTrail
         {
             get
@@ -545,7 +545,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(5)]
+        [DefaultValue(20)]
         public int Thunderstorm
         {
             get

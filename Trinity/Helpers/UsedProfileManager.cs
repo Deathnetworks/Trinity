@@ -43,7 +43,7 @@ namespace Trinity
                         Trinity.CurrentProfile = currentProfile;
                         Trinity.CurrentProfileName = ProfileManager.CurrentProfile.Name;
 
-                        if (Trinity.FirstProfile == "")
+                        if (Trinity.FirstProfile == string.Empty)
                             Trinity.FirstProfile = currentProfile;
                     }
                 }

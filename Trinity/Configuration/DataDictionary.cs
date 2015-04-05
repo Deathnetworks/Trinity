@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Trinity.Objects;
 using Trinity.Reference;
 using Zeta.Common;
@@ -232,6 +233,7 @@ namespace Trinity
         {
             60757, // Belial's chambers
             405915, // p1_TieredRift_Challenge
+            332335, // Navigator is very low here (25/30ms by move)
         };
 
         public static HashSet<int> QuestLevelAreaIds { get { return DataDictionary.questLevelAreaIds; } }
@@ -269,112 +271,135 @@ namespace Trinity
             201454, 201464, 201426, 201438, 200969, 201423, 201242,
         };
 
-        /// <summary>
-        /// This list is used for Units with specific Animations we want to treat as avoidance
-        /// </summary>
-        public static HashSet<DoubleInt> AvoidanceAnimations { get { return DataDictionary.avoidanceAnimations; } }
-        private static readonly HashSet<DoubleInt> avoidanceAnimations = new HashSet<DoubleInt>
+        public static HashSet<string> AvoidAnimationsTitles { get { return avoidAnimationsTitles; } }
+        private static readonly HashSet<string> avoidAnimationsTitles = new HashSet<string>
         {
-            // Fat guys that explode into worms
-            // Stitch_Suicide_Bomb State=Transform By: Corpulent_C (3849)
-            new DoubleInt((int)SNOActor.Corpulent_A, (int)SNOAnim.Stitch_Suicide_Bomb),
-            new DoubleInt((int)SNOActor.Corpulent_A_Unique_01, (int)SNOAnim.Stitch_Suicide_Bomb),
-            new DoubleInt((int)SNOActor.Corpulent_A_Unique_02, (int)SNOAnim.Stitch_Suicide_Bomb), 
-            new DoubleInt((int)SNOActor.Corpulent_A_Unique_03, (int)SNOAnim.Stitch_Suicide_Bomb), 
-            new DoubleInt((int)SNOActor.Corpulent_B, (int)SNOAnim.Stitch_Suicide_Bomb), 
-            new DoubleInt((int)SNOActor.Corpulent_B_Unique_01, (int)SNOAnim.Stitch_Suicide_Bomb), 
-            new DoubleInt((int)SNOActor.Corpulent_C, (int)SNOAnim.Stitch_Suicide_Bomb), 
-            new DoubleInt((int)SNOActor.Corpulent_D_CultistSurvivor_Unique, (int)SNOAnim.Stitch_Suicide_Bomb),             
-            new DoubleInt((int)SNOActor.Corpulent_C_OasisAmbush_Unique, (int)SNOAnim.Stitch_Suicide_Bomb),  
-            new DoubleInt((int)SNOActor.Corpulent_D_Unique_Spec_01, (int)SNOAnim.Stitch_Suicide_Bomb), 
+            "attack", "Attack",
+            "cold", "Cold", 
+            "fire", "Fre", 
+            "poison", "Poison", 
+            "arcane", "Arcane", 
+            "projectile", "Projectile", 
+            "lighting", "Lighting", 
+            "lightning", "Lightning", 
+            "resurrect", "Resurrect", 
+            "charge", "Charge", 
+            "teleport", "Teleport", 
+            "teleporter", "Teleporter", 
+            "bomb", "Bomb", 
+            "_cast", "_Cast", 
+            "ball", "ball", 
+            "meteor", "meteor", 
+            "missile", "missile", 
+            "monsteraffix", "Monsteraffix", "MonsterAffix", "monsterAffix", 
+            "mines", "Mines", 
+            "impact", "Impact", 
+            "inpact", "Inpact", 
+            "suicide", "Suicide",
+            "ball", "Ball",
+            "cannon", "Cannon",
+            "dash", "Dash",
+            "orbiter", "Orbiter", 
+            "plagued", "Plagued",
+            "avenger", "Avenger",
+            "desecrator", "Desecrator",
+            "electrified", "Electrified",
+            "chains", "Chains",
+            "frozen", "Frozen",
+            "horde", "Horde",
+            "jail", "Jail",
+            "jailer", "Jailer",
+            "knockback", "Knockback",
+            "molten", "Molten",
+            "mortar", "Mortar",
+            "avenger", "Avenger",
+            //"waller", "Waller",
+            "vampiric", "Vampiric",
+            "nightmarish", "Nightmarish",
+            //"vortex", "Vortex",
+            "wormhole", "Wormhole",
+            "arrow", "Arrow",
+            "shot", "Shot",
+            //"wizard", "Wizard",
+            "grenade", "Grenade",
+            "ray", "Ray",
+            "bane", "Bane",
+            "blister", "Blister",
+            //"trap", "Trap",
+            "blow", "Blow",
+            "gun", "Gun",
+            "DemonMine_A_death", 
+            "DemonMine_B_death", 
+            "DemonMine_C_death",
+            "Catacomb_Floor_Runes_A_death", 
+            "Catacomb_Floor_Runes_B_death", 
+            "Catacomb_Floor_Runes_C_death",
+            //"Atacking", "atacking",
+            "Attacking", "attacking",
+            //"a3_Battlefield_Demoic_Forge_Atacking",
+            "gas", "Gas",
+            "gaz", "Gaz",
+            "Stitch_Suicide_Bomb", "Suicide_Bomb",
+        };
 
-            // Beast Charge
-            new DoubleInt((int)SNOActor.Beast_A, (int)SNOAnim.Beast_start_charge_02),
-            new DoubleInt((int)SNOActor.Beast_A, (int)SNOAnim.Beast_charge_02),
-            new DoubleInt((int)SNOActor.Beast_A, (int)SNOAnim.Beast_charge_04),
-            new DoubleInt((int)SNOActor.Beast_B, (int)SNOAnim.Beast_start_charge_02),
-            new DoubleInt((int)SNOActor.Beast_B, (int)SNOAnim.Beast_charge_02),
-            new DoubleInt((int)SNOActor.Beast_B, (int)SNOAnim.Beast_charge_04),
-            new DoubleInt((int)SNOActor.Beast_C, (int)SNOAnim.Beast_start_charge_02),
-            new DoubleInt((int)SNOActor.Beast_C, (int)SNOAnim.Beast_charge_02),
-            new DoubleInt((int)SNOActor.Beast_C, (int)SNOAnim.Beast_charge_04),
-            new DoubleInt((int)SNOActor.Beast_D, (int)SNOAnim.Beast_start_charge_02),
-            new DoubleInt((int)SNOActor.Beast_D, (int)SNOAnim.Beast_charge_02),
-            new DoubleInt((int)SNOActor.Beast_D, (int)SNOAnim.Beast_charge_04),
-
-            new DoubleInt(330824, (int)SNOAnim.x1_Urzael_attack_06), // Urzael flame 
-            new DoubleInt(330824, 348109), // Urzael Cannonball Aim
-            new DoubleInt(330824, 344952), // Urzael Flying
-
-            // Nobody wants to get hit by a mallet demon
-            new DoubleInt(343767, (int)SNOAnim.malletDemon_attack_01), // X1_LR_Boss_MalletDemon
-            new DoubleInt(106709, (int)SNOAnim.malletDemon_attack_01), // MalletDemon_A
-            new DoubleInt(219736, (int)SNOAnim.malletDemon_attack_01), // MalletDemon_A_Unique_01  
-            new DoubleInt(219751, (int)SNOAnim.malletDemon_attack_01), // MalletDemon_A_Unique_02 
-
-            // These guys cast meteors Meteors
-            // morluSpellcaster_attack_AOE_01 State=Transform By: morluSpellcaster_A (4760)
-            //new DoubleInt((int)SNOActor.morluSpellcaster_A, (int)SNOAnim.morluSpellcaster_attack_AOE_01),             
-            //new DoubleInt((int)SNOActor.morluSpellcaster_B, (int)SNOAnim.morluSpellcaster_attack_AOE_01),          
-            //new DoubleInt((int)SNOActor.morluSpellcaster_D, (int)SNOAnim.morluSpellcaster_attack_AOE_01), 
-            //new DoubleInt((int)SNOActor.X1_LR_Boss_morluSpellcaster_Fire, (int)SNOAnim.morluSpellcaster_attack_AOE_01),
-
-            // Spinny AOE Attack
-            new DoubleInt((int)SNOActor.x1_LR_DeathMaiden_A, (int)SNOAnim.x1_deathMaiden_attack_special_360_01),
-
-            new DoubleInt((int)SNOActor.x1_portalGuardianMinion_Melee_A, (int)SNOAnim.x1_portalGuardianMinion_attack_charge_01), // x1_portalGuardianMinion_Melee_A (279052)
-            new DoubleInt((int)SNOActor.X1_BigRed_Chronodemon_Burned_A, (int)SNOAnim.X1_BigRed_attack_02), // X1_BigRed_Chronodemon_Burned_A (326670)
-            
-            // Angels with those big clubs with a dashing attack
-            // Angel_Corrupt_attack_dash_in State=Transform By: Angel_Corrupt_A (106711)
-            new DoubleInt((int)SNOActor.Angel_Corrupt_A, (int)SNOAnim.Angel_Corrupt_attack_dash_in), 
-            new DoubleInt((int)SNOActor.Angel_Corrupt_A, (int)SNOAnim.Angel_Corrupt_attack_dash_middle), 
-            new DoubleInt((int)SNOActor.Angel_Corrupt_A, (int)SNOAnim.Angel_Corrupt_attack_dash_out), 
-
-            // Big guys with blades on their arms who jump accross the screen and stun you
-            // x1_westmarchBrute_attack_02_out State=Attacking By: x1_westmarchBrute_A (258678)
-            new DoubleInt((int)SNOActor.x1_westmarchBrute_A, (int)SNOAnim.x1_westmarchBrute_attack_02_in), 
-            new DoubleInt((int)SNOActor.x1_westmarchBrute_A, (int)SNOAnim.x1_westmarchBrute_attack_02_mid), 
-            new DoubleInt((int)SNOActor.x1_westmarchBrute_A, (int)SNOAnim.x1_westmarchBrute_attack_02_out),   
-           
-            // snakeMan_melee_generic_cast_01 State=Transform By: X1_LR_Boss_Snakeman_Melee_Belial (360281)
-            new DoubleInt((int)SNOActor.X1_LR_Boss_Snakeman_Melee_Belial, (int)SNOAnim.snakeMan_melee_generic_cast_01),  
- 
-            //x1_Squigglet_Generic_Cast State=Transform By: X1_LR_Boss_Squigglet (353535)
-            new DoubleInt((int)SNOActor.X1_LR_Boss_Squigglet, (int)SNOAnim.x1_Squigglet_Generic_Cast),
-
-            //] Triune_Berserker_specialAttack_loop_01 State=TakingDamage By: Triune_Berserker_A (6052)
-            new DoubleInt((int)SNOActor.Triune_Berserker_A, (int)SNOAnim.Triune_Berserker_specialAttack_01),
-            new DoubleInt((int)SNOActor.Triune_Berserker_A, (int)SNOAnim.Triune_Berserker_specialAttack_loop_01),
-            new DoubleInt((int)SNOActor.Triune_Berserker_B, (int)SNOAnim.Triune_Berserker_specialAttack_01),
-            new DoubleInt((int)SNOActor.Triune_Berserker_B, (int)SNOAnim.Triune_Berserker_specialAttack_loop_01),
-            new DoubleInt((int)SNOActor.Triune_Berserker_C, (int)SNOAnim.Triune_Berserker_specialAttack_01),
-            new DoubleInt((int)SNOActor.Triune_Berserker_C, (int)SNOAnim.Triune_Berserker_specialAttack_loop_01),
-            new DoubleInt((int)SNOActor.Triune_Berserker_D, (int)SNOAnim.Triune_Berserker_specialAttack_01),
-            new DoubleInt((int)SNOActor.Triune_Berserker_D, (int)SNOAnim.Triune_Berserker_specialAttack_loop_01),
-       };
-
-
-        /// <summary>
-        /// This list is used for animations where the avoidance point should be the player's current location
-        /// </summary>
-        public static HashSet<int> AvoidAnimationAtPlayer { get { return avoidAnimationAtPlayer; } }
-        private static readonly HashSet<int> avoidAnimationAtPlayer = new HashSet<int>
+        public static HashSet<string> AvoidancesAtPlayerTitles { get { return avoidancesAtPlayerTitles; } }
+        private static readonly HashSet<string> avoidancesAtPlayerTitles = new HashSet<string>
         {
-            (int)SNOAnim.Beast_start_charge_02, // A1 Savage Beast Charge - needs special handling!
-            (int)SNOAnim.Beast_charge_02, // A1 Savage Beast Charge - needs special handling!
-            (int)SNOAnim.Beast_charge_04, // A1 Savage Beast Charge - needs special handling!
-            (int)SNOAnim.morluSpellcaster_attack_AOE_01, //morluSpellcaster_D
-            (int)SNOAnim.X1_LR_Boss_morluSpellcaster_generic_cast, //morluSpellcaster_D
-            (int)SNOAnim.snakeMan_melee_generic_cast_01, //X1_LR_Boss_Snakeman_Melee_Belial (360281)
-       };
+            "teleport", "Teleport", 
+            "teleporter", "Teleporter", 
+            "dash", "Dash",
+            //"waller", "Waller",
+            "meteor", "meteor", 
+            "jailer", "Jailer",
+            //"vortex", "Vortex",
+        };
 
-        public static Dictionary<int, float> DefaultAvoidanceAnimationCustomRadius { get { return defaultAvoidanceAnimationCustomRadius; } }
-        private static readonly Dictionary<int, float> defaultAvoidanceAnimationCustomRadius = new Dictionary<int, float>()
+        public static HashSet<int> AnimationsObsoleteIds { get { return animationsObsoleteIds; } }
+        private static readonly HashSet<int> animationsObsoleteIds = new HashSet<int>
         {
-            {(int)SNOAnim.morluSpellcaster_attack_AOE_01, 20f },
-            {(int)SNOAnim.x1_deathMaiden_attack_special_360_01, 15f},
-            {(int)SNOAnim.x1_Squigglet_Generic_Cast, 40f}, // Rift Boss Slime AOE
+            121154, // TerrorDemon_teleport_intro 
+            216925, // Enchantress_1HS_cast_01
+            165413, // DH_sentryrune_missiles_spawn_01
+            165411, // DH_sentryRune_missiles_attack_01
+            95483, // a1dun_Leor_Jail_Door_Breakable_A_idle
+            178664, // ActorSno Dh minion just in case
+            173827, // ActorSno Dh minion just in case
+            133741, // ActorSno Dh minion just in case
+            159144, // ActorSno Dh minion just in case
+            181748, // ActorSno Dh minion just in case
+            159098, // ActorSno Dh minion just in case
+            159102, // ActorSno Dh minion just in case
+            159144, // ActorSno Dh minion just in case
+            334861, // ActorSno Dh minion just in case
+            150025, // ActorSno Dh minion just in case
+            150037, // ActorSno Dh minion just in case
+            155149, // ActorSno Dh minion just in case
+            154593, // ActorSno Dh minion just in case
+            154199, // ActorSno Dh minion just in case
+            147960, // ActorSno Dh minion just in case
+            129934, // ActorSno Dh minion just in case
+            130366, // ActorSno Dh minion just in case
+            367223, // ActorSno Dh minion just in case
+            367258, // ActorSno Dh minion just in case
+            160612, // ActorSno Dh minion just in case
+            186020, // Enchantress
+        };
+
+        public static HashSet<int> AvoidancesAtPlayer { get { return avoidancesAtPlayer; } }
+        private static readonly HashSet<int> avoidancesAtPlayer = new HashSet<int>
+        {
+            337109, // Wormhole X1_MonsterAffix_TeleportMines
+            175452, // morluSpellcaster_teleport_trailActor-23356 Type=ServerProp
+            93629, // SkeletonKing_Teleport_Projectile-78908 Type=Projectile
+            428810, // p2_morluSpellcaster_teleport_trailActor_cold-145111 Type=ServerProp
+            177548, // angelCorrupt_dash_wave_model-164484
+            //360598, // x1_Urzael_CeilingDebris_DamagingFire_wall
+            //226808, // monsterAffix_waller_model-121230 Type=ServerProp
+            3751, // Champion_Teleport_shell-111189
+            93892, // SkeletonKing_Teleport_arrival_proxy-173260
+            93909, // SkeletonKing_Teleport_Back_trailDudeModel-175506
+            83860, // SkeletonKing_Teleport_trailDudeModel-184327
+            190198, // Despair_Teleport_shell-21820
         };
 
         /// <summary>
@@ -416,19 +441,15 @@ namespace Trinity
             226350, // Diablo Ring of Fire
             226525, // Diablo Ring of Fire
             250031, // Mortar MonsterAffix_Mortar_Pending
-
             84608,  // Desecrator monsterAffix_Desecrator_damage_AOE
             84606,  // Desecrator monsterAffix_Desecrator_telegraph
 
             /* 2.0 */
             349774, // FrozenPulse x1_MonsterAffix_frozenPulse_monster
-            343539, // Orbiter X1_MonsterAffix_Orbiter_Projectile
-            316389, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_projectile (316389)
             340319, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_bomb_start (340319)
             341512, // Thunderstorm x1_MonsterAffix_Thunderstorm_Impact
             337109, // Wormhole X1_MonsterAffix_TeleportMines
 
-            338889, // x1_Adria_bouncingProjectile
             360738, // X1_Adria_arcanePool
             358404, // X1_Adria_blood_large
 
@@ -454,15 +475,121 @@ namespace Trinity
             360046, // X1_Unique_Monster_Generic_AOE_DOT_Poison_10foot
             363358, // X1_Unique_Monster_Generic_AOE_DOT_Poison_20foot
             368156, // X1_Unique_Monster_Generic_AOE_Lightning_Ring
-            358917, // X1_Unique_Monster_Generic_AOE_Sphere_Distortion
-            377086, // X1_Unique_Monster_Generic_Projectile_Arcane
-            377087, // X1_Unique_Monster_Generic_Projectile_Cold
-            377088, // X1_Unique_Monster_Generic_Projectile_Fire
-            377089, // X1_Unique_Monster_Generic_Projectile_Holy
-            377090, // X1_Unique_Monster_Generic_Projectile_Lightning
-            377091, // X1_Unique_Monster_Generic_Projectile_Physical
-            377092, // X1_Unique_Monster_Generic_Projectile_Poison
+            358917, // X1_Unique_Monster_Generic_AOE_Sphere_Distortion           
 
+            //buddyMe add
+            250031, // MonsterAffix_Mortar_Pending
+            365810, // Grenadier_Proj_mortar_inpact
+            300476, // x1_wizard_staticField_electricField
+            //167628, // Wizard_FamiliarRune_Pierce_Glow
+            299099, // x1_wizard_staticField_blastwaveGeo
+            3851, // Corpulent_suicide_blood
+            //99566, // Wizard_magicMissile_wobble-40033 Type=ServerProp
+            159166, // g_monster_projectile_poison_impact-40858 Type=ServerProp
+            217470, // grenadier_proj_trail
+            142797, // zombie_female_barfBall_projectile_impact-38722 Type=ServerProp
+            4219, // gibClusters_fire_humanoid-47261 Type=ServerProp
+            5391, // SkeletonSummoner_impact-90121 Type=Projectile
+            340343, // x1_skeletonArcher_arrow_cold_impact-103170 Type=ServerProp
+            4393, // g_chargedBolt_impact-113582 Type=ServerProp
+            //226808, // monsterAffix_waller_model-121230 Type=ServerProp
+            //85809, // monsterAffix_Vortex_proxy-130046 Type=ServerProp
+            52689, // gibClusters_fire_humanoid_large-135376 Type=ServerPro
+            //89862, // monsterAffix_Vortex_model-18897 Type=Gizmo
+            334552, // x1_bloodScratch_leaperAngel_attack2-29155 Type=ServerProp
+            98220, // monsterAffix_healthLink_jumpActor-29351 Type=ServerProp
+            260812, // Unique_Monster_IceTrail-29820 Type=ServerProp
+            159369, // MorluSpellcaster_Meteor_Pending-1262 Type=ServerProp
+            160401, // demonFlyer_fireball_impact-1272 Type=ServerProp
+            159368, // MorluSpellcaster_Meteor_Impact-1312 Type=ServerProp
+            159367, // MorluSpellcaster_Meteor_afterBurn-1314 Type=ServerProp
+            5214, // SandWasp_Projectile_impact-2157 Type=Projectile
+            5373, // skeletonMage_fire_groundImpact-5478 Type=Projectile
+            161448, // bloodScratch_azmodanBodyguard_attack02-46172 Type=ServerProp
+            334547, // x1_bloodScratch_leaperAngel_attack1-37848 Type=ServerProp
+            178102, // bloodScratch_angelCorrupt_attack01-51055 Type=ServerProp
+            175452, // morluSpellcaster_teleport_trailActor-23356 Type=ServerProp
+            72100, // brickHouse_swipe_attack01-38768 Type=ServerProp
+            185843, // zoltunKulle_fieryBoulder_groundImpact-169060 Type=ServerProp
+            99355, // Goatman_Shaman_Iceball_Explosion-106065 Type=ServerProp
+            428810, // p2_morluSpellcaster_teleport_trailActor_cold-145111 Type=ServerProp
+            349779, // x1_MonsterAffix_frozenPulse_shard-143059 Type=ServerProp
+            149482, // bloodScratch_demonTrooper_attack01_model-10282 Type=ServerProp
+            186055, // ZK_tornado_model-177099 Type=Projectile
+            346976, // x1_Urzael_Cannonball_burning_impact
+            159166, // g_monster_projectile_poison_impact-40858 Type=ServerProp
+            142797, // zombie_female_barfBall_projectile_impact-38722 Type=ServerProp
+            179234, // MastaBlasta_Rider_projectile_impact-116890 Type=Projectile
+            4101, // fallenShaman_fireBall_impact-143262 Type=Projectile
+            159164, // g_monster_projectile_cold_impact-29999 Type=ServerProp
+            322355, // x1_portalGuardianMinion_projectile_impact-1758 Type=ServerProp
+            182428, // mistressOfPain_painBolt_impact-24368 Type=ServerProp
+            290108, // x1_westmarchRanged_projectile_impact-42165 Type=ServerProp
+            290108, // x1_westmarchRanged_projectile_impact-48018 Type=ServerProp
+            5369, // skeletonMage_Cold_groundImpact-57622 Type=ServerProp
+            176534, // Goatmutant_Shaman_projectile_impact-126332 Type=ServerProp
+            189480, // lordOfDespair_volley_projectile_groundImpact-48074 Type=Projectile
+            5215, // SandWasp_Projectile_targetImpact-3639 Type=ServerProp
+            266673, // x1_bloodScratch_bogFamily_grunt_attack02-4194 Type=ServerProp
+            334773, // x1_bloodScratch_leaperAngel_attack1_permR-8905 Type=ServerProp
+            334758, // x1_bloodScratch_leaperAngel_attack1_permL-8904 Type=ServerProp
+            3346, // Beast_impactWave-59332 Type=ServerProp
+            282455, // x1_Lieutenant_Mortar_Impact-180450 Type=Projectile
+            4224, // gibClusters_fire_skeleton-32236 Type=ServerProp
+            289811, // x1_bloodScratch_westmarchBrute_attackDecap-42762 Type=ServerProp
+            159163, // g_monster_projectile_fire_impact-20140 Type=ServerProp
+            5384, // skeletonMage_poison_groundImpact-72748 Type=Projectile
+            //170199, // Wizard_teleport_castGlow-14804 Type=ServerProp
+            266303, // x1_bloodScratch_bogFamily_brute_attack08_B-207570 Type=ServerProp
+            5378, // skeletonMage_Lightning_impact-56968 Type=Projectile
+            328379, // x1_squigglet_cast_emitter-13534 Type=ServerProp
+            367950, // x1_Cesspool_Slime_Posion_Attack_impact-43600 Type=ServerProp
+            155356, // emitter_spiral
+            343582, // X1_MonsterAffix_Orbiter_FocalPoint-38229 Type=ServerProp
+            343539, // Orbiter X1_MonsterAffix_Orbiter_Projectile
+            346805, // x1_MonsterAffix_orbiter_projectile_orb-40179 Type=Projectile
+            346837, // x1_MonsterAffix_orbiter_projectile_focus-40176 Type=Projectile
+            346839, // x1_MonsterAffix_orbiter_glowSphere-40177 Type=Projectile
+
+            //test
+            154028, // GrenadeProxy_Indigo-83075
+            337172, // x1_Bog_Bear_Trap_inHand-83343
+            237062, // x1_Bog_Bear_Trap-88163
+            290259, // x1_Bog_Bear_Trap_Fizzle_Client-89719
+            337080, // x1_BogFamily_ranged_blowGun_model-92093
+            339394, // x1_bloodScratch_bogFamily_grunt_attack05-95381
+            266736, // x1_bloodScratch_bogFamily_grunt_attack03-96705
+            272583, // x1_bogBlight_summon_cast_glowSphere-103855
+            219808, // bloodScratch_morluMelee_attack02-159571
+            177548, // angelCorrupt_dash_wave_model-164484
+            120652, // a3dun_crater_Demon_GroundTrap_GasChamber-166670
+            201912, // trOut_sign_arrow_south_Dock-606
+            201911, // trOut_sign_arrow_north_Wilderness-617
+            185366, // Demonic_Meteor_Impact-36403
+            //6524, // Wizard_disintegrate_sourceGlow-57492
+            290140, // x1_bloodScratch_deathMaiden_attack01-58676
+            4102, // fallenShaman_fireBall_obj-3073
+            230834, // SkeletonArcher_Jail-39897
+            59401, // caOut_Oasis_Attack_Plant-67356
+            3424, // BoneArcher_arrow-71648
+            219793, // bloodScratch_morluMelee_attack01-99247
+            148077, // wizard_rayOfFrost_dome_swirls3-88160
+            3751, // Champion_Teleport_shell-111189
+            5383, // skeletonMage_Poison_death-342304
+            178418, // bloodScratch_soulRipper_attack02-362478
+            137122, // Corpulent_suicide_spiders-376550
+            147977, // wizard_rayOfFrost_dome_swirls1-138997
+            3199, // ArcaneSummon_trailActor-4801
+            3198, // ArcaneSummon_skeleton-4906
+            4243, // gibClusters_poison_humanoid-11502
+            4245, // gibClusters_poison_humanoid_small-34035
+            52692, // gibClusters_poison_humanoid_large-3884
+            337387, // x1_bloodScratch_leaperAngel_attack1_permL_rage-12533
+            93892, // SkeletonKing_Teleport_arrival_proxy-173260
+            93909, // SkeletonKing_Teleport_Back_trailDudeModel-175506
+            83860, // SkeletonKing_Teleport_trailDudeModel-184327
+            190198, // Despair_Teleport_shell-21820
+            4606, // lightningRadialDisc-27787
         };
 
         /// <summary>
@@ -480,23 +607,17 @@ namespace Trinity
             185999, // Diablo Expanding Fire
             196526, // Diablo Expanding Fire
             136533, // Diablo Lightning Breath
-            343539, // Orbiter X1_MonsterAffix_Orbiter_Projectile
-            341512, // Thunderstorm 
+            
             316389, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_projectile (316389)
             340319, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_bomb_start (340319)
             
             // A5
-
             338889, // x1_Adria_bouncingProjectile
-
             362850, // x1_Urzael_Cannonball_burning_invisible
-            346976, // x1_Urzael_Cannonball_burning_impact
             346975, // x1_Urzael_Cannonball_burning
-
             335505, // x1_malthael_drainSoul_ghost
             325136, // x1_Malthael_DeathFogMonster
             340512, // x1_Malthael_Mephisto_LightningObject
-
             377086, // X1_Unique_Monster_Generic_Projectile_Arcane
             377087, // X1_Unique_Monster_Generic_Projectile_Cold
             377088, // X1_Unique_Monster_Generic_Projectile_Fire
@@ -504,11 +625,105 @@ namespace Trinity
             377090, // X1_Unique_Monster_Generic_Projectile_Lightning
             377091, // X1_Unique_Monster_Generic_Projectile_Physical
             377092, // X1_Unique_Monster_Generic_Projectile_Poison
-
             3528,   // Butcher_hook
 
-            // 4394, //g_ChargedBolt_Projectile-200915 (4394) Type=Projectile
-            // 368392, // x1_Cesspool_Slime_Posion_Attack_Projectile-222254 (368392) Type=Projectile
+            // buddyMe add
+            4394, //g_ChargedBolt_Projectile-200915 (4394) Type=Projectile
+            368392, // x1_Cesspool_Slime_Posion_Attack_Projectile-222254 (368392) Type=Projectile
+            //99566, // Wizard_magicMissile_wobble-40033 Type=ServerProp
+            120957, // zombie_female_barfBall_projectile-38684 Type=Projectile
+            312942, // x1_skeletonArcher_arrow_cold-49212 Type=Projectile
+            228885, // monsterAffix_entangler_ringGlow_geo-57709 Type=Projectile
+            4221, // gibClusters_fire_humanoid_small-81993 Type=Projectile
+            340319, // x1_MonsterAffix_CorpseBomber_bomb_start-85444 Type=ServerProp
+            316389, // x1_MonsterAffix_CorpseBomber_projectile-85594 Type=Projectile
+            5392, // SkeletonSummoner_projectile-90107 Type=Projectile
+            164829, // succubus_bloodStar_projectile-116681 Type=Projectile
+            179226, // MastaBlasta_Rider_projectile-116739 Type=Projectile
+            4220, // gibClusters_fire_humanoid_fat-121048 Type=Projectile
+            366924, // x1_MonsterAffix_frozenPulse_shard_search-126831 Type=Projectile
+            165123, // bloodScratch_Succubus_attack02_swipe1-129793 Type=Projectile
+            52689, // gibClusters_fire_humanoid_large-135376 Type=ServerProp
+            143266, // monsterAffix_frenzySwipe-139031 Type=Projectile
+            179880, // hoodedNightmare_Lighting_projectile-18273 Type=Projectile
+            4546, // lacuniFemale_bomb_projectile-18299 Type=Projectile
+            4543, // lacuniFemale_bomb_groundMiss-18411 Type=Projectile
+            323212, // x1_squigglet_projectile-18625 Type=Projectile
+            4543, // lacuniFemale_bomb_groundMiss-19234 Type=ServerProp
+            4546, // lacuniFemale_bomb_projectile-19277 Type=Projectile
+            257306, // arcaneEnchantedDummy_spawn-19349 Type=ServerProp
+            208962, // Spider_Elemental_Fire_tesla_A-21395 Type=Projectile
+            337386, // x1_bloodScratch_leaperAngel_attack2_rage-22885 Type=Projectile
+            137992, // Spider_Elemental_Fire_A-24160 Type=Projectile
+            4981, // QuillDemonHorn_Projectile-39553 Type=Projectile
+            192591, // battle_arrowLayerFire_far-7376 Type=Projectile
+            180248, // battleFieldsBridge_fireBall-7929 Type=ServerProp
+            322319, // x1_PortalGuardianMinion_projectile_geo-1678 Type=Projectile
+            169669, // bloodScratch_GoatMutant_Melee_attack02-51079 Type=Projectile
+            169665, // bloodScratch_GoatMutant_Melee_attack01-69048 Type=Projectile
+            161448, // bloodScratch_azmodanBodyguard_attack02-9527 Type=Projectile
+            339972, // Poison_Glob-13268 Type=Projectile
+            //71129, // Wizard_meteor_distortExplosion-23927 Type=Projectile
+            226722, // monsterAffix_Avenger_glowSphere-55342 Type=Projectile
+            208963, // Spider_Elemental_Poison_tesla_A-22687 Type=ServerProp
+            180206, // MistressOfPain_painBolt_projectile-24296 Type=Projectile
+            221658, // MonsterAffix_ArcaneEnchanted_trailActor-29232 Type=ServerProp
+            173299, // MorluSpellcaster_meteor_model-18782 Type=Projectile
+            4764, // morluSpellcast_meteor_castSphere-23153 Type=ServerProp
+            360430, // x1_westmarchRanged_projectile_invisible-41996 Type=Projectile
+            290043, // x1_westmarchRanged_projectile-42109 Type=Projectile
+            290043, // x1_westmarchRanged_projectile-48008 Type=Projectile
+            360430, // x1_westmarchRanged_projectile_invisible-48137 Type=Projectile
+            290109, // x1_westmarchRanged_projectile_miss-51450 Type=ServerProp
+            93629, // SkeletonKing_Teleport_Projectile-78908 Type=Projectile
+            5361, // SkeletonKing_Ghost_attackModel-80987 Type=Projectile
+            80143, // goatWarrior_shaman_projectile-106030 Type=Projectile
+            185679, // zoltunKulle_fieryBoulder_projectile-169021 Type=Projectile
+            4218, // gibClusters_fire_Beast-14608 Type=Projectile
+            161310, // bloodScratch_azmodanBodyguard_attack01-30679 Type=Projectile
+            337388, // x1_bloodScratch_leaperAngel_attack1_permR_rage-33197 Type=Projectile
+            5370, // skeletonMage_Cold_projectile-57612 Type=Projectile
+            223933, // monsterAffix_plagued_groundGeo-46188 Type=ServerProp
+            71686, // creepMob_burrowArm_projectile-83476 Type=Projectile
+            176406, // GoatMutant_Shaman_blast_projectile-126320 Type=ServerProp
+            189476, // lordOfDespair_volley_projectile-47945 Type=Projectile
+            89588, // soulRipper_tongue_proxy_projectile-14605 Type=Projectile
+            5374, // skeletonMage_Fire_projectile-5282 Type=Projectile
+            4547, // lacuniFemale_bomb_projectile_actor-16918 Type=Projectile
+            332231, // x1_bloodScratch_westmarchBrute_B_attack01A-45540 Type=Projectile
+            341902, // x1_bloodScratch_deathMaiden_fire_attack01-207658 Type=Projectile
+            202859, // g_monster_projectile_poison_globModel-38106 Type=ServerProp
+            //6513, // Wizard_arcaneOrb_aoe_blastWave-108621 Type=Projectile
+            4074, // fallenChamp_attack1Swipe-150326 Type=Projectile
+            282452, // x1_Lieutenant_Mortar_projectile-180295 Type=Projectile
+            141867, // bloodScratch_terrorDemon_attack01_swipe2-21043 Type=Projectile
+            5385, // skeletonMage_Poison_projectile-71726 Type=Projectile
+            5379, // skeletonMage_Lightning_projectile-56957 Type=Projectile
+            337385, // x1_bloodScratch_leaperAngel_attack1_rage-68359 Type=Projectile
+            184029, // bloodScratch_Despair_attack270-133528 Type=Projectile
+            316389, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_projectile (316389)
+            338889, // x1_Adria_bouncingProjectile
+            377086, // X1_Unique_Monster_Generic_Projectile_Arcane
+            377087, // X1_Unique_Monster_Generic_Projectile_Cold
+            377088, // X1_Unique_Monster_Generic_Projectile_Fire
+            377089, // X1_Unique_Monster_Generic_Projectile_Holy
+            377090, // X1_Unique_Monster_Generic_Projectile_Lightning
+            377091, // X1_Unique_Monster_Generic_Projectile_Physical
+            377092, // X1_Unique_Monster_Generic_Projectile_Poison
+            120957, // zombie_female_barfBall_projectile-38684 Type=Projectile
+            74501, // a1dun_leor_firewall1_dist-30329 Type=Projectile
+            284752, // x1_Bog_Bear_Trap_projectile_lobbed-36341 Type=Projectile
+            6040, // TriuneSummoner_fireball_projectile-36483 Type=Projectile
+            347298, // x1_DarkAngel_Summon_groundFog_projectile-2225 Type=Projectile
+            377326, // x1_monsterAffix_generic_coldDOT_runeGeo-15147 Type=Projectile
+            226799, // monsterAffix_ghostly_distGeo-12269 Type=Projectile
+            5213, // sandWasp_Projectile_actor-4209 Type=ServerProp
+            284766, // _Bog_Bear_Trap_projectile_Tossed-4833 Type=ServerProp
+            273844, // x1_bogBlight_pustule_projectile-6413 Type=Projectile
+            189247, // a4dun_Garden_Corruption_Mine_projectile-37646
+            467, // TriuneSummoner_fireBall_obj-106116
+            159165, // g_monster_projectile_lightning_impact-284336
+            373937, // X1_LR_Boss_FireNova_projectile-172413
       };
 
         /// <summary>
@@ -521,7 +736,7 @@ namespace Trinity
             6578,   // Poison Tree
             316389, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_projectile (316389)
             340319, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_bomb_start (340319)
-            159369, //MorluSpellcaster_Meteor_Pending-178011 (159369)
+            159369, // MorluSpellcaster_Meteor_Pending-178011 (159369)
         };
 
         /// <summary>
@@ -530,15 +745,6 @@ namespace Trinity
         public static Dictionary<int, TimeSpan> AvoidanceSpawnerDuration { get { return avoidanceSpawnerDuration; } }
         private static readonly Dictionary<int, TimeSpan> avoidanceSpawnerDuration = new Dictionary<int, TimeSpan>
         {
-            {5482, TimeSpan.FromSeconds(15)},   // Poison Tree
-            {6578, TimeSpan.FromSeconds(15)},   // Poison Tree
-            {316389, TimeSpan.FromSeconds(6)}, // PoisonEnchanted 
-            {340319, TimeSpan.FromSeconds(6)}, // PoisonEnchanted 
-            {4803, TimeSpan.FromSeconds(10)}, // Molten Core
-            {4804, TimeSpan.FromSeconds(10)}, // Molten Core
-            {224225, TimeSpan.FromSeconds(10)}, // Molten Core
-            {247987, TimeSpan.FromSeconds(10)}, // Molten Core
-            {159369, TimeSpan.FromSeconds(3)}, // Morlu Meteor
         };
 
         public static Dictionary<int, float> DefaultAvoidanceCustomRadius { get { return defaultAvoidanceCustomRadius; } }
@@ -586,6 +792,19 @@ namespace Trinity
             {377090, 10f}, // X1_Unique_Monster_Generic_Projectile_Lightning
             {377091, 10f}, // X1_Unique_Monster_Generic_Projectile_Physical
             {377092, 10f}, // X1_Unique_Monster_Generic_Projectile_Poison
+
+            {118595, 12f}, // ANIM * A3_Battlefield_DemonMine_C_death 
+            {(int)SNOAnim.Stitch_Suicide_Bomb_spiders, 35f}, // ANIM * Stitch_Suicide_Bomb
+            {(int)SNOActor.Corpulent_A, 35f}, // ANIM * Stitch_Suicide_Bomb
+            {(int)SNOActor.Corpulent_A_Unique_01, 35f},  // ANIM * Stitch_Suicide_Bomb
+            {(int)SNOActor.Corpulent_A_Unique_02, 35f},  // ANIM * Stitch_Suicide_Bomb
+            {(int)SNOActor.Corpulent_A_Unique_03, 35f},  // ANIM * Stitch_Suicide_Bomb
+            {(int)SNOActor.Corpulent_B, 35f},  // ANIM * Stitch_Suicide_Bomb
+            {(int)SNOActor.Corpulent_B_Unique_01, 35f},  // ANIM * Stitch_Suicide_Bomb
+            {(int)SNOActor.Corpulent_C, 35f},  // ANIM * Stitch_Suicide_Bomb
+            {(int)SNOActor.Corpulent_D_CultistSurvivor_Unique, 35f},  // ANIM * Stitch_Suicide_Bomb   
+            {(int)SNOActor.Corpulent_C_OasisAmbush_Unique, 35f},  // ANIM * Stitch_Suicide_Bomb
+            {(int)SNOActor.Corpulent_D_Unique_Spec_01, 35f},  // ANIM * Stitch_Suicide_Bomb
         };
 
         /*
@@ -593,7 +812,7 @@ namespace Trinity
          */
 
         /// <summary>
-        /// ActorSNO's of Very fast moving mobs (eg wasps), for special skill-selection decisions
+        /// ActorSNO's of Very fast moving mobs (eg wasps }, for special skill-selection decisions
         /// </summary>
         public static HashSet<int> FastMovingMonsterIds { get { return fastMovementMonsterIds; } }
         private static readonly HashSet<int> fastMovementMonsterIds = new HashSet<int> {
@@ -706,9 +925,9 @@ namespace Trinity
         public static HashSet<int> BossIds { get { return bossIds; } }
         private static readonly HashSet<int> bossIds = new HashSet<int>
         {
-            // Siegebreaker (96192), Azmodan (89690), Cydea (95250), Heart-thing (193077), 
+            // Siegebreaker (96192 }, Azmodan (89690 }, Cydea (95250 }, Heart-thing (193077 }, 
             96192,                   89690,           95250,         193077, 
-            //Kulle (80509), Small Belial (220160), Big Belial (3349), Diablo 1 (114917), terror Diablo (133562)
+            //Kulle (80509 }, Small Belial (220160 }, Big Belial (3349 }, Diablo 1 (114917 }, terror Diablo (133562)
             80509,           220160,                3349,              114917,            133562, 
             62975, // Belial TrueForm
             //Maghda, Kamyr (MiniBoss before Belial)
@@ -721,7 +940,7 @@ namespace Trinity
             137139,
             // Diablo shadow clones (needs all of them, there is a male & female version of each class!)
             144001, 144003, 143996, 143994, 
-            // Jondar, Chancellor, Queen Araneae (act 1 dungeons), Skeleton King, Butcher
+            // Jondar, Chancellor, Queen Araneae (act 1 dungeons }, Skeleton King, Butcher
             86624, 156353, 51341, 5350, 3526,
             361347, //Jondar from the Adventure mode
             215103, // Istaku            
@@ -756,7 +975,436 @@ namespace Trinity
             374751, // x1_PortalGuardian_A
             307339, // X1_Rockworm_Pand_Unique_HexMaze
             297730, // x1_Malthael_Boss
+
+            255704, // GoatMutant_Ranged_A_Unique_Uber - Odeg the Keywarden
+            256022, // DuneDervish_B_Unique_Uber - Sokahr the Keywarden
+            256040, // morluSpellcaster_A_Unique_Uber - Xah'Rith Keywarden
+            256054, // TerrorDemon_A_Unique_Uber - Nekarat the Keywarden
         };
+
+        // A list of Unique mini-bosses in the game, just to make CERTAIN they are treated as elites
+        /// <summary>
+        /// Contains ActorSNO of known mini-bosses, work in progress by Kevin S.
+        /// Will be useful for any achievements profile, and more
+        /// </summary>
+        public static HashSet<int> EliteRareUniqueIds { get { return eliteRareUniqueIds; } }
+        private static readonly HashSet<int> eliteRareUniqueIds = new HashSet<int>
+        {
+		//A1
+		361347, // Adventurer_D_TemplarIntroUnique_AdventureMode - Rad'Noj
+		129439, // Spider_A_Unique - Arsect The Venomous
+		218456, // Spiderling_A_Unique_01 - Venimite
+		108444, // ZombieFemale_A_TristramQuest (Wretched Mothers)
+        176889, // ZombieFemale_Unique_WretchedQueen
+        76676, // Goatman_Shaman_B_Unique
+        76953, // Unburied_A_Unique
+        81342, // GoatMutant_Melee_A_Unique_Gharbad
+        81533, // Goatman_Shaman_A_Event_Graveyard_Unique
+        82563, // Unburied_A_Unique_LeoricBoss
+        85971, // Ghost_A_Unique_House1000Undead
+        86624, // Adventurer_D_TemplarIntroUnique
+        104247, // Scavenger_B_Armorer_Unique
+        105620, // Zombie_Inferno_C_Unique
+        111321, // Zombie_Plagued_C_Unique
+		496, // WoodWraith_Unique_A
+		115403, // Skeleton_A_Cain_Unique
+        129997, // ThousandPounder_Unique
+        131131, // TriuneSummoner_A_Unique_SwordOfJustice
+        156353, // Ghost_A_Unique_Chancellor
+        156511, // Triune_Berserker_C_Unique_AlcarnusBridge
+        156801, // Unique_CaptainDaltyn
+        165602, // Ghost_D_Unique01
+        167205, // Scavenger_B_Unique_ScavengerFarm
+		//A2
+		164502, // sandMonster_A_Head_Guardian
+		217744, // Nine Toads
+		222011, // Scar Talon
+		222180, // Torsar
+		168951, // snakeMan_Caster_A_Unique_WaterfallAmbush - Ssthrass
+		115132, // LacuniMale_B_Unique_OasisLacuniAmbush - Leodesh the Stalker
+		140424, // Mundunogo
+		113994, // Corpulent_C_OasisAmbush_Unique - Fezuul
+		258955, // Bramok the Overlord
+		208543, // Ashangu
+		259187, // Rakanishu
+		222236, // Grool
+		222413, // sandMonster_B_Unique_01
+        222523, // sandMonster_C_Unique_01
+		5203, // SandShark_Unique_Mother
+        59593, // LacuniMale_B_UniqueTower
+        59970, // LacuniFemale_A_Unique
+        60583, // Khamsin_Mine_Unique
+		111868, // DuneDervish_A_DervishTwister_Unique
+		166133, // FallenShaman_A_Unique01
+		168240, // Zombie_Unique_JewelerQuest
+		323525, // LacuniFemale_C_OpenWorld_Unique
+		//A3
+		//A4
+		196102, // TerrorDemon_A_Unique_1000Monster
+		//A5
+		361973, // x1_BogFamily_ranged_Unique_A
+        361974, // x1_BogFamily_ranged_Unique_B
+        361991, // x1_NightScreamer_Unique_B
+        362299, // x1_MoleMutant_Melee_Unique_A
+        362303, // x1_MoleMutant_Melee_Unique_B
+        362305, // x1_moleMutant_Ranged_Unique_A
+        362307, // x1_MoleMutant_Shaman_Unique_A
+        362309, // x1_moleMutant_Ranged_Unique_B
+        362310, // x1_MoleMutant_Shaman_Unique_B
+        362891, // X1_armorScavenger_Unique_A
+        362895, // X1_armorScavenger_Unique_B
+        363051, // x1_Rockworm_Pand_Unique_A
+        363060, // x1_Rockworm_Pand_Unique_B
+        363073, // x1_Squigglet_Unique_A
+        363108, // x1_Squigglet_Unique_B
+        363228, // x1_leaperAngel_Unique_A
+        363230, // x1_leaperAngel_Unique_B
+        363232, // x1_Wraith_Unique_A
+        363361, // x1_Wraith_Unique_B
+        363367, // x1_sniperAngel_Unique_A
+        363374, // x1_sniperAngel_Unique_B
+        363378, // x1_FortressBrute_Unique_A
+        363421, // x1_FortressBrute_Unique_B
+        363910, // x1_westmarchHound_Leader_Unique_A
+        363986, // x1_westmarchHound_Leader_Unique_B
+        363988, // x1_westmarchHound_Unique_A
+        363990, // x1_westmarchHound_Unique_B
+        365050, // X1_demonTrooper_Demon_Event_Unique
+        365101, // X1_demonTrooper_MouseTrap_Event_Unique
+		273418, // x1_DeathMaiden_Unique_A
+        273419, // x1_DeathMaiden_Unique_B
+        274324, // x1_DeathMaiden_Unique_C
+        284676, // x1_westmarchRanged_A_Unique_01
+        284677, // x1_westmarchRanged_A_Unique_02
+        288471, // x1_WickerMan_Unique_A
+        294987, // x1_Tentacle_Goatman_Melee_A_Unique
+        307099, // x1_FloaterAngel_Unique_03
+        307329, // X1_Angel_Trooper_Unique_HexMaze
+        307331, // X1_MastaBlasta_Rider_A_Unique_HexMaze
+        307333, // X1_armorScavenger_Unique_HexMaze
+        307335, // X1_BigRed_Unique_HexMaze
+        307339, // X1_Rockworm_Pand_Unique_HexMaze
+        309462, // x1_FloaterAngel_Unique_04
+        309508, // x1_westmarchBrute_Unique_Event_Pontificus
+        311343, // x1_westmarchBrute_Unique_B
+        321953, // x1_westmarchBrute_A_Unique_captainStokely
+        323524, // x1_westmarchBrute_Unique_C
+        328026, // x1_Succubus_Doomed_Unique_A
+        329999, // x1_westmarchBrute_B_Unique_Event_BrutelyUnfortunate
+        330456, // x1_westmarchBrute_A_Unique_FireAmbush
+        332432, // x1_devilshand_unique_SkeletonSummoner_B
+        332433, // x1_devilshand_unique_TriuneSummoner_C
+        332861, // x1_westmarchFemale_A_Graveyard_Unique_1
+        334282, // X1_armorScavenger_Unique_Event_Worldstone
+		335078, // x1_westmarchRanged_Graveyard_Unique_1
+        336400, // x1_Skeleton_Westmarch_A_UniqueEvent_MassacredGuards
+        336418, // x1_BogFamily_Brute_Unique_A
+        336800, // X1_Fast_ZombieSkinny_Unique_A
+        339754, // x1_Monstrosity_ScorpionBug_A_event_unique
+        340326, // x1_BogFamily_brute_unique_familyEvent_A
+        340452, // x1_devilshand_unique_Rockworm_A3
+        341104, // x1_BogFamily_ranged_A_unique_hunter
+        341240, // x1_TriuneSummoner_C_Unique_01
+        341273, // x1_bogBlight_Maggot_A_unique_deathGrub
+        341598, // x1_BogBlight_A_Unique_MaggotCrew
+		354549, // x1_MoleMutant_Garden_Unique_A
+        354550, // x1_MoleMutant_Garden_Unique_B
+        354551, // x1_MoleMutant_Garden_Unique_C
+        354552, // x1_MoleMutant_Garden_Unique_D
+        354582, // x1_MoleMutant_Garden_Unique_E
+        355667, // x1_DeathMaiden_Unique_Fire_A
+        355672, // x1_DeathMaiden_Unique_Fire_B
+        355680, // x1_DeathMaiden_Unique_Fire_C
+        356380, // x1_BogFamily_brute_BogMonsterEvent_Unique
+        356781, // x1_bogBlight_Maggot_A_unique_MaggotLoad
+        356808, // x1_leaperAngel_A_Unique_LeaperOfSouls
+        356912, // X1_Shield_Skeleton_Westmarch_Unique_YardRush
+        357048, // x1_FloaterAngel_A_ZombieSorcerer_Unique
+        357197, // x1_Westm_Graveyard_Ghost_Female_01_UniqueEvent
+        359982, // X1_Shield_Skeleton_Westmarch_Unique_SkeletonRush
+        360206, // x1_WestM_Intro_BadGuy_Unique
+        360241, // x1_DeathMaiden_Pand_A_FortressUnique
+        360242, // x1_leaperAngel_A_FortressUnique
+        360243, // x1_sniperAngel_A_FortressUnique
+        360244, // x1_Wraith_A_FortressUnique
+        360245, // x1_westmarchBrute_C_FortressUnique
+		348771, // x1_DeathMaiden_Unique_Heaven
+        349156, // x1_BogFamily_melee_A_unique_key
+        350754, // x1_BogBlight_MME_Unique_A
+        351179, // x1_BogFamily_melee_A_Unique_DH
+        351183, // x1_DeathMaiden_Unique_A_DH
+        351252, // x1_BogBlight_MaggotDinnerParty_Unique
+        353240, // X1_Fast_Zombie_A_GraveRobertUnique
+        354378, // x1_Squigglet_A_unique_cellarEventB
+		360826, // x1_Ghost_Dark_Unique_A
+        360842, // x1_Ghost_Dark_Unique_B
+        360849, // x1_FloaterAngel_Unique_05
+        360853, // x1_Shield_Skeleton_Westmarch_Unique_A
+        360858, // x1_Skeleton_Westmarch_Unique_A
+        360861, // x1_SkeletonArcher_Westmarch_Unique_A
+        360864, // x1_westmarchBrute_Unique_D
+        360869, // x1_Ghost_Dark_Unique_C
+        360881, // x1_westmarchRanged_Unique_A
+        361088, // X1_Plagued_LacuniMale_Unique_A
+        361099, // X1_Plagued_LacuniMale_Unique_B
+        361129, // x1_DeathMaiden_Unique_Heaven_VO
+        361291, // x1_Dark_Angel_Unique_A
+        361313, // x1_Dark_Angel_Unique_B
+		361417, // x1_westmarchRanged_Unique_B
+        361419, // X1_Fast_ZombieSkinny_Unique_B
+        361755, // x1_NightScreamer_Unique_A
+        361771, // x1_BogFamily_Brute_Unique_B
+        361952, // x1_BogFamily_ranged_A_unique_hunter_B
+		368175, // x1_Beast_Skeleton_Unique_A
+        369424, // x1_DeathMaiden_Unique_D
+        369430, // x1_Ghost_Dark_Unique_D
+        369435, // x1_FloaterAngel_Unique_06
+        369465, // x1_westmarchRanged_Unique_C
+        369466, // x1_westmarchRanged_Unique_D
+        369467, // x1_westmarchRanged_Unique_E
+        369505, // x1_westmarchRanged_Unique_abattoir_DeadEndDoorAmbush
+		370283, // x1_Squigglet_Unique_C
+        370768, // x1_BogBlight_Unique_A
+        370800, // x1_WestmarchBat_Unique_B
+		365759, // X1_BigRed_Chronodemon_Burned_A_unique
+        365850, // x1_demonMelee_Catacombs_Mutant_Event_Unique
+		373871, // x1_westmarchBrute_C_Unique_01
+        373873, // x1_sniperAngel_Unique_C
+        373879, // x1_moleMutant_Ranged_Unique_C
+        373881, // x1_MoleMutant_Shaman_Unique_C
+        373883, // x1_Squigglet_Unique_D
+        373892, // X1_armorScavenger_Unique_C
+        374739, // x1_Monstrosity_ScorpionBug_Unique_B
+        374987, // X1_Spider_Poison_A_Unique_01
+        375398, // x1_DeathMaiden_Unique_Fire_AbattoirFurnace
+        375402, // x1_WitherMoth_A_Unique_01
+		373819, // X1_Fast_Zombie_Unique_A
+        373821, // x1_westmarchRanged_Unique_F
+        373830, // x1_Shield_Skeleton_Westmarch_Unique_B
+        373833, // TentacleHorse_Fat_Unique_B
+        373842, // x1_MoleMutant_Melee_Unique_C
+        373848, // x1_Monstrosity_ScorpionBug_Unique_A
+
+        169533, // Goatman_Shaman_B_Unique_MysticWagon
+        176889, // ZombieFemale_Unique_WretchedQueen
+        178619, // TownAttack_Summoner_Unique
+        189906, // TriuneVesselActivated_A_Unique_Tower_Of_Power
+        195639, // Corpulent_D_CultistSurvivor_Unique
+        201679, // TentacleHorse_B_Unique_01
+        201878, // QuillDemon_A_Unique_LootHoarderLeader
+        203795, // fastMummy_B_FacePuzzleUnique
+        207605, // Ghost_D_FacePuzzleUnique
+        207838, // CoreEliteDemon_A_NoPod_Unique
+        208543, // FallenShaman_A_Unique_MiniPools
+        209506, // TentacleHorse_A_Unique_01
+        209553, // Ghost_A_Unique_01
+        209596, // Succubus_A_Unique_01
+        209608, // ZombieSkinny_A_Unique_01
+        212664, // TentacleBear_A_Unique_01
+        212667, // tentacleFlower_A_Unique_01
+        212731, // unique_talRashasLidlesseye_model
+        212750, // LacuniFemale_C_Unique
+        212942, // ThousandPounder_B_Unique
+        214948, // TentacleHorse_C_Unique_01
+        215445, // FallenShaman_A_Unique01Whipple
+        217479, // WoodWraith_Unique_A_Static
+        217744, // fastMummy_C_Unique
+        218206, // graveDigger_B_Ghost_Unique
+        218270, // ZombieSkinny_A_Unique_02
+        218307, // Corpulent_A_Unique_01
+        218308, // Corpulent_A_Unique_02
+        218314, // FleshPitFlyer_A_Unique_01
+        218321, // Skeleton_A_Unique_02
+        218332, // Scavenger_A_Unique_01
+        218345, // ZombieSkinny_A_Unique_03
+        218348, // graveRobber_A_Ghost_Unique_01
+        218351, // graveRobber_A_Ghost_Unique_02
+        218356, // Unburied_A_Unique_01
+        218362, // FleshPitFlyer_A_Unique_02
+        218364, // Skeleton_A_Unique_03
+        218396, // Shield_Skeleton_A_Unique_01
+        218400, // SkeletonArcher_A_Unique_01
+        218405, // Corpulent_B_Unique_01
+        218422, // Beast_A_Unique_01
+        218424, // Scavenger_B_Unique_01
+        218428, // Goatman_Melee_A_Unique_01
+        218431, // ZombieSkinny_A_Unique_04
+        218441, // Ghost_A_Unique_02
+        218444, // Ghoul_A_Unique_01
+        218448, // Spider_A_Unique_01
+        218456, // Spiderling_A_Unique_01
+        218458, // Spider_Poison_A_Unique_01
+        218462, // Spider_Poison_A_Unique_02
+        218469, // Goatman_Melee_B_Unique_01
+        218473, // Goatman_Ranged_A_Unique_01
+        218508, // Goatman_Shaman_A_Unique_01
+        218536, // Beast_A_Unique_02
+        218566, // FleshPitFlyer_C_Unique_01
+        218656, // TriuneCultist_A_Unique_01
+        218662, // TriuneSummoner_A_Unique_01
+        218664, // TriuneSummoner_A_Unique_02
+        218666, // ZombieSkinny_A_Unique_05
+        218672, // Triune_Berserker_A_Unique_01
+        218674, // Triune_Berserker_A_Unique_02
+        218676, // TriuneCultist_A_Unique_02
+        218678, // Triune_Berserker_A_Unique_03
+        218802, // TentacleHorse_A_Unique_02
+        218804, // TentacleHorse_Fat_A_Unique_01
+        218806, // TentacleHorse_A_Unique_03
+        218807, // TentacleHorse_A_Unique_04
+        218808, // TentacleHorse_A_Unique_05
+        218873, // MorluSpellcaster_A_Sao_Unique
+        219651, // CoreEliteDemon_A_Unique_01
+        219668, // MastaBlasta_Rider_A_Unique_01
+        219725, // ZombieFemale_A_TristramQuest_Unique
+        219727, // BigRed_A_Unique_01
+        219736, // MalletDemon_A_Unique_01
+        219751, // MalletDemon_A_Unique_02
+        219847, // Succubus_C_Unique_01
+        219893, // Angel_Corrupt_A_Unique_03
+        219916, // MastaBlasta_Steed_A_Unique_01
+        219925, // morluMelee_A_Unique_01
+        219936, // morluMelee_A_Unique_02
+        219949, // HoodedNightmare_A_Unique_01
+        219960, // HoodedNightmare_A_Unique_02
+        219985, // morluSpellcaster_A_Unique_01
+        219995, // ZombieSkinny_A_Unique_06
+        220034, // Triune_Berserker_A_Unique_04
+        220232, // demonFlyer_A_Unique_01
+        220377, // FallenChampion_D_Unique_01
+        220381, // FallenHound_D_Unique_01
+        220395, // demonTrooper_A_Unique_02
+        220397, // demonTrooper_A_Unique_03
+        220435, // FallenHound_D_Unique_02
+        220444, // SoulRipper_A_Unique_01
+        220455, // QuillDemon_C_Unique_01
+        220468, // Shield_Skeleton_E_Unique_01
+        220476, // demonTrooper_B_Unique_01
+        220479, // skeleton_twoHander_Keep_Swift_E_Unique_01
+        220481, // SoulRipper_A_Unique_02
+        220485, // Brickhouse_A_Unique_01
+        220491, // Brickhouse_A_Unique_02
+        220499, // SkeletonArcher_E_Unique_01
+        220509, // creepMob_A_Unique_01
+        220683, // graveRobber_A_Ghost_Unique_03
+        220688, // GoatMutant_Melee_A_Unique_01
+        220691, // fastMummy_C_Unique_01
+        220699, // GoatMutant_Melee_A_Unique_02
+        220701, // demonFlyer_B_Unique_01
+        220705, // GoatMutant_Ranged_A_Unique_01
+        220708, // GoatMutant_Melee_A_Unique_03
+        220710, // Shield_Skeleton_E_Unique_02
+        220727, // GoatMutant_Shaman_A_Unique_01
+        220773, // ThousandPounder_Unique_01
+        220775, // demonFlyer_B_Unique_02
+        220777, // Rockworm_A3_Crater_Unique_01
+        220783, // Succubus_A_Unique_02
+        220789, // creepMob_A_Unique_02
+        220795, // Monstrosity_Scorpion_A_Unique_01
+        220806, // azmodanBodyguard_A_Unique_01
+        220810, // Ghoul_E_Unique_01
+        220812, // azmodanBodyguard_A_Unique_02
+        220814, // SoulRipper_A_Unique_03
+        220817, // Monstrosity_Scorpion_A_Unique_02
+        220850, // GoatMutant_Shaman_B_Unique_01
+        220851, // Rockworm_A3_Crater_Unique_02
+        220853, // GoatMutant_Ranged_B_Unique_01
+        220857, // GoatMutant_Melee_B_Unique_01
+        220862, // GoatMutant_Melee_B_Unique_02
+        220868, // GoatMutant_Shaman_B_Unique_02
+        220881, // ThousandPounder_C_Unique_01
+        220884, // azmodanBodyguard_A_Unique_03
+        220889, // Monstrosity_Scorpion_B_Unique_01
+        220982, // Triune_Berserker_E_Unique
+        221367, // LacuniFemale_A_Unique_01
+        221372, // LacuniFemale_A_Unique_02
+        221377, // FallenChampion_A_Unique_01
+        221379, // FallenChampion_A_Unique_02
+        221402, // SandShark_A_Unique_01
+        221406, // FallenGrunt_A_Unique_01
+        221442, // Triune_Berserker_B_Unique_01
+        221656, // a1dun_Leoric_Unburied_A_Unique
+        221810, // Triune_Summonable_D_Unique_01
+        221981, // TriuneCultist_C_Unique_01
+        221999, // TriuneCultist_C_Unique_02
+        222001, // TriuneSummoner_C_Unique_01
+        222003, // Triune_Berserker_C_Unique_01
+        222005, // snakeMan_Melee_A_Unique_01
+        222008, // snakeMan_Caster_A_Unique_01
+        222011, // Bloodhawk_A_Unique_01
+        222180, // DuneDervish_B_Unique_01
+        222186, // fastMummy_B_Unique_01
+        222189, // Swarm_B_Unique_01
+        222236, // Ghoul_B_Unique_01
+        222238, // snakeMan_Melee_A_Unique_02
+        222335, // FallenChampion_B_Unique_01
+        222339, // LacuniFemale_B_Unique_01
+        222352, // Sandling_B_Unique_01
+        222385, // Bloodhawk_A_Unique_02
+        222400, // fastMummy_B_Unique_02
+        222413, // sandMonster_B_Unique_01
+        222427, // FleshPitFlyer_C_Unique_02
+        222502, // skeletonMage_Cold_B_Unique_01
+        222510, // skeletonMage_Fire_B_Unique_01
+        222511, // skeletonMage_Lightning_B_Unique_01
+        222512, // skeletonMage_Poison_B_Unique_01
+        222523, // sandMonster_C_Unique_01
+        222526, // Ghost_D_Unique_01
+        223691, // morluSpellcaster_A_Unique_Sigil
+        225502, // graveDigger_B_Ghost_Unique_01
+        226509, // ZombieSkinny_A_Unique_Marko
+        229946, // Triune_Berserker_B_G_Unique_01
+        229948, // Triune_Berserker_B_G_Unique_02
+        229950, // Triune_Berserker_B_G_Unique_03
+        230757, // skeletonMage_Fire_B_Unique_BloodGuardian
+        257972, // Unique_Monster_Earthquake_Prototype
+        260226, // creepMob_A_MedicalCamp_Unique
+        260227, // demonTrooper_A_Reinforcements_Unique
+        260228, // FallenChampion_B_PrisonersEvent_Unique
+        260229, // FallenGrunt_A_Rakanishu_Unique
+        260230, // FallenGrunt_C_RescueEscort_Unique
+        260231, // FleshPitFlyer_B_FarmhouseAmbush_Unique
+        260232, // Ghoul_A_NephMonument_Unique
+        260233, // Ghoul_E_BlazeOfGlory_Unique
+        260234, // Scavenger_B_MinerEvent_Unique
+        260235, // Skeleton_D_Fire_BlacksmithEvent_Unique
+        260236, // Triune_Berserker_B_RestlessSands_Unique
+        260812, // Unique_Monster_IceTrail
+        334402, // BigRed_A_Unique_03
+        334765, // TerrorDemon_A_Unique_01
+        343033, // ThousandPounder_C_Unique_DevilsHand
+        343046, // treasureGoblin_C_Unique_DevilsHand
+        360614, // Bloodhawk_A_Unique_HexMaze
+        361349, // Unique_CaptainDaltyn_AdventureMode
+        361972, // QuillDemon_Mother_Unique
+        365330, // Goatman_Melee_A_Unique_03
+        365335, // Beast_A_Unique_03
+        365425, // Skeleton_B_Unique_01
+        365429, // Skeleton_B_Unique_02
+        365438, // Goatman_Shaman_B_Unique_01
+        365450, // Corpulent_A_Unique_03
+        365465, // Corpulent_D_Unique_Spec_01
+        365906, // Unburied_C_Unique_01
+        366975, // Goatman_Shaman_C_Unique_01
+        366981, // Goatman_Shaman_C_Unique_02
+        366990, // TriuneCultist_B_Unique_01
+        366998, // TriuneCultist_A_Unique_03
+        367006, // FallenChampion_B_Unique_02
+        367011, // DuneDervish_A_Unique_01
+        367018, // FallenGrunt_B_Unique_01
+        367073, // snakeMan_Caster_B_Unique_01
+        367095, // snakeMan_Caster_B_Unique_02
+        367096, // snakeMan_Melee_B_Unique_01
+        367333, // demonTrooper_B_Unique_02
+        367335, // demonTrooper_B_Unique_03
+        367341, // FallenShaman_C_Unique_01
+        367360, // ThousandPounder_B_Unique_02
+        367366, // demonFlyer_C_unique_01
+        367371, // FallenHound_E_Unique_01
+        370238, // TentacleHorse_B_Unique_02
+        373017, // ZombieFemale_Spitter_Unique_A
+        373869, // TentacleBear_C_Unique_01
+		};
 
         // Three special lists used purely for checking for the existance of a player's summoned mystic ally, gargantuan, or zombie dog
 
@@ -774,6 +1422,14 @@ namespace Trinity
             110959, 103235, 103215, 105763, 103217, 51353, 
         };
 
+        public static HashSet<int> FetishArmyIds { get { return fetishArmyIds; } }
+        private static readonly HashSet<int> fetishArmyIds = new HashSet<int> { 
+            87189, 89934, 90072, 409656, 410238, 89933 }; // 409590 Name: Fetish_Melee_Sycophants-2004 //182271
+
+        public static HashSet<int> BigBadVoodooIds { get { return bigBadVoodooIds; } }
+        private static readonly HashSet<int> bigBadVoodooIds = new HashSet<int> { 
+            182271 };
+
         public static HashSet<int> DemonHunterPetIds { get { return demonHunterPetIds; } }
         private static readonly HashSet<int> demonHunterPetIds = new HashSet<int> { 
             178664, 
@@ -785,7 +1441,17 @@ namespace Trinity
             159102,
             159144,
             334861,
-
+            150025,
+            150037,
+            155149,
+            154593,
+            154199,
+            147960,
+            129934,
+            130366,
+            367223,
+            367258,
+            160612,
         };
 
         public static HashSet<int> DemonHunterSentryIds { get { return demonHunterSentryIds; } }
@@ -800,6 +1466,15 @@ namespace Trinity
             80757, // Wizard_HydraHead_Default_2
             80758, // Wizard_HydraHead_Default_3
         };
+
+        public static HashSet<int> FollowerIds { get { return followerIds; } }
+        private static readonly HashSet<int> followerIds = new HashSet<int>
+        { 
+            4482, // Enchantress
+            4538, // Templar
+            4644, // Scoundrel
+        };
+
 
         /// <summary>
         /// World-object dictionaries eg large object lists, ignore lists etc.
@@ -869,6 +1544,10 @@ namespace Trinity
             {309432, 37f}, // x1_westm_Bridge
             {54850, 14f}, // a3dun_Keep_SiegeTowerDoor
             {325136, 15f},
+            {340480, 30f}, // x1_Catacombs_Door_A_FX_Mouse
+            {374731, 30f}, // x1_Catacombs_Door_Server_Prop
+            {262286, 30f}, // x1_Catacombs_Door_A_FX_Rays_Slowing
+            {345761, 30f}, // x1_Catacombs_Door_A_Ground _Center}
         };
 
         /// <summary>
@@ -877,7 +1556,6 @@ namespace Trinity
         /// </summary>
         public static HashSet<int> NavigationObstacleIds { get { return navigationObstacleIds; } }
         private static readonly HashSet<int> navigationObstacleIds = new HashSet<int> {
-            174900, 185391, // demonic forge
             194682, 81699, 3340, 123325, 
 
             158681, // A1 Blacksmith_Lore
@@ -892,6 +1570,11 @@ namespace Trinity
             321855, // x1_Pand_Ext_Ordnance_Mine
             355898, // x1_Bog_Family_Guard_Tower_Stump
             376917, // [1FA3B814] Type: ServerProp Name: x1_Westm_Hub_Stool_A-381422 ActorSNO: 376917, Distance: 2.337004
+            /*226808, // monsterAffix_waller_model (226808)
+            340480, // x1_Catacombs_Door_A_FX_Mouse
+            374731, // x1_Catacombs_Door_Server_Prop
+            262286, // x1_Catacombs_Door_A_FX_Rays_Slowing
+            345761, // x1_Catacombs_Door_A_Ground _Center*/
         };
 
         /// <summary>
@@ -906,7 +1589,6 @@ namespace Trinity
             {104827, 15}, // trOut_FesteringWoods_Neph_Column_C_Broken_Base 
             {355898, 12}, // x1_Bog_Family_Guard_Tower_Stump
             {376917, 10}, 
-            
          };
 
         public static HashSet<int> ForceDestructibles { get { return forceDestructibles; } }
@@ -964,8 +1646,8 @@ namespace Trinity
             116807, // Butcher Health Well
             180575, // Diablo arena Health Well
             129031, // A3 Skycrown Catapults
-            220160, // Small Belial (220160), 
-            3349,   // Big Belial (3349),    
+            220160, // Small Belial (220160 }, 
+            3349,   // Big Belial (3349 },    
             210268, // Corrupt Growths 2nd Tier
             193077, // a3dun_Crater_ST_GiantDemonHeart_Mob
 
@@ -1142,6 +1824,15 @@ namespace Trinity
             405915, // p1_TieredRift_Challenge 
         };
 
+        /// <summary>
+        /// A list of LevelAreaId's that the bot should always ignore Line of Sight
+        /// </summary>
+        public static HashSet<int> NeverRaycastWorlds { get { return neverRaycastWorlds; } }
+        private static readonly HashSet<int> neverRaycastWorlds = new HashSet<int>()
+        {
+            288685,
+            288454,
+        };
 
         public static HashSet<int> AlwaysRaycastWorlds { get { return DataDictionary.alwaysRaycastWorlds; } }
         private static readonly HashSet<int> alwaysRaycastWorlds = new HashSet<int>()
@@ -1178,7 +1869,7 @@ namespace Trinity
         public static HashSet<int> IgnoreUntargettableAttribute { get { return DataDictionary.ignoreUntargettableAttribute; } }
         private static readonly HashSet<int> ignoreUntargettableAttribute = new HashSet<int>()
         {
-            5432, // A2 Snakem
+            //5432, // A2 Snakem
         };
 
         public static HashSet<string> WhiteItemCraftingWhiteList { get { return whiteItemCraftingWhiteList; } }
@@ -1264,7 +1955,35 @@ namespace Trinity
             { Skills.Wizard.Archon, Sets.VyrsAmazingArcana },
         };
 
+        public static readonly Dictionary<int, string> LegendaryGems = new Dictionary<int, string>
+        {
+            {405775,"Bane of the Powerful"},
+            {405781,"Bane of the Trapped"},
+            {405792,"Wreath of Lightning"},
+            {405793,"Gem of Efficacious Toxin"},
+            {405794,"Pain Enhancer"},
+            {405795,"Mirinae, Teardrop of the Starweaver"},
+            {405796,"Gogok of Swiftness"},
+            {405797,"Invigorating Gemstone"},
+            {405798,"Enforcer"},
+            {405800,"Moratorium"},
+            {405801,"Zei's Stone of Vengeance"},
+            {405802,"Simplicity's Strength"},
+            {405803,"Boon of the Hoarder"},
+            {405804,"Taeguk"},
+            {428033,"Esoteric Alteration"},
+            {405783,"Gem of Ease"},
+            {428034,"Molten Wildebeest’s Gizzard"},
+        };
+
         #region Methods
+
+        public static bool ContainsKeyValue(Dictionary<int, HashSet<int>> dict, int expectedKey, int expectedValue)
+        {
+            HashSet<int> actualValue;
+            return dict.TryGetValue(expectedKey, out actualValue) &&
+                   actualValue.Any(value => value == expectedValue);
+        }
 
         /// <summary>
         /// Add an ActorSNO to the blacklist. Returns false if the blacklist already contains the ActorSNO

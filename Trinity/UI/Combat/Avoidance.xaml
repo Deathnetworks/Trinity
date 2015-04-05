@@ -36,7 +36,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Margin="2" Text="Arcane" FontWeight="Bold" VerticalAlignment="Center"/>
                 <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                            Interval="500" Maximum="30" Minimum="2" 
+                            Interval="500" Maximum="40" Minimum="2" 
                             SmallChange="1" LargeChange="5"
                             TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=DataContext.Avoid.Arcane, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl, AncestorLevel=2}}" 

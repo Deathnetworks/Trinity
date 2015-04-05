@@ -257,38 +257,21 @@ namespace Trinity.Technicals
         }
 
         /// <summary>
-        /// Gets the Images path
-        /// </summary>
-        public static string TrinityImagesPath
-        {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(_trinityImagesPath))
-                {
-                    _trinityImagesPath = Path.Combine(DemonBuddyPath, "Images");
-                    CreateDirectory(_trinityImagesPath);
-                }
-                return _trinityImagesPath;
-            }
-        }
-        private static string _trinityImagesPath;
-
-        /// <summary>
         /// Gets the TrinityLogs path - for NON-battletag specific logging
         /// </summary>
         public static string TrinityLogsPath
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(_trinityLogsPath))
+                if (string.IsNullOrWhiteSpace(_TrinityLogsPath))
                 {
-                    _trinityLogsPath = Path.Combine(DemonBuddyPath, "TrinityLogs");
-                    CreateDirectory(_trinityLogsPath);
+                    _TrinityLogsPath = Path.Combine(DemonBuddyPath, "TrinityLogs");
+                    CreateDirectory(_TrinityLogsPath);
                 }
-                return _trinityLogsPath;
+                return _TrinityLogsPath;
             }
         }
-        private static string _trinityLogsPath;
+        private static string _TrinityLogsPath;
 
         /// <summary>
         /// Gets the scripted item rules path.
