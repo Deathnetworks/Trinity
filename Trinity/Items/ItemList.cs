@@ -48,6 +48,7 @@ namespace Trinity.Items
                 foreach (var itemRule in itemSetting.Rules)
                 {
                     var result = false;
+                    string friendlyVariant;
                     double itemValue = 0;
                     double ruleValue = 0;
 
@@ -83,35 +84,124 @@ namespace Trinity.Items
                             result = itemValue >= ruleValue;
                             break;
 
-                        case ItemProperty.BaseDamage:
-                            itemValue = cItem.MaxDamage;
+                        case ItemProperty.ResourceCost:
+                            itemValue = Math.Round(cItem.AcdItem.Stats.ResourceCostReductionPercent, MidpointRounding.AwayFromZero);
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
+                            break;
+
+                        case ItemProperty.Cooldown:
+                            itemValue = Math.Round(cItem.AcdItem.Stats.PowerCooldownReductionPercent, MidpointRounding.AwayFromZero);
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
+                            break;
+
+                        case ItemProperty.ResistAll:
+                            itemValue = cItem.AcdItem.Stats.ResistAll;
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
+                            break;
+
+                        case ItemProperty.Sockets:
+                            itemValue = cItem.AcdItem.Stats.Sockets;
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
+                            break;
+
+                        case ItemProperty.Vitality:
+                            itemValue = cItem.AcdItem.Stats.Vitality;
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
+                            break;
+
+                        case ItemProperty.FireSkills:
+                            itemValue = cItem.AcdItem.Stats.FireSkillDamagePercentBonus;
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
+                            break;
+
+                        case ItemProperty.ColdSkills:
+                            itemValue = cItem.AcdItem.Stats.ColdSkillDamagePercentBonus;
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
+                            break;
+
+                        case ItemProperty.LightningSkills:
+                            itemValue = cItem.AcdItem.Stats.LightningSkillDamagePercentBonus;
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
+                            break;
+
+                        case ItemProperty.ArcaneSkills:
+                            itemValue = cItem.AcdItem.Stats.ArcaneSkillDamagePercentBonus;
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
+                            break;
+
+                        case ItemProperty.HolySkills:
+                            itemValue = cItem.AcdItem.Stats.HolySkillDamagePercentBonus;
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
+                            break;
+
+                        case ItemProperty.PoisonSkills:
+                            itemValue = cItem.AcdItem.Stats.PosionSkillDamagePercentBonus;
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
+                            break;
+
+                        case ItemProperty.PhysicalSkills:
+                            itemValue = cItem.AcdItem.Stats.PhysicalSkillDamagePercentBonus;
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
+                            break;
+
+                        case ItemProperty.DamageAgainstElites:
+                            itemValue = cItem.AcdItem.Stats.DamagePercentBonusVsElites;
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
+                            break;
+
+                        case ItemProperty.DamageFromElites:
+                            itemValue = cItem.AcdItem.Stats.DamagePercentReductionFromElites;
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
+                            break;
+
+                        case ItemProperty.BaseMaxDamage:
+                            itemValue = ItemDataUtils.GetMaxBaseDamage(cItem.AcdItem);
                             ruleValue = itemRule.Value;
                             result = itemValue >= ruleValue;
                             break;
 
                         case ItemProperty.SkillDamage:
 
-                            var skill = ItemDataUtils.GetSkillsForItemType(cItem.TrinityItemType, Trinity.Player.ActorClass).FirstOrDefault(s => s.Id == itemRule.Variant);
+                            var skillId = itemRule.Variant;
+                            var skill = ItemDataUtils.GetSkillsForItemType(cItem.TrinityItemType, Trinity.Player.ActorClass).FirstOrDefault(s => s.Id == skillId);                            
                             if (skill != null)
+                            {
+                                friendlyVariant = skill.Name;
                                 itemValue = cItem.AcdItem.GetSkillDamageIncrease(skill.SNOPower);
-                            
+                            }
+                                                            
                             ruleValue = itemRule.Value;
                             result = itemValue >= ruleValue;
                             break;
 
                         case ItemProperty.PercentDamage:
-                            //itemValue = cItem.;
-                            //ruleValue = itemRule.Value;
-                            //result = itemValue >= ruleValue;
+                            itemValue = cItem.AcdItem.Stats.WeaponDamagePercent;
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
                             break;
                     }
 
-                    Logger.LogDebug("  >>  Evaluated {0} -- {1} (Item: {2} -v- Rule: {3}) = {4}", 
+                    Logger.LogDebug("  >>  Evaluated {0} -- {1} {5} (Item: {2} -v- Rule: {3}) = {4}", 
                         cItem.RealName, 
-                        itemRule.ItemProperty, 
+                        itemRule.ItemProperty.ToString().AddSpacesToSentence(), 
                         itemValue,
                         ruleValue,
-                        result);
+                        result,
+                        friendlyVariant);
 
                     if (!result)
                         return false;

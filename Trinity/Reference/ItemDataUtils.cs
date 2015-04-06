@@ -30,6 +30,18 @@ namespace Trinity.Reference
             return 0;
         }
 
+        public static int GetMinBaseDamage(ACDItem item)
+        {
+            var min = item.Stats.MinDamageElemental;
+            return (min != 0) ? (int) min : (int) item.Stats.MinDamage;
+        }
+
+        public static int GetMaxBaseDamage(ACDItem item)
+        {
+            var max = item.Stats.MaxDamageElemental;
+            return (max != 0) ? (int)max : (int)item.Stats.MaxDamage;
+        }
+
         public enum StatType
         {
             Unknown = 0,
@@ -115,19 +127,34 @@ namespace Trinity.Reference
             return result;
         }
 
+        /// <summary>
+        /// Returns an object with the Min and Max values for a particular property and item
+        /// Eg. Fire Damage 15-20%
+        /// </summary>
         public static ItemStatRange GetItemStatRange(Item item, ItemProperty prop)
         {
             ItemStatRange statRange;
-            
+
+            var result = new ItemStatRange();
+
+            if(prop == ItemProperty.Ancient)
+                return new ItemStatRange { Max = 1, Min = 0};
+
             if (ItemPropertyLimitsByItemType.TryGetValue(new KeyValuePair<GItemType, ItemProperty>(item.GItemType,prop), out statRange))
-                return statRange;
+                result = statRange;
 
             if (SpecialItemsPropertyCases.TryGetValue(new Tuple<Item, ItemProperty>(item, prop), out statRange))
-                return statRange;
-            
-            return new ItemStatRange();
+                result = statRange;
+
+            return result;
         }
 
+        /// <summary>
+        /// Determine if an item can have a given property
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="prop"></param>
+        /// <returns></returns>
         public static bool IsValidPropertyForItem(Item item, ItemProperty prop)
         {
             ItemStatRange statRange;
@@ -144,6 +171,9 @@ namespace Trinity.Reference
             return false;
         }
 
+        /// <summary>
+        /// Returns all the possible properties for a given item.
+        /// </summary>
         public static List<ItemProperty> GetPropertiesForItem(Item item)
         {
             var props = ItemPropertyLimitsByItemType.Where(pair => pair.Key.Key == item.GItemType).Select(pair => pair.Key.Value).ToList();
@@ -154,6 +184,10 @@ namespace Trinity.Reference
             return props;
         }
 
+        /// <summary>
+        /// Get all the possible options for multi-value item properties. 
+        /// For example Skill Damage for Quiver can be for the Sentry, Cluster Arrow, Multishot etc.
+        /// </summary>
         public static List<object> GetItemPropertyVariants(ItemProperty prop, GItemType itemType)
         {
             var result = new List<object>();
@@ -169,6 +203,7 @@ namespace Trinity.Reference
 
         /// <summary>
         /// Items with unusual properties are listed here
+        /// Determines if Property will be available in ItemList rules dropdown.
         /// </summary>
         public static readonly Dictionary<Tuple<Item,ItemProperty>, ItemStatRange> SpecialItemsPropertyCases = new Dictionary<Tuple<Item,ItemProperty>, ItemStatRange>
         {
@@ -187,10 +222,16 @@ namespace Trinity.Reference
             { new Tuple<Item, ItemProperty>(Legendary.SunKeeper, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 30, Min = 15 }},
             { new Tuple<Item, ItemProperty>(Legendary.Frostburn, ItemProperty.ColdSkills), new ItemStatRange { Max = 15, Min = 10 }},
             { new Tuple<Item, ItemProperty>(Legendary.ThundergodsVigor, ItemProperty.LightningSkills), new ItemStatRange { Max = 15, Min = 10 }},
+            { new Tuple<Item, ItemProperty>(Legendary.SashOfKnives, ItemProperty.ResourceCost), new ItemStatRange { Max = 8, Min = 5 }},
+            { new Tuple<Item, ItemProperty>(Legendary.StoneOfJordan, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 30, Min = 25 }},
+            { new Tuple<Item, ItemProperty>(Legendary.Unity, ItemProperty.ResourceCost), new ItemStatRange { Max = 15, Min = 12 }},
+            { new Tuple<Item, ItemProperty>(Legendary.HellcatWaistguard, ItemProperty.ResourceCost), new ItemStatRange { Max = 6, Min = 3 }},
+            { new Tuple<Item, ItemProperty>(Legendary.SunKeeper, ItemProperty.ResourceCost), new ItemStatRange { Max = 30, Min = 15 }},
         };
 
         /// <summary>
-        /// Properties that are ALWAYS available to the ItemType are listed here.
+        /// Properties that are ALWAYS available to the ItemType are listed here.  
+        /// Determines if Property will be available in ItemList rules dropdown.     
         /// </summary>
         public static readonly Dictionary<KeyValuePair<GItemType, ItemProperty>, ItemStatRange> ItemPropertyLimitsByItemType = new Dictionary<KeyValuePair<GItemType, ItemProperty>, ItemStatRange>
         {
@@ -289,55 +330,55 @@ namespace Trinity.Reference
             {new KeyValuePair<GItemType, ItemProperty>(GItemType.Spear, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
             {new KeyValuePair<GItemType, ItemProperty>(GItemType.Dagger, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
 
-            // Skill Damage
-
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Helm, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.VoodooMask, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.WizardHat, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.SpiritStone, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Quiver, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Orb, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mojo, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Shoulder, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Chest, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Cloak, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Belt, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyBelt, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Legs, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Boots, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyWeapon, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Wand, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Flail, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.HandCrossbow, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.FistWeapon, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandDaibo, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMighty, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            // Skill Damage acdItem.GetSkillDamageIncrease() method is fixed.
+            // DISABLED until DB's 
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Helm, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.VoodooMask, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.WizardHat, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.SpiritStone, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Quiver, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Orb, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Mojo, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Shoulder, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Chest, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Cloak, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Belt, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyBelt, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Legs, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Boots, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyWeapon, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Wand, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Flail, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.HandCrossbow, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.FistWeapon, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandDaibo, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
+            //{new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMighty, ItemProperty.SkillDamage), new ItemStatRange { Max = 15, Min = 10 }},
 
             // Base Damage
 
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Orb, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 600, AncientMin = 400, Max = 500, Min = 340 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mojo, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 600, AncientMin = 400, Max = 500, Min = 340 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyWeapon, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Wand, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Flail, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Axe, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.HandCrossbow, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1304, Min = 856 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.CeremonialKnife, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.FistWeapon, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mace, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Sword, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Spear, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Dagger, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandDaibo, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandCrossbow, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1788, Min = 1177 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandAxe, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandBow, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1788, Min = 1177 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandFlail, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMace, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMighty, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandPolearm, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandStaff, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
-            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandSword, ItemProperty.BaseDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Orb, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 600, AncientMin = 400, Max = 500, Min = 340 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mojo, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 600, AncientMin = 400, Max = 500, Min = 340 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyWeapon, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Wand, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Flail, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Axe, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.HandCrossbow, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1304, Min = 856 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.CeremonialKnife, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.FistWeapon, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mace, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Sword, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Spear, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Dagger, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1490, Min = 981 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandDaibo, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandCrossbow, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1788, Min = 1177 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandAxe, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandBow, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 1940, AncientMin = 1318, Max = 1788, Min = 1177 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandFlail, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMace, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMighty, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandPolearm, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandStaff, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandSword, ItemProperty.BaseMaxDamage), new ItemStatRange { AncientMax = 2325, AncientMin = 1582, Max = 1788, Min = 1177 }},
 
             // Percent Damage
 
@@ -363,7 +404,134 @@ namespace Trinity.Reference
             {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandStaff, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
             {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandSword, ItemProperty.PercentDamage), new ItemStatRange {  Max = 10, Min = 6 }},
 
+            // Sockets
 
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Ring, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Amulet, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Helm, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.VoodooMask, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.WizardHat, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.SpiritStone, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Quiver, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Orb, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mojo, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Chest, ItemProperty.Sockets), new ItemStatRange { Max = 3, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Cloak, ItemProperty.Sockets), new ItemStatRange { Max = 3, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Legs, ItemProperty.Sockets), new ItemStatRange { Max = 2, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyWeapon, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Wand, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Flail, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Axe, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.HandCrossbow, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.CeremonialKnife, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.FistWeapon, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mace, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Sword, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandDaibo, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandCrossbow, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandAxe, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandBow, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandFlail, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMace, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMighty, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandPolearm, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandStaff, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandSword, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Spear, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Shield, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Dagger, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.CrusaderShield, ItemProperty.Sockets), new ItemStatRange { Max = 1, Min = 0 }},
+            
+            // Resource Cost Reduction
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Ring, ItemProperty.ResourceCost), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Amulet, ItemProperty.ResourceCost), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Gloves, ItemProperty.ResourceCost), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Quiver, ItemProperty.ResourceCost), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Orb, ItemProperty.ResourceCost), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mojo, ItemProperty.ResourceCost), new ItemStatRange {Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Shoulder, ItemProperty.ResourceCost), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyWeapon, ItemProperty.ResourceCost), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Wand, ItemProperty.ResourceCost), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Flail, ItemProperty.ResourceCost), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Axe, ItemProperty.ResourceCost), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.HandCrossbow, ItemProperty.ResourceCost), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.CeremonialKnife, ItemProperty.ResourceCost), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.FistWeapon, ItemProperty.ResourceCost), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mace, ItemProperty.ResourceCost), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Sword, ItemProperty.ResourceCost), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandDaibo, ItemProperty.ResourceCost), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandCrossbow, ItemProperty.ResourceCost), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandAxe, ItemProperty.ResourceCost), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandBow, ItemProperty.ResourceCost), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandFlail, ItemProperty.ResourceCost), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMace, ItemProperty.ResourceCost), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMighty, ItemProperty.ResourceCost), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandPolearm, ItemProperty.ResourceCost), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandStaff, ItemProperty.ResourceCost), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandSword, ItemProperty.ResourceCost), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Spear, ItemProperty.ResourceCost), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Dagger, ItemProperty.ResourceCost), new ItemStatRange { Max = 10, Min = 8 }},
+
+            // Cooldown Reduction
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Ring, ItemProperty.Cooldown), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Amulet, ItemProperty.Cooldown), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Gloves, ItemProperty.Cooldown), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Quiver, ItemProperty.Cooldown), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Orb, ItemProperty.Cooldown), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mojo, ItemProperty.Cooldown), new ItemStatRange {Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Shoulder, ItemProperty.Cooldown), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyWeapon, ItemProperty.Cooldown), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Wand, ItemProperty.Cooldown), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Flail, ItemProperty.Cooldown), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Axe, ItemProperty.Cooldown), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.HandCrossbow, ItemProperty.Cooldown), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.CeremonialKnife, ItemProperty.Cooldown), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.FistWeapon, ItemProperty.Cooldown), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mace, ItemProperty.Cooldown), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Sword, ItemProperty.Cooldown), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandDaibo, ItemProperty.Cooldown), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandCrossbow, ItemProperty.Cooldown), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandAxe, ItemProperty.Cooldown), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandBow, ItemProperty.Cooldown), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandFlail, ItemProperty.Cooldown), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMace, ItemProperty.Cooldown), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMighty, ItemProperty.Cooldown), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandPolearm, ItemProperty.Cooldown), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandStaff, ItemProperty.Cooldown), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandSword, ItemProperty.Cooldown), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Spear, ItemProperty.Cooldown), new ItemStatRange { Max = 10, Min = 6 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Dagger, ItemProperty.Cooldown), new ItemStatRange { Max = 10, Min = 6 }},
+
+            // Damage Against Elites
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.MightyWeapon, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Wand, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Flail, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Axe, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.HandCrossbow, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.CeremonialKnife, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.FistWeapon, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mace, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Sword, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandDaibo, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 10, Min = 9 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandCrossbow, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 10, Min = 9 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandAxe, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 10, Min = 9 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandBow, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 10, Min = 9 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandFlail, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 10, Min = 9 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMace, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 10, Min = 9 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandMighty, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 10, Min = 9 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandPolearm, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 10, Min = 9 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandStaff, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 10, Min = 9 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.TwoHandSword, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 10, Min = 9 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Spear, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Shield, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Dagger, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.CrusaderShield, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 8, Min = 5 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Quiver, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Orb, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 10, Min = 8 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mojo, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 10, Min = 8 }},
 
 
             //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Ring, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 50, Min = 26 }},

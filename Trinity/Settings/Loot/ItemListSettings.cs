@@ -30,6 +30,9 @@ using Trinity.Helpers;
 
 namespace Trinity.Settings.Loot
 {
+    /// <summary>
+    /// Settings for ItemList looting
+    /// </summary>
     [DataContract(Namespace = "")]
     public class ItemListSettings : ITrinitySetting<ItemListSettings>, INotifyPropertyChanged
     {
@@ -67,9 +70,18 @@ namespace Trinity.Settings.Loot
             BaseType,
             ItemType,
             SetName,
+            IsEquipped,
+            ActorClass,
             IsSetItem,
             IsCrafted,
             IsValid
+        }
+
+        public enum SortingType
+        {
+            None,
+            Name,
+            Id
         }
 
         public enum ModalPage
@@ -151,6 +163,7 @@ namespace Trinity.Settings.Loot
 
         /// <summary>
         /// Main collection for all items, underlies CollectionViewSource
+        /// This is only used for displaying the UI and user interaction.        
         /// </summary>
         [IgnoreDataMember]
         public FullyObservableCollection<LItem> DisplayItems
@@ -170,7 +183,9 @@ namespace Trinity.Settings.Loot
         }
 
         /// <summary>
-        /// The source of truth - currently selected items, this is persisted to the settings file.
+        /// Contains the currently selected items; this is persisted to the settings file.
+        /// Code elsewhere in trinity (such as loot engien) can check items against it at any time.
+        /// LItems here have a minimal set of data; only Ids of the items and rules are are saved.
         /// </summary>
         [DataMember(IsRequired = false)]
         public List<LItem> SelectedItems
@@ -183,11 +198,8 @@ namespace Trinity.Settings.Loot
             {
                 if (_selectedItems != value)
                 {
-                    //if (_selectedItems == null || value != null)
-                    //{
-                        _selectedItems = value;
-                        OnPropertyChanged("SelectedItems");
-                    //}
+                    _selectedItems = value;
+                    OnPropertyChanged("SelectedItems");
                 }
             }
         }
@@ -331,12 +343,18 @@ namespace Trinity.Settings.Loot
 
         #region Methods
 
+        /// <summary>
+        /// Generates an export code of the current state
+        /// </summary>        
         public string CreateExportCode()
         {
             var settingsXml = TrinitySetting.GetSettingsXml(this);
             return ExportHelper.Compress(settingsXml);
         }
 
+        /// <summary>
+        /// Decodes an export code and applies it to the current state.
+        /// </summary>
         public ItemListSettings ImportFromCode(string code)
         {
             if (string.IsNullOrEmpty(code) || string.IsNullOrWhiteSpace(code))
@@ -383,8 +401,8 @@ namespace Trinity.Settings.Loot
         /// </summary>
         private void SettingsWindowOpened()
         {
-            CreateView();            
-            UpdateSelectedItems();
+            CreateView();
+            UpdateSelectedItems();           
         }
 
         /// <summary>
@@ -395,8 +413,7 @@ namespace Trinity.Settings.Loot
             Collection = new CollectionViewSource();
             Collection.Source = DisplayItems;
             ChangeGrouping(Grouping);
-            Collection.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
-            Collection.View.Refresh();
+            ChangeSorting(SortingType.Name);
         }
 
         /// <summary>
@@ -436,7 +453,7 @@ namespace Trinity.Settings.Loot
         }
 
         /// <summary>
-        /// Change the grouping order
+        /// Change the grouping property
         /// </summary>
         /// <param name="groupingType"></param>
         internal void ChangeGrouping(GroupingType groupingType)
@@ -450,6 +467,22 @@ namespace Trinity.Settings.Loot
                 Collection.GroupDescriptions.Clear();
                 if (groupingType != GroupingType.None)
                     Collection.GroupDescriptions.Add(new PropertyGroupDescription(groupingType.ToString()));
+            }
+        }
+
+        /// <summary>
+        /// Change the sorting order
+        /// </summary>
+        /// <param name="sortingType"></param>
+        internal void ChangeSorting(SortingType sortingType)
+        {
+            if (Collection == null)
+                return;
+
+            using (Collection.DeferRefresh())
+            {
+                Collection.SortDescriptions.Clear();
+                Collection.SortDescriptions.Add(new SortDescription(sortingType.ToString(), ListSortDirection.Ascending));
             }
         }
 
@@ -505,9 +538,6 @@ namespace Trinity.Settings.Loot
         /// <param name="args"></param>
         public void SyncSelectedItem(ChildElementPropertyChangedEventArgs args)
         {
-            if (IsUpdatingCollection)
-                return;
-
             var item = args.ChildElement as LItem;
             if (item != null && args.PropertyName.ToString() == "IsSelected")
             {
@@ -525,10 +555,8 @@ namespace Trinity.Settings.Loot
             }
         }
 
-        private bool IsUpdatingCollection { get; set; }
-
         /// <summary>
-        /// Updates the DisplayItems collection to match the Selected collection
+        /// Updates the DisplayItems collection to match the Selected collection.         
         /// </summary>
         public void UpdateSelectedItems()
         {

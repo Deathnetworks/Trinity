@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Collections;
+using System.Collections.Generic;
 using System.Windows.Data;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Trinity.Technicals;
 
@@ -13,34 +16,55 @@ namespace Trinity.UIComponents
     /// </summary>
     public sealed class UriToCachedImageConverter : IValueConverter
     {
+        public Dictionary<string, ImageSource> ImageCache = new Dictionary<string, ImageSource>();
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var url = value as string;
-            if (string.IsNullOrEmpty(url))
-                return null;
-
-            var webUri = new Uri(url, UriKind.Absolute);
-            var filename = Path.GetFileName(webUri.AbsolutePath);
-            
-            var localFilePath = Path.Combine(FileManager.TrinityImagesPath, filename);
-
-            if (File.Exists(localFilePath))
+            try
             {
-                Logger.LogVerbose("Found cached image on disk: {0}", filename);
-                return BitmapFrame.Create(new Uri(localFilePath, UriKind.Absolute));
+                var url = value as string;
+                if (string.IsNullOrEmpty(url))
+                    return null;
+
+                var webUri = new Uri(url, UriKind.Absolute);
+                var filename = Path.GetFileName(webUri.AbsolutePath);
+            
+                var localFilePath = Path.Combine(FileManager.TrinityImagesPath, filename);
+
+                ImageSource cachedImage;
+                if (ImageCache.TryGetValue(localFilePath, out cachedImage))
+                {
+                    Logger.LogVerbose("Found cached image: {0}", filename);
+                    return cachedImage;                
+                }
+            
+                if (File.Exists(localFilePath))
+                {
+                    Logger.LogVerbose("Found image on disk: {0}", filename);
+                    var diskImage = BitmapFrame.Create(new Uri(localFilePath, UriKind.Absolute), BitmapCreateOptions.DelayCreation, BitmapCacheOption.OnLoad);
+                    ImageCache.Add(localFilePath, diskImage);
+                    return diskImage;
+                }
+
+                Logger.LogVerbose("Creating image from url: {0}", value.ToString());
+
+                var image = new BitmapImage();
+                image.BeginInit();
+                image.CacheOption = BitmapCacheOption.OnLoad;
+                image.UriSource = webUri;
+                image.EndInit();
+
+                ImageCache.Add(localFilePath, image);
+                SaveImage(image, localFilePath);
+                return image;
+
             }
-
-            Logger.LogVerbose("Creating Bitmap from url: {0}", value.ToString());
-
-            var image = new BitmapImage();
-            image.BeginInit();
-            image.CacheOption = BitmapCacheOption.OnLoad;
-            image.UriSource = webUri;
-            image.EndInit();
-
-            SaveImage(image, localFilePath);
-
-            return image;
+            catch (Exception ex)
+            {
+                Logger.LogDebug("Exception Loading ListItem Image: {0} {1}", ex.Message, ex.InnerException);
+            }
+            
+            return null;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
