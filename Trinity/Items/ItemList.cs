@@ -48,7 +48,7 @@ namespace Trinity.Items
                 foreach (var itemRule in itemSetting.Rules)
                 {
                     var result = false;
-                    string friendlyVariant;
+                    string friendlyVariant = string.Empty;
                     double itemValue = 0;
                     double ruleValue = 0;
 
