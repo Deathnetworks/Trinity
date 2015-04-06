@@ -90,6 +90,7 @@
     <Compile Include="Cache\CacheData.Hotbar.cs" />
     <Compile Include="Cache\CacheData.Inventory.cs" />
     <Compile Include="Cache\CacheData.Player.cs" />
+    <Compile Include="Helpers\GetAttributeExtensions.cs" />
     <Compile Include="Cache\ItemStashSellAppender.cs" />
     <Compile Include="Cache\ItemDroppedAppender.cs" />
     <Compile Include="Cache\TrinityBountyInfo.cs" />
@@ -111,7 +112,7 @@
     <Compile Include="Combat\AvoidanceManager.cs" />
     <Compile Include="Combat\AvoidanceType.cs" />
     <Compile Include="Combat\Enemies.cs" />
-	<Compile Include="Combat\QueuedMovement.cs" />
+    <Compile Include="Combat\QueuedMovement.cs" />
     <Compile Include="Combat\Routine\TrinityRoutine.cs" />
     <Compile Include="Combat\SpellTracker.cs" />
     <Compile Include="Configuration\Events.cs" />

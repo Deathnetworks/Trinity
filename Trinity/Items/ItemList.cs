@@ -79,7 +79,7 @@ namespace Trinity.Items
                             break;
 
                         case ItemProperty.AttackSpeed:
-                            itemValue = cItem.AttackSpeedPercent;
+                            itemValue = Math.Round(cItem.AttackSpeedPercent, MidpointRounding.AwayFromZero);
                             ruleValue = itemRule.Value;
                             result = itemValue >= ruleValue;
                             break;
@@ -157,13 +157,13 @@ namespace Trinity.Items
                             break;
 
                         case ItemProperty.DamageAgainstElites:
-                            itemValue = cItem.AcdItem.Stats.DamagePercentBonusVsElites;
+                            itemValue = Math.Round(cItem.AcdItem.Stats.DamagePercentBonusVsElites, MidpointRounding.AwayFromZero);
                             ruleValue = itemRule.Value;
                             result = itemValue >= ruleValue;
                             break;
 
                         case ItemProperty.DamageFromElites:
-                            itemValue = cItem.AcdItem.Stats.DamagePercentReductionFromElites;
+                            itemValue = Math.Round(cItem.AcdItem.Stats.DamagePercentReductionFromElites, MidpointRounding.AwayFromZero);
                             ruleValue = itemRule.Value;
                             result = itemValue >= ruleValue;
                             break;
@@ -181,7 +181,7 @@ namespace Trinity.Items
                             if (skill != null)
                             {
                                 friendlyVariant = skill.Name;
-                                itemValue = cItem.AcdItem.GetSkillDamageIncrease(skill.SNOPower);
+                                itemValue = cItem.AcdItem.SkillDamagePercent(skill.SNOPower);
                             }
                                                             
                             ruleValue = itemRule.Value;
@@ -189,7 +189,7 @@ namespace Trinity.Items
                             break;
 
                         case ItemProperty.PercentDamage:
-                            itemValue = cItem.AcdItem.Stats.WeaponDamagePercent;
+                            itemValue = cItem.AcdItem.WeaponDamagePercent();
                             ruleValue = itemRule.Value;
                             result = itemValue >= ruleValue;
                             break;
