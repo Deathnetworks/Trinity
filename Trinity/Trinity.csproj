@@ -90,6 +90,7 @@
     <Compile Include="Cache\CacheData.Hotbar.cs" />
     <Compile Include="Cache\CacheData.Inventory.cs" />
     <Compile Include="Cache\CacheData.Player.cs" />
+    <Compile Include="Helpers\EnumValue.cs" />
     <Compile Include="Helpers\GetAttributeExtensions.cs" />
     <Compile Include="Cache\ItemStashSellAppender.cs" />
     <Compile Include="Cache\ItemDroppedAppender.cs" />

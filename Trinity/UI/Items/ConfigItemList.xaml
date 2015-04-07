@@ -271,6 +271,30 @@
                     <DataTrigger Binding="{Binding Path=ItemProperty}" Value="ResourceCost">
                         <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
                     </DataTrigger>
+                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="ElementalDamage">
+                        <Setter Property="ContentTemplate" Value="{DynamicResource DropdownSliderFormTemplate}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="FireSkills">
+                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="LightningSkills">
+                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="HolySkills">
+                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="ColdSkills">
+                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="PhysicalSkills">
+                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="ArcaneSkills">
+                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="PoisonSkills">
+                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
+                    </DataTrigger>                    
                 </Style.Triggers>
             </Style>
 

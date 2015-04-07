@@ -82,5 +82,6 @@ namespace Trinity.UIComponents
         PercentDamage = 71,
         Ancient = 72,
         PrimaryStat = 73,
+        ElementalDamage = 74,
     }
 }

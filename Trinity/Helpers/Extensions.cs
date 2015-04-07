@@ -46,6 +46,15 @@ namespace Trinity.Helpers
             }
         }
 
+        public static EnumValue<TEnum> ToEnumValue<TEnum>(this TEnum e) where TEnum : struct, IConvertible
+        {
+            if (!typeof(TEnum).IsEnum)
+            {
+                throw new ArgumentException("T must be an enumerated type");
+            }
+            return new EnumValue<TEnum>(e);
+        }
+
         private static Regex ItemQualityRegex = new Regex("{c:[a-zA-Z0-9]{8}}", RegexOptions.Compiled);
 
         public static ItemQuality ItemLinkColorQuality(this ACDItem item)

@@ -188,11 +188,26 @@ namespace Trinity.Items
                             result = itemValue >= ruleValue;
                             break;
 
+                        case ItemProperty.ElementalDamage:
+
+                            var elementId = itemRule.Variant;
+                            var element = (Element)elementId;
+                            if (element != Element.Unknown)
+                            {
+                                friendlyVariant = ((EnumValue<Element>) element).Name;
+                                itemValue = Math.Round(ItemDataUtils.GetElementalDamage(cItem.AcdItem, element), MidpointRounding.AwayFromZero);
+                            }
+
+                            ruleValue = itemRule.Value;
+                            result = itemValue >= ruleValue;
+                            break;
+
                         case ItemProperty.PercentDamage:
                             itemValue = cItem.AcdItem.WeaponDamagePercent();
                             ruleValue = itemRule.Value;
                             result = itemValue >= ruleValue;
                             break;
+
                     }
 
                     Logger.LogDebug("  >>  Evaluated {0} -- {1} {5} (Item: {2} -v- Rule: {3}) = {4}", 

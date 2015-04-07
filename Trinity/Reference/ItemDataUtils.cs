@@ -42,6 +42,28 @@ namespace Trinity.Reference
             return (max != 0) ? (int)max : (int)item.Stats.MaxDamage;
         }
 
+        public static double GetElementalDamage(ACDItem item, Element element)
+        {
+            switch (element)
+            {
+                case Element.Fire:
+                    return item.Stats.FireSkillDamagePercentBonus;
+                case Element.Cold:
+                    return item.Stats.ColdSkillDamagePercentBonus;
+                case Element.Lightning:
+                    return item.Stats.LightningSkillDamagePercentBonus;
+                case Element.Poison:
+                    return item.Stats.PosionSkillDamagePercentBonus;
+                case Element.Arcane:
+                    return item.Stats.ArcaneSkillDamagePercentBonus;
+                case Element.Holy:
+                    return item.Stats.HolySkillDamagePercentBonus;
+                case Element.Physical:
+                    return item.Stats.PhysicalSkillDamagePercentBonus;
+            }
+            return 0;
+        }
+
         public enum StatType
         {
             Unknown = 0,
@@ -197,6 +219,19 @@ namespace Trinity.Reference
                     var classRestriction = (Item.GetClassRestriction(itemType));
                     result = GetSkillsForItemType(itemType, classRestriction).Cast<object>().ToList();
                     break;
+
+                case ItemProperty.ElementalDamage:
+                    result = new List<object>
+                    {
+                        Element.Poison.ToEnumValue(),
+                        Element.Holy.ToEnumValue(),
+                        Element.Cold.ToEnumValue(),
+                        Element.Arcane.ToEnumValue(),
+                        Element.Fire.ToEnumValue(),
+                        Element.Physical.ToEnumValue(),
+                        Element.Lightning.ToEnumValue(),                       
+                    };
+                    break;
             }
             return result;
         }
@@ -224,6 +259,7 @@ namespace Trinity.Reference
             { new Tuple<Item, ItemProperty>(Legendary.ThundergodsVigor, ItemProperty.LightningSkills), new ItemStatRange { Max = 15, Min = 10 }},
             { new Tuple<Item, ItemProperty>(Legendary.SashOfKnives, ItemProperty.ResourceCost), new ItemStatRange { Max = 8, Min = 5 }},
             { new Tuple<Item, ItemProperty>(Legendary.StoneOfJordan, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 30, Min = 25 }},
+            { new Tuple<Item, ItemProperty>(Legendary.StoneOfJordan, ItemProperty.ElementalDamage), new ItemStatRange { Max = 20, Min = 15 }},
             { new Tuple<Item, ItemProperty>(Legendary.Unity, ItemProperty.ResourceCost), new ItemStatRange { Max = 15, Min = 12 }},
             { new Tuple<Item, ItemProperty>(Legendary.HellcatWaistguard, ItemProperty.ResourceCost), new ItemStatRange { Max = 6, Min = 3 }},
             { new Tuple<Item, ItemProperty>(Legendary.SunKeeper, ItemProperty.ResourceCost), new ItemStatRange { Max = 30, Min = 15 }},
@@ -532,6 +568,11 @@ namespace Trinity.Reference
             {new KeyValuePair<GItemType, ItemProperty>(GItemType.Quiver, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 10, Min = 8 }},
             {new KeyValuePair<GItemType, ItemProperty>(GItemType.Orb, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 10, Min = 8 }},
             {new KeyValuePair<GItemType, ItemProperty>(GItemType.Mojo, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 10, Min = 8 }},
+
+            // ElementalDamage
+
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Amulet, ItemProperty.ElementalDamage), new ItemStatRange { Max = 20, Min = 15 }},
+            {new KeyValuePair<GItemType, ItemProperty>(GItemType.Bracer, ItemProperty.ElementalDamage), new ItemStatRange { Max = 20, Min = 15 }},
 
 
             //{new KeyValuePair<GItemType, ItemProperty>(GItemType.Ring, ItemProperty.CritcalHitDamage), new ItemStatRange { Max = 50, Min = 26 }},
