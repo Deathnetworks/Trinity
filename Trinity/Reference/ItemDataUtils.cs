@@ -252,7 +252,7 @@ namespace Trinity.Reference
             { new Tuple<Item, ItemProperty>(Legendary.LacuniProwlers, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
             { new Tuple<Item, ItemProperty>(Legendary.SteadyStrikers, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
             { new Tuple<Item, ItemProperty>(Legendary.MempoOfTwilight, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
-            { new Tuple<Item, ItemProperty>(Legendary.AndarielsVisage, ItemProperty.FireSkills), new ItemStatRange { Max = 20, Min = 15 }},
+            { new Tuple<Item, ItemProperty>(Legendary.AndarielsVisage, ItemProperty.ElementalDamage), new ItemStatRange { Max = 20, Min = 15 }},
             { new Tuple<Item, ItemProperty>(Legendary.AndarielsVisage, ItemProperty.AttackSpeed), new ItemStatRange { Max = 7, Min = 5 }},
             { new Tuple<Item, ItemProperty>(Legendary.SunKeeper, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 30, Min = 15 }},
             { new Tuple<Item, ItemProperty>(Legendary.Frostburn, ItemProperty.ColdSkills), new ItemStatRange { Max = 15, Min = 10 }},
@@ -260,9 +260,14 @@ namespace Trinity.Reference
             { new Tuple<Item, ItemProperty>(Legendary.SashOfKnives, ItemProperty.ResourceCost), new ItemStatRange { Max = 8, Min = 5 }},
             { new Tuple<Item, ItemProperty>(Legendary.StoneOfJordan, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 30, Min = 25 }},
             { new Tuple<Item, ItemProperty>(Legendary.StoneOfJordan, ItemProperty.ElementalDamage), new ItemStatRange { Max = 20, Min = 15 }},
-            { new Tuple<Item, ItemProperty>(Legendary.Unity, ItemProperty.ResourceCost), new ItemStatRange { Max = 15, Min = 12 }},
-            { new Tuple<Item, ItemProperty>(Legendary.HellcatWaistguard, ItemProperty.ResourceCost), new ItemStatRange { Max = 6, Min = 3 }},
-            { new Tuple<Item, ItemProperty>(Legendary.SunKeeper, ItemProperty.ResourceCost), new ItemStatRange { Max = 30, Min = 15 }},
+            { new Tuple<Item, ItemProperty>(Legendary.Unity, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 15, Min = 12 }},
+            { new Tuple<Item, ItemProperty>(Legendary.HellcatWaistguard, ItemProperty.DamageAgainstElites), new ItemStatRange { Max = 6, Min = 3 }},
+            { new Tuple<Item, ItemProperty>(Legendary.Etrayu, ItemProperty.ColdSkills), new ItemStatRange { Max = 20, Min = 15 }},
+            { new Tuple<Item, ItemProperty>(Legendary.Uskang, ItemProperty.LightningSkills), new ItemStatRange { Max = 20, Min = 15 }},
+            { new Tuple<Item, ItemProperty>(Legendary.Triumvirate, ItemProperty.LightningSkills), new ItemStatRange { Max = 10, Min = 7 }},
+            { new Tuple<Item, ItemProperty>(Legendary.Triumvirate, ItemProperty.FireSkills), new ItemStatRange { Max = 10, Min = 7 }},
+            { new Tuple<Item, ItemProperty>(Legendary.Triumvirate, ItemProperty.ArcaneSkills), new ItemStatRange { Max = 10, Min = 7 }},
+            { new Tuple<Item, ItemProperty>(Legendary.WinterFlurry, ItemProperty.ColdSkills), new ItemStatRange { Max = 20, Min = 15 }},
         };
 
         /// <summary>
