@@ -527,7 +527,7 @@ namespace Trinity
                             }
 
                             if (c_IgnoreReason != "InternalName")
-                                Logger.Log(TrinityLogLevel.Info, LogCategory.CacheManagement,
+                                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                                     "[{0:0000.00}ms] {1} {2} Type: {3} ({4}/{5}) Name={6} ({7}) {8} {9} Dist2Mid={10:0} Dist2Rad={11:0} ZDiff={12:0} Radius={13:0} RAGuid={14} {15}",
                                     duration,
                                     (addToCache ? "Added " : "Ignored"),
