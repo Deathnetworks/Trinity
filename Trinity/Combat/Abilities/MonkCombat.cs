@@ -68,7 +68,7 @@ namespace Trinity.Combat.Abilities
             {
                 // Sweeping Winds Refresh
                 if (Player.PrimaryResource >= _minSweepingWindSpirit &&
-                   CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) && 
+                   CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) &&
                    !GetHasBuff(SNOPower.Monk_SweepingWind))
                 {
                     return new TrinityPower(SNOPower.Monk_SweepingWind);
@@ -207,7 +207,7 @@ namespace Trinity.Combat.Abilities
 
             // Sweeping Winds Refresh(wtf the last logic)
             if (Player.PrimaryResource >= _minSweepingWindSpirit &&
-               CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) && 
+               CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) &&
                ((!GetHasBuff(SNOPower.Monk_SweepingWind) && (_hasInnaSet || TargetUtil.AnyMobsInRange(18f))) ||
                CombatBase.IsTaegukBuffWillExpire))
             {
@@ -259,8 +259,8 @@ namespace Trinity.Combat.Abilities
                 Skills.Monk.ExplodingPalm.IsActive)
             {
                 var _target = TargetUtil.BestExploadingPalmDebuffedTarget(wolRange);
-                if (_target.IsTrashPackOrBossEliteRareUnique && 
-                    TargetUtil.MobsWithDebuff(_target.Position, SNOPower.Monk_ExplodingPalm, 10f) >= 0.5 * TargetUtil.NumMobsInRangeOfPosition(_target.Position, 10f) && 
+                if (_target.IsTrashPackOrBossEliteRareUnique &&
+                    TargetUtil.MobsWithDebuff(_target.Position, SNOPower.Monk_ExplodingPalm, 10f) >= 0.5 * TargetUtil.NumMobsInRangeOfPosition(_target.Position, 10f) &&
                     _target.RadiusDistance <= wolRange && _target.HasDebuff(SNOPower.Monk_ExplodingPalm))
                 {
                     return new TrinityPower(SNOPower.Monk_WaveOfLight, 0f, _target.ACDGuid);
@@ -274,8 +274,8 @@ namespace Trinity.Combat.Abilities
                 CurrentTarget.IsTrashPackOrBossEliteRareUnique && Skills.Monk.ExplodingPalm.IsActive)
             {
                 var _target = TargetUtil.BestExploadingPalmDebuffedTarget(10f);
-                if (_target.IsTrashPackOrBossEliteRareUnique && 
-                    TargetUtil.MobsWithDebuff(_target.Position, SNOPower.Monk_ExplodingPalm, 10f) >= 0.5 * TargetUtil.NumMobsInRangeOfPosition(_target.Position, 10f) && 
+                if (_target.IsTrashPackOrBossEliteRareUnique &&
+                    TargetUtil.MobsWithDebuff(_target.Position, SNOPower.Monk_ExplodingPalm, 10f) >= 0.5 * TargetUtil.NumMobsInRangeOfPosition(_target.Position, 10f) &&
                     _target.RadiusDistance <= 10f && _target.HasDebuff(SNOPower.Monk_ExplodingPalm))
                 {
                     return new TrinityPower(SNOPower.Monk_LashingTailKick, 0f, _target.ACDGuid);
@@ -287,7 +287,7 @@ namespace Trinity.Combat.Abilities
             {
                 ChangeTarget();
             }
-            
+
             // Dashing Strike
             if (CanCastDashingStrike)
             {
@@ -301,8 +301,8 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, CurrentTarget.Position);
                 }
 
-                if (CurrentTarget.IsTrashPackOrBossEliteRareUnique && 
-                    (CurrentTarget.Distance >= 10f || 
+                if (CurrentTarget.IsTrashPackOrBossEliteRareUnique &&
+                    (CurrentTarget.Distance >= 10f ||
                     !NavHelper.CanRayCast(CurrentTarget.Position) ||
                     CacheData.MonsterObstacles.Any(m => m.RActorGUID != CurrentTarget.RActorGuid && MathUtil.IntersectsPath(m.Position, 5f, CurrentTarget.Position, Player.Position))))
                 {
@@ -341,14 +341,14 @@ namespace Trinity.Combat.Abilities
 
             // Exploding Palm
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
-                CanCast(SNOPower.Monk_ExplodingPalm, CanCastFlags.NoTimer) && 
+                CanCast(SNOPower.Monk_ExplodingPalm, CanCastFlags.NoTimer) &&
                 !CurrentTarget.HasDebuff(SNOPower.Monk_ExplodingPalm))
             {
                 return new TrinityPower(SNOPower.Monk_ExplodingPalm, 10f, CurrentTarget.ClusterPosition(8f), CurrentTarget.ACDGuid);
             }
 
             // Wave of light
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight) && 
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight) &&
                 (TargetUtil.AnyMobsInRange(25, Settings.Combat.Monk.MinWoLTrashCount) || CurrentTarget.IsTrashPackOrBossEliteRareUnique) &&
                 (!Settings.Combat.Monk.SWBeforeWoL || (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3)))
             {
@@ -361,7 +361,7 @@ namespace Trinity.Combat.Abilities
                     CombatBase.SwitchToTarget(_target);
                     return new TrinityPower(SNOPower.Monk_WaveOfLight, wolRange, _target.ClusterPosition((float)(wolRange - 2f)), _target.ACDGuid);
                 }
-                    
+
             }
 
             // Lashing Tail Kick
@@ -486,7 +486,7 @@ namespace Trinity.Combat.Abilities
                 SpellHistory.TimeSinceUse(SNOPower.Monk_WayOfTheHundredFists) > TimeSpan.FromMilliseconds(wothfInterval)))
             {
                 // RefreshSweepingWind();
-                return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 16f, CurrentTarget.ClusterPosition(14f), CurrentTarget.ACDGuid); 
+                return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 16f, CurrentTarget.ClusterPosition(14f), CurrentTarget.ACDGuid);
             }
 
             // Crippling Wave
@@ -579,7 +579,7 @@ namespace Trinity.Combat.Abilities
             if (CurrentTarget.IsBossOrEliteRareUnique) { range += 10f; }
 
             var bestExplodingPalmTarget = TargetUtil.BestExploadingPalmTarget(range);
-            if (bestExplodingPalmTarget  != default(TrinityCacheObject) && 
+            if (bestExplodingPalmTarget != default(TrinityCacheObject) &&
                 bestExplodingPalmTarget.RActorGuid != CurrentTarget.RActorGuid)
             {
                 //Trinity.Blacklist1Second.Add(CurrentTarget.RActorGuid);
@@ -644,7 +644,7 @@ namespace Trinity.Combat.Abilities
             //    return;
 
             //if (GetHasBuff(SNOPower.Monk_SweepingWind))
-                //LastSweepingWindRefresh = DateTime.UtcNow;
+            //LastSweepingWindRefresh = DateTime.UtcNow;
         }
 
         internal static void GenerateMonkZigZag()
@@ -736,13 +736,9 @@ namespace Trinity.Combat.Abilities
                     return false;
             }
 
-            try
-            {
-                if (ZetaDia.Me.LoopingAnimationEndTime > 0)
-                    return false;
-            }
-            catch { }
-            
+            if (ZetaDia.Me.LoopingAnimationEndTime > 0)
+                return false;
+
 
             return true;
         }
@@ -783,16 +779,16 @@ namespace Trinity.Combat.Abilities
                 return;
 
             //if (Player.IsInTown)
-                //return;
+            //return;
 
-           // Sweeping Winds Refresh(wtf the last logic)
+            // Sweeping Winds Refresh(wtf the last logic)
             if (Player.PrimaryResource >= _minSweepingWindSpirit &&
-               CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) && 
+               CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) &&
                ((!GetHasBuff(SNOPower.Monk_SweepingWind) && (_hasInnaSet || (Trinity.ObjectCache != null && TargetUtil.AnyMobsInRange(18f)))) ||
                CombatBase.IsTaegukBuffWillExpire))
             {
-                Logger.Log("Sweeping Wind Out of Band Refresh {0}", 
-                    CombatBase.Cast(new TrinityPower(SNOPower.Monk_SweepingWind)) ? 
+                Logger.Log("Sweeping Wind Out of Band Refresh {0}",
+                    CombatBase.Cast(new TrinityPower(SNOPower.Monk_SweepingWind)) ?
                     "succeeded" : "failed");
             }
         }

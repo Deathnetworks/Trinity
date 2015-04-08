@@ -49,7 +49,7 @@ namespace Trinity
                     if (!ZetaDia.Me.CommonData.IsValid)
                         return GetRunStatus("CDInvalid", RunStatus.Failure);
 
-                    if (!Player.IsValid)           
+                    if (!Player.IsValid)
                         return GetRunStatus("NotInGameWorld", RunStatus.Failure);
 
                     if (Player.IsDead)
@@ -146,7 +146,7 @@ namespace Trinity
                 { SetQueuedBasicMovement(ForceNewMovement); }
 
                 if (CombatBase.QueuedMovement.IsQueuedMovement)
-                    CombatBase.QueuedMovement.Execute(); 
+                    CombatBase.QueuedMovement.Execute();
 
                 Logger.LogDebug(LogCategory.Behavior, "End of HandleTarget");
                 return GetRunStatus("EndLoop", RunStatus.Running);
@@ -256,7 +256,7 @@ namespace Trinity
                 Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "Town Run Ready!");
                 return true;
             }
-;
+            ;
             return false;
         }
 
@@ -513,7 +513,7 @@ namespace Trinity
                                     _lastDestroyedDestructible = DateTime.UtcNow;
                                     _needClearDestructibles = true;
                                 }
-                                
+
 
                                 return true;
                             }
@@ -584,8 +584,8 @@ namespace Trinity
 
             //    // don't timeout on avoidance
             //    if (CurrentTarget.Type == GObjectType.Avoidance)
-                
-                    
+
+
 
             //    // don't timeout on legendary items
             //    if (CurrentTarget.Type == GObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary)
@@ -970,12 +970,8 @@ namespace Trinity
                 statusText.Append(" Power=");
                 statusText.Append(CombatBase.CurrentPower.SNOPower);
             }
-            try
-            {
-                statusText.Append(" Speed=");
-                statusText.Append(ZetaDia.Me.Movement.SpeedXY.ToString("0.00"));
-            }
-            catch { }
+            statusText.Append(" Speed=");
+            statusText.Append(ZetaDia.Me.Movement.SpeedXY.ToString("0.00"));
             statusText.Append(" SNO=");
             statusText.Append(CurrentTarget.ActorSNO.ToString(CultureInfo.InvariantCulture));
             statusText.Append(" Elite=");
@@ -1052,7 +1048,7 @@ namespace Trinity
                 }
 
                 // Keep kiting option
-                if (Settings.Combat.Misc.KeepMovingInCombat && CurrentTarget.IsUnit && 
+                if (Settings.Combat.Misc.KeepMovingInCombat && CurrentTarget.IsUnit &&
                     CurrentTargetIsInRange && !CombatBase.IsNull(CombatBase.CurrentPower) &&
                     MainGrid.MapAsList.Any() &&
                     (Player.IsRanged || TargetUtil.ClusterExists(Settings.Combat.Misc.TrashPackClusterRadius, TargetCurrentDistance + 5f, Settings.Combat.Misc.TrashPackSize)))
@@ -1061,7 +1057,7 @@ namespace Trinity
                     {
                         Name = CurrentTarget.InternalName,
                         Infos = "(Keep moving) " + CurrentTarget.Infos,
-                        Destination = Player.IsRanged ? 
+                        Destination = Player.IsRanged ?
                         GridMap.GetBestMoveNode().Position :
                         GridMap.GetBestClusterNode(_radius: Settings.Combat.Misc.TrashPackClusterRadius, _size: Settings.Combat.Misc.TrashPackSize, _range: TargetCurrentDistance + 5f).Position,
                         OnUpdate = m =>
@@ -1442,7 +1438,7 @@ namespace Trinity
                     CacheData.InteractAttempts.Add(CurrentTarget.RActorGuid, 1);
 
                     // Fire item looted for Demonbuddy Item stats
-                    try { GameEvents.FireItemLooted(CurrentTarget.ACDGuid); } catch { }
+                    GameEvents.FireItemLooted(CurrentTarget.ACDGuid);
                 }
                 else
                 {

@@ -247,7 +247,7 @@ namespace Trinity.Combat
                 _status.ChangeInDistance = _status.LastPosition.Distance(_destination) - _status.DistanceToObjective;
                 _status.LastPosition = ZetaDia.Me.Position;
 
-                bool _straightLinePathing = DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) || 
+                bool _straightLinePathing = DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) ||
                     _destination.Distance2DSqr(Trinity.Player.Position) <= 10f * 10f ||
                     NavHelper.CanRayCast(_destination);
 
@@ -279,7 +279,7 @@ namespace Trinity.Combat
                     default:
                         SuccessHandler("MoveResult.Default");
                         return RunStatus.Success;
-                } 
+                }
             }
         }
 
@@ -406,13 +406,9 @@ namespace Trinity.Combat
 
             private static void Pulse()
             {
-                try
-                {
-                    ChangeInDistance = _lastPosition.Distance(ZetaDia.Me.Position);
-                    _lastPosition = ZetaDia.Me.Position;
-                    IsStuck();
-                }
-                catch { }
+                ChangeInDistance = _lastPosition.Distance(ZetaDia.Me.Position);
+                _lastPosition = ZetaDia.Me.Position;
+                IsStuck();
             }
 
             public static double StuckElapsedMilliseconds
@@ -427,23 +423,19 @@ namespace Trinity.Combat
 
             public static bool IsStuck(float changeInDistanceLimit = 2.5f, double stuckTimeLimit = 500)
             {
-                try
+                if (ChangeInDistance < MaxPossibleDistanceTravelled && ChangeInDistance < changeInDistanceLimit * ZetaDia.Me.MovementScalar)
                 {
-                    if (ChangeInDistance < MaxPossibleDistanceTravelled && ChangeInDistance < changeInDistanceLimit * ZetaDia.Me.MovementScalar)
-                    {
-                        if (_isMoving)
-                        {
-                            Reset();
-                            StuckTime.Start();
-                        }
-                        _isMoving = false;
-                    }
-                    else
+                    if (_isMoving)
                     {
                         Reset();
+                        StuckTime.Start();
                     }
+                    _isMoving = false;
                 }
-                catch { }
+                else
+                {
+                    Reset();
+                }
 
                 _log = string.Format("Speed={0:0.#}/{1:0.#} StuckTime={2:0.#}/{3:0.#}", ChangeInDistance, changeInDistanceLimit * ZetaDia.Me.MovementScalar, StuckTime.ElapsedMilliseconds, stuckTimeLimit);
 

@@ -54,25 +54,13 @@ namespace Trinity
         /// </summary>
         public static void MaintainCache()
         {
-            try
+            int worldId = ZetaDia.CurrentWorldId;
+            foreach (PositionCache p in Cache.Where(p => p.WorldId != worldId))
             {
-                int worldId = ZetaDia.CurrentWorldId;
-                /*foreach (PositionCache p in Cache.Where(p => p.Position.Distance2D(Trinity.Player.Position) > 200))
-                {
-                    CacheData.VisitedZone.Remove(p.Position);
-                    Cache.Remove(p);
-                }*/
-                foreach (PositionCache p in Cache.Where(p => p.WorldId != worldId))
-                {
-                    CacheData.VisitedZones.Remove(p.Position);
-                    Cache.Remove(p);
-                }
+                CacheData.VisitedZones.Remove(p.Position);
+                Cache.Remove(p);
             }
-            catch { }
 
-            //Cache.RemoveWhere(p => p.Position.Distance2D(Trinity.Player.Position) > 200);
-            //Cache.RemoveWhere(p => DateTime.UtcNow.Subtract(p.RecordedAt).TotalMilliseconds > 15000);
-            //Cache.RemoveWhere(p => p.WorldId != worldId);
         }
 
         public bool Equals(PositionCache other)

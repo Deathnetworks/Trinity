@@ -69,21 +69,17 @@ namespace Trinity.Helpers
                 return true;
             }
 
-            try
+            // We keep dying because we're spawning in AoE and next to 50 elites and we need to just leave the game
+            if (DateTime.UtcNow.Subtract(Trinity.LastDeathTime).TotalSeconds < 30 &&
+                ZetaDia.Me.Inventory.Equipped.Any() &&
+                ZetaDia.Me.Inventory.Equipped.Where(i => i.ACDGuid != 0 && i.IsValid).Average(i => i.DurabilityPercent) < 0.05 && !ZetaDia.IsInTown)
             {
-                // We keep dying because we're spawning in AoE and next to 50 elites and we need to just leave the game
-                if (DateTime.UtcNow.Subtract(Trinity.LastDeathTime).TotalSeconds < 30 &&
-                    ZetaDia.Me.Inventory.Equipped.Any() &&
-                    ZetaDia.Me.Inventory.Equipped.Where(i => i.ACDGuid != 0 && i.IsValid).Average(i => i.DurabilityPercent) < 0.05 && !ZetaDia.IsInTown)
-                {
-                    Logger.Log("Durability is zero, emergency leave game");
-                    ZetaDia.Service.Party.LeaveGame(true);
-                    await CommonCoroutines.LeaveGame("Durability is zero");
-                    Logger.LogDebug(LogCategory.GlobalHandler, "Recently died, durability zero");
-                    return true;
-                }   
+                Logger.Log("Durability is zero, emergency leave game");
+                ZetaDia.Service.Party.LeaveGame(true);
+                await CommonCoroutines.LeaveGame("Durability is zero");
+                Logger.LogDebug(LogCategory.GlobalHandler, "Recently died, durability zero");
+                return true;
             }
-            catch { }
 
             Trinity.ResetTickValues();
             return await new Decorator(Trinity.TargetCheck, new Action(ret => Trinity.HandleTarget())).ExecuteCoroutine();

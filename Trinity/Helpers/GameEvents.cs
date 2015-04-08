@@ -36,22 +36,16 @@ namespace Trinity
             V.ValidateLoad();
 
             // Recording of all the XML's in use this run
-            try
+            string sThisProfile = GlobalSettings.Instance.LastProfile;
+            if (sThisProfile != CurrentProfile)
             {
-                string sThisProfile = GlobalSettings.Instance.LastProfile;
-                if (sThisProfile != CurrentProfile)
-                {
-                    ProfileHistory.Add(sThisProfile);
-                    CurrentProfile = sThisProfile;
-                    if (FirstProfile == string.Empty)
-                        FirstProfile = sThisProfile;
-                }
+                ProfileHistory.Add(sThisProfile);
+                CurrentProfile = sThisProfile;
+                if (FirstProfile == string.Empty)
+                    FirstProfile = sThisProfile;
+            }
 
-                DebugUtil.LogSystemInformation();
-            }
-            catch
-            {
-            }
+            DebugUtil.LogSystemInformation();
 
             if (!ItemDropStats.MaintainStatTracking)
             {
@@ -210,7 +204,7 @@ namespace Trinity
                 Blacklist60Seconds = new HashSet<int>();
                 Blacklist90Seconds = new HashSet<int>();
                 Blacklist15Seconds = new HashSet<int>();
-           
+
                 PlayerMover.TotalAntiStuckAttempts = 1;
                 PlayerMover.vSafeMovementLocation = Vector3.Zero;
                 PlayerMover.LastPosition = Vector3.Zero;

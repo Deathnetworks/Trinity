@@ -218,7 +218,7 @@ namespace Trinity.Combat.Abilities
             }
 
             // Spirit Barrage Manitou
-            if (CanCast(SNOPower.Witchdoctor_SpiritBarrage) && Runes.WitchDoctor.Manitou.IsActive && 
+            if (CanCast(SNOPower.Witchdoctor_SpiritBarrage) && Runes.WitchDoctor.Manitou.IsActive &&
                 TimeSincePowerUse(SNOPower.Witchdoctor_SpiritBarrage) > 18000)
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage);
@@ -363,7 +363,7 @@ namespace Trinity.Combat.Abilities
             }
 
             // Piranhas
-            if (Skills.WitchDoctor.Piranhas.CanCast() && 
+            if (Skills.WitchDoctor.Piranhas.CanCast() &&
                 (TargetUtil.ClusterExists(20f, 3) || TargetUtil.EliteOrTrashInRange(RangedAttackRange)))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_Piranhas, RangedAttackRange, TargetUtil.GetBestClusterPoint(20f));
@@ -556,30 +556,26 @@ namespace Trinity.Combat.Abilities
 
         public static TrinityPower RunTiklandianRoutine()
         {
-            try
+            // Piranhas
+            if (Skills.WitchDoctor.Piranhas.CanCast() &&
+                (TargetUtil.ClusterExists(20f, 3) || TargetUtil.EliteOrTrashInRange(RangedAttackRange)))
             {
-                // Piranhas
-                if (Skills.WitchDoctor.Piranhas.CanCast() && 
-                    (TargetUtil.ClusterExists(20f, 3) || TargetUtil.EliteOrTrashInRange(RangedAttackRange)))
-                {
-                    return new TrinityPower(SNOPower.Witchdoctor_Piranhas, RangedAttackRange, TargetUtil.GetBestClusterPoint(20f));
-                }
-
-                float horrifyMinRange = Runes.WitchDoctor.FaceOfDeath.IsActive ? 24f : 18f;
-
-                //Cast Horrify before we go into the fray
-                if (Skills.WitchDoctor.Horrify.CanCast() && TikHorrifyCriteria(new TargetArea(horrifyMinRange)))
-                {
-                    Skills.WitchDoctor.Horrify.Cast();
-                }
-
-                // Should we move to a better position to fear people
-                if (TikHorrifyCriteria(new TargetCluster(horrifyMinRange)))
-                {
-                    MoveToHorrifyPoint(new TargetCluster(horrifyMinRange));
-                }
+                return new TrinityPower(SNOPower.Witchdoctor_Piranhas, RangedAttackRange, TargetUtil.GetBestClusterPoint(20f));
             }
-            catch { }
+
+            float horrifyMinRange = Runes.WitchDoctor.FaceOfDeath.IsActive ? 24f : 18f;
+
+            //Cast Horrify before we go into the fray
+            if (Skills.WitchDoctor.Horrify.CanCast() && TikHorrifyCriteria(new TargetArea(horrifyMinRange)))
+            {
+                Skills.WitchDoctor.Horrify.Cast();
+            }
+
+            // Should we move to a better position to fear people
+            if (TikHorrifyCriteria(new TargetCluster(horrifyMinRange)))
+            {
+                MoveToHorrifyPoint(new TargetCluster(horrifyMinRange));
+            }
 
             return null;
         }
@@ -613,66 +609,62 @@ namespace Trinity.Combat.Abilities
 
         public static TrinityPower RunJadeHarvesterRoutine()
         {
-            try
+            // Piranhas
+            if (Skills.WitchDoctor.Piranhas.CanCast() &&
+                (TargetUtil.ClusterExists(20f, 3) || TargetUtil.EliteOrTrashInRange(RangedAttackRange)))
             {
-                // Piranhas
-                if (Skills.WitchDoctor.Piranhas.CanCast() && 
-                    (TargetUtil.ClusterExists(20f, 3) || TargetUtil.EliteOrTrashInRange(RangedAttackRange)))
+                return new TrinityPower(SNOPower.Witchdoctor_Piranhas, RangedAttackRange, TargetUtil.GetBestClusterPoint(20f));
+            }
+
+            SoulHarvestBestCluster = GetSoulHarvestBestCluster;
+            // Should we move to cluster for harvest
+            if (SoulHarvestBestCluster != null)
+            {
+                MoveToSoulHarvestPoint(SoulHarvestBestCluster);
+                if (CurrentTarget == null)
                 {
-                    return new TrinityPower(SNOPower.Witchdoctor_Piranhas, RangedAttackRange, TargetUtil.GetBestClusterPoint(20f));
-                }
-
-                SoulHarvestBestCluster = GetSoulHarvestBestCluster;
-                // Should we move to cluster for harvest
-                if (SoulHarvestBestCluster != null)
-                {
-                    MoveToSoulHarvestPoint(SoulHarvestBestCluster);
-                    if (CurrentTarget == null)
-                    {
-                        CombatBase.SwitchToTarget(TargetUtil.GetClosestTarget(150f));
-                        Trinity.CurrentTarget.Position = SoulHarvestBestCluster.Position;
-                    }
-                }
-
-
-                // Should we harvest right here?
-                if (Skills.WitchDoctor.SoulHarvest.CanCast() &&
-                    (IdealSoulHarvestCriteria(Enemies.CloseNearby) || MinimumSoulHarvestCriteria(Enemies.CloseNearby)))
-                {
-                    Skills.WitchDoctor.SoulHarvest.Cast();
-                }
-
-                if (CurrentTarget != null && CurrentTarget.IsUnit)
-                {
-                    TrinityCacheObject getTargetWithoutDebuffs = Enemies.BestCluster.GetTargetWithoutDebuffs(HarvesterCoreDebuffs);
-                    if (getTargetWithoutDebuffs != null && getTargetWithoutDebuffs != default(TrinityCacheObject))
-                    {
-                        CombatBase.SwitchToTarget(getTargetWithoutDebuffs);
-                    }
-
-                    // Locust Swarm
-                    if (CanCast(SNOPower.Witchdoctor_Locust_Swarm) &&
-                        !CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Locust_Swarm))
-                    {
-                        return new TrinityPower(SNOPower.Witchdoctor_Locust_Swarm, MeleeAttackRange, CurrentTarget.ClusterPosition(MeleeAttackRange), CurrentTarget.ACDGuid);
-                    }
-
-                    // Haunt 
-                    if (CanCast(SNOPower.Witchdoctor_Haunt) &&
-                        !CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Haunt))
-                    {
-                        return new TrinityPower(SNOPower.Witchdoctor_Haunt, MeleeAttackRange, CurrentTarget.ClusterPosition(MeleeAttackRange), CurrentTarget.ACDGuid);
-                    }
-
-                    // Acid Cloud
-                    if (Skills.WitchDoctor.AcidCloud.CanCast() && Player.PrimaryResource >= 325 &&
-                        LastPowerUsed != SNOPower.Witchdoctor_AcidCloud)
-                    {
-                        return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, MeleeAttackRange, CurrentTarget.ClusterPosition(MeleeAttackRange));
-                    }
+                    CombatBase.SwitchToTarget(TargetUtil.GetClosestTarget(150f));
+                    Trinity.CurrentTarget.Position = SoulHarvestBestCluster.Position;
                 }
             }
-            catch { }
+
+
+            // Should we harvest right here?
+            if (Skills.WitchDoctor.SoulHarvest.CanCast() &&
+                (IdealSoulHarvestCriteria(Enemies.CloseNearby) || MinimumSoulHarvestCriteria(Enemies.CloseNearby)))
+            {
+                Skills.WitchDoctor.SoulHarvest.Cast();
+            }
+
+            if (CurrentTarget != null && CurrentTarget.IsUnit)
+            {
+                TrinityCacheObject getTargetWithoutDebuffs = Enemies.BestCluster.GetTargetWithoutDebuffs(HarvesterCoreDebuffs);
+                if (getTargetWithoutDebuffs != null && getTargetWithoutDebuffs != default(TrinityCacheObject))
+                {
+                    CombatBase.SwitchToTarget(getTargetWithoutDebuffs);
+                }
+
+                // Locust Swarm
+                if (CanCast(SNOPower.Witchdoctor_Locust_Swarm) &&
+                    !CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Locust_Swarm))
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_Locust_Swarm, MeleeAttackRange, CurrentTarget.ClusterPosition(MeleeAttackRange), CurrentTarget.ACDGuid);
+                }
+
+                // Haunt 
+                if (CanCast(SNOPower.Witchdoctor_Haunt) &&
+                    !CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Haunt))
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_Haunt, MeleeAttackRange, CurrentTarget.ClusterPosition(MeleeAttackRange), CurrentTarget.ACDGuid);
+                }
+
+                // Acid Cloud
+                if (Skills.WitchDoctor.AcidCloud.CanCast() && Player.PrimaryResource >= 325 &&
+                    LastPowerUsed != SNOPower.Witchdoctor_AcidCloud)
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, MeleeAttackRange, CurrentTarget.ClusterPosition(MeleeAttackRange));
+                }
+            }
 
             return null;
         }

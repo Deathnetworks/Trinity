@@ -94,63 +94,59 @@ namespace Trinity.Helpers
 
         public static void LogBuildAndItems(TrinityLogLevel level = TrinityLogLevel.Debug)
         {
-            try
+            using (new MemoryHelper())
             {
-                using (new MemoryHelper())
+                Action<Item, TrinityLogLevel> logItem = (i, l) =>
                 {
-                    Action<Item, TrinityLogLevel> logItem = (i, l) =>
-                    {
-                        Logger.Log(l, LogCategory.UserInformation, string.Format("Item: {0}: {1} ({2}) is Equipped", i.ItemType, i.Name, i.Id));
-                    };
+                    Logger.Log(l, LogCategory.UserInformation, string.Format("Item: {0}: {1} ({2}) is Equipped", i.ItemType, i.Name, i.Id));
+                };
 
-                    var actualEquipped = CacheData.Inventory.Equipped.Where(i => i.ItemQualityLevel == ItemQuality.Legendary).ToList();
-                    var referenceEquipped = Legendary.Equipped.Where(i => i.IsEquipped).ToList();
-                    if (actualEquipped.Count != referenceEquipped.Count)
-                    {
-                        var missingItems = actualEquipped.Where(i => referenceEquipped.All(item => item.Id != i.ActorSNO));
-                        Logger.Log(">> Warning - One or more of your equipped items is recorded incorrectly in Trinity; please report:");
-                        Zeta.Common.Extensions.ForEach(missingItems, i => Logger.Log(">> {0} {1} ActorSNO={2} BaseType={3} ItemType={4}", i.InternalName, i.Name, i.ActorSNO, i.ItemBaseType, i.ItemType));
-                    }
-
-                    Logger.Log(level, LogCategory.UserInformation, "------ Equipped Legendaries: Items={0}, Sets={1} ------", Legendary.Equipped.Count, Sets.Equipped.Count);
-
-                    Zeta.Common.Extensions.ForEach(Legendary.Equipped.Where(c => !c.IsSetItem || !c.Set.IsEquipped), i => logItem(i, level));
-
-                    Sets.Equipped.ForEach(s =>
-                    {
-                        Logger.Log(level, LogCategory.UserInformation, "------ Set: {0} {1}: {2}/{3} Equipped. ActiveBonuses={4}/{5} ------",
-                            s.Name,
-                            s.IsClassRestricted ? "(" + s.ClassRestriction + ")" : string.Empty,
-                            s.EquippedItems.Count,
-                            s.Items.Count,
-                            s.CurrentBonuses,
-                            s.MaxBonuses);
-
-                        Zeta.Common.Extensions.ForEach(s.Items.Where(i => i.IsEquipped), i => logItem(i, level));
-                    });
-
-                    Logger.Log(level, LogCategory.UserInformation, "------ Active Skills / Runes ------", SkillUtils.Active.Count, SkillUtils.Active.Count);
-
-                    Action<Skill> logSkill = s =>
-                    {
-                        Logger.Log(level, LogCategory.UserInformation, "Skill: {0} Rune={1} Type={2}",
-                            s.Name,
-                            s.CurrentRune.Name,
-                            (s.Category == SpellCategory.Primary) ? "Primary" : "Spender"
-                            );
-                    };
-
-                    SkillUtils.Active.ForEach(logSkill);
-
-                    Logger.Log(level, LogCategory.UserInformation, "------ Passives ------", SkillUtils.Active.Count, SkillUtils.Active.Count);
-
-                    Action<Passive> logPassive = p => Logger.Log(level, LogCategory.UserInformation, "Passive: {0}", p.Name);
-
-                    PassiveUtils.Active.ForEach(logPassive);
-
+                var actualEquipped = CacheData.Inventory.Equipped.Where(i => i.ItemQualityLevel == ItemQuality.Legendary).ToList();
+                var referenceEquipped = Legendary.Equipped.Where(i => i.IsEquipped).ToList();
+                if (actualEquipped.Count != referenceEquipped.Count)
+                {
+                    var missingItems = actualEquipped.Where(i => referenceEquipped.All(item => item.Id != i.ActorSNO));
+                    Logger.Log(">> Warning - One or more of your equipped items is recorded incorrectly in Trinity; please report:");
+                    Zeta.Common.Extensions.ForEach(missingItems, i => Logger.Log(">> {0} {1} ActorSNO={2} BaseType={3} ItemType={4}", i.InternalName, i.Name, i.ActorSNO, i.ItemBaseType, i.ItemType));
                 }
+
+                Logger.Log(level, LogCategory.UserInformation, "------ Equipped Legendaries: Items={0}, Sets={1} ------", Legendary.Equipped.Count, Sets.Equipped.Count);
+
+                Zeta.Common.Extensions.ForEach(Legendary.Equipped.Where(c => !c.IsSetItem || !c.Set.IsEquipped), i => logItem(i, level));
+
+                Sets.Equipped.ForEach(s =>
+                {
+                    Logger.Log(level, LogCategory.UserInformation, "------ Set: {0} {1}: {2}/{3} Equipped. ActiveBonuses={4}/{5} ------",
+                        s.Name,
+                        s.IsClassRestricted ? "(" + s.ClassRestriction + ")" : string.Empty,
+                        s.EquippedItems.Count,
+                        s.Items.Count,
+                        s.CurrentBonuses,
+                        s.MaxBonuses);
+
+                    Zeta.Common.Extensions.ForEach(s.Items.Where(i => i.IsEquipped), i => logItem(i, level));
+                });
+
+                Logger.Log(level, LogCategory.UserInformation, "------ Active Skills / Runes ------", SkillUtils.Active.Count, SkillUtils.Active.Count);
+
+                Action<Skill> logSkill = s =>
+                {
+                    Logger.Log(level, LogCategory.UserInformation, "Skill: {0} Rune={1} Type={2}",
+                        s.Name,
+                        s.CurrentRune.Name,
+                        (s.Category == SpellCategory.Primary) ? "Primary" : "Spender"
+                        );
+                };
+
+                SkillUtils.Active.ForEach(logSkill);
+
+                Logger.Log(level, LogCategory.UserInformation, "------ Passives ------", SkillUtils.Active.Count, SkillUtils.Active.Count);
+
+                Action<Passive> logPassive = p => Logger.Log(level, LogCategory.UserInformation, "Passive: {0}", p.Name);
+
+                PassiveUtils.Active.ForEach(logPassive);
+
             }
-            catch { }
         }
 
 
