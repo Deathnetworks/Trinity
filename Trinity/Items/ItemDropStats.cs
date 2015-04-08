@@ -57,8 +57,8 @@ namespace Trinity
         public static long LastXP = 0;
         public static long NextLevelXP = 0;
         // Gold counter
-        public static int TotalGold = 0;
-        public static int LastGold = 0;
+        public static long TotalGold = 0;
+        public static long LastGold = 0;
         // Level and ParagonLevel
         public static int Level = 0;
         public static int ParagonLevel = 0;

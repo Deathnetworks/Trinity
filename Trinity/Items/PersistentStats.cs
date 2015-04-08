@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
 using Trinity.Technicals;
-using Zeta.Common.Plugins;
 using Zeta.Game;
 
 namespace Trinity
@@ -21,8 +20,8 @@ namespace Trinity
         public long TotalXp;
         public long LastXp;
         public long NextLvXp;
-        public int TotalGold;
-        public int LastGold;
+        public long TotalGold;
+        public long LastGold;
         public int Level;
         public int ParagonLevel;
         public ItemDropStats ItemsDropped;
