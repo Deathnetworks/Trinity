@@ -31,6 +31,14 @@ namespace Trinity
         private const ulong reviveAtCheckpointHash = 0xBFAAF48BA9316742;
         private const ulong reviveInTownHash = 0x7A2AF9C0F3045ADA;
 
+        //[1F03C1A0] Mouseover: 0x6DA3168427892076, Name: Root.NormalLayer.GreaterRifts_VictoryScreen.LayoutRoot.Middle_Frame.button_exit
+        private const ulong riftCompleteOkButton = 0x6DA3168427892076;
+
+        public static UIElement RiftCompleteOkButton
+        {
+            get { return UIElement.FromHash(riftCompleteOkButton); }
+        }
+
         public static UIElement StashDialogMainPage
         {
             get { return UIElement.FromHash(0xB83F0423F7247928); }
@@ -250,6 +258,8 @@ namespace Trinity
             if (loopingAnimationEndTime > 0)
                 return;
             if (ZetaDia.IsInGame && SafeClickElement(MercenaryOKButton, "Mercenary OK Button"))
+                return;
+            if (SafeClickElement(RiftCompleteOkButton, "Rift Complete OK Button"))
                 return;
             if (SafeClickElement(GenericOK, "GenericOK"))
                 return;
