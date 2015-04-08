@@ -2,13 +2,24 @@
 using System.Linq;
 using Trinity.Config.Combat;
 using Trinity.Reference;
+using Trinity.Technicals;
 using Zeta.Common;
+using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 
 namespace Trinity.Combat.Abilities
 {
     class BarbarianCombat : CombatBase
     {
+        public static bool CurrentlyUseFuriousCharge
+        {
+            get
+            {
+                return Player.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_FuriousCharge) &&
+                    CombatBase.TimeSincePowerUse(SNOPower.Barbarian_FuriousCharge) < 350;
+            }
+        }
+
         private static bool _allowSprintOoc = true;
         private const float maxFuriousChargeDistance = 40f;
 
@@ -172,23 +183,46 @@ namespace Trinity.Combat.Abilities
             if (IsNull(power) && CanUseCleave)
                 power = PowerCleave;
 
-            if (IsNull(power) &&
-                !UseOOCBuff && !IsCurrentlyAvoiding &&
-                CurrentTarget != null && CurrentTarget.IsUnit &&
-                Sets.TheLegacyOfRaekor.IsMaxBonusActive && 
-                Skills.Barbarian.FuriousCharge.IsActive)
+            // The Legacy Of Raekor Kite Logic
+            if (IsNull(power) && CurrentTarget != null && 
+                Sets.TheLegacyOfRaekor.IsMaxBonusActive && Skills.Barbarian.FuriousCharge.IsActive)
             {
-                if (TargetUtil.NumMobsInLosInRangeOfPosition(CurrentTarget.Position, 35f) == 1 &&
+                var _kiteNode = GridMap.GetBestMoveNode(20f, _prioritizeDist: true);
+
+                if (IsNull(power) && _kiteNode != null && TargetUtil.NumMobsInLosInRangeOfPosition(CurrentTarget.Position, 35f) == 1 &&
+                    !(CurrentTarget.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize) &&
                     !CurrentTarget.IsBossOrEliteRareUnique)
                 {
                     Trinity.Blacklist15Seconds.Add(CurrentTarget.RActorGuid);
-                    Trinity.CurrentTarget = null;
-
-                    return null;
+                    power = new TrinityPower(SNOPower.Walk, 0f, _kiteNode.Position);
                 }
 
-                if (IsNull(power) && (TargetUtil.AnyMobsInRange(20f, 2) || CurrentTarget.IsBoss))
-                    power = new TrinityPower(SNOPower.Walk, 0f, GridMap.GetBestMoveNode(35f).Position);
+                if (IsNull(power) && _kiteNode != null && (TargetUtil.AnyMobsInRange(30f, 2) || (CurrentTarget.IsBoss && CurrentTarget.Distance <= 35f)))
+                    power = new TrinityPower(SNOPower.Walk, 0f, _kiteNode.Position);
+
+                if (!IsNull(power))
+                {
+                    Trinity.Player.NeedToKite = true;
+                    CombatBase.QueuedMovement.Queue(new QueuedMovement
+                    {
+                        Name = CurrentTarget.InternalName,
+                        Infos = "(Barbarian Kite) " + CurrentTarget.Infos + " WeightInfos: " + GridMap.GetBestMoveNode(20f, _prioritizeDist: true).WeightInfos,
+                        Destination = power.TargetPosition,
+                        StopCondition = m =>
+                            m.Destination == Vector3.Zero ||
+                            m.Destination.Distance2D(Trinity.Player.Position) <= 1f ||
+                            CurrentTarget == null ||
+                            CombatBase.IsNull(CombatBase.CurrentPower) || CurrentTarget == null || CurrentTarget.IsAvoidance ||
+                            !CurrentTarget.IsUnit || CombatBase.CurrentPower.SNOPower != SNOPower.Walk
+                        ,
+                        Options = new QueuedMovementOptions
+                        {
+                            Logging = LogLevel.Info,
+                            AcceptableDistance = 3f,
+                            Type = MoveType.SpecialCombat,
+                        }
+                    });
+                }
             }
 
             // Default Attacks
@@ -211,7 +245,7 @@ namespace Trinity.Combat.Abilities
                 if (CanCast(SNOPower.Barbarian_IgnorePain) && Player.CurrentHealthPct <= V.F("Barbarian.IgnorePain.MinHealth"))
                     return true;
 
-                return Sets.TheLegacyOfRaekor.IsFullyEquipped && ShouldFuryDump;
+                return CanCast(SNOPower.Barbarian_IgnorePain, CanCastFlags.NoTimer) && Sets.TheLegacyOfRaekor.IsFullyEquipped && ShouldFuryDump;
             }
         }
         public static bool ShouldWaitForCallOfTheAncients
@@ -468,18 +502,47 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                if (CombatBase.IsCombatAllowed && CanCast(SNOPower.Barbarian_FuriousCharge, CanCastFlags.NoTimer))
+                if (CombatBase.IsCombatAllowed && (CanCast(SNOPower.Barbarian_FuriousCharge) || 
+                    (Skills.Barbarian.FuriousCharge.IsActive && Sets.TheLegacyOfRaekor.IsMaxBonusActive)))
                 {
+                    var _moveNode = TargetUtil.GetBestFuriousChargeMoveNode(maxFuriousChargeDistance);
                     var _castNode = TargetUtil.GetBestFuriousChargeNode(maxFuriousChargeDistance);
-                    if (_castNode != null)
-                        return new TrinityPower(SNOPower.Barbarian_FuriousCharge, 0f, _castNode.Position);
 
-                    var _moveNode = TargetUtil.GetBestFuriousChargePreNode(maxFuriousChargeDistance);
+                    if (CanCast(SNOPower.Barbarian_FuriousCharge))
+                    {
+                        // Cast without moving
+                        if (_castNode != null && (_moveNode == null || _moveNode.SpecialWeight <= _castNode.SpecialWeight ||
+                            !(_moveNode.SpecialWeight > _castNode.SpecialWeight && _moveNode.Distance <= 7f && _moveNode.Distance > 3f)))
+                            return new TrinityPower(SNOPower.Barbarian_FuriousCharge, 0f, _castNode.Position);
+
+                        _castNode = _moveNode != null ? TargetUtil.GetBestFuriousChargeNode(maxFuriousChargeDistance, _moveNode.Position) : null;
+
+                        // New trinity power with a move position & a target position
+                        if (_moveNode != null && _castNode != null)
+                            return new TrinityPower(SNOPower.Barbarian_FuriousCharge, 4f, _moveNode.Position, _castNode.Position);
+                    }
+
+                    var _closestTarget = TargetUtil.GetClosestTarget(maxFuriousChargeDistance, _useWeights: false);
+                    _moveNode = _closestTarget != default(TrinityCacheObject) ? TargetUtil.GetBestFuriousChargeMoveNode(maxFuriousChargeDistance, _closestTarget.Position) : null;
                     _castNode = _moveNode != null ? TargetUtil.GetBestFuriousChargeNode(maxFuriousChargeDistance, _moveNode.Position) : null;
 
                     // New trinity power with a move position & a target position
                     if (_moveNode != null && _castNode != null)
-                        return new TrinityPower(SNOPower.Barbarian_FuriousCharge, 3f, _moveNode.Position, _castNode.Position);
+                        return new TrinityPower(SNOPower.Barbarian_FuriousCharge, 4f, _moveNode.Position, _castNode.Position);
+
+                    /*_moveNode = TargetUtil.GetBestFuriousChargeMoveNode(maxFuriousChargeDistance, _useFcWeights: false);
+                    _castNode = _moveNode != null && _moveNode.SpecialWeight > 0 ? TargetUtil.GetBestFuriousChargeNode(maxFuriousChargeDistance, _moveNode.Position) : null;
+
+                    // New trinity power with a move position & a target position
+                    if (_moveNode != null && _castNode != null)
+                        return new TrinityPower(SNOPower.Barbarian_FuriousCharge, 4f, _moveNode.Position, _castNode.Position);*/
+
+                    if (CanCast(SNOPower.Barbarian_FuriousCharge) && CurrentTarget != null && CurrentTarget.IsPlayerFacing(20f) && CurrentTarget.Distance < 10f)
+                        return new TrinityPower(SNOPower.Barbarian_FuriousCharge, 4f, CurrentTarget.Position);
+
+                    var _kiteNode = GridMap.GetBestMoveNode(15f, 40f);
+                    if (IsCurrentlyAvoiding && CanCast(SNOPower.Barbarian_FuriousCharge) && Player.CurrentHealthPct <= 0.6 && _kiteNode != null)
+                        return new TrinityPower(SNOPower.Barbarian_FuriousCharge, 0f, _kiteNode.Position);
                 }
 
                 return null;
@@ -571,6 +634,9 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
+                if (CanCast(SNOPower.Barbarian_Sprint, CanCastFlags.NoTimer) && IsCurrentlyAvoiding)
+                    return true;
+
                 return Trinity.Settings.Combat.Barbarian.SprintMode != BarbarianSprintMode.MovementOnly &&
                     !UseOOCBuff && CanCast(SNOPower.Barbarian_Sprint, CanCastFlags.NoTimer) && !Player.IsIncapacitated &&
                     (
@@ -750,7 +816,7 @@ namespace Trinity.Combat.Abilities
         public static TrinityPower PowerWrathOfTheBerserker { get { return new TrinityPower(SNOPower.Barbarian_WrathOfTheBerserker); } }
         public static TrinityPower PowerCallOfTheAncients { get { return new TrinityPower(SNOPower.Barbarian_CallOfTheAncients, V.I("Barbarian.CallOfTheAncients.TickDelay"), V.I("Barbarian.CallOfTheAncients.TickDelay")); } }
         public static TrinityPower PowerBattleRage { get { return new TrinityPower(SNOPower.Barbarian_BattleRage); } }
-        public static TrinityPower PowerSprint { get { return new TrinityPower(SNOPower.Barbarian_Sprint, 0, 0); } }
+        public static TrinityPower PowerSprint { get { return new TrinityPower(SNOPower.Barbarian_Sprint); } }
         public static TrinityPower PowerWarCry { get { return new TrinityPower(SNOPower.X1_Barbarian_WarCry_v2); } }
         public static TrinityPower PowerThreateningShout { get { return new TrinityPower(SNOPower.Barbarian_ThreateningShout); } }
         public static TrinityPower PowerRevenge { get { return new TrinityPower(SNOPower.Barbarian_Revenge); } }

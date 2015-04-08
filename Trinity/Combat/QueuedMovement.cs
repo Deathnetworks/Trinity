@@ -183,103 +183,103 @@ namespace Trinity.Combat
                     FinishedHandler();
 
                 QueueingHandler(movement);
-                LastExecutedMovement = DateTime.UtcNow;
             }
         }
 
         public RunStatus Execute()
         {
-            if (!IsQueuedMovement)
+            using (new MemorySpy("QueuedMovement.Execute()"))
             {
-                FailedHandler("Dequeue");
-                return RunStatus.Failure;
-            }
-
-            if (CurrentMovement == null)
-            {
-                CurrentMovement = _internalQueue.Dequeue();
-                CurrentMovement.StartPosition = ZetaDia.Me.Position;
-                CurrentMovement.LastStartedTime = DateTime.UtcNow;
-                Stuck.Reset();
-            }
-
-            if (DateTime.UtcNow.Subtract(LastExecutedMovement).TotalMilliseconds < 50)
-                return RunStatus.Running;
-
-            LastExecutedMovement = DateTime.UtcNow;
-
-            _options = Options;
-
-            if (CurrentMovement.StopCondition != null &&
-                CurrentMovement.StopCondition.Invoke(CurrentMovement))
-            {
-                SuccessHandler("StopWhen");
-                return RunStatus.Success;
-            }
-
-            if (Stuck.IsStuck(_options.ChangeInDistanceLimit, _options.TimeBeforeBlocked))
-            {
-                FailedHandler("Blocked " + Stuck.LastLogMessage);
-                return RunStatus.Failure;
-            }
-
-            if (IsBlacklisted(CurrentMovement))
-            {
-                FailedHandler("RecentlyFailed");
-                return RunStatus.Failure;
-            }
-
-            if (CurrentMovement.OnUpdate != null)
-                CurrentMovement.OnUpdate.Invoke(CurrentMovement);
-
-            Vector3 _destination = CurrentMovement.Destination;
-
-            _status.DistanceToObjective = ZetaDia.Me.Position.Distance(_destination);
-
-            if (_status.DistanceToObjective < _options.AcceptableDistance)
-            {
-                SuccessHandler(string.Format("AcceptableDistance: {0}", _options.AcceptableDistance));
-                return RunStatus.Success;
-            }
-
-            if (_status.DistanceToObjective > _options.MaxDistance)
-            {
-                FailedHandler(string.Format("MaxDistance: {0}", _options.MaxDistance));
-                return RunStatus.Success;
-            }
-
-            _status.ChangeInDistance = _status.LastPosition.Distance(_destination) - _status.DistanceToObjective;
-            _status.LastPosition = ZetaDia.Me.Position;
-
-            if (DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) ||
-                _destination.Distance2DSqr(Trinity.Player.Position) <= 10f * 10f)
-            {
-                Navigator.PlayerMover.MoveTowards(_destination);
-                _status.LastStatus = MoveResult.Moved;
-            }
-            else
-            {
-                _status.LastStatus = PlayerMover.NavigateTo(_destination, CurrentMovement.Name);
-            }
-
-            CurrentMovement.Status = _status;
-
-            switch (_status.LastStatus)
-            {
-                case MoveResult.ReachedDestination:
-                case MoveResult.PathGenerationFailed:
-                case MoveResult.PathGenerating:
-                case MoveResult.PathGenerated:
-                case MoveResult.Moved:
-                    MovedHandler();
-                    return RunStatus.Running;
-                case MoveResult.UnstuckAttempt:
-                case MoveResult.Failed:
-                    FailedHandler("Navigation");
+                if (!IsQueuedMovement)
+                {
+                    FailedHandler("Dequeue");
                     return RunStatus.Failure;
-                default:
-                    SuccessHandler("MoveResult.Default");
+                }
+
+                if (CurrentMovement == null)
+                {
+                    CurrentMovement = _internalQueue.Dequeue();
+                    CurrentMovement.StartPosition = ZetaDia.Me.Position;
+                    CurrentMovement.LastStartedTime = DateTime.UtcNow;
+                    Stuck.Reset();
+                }
+
+                _options = Options;
+
+                if (CurrentMovement.StopCondition != null &&
+                    CurrentMovement.StopCondition.Invoke(CurrentMovement))
+                {
+                    SuccessHandler("StopWhen");
                     return RunStatus.Success;
+                }
+
+                if (Stuck.IsStuck(_options.ChangeInDistanceLimit, _options.TimeBeforeBlocked))
+                {
+                    FailedHandler("Blocked " + Stuck.LastLogMessage);
+                    return RunStatus.Failure;
+                }
+
+                if (IsBlacklisted(CurrentMovement))
+                {
+                    FailedHandler("RecentlyFailed");
+                    return RunStatus.Failure;
+                }
+
+                if (CurrentMovement.OnUpdate != null)
+                    CurrentMovement.OnUpdate.Invoke(CurrentMovement);
+
+                Vector3 _destination = CurrentMovement.Destination;
+
+                _status.DistanceToObjective = ZetaDia.Me.Position.Distance(_destination);
+
+                if (_status.DistanceToObjective < _options.AcceptableDistance)
+                {
+                    SuccessHandler(string.Format("AcceptableDistance: {0}", _options.AcceptableDistance));
+                    return RunStatus.Success;
+                }
+
+                if (_status.DistanceToObjective > _options.MaxDistance)
+                {
+                    FailedHandler(string.Format("MaxDistance: {0}", _options.MaxDistance));
+                    return RunStatus.Success;
+                }
+
+                _status.ChangeInDistance = _status.LastPosition.Distance(_destination) - _status.DistanceToObjective;
+                _status.LastPosition = ZetaDia.Me.Position;
+
+                bool _straightLinePathing = DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) || 
+                    _destination.Distance2DSqr(Trinity.Player.Position) <= 10f * 10f ||
+                    NavHelper.CanRayCast(_destination);
+
+                if (_straightLinePathing)
+                {
+                    Navigator.PlayerMover.MoveTowards(_destination);
+                    _status.LastStatus = MoveResult.Moved;
+                }
+                else
+                {
+                    _status.LastStatus = PlayerMover.NavigateTo(_destination, CurrentMovement.Name);
+                }
+
+                CurrentMovement.Status = _status;
+
+                switch (_status.LastStatus)
+                {
+                    case MoveResult.ReachedDestination:
+                    case MoveResult.PathGenerationFailed:
+                    case MoveResult.PathGenerating:
+                    case MoveResult.PathGenerated:
+                    case MoveResult.Moved:
+                        MovedHandler();
+                        return RunStatus.Running;
+                    case MoveResult.UnstuckAttempt:
+                    case MoveResult.Failed:
+                        FailedHandler("Navigation");
+                        return RunStatus.Failure;
+                    default:
+                        SuccessHandler("MoveResult.Default");
+                        return RunStatus.Success;
+                } 
             }
         }
 
@@ -317,7 +317,7 @@ namespace Trinity.Combat
             PlayerMover.UnstuckHandler();
 
             var location = (!string.IsNullOrEmpty(reason) ? "(" + reason + ") " : reason);
-            LogLocation("Failed " + location + "moving to ", CurrentMovement, Stuck.LastLogMessage, TrinityLogLevel.Verbose);
+            LogLocation("Failed " + location + "moving to ", CurrentMovement, Stuck.LastLogMessage, TrinityLogLevel.Error);
 
             FinishedHandler();
         }

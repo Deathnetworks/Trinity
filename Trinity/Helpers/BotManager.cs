@@ -84,6 +84,8 @@ namespace Trinity.Helpers
                 }   
             }
             catch { }
+
+            Trinity.ResetTickValues();
             return await new Decorator(Trinity.TargetCheck, new Action(ret => Trinity.HandleTarget())).ExecuteCoroutine();
         }
 

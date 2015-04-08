@@ -31,7 +31,7 @@ namespace Trinity.Technicals
                     if (_Stopwatch.Elapsed.TotalMilliseconds > 1000 ||
                         (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance) && _Stopwatch.Elapsed.TotalMilliseconds > 25))
                     {
-                        Logging.ErrorFormat("[Trinity][Performance] Execution of {0} took {1:00.00}ms.", _BlockName,
+                        Logging.InfoFormat("[Trinity][Performance] Execution of {0} took {1:00.00}ms.", _BlockName,
                                             _Stopwatch.Elapsed.TotalMilliseconds);
                     }
                     else if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance))

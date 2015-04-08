@@ -18,6 +18,15 @@ namespace Trinity.Combat.Abilities
 {
     public class MonkCombat : CombatBase
     {
+        public static bool CurrentlyUseDashingStrike
+        {
+            get
+            {
+                return Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.X1_Monk_DashingStrike) &&
+                    CombatBase.TimeSincePowerUse(SNOPower.X1_Monk_DashingStrike) < 350;
+            }
+        }
+
         private const float MaxDashingStrikeRange = 55f;
         private static DateTime _lastTargetChange = DateTime.MinValue;
 
@@ -76,9 +85,8 @@ namespace Trinity.Combat.Abilities
 
             // Epiphany: spirit regen, dash to targets
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.X1_Monk_Epiphany, CanCastFlags.NoTimer) && (Settings.Combat.Monk.EpiphanyOffCD ||
-                (TargetUtil.EliteOrTrashInRange(15f) || TargetUtil.AnyMobsInRange(15f, 5)) &&
-                (Player.PrimaryResourcePct < 0.50 || ((Runes.Monk.DesertShroud.IsActive || Runes.Monk.SoothingMist.IsActive) && Player.CurrentHealthPct < 0.50)))
-                )
+                (TargetUtil.EliteOrTrashInRange(20f) || TargetUtil.AnyMobsInRange(20f, 5)) &&
+                (Player.PrimaryResourcePct < 0.50 || Runes.Monk.DesertShroud.IsActive || Runes.Monk.SoothingMist.IsActive || Player.CurrentHealthPct < 0.50)))
             {
                 return new TrinityPower(SNOPower.X1_Monk_Epiphany);
             }
@@ -238,10 +246,40 @@ namespace Trinity.Combat.Abilities
             var wolRange = Legendary.TzoKrinsGaze.IsEquipped ? 35f : 10f;
             if (!UseOOCBuff && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight))
             {
-                if (MinimumSunwukoCriteria(Enemies.CloseNearby) && Skills.Monk.WaveOfLight.CanCast(CanCastFlags.NoTimer))
+                if (MinimumSunwukoCriteria(Enemies.AtPlayerNearby) && Skills.Monk.WaveOfLight.CanCast(CanCastFlags.NoTimer))
                     Skills.Monk.WaveOfLight.Cast(TargetUtil.GetBestClusterPoint(_range: wolRange));
-                else if (MinimumSunwukoCriteria(new TargetArea(8f)) && Skills.Monk.LashingTailKick.CanCast(CanCastFlags.NoTimer))
-                    Skills.Monk.LashingTailKick.Cast(TargetUtil.GetBestClusterPoint(6f));
+                else if (MinimumSunwukoCriteria(Enemies.AtPlayerNearby) && Skills.Monk.LashingTailKick.CanCast(CanCastFlags.NoTimer))
+                    Skills.Monk.LashingTailKick.Cast(TargetUtil.GetBestClusterPoint(8f));
+            }
+
+            // Wave of light
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight) &&
+                TargetUtil.AnyMobsInRange(25, Settings.Combat.Monk.MinWoLTrashCount) &&
+                (!Settings.Combat.Monk.SWBeforeWoL || (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3)) &&
+                Skills.Monk.ExplodingPalm.IsActive)
+            {
+                var _target = TargetUtil.BestExploadingPalmDebuffedTarget(wolRange);
+                if (_target.IsTrashPackOrBossEliteRareUnique && 
+                    TargetUtil.MobsWithDebuff(_target.Position, SNOPower.Monk_ExplodingPalm, 10f) >= 0.5 * TargetUtil.NumMobsInRangeOfPosition(_target.Position, 10f) && 
+                    _target.RadiusDistance <= wolRange && _target.HasDebuff(SNOPower.Monk_ExplodingPalm))
+                {
+                    return new TrinityPower(SNOPower.Monk_WaveOfLight, 0f, _target.ACDGuid);
+                }
+
+            }
+
+            // Lashing Tail Kick
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_LashingTailKick) &&
+                TargetUtil.AnyMobsInRange(25, 2) &&
+                CurrentTarget.IsTrashPackOrBossEliteRareUnique && Skills.Monk.ExplodingPalm.IsActive)
+            {
+                var _target = TargetUtil.BestExploadingPalmDebuffedTarget(10f);
+                if (_target.IsTrashPackOrBossEliteRareUnique && 
+                    TargetUtil.MobsWithDebuff(_target.Position, SNOPower.Monk_ExplodingPalm, 10f) >= 0.5 * TargetUtil.NumMobsInRangeOfPosition(_target.Position, 10f) && 
+                    _target.RadiusDistance <= 10f && _target.HasDebuff(SNOPower.Monk_ExplodingPalm))
+                {
+                    return new TrinityPower(SNOPower.Monk_LashingTailKick, 0f, _target.ACDGuid);
+                }
             }
 
             // Make a mega-splosion
@@ -258,8 +296,13 @@ namespace Trinity.Combat.Abilities
                     return JawBreakerDashingStrike();
                 }
 
+                if (CurrentTarget.IsTrashPackOrBossEliteRareUnique && CurrentTarget.Distance >= MaxDashingStrikeRange && CurrentTarget.IsInLineOfSight())
+                {
+                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, CurrentTarget.Position);
+                }
+
                 if (CurrentTarget.IsTrashPackOrBossEliteRareUnique && 
-                    (CurrentTarget.Distance >= 15f || 
+                    (CurrentTarget.Distance >= 10f || 
                     !NavHelper.CanRayCast(CurrentTarget.Position) ||
                     CacheData.MonsterObstacles.Any(m => m.RActorGUID != CurrentTarget.RActorGuid && MathUtil.IntersectsPath(m.Position, 5f, CurrentTarget.Position, Player.Position))))
                 {
@@ -269,7 +312,12 @@ namespace Trinity.Combat.Abilities
                         Trinity.CurrentTarget = TargetUtil.GetDashStrikeFarthestTarget(MaxDashingStrikeRange, 25f);
                     }
 
-                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.ClusterPosition(10f));
+                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.ClusterPosition(5f));
+                }
+
+                if (CombatBase.QueuedMovement.IsQueuedMovement && Combat.QueuedMovementManager.Stuck.IsStuck(2f, 250))
+                {
+                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0, CombatBase.QueuedMovement.CurrentMovement.Destination);
                 }
 
                 GridNode bestCluster = GridMap.GetBestClusterNode(_useDefault: false);
@@ -294,27 +342,41 @@ namespace Trinity.Combat.Abilities
             // Exploding Palm
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
                 CanCast(SNOPower.Monk_ExplodingPalm, CanCastFlags.NoTimer) && 
-                (Runes.Monk.EssenceBurn.IsActive ? !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.Monk_ExplodingPalm) && !CurrentTarget.HasDebuff(SNOPower.Monk_ExplodingPalm) : !Skills.Monk.ExplodingPalm.IsTrackedOnUnit(CurrentTarget)))
+                !CurrentTarget.HasDebuff(SNOPower.Monk_ExplodingPalm))
             {
                 return new TrinityPower(SNOPower.Monk_ExplodingPalm, 10f, CurrentTarget.ClusterPosition(8f), CurrentTarget.ACDGuid);
             }
 
             // Wave of light
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight) && 
-                (TargetUtil.AnyMobsInRange(25, Settings.Combat.Monk.MinWoLTrashCount) || TargetUtil.IsEliteTargetInRange(25) || CurrentTarget.IsTrashPackOrBossEliteRareUnique) &&
-                (!Settings.Combat.Monk.SWBeforeWoL || (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3)) &&
-                (!Skills.Monk.ExplodingPalm.IsActive || TargetUtil.NumMobsInRangeOfPosition(CurrentTarget.Position, 12f) <= 1 || CurrentTarget.HasDebuff(SNOPower.Monk_ExplodingPalm)))
+                (TargetUtil.AnyMobsInRange(25, Settings.Combat.Monk.MinWoLTrashCount) || CurrentTarget.IsTrashPackOrBossEliteRareUnique) &&
+                (!Settings.Combat.Monk.SWBeforeWoL || (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3)))
             {
-                // RefreshSweepingWind(true);
-                return new TrinityPower(SNOPower.Monk_WaveOfLight, wolRange, CurrentTarget.ClusterPosition((float)(wolRange - 2f)), CurrentTarget.ACDGuid);
+                float range = Skills.Monk.DashingStrike.CanCast() ? 35f : 15f;
+                if (CurrentTarget.IsBossOrEliteRareUnique) { range += 10f; }
+
+                var _target = TargetUtil.BestExploadingPalmDebuffedTarget(range);
+                if (!Skills.Monk.ExplodingPalm.IsActive || TargetUtil.NumMobsInRangeOfPosition(_target.Position, 12f) <= 1 || _target.HasDebuff(SNOPower.Monk_ExplodingPalm))
+                {
+                    CombatBase.SwitchToTarget(_target);
+                    return new TrinityPower(SNOPower.Monk_WaveOfLight, wolRange, _target.ClusterPosition((float)(wolRange - 2f)), _target.ACDGuid);
+                }
+                    
             }
 
             // Lashing Tail Kick
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_LashingTailKick) &&
                 (!Skills.Monk.ExplodingPalm.IsActive || TargetUtil.NumMobsInRangeOfPosition(CurrentTarget.Position, 12f) <= 1 || CurrentTarget.HasDebuff(SNOPower.Monk_ExplodingPalm)))
             {
-                // RefreshSweepingWind(true);
-                return new TrinityPower(SNOPower.Monk_LashingTailKick, 10f, CurrentTarget.ClusterPosition(8f), CurrentTarget.ACDGuid);
+                float range = Skills.Monk.DashingStrike.CanCast() ? 35f : 15f;
+                if (CurrentTarget.IsBossOrEliteRareUnique) { range += 10f; }
+
+                var _target = TargetUtil.BestExploadingPalmDebuffedTarget(range);
+                if (!Skills.Monk.ExplodingPalm.IsActive || TargetUtil.NumMobsInRangeOfPosition(_target.Position, 12f) <= 1 || _target.HasDebuff(SNOPower.Monk_ExplodingPalm))
+                {
+                    CombatBase.SwitchToTarget(_target);
+                    return new TrinityPower(SNOPower.Monk_LashingTailKick, 10f, _target.ClusterPosition(8f), _target.ACDGuid);
+                }
             }
 
             // For tempest rush re-use
@@ -498,10 +560,10 @@ namespace Trinity.Combat.Abilities
                  CurrentTarget.IsUnit && !CurrentTarget.IsTreasureGoblin &&
 
                 // Avoid rapidly changing targets
-                DateTime.UtcNow.Subtract(_lastTargetChange).TotalMilliseconds > 500 &&
+                //DateTime.UtcNow.Subtract(_lastTargetChange).TotalMilliseconds > 500 &&
 
                 // enough resources and mobs nearby
-                Player.PrimaryResource > 40 && TargetUtil.AnyMobsInRange(20f, 2) &&
+                Player.PrimaryResource > 40 && //TargetUtil.AnyMobsInRange(20f, 2) &&
 
                 // Don't bother if X or more targets already have EP
                 CurrentTarget.HasDebuff(SNOPower.Monk_ExplodingPalm);
@@ -513,16 +575,16 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         internal static void ChangeTarget()
         {
-            float range = Skills.Monk.DashingStrike.IsActive && Skills.Monk.DashingStrike.CanCast() ? 26f : 15f;
+            float range = Skills.Monk.DashingStrike.CanCast() ? 35f : 15f;
             if (CurrentTarget.IsBossOrEliteRareUnique) { range += 10f; }
 
             var bestExplodingPalmTarget = TargetUtil.BestExploadingPalmTarget(range);
-            if (bestExplodingPalmTarget.ACDGuid != CurrentTarget.ACDGuid)
+            if (bestExplodingPalmTarget  != default(TrinityCacheObject) && 
+                bestExplodingPalmTarget.RActorGuid != CurrentTarget.RActorGuid)
             {
-                Trinity.Blacklist1Second.Add(CurrentTarget.RActorGuid);
-                Trinity.CurrentTarget = bestExplodingPalmTarget;
-
-                _lastTargetChange = DateTime.UtcNow;
+                //Trinity.Blacklist1Second.Add(CurrentTarget.RActorGuid);
+                if (CombatBase.SwitchToTarget(bestExplodingPalmTarget))
+                    _lastTargetChange = DateTime.UtcNow;
             }
         }
 
@@ -687,6 +749,30 @@ namespace Trinity.Combat.Abilities
 
         internal static void RunOngoingPowers()
         {
+            if (ZetaDia.Service.Hero == null)
+                return;
+
+            if (!ZetaDia.Service.Hero.IsValid)
+                return;
+
+            if (!ZetaDia.IsInGame)
+                return;
+
+            if (ZetaDia.IsLoadingWorld)
+                return;
+
+            if (!ZetaDia.Me.IsValid)
+                return;
+
+            if (!ZetaDia.Me.CommonData.IsValid)
+                return;
+
+            if (!Player.IsValid)
+                return;
+
+            if (Player.IsDead)
+                return;
+
             MaintainTempestRush();
             MaintainSweepingWind();
         }

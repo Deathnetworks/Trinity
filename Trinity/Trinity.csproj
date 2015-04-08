@@ -101,6 +101,8 @@
     <Compile Include="Cache\RefreshAvoidance.cs" />
     <Compile Include="Cache\RefreshGizmo.cs" />
     <Compile Include="Cache\SameWorldPortal.cs" />
+    <Compile Include="Cache\Avoidance.cs" />
+    <Compile Include="Cache\AvoidanceAnim.cs" />
     <Compile Include="Combat\Abilities\BarbarianCombat.cs" />
     <Compile Include="Combat\Abilities\CombatBase.cs" />
     <Compile Include="Combat\Abilities\CrusaderCombat.cs" />
@@ -258,6 +260,7 @@
     <Compile Include="Settings\TrinitySetting.cs" />
     <Compile Include="Settings\WorldObjectSetting.cs" />
     <Compile Include="Helpers\PerformanceLogger.cs" />
+    <Compile Include="Helpers\MemorySpy.cs" />
     <Compile Include="UI\TabUI.cs" />
     <Compile Include="UI\UIComponents\Behaviors\InputBindingBehavior.cs" />
     <Compile Include="UI\UIComponents\Converters\BoolInverterConverter.cs" />

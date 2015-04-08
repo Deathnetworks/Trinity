@@ -23,13 +23,17 @@ namespace Trinity
 {
     public partial class Trinity : IPlugin
     {
+        private static int Tick = 0;
         /// <summary>
         /// For backwards compatability
         /// </summary>
         public static void RefreshDiaObjects()
         {
             // Framelock should happen in the MainLoop, where we read all the actual ACD's
-            RefreshDiaObjectCache();
+            using (new MemorySpy("RefreshDiaObjects()"))
+            {
+                RefreshDiaObjectCache();
+            }
         }
 
         /// <summary>
@@ -39,6 +43,9 @@ namespace Trinity
         /// <returns>True if the cache was updated</returns>
         public static bool RefreshDiaObjectCache()
         {
+            if (Tick > 10) Tick = 0;
+            Tick++;
+
             if (ZetaDia.Service.Hero == null)
             {
                 Logger.LogError("Hero is null!");
@@ -73,8 +80,6 @@ namespace Trinity
 
             using (new PerformanceLogger("RefreshDiaObjectCache"))
             {
-                TaskTimers[0].Start();
-
                 /* Reduce ignore-for-loops counter */
                 if (_ignoreTargetForLoops > 0)
                     _ignoreTargetForLoops--;
@@ -84,290 +89,228 @@ namespace Trinity
                 PlayerMover.vSafeMovementLocation = Vector3.Zero;
                 PlayerMover.TimeLastRecordedPosition = DateTime.UtcNow;
 
-                using (new PerformanceLogger("RefreshDiaObjectCache.CheckAvoidDeath"))
-                {
-                    if (Settings.Combat.Misc.AvoidDeath &&
-                        Player.CurrentHealthPct <= CombatBase.EmergencyHealthPotionLimit &&
-                        !SNOPowerUseTimer(SNOPower.DrinkHealthPotion) &&
-                        TargetUtil.AnyMobsInRange(90f, false))
-                    {
-                        Logger.LogNormal("Attempting to avoid death!");
-                        Trinity.Player.AvoidDeath = true;
-                    }
-                }
-
                 /* Refresh the Cache */
                 using (new PerformanceLogger("RefreshDiaObjectCache.UpdateBlock"))
                 {
-                    TaskTimers[1].Start();
-                    GenericCache.MaintainCache();
-                    GenericBlacklist.MaintainBlacklist();
-                    CacheData.Clear();
-                    TaskTimers[1].Stop();
-
-                    /* Now pull up all the data and store anything we want to handle in the super special cache list
-                    Also use many cache dictionaries to minimize DB<->D3 memory hits, and speed everything up a lot */
-                    TaskTimers[2].Start();
-                    RefreshCacheInit();
-                    RefreshCacheMainLoop();
-                    TaskTimers[2].Stop();
-
-                    TaskTimers[3].Start();
-                    /* Add Legendary & Set Minimap Markers to ObjectCache */
-                RefreshCacheMarkers();
-
-                    /* Add Team HotSpots to the cache */
-                ObjectCache.AddRange(GroupHotSpots.GetCacheObjectHotSpots());
-
-                /* Fire Chains Experimental Avoidance */
-                    #region FireChains
-                if (Settings.Combat.Misc.UseExperimentalFireChainsAvoidance)
-                {
-                    const float fireChainSize = 5f;
-                    foreach (var unit1 in ObjectCache.Where(u => u.MonsterAffixes.HasFlag(MonsterAffixes.FireChains)))
+                    /* Refresh at Tick pair */
+                    if ((Tick & 1) != 1)
                     {
-                        foreach (var unit2 in ObjectCache.Where(u => u.MonsterAffixes.HasFlag(MonsterAffixes.FireChains)).Where(unit2 => unit1.RActorGuid != unit2.RActorGuid))
+                        using (new MemorySpy("RefreshDiaObjects().Maintain"))
                         {
-                            for (float i = 0; i <= unit1.Position.Distance2D(unit2.Position); i += (fireChainSize / 4))
-                            {
-                                Vector3 fireChainSpot = MathEx.CalculatePointFrom(unit1.Position, unit2.Position, i);
+                            GenericCache.MaintainCache();
+                            GenericBlacklist.MaintainBlacklist();
+                            CacheData.Clear();
+                        }
 
-                                if (Player.Position.Distance2D(fireChainSpot) <= fireChainSize)
+                        /* Now pull up all the data and store anything we want to handle in the super special cache list
+                        Also use many cache dictionaries to minimize DB<->D3 memory hits, and speed everything up a lot */
+                        using (new MemorySpy("RefreshDiaObjects().Init"))
+                        { RefreshCacheInit(); }
+                        using (new MemorySpy("RefreshDiaObjects().Loop"))
+                        { RefreshCacheMainLoop(); }
+
+                        /* Add Legendary & Set Minimap Markers to ObjectCache */
+                        using (new MemorySpy("RefreshDiaObjects().Markers"))
+                        { RefreshCacheMarkers(); }
+
+                        /* Add Team HotSpots to the cache */
+                        using (new MemorySpy("RefreshDiaObjects().HotSpots"))
+                        { ObjectCache.AddRange(GroupHotSpots.GetCacheObjectHotSpots()); }
+
+                        /* Fire Chains Experimental Avoidance */
+                        using (new MemorySpy("RefreshDiaObjects().FireChains"))
+                        {
+                            #region FireChains
+                            if (Settings.Combat.Misc.UseExperimentalFireChainsAvoidance)
+                            {
+                                const float fireChainSize = 5f;
+                                foreach (var unit1 in ObjectCache.Where(u => u.MonsterAffixes.HasFlag(MonsterAffixes.FireChains)))
                                 {
-                                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Avoiding Fire Chains!");
-                                        Trinity.Player.StandingInAvoidance = true;
+                                    foreach (var unit2 in ObjectCache.Where(u => u.MonsterAffixes.HasFlag(MonsterAffixes.FireChains)).Where(unit2 => unit1.RActorGuid != unit2.RActorGuid))
+                                    {
+                                        for (float i = 0; i <= unit1.Position.Distance2D(unit2.Position); i += (fireChainSize / 4))
+                                        {
+                                            Vector3 fireChainSpot = MathEx.CalculatePointFrom(unit1.Position, unit2.Position, i);
+
+                                            if (Player.Position.Distance2D(fireChainSpot) <= fireChainSize)
+                                            {
+                                                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Avoiding Fire Chains!");
+                                                Trinity.Player.StandingInAvoidance = true;
+                                            }
+                                            CacheData.AvoidanceObstacles.Add(new CacheObstacleObject(fireChainSpot, fireChainSize, -2, "FireChains"));
+                                        }
+                                    }
+                                    if (CacheData.AvoidanceObstacles.Any(aoe => aoe.ActorSNO == -2))
+                                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Generated {0} avoidance points for FireChains, minDistance={1} maxDistance={2}",
+                                            CacheData.AvoidanceObstacles.Count(aoe => aoe.ActorSNO == -2),
+                                            CacheData.AvoidanceObstacles.Where(aoe => aoe.ActorSNO == -2)
+                                                .Min(aoe => aoe.Position.Distance2D(Trinity.Player.Position)),
+                                            CacheData.AvoidanceObstacles.Where(aoe => aoe.ActorSNO == -2)
+                                                .Max(aoe => aoe.Position.Distance2D(Trinity.Player.Position)));
                                 }
-                                CacheData.TimeBoundAvoidance.Add(new CacheObstacleObject(fireChainSpot, fireChainSize, -2, "FireChains"));
                             }
-                        }
-                        if (CacheData.TimeBoundAvoidance.Any(aoe => aoe.ActorSNO == -2))
-                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Generated {0} avoidance points for FireChains, minDistance={1} maxDistance={2}",
-                                CacheData.TimeBoundAvoidance.Count(aoe => aoe.ActorSNO == -2),
-                                CacheData.TimeBoundAvoidance.Where(aoe => aoe.ActorSNO == -2)
-                                    .Min(aoe => aoe.Position.Distance2D(Trinity.Player.Position)),
-                                CacheData.TimeBoundAvoidance.Where(aoe => aoe.ActorSNO == -2)
-                                    .Max(aoe => aoe.Position.Distance2D(Trinity.Player.Position)));
-                    }
-                }
-                    #endregion
-
-                    /* Clear animation at player obsolete */
-                    CacheData.ClearObsolete();
-                    /* Add avoidances and usafe zones to dictionary (faster check / HashSet) */
-                    CacheData.SetDictionary();
-
-                    /* Combat helper values */
-                    CombatBase.RefreshValues();
-                    TaskTimers[3].Stop();
-
-                    /* Set Weights, assign CurrentTarget */
-                    TaskTimers[4].Start();
-                    RefreshDiaGetWeights();
-                    TaskTimers[4].Stop();
-
-                    /* Refresh grid map fields */
-                    GridMap.RefreshGridMainLoop();
-
-                    TaskTimers[5].Start();
-                    Events.OnCacheUpdatedHandler.Invoke();
-                    TaskTimers[5].Stop();
-                }
-
-                TaskTimers[6].Start();
-                // Pre-townrun is too far away
-                if (!Player.IsInTown && TownRun.PreTownRunPosition != Vector3.Zero && TownRun.PreTownRunWorldId == Player.WorldID && !ForceVendorRunASAP
-                    && TownRun.PreTownRunPosition.Distance2D(Player.Position) <= V.F("Cache.PretownRun.MaxDistance"))
-                {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Pre-TownRun position is more than {0} yards away, canceling", V.I("Cache.PretownRun.MaxDistance"));
-                    TownRun.PreTownRunPosition = Vector3.Zero;
-                    TownRun.PreTownRunWorldId = -1;
-                }
-
-                // Reached pre-townrun position
-                if (!Player.IsInTown && TownRun.PreTownRunPosition != Vector3.Zero && TownRun.PreTownRunWorldId == Player.WorldID && !ForceVendorRunASAP
-                    && TownRun.PreTownRunPosition.Distance2D(Player.Position) <= 15f)
-                {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Successfully returned to Pre-TownRun Position");
-                    TownRun.PreTownRunPosition = Vector3.Zero;
-                    TownRun.PreTownRunWorldId = -1;
-                }
-
-                // After a townrun, make sure to return to original TownRun Location
-                if (!Player.IsInTown && CurrentTarget == null && TownRun.PreTownRunPosition != Vector3.Zero && TownRun.PreTownRunWorldId == Player.WorldID && !ForceVendorRunASAP)
-                {
-                    if (TownRun.PreTownRunPosition.Distance2D(Player.Position) > 10f && TownRun.PreTownRunPosition.Distance2D(Player.Position) <= V.F("Cache.PretownRun.MaxDistance"))
-                    {
-                        CurrentTarget = new TrinityCacheObject()
-                        {
-                            Position = TownRun.PreTownRunPosition,
-                            Type = GObjectType.Player,
-                            Weight = 20000,
-                            Distance = 2f,
-                            Radius = 2f,
-                            InternalName = "PreTownRunPosition"
-                        };
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Returning to Pre-TownRun Position");
-                    }
-                }
-
-                using (new PerformanceLogger("RefreshDiaObjectCache.FinalChecks"))
-                {
-                    // force to stay put if we want to town run and there's no target
-                    if (CurrentTarget == null && ForceVendorRunASAP)
-                    {
-                        DontMoveMeIAmDoingShit = true;
-                    }
-
-                    if (Settings.WorldObject.EnableBountyEvents)
-                    {
-                        bool eventObjectNear = ObjectCache.Any(o => o.Type == GObjectType.CursedChest || o.Type == GObjectType.CursedShrine);
-
-                        if (!Player.InActiveEvent)
-                        {
-                            EventStartPosition = Vector3.Zero;
-                            EventStartTime = DateTime.MinValue;
+                            #endregion
                         }
 
-                        // Reset Event time while we have targts
-                        if (CurrentTarget != null && Player.InActiveEvent && eventObjectNear)
-                        {
-                            EventStartTime = DateTime.UtcNow;
-                        }
+                        /* Clear animation at player obsolete */
+                        using (new MemorySpy("RefreshDiaObjects().Obsolete"))
+                        { CacheData.ClearObsolete(); }
 
-                        if (eventObjectNear)
-                        {
-                            EventStartPosition = ObjectCache.FirstOrDefault(o => o.Type == GObjectType.CursedChest || o.Type == GObjectType.CursedShrine).Position;
-                        }
+                        /* Add avoidances and usafe zones to dictionary (faster check / HashSet) */
+                        using (new MemorySpy("RefreshDiaObjects().SetDictionary"))
+                        { CacheData.SetDictionary(); }
 
-                        var activeEvent = ZetaDia.ActInfo.ActiveQuests.FirstOrDefault(q => DataDictionary.EventQuests.Contains(q.QuestSNO));
+                        /* Combat helper values */
+                        using (new MemorySpy("RefreshDiaObjects().RefreshCombatValues"))
+                        { CombatBase.RefreshValues(); }
 
-                        const int waitTimeoutSeconds = 90;
-                        if (DateTime.UtcNow.Subtract(EventStartTime).TotalSeconds > waitTimeoutSeconds && activeEvent != null)
-                        {
-                            CacheData.BlacklistedEvents.Add(activeEvent.QuestSNO);
-                        }
+                        /* Set Weights, assign CurrentTarget */
+                        using (new MemorySpy("RefreshDiaObjects().Weight"))
+                        { RefreshDiaGetWeights(); }
 
-                        if (CurrentTarget == null && Player.InActiveEvent && EventStartPosition != Vector3.Zero &&
-                            DateTime.UtcNow.Subtract(EventStartTime).TotalSeconds < waitTimeoutSeconds &&
-                            activeEvent != null && !CacheData.BlacklistedEvents.Contains(activeEvent.QuestSNO))
-                        {
-                            CurrentTarget = new TrinityCacheObject()
-                            {
-                                Position = EventStartPosition,
-                                Type = GObjectType.Player,
-                                Weight = 20000,
-                                Distance = 2f,
-                                Radius = 2f,
-                                InternalName = "WaitForEvent"
-                            };
-                            Logger.Log("Waiting for Event {0} - Time Remaining: {1:0} seconds",
-                                ZetaDia.ActInfo.ActiveQuests.FirstOrDefault(q => DataDictionary.EventQuests.Contains(q.QuestSNO)).Quest,
-                                waitTimeoutSeconds - DateTime.UtcNow.Subtract(EventStartTime).TotalSeconds);
-                        }
+                        /* Invoke all methode called in cache update */
+                        using (new MemorySpy("RefreshDiaObjects().InvokeEvents"))
+                        { Events.OnCacheUpdatedHandler.Invoke(); }
                     }
-
-                    // Still no target, let's see if we should backtrack or wait for wrath to come off cooldown...
-                    if (CurrentTarget == null)
-                    {
-                        RefreshWaitTimers();
-                    }
-
-                    // Still no target, let's end it all!
-                    if (CurrentTarget != null)
-                    {
-
-                    if (CurrentTarget.IsUnit)
-                        lastHadUnitInSights = DateTime.UtcNow;
-
-                    if (CurrentTarget.IsBossOrEliteRareUnique)
-                        lastHadEliteUnitInSights = DateTime.UtcNow;
-
-                    if (CurrentTarget.IsBoss || CurrentTarget.IsBountyObjective)
-                        lastHadBossUnitInSights = DateTime.UtcNow;
-
-
-                    if (CurrentTarget.Type == GObjectType.Container)
-                        lastHadContainerInSights = DateTime.UtcNow;
-
-                    // Record the last time our target changed
-                    if (LastTargetRactorGUID != CurrentTarget.RActorGuid)
-                    {
-                        RecordTargetHistory();
-
-                            Logger.Log(TrinityLogLevel.Info, LogCategory.CacheManagement,
-                            "Found New Target {0} dist={1:0} IsElite={2} Radius={3:0.0} Weight={4:0} ActorSNO={5} " +
-                            "Anim={6} TargetedCount={7} Type={8} ",
-                            CurrentTarget.InternalName,
-                            CurrentTarget.Distance,
-                            CurrentTarget.IsEliteRareUnique,
-                            CurrentTarget.Radius,
-                            CurrentTarget.Weight,
-                            CurrentTarget.ActorSNO,
-                            CurrentTarget.Animation,
-                            CurrentTarget.TimesBeenPrimaryTarget,
-                            CurrentTarget.Type
-                            );
-
-                        _lastPickedTargetTime = DateTime.UtcNow;
-                        _targetLastHealth = 0f;
-                    }
+                    /* Refresh at Tick impair */
                     else
                     {
-                        // We're sticking to the same target, so update the target's health cache to check for stucks
-                        if (CurrentTarget.IsUnit)
+                        /* Refresh grid map fields */
+                        using (new MemorySpy("RefreshDiaObjects().Grid"))
+                        { GridMap.RefreshGridMainLoop(); }
+                    }                    
+                }
+
+                using (new MemorySpy("RefreshDiaObjects().FinalCheck"))
+                {
+                    if (ObjectCache != null)
+                    {
+                        // Pre-townrun is too far away
+                        if (!Player.IsInTown && TownRun.PreTownRunPosition != Vector3.Zero && TownRun.PreTownRunWorldId == Player.WorldID && !ForceVendorRunASAP
+                            && TownRun.PreTownRunPosition.Distance2D(Player.Position) <= V.F("Cache.PretownRun.MaxDistance"))
                         {
-                            // Check if the health has changed, if so update the target-pick time before we blacklist them again
-                            if (CurrentTarget.HitPointsPct != _targetLastHealth)
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Pre-TownRun position is more than {0} yards away, canceling", V.I("Cache.PretownRun.MaxDistance"));
+                            TownRun.PreTownRunPosition = Vector3.Zero;
+                            TownRun.PreTownRunWorldId = -1;
+                        }
+
+                        // Reached pre-townrun position
+                        if (!Player.IsInTown && TownRun.PreTownRunPosition != Vector3.Zero && TownRun.PreTownRunWorldId == Player.WorldID && !ForceVendorRunASAP
+                            && TownRun.PreTownRunPosition.Distance2D(Player.Position) <= 15f)
+                        {
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Successfully returned to Pre-TownRun Position");
+                            TownRun.PreTownRunPosition = Vector3.Zero;
+                            TownRun.PreTownRunWorldId = -1;
+                        }
+
+                        // After a townrun, make sure to return to original TownRun Location
+                        if (!Player.IsInTown && CurrentTarget == null && TownRun.PreTownRunPosition != Vector3.Zero && TownRun.PreTownRunWorldId == Player.WorldID && !ForceVendorRunASAP)
+                        {
+                            if (TownRun.PreTownRunPosition.Distance2D(Player.Position) > 10f && TownRun.PreTownRunPosition.Distance2D(Player.Position) <= V.F("Cache.PretownRun.MaxDistance"))
                             {
-                                Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Keeping Target {0} - CurrentTarget.HitPoints: {1:0.00} TargetLastHealth: {2:0.00} ",
-                                                CurrentTarget.RActorGuid, CurrentTarget.HitPointsPct, _targetLastHealth);
-                                _lastPickedTargetTime = DateTime.UtcNow;
+                                CurrentTarget = new TrinityCacheObject()
+                                {
+                                    Position = TownRun.PreTownRunPosition,
+                                    Type = GObjectType.Player,
+                                    Weight = 20000,
+                                    Distance = 2f,
+                                    Radius = 2f,
+                                    InternalName = "PreTownRunPosition"
+                                };
+                                Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Returning to Pre-TownRun Position");
                             }
-                            // Now store the target's last-known health
-                            _targetLastHealth = CurrentTarget.HitPointsPct;
+                        }
+
+                        using (new PerformanceLogger("RefreshDiaObjectCache.FinalChecks"))
+                        {
+                            // force to stay put if we want to town run and there's no target
+                            if (CurrentTarget == null && ForceVendorRunASAP)
+                            {
+                                DontMoveMeIAmDoingShit = true;
+                            }
+
+                            if (Settings.WorldObject.EnableBountyEvents)
+                            {
+                                bool eventObjectNear = ObjectCache.Any(o => o.Type == GObjectType.CursedChest || o.Type == GObjectType.CursedShrine);
+
+                                if (!Player.InActiveEvent)
+                                {
+                                    EventStartPosition = Vector3.Zero;
+                                    EventStartTime = DateTime.MinValue;
+                                }
+
+                                // Reset Event time while we have targts
+                                if (CurrentTarget != null && Player.InActiveEvent && eventObjectNear)
+                                {
+                                    EventStartTime = DateTime.UtcNow;
+                                }
+
+                                if (eventObjectNear)
+                                {
+                                    EventStartPosition = ObjectCache.FirstOrDefault(o => o.Type == GObjectType.CursedChest || o.Type == GObjectType.CursedShrine).Position;
+                                }
+
+                                var activeEvent = ZetaDia.ActInfo.ActiveQuests.FirstOrDefault(q => DataDictionary.EventQuests.Contains(q.QuestSNO));
+
+                                const int waitTimeoutSeconds = 90;
+                                if (DateTime.UtcNow.Subtract(EventStartTime).TotalSeconds > waitTimeoutSeconds && activeEvent != null)
+                                {
+                                    CacheData.BlacklistedEvents.Add(activeEvent.QuestSNO);
+                                }
+
+                                if (CurrentTarget == null && Player.InActiveEvent && EventStartPosition != Vector3.Zero &&
+                                    DateTime.UtcNow.Subtract(EventStartTime).TotalSeconds < waitTimeoutSeconds &&
+                                    activeEvent != null && !CacheData.BlacklistedEvents.Contains(activeEvent.QuestSNO))
+                                {
+                                    CurrentTarget = new TrinityCacheObject()
+                                    {
+                                        Position = EventStartPosition,
+                                        Type = GObjectType.Player,
+                                        Weight = 20000,
+                                        Distance = 2f,
+                                        Radius = 2f,
+                                        InternalName = "WaitForEvent"
+                                    };
+                                    Logger.Log("Waiting for Event {0} - Time Remaining: {1:0} seconds",
+                                        ZetaDia.ActInfo.ActiveQuests.FirstOrDefault(q => DataDictionary.EventQuests.Contains(q.QuestSNO)).Quest,
+                                        waitTimeoutSeconds - DateTime.UtcNow.Subtract(EventStartTime).TotalSeconds);
+                                }
+                            }
+
+                            // Still no target, let's see if we should backtrack or wait for wrath to come off cooldown...
+                            if (CurrentTarget == null)
+                            {
+                                RefreshWaitTimers();
+                            }
+
+                            // Still has target
+                            if (CurrentTarget != null)
+                            {
+                                CombatBase.SwitchToTarget(CurrentTarget);
+                            }
+
+                            // Store less important objects.
+                            if (ObjectCache.Count > 1)
+                            {
+                                var setting = Settings.Advanced.CacheWeightThresholdPct;
+                                var threshold = setting > 0 && CurrentTarget != null ? CurrentTarget.Weight * ((double)setting / 100) : 0;
+
+                                var lowPriorityObjects = ObjectCache.DistinctBy(c => c.RActorGuid).Where(c =>
+                                    c.Type != GObjectType.Avoidance && c.Type != GObjectType.Unit ||
+                                    c.Weight < threshold && c.Distance > 12f && !c.IsElite
+                                    ).ToDictionary(x => x.RActorGuid, x => x);
+
+                                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Cached {0}/{1} ({2:0}%) WeightThreshold={3}",
+                                    lowPriorityObjects.Count,
+                                    ObjectCache.Count,
+                                    lowPriorityObjects.Count > 0 ? ((double)lowPriorityObjects.Count / ObjectCache.Count) * 100 : 0,
+                                    threshold);
+
+                                CacheData.LowPriorityObjectCache = lowPriorityObjects;
+                            }
                         }
                     }
                 }
-
-                // Store less important objects.
-                if (ObjectCache.Count > 1)
-                {
-                    var setting = Settings.Advanced.CacheWeightThresholdPct;
-                    var threshold = setting > 0 && CurrentTarget != null ? CurrentTarget.Weight * ((double)setting / 100) : 0;
-
-                    var lowPriorityObjects = ObjectCache.DistinctBy(c => c.RActorGuid).Where(c =>
-                        c.Type != GObjectType.Avoidance && c.Type != GObjectType.Unit ||
-                        c.Weight < threshold && c.Distance > 12f && !c.IsElite
-                        ).ToDictionary(x => x.RActorGuid, x => x);
-
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Cached {0}/{1} ({2:0}%) WeightThreshold={3}",
-                        lowPriorityObjects.Count,
-                        ObjectCache.Count,
-                        lowPriorityObjects.Count > 0 ? ((double)lowPriorityObjects.Count / ObjectCache.Count) * 100 : 0,
-                        threshold);
-
-                    CacheData.LowPriorityObjectCache = lowPriorityObjects;
-                }
-                }
-
-                TaskTimers[6].Stop();
-                TaskTimers[0].Stop();
-
-                string _taskTimers = " /";
-                for (int t = 1; t < TaskTimers.Length; t++)
-                {
-                    if (TaskTimers[t].IsRunning)
-                        TaskTimers[t].Stop();
-                    if (TaskTimers[t].ElapsedMilliseconds >= 1)
-                        _taskTimers += string.Format("/ {0}/{1:00} ", t, TaskTimers[t].ElapsedMilliseconds);
-
-                    TaskTimers[t].Reset();
-                }
-
-                if (_taskTimers != " /" || TaskTimers[0].ElapsedMilliseconds >= 1)
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.Performance, "Refresh cache took {0}ms{1}", TaskTimers[0].ElapsedMilliseconds, _taskTimers != " /" ? _taskTimers : "");
-
-                TaskTimers[0].Reset();
 
                 // We have a target and the cached was refreshed
                 return CurrentTarget != null;
@@ -395,7 +338,7 @@ namespace Trinity
 
                     if (GenericBlacklist.ContainsKey(hash))
                     {
-                        Logger.LogDebug(LogCategory.CacheManagement, "Ignoring Marker because it's blacklisted {0} {1} at {2} distance {3}", name, marker.NameHash, marker.Position, marker.Position.Distance(Player.Position));
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Ignoring Marker because it's blacklisted {0} {1} at {2} distance {3}", name, marker.NameHash, marker.Position, marker.Position.Distance(Player.Position));
                         continue;
                     }
 
@@ -417,12 +360,12 @@ namespace Trinity
 
                 if (legendaryItemMarkers.Any() && TrinityItemManager.FindValidBackpackLocation(true) != new Vector2(-1, -1))
                 {
-                    var legendaryItems = ZetaDia.Actors.GetActorsOfType<DiaItem>().Where(i => i.IsValid && i.IsACDBased && i.Position.Distance2D(ZetaDia.Me.Position) < 5f && 
+                    var legendaryItems = ZetaDia.Actors.GetActorsOfType<DiaItem>().Where(i => i.IsValid && i.IsACDBased && i.Position.Distance2D(ZetaDia.Me.Position) < 5f &&
                         legendaryItemMarkers.Any(im => i.Position.Distance2D(i.Position) < 2f));
 
                     foreach (var diaItem in legendaryItems)
                     {
-                        Logger.LogDebug(LogCategory.CacheManagement, "Adding Legendary Item from Marker {0} dist={1} ActorSNO={2} ACD={3} RActor={4}", 
+                        Logger.LogDebug(LogCategory.CacheManagement, "Adding Legendary Item from Marker {0} dist={1} ActorSNO={2} ACD={3} RActor={4}",
                             diaItem.Name, diaItem.Distance, diaItem.ActorSNO, diaItem.ACDGuid, diaItem.RActorGuid);
 
                         ObjectCache.Add(new TrinityCacheObject()
@@ -524,7 +467,7 @@ namespace Trinity
                             if (timeSinceRefresh < Settings.Advanced.CacheLowPriorityRefreshRate && cachedObject.Distance > 12f)
                             {
                                 cachedObject.Position = currentObject.Position;
-                                ObjectCache.Add(cachedObject);           
+                                ObjectCache.Add(cachedObject);
                                 continue;
                             }
                         }
@@ -553,12 +496,12 @@ namespace Trinity
                             double duration = t1.Elapsed.TotalMilliseconds;
 
                             // don't log stuff we never care about
-                            if (duration <= 1 && c_IgnoreSubStep == "IgnoreNames")
+                            if (duration <= 1 && (c_IgnoreReason == "IgnoreName" || c_IgnoreReason == "InvalidName"))
                                 continue;
 
                             string extraData = "";
 
-                            switch (CurrentCacheObject.Type)
+                            switch (c_CacheObject.Type)
                             {
                                 case GObjectType.Unit:
                                     {
@@ -584,23 +527,23 @@ namespace Trinity
                             }
 
                             if (c_IgnoreReason != "InternalName")
-                                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
+                                Logger.Log(TrinityLogLevel.Info, LogCategory.CacheManagement,
                                     "[{0:0000.00}ms] {1} {2} Type: {3} ({4}/{5}) Name={6} ({7}) {8} {9} Dist2Mid={10:0} Dist2Rad={11:0} ZDiff={12:0} Radius={13:0} RAGuid={14} {15}",
                                     duration,
                                     (addToCache ? "Added " : "Ignored"),
-                                    (!addToCache ? ("By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
-                                    CurrentCacheObject.ActorType,
-                                    CurrentCacheObject.GizmoType != GizmoType.None ? CurrentCacheObject.GizmoType.ToString() : "",
-                                    CurrentCacheObject.Type,
-                                    CurrentCacheObject.InternalName,
-                                    CurrentCacheObject.ActorSNO,
-                                    (CurrentCacheObject.IsBoss ? " IsBoss" : ""),
+                                    (!addToCache ? ("By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_InfosSubStep) : ""),
+                                    c_CacheObject.ActorType,
+                                    c_CacheObject.GizmoType != GizmoType.None ? c_CacheObject.GizmoType.ToString() : "",
+                                    c_CacheObject.Type,
+                                    c_CacheObject.InternalName,
+                                    c_CacheObject.ActorSNO,
+                                    (c_CacheObject.IsBoss ? " IsBoss" : ""),
                                     (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""),
-                                    CurrentCacheObject.Distance,
-                                    CurrentCacheObject.RadiusDistance,
+                                    c_CacheObject.Distance,
+                                    c_CacheObject.RadiusDistance,
                                     c_ZDiff,
-                                    CurrentCacheObject.Radius,
-                                    CurrentCacheObject.RActorGuid,
+                                    c_CacheObject.Radius,
+                                    c_CacheObject.RActorGuid,
                                     extraData);
                         }
                     }
@@ -635,8 +578,6 @@ namespace Trinity
         {
             using (new PerformanceLogger("RefreshDiaObjectCache.CacheInit"))
             {
-
-                // Update when we last refreshed with current time
                 LastRefreshedCache = DateTime.UtcNow;
 
                 // Blank current/last/next targets
@@ -729,7 +670,6 @@ namespace Trinity
                 // Flag for if we should search for an avoidance spot or not
                 Trinity.Player.StandingInAvoidance = false;
                 Trinity.Player.TryToAvoidProjectile = false;
-                Trinity.Player.AvoidDeath = false;
                 Trinity.Player.NeedToKite = false;
 
                 IsAlreadyMoving = false;
@@ -745,7 +685,7 @@ namespace Trinity
             CacheData.FullClear();
         }
 
-        private static HashSet<string> ignoreNames = new HashSet<string>
+        private static HashSet<string> IgnoreNames = new HashSet<string>
         {
             "MarkerLocation", "Generic_Proxy", "Hireling", "Start_Location", "SphereTrigger", "Checkpoint", "ConductorProxyMaster", "BoxTrigger", "SavePoint", "TriggerSphere", 
             "minimapicon", 
@@ -779,14 +719,14 @@ namespace Trinity
                 DateTime.UtcNow.Subtract(lastHadContainerInSights).TotalMilliseconds <= Settings.WorldObject.OpenContainerDelay)
             {
                 CurrentTarget = new TrinityCacheObject()
-                                    {
-                                        Position = Player.Position,
+                {
+                    Position = Player.Position,
                     Type = GObjectType.Player,
-                                        Weight = 20000,
-                                        Distance = 2f,
-                                        Radius = 2f,
-                                        InternalName = "WaitForLootDrops"
-                                    };
+                    Weight = 20000,
+                    Distance = 2f,
+                    Radius = 2f,
+                    InternalName = "WaitForLootDrops"
+                };
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Waiting for loot to drop, delay: {0}ms", Settings.Combat.Misc.DelayAfterKill);
             }
 
@@ -800,14 +740,14 @@ namespace Trinity
                 BarbarianCombat.AllowSprintOOC = false;
                 Logger.Log("[Trinity] Waiting for Wrath Of The Berserker cooldown before continuing to Azmodan.");
                 CurrentTarget = new TrinityCacheObject()
-                                    {
-                                        Position = Player.Position,
+                {
+                    Position = Player.Position,
                     Type = GObjectType.Player,
-                                        Weight = 20000,
-                                        Distance = 2f,
-                                        Radius = 2f,
-                                        InternalName = "WaitForWrath"
-                                    };
+                    Weight = 20000,
+                    Distance = 2f,
+                    Radius = 2f,
+                    InternalName = "WaitForWrath"
+                };
             }
             // And a special check for wizard archon
             if (CurrentTarget == null && Hotbar.Contains(SNOPower.Wizard_Archon) && !SNOPowerUseTimer(SNOPower.Wizard_Archon) && Settings.Combat.Wizard.WaitArchon && Player.WorldID == 121214 &&
@@ -815,14 +755,14 @@ namespace Trinity
             {
                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Waiting for Wizard Archon cooldown before continuing to Azmodan.");
                 CurrentTarget = new TrinityCacheObject()
-                                    {
-                                        Position = Player.Position,
+                {
+                    Position = Player.Position,
                     Type = GObjectType.Player,
-                                        Weight = 20000,
-                                        Distance = 2f,
-                                        Radius = 2f,
-                                        InternalName = "WaitForArchon"
-                                    };
+                    Weight = 20000,
+                    Distance = 2f,
+                    Radius = 2f,
+                    InternalName = "WaitForArchon"
+                };
             }
             // And a very sexy special check for WD BigBadVoodoo
             if (CurrentTarget == null && Hotbar.Contains(SNOPower.Witchdoctor_BigBadVoodoo) && !PowerManager.CanCast(SNOPower.Witchdoctor_BigBadVoodoo) && Player.WorldID == 121214 &&
@@ -830,14 +770,14 @@ namespace Trinity
             {
                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Waiting for WD BigBadVoodoo cooldown before continuing to Azmodan.");
                 CurrentTarget = new TrinityCacheObject()
-                                    {
-                                        Position = Player.Position,
+                {
+                    Position = Player.Position,
                     Type = GObjectType.Player,
-                                        Weight = 20000,
-                                        Distance = 2f,
-                                        Radius = 2f,
-                                        InternalName = "WaitForVoodooo"
-                                    };
+                    Weight = 20000,
+                    Distance = 2f,
+                    Radius = 2f,
+                    InternalName = "WaitForVoodooo"
+                };
             }
         }
 

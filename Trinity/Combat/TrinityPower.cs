@@ -232,7 +232,7 @@ namespace Trinity
             SNOPower = snoPower;
             MinimumRange = minimumRange;
             TargetPosition = position;
-            MovePosition = position;
+            MovePosition = Vector3.Zero;
             TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
             TargetACDGUID = -1;
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");

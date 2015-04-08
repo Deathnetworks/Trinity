@@ -60,7 +60,7 @@ namespace Trinity
         /// </summary>
         public void OnPulse()
         {
-            using (new PerformanceLogger("OnPulse"))
+            using (new MemorySpy("OnPulse()"))
             {
                 try
                 {
@@ -106,6 +106,7 @@ namespace Trinity
                     Logger.Log(LogCategory.UserInformation, "Exception in Pulse: {0}", ex.ToString());
                 }
             }
+            Memory.LogSpy();
         }
 
         /// <summary>

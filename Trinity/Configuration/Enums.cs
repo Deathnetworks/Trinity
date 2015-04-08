@@ -100,6 +100,7 @@
     {
         Unknown,
         Avoidance,
+        OocAvoidance,
         Backtrack,
         Barricade,
         Checkpoint,
@@ -136,7 +137,8 @@
         Lightning,
         Poison,
         Arcane,
-        Holy
+        Holy,
+        GroundEffect,
     }
 
     public enum SpellCategory
@@ -205,8 +207,43 @@
         Avoidance = 5,
         Kite = 4,
         SpecialCombat = 3,
-        KeepMoving = 2,
-        BasicCombat = 1,
+        BasicCombat = 2,
+        KeepMoving = 1,
         TargetAttempt = 0
+    }
+
+    public enum AvoidType
+    {
+        Unknown = 0,
+        GenericCast,
+        MeleeAttack,
+        RangedAttack,
+        Attack,
+        AttackRight,
+        AttackLeft,
+        Teleport,
+        Leap,
+        Charge,
+        Strafe,
+        StrafeRight,
+        StrafeLeft,
+        Dash,
+        Grab,
+        GroundCircle,
+        KnockBack,
+        RotateLeft,
+        RotateRight,
+        Bomb,
+        Projectile,
+    }
+
+    public enum WeightType
+    {
+        Unknown = 0,
+        Unchangeable,
+        Dynamic,
+        Target,
+        Cluster,
+        Monster
     }
 }

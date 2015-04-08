@@ -13,7 +13,6 @@ namespace Trinity.Helpers
 {
     class DebugUtil
     {
-
         private static DateTime _lastCacheClear = DateTime.MinValue;
 
         private static Dictionary<string, DateTime> _seenAnimationCache = new Dictionary<string, DateTime>();
@@ -46,24 +45,7 @@ namespace Trinity.Helpers
             // Log Object
             if (!_seenUnknownCache.ContainsKey(diaObject.ActorSNO))
             {
-                if (DataDictionary.AvoidAnimationsTitles.Any(n => diaObject.Name.Contains(n)) &&
-                    !DataDictionary.Avoidances.Contains(diaObject.ActorSNO) &&
-                    !DataDictionary.AvoidanceProjectiles.Contains(diaObject.ActorSNO))
-                {
-                    if (diaObject.Name.Contains("DH") || diaObject.Name.Contains("Dh") || diaObject.Name.Contains("dh") || diaObject.Name.Contains("DemonHunter") ||
-                        diaObject.Name.Contains("Demonhunter") || diaObject.Name.Contains("demonHunter") || diaObject.Name.Contains("demonhunter") || diaObject.Name.Contains("Enchantress"))
-                        return;
-                    if (diaObject.Name.Contains("impact") || diaObject.Name.Contains("inpact"))
-                        LogInFile("Avoidances", string.Format("{0}, // {1}", diaObject.ActorSNO, diaObject.Name));
-                    else if (diaObject.Name.Contains("missile") || diaObject.Name.Contains("projectile") || diaObject.Name.Contains("ball"))
-                        LogInFile("AvoidanceProjectiles", string.Format("{0}, // {1}", diaObject.ActorSNO, diaObject.Name));
-                    else
-                        LogInFile("Avoidances", string.Format("{0}, // {1}", diaObject.ActorSNO, diaObject.Name));
-                }
-                else
-                {
-                    Logger.Log(LogCategory.UnknownObjects, "{0} ({1}) Type={2}", diaObject.Name, diaObject.ActorSNO, diaObject.ActorType);
-                }
+                Logger.Log(LogCategory.UnknownObjects, "{0} ({1}) Type={2}", diaObject.Name, diaObject.ActorSNO, diaObject.ActorType);
                 _seenUnknownCache.Add(diaObject.ActorSNO, DateTime.UtcNow);
             }
 

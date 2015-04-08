@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Trinity.Config;
 using Trinity.ItemRules;
+using Trinity.Technicals;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -61,8 +62,6 @@ namespace Trinity
         /// It's cached data using my own class, so I never need to hit D3 memory to "re-check" the data or to call an interact request or anything
         /// </summary>
         internal static TrinityCacheObject CurrentTarget { get; set; }
-
-        public static Stopwatch[] TaskTimers = Enumerable.Range(0, 21).Select(i => new Stopwatch()).ToArray();
 
         /// <summary>
         /// A flag to indicate if we should pick a new power/ability to use or not
@@ -181,7 +180,7 @@ namespace Trinity
 
 
         // Caching of the current primary target's health, to detect if we AREN'T damaging it for a period of time
-        private static double _targetLastHealth;
+        internal static double TargetLastHealth;
 
         // This is used so we don't use certain skills until we "top up" our primary resource by enough
         internal static double MinEnergyReserve = 0d;
@@ -189,7 +188,7 @@ namespace Trinity
         /// <summary>
         /// Store the date-time when we *FIRST* picked this target, so we can blacklist after X period of time targeting
         /// </summary>
-        private static DateTime _lastPickedTargetTime = DateTime.MinValue;
+        internal static DateTime LastPickedTargetTime = DateTime.MinValue;
 
         // These values below are set on a per-class basis later on, so don't bother changing them here! These are the old default values
         public static double PlayerEmergencyHealthPotionLimit = 0.35;
@@ -316,6 +315,8 @@ namespace Trinity
         internal static Vector3 ShiftedPosition = Vector3.Zero;
         internal static DateTime lastShiftedPosition = DateTime.MinValue;
         internal static int ShiftPositionFor = 0;
+        internal static Vector3 TargetCurrentDestination;
+        internal static Vector3 MoveCurrentDestination;
         internal static Vector3 CurrentDestination;
         public static int CurrentWorldDynamicId = -1;
         public static int CurrentWorldId = -1; // worldId from profiles, used in persistent stats
@@ -361,7 +362,7 @@ namespace Trinity
         /// <summary>
         /// The RActorGUID of the last CurrentTarget (PrimaryTarget)
         /// </summary>
-        private static int LastTargetRactorGUID;
+        internal static int LastTargetRactorGUID;
 
         internal static int LastTargetACDGuid;
         /// <summary>
@@ -472,12 +473,20 @@ namespace Trinity
         }
 
         private static DateTime eventStartTime = DateTime.MinValue;
-
         public static DateTime EventStartTime
         {
             get { return Trinity.eventStartTime; }
             set { Trinity.eventStartTime = value; }
         }
 
+        internal static bool KillMonstersInAoE { get; set; }
+        internal static bool LogHasFlagPerformance { get; set; }
+
+        // Refresh before anything else
+        internal static void ResetTickValues()
+        {
+            LogHasFlagPerformance = Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance);
+            KillMonstersInAoE = Settings.Combat.Misc.KillMonstersInAoE;
+        }
     }
 }

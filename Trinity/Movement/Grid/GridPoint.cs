@@ -4,6 +4,7 @@ using System.Linq;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Reference;
+using Trinity.Technicals;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Game;
@@ -23,37 +24,29 @@ namespace Trinity
 
             /* Infos fields */
             HasAvoidanceRelated = false;
-            IsInMonsterRadius = false;
+            HasMonsterRelated = false;
 
             /* Weight */
             DynamicWeight = 0f;
             DynamicWeightInfos = string.Empty;
-            SafeWeightMonsterRelated = 0;
 
             /* Special weight */
-            ClusterWeight = 0f;
+            ClusterWeight = 0;
+            ClusterWeightInfos = string.Empty;
+
+            MonsterWeight = 0;
+            MonsterWeightInfos = string.Empty;
+
+            TargetWeight = 0;
+            TargetWeightInfos = string.Empty;
+
             SpecialWeight = 0;
             SpecialCount = 0;
-
-            if (ObjectsLastWeightValues.Any())
-            {
-                List<int> _itemToRemove = new List<int>();
-                foreach (var _o in ObjectsLastWeightValues)
-                {
-                    _o.Value.IncreaseLoopCount();
-                    if (!_o.Value.KeepObject)
-                        _itemToRemove.Add(_o.Key);
-                }
-
-                foreach (int _i in _itemToRemove)
-                {
-                    ObjectsLastWeightValues.Remove(_i);
-                }
-            }
         }
 
         public void FinalCheck()
         {
+            // Some stuff
         }
 
         public Vector3 Position { get; set; }
@@ -65,91 +58,151 @@ namespace Trinity
                 if (LastTickValue_Distance >= 0)
                     return LastTickValue_Distance;
 
-                MainGrid.Timers[11].Start();
                 LastTickValue_Distance = this.Position.Distance2D(Trinity.Player.Position);
-                MainGrid.Timers[11].Stop();
-
                 return LastTickValue_Distance;
             }
         }
 
         /* Infos fields */
         public bool HasAvoidanceRelated = false;
-        public bool IsInMonsterRadius = false;
+        public bool HasMonsterRelated = false;
 
         /* Weighting */
-        public Dictionary<int, DynamicWeight> ObjectsLastWeightValues = new Dictionary<int, DynamicWeight>();
-        public double ClusterWeight = 0;
+        public Dictionary<int, DynamicWeight> LastDynamicWeightValues = new Dictionary<int, DynamicWeight>();
+        public Dictionary<int, DynamicWeight> LastClusterWeightValues = new Dictionary<int, DynamicWeight>();
+        public Dictionary<int, DynamicWeight> LastMonsterWeightValues = new Dictionary<int, DynamicWeight>();
+        public Dictionary<int, DynamicWeight> LastTargetWeightValues = new Dictionary<int, DynamicWeight>();
+
+        public double DynamicWeight = 0;
+        public string DynamicWeightInfos = string.Empty;
+
+        public double UnchangeableWeight = 0;
+        public string UnchangeableWeightInfos = string.Empty;
+
+        /* Does not set by grid generationcan be used for other thing */
         public double SpecialWeight = 0;
         public int SpecialCount = 0;
 
-        public double SafeWeightMonsterRelated = 0;
-        public double SafeWeight
-        {
-            get
-            {
-                return DynamicWeight + UnchangeableWeight + SafeWeightMonsterRelated;
-            }
-        }
+        public double ClusterWeight = 0;
+        public string ClusterWeightInfos = string.Empty;
+
+        public double MonsterWeight = 0;
+        public string MonsterWeightInfos = string.Empty;
+
+        public double TargetWeight = 0;
+        public string TargetWeightInfos = string.Empty;
+
         public double Weight 
         { 
             get 
             {
-                if (HasAvoidanceRelated)
-                    return DynamicWeight + UnchangeableWeight; 
-                return DynamicWeight + UnchangeableWeight + ClusterWeight; 
+                using (new MemorySpy("GridNode.Weight"))
+                {
+                    if (Distance >= MainGrid.GridRange)
+                        return UnchangeableWeight;
+
+                    double _w = DynamicWeight + UnchangeableWeight;
+                    if (!HasAvoidanceRelated && !Trinity.Player.NeedToKite) _w += ClusterWeight;
+                    if (Trinity.Player.NeedToKite || MainGrid.ShouldBeAwayFromAoE) _w += MonsterWeight;
+                    if (!Trinity.Player.NeedToKite && !MainGrid.ShouldAvoidAoE) _w += TargetWeight;
+
+                    return _w;
+                }
             } 
         }
         public string WeightInfos 
         { 
             get 
             {
-                return DynamicWeightInfos + UnchangeableWeightInfos; 
+                using (new MemorySpy("GridNode.WeightInfos"))
+                {
+                    if (Distance >= MainGrid.GridRange)
+                        return UnchangeableWeightInfos;
+
+                    string _wi = DynamicWeightInfos + UnchangeableWeightInfos;
+                    if (!HasAvoidanceRelated && !Trinity.Player.NeedToKite) _wi += ClusterWeightInfos;
+                    if (Trinity.Player.NeedToKite || MainGrid.ShouldBeAwayFromAoE) _wi += MonsterWeightInfos;
+                    if (!Trinity.Player.NeedToKite && !MainGrid.ShouldAvoidAoE) _wi += TargetWeightInfos;
+
+                    return _wi;
+                }
             } 
         }
 
-        public double DynamicWeight = 0;
-        public string DynamicWeightInfos { get; set; }
-        public void OperateDynamicWeight(string _weightInfos, float _weight, int _saveAsKey = 0, int _keepDuringLoop = 3, bool _addToCluster = false, bool _addToSafeWeight = false)
+        public void OperateWeight(WeightType _type, string _weightInfos, float _weight, int _saveAsKey = 0, int _keepDuringLoop = 5)
         {
-            MainGrid.Timers[12].Start();
-            if (_weight != 0f)
+            using (new MemorySpy("GridNode.OperateWeight()"))
             {
-                if (_addToSafeWeight && !MainGrid.ShouldBeAwayFromAoE)
-                    SafeWeightMonsterRelated += _weight;
-                else
+                switch (_type)
                 {
-                    DynamicWeight += _weight;
-                    DynamicWeightInfos += " " + _weightInfos + "(" + _weight.ToString("F0") + ")";
-                }
+                    case WeightType.Target:
+                        {
+                            if (_weight != 0)
+                            {
+                                TargetWeight += _weight;
+                                TargetWeightInfos += " " + _weightInfos + "(" + _weight.ToString("F0") + ")";
+                            }
 
-                if (_addToCluster) { ClusterWeight += Weight; }
+                            if (_saveAsKey != 0 && !LastTargetWeightValues.ContainsKey(_saveAsKey))
+                                LastTargetWeightValues.Add(_saveAsKey, new DynamicWeight(_weight, _weightInfos, _keepDuringLoop));
+                        }
+                        break;
+                    case WeightType.Cluster:
+                        {
+                            if (_weight != 0)
+                            {
+                                ClusterWeight += _weight;
+                                ClusterWeightInfos += " " + _weightInfos + "(" + _weight.ToString("F0") + ")"; 
+                            }
+
+                            if (_saveAsKey != 0 && !LastClusterWeightValues.ContainsKey(_saveAsKey))
+                                LastClusterWeightValues.Add(_saveAsKey, new DynamicWeight(_weight, _weightInfos, _keepDuringLoop));
+                        } 
+                        break;
+                    case WeightType.Monster:
+                        {
+                            if (_weight != 0)
+                            {
+                                MonsterWeight += _weight;
+                                MonsterWeightInfos += " " + _weightInfos + "(" + _weight.ToString("F0") + ")"; 
+                            }
+
+                            if (_saveAsKey != 0 && !LastMonsterWeightValues.ContainsKey(_saveAsKey))
+                                LastMonsterWeightValues.Add(_saveAsKey, new DynamicWeight(_weight, _weightInfos, _keepDuringLoop));
+                        } 
+                        break;
+                    case WeightType.Unchangeable:
+                        {
+                            if (_weight != 0)
+                            {
+                                UnchangeableWeight += _weight;
+                                UnchangeableWeightInfos += " " + _weightInfos + "(" + _weight.ToString("F0") + ")";
+                            }
+                        }
+                        break;
+                    case WeightType.Dynamic:
+                        {
+                            if (_weight != 0)
+                            {
+                                DynamicWeight += _weight;
+                                DynamicWeightInfos += " " + _weightInfos + "(" + _weight.ToString("F0") + ")"; 
+                            }
+
+                            if (_saveAsKey != 0 && !LastDynamicWeightValues.ContainsKey(_saveAsKey))
+                                LastDynamicWeightValues.Add(_saveAsKey, new DynamicWeight(_weight, _weightInfos, _keepDuringLoop));
+                        }
+                        break;
+                    default:
+                        break;
+                }              
             }
-
-            if (_saveAsKey != 0)
-            {
-                // try catch fastest to check keys in collection
-                try { ObjectsLastWeightValues.Add(_saveAsKey, new DynamicWeight(_weight, _weightInfos, _keepDuringLoop)); }
-                catch { }
-            }
-            MainGrid.Timers[12].Stop(); 
-        }
-
-        public double UnchangeableWeight = 0;
-        public string UnchangeableWeightInfos { get; set; }
-        public void OperateUnchangeableWeight(string weightInfos, float weight)
-        {
-            MainGrid.Timers[13].Start();
-            UnchangeableWeight += weight;
-            UnchangeableWeightInfos += " " + weightInfos + "(" + weight.ToString("F0") + ")";
-            MainGrid.Timers[13].Stop();
         }
 
         public int NearbyGridPointsCount = -1;
         public int NearbyExitsCount = -1;
         public int NearbyExitsWithinDistance(float _minWeight = 0f, float _exitRange = 35f)
         {
-            using (new Technicals.PerformanceLogger("GridPoint.GridPointsNearExits"))
+            using (new MemorySpy("GridNode.NearbyExitsWithinDistance()"))
             {
                 int _count = 0;
                 int _nodesCount = 0;
@@ -161,7 +214,7 @@ namespace Trinity
                     if (_i.Distance > 35f)
                         continue;
 
-                    if (_i.DynamicWeight <= GridMap.GetBestMoveNode().Weight * 0.7)
+                    if (_i.Weight <= _minWeight)
                         continue;
 
                     if (ObjectOOR(_i.Position, _exitRange))
@@ -200,14 +253,14 @@ namespace Trinity
         {
             /* Nearby recorded points */
             if (NearbyExitsCount > 0)
-                OperateUnchangeableWeight(String.Format("HasExits[{0}]", NearbyExitsCount), MainGrid.BaseWeight * NearbyExitsCount);
+                OperateWeight(WeightType.Unchangeable, String.Format("HasExits[{0}]", NearbyExitsCount), MainGrid.BaseWeight * NearbyExitsCount);
 
             /* Nearby recorded exits */
             if (NearbyGridPointsCount > 0)
-                OperateUnchangeableWeight(String.Format("CloseToOtherPoints[{0}]", NearbyGridPointsCount), MainGrid.BaseWeight * NearbyGridPointsCount);
+                OperateWeight(WeightType.Unchangeable, String.Format("CloseToOtherPoints[{0}]", NearbyGridPointsCount), MainGrid.BaseWeight * NearbyGridPointsCount);
 
             /* Unsafe kite zones (NavHelper.cs)*/
-            if (!MainGrid.UnSafeZonesCacheIsEmpty)
+            if (!MainGrid.UnSafeZonesCacheIsEmpty && MainGrid.ShouldBeAwayFromAoE)
             {
                 foreach (var _a in CacheData.UnSafeZones)
                 {
@@ -215,7 +268,7 @@ namespace Trinity
                         continue;
 
                     if (_a.Key.Distance2D(Position) <= _a.Value)
-                        OperateUnchangeableWeight("IsInUnsafeKiteAreas", (MainGrid.BaseWeight - _a.Key.Distance2D(Position)) * -5f);
+                        OperateWeight(WeightType.Unchangeable, "IsInUnsafeKiteAreas", (MainGrid.BaseWeight - _a.Key.Distance2D(Position)) * -5f);
                 }
             }
 
@@ -228,17 +281,30 @@ namespace Trinity
                         continue;
 
                     if (Position.Distance2D(_p.Key) <= 7f)
-                        OperateUnchangeableWeight("IsInVisitedZone", (MainGrid.BaseWeight - _p.Key.Distance2D(Position)) * 4f);
+                        OperateWeight(WeightType.Unchangeable, "IsInVisitedZone", (MainGrid.BaseWeight - _p.Key.Distance2D(Position)) * 4f);
                 }
             }
         }
         public void SetNavWeight()
         {
+            DynamicWeight _w;
             bool isNavigable = false;
+
             if (Distance < 10f)
                 isNavigable = true;
             else if (MainGrid.NavZones.ContainsKey(MainGrid.VectorToGrid(Position)))
                 isNavigable = true;
+            else if (LastDynamicWeightValues.TryGetValue(1, out _w))
+            {
+                _w.IncreaseLoopCount();
+                if (_w.KeepObject)
+                {
+                    OperateWeight(WeightType.Dynamic, _w.ObjectWeightInfo + "[D]", _w.ObjectWeight);
+                    return;
+                }
+
+                LastDynamicWeightValues.Remove(1);
+            }
             else if (MainGrid.NavZones.Any(i => i.Key.Distance2D(Position) <= i.Value))
                 isNavigable = true;
             else if (NavHelper.CanRayCast(Position))
@@ -248,7 +314,7 @@ namespace Trinity
             }
 
             if (isNavigable)
-                OperateDynamicWeight("IsNavigable", (MainGrid.BaseWeight - Distance) * 5f, 1, 3);
+                OperateWeight(WeightType.Dynamic, "IsNavigable", (MainGrid.BaseWeight - Distance) * 5f, 1, 3);
         }
         public void SetTargetWeights()
         {
@@ -265,82 +331,107 @@ namespace Trinity
                 return;
 
             DynamicWeight _w;
-            if (ObjectsLastWeightValues.TryGetValue(Trinity.CurrentTarget.RActorGuid + 99999, out _w))
+            if (LastTargetWeightValues.TryGetValue(Trinity.CurrentTarget.RActorGuid + 99999, out _w))
             {
-                OperateDynamicWeight(_w.ObjectWeightInfo + "[D]", _w.ObjectWeight);
-            }
-            else
-            {
-                float _weight = 0f;
-                string _weightInfos = string.Empty;
-
-                int _dstFromObj = (int)Position.Distance2D(Trinity.CurrentTarget.Position) - (int)Trinity.CurrentTarget.Radius;
-                if (_dstFromObj <= MainGrid.MinRangeToTarget - 3f)
+                _w.IncreaseLoopCount();
+                if (_w.KeepObject)
                 {
-                    if (Trinity.CurrentTarget.IsInLineOfSightOfPoint(Position))
-                    {
-                        _weight = MainGrid.ShouldBeAwayFromAoE ? (MainGrid.BaseWeight + _dstFromObj) * 10f : (MainGrid.BaseWeight - _dstFromObj) * 10f;
-                        _weightInfos = "IsInLoSOfTarget" + "(" + _weight.ToString("F0") + ")";
-
-                        if (MainGrid.PlayerShouldKite && _dstFromObj > CombatBase.KiteDistance)
-                        {
-                            _weight = MainGrid.ShouldBeAwayFromAoE ? (MainGrid.BaseWeight + _dstFromObj) * 8f : (MainGrid.BaseWeight - _dstFromObj) * 10f;
-                            _weightInfos += " IsInTargetRequiredRangeInKiteRange";
-                        }
-                        else
-                        {
-                            _weight = MainGrid.ShouldBeAwayFromAoE ? (MainGrid.BaseWeight + _dstFromObj) * 6f : (MainGrid.BaseWeight - _dstFromObj) * 10f;
-                            _weightInfos += " IsInTargetRequiredRange";
-                        }
-                    }
+                    OperateWeight(WeightType.Target, _w.ObjectWeightInfo + "[D]", _w.ObjectWeight);
+                    return;
                 }
 
-                OperateDynamicWeight(_weightInfos, _weight, Trinity.CurrentTarget.RActorGuid + 99999);
+                LastTargetWeightValues.Remove(Trinity.CurrentTarget.RActorGuid + 99999);
             }
+
+            float _weight = 0f;
+            string _weightInfos = string.Empty;
+
+            int _dstFromObj = (int)Position.Distance2D(Trinity.CurrentTarget.Position) - (int)Trinity.CurrentTarget.Radius;
+            if (_dstFromObj <= MainGrid.MinRangeToTarget - 3f)
+            {
+                if (Trinity.CurrentTarget.IsInLineOfSightOfPoint(Position))
+                {
+                    _weight = MainGrid.ShouldBeAwayFromAoE ? (MainGrid.BaseWeight + _dstFromObj) * 10f : (MainGrid.BaseWeight - _dstFromObj) * 10f;
+                    _weightInfos = "IsInLoSOfTarget" + "(" + _weight.ToString("F0") + ")";
+
+                    if (MainGrid.PlayerShouldKite && _dstFromObj > CombatBase.KiteDistance)
+                    {
+                        _weight = MainGrid.ShouldBeAwayFromAoE ? (MainGrid.BaseWeight + _dstFromObj) * 8f : (MainGrid.BaseWeight - _dstFromObj) * 10f;
+                        _weightInfos += " IsInTargetRequiredRangeInKiteRange";
+                    }
+                    else
+                    {
+                        _weight = MainGrid.ShouldBeAwayFromAoE ? (MainGrid.BaseWeight + _dstFromObj) * 6f : (MainGrid.BaseWeight - _dstFromObj) * 10f;
+                        _weightInfos += " IsInTargetRequiredRange";
+                    }
+                }
+            }
+
+            OperateWeight(WeightType.Target, _weightInfos, _weight, Trinity.CurrentTarget.RActorGuid + 99999, 3);
         }
         public void SetAvoidancesWeights()
         {
             if (MainGrid.AvoidancesCacheIsEmpty)
                 return;
 
-            foreach (var _a in CacheData.Avoidances)
+            foreach (var _a in CacheData.AvoidanceObstacles)
             {
+                int _key = _a.IsAvoidanceAnimations ? (int)_a.Animation : _a.RActorGUID;
+                _key += (int)_a.Position.X + (int)_a.Position.Y;
+
                 DynamicWeight _w;
-                if (ObjectsLastWeightValues.TryGetValue(_a.Key, out _w))
+                if (LastDynamicWeightValues.TryGetValue(_key, out _w))
                 {
-                    HasAvoidanceRelated = true;
-                    OperateDynamicWeight(_w.ObjectWeightInfo + "[D]", _w.ObjectWeight);
-                }
-                else
-                {
-                    if (ObjectOOR(_a.Value.Item1, 60f))
+                    _w.IncreaseLoopCount();
+                    if (_w.KeepObject)
+                    {
+                        if (_w.ObjectWeight < 0)
+                            HasAvoidanceRelated = true;
+
+                        OperateWeight(WeightType.Dynamic, _w.ObjectWeightInfo + "[D]", _w.ObjectWeight);
                         continue;
-
-                    float _weight = 0f;
-                    string _weightInfo = string.Empty;
-                    float _dstFromObj = Position.Distance2D(_a.Value.Item1);
-
-                    if (_dstFromObj <= _a.Value.Item2)
-                    {
-                        _weight += (MainGrid.BaseWeight - _dstFromObj + _a.Value.Item2) * -30f;
-                        _weightInfo += "IsStandingInAvoidance";
                     }
-                    else if (_dstFromObj <= _a.Value.Item2 * 1.2)
+
+                    LastDynamicWeightValues.Remove(_key);
+                }
+
+                if (ObjectOOR(_a.Position, 60f))
+                    continue;
+
+                float _weight = 0f;
+                string _weightInfo = string.Empty;
+                float _dstFromObj = Position.Distance2D(_a.Position);
+
+                if (_dstFromObj <= _a.Radius)
+                {
+                    _weight += (MainGrid.BaseWeight - _dstFromObj + _a.Radius) * -30f;
+                    _weightInfo += "IsStandingInAvoidance";
+                }
+                else if (_a.AvoidType != AvoidType.Projectile)
+                {
+                    if (_dstFromObj <= _a.Radius * 1.2)
                     {
-                        _weight += (MainGrid.BaseWeight - _dstFromObj + _a.Value.Item2) * -28f;
+                        _weight += (MainGrid.BaseWeight - _dstFromObj + _a.Radius) * -28f;
                         _weightInfo += "IsCloseToAvoidance";
                     }
-                    else if (MathUtil.IntersectsPath(_a.Value.Item1, _a.Value.Item2, Trinity.Player.Position, Position, true, true))
+                    else
                     {
-                        _weight += (MainGrid.BaseWeight - _dstFromObj + _a.Value.Item2) * -26f;
-                        _weightInfo += "IsIntersectAvoidanceRadius";
+                        using (new MemorySpy("GridNode.SetAvoidancesWeights().GetIntersect"))
+                        {
+                            if (Trinity.Player.Position.Distance2D(_a.Position) < Distance &&
+                            MathUtil.IntersectsPath(_a.Position, _a.Radius + 2f, Trinity.Player.Position, Position, true, true))
+                            {
+                                _weight += (MainGrid.BaseWeight - _dstFromObj + _a.Radius) * -26f;
+                                _weightInfo += "IsIntersectAvoidanceRadius";
+                            }
+                        }
                     }
-
-                    if (_weight > 0)
-                        HasAvoidanceRelated = true;
-
-                    OperateDynamicWeight(_weightInfo, _weight, _a.Key);
                 }
+
+                if (_weight < 0)
+                    HasAvoidanceRelated = true;
+
+                OperateWeight(WeightType.Dynamic, _weightInfo, _weight, _key, 3);
             }
         }
         public void SetCacheObjectsWeights()
@@ -350,74 +441,101 @@ namespace Trinity
 
             foreach (TrinityCacheObject _o in Trinity.ObjectCache)
             {
-                if (_o.Distance > 45f)
+                if (_o.Distance > 55f)
                     continue;
 
-                if (ObjectOOR(_o.Position, 45f))
+                if (ObjectOOR(_o.Position, 55f))
                     continue;
 
-                MainGrid.Timers[20].Start();
                 DynamicWeight _w;
-                if (ObjectsLastWeightValues.TryGetValue(_o.RActorGuid, out _w))
+                if (LastDynamicWeightValues.TryGetValue(_o.RActorGuid, out _w))
                 {
-                    if (_w.ObjectWeightInfo.Contains("IsInMonsterRadius"))
-                        IsInMonsterRadius = true;
+                    _w.IncreaseLoopCount();
+                    if (_w.KeepObject)
+                    {
+                        OperateWeight(WeightType.Dynamic, _w.ObjectWeightInfo + "[D]", _w.ObjectWeight);
+                        continue;
+                    }
 
-                    bool _isSafeWeight = _w.ObjectWeightInfo.Contains("Monster") || _w.ObjectWeightInfo.Contains("Kite");
-
-                    OperateDynamicWeight(_w.ObjectWeightInfo + "[D]", _w.ObjectWeight, _addToSafeWeight: _isSafeWeight);
-                    MainGrid.Timers[20].Stop();
-                    continue;
+                    LastDynamicWeightValues.Remove(_o.RActorGuid);
                 }
-                MainGrid.Timers[20].Stop();
 
-                MainGrid.Timers[19].Start();
                 switch (_o.Type)
                 {
                     case GObjectType.Unit:
                         #region Unit
                         {
+                            if (LastMonsterWeightValues.TryGetValue(_o.RActorGuid, out _w))
+                            {
+                                _w.IncreaseLoopCount();
+                                if (_w.KeepObject)
+                                {
+                                    if (_w.ObjectWeight < 0)
+                                        HasMonsterRelated = true;
+
+                                    OperateWeight(WeightType.Monster, _w.ObjectWeightInfo + "[D]", _w.ObjectWeight);
+                                    continue;
+                                }
+
+                                LastMonsterWeightValues.Remove(_o.RActorGuid);
+                            }
+
                             int _dstFromObj = (int)Position.Distance2D(_o.Position);
+
                             if (!MainGrid.ShouldBeAwayFromAoE)
                             {
+                                if (LastClusterWeightValues.TryGetValue(_o.RActorGuid + (int)_o.Position.X + (int)_o.Position.Y, out _w))
+                                {
+                                    _w.IncreaseLoopCount();
+                                    if (_w.KeepObject)
+                                    {
+                                        if (_dstFromObj <= _o.Radius)
+                                            HasMonsterRelated = true;
+
+                                        OperateWeight(WeightType.Cluster, _w.ObjectWeightInfo + "[D]", _w.ObjectWeight);
+                                        continue;
+                                    }
+
+                                    LastClusterWeightValues.Remove(_o.RActorGuid + (int)_o.Position.X + (int)_o.Position.Y);
+                                }
+
                                 float _clusterWeight = 0f;
                                 if (!HasAvoidanceRelated && _dstFromObj <= Trinity.Settings.Combat.Misc.TrashPackClusterRadius && _o.IsTrashPackOrBossEliteRareUnique)
                                 {
-                                    _clusterWeight = (float)(MainGrid.BaseWeight - (_dstFromObj * 2) + _o.Radius + ((_o.Weight * 100) / 50000)) * _o.NearbyUnits * 10f;
-                                    OperateDynamicWeight("Clustering", _clusterWeight, _addToCluster: true);
+                                    _clusterWeight = (float)(((Trinity.Settings.Combat.Misc.TrashPackClusterRadius - _dstFromObj) * Trinity.Settings.Combat.Misc.TrashPackClusterRadius) + _o.Radius + ((_o.Weight * 100) / 50000)) * _o.NearbyUnits * 10f;
+                                    OperateWeight(WeightType.Cluster, "Clustering", _clusterWeight, _o.RActorGuid + (int)_o.Position.X + (int)_o.Position.Y, 3);
                                 }
 
                                 if (_dstFromObj <= _o.Radius)
-                                    IsInMonsterRadius = true;
+                                    HasMonsterRelated = true;
                             }
-                            
-                            if (_dstFromObj <= _o.Radius)
+                            else if (_dstFromObj <= _o.Radius)
                             {
-                                IsInMonsterRadius = true;
-                                OperateDynamicWeight("IsInMonsterRadius", (MainGrid.BaseWeight - _dstFromObj + _o.Radius) * -13f, _o.RActorGuid, 10, _addToSafeWeight: true);
+                                HasMonsterRelated = true;
+                                OperateWeight(WeightType.Monster, "IsInMonsterRadius", (MainGrid.BaseWeight - _dstFromObj + _o.Radius) * -13f, _o.RActorGuid, 3);
                             }
                             else if (MainGrid.PlayerShouldKite && !_o.IsTreasureGoblin && _dstFromObj <= CombatBase.KiteDistance)
                             {
                                 if (_o.IsBoss && MainGrid.ShouldKiteBosses)
                                 {
-                                    OperateDynamicWeight("IsInBossKiteRange", (MainGrid.BaseWeight - _dstFromObj + CombatBase.KiteDistance + _o.Radius) * -11f, _o.RActorGuid, 10, _addToSafeWeight: true);
+                                    OperateWeight(WeightType.Monster, "IsInBossKiteRange", (MainGrid.BaseWeight - _dstFromObj + CombatBase.KiteDistance + _o.Radius) * -11f, _o.RActorGuid, 3);
                                 }
                                 else if (_o.IsBossOrEliteRareUnique && MainGrid.ShouldKiteElites)
                                 {
-                                    OperateDynamicWeight("IsInEliteKiteRange", (MainGrid.BaseWeight - _dstFromObj + CombatBase.KiteDistance + _o.Radius) * -9f, _o.RActorGuid, 10, _addToSafeWeight: true);
+                                    OperateWeight(WeightType.Monster, "IsInEliteKiteRange", (MainGrid.BaseWeight - _dstFromObj + CombatBase.KiteDistance + _o.Radius) * -9f, _o.RActorGuid, 3);
                                 }
                                 else if (MainGrid.ShouldKiteTrashs)
                                 {
-                                    OperateDynamicWeight("IsInMobKiteRange", (MainGrid.BaseWeight - _dstFromObj + CombatBase.KiteDistance + _o.Radius) * -7f, _o.RActorGuid, 10, _addToSafeWeight: true);
+                                    OperateWeight(WeightType.Monster, "IsInMobKiteRange", (MainGrid.BaseWeight - _dstFromObj + CombatBase.KiteDistance + _o.Radius) * -7f, _o.RActorGuid, 3);
                                 }
                             }
-                            else if (_o.Distance < Distance && MathUtil.IntersectsPath(_o.Position, _o.Radius, Trinity.Player.Position, Position, true, true))
+                            else if (_o.Distance < Distance && MathUtil.IntersectsPath(_o.Position, _o.Radius + 2f, Trinity.Player.Position, Position))
                             {
-                                OperateDynamicWeight("IsIntersectMonsterRadius", (MainGrid.BaseWeight - _dstFromObj + _o.Radius) * -6f, _o.RActorGuid, 10, _addToSafeWeight: true);
+                                OperateWeight(WeightType.Monster, "IsIntersectMonsterRadius", (MainGrid.BaseWeight - _dstFromObj + _o.Radius) * -6f, _o.RActorGuid, 3);
                             }
                             else if (MainGrid.ShouldFlee)
                             {
-                                OperateDynamicWeight("AvoidMonster", (MainGrid.BaseWeight + _dstFromObj) * 10f, _o.RActorGuid, 10, _addToSafeWeight: true);
+                                OperateWeight(WeightType.Monster, "AvoidMonster", (MainGrid.BaseWeight + _dstFromObj) * 10f, _o.RActorGuid, 3);
                             }
                             break;
                         }
@@ -428,11 +546,11 @@ namespace Trinity
                             int _dstFromObj = (int)Position.Distance2D(_o.Position);
                             if (_dstFromObj <= 5f && Trinity.Player.CurrentHealthPct < 0.3)
                             {
-                                OperateDynamicWeight("IsInHealthWellRequiredRange", (MainGrid.BaseWeight - Distance) * 4f, _o.RActorGuid, _addToCluster: true);
+                                OperateWeight(WeightType.Dynamic, "IsInHealthWellRequiredRange", (MainGrid.BaseWeight - Distance) * 4f, _o.RActorGuid);
                             }
                             else if (_o.Distance < Distance && MathUtil.IntersectsPath(_o.Position, 5f, Trinity.Player.Position, Position))
                             {
-                                OperateDynamicWeight("IsIntersectHealthWellRequiredRange", (MainGrid.BaseWeight - Distance) * 4f, _o.RActorGuid, _addToCluster: true);
+                                OperateWeight(WeightType.Dynamic, "IsIntersectHealthWellRequiredRange", (MainGrid.BaseWeight - Distance) * 4f, _o.RActorGuid);
                             }
                             break;
                         }
@@ -445,30 +563,30 @@ namespace Trinity
                             {
                                 if (Trinity.Settings.Combat.Misc.HiPriorityHG)
                                 {
-                                    OperateDynamicWeight("IsInHealthGlobePickUpRadius&HighPririty", (float)((MainGrid.BaseWeight - Distance) * MainGrid.HealthGlobeWeightPct * 8f), _o.RActorGuid, _addToCluster: true);
+                                    OperateWeight(WeightType.Dynamic, "IsInHealthGlobePickUpRadius&HighPririty", (float)((MainGrid.BaseWeight - Distance) * MainGrid.HealthGlobeWeightPct * 8f), _o.RActorGuid);
                                 }
                                 else if (MainGrid.ShouldAvoidAoE)
                                 {
-                                    OperateDynamicWeight("IsInHealthGlobePickUpRadius&LowHealth", (float)((MainGrid.BaseWeight - Distance) * MainGrid.HealthGlobeWeightPct * 7f), _o.RActorGuid, _addToCluster: true);
+                                    OperateWeight(WeightType.Dynamic, "IsInHealthGlobePickUpRadius&LowHealth", (float)((MainGrid.BaseWeight - Distance) * MainGrid.HealthGlobeWeightPct * 7f), _o.RActorGuid);
                                 }
                                 else
                                 {
-                                    OperateDynamicWeight("IsInHealthGlobePickUpRadius", (float)((MainGrid.BaseWeight - Distance) * MainGrid.HealthGlobeWeightPct * 6f), _o.RActorGuid, _addToCluster: true);
+                                    OperateWeight(WeightType.Dynamic, "IsInHealthGlobePickUpRadius", (float)((MainGrid.BaseWeight - Distance) * MainGrid.HealthGlobeWeightPct * 6f), _o.RActorGuid);
                                 }
                             }
                             else if (_o.Distance < Distance && MathUtil.IntersectsPath(_o.Position, Trinity.Player.GoldPickupRadius + 2f, Trinity.Player.Position, Position))
                             {
                                 if (Trinity.Settings.Combat.Misc.HiPriorityHG)
                                 {
-                                    OperateDynamicWeight("IsIntersectHealthGlobePickUpRadius&HiPriority", (float)((MainGrid.BaseWeight - Distance) * MainGrid.HealthGlobeWeightPct * 8f), _o.RActorGuid, _addToCluster: true);
+                                    OperateWeight(WeightType.Dynamic, "IsIntersectHealthGlobePickUpRadius&HiPriority", (float)((MainGrid.BaseWeight - Distance) * MainGrid.HealthGlobeWeightPct * 8f), _o.RActorGuid);
                                 }
                                 else if (MainGrid.ShouldAvoidAoE)
                                 {
-                                    OperateDynamicWeight("IsIntersectHealthGlobePickUpRadius&LowHealth", (float)((MainGrid.BaseWeight - Distance) * MainGrid.HealthGlobeWeightPct * 7f), _o.RActorGuid, _addToCluster: true);
+                                    OperateWeight(WeightType.Dynamic, "IsIntersectHealthGlobePickUpRadius&LowHealth", (float)((MainGrid.BaseWeight - Distance) * MainGrid.HealthGlobeWeightPct * 7f), _o.RActorGuid);
                                 }
                                 else
                                 {
-                                    OperateDynamicWeight("IsIntersectHealthGlobePickUpRadius", (float)((MainGrid.BaseWeight - Distance) * MainGrid.HealthGlobeWeightPct * 6f), _o.RActorGuid, _addToCluster: true);
+                                    OperateWeight(WeightType.Dynamic, "IsIntersectHealthGlobePickUpRadius", (float)((MainGrid.BaseWeight - Distance) * MainGrid.HealthGlobeWeightPct * 6f), _o.RActorGuid);
                                 }
                             }
                             break;
@@ -482,11 +600,11 @@ namespace Trinity
                                 int _dstFromObj = (int)Position.Distance2D(_o.Position);
                                 if (_dstFromObj <= Trinity.Player.GoldPickupRadius + 2f)
                                 {
-                                    OperateDynamicWeight("IsInProgressionGlobePickUpRadius", (MainGrid.BaseWeight - Distance) * 3f, _o.RActorGuid, _addToCluster: true);
+                                    OperateWeight(WeightType.Dynamic, "IsInProgressionGlobePickUpRadius", (MainGrid.BaseWeight - Distance) * 3f, _o.RActorGuid);
                                 }
                                 else if (_o.Distance < Distance && MathUtil.IntersectsPath(_o.Position, Trinity.Player.GoldPickupRadius + 2f, Trinity.Player.Position, Position))
                                 {
-                                    OperateDynamicWeight("IsIntersectProgressionGlobePickUpRadius", (MainGrid.BaseWeight - Distance) * 3f, _o.RActorGuid, _addToCluster: true);
+                                    OperateWeight(WeightType.Dynamic, "IsIntersectProgressionGlobePickUpRadius", (MainGrid.BaseWeight - Distance) * 3f, _o.RActorGuid);
                                 }
                             }
                             break;
@@ -500,11 +618,11 @@ namespace Trinity
                                 int _dstFromObj = (int)Position.Distance2D(_o.Position);
                                 if (_dstFromObj <= Trinity.Player.GoldPickupRadius + 2f)
                                 {
-                                    OperateDynamicWeight("IsInPowerGlobePickUpRadius", (MainGrid.BaseWeight - Distance) * 2f, _o.RActorGuid, _addToCluster: true);
+                                    OperateWeight(WeightType.Dynamic, "IsInPowerGlobePickUpRadius", (MainGrid.BaseWeight - Distance) * 2f, _o.RActorGuid);
                                 }
                                 else if (_o.Distance < Distance && MathUtil.IntersectsPath(_o.Position, Trinity.Player.GoldPickupRadius + 2f, Trinity.Player.Position, Position))
                                 {
-                                    OperateDynamicWeight("IsIntersectPowerGlobePickUpRadius", (MainGrid.BaseWeight - Distance) * 2f, _o.RActorGuid, _addToCluster: true);
+                                    OperateWeight(WeightType.Dynamic, "IsIntersectPowerGlobePickUpRadius", (MainGrid.BaseWeight - Distance) * 2f, _o.RActorGuid);
                                 } 
                             }
                             break;
@@ -520,30 +638,30 @@ namespace Trinity
                                 {
                                     if (Legendary.Goldwrap.IsEquipped)
                                     {
-                                        OperateDynamicWeight("IsInGoldPickUpRadius&Goldwrap", (MainGrid.BaseWeight - Distance) * 10f, _o.RActorGuid, _addToCluster: true);
+                                        OperateWeight(WeightType.Dynamic, "IsInGoldPickUpRadius&Goldwrap", (MainGrid.BaseWeight - Distance) * 10f, _o.RActorGuid);
                                     }
                                     else if (Legendary.KymbosGold.IsEquipped && Trinity.Player.CurrentHealthPct < 0.8)
                                     {
-                                        OperateDynamicWeight("IsInGoldPickUpRadius&KymboGold", (MainGrid.BaseWeight - Distance) * 5f, _o.RActorGuid, _addToCluster: true);
+                                        OperateWeight(WeightType.Dynamic, "IsInGoldPickUpRadius&KymboGold", (MainGrid.BaseWeight - Distance) * 5f, _o.RActorGuid);
                                     }
                                     else
                                     {
-                                        OperateDynamicWeight("IsInGoldPickUpRadius", (MainGrid.BaseWeight - Distance * 2f), _o.RActorGuid, _addToCluster: true);
+                                        OperateWeight(WeightType.Dynamic, "IsInGoldPickUpRadius", (MainGrid.BaseWeight - Distance * 2f), _o.RActorGuid);
                                     }
                                 }
                                 else if (_o.Distance < Distance && MathUtil.IntersectsPath(_o.Position, Trinity.Player.GoldPickupRadius + 2f, Trinity.Player.Position, Position))
                                 {
                                     if (Legendary.Goldwrap.IsEquipped)
                                     {
-                                        OperateDynamicWeight("IsIntersectGoldPickUpRadius&Goldwrap", (MainGrid.BaseWeight - Distance) * 10f, _o.RActorGuid, _addToCluster: true);
+                                        OperateWeight(WeightType.Dynamic, "IsIntersectGoldPickUpRadius&Goldwrap", (MainGrid.BaseWeight - Distance) * 10f, _o.RActorGuid);
                                     }
                                     else if (Legendary.KymbosGold.IsEquipped && Trinity.Player.CurrentHealthPct < 0.8)
                                     {
-                                        OperateDynamicWeight("IsIntersectGoldPickUpRadius&KymboGold", (MainGrid.BaseWeight - Distance) * 5f, _o.RActorGuid, _addToCluster: true);
+                                        OperateWeight(WeightType.Dynamic, "IsIntersectGoldPickUpRadius&KymboGold", (MainGrid.BaseWeight - Distance) * 5f, _o.RActorGuid);
                                     }
                                     else
                                     {
-                                        OperateDynamicWeight("IsIntersectGoldPickUpRadius", (MainGrid.BaseWeight - Distance) * 1.5f, _o.RActorGuid, _addToCluster: true);
+                                        OperateWeight(WeightType.Dynamic, "IsIntersectGoldPickUpRadius", (MainGrid.BaseWeight - Distance) * 1.5f, _o.RActorGuid);
                                     }
                                 } 
                             }
@@ -558,22 +676,22 @@ namespace Trinity
                             {
                                 if (Trinity.Settings.WorldObject.HiPriorityShrines)
                                 {
-                                    OperateDynamicWeight("IsInShrineRequiredRange&HiPriority", (MainGrid.BaseWeight - Distance) * 6f, _o.RActorGuid, _addToCluster: true);
+                                    OperateWeight(WeightType.Dynamic, "IsInShrineRequiredRange&HiPriority", (MainGrid.BaseWeight - Distance) * 6f, _o.RActorGuid);
                                 }
                                 else
                                 {
-                                    OperateDynamicWeight("IsInShrineRequiredRange", (MainGrid.BaseWeight - Distance) * 3f, _o.RActorGuid, _addToCluster: true);
+                                    OperateWeight(WeightType.Dynamic, "IsInShrineRequiredRange", (MainGrid.BaseWeight - Distance) * 3f, _o.RActorGuid);
                                 }
                             }
                             else if (_o.Distance < Distance && MathUtil.IntersectsPath(_o.Position, Trinity.Player.GoldPickupRadius + 2f, Trinity.Player.Position, Position))
                             {
                                 if (Trinity.Settings.WorldObject.HiPriorityShrines)
                                 {
-                                    OperateDynamicWeight("IsIntersectShrineRequiredRange&HiPriority", (MainGrid.BaseWeight - Distance) * 6f, _o.RActorGuid, _addToCluster: true);
+                                    OperateWeight(WeightType.Dynamic, "IsIntersectShrineRequiredRange&HiPriority", (MainGrid.BaseWeight - Distance) * 6f, _o.RActorGuid);
                                 }
                                 else
                                 {
-                                    OperateDynamicWeight("IsIntersectShrineRequiredRange", (MainGrid.BaseWeight - Distance) * 3f, _o.RActorGuid, _addToCluster: true);
+                                    OperateWeight(WeightType.Dynamic, "IsIntersectShrineRequiredRange", (MainGrid.BaseWeight - Distance) * 3f, _o.RActorGuid);
                                 }
                             }
                             break;
@@ -591,15 +709,15 @@ namespace Trinity
                                     (Trinity.Settings.WorldObject.HiPriorityContainers ||
                                     ((Legendary.HarringtonWaistguard.IsEquipped && !Legendary.HarringtonWaistguard.IsBuffActive))))
                                 {
-                                    OperateDynamicWeight("IsInContainerRequiredRange&HiPriority", (MainGrid.BaseWeight - Distance) * 10f, _o.RActorGuid, _addToCluster: true);
+                                    OperateWeight(WeightType.Dynamic, "IsInContainerRequiredRange&HiPriority", (MainGrid.BaseWeight - Distance) * 10f, _o.RActorGuid);
                                 }
                                 else if (_dstFromObj <= _o.Radius + 5f)
                                 {
-                                    OperateDynamicWeight("IsInContainerRequiredRange&HiPriority", (MainGrid.BaseWeight - Distance) * -2f, _o.RActorGuid);
+                                    OperateWeight(WeightType.Dynamic, "IsInContainerRequiredRange&HiPriority", (MainGrid.BaseWeight - Distance) * -2f, _o.RActorGuid);
                                 }
                                 else if (_o.Distance < Distance && MathUtil.IntersectsPath(_o.Position, _o.Radius, Trinity.Player.Position, Position, true, true))
                                 {
-                                    OperateDynamicWeight("IntersectsPathObstacles", (MainGrid.BaseWeight - _dstFromObj + _o.Radius) * -2f, _o.RActorGuid);
+                                    OperateWeight(WeightType.Dynamic, "IntersectsPathObstacles", (MainGrid.BaseWeight - _dstFromObj + _o.Radius) * -2f, _o.RActorGuid);
                                 } 
                             }
                             break;
@@ -608,7 +726,6 @@ namespace Trinity
                     default:
                         break;
                 }
-                MainGrid.Timers[19].Stop();
             }
         }
     }

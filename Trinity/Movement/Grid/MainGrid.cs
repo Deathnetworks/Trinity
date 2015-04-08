@@ -79,13 +79,12 @@ namespace Trinity
         public static Dictionary<Tuple<int,int>,GridNode> NodesRecorded = new Dictionary<Tuple<int,int>,GridNode>();
         public static Dictionary<Vector3, float> NavZones = new Dictionary<Vector3, float>();
 
-        public static Stopwatch[] Timers = Enumerable.Range(0, 21).Select(i => new Stopwatch()).ToArray();
         public static HashSet<GridNode> MapAsList = new HashSet<GridNode>();
         public static Vector3 NavZonePosition = new Vector3();
 
         public static GridNode LastResult = new GridNode();
 
-        public const float GridRange = 85f;
+        public const float GridRange = 75f;
         public const float GridSquareSize = 2f;
         public const float BaseWeight = GridRange + 10f;
         #endregion
@@ -106,31 +105,34 @@ namespace Trinity
         /// <returns>Return true if grid has been refresh</returns>
         public static bool Refresh(Vector3 _center)
         {
-            using (new PerformanceLogger("GridNavigation.RefreshGridMap"))
+            using (new MemorySpy("MainGrid.Refresh()"))
             {
-                Timers[0].Start();
                 #region Fields
 
-                Timers[14].Start();
-                /* Repick, increase performance if GridSquareSize != 1 */
-                var _centerToGrid = GridMap.GetPointAt(_center);
-                if (_centerToGrid != null) _center = _centerToGrid.Position;
+                Vector2 _minWorld;
+                Point _minPoint;
+                Vector2 _maxWorld;
+                Point _maxPoint;
+                Point _centerPos;
+                GridNode _bestNode;
 
-                /* corner 1 */
-                Vector2 _minWorld = new Vector2(_center.X - GridRange, _center.Y - GridRange);
-                Point _minPoint = MainGridProvider.WorldToGrid(_minWorld);
-                _minPoint.X = Math.Max(_minPoint.X, 0);
-                _minPoint.Y = Math.Max(_minPoint.Y, 0);
+                using (new MemorySpy("MainGrid.Refresh().SetInit"))
+                {
+                    /* corner 1 */
+                    _minWorld = new Vector2(_center.X - GridRange, _center.Y - GridRange);
+                    _minPoint = MainGridProvider.WorldToGrid(_minWorld);
+                    _minPoint.X = Math.Max(_minPoint.X, 0);
+                    _minPoint.Y = Math.Max(_minPoint.Y, 0);
 
-                /* corner 2 */
-                Vector2 _maxWorld = new Vector2(_center.X + GridRange, _center.Y + GridRange);
-                Point _maxPoint = MainGridProvider.WorldToGrid(_maxWorld);
-                _maxPoint.X = Math.Min(_maxPoint.X, MainGridProvider.Width - 1);
-                _maxPoint.Y = Math.Min(_maxPoint.Y, MainGridProvider.Height - 1);
+                    /* corner 2 */
+                    _maxWorld = new Vector2(_center.X + GridRange, _center.Y + GridRange);
+                    _maxPoint = MainGridProvider.WorldToGrid(_maxWorld);
+                    _maxPoint.X = Math.Min(_maxPoint.X, MainGridProvider.Width - 1);
+                    _maxPoint.Y = Math.Min(_maxPoint.Y, MainGridProvider.Height - 1);
 
-                Point _centerPos = MainGridProvider.WorldToGrid(_center.ToVector2());
-                GridNode _bestNode = new GridNode(new Vector3());
-                Timers[14].Stop();
+                    _centerPos = MainGridProvider.WorldToGrid(_center.ToVector2());
+                    _bestNode = new GridNode(new Vector3());
+                }
                 #endregion
 
                 MapAsList.Clear();
@@ -139,95 +141,91 @@ namespace Trinity
                     int _searchAreaBasis = _y * MainGridProvider.Width;
                     for (int _x = _minPoint.X; _x <= _maxPoint.X; _x = _x + (int)GridSquareSize)
                     {
-                        Timers[15].Start();
+
                         int _dx = _centerPos.X - _x;
                         int _dy = _centerPos.Y - _y;
 
                         /* Out of range */
-                        if (_dx * _dx + _dy * _dy > (GridRange / 2.5f) * (GridRange / 2.5f))
+                        using (new MemorySpy("MainGrid.Refresh().OutOfRangeCheck"))
                         {
-                            Timers[15].Stop();
-                            continue;
+                            if (_dx * _dx + _dy * _dy > (GridRange / 2f) * (GridRange / 2f))
+                                continue;
                         }
 
                         /* Cant stand at */
-                        if (!MainGridProvider.SearchArea[_searchAreaBasis + _x])
+                        using (new MemorySpy("MainGrid.Refresh().CantStandAtCheck"))
                         {
-                            Timers[15].Stop();
-                            continue;
+                            if (!MainGridProvider.SearchArea[_searchAreaBasis + _x])
+                                continue;
                         }
-                        Timers[15].Stop();
 
-                        /* THIS IS A NODE */
+                        Vector2 _xy;
+                        Vector3 _xyz;
+                        GridNode _g;
 
-                        Timers[1].Start();
-                        Vector2 _xy = MainGridProvider.GridToWorld(new Point(_x, _y));
-                        Vector3 _xyz = new Vector3(_xy.X, _xy.Y, MainGridProvider.GetHeight(_xy));
-
-                        GridNode _g = new GridNode(_xyz);
-                        GridNode _nodeRecorded;
-                        if (MainGrid.NodesRecorded.TryGetValue(MainGrid.VectorToTuple(_g.Position), out _nodeRecorded))
+                        using (new MemorySpy("MainGrid.Refresh().SetPosition"))
                         {
-                            /* switch to recorded point */
-                            Timers[1].Stop();
+                            _xy = MainGridProvider.GridToWorld(new Point(_x, _y));
 
-                            /* Take back recorded values */
-                            Timers[2].Start();
-                            /* Reset value */
-                            _nodeRecorded.ResetTickValues();
+                            /* Round to int pair sup, require to no change GridSquareSize value (2) */
+                            _xy.X = ((int)_xy.X & 1) == 1 ? (int)_xy.X + 1 : (int)_xy.X;
+                            _xy.Y = ((int)_xy.Y & 1) == 1 ? (int)_xy.Y + 1 : (int)_xy.Y;
 
-                            _g.DynamicWeight = _nodeRecorded.DynamicWeight;
-                            _g.DynamicWeightInfos = _nodeRecorded.DynamicWeightInfos;
+                            _xyz = new Vector3(_xy.X, _xy.Y, MainGridProvider.GetHeight(_xy));
+                            _g = new GridNode(_xyz);
+                        }
 
-                            _g.UnchangeableWeight = _nodeRecorded.UnchangeableWeight;
-                            _g.UnchangeableWeightInfos = _nodeRecorded.UnchangeableWeightInfos;
+                        GridNode _nodeRecorded;
+                        bool _recorded = false;
 
-                            _g.NearbyExitsCount = _nodeRecorded.NearbyExitsCount;
-                            _g.NearbyGridPointsCount = _nodeRecorded.NearbyGridPointsCount;
+                        using (new MemorySpy("MainGrid.Refresh().CheckRecorded"))
+                        { _recorded = MainGrid.NodesRecorded.TryGetValue(MainGrid.VectorToTuple(_g.Position), out _nodeRecorded); }
 
-                            _g.ObjectsLastWeightValues = _nodeRecorded.ObjectsLastWeightValues;
+                        if (_recorded)
+                        {
+                            using (new MemorySpy("MainGrid.Refresh().GetRecordedValues"))
+                            {
+                                _nodeRecorded.ResetTickValues();
 
-                            /* Then remove it */
-                            MainGrid.NodesRecorded.Remove(MainGrid.VectorToTuple(_g.Position));
-                            Timers[2].Stop();
+                                _g.UnchangeableWeight = _nodeRecorded.UnchangeableWeight;
+                                _g.UnchangeableWeightInfos = _nodeRecorded.UnchangeableWeightInfos;
+
+                                _g.NearbyExitsCount = _nodeRecorded.NearbyExitsCount;
+                                _g.NearbyGridPointsCount = _nodeRecorded.NearbyGridPointsCount;
+
+                                _g.LastDynamicWeightValues = _nodeRecorded.LastDynamicWeightValues;
+                                _g.LastTargetWeightValues = _nodeRecorded.LastTargetWeightValues;
+                                _g.LastClusterWeightValues = _nodeRecorded.LastClusterWeightValues;
+                                _g.LastMonsterWeightValues = _nodeRecorded.LastMonsterWeightValues;
+
+                                MainGrid.NodesRecorded.Remove(MainGrid.VectorToTuple(_g.Position));
+                            }
                         }
                         else
                         {
-                            /* Create new point */
-                            Timers[1].Stop();
-
-                            Timers[3].Start();
-                            /* Reset value */
-                            _g.ResetTickValues();
-
-                            /* This weight never change */
-                            _g.SetUnchangeableWeight();
-                            Timers[3].Stop();
+                            using (new MemorySpy("MainGrid.Refresh().GetNewValues"))
+                            {
+                                _g.ResetTickValues();
+                                _g.SetUnchangeableWeight();
+                            }
                         }
 
-                        /* Everytime */
-                        _g.OperateDynamicWeight("BaseDistanceWeight", (MainGrid.GridRange - _g.Distance) * 5f);
+                        _g.OperateWeight(WeightType.Dynamic, "BaseDistanceWeight", (MainGrid.GridRange - _g.Distance) * 5f);
 
-                        Timers[4].Start();
-                        /* Set weight related to unit target */
-                        _g.SetTargetWeights();
-                        Timers[4].Stop();
+                        using (new MemorySpy("MainGrid.Refresh().SetTargetWeights"))
+                        {
+                            _g.SetTargetWeights();
+                        }
 
-                        Timers[5].Start();
-                        /* Set weight related to avoidances */
-                        _g.SetAvoidancesWeights();
-                        Timers[5].Stop();
+                        using (new MemorySpy("MainGrid.Refresh().SetAvoidancesWeights"))
+                        {
+                            _g.SetAvoidancesWeights();
+                        }
 
-                        Timers[6].Start();
-                        /* Set weight related to cache objects */
-                        _g.SetCacheObjectsWeights();
-                        Timers[6].Stop();
-
-                        Timers[7].Start();
-                        /* try catch fastest to check key in collection */
-                        try { MainGrid.NodesRecorded.Add(MainGrid.VectorToTuple(_xyz), _g); }
-                        catch { }
-                        Timers[7].Stop();
+                        using (new MemorySpy("MainGrid.Refresh().SetCacheObjectsWeights"))
+                        {
+                            _g.SetCacheObjectsWeights();
+                        }
 
                         MapAsList.Add(_g);
 
@@ -240,81 +238,103 @@ namespace Trinity
                     }
                 }
 
-                Timers[8].Start();
                 /* low, so reduce list to minimum with dist & weight limit */
-                foreach (var _g in MapAsList)
+                using (new MemorySpy("MainGrid.Refresh().LowWeighting"))
                 {
-                    /* Something to do */
-                    _g.FinalCheck();
-
-                    if (_g.DynamicWeight <= _bestNode.Weight * 0.7)
-                        continue;
-
-                    if (_g.Distance > 40f)
-                        continue;
-
-                    Timers[9].Start();
-                    /* Ray cast */
-                    _g.SetNavWeight();
-                    Timers[9].Stop();
-
-                    /* Count ray casted points within distance */
-                    if (_g.NearbyExitsCount < 0)
+                    foreach (var _g in MapAsList)
                     {
-                        _g.NearbyExitsCount = _g.NearbyExitsWithinDistance((float)(_bestNode.Weight * 0.7));
+                        /* Something to do */
+                        _g.FinalCheck();
 
-                        if (_g.NearbyExitsCount > 0)
-                            _g.OperateUnchangeableWeight(String.Format("HasExits[{0}]", _g.NearbyExitsCount), MainGrid.BaseWeight * _g.NearbyExitsCount);
+                        if (_g.Weight <= _bestNode.Weight * 0.75)
+                        {
+                            using (new MemorySpy("MainGrid.Refresh().DictionaryAdd"))
+                            {
+                                if (!MainGrid.NodesRecorded.ContainsKey(MainGrid.VectorToTuple(_g.Position)))
+                                    MainGrid.NodesRecorded.Add(MainGrid.VectorToTuple(_g.Position), _g);
+                            }
 
-                        if (_g.NearbyGridPointsCount > 0)
-                            _g.OperateUnchangeableWeight(String.Format("CloseToOtherPoints[{0}]", _g.NearbyGridPointsCount), MainGrid.BaseWeight * _g.NearbyGridPointsCount);
+                            continue;
+                        }
+
+                        if (_g.Distance > 40f)
+                        {
+                            using (new MemorySpy("MainGrid.Refresh().DictionaryAdd"))
+                            {
+                                if (!MainGrid.NodesRecorded.ContainsKey(MainGrid.VectorToTuple(_g.Position)))
+                                    MainGrid.NodesRecorded.Add(MainGrid.VectorToTuple(_g.Position), _g);
+                            }
+
+                            continue;
+                        }
+
+                        /* Ray cast */
+                        using (new MemorySpy("MainGrid.Refresh().SetNavWeight"))
+                        {
+                            _g.SetNavWeight();
+                        }
+
+                        /* Count ray casted points within distance */
+                        using (new MemorySpy("MainGrid.Refresh().SetSafeZoneWeight"))
+                        {
+                            if (_g.NearbyExitsCount < 0)
+                            {
+                                _g.NearbyExitsCount = _g.NearbyExitsWithinDistance((float)(_bestNode.Weight * 0.75), 30f);
+
+                                if (_g.NearbyExitsCount > 0)
+                                    _g.OperateWeight(WeightType.Unchangeable, String.Format("HasExits[{0}]", _g.NearbyExitsCount), MainGrid.BaseWeight * _g.NearbyExitsCount);
+
+                                if (_g.NearbyGridPointsCount > 0)
+                                    _g.OperateWeight(WeightType.Unchangeable, String.Format("CloseToOtherPoints[{0}]", _g.NearbyGridPointsCount), MainGrid.BaseWeight * _g.NearbyGridPointsCount);
+                            }
+                        }
+
+                        /* try catch fastest to check key in collection */
+                        using (new MemorySpy("MainGrid.Refresh().AddToDictionary"))
+                        {
+                            if (!MainGrid.NodesRecorded.ContainsKey(MainGrid.VectorToTuple(_g.Position)))
+                                MainGrid.NodesRecorded.Add(MainGrid.VectorToTuple(_g.Position), _g);
+                        }
                     }
                 }
-                Timers[8].Stop();
             }
 
-            Timers[0].Stop();
             return true;
         }
 
-        private static int Tick = 0;
         internal static void ResetTickValues()
         {
-            if (Tick > 10) { Tick = 0; }
-            Tick++;
-
-            /* at every tick */
-            GridResults.ResetTickValues();
-
-            tickValue_MinRangeToTarget = -1f;
-            isTickRecorded_PlayerShouldKite = false;
-            isTickRecorded_ShouldAvoidAoE = false;
-            isTickRecorded_ShouldCollectHealthGlobe = false;
-            tickValue_HealthGlobeWeightPct = -1f;
-
-            ObjectCacheIsEmpty = !ObjectCache.Any();
-            AvoidancesCacheIsEmpty = !CacheData.Avoidances.Any();
-            PositionsCacheIsEmpty = !CacheData.VisitedZones.Any();
-            UnSafeZonesCacheIsEmpty = !CacheData.UnSafeZones.Any();
-
-            ShouldKiteBosses = CombatBase.KiteMode != KiteMode.Never || Trinity.Player.AvoidDeath;
-            ShouldKiteElites = CombatBase.KiteMode == KiteMode.Elites || CombatBase.KiteMode == KiteMode.Always || Trinity.Player.AvoidDeath;
-            ShouldKiteTrashs = CombatBase.KiteMode == KiteMode.Always || Trinity.Player.AvoidDeath;
-            ShouldFlee = (Trinity.Settings.Combat.Misc.FleeInGhostMode && Trinity.Player.IsGhosted) || Trinity.Player.AvoidDeath;
-
-            ShouldBeAwayFromAoE = Player.IsRanged || (PlayerShouldKite && Player.NeedToKite) || ShouldFlee || ShouldAvoidAoE;
-
-            PlayerIsInTrialRift = Player.LevelAreaId.Equals(DataDictionary.RiftTrialLevelAreaId);
-
-            /* at multiple of 2 */
-            if (Tick % 2 == 0)
+            using (new MemorySpy("MainGrid.ResetTickValues()"))
             {
-                Timers[10].Start();
-                List<Tuple<int, int>> _itemToRemove = new List<Tuple<int, int>>();
+                /* at every tick */
+                GridResults.ResetTickValues();
 
-                foreach (var _g in NodesRecorded) { if (_g.Value.ObjectOOR(_g.Value.Position, GridRange + 30)) { _itemToRemove.Add(_g.Key); } }
-                foreach (var _i in _itemToRemove) { NodesRecorded.Remove(_i); }
-                Timers[10].Stop();
+                tickValue_MinRangeToTarget = -1f;
+                isTickRecorded_PlayerShouldKite = false;
+                isTickRecorded_ShouldAvoidAoE = false;
+                isTickRecorded_ShouldCollectHealthGlobe = false;
+                tickValue_HealthGlobeWeightPct = -1f;
+
+                ObjectCacheIsEmpty = ObjectCache != null && !ObjectCache.Any();
+                AvoidancesCacheIsEmpty = !CacheData.AvoidanceObstacles.Any();
+                PositionsCacheIsEmpty = !CacheData.VisitedZones.Any();
+                UnSafeZonesCacheIsEmpty = !CacheData.UnSafeZones.Any();
+
+                ShouldKiteBosses = CombatBase.KiteMode != KiteMode.Never || Trinity.Player.AvoidDeath;
+                ShouldKiteElites = CombatBase.KiteMode == KiteMode.Elites || CombatBase.KiteMode == KiteMode.Always || Trinity.Player.AvoidDeath;
+                ShouldKiteTrashs = CombatBase.KiteMode == KiteMode.Always || Trinity.Player.AvoidDeath;
+                ShouldFlee = (Trinity.Settings.Combat.Misc.FleeInGhostMode && Trinity.Player.IsGhosted) || Trinity.Player.AvoidDeath;
+
+                ShouldBeAwayFromAoE = Player.IsRanged || (PlayerShouldKite && Player.NeedToKite) || ShouldFlee || ShouldAvoidAoE;
+
+                PlayerIsInTrialRift = Player.LevelAreaId.Equals(DataDictionary.RiftTrialLevelAreaId);
+
+                using (new MemorySpy("MainGrid.ResetTickValues().RemoveObsoletNode"))
+                {
+                    //if (NodesRecorded.Any(g => g.Value.ObjectOOR(g.Value.Position, 200)))
+                    if (NodesRecorded.Count() > 7500)
+                        NodesRecorded.Clear();
+                }
 
                 if (NavZonePosition == new Vector3() ||
                 NavZonePosition.Distance2D(Player.Position) >= 5f)
@@ -322,13 +342,6 @@ namespace Trinity
                     NavZonePosition = Player.Position;
                     NavZones.Clear();
                 }
-            }
-
-            /* at multiple of 3 */
-            if (Tick % 3 == 0)
-            {
-                if (MainGridProvider.Width == 0 || MainGridProvider.Height == 0)
-                    GridSegmentation.Reset();
             }
         }
 

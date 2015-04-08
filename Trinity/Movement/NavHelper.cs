@@ -91,16 +91,8 @@ namespace Trinity
             // So ZetaDia.Physics.Raycast() == !Navigator.Raycast()
             // We're using Navigator.Raycast now because it's "faster" (per Nesox)
 
-            using (new PerformanceLogger("CanRayCast"))
+            using (new MemorySpy("NavHelper.CanRayCast()"))
             {
-                /*if (CacheData.UnRaycastedLines.Any(l => 
-                        (l.Key.Distance2D(vDestination) <= 5f && l.Value.Distance2D(vStartLocation) <= 5f) ||
-                        (l.Key.Distance2D(vStartLocation) <= 5f && l.Value.Distance2D(vDestination) <= 5f))
-                    )
-                {
-                    return false;
-                }*/
-                MainGrid.Timers[16].Start();
                 foreach (var cacheObstacle in CacheData.NavRayCastObstacles.OrderBy(o => o.Key.Distance2D(vStartLocation)))
                 {
                     if (cacheObstacle.Value <= 3f)
@@ -110,23 +102,12 @@ namespace Trinity
                         continue;
                     
                     if (MathEx.IntersectsPath(cacheObstacle.Key, cacheObstacle.Value, vStartLocation, vDestination))
-                    {
-                        //if (!CacheData.UnRaycastedLines.ContainsKey(vDestination))
-                        //    CacheData.UnRaycastedLines.Add(vDestination, vStartLocation);
-                        MainGrid.Timers[16].Stop();
                         return false;
-                    }
                 }
 
                 if (Navigator.Raycast(vStartLocation, vDestination))
-                {
-                    //if (!CacheData.UnRaycastedLines.ContainsKey(vDestination))
-                    //    CacheData.UnRaycastedLines.Add(vDestination, vStartLocation);
-                    MainGrid.Timers[16].Stop();
                     return false;
-                }
 
-                MainGrid.Timers[16].Stop();
                 return true;
             }
         }
@@ -182,7 +163,7 @@ namespace Trinity
         /// </summary>
         internal static bool ObjectIsInLosOfPoint(Vector3 origin, TrinityCacheObject o)
         {
-            using (new PerformanceLogger("NavHelper.LoSCheck"))
+            using (new MemorySpy("NavHelper.ObjectIsInLosOfPoint()"))
             {
                 if (o == null)
                     return false;
@@ -242,7 +223,7 @@ namespace Trinity
 
                     if (o.Type == GObjectType.Unit)
                     {
-                        if (Math.Abs(origin.Z - o.Position.Z) > 12f)
+                        if (Math.Abs(origin.Z - o.Position.Z) > 12f || o.ZDiff > 11f)
                         {
                             if (isPlayerLocation && CacheData.HasBeenInLoS.ContainsKey(o.RActorGuid))
                                 CacheData.HasBeenInLoS.Remove(o.RActorGuid);
@@ -296,7 +277,7 @@ namespace Trinity
         internal static Vector3 FindSafeZone(bool isStuck, int stuckAttempts, Vector3 dangerPoint, float minimumRange = 5f, float maximumRange = 100f)
         {
             // Handle The Butcher's Lair
-            var butcherFloorPanels = CacheData.TimeBoundAvoidance.Where(aoe => DataDictionary.ButcherFloorPanels.Contains(aoe.ActorSNO)).ToList();
+            var butcherFloorPanels = CacheData.AvoidanceObstacles.Where(aoe => DataDictionary.ButcherFloorPanels.Contains(aoe.ActorSNO)).ToList();
             if (butcherFloorPanels.Any())
             {
                 foreach (var bestSafeGridPointoint in DataDictionary.ButcherPanelPositions.OrderBy(p => p.Value.Distance2DSqr(Player.Position)))
@@ -308,7 +289,7 @@ namespace Trinity
                     }
 
                     // floor panel position is in Butcher animation avoidance (charging, chain hook)
-                    if (CacheData.TimeBoundAvoidance.Any(aoe => aoe.Position.Distance2D(bestSafeGridPointoint.Value) < aoe.Radius))
+                    if (CacheData.AvoidanceObstacles.Any(aoe => aoe.Position.Distance2D(bestSafeGridPointoint.Value) < aoe.Radius))
                         continue;
 
                     // no avoidance object in cache, this point is safe
@@ -337,7 +318,7 @@ namespace Trinity
                     ));
                 // Wizards can look for bee stings in range and try a wave of force to dispel them
                 if (Player.ActorClass == ActorClass.Wizard && CombatBase.CanCast(SNOPower.Wizard_WaveOfForce) &&
-                    !Player.IsIncapacitated && CacheData.TimeBoundAvoidance.Count(u => u.ActorSNO == 5212 && u.Position.Distance(Player.Position) <= 15f) >= 2 &&
+                    !Player.IsIncapacitated && CacheData.AvoidanceObstacles.Count(u => u.ActorSNO == 5212 && u.Position.Distance(Player.Position) <= 15f) >= 2 &&
                     (
                     //HotbarSkills.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) || 
                     PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))
@@ -558,7 +539,7 @@ namespace Trinity
 
                             timers[5].Start();
                             #region Avoidance check
-                            foreach (CacheObstacleObject a in CacheData.TimeBoundAvoidance)
+                            foreach (CacheObstacleObject a in CacheData.AvoidanceObstacles)
                             {
                                 if (Player.Position.Distance2D(a.Position) > maxDistance + 10f)
                                 {
@@ -845,12 +826,12 @@ namespace Trinity
             {
                 #region gridPoint fields
                 timers[1].Start();
-                gridPoint.OperateDynamicWeight("BaseDistanceWeight", (maxDistance - gridPoint.Distance) * 10f);
+                gridPoint.OperateWeight(WeightType.Dynamic, "BaseDistanceWeight", (maxDistance - gridPoint.Distance) * 10f);
 
                 float dstFromPlayerToPoint = gridPoint.Position.Distance2D(Player.Position);
                 timers[1].Stop();
                 #endregion
-                foreach (CacheObstacleObject cacheObject in CacheData.TimeBoundAvoidance)
+                foreach (CacheObstacleObject cacheObject in CacheData.AvoidanceObstacles)
                 {
                     #region cacheObject fields
 
@@ -869,13 +850,13 @@ namespace Trinity
                         timers[4].Start();
                         if (dstFromObjectToPoint <= cacheObject.Radius * 1.3)
                         {
-                            gridPoint.OperateDynamicWeight("CloseToAoe", (maxWeight - dstFromObjectToPoint) * -10f);
+                            gridPoint.OperateWeight(WeightType.Dynamic, "CloseToAoe", (maxWeight - dstFromObjectToPoint) * -10f);
                         }
                         timers[4].Stop();
                         timers[5].Start();
                         if (MathUtil.IntersectsPath(cacheObject.Position, cacheObject.Radius, Player.Position, gridPoint.Position, true, true))
                         {
-                            gridPoint.OperateDynamicWeight("IntersectsPathAoE", (maxWeight - dstFromObjectToPoint + cacheObject.Radius) * -8f);
+                            gridPoint.OperateWeight(WeightType.Dynamic, "IntersectsPathAoE", (maxWeight - dstFromObjectToPoint + cacheObject.Radius) * -8f);
                         }
                         timers[5].Stop();
                         break;
@@ -906,7 +887,7 @@ namespace Trinity
                                 timers[6].Start();
                                 if (playerIsInBadWay)
                                 {
-                                    gridPoint.OperateDynamicWeight("AvoidThisUnit", (maxWeight + dstFromObjectToPoint) * 6f);
+                                    gridPoint.OperateWeight(WeightType.Dynamic, "AvoidThisUnit", (maxWeight + dstFromObjectToPoint) * 6f);
                                     break;
                                 }
                                 timers[6].Stop();
@@ -916,15 +897,15 @@ namespace Trinity
                                 {
                                     if (cacheObject.IsInLineOfSightOfPoint(gridPoint.Position))
                                     {
-                                        gridPoint.OperateDynamicWeight("CanRayCastTarget", (maxWeight + dstFromObjectToPoint) * 10f);
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "CanRayCastTarget", (maxWeight + dstFromObjectToPoint) * 10f);
 
                                         if (playerShouldKite && dstFromObjectToPoint > CombatBase.KiteDistance)
                                         {
-                                            gridPoint.OperateDynamicWeight("TargetSafePowerRange", (maxWeight + dstFromObjectToPoint) * 8f);
+                                            gridPoint.OperateWeight(WeightType.Dynamic, "TargetSafePowerRange", (maxWeight + dstFromObjectToPoint) * 8f);
                                         }
                                         else
                                         {
-                                            gridPoint.OperateDynamicWeight("TargetPowerRange", (maxWeight + dstFromObjectToPoint) * 4f);
+                                            gridPoint.OperateWeight(WeightType.Dynamic, "TargetPowerRange", (maxWeight + dstFromObjectToPoint) * 4f);
                                         }
                                     }
                                 }
@@ -934,22 +915,22 @@ namespace Trinity
                                 {
                                     if (cacheObject.IsBoss && CombatBase.KiteMode != KiteMode.Never)
                                     {
-                                        gridPoint.OperateDynamicWeight("InBossKiteRange", (maxWeight - dstFromObjectToPoint + CombatBase.KiteDistance) * -11f);                                        
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "InBossKiteRange", (maxWeight - dstFromObjectToPoint + CombatBase.KiteDistance) * -11f);                                        
                                     }
                                     else if (cacheObject.IsBossOrEliteRareUnique && (CombatBase.KiteMode == KiteMode.Elites || CombatBase.KiteMode == KiteMode.Always))
                                     {
-                                        gridPoint.OperateDynamicWeight("InEliteKiteRange", (maxWeight - dstFromObjectToPoint + CombatBase.KiteDistance) * -9f);                                        
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "InEliteKiteRange", (maxWeight - dstFromObjectToPoint + CombatBase.KiteDistance) * -9f);                                        
                                     }
                                     else if (CombatBase.KiteMode == KiteMode.Always)
                                     {
-                                        gridPoint.OperateDynamicWeight("InMobKiteRange", (maxWeight - dstFromObjectToPoint + CombatBase.KiteDistance) * -7f);   
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "InMobKiteRange", (maxWeight - dstFromObjectToPoint + CombatBase.KiteDistance) * -7f);   
                                     }
                                 }
                                 timers[8].Stop();
                                 timers[9].Start();
                                 if (MathUtil.IntersectsPath(cacheObject.Position, cacheObject.Radius, Player.Position, gridPoint.Position, true, true))
                                 {
-                                    gridPoint.OperateDynamicWeight("IntersectsPathUnit", (maxWeight - dstFromObjectToPoint + cacheObject.Radius) * -6f);
+                                    gridPoint.OperateWeight(WeightType.Dynamic, "IntersectsPathUnit", (maxWeight - dstFromObjectToPoint + cacheObject.Radius) * -6f);
                                 }
                                 timers[9].Stop();
 
@@ -966,7 +947,7 @@ namespace Trinity
                                     {
                                         break;
                                     }
-                                    gridPoint.OperateDynamicWeight("CloseToHealthGlobe", (maxWeight - dstFromPlayerToPoint) * 4f);
+                                    gridPoint.OperateWeight(WeightType.Dynamic, "CloseToHealthGlobe", (maxWeight - dstFromPlayerToPoint) * 4f);
                                 }
                                 timers[10].Stop();
                                 break;
@@ -980,15 +961,15 @@ namespace Trinity
                                 {
                                     if (Trinity.Settings.Combat.Misc.HiPriorityHG)
                                     {
-                                        gridPoint.OperateDynamicWeight("CloseToHealthGlobeHighPririty", (float)((maxWeight - dstFromPlayerToPoint) * healthGlobeWeightPct * 10f));
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "CloseToHealthGlobeHighPririty", (float)((maxWeight - dstFromPlayerToPoint) * healthGlobeWeightPct * 10f));
                                     }
                                     else if (playerIsInBadWay)
                                     {
-                                        gridPoint.OperateDynamicWeight("CloseToHealthGlobe&LowHealth", (float)((maxWeight - dstFromPlayerToPoint) * healthGlobeWeightPct * 9f));
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "CloseToHealthGlobe&LowHealth", (float)((maxWeight - dstFromPlayerToPoint) * healthGlobeWeightPct * 9f));
                                     }
                                     else
                                     {
-                                        gridPoint.OperateDynamicWeight("CloseToHealthGlobe", (float)((maxWeight - dstFromPlayerToPoint) * healthGlobeWeightPct * 8f));
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "CloseToHealthGlobe", (float)((maxWeight - dstFromPlayerToPoint) * healthGlobeWeightPct * 8f));
                                     }
                                 }
                                 timers[11].Stop();
@@ -997,15 +978,15 @@ namespace Trinity
                                 {
                                     if (Trinity.Settings.Combat.Misc.HiPriorityHG)
                                     {
-                                        gridPoint.OperateDynamicWeight("IntersectsPathHealthGlobe&HiPriority", (float)((maxWeight - dstFromPlayerToPoint) * healthGlobeWeightPct * 10f));
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "IntersectsPathHealthGlobe&HiPriority", (float)((maxWeight - dstFromPlayerToPoint) * healthGlobeWeightPct * 10f));
                                     }
                                     else if (playerIsInBadWay)
                                     {
-                                        gridPoint.OperateDynamicWeight("IntersectsPathHealthGlobe&LowHealth", (float)((maxWeight - dstFromPlayerToPoint) * healthGlobeWeightPct * 9f));
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "IntersectsPathHealthGlobe&LowHealth", (float)((maxWeight - dstFromPlayerToPoint) * healthGlobeWeightPct * 9f));
                                     }
                                     else
                                     {
-                                        gridPoint.OperateDynamicWeight("IntersectsPathHealthGlobe", (float)((maxWeight - dstFromPlayerToPoint) * healthGlobeWeightPct * 8f));
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "IntersectsPathHealthGlobe", (float)((maxWeight - dstFromPlayerToPoint) * healthGlobeWeightPct * 8f));
                                     }
                                 }
                                 timers[12].Stop();
@@ -1018,13 +999,13 @@ namespace Trinity
                                 timers[13].Start();
                                 if (dstFromObjectToPoint <= Player.GoldPickupRadius + 2f)
                                 {
-                                    gridPoint.OperateDynamicWeight("CloseToProgressionGlobe", (maxWeight - dstFromPlayerToPoint) * 3f);
+                                    gridPoint.OperateWeight(WeightType.Dynamic, "CloseToProgressionGlobe", (maxWeight - dstFromPlayerToPoint) * 3f);
                                 }
                                 timers[13].Stop();
                                 timers[14].Start();
                                 if (MathUtil.IntersectsPath(cacheObject.Position, Player.GoldPickupRadius + 2f, Player.Position, gridPoint.Position))
                                 {
-                                    gridPoint.OperateDynamicWeight("IntersectsPathProgressionGlobe", (maxWeight - dstFromPlayerToPoint) * 3f);
+                                    gridPoint.OperateWeight(WeightType.Dynamic, "IntersectsPathProgressionGlobe", (maxWeight - dstFromPlayerToPoint) * 3f);
                                 }
                                 timers[14].Stop();
                                 break;
@@ -1036,13 +1017,13 @@ namespace Trinity
                                 timers[15].Start();
                                 if (dstFromObjectToPoint <= Player.GoldPickupRadius + 2f)
                                 {
-                                    gridPoint.OperateDynamicWeight("CloseToPowerGlobe", (maxWeight - dstFromPlayerToPoint) * 2f);
+                                    gridPoint.OperateWeight(WeightType.Dynamic, "CloseToPowerGlobe", (maxWeight - dstFromPlayerToPoint) * 2f);
                                 }
                                 timers[15].Stop();
                                 timers[16].Start();
                                 if (MathUtil.IntersectsPath(cacheObject.Position, Player.GoldPickupRadius + 2f, Player.Position, gridPoint.Position))
                                 {
-                                    gridPoint.OperateDynamicWeight("IntersectsPathPowerGlobe", (maxWeight - dstFromPlayerToPoint) * 2f);
+                                    gridPoint.OperateWeight(WeightType.Dynamic, "IntersectsPathPowerGlobe", (maxWeight - dstFromPlayerToPoint) * 2f);
                                 }
                                 timers[16].Stop();
                                 break;
@@ -1056,15 +1037,15 @@ namespace Trinity
                                 {
                                     if (Legendary.Goldwrap.IsEquipped)
                                     {
-                                        gridPoint.OperateDynamicWeight("CloseToGold&GoldWrapActive", (maxWeight - dstFromPlayerToPoint) * 10f);
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "CloseToGold&GoldWrapActive", (maxWeight - dstFromPlayerToPoint) * 10f);
                                     }
                                     else if (Legendary.KymbosGold.IsEquipped && Player.CurrentHealthPct < 0.8)
                                     {
-                                        gridPoint.OperateDynamicWeight("CloseToGold&GoldWrapActive", (maxWeight - dstFromPlayerToPoint) * 5f);
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "CloseToGold&GoldWrapActive", (maxWeight - dstFromPlayerToPoint) * 5f);
                                     }
                                     else
                                     {
-                                        gridPoint.OperateDynamicWeight("CloseToGold", (maxWeight - dstFromPlayerToPoint));
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "CloseToGold", (maxWeight - dstFromPlayerToPoint));
                                     }
                                 }
                                 timers[17].Stop();
@@ -1073,15 +1054,15 @@ namespace Trinity
                                 {
                                     if (Legendary.Goldwrap.IsEquipped)
                                     {
-                                        gridPoint.OperateDynamicWeight("IntersectsPathGold&GoldWrapActive", (maxWeight - dstFromPlayerToPoint) * 10f);
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "IntersectsPathGold&GoldWrapActive", (maxWeight - dstFromPlayerToPoint) * 10f);
                                     }
                                     else if (Legendary.KymbosGold.IsEquipped && Player.CurrentHealthPct < 0.8)
                                     {
-                                        gridPoint.OperateDynamicWeight("IntersectsPathGold&GoldWrapActive", (maxWeight - dstFromPlayerToPoint) * 5f);
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "IntersectsPathGold&GoldWrapActive", (maxWeight - dstFromPlayerToPoint) * 5f);
                                     }
                                     else
                                     {
-                                        gridPoint.OperateDynamicWeight("IntersectsPathGold", (maxWeight - dstFromPlayerToPoint) * 1.5f);
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "IntersectsPathGold", (maxWeight - dstFromPlayerToPoint) * 1.5f);
                                     }
                                 }
                                 timers[18].Stop();
@@ -1096,11 +1077,11 @@ namespace Trinity
                                 {
                                     if (Trinity.Settings.WorldObject.HiPriorityShrines)
                                     {
-                                        gridPoint.OperateDynamicWeight("CloseToShrineHiPriority", (maxWeight - dstFromPlayerToPoint) * 6f);
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "CloseToShrineHiPriority", (maxWeight - dstFromPlayerToPoint) * 6f);
                                     }
                                     else
                                     {
-                                        gridPoint.OperateDynamicWeight("CloseToShrine", (maxWeight - dstFromPlayerToPoint) * 3f);
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "CloseToShrine", (maxWeight - dstFromPlayerToPoint) * 3f);
                                     }
                                 }
                                 timers[19].Start();
@@ -1109,11 +1090,11 @@ namespace Trinity
                                 {
                                     if (Trinity.Settings.WorldObject.HiPriorityShrines)
                                     {
-                                        gridPoint.OperateDynamicWeight("IntersectsPathShrineHiPriority", (maxWeight - dstFromPlayerToPoint) * 6f);
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "IntersectsPathShrineHiPriority", (maxWeight - dstFromPlayerToPoint) * 6f);
                                     }
                                     else
                                     {
-                                        gridPoint.OperateDynamicWeight("IntersectsPathShrine", (maxWeight - dstFromPlayerToPoint) * 3f);
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "IntersectsPathShrine", (maxWeight - dstFromPlayerToPoint) * 3f);
                                     }
                                 }
                                 timers[20].Stop();
@@ -1127,7 +1108,7 @@ namespace Trinity
                                 timers[21].Start();
                                 if (MathUtil.IntersectsPath(cacheObject.Position, cacheObject.Radius, Player.Position, gridPoint.Position, true, true))
                                 {
-                                    gridPoint.OperateDynamicWeight("IntersectsPathObstacles", (maxWeight - dstFromObjectToPoint + cacheObject.Radius) * -4f);
+                                    gridPoint.OperateWeight(WeightType.Dynamic, "IntersectsPathObstacles", (maxWeight - dstFromObjectToPoint + cacheObject.Radius) * -4f);
                                 }
                                 if (CurrentTarget != null && CurrentTarget.IsUnit && MathUtil.IntersectsPath(cacheObject.Position, cacheObject.Radius, Player.Position, CurrentTarget.Position))
                                 {
@@ -1148,13 +1129,13 @@ namespace Trinity
                                     (Trinity.Settings.WorldObject.HiPriorityContainers || 
                                     ((Legendary.HarringtonWaistguard.IsEquipped && !Legendary.HarringtonWaistguard.IsBuffActive))))
                                 {
-                                    gridPoint.OperateDynamicWeight("IntersectsPathObstacles", (maxWeight - dstFromPlayerToPoint) * 10f);
+                                    gridPoint.OperateWeight(WeightType.Dynamic, "IntersectsPathObstacles", (maxWeight - dstFromPlayerToPoint) * 10f);
                                 }
                                 timers[22].Stop();
                                 timers[23].Start();
                                 if (MathUtil.IntersectsPath(cacheObject.Position, cacheObject.Radius, Player.Position, gridPoint.Position, true, true))
                                 {
-                                    gridPoint.OperateDynamicWeight("IntersectsPathObstacles", (maxWeight - dstFromObjectToPoint + cacheObject.Radius) * -2f);
+                                    gridPoint.OperateWeight(WeightType.Dynamic, "IntersectsPathObstacles", (maxWeight - dstFromObjectToPoint + cacheObject.Radius) * -2f);
                                 }
                                 timers[23].Stop();
                                 break;
@@ -1187,11 +1168,11 @@ namespace Trinity
                 timers[25].Start();
                 if (visitedZoneWeight > 0f)
                 {
-                    gridPoint.OperateDynamicWeight("InVisitedZone", (maxWeight - gridPoint.Distance) * Math.Min(visitedZoneWeight, 4f));
+                    gridPoint.OperateWeight(WeightType.Dynamic, "InVisitedZone", (maxWeight - gridPoint.Distance) * Math.Min(visitedZoneWeight, 4f));
 
                     if (MathUtil.GetHeadingToPoint(gridPoint.Position).Equals(bestSafeDirection))
                     {
-                        gridPoint.OperateDynamicWeight("InBestSafeDirection", (maxWeight - gridPoint.Distance) * 2f);
+                        gridPoint.OperateWeight(WeightType.Dynamic, "InBestSafeDirection", (maxWeight - gridPoint.Distance) * 2f);
                     }
                 }
                 timers[25].Stop();
@@ -1226,17 +1207,17 @@ namespace Trinity
                     timers[26].Start();
                     foreach (GridNode gridPoint in gridList)
                     {
-                        gridPoint.OperateDynamicWeight("CloseToOTherPoints", (maxWeight - gridPoint.Distance) * Math.Min(gridList.Where(p => p.Position.Distance2D(gridPoint.Position) < 15f).Count(), 8f));
+                        gridPoint.OperateWeight(WeightType.Dynamic, "CloseToOTherPoints", (maxWeight - gridPoint.Distance) * Math.Min(gridList.Where(p => p.Position.Distance2D(gridPoint.Position) < 15f).Count(), 8f));
 
                         if (CanRayCast(gridPoint.Position))
                         {
                             if (playerIsInBadWay)
                             {
-                                gridPoint.OperateDynamicWeight("PlayerCanRayCastPointHiP", (maxWeight - gridPoint.Distance) * 8f);
+                                gridPoint.OperateWeight(WeightType.Dynamic, "PlayerCanRayCastPointHiP", (maxWeight - gridPoint.Distance) * 8f);
                             }
                             else
                             {
-                                gridPoint.OperateDynamicWeight("PlayerCanRayCastPoint", (maxWeight - gridPoint.Distance) * 5f);
+                                gridPoint.OperateWeight(WeightType.Dynamic, "PlayerCanRayCastPoint", (maxWeight - gridPoint.Distance) * 5f);
                             }
                         }
 

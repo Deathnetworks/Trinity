@@ -56,6 +56,9 @@ namespace Trinity.Combat.Abilities
                 return true;
             }
 
+            if (_power.SNOPower == SNOPower.Walk)
+                return false;
+
             if (ZetaDia.Me.UsePower(_power.SNOPower, _power.TargetPosition, _power.TargetDynamicWorldId, _power.TargetACDGUID))
             {
                 float _distToTarget = 0;
@@ -66,7 +69,7 @@ namespace Trinity.Combat.Abilities
 
                 string powerResultInfo = _power.TargetPosition != Vector3.Zero ? "at " + NavHelper.PrettyPrintVector3(_power.TargetPosition) + " dist=" + (int)_distToTarget : "";
                 powerResultInfo += _power.TargetACDGUID != -1 ? " on " + _power.TargetACDGUID : "";
-                Logger.Log(TrinityLogLevel.Info, LogCategory.Movement, "Used Power {0} " + powerResultInfo, _power.SNOPower);
+                Logger.Log(TrinityLogLevel.Info, LogCategory.Targetting, "Used Power {0} " + powerResultInfo, _power.SNOPower);
 
                 SpellTracker.TrackSpellOnUnit(_power.TargetACDGUID, _power.SNOPower);
                 SpellHistory.RecordSpell(_power);
@@ -183,13 +186,81 @@ namespace Trinity.Combat.Abilities
             }
         }
 
+        internal static bool SwitchToTarget(TrinityCacheObject _target)
+        {
+            if (_target == null || _target == default(TrinityCacheObject))
+                return false;
+
+            // Change target
+            if (_target.RActorGuid != CurrentTarget.RActorGuid)
+                Trinity.CurrentTarget = _target;
+
+            if (CurrentTarget != null)
+            {
+                if (CurrentTarget.IsUnit)
+                    Trinity.lastHadUnitInSights = DateTime.UtcNow;
+
+                if (CurrentTarget.IsBossOrEliteRareUnique)
+                    Trinity.lastHadEliteUnitInSights = DateTime.UtcNow;
+
+                if (CurrentTarget.IsBoss || CurrentTarget.IsBountyObjective)
+                    Trinity.lastHadBossUnitInSights = DateTime.UtcNow;
+
+                if (CurrentTarget.Type == GObjectType.Container)
+                    Trinity.lastHadContainerInSights = DateTime.UtcNow;
+
+                // Record the last time our target changed
+                if (Trinity.LastTargetRactorGUID != CurrentTarget.RActorGuid)
+                {
+                    Trinity.RecordTargetHistory();
+
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.Targetting,
+                        "Found New Target {0} dist={1:0} IsElite={2} Radius={3:0.0} Weight={4:0} ActorSNO={5} " +
+                        "Anim={6} TargetedCount={7} Type={8} ",
+                        CurrentTarget.InternalName,
+                        CurrentTarget.Distance,
+                        CurrentTarget.IsEliteRareUnique,
+                        CurrentTarget.Radius,
+                        CurrentTarget.Weight,
+                        CurrentTarget.ActorSNO,
+                        CurrentTarget.Animation,
+                        CurrentTarget.TimesBeenPrimaryTarget,
+                        CurrentTarget.Type
+                        );
+
+                    Trinity.LastPickedTargetTime = DateTime.UtcNow;
+                    Trinity.TargetLastHealth = 0f;
+                    Trinity.LastTargetRactorGUID = CurrentTarget.RActorGuid;
+
+                    return true;
+                }
+
+                // We're sticking to the same target, so update the target's health cache to check for stucks
+                if (CurrentTarget.IsUnit)
+                {
+                    // Check if the health has changed, if so update the target-pick time before we blacklist them again
+                    if (CurrentTarget.HitPointsPct != Trinity.TargetLastHealth)
+                    {
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.Targetting, "Keeping Target {0} - CurrentTarget.HitPoints: {1:0.00} TargetLastHealth: {2:0.00} ",
+                                        CurrentTarget.RActorGuid, CurrentTarget.HitPointsPct, Trinity.TargetLastHealth);
+                        Trinity.LastPickedTargetTime = DateTime.UtcNow;
+                    }
+                    // Now store the target's last-known health
+                    Trinity.TargetLastHealth = CurrentTarget.HitPointsPct;
+                }
+            }
+
+            return false;
+        }
+
         internal static void RefreshValues()
         {
+            TargetUtil.ResetTickValues();
+            DemonHunterCombat.ResetArea();
+
             PlayerIsSurrounded = Trinity.ObjectCache != null && Trinity.ObjectCache.Count(o => o.IsUnit && o.Weight > 0 && o.RadiusDistance < 16f) > 4;
             PlayerShouldNotFight = Player.StandingInAvoidance || Player.AvoidDeath || Player.NeedToKite;
             PlayerIsImmune = false;// GetHasBuff(SNOPower.Witchdoctor_SpiritWalk) || GetHasBuff(SNOPower.DemonHunter_SmokeScreen);
-
-            DemonHunterCombat.ResetArea();
         }
 
         private static int _kiteDistance;

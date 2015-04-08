@@ -19,8 +19,15 @@ namespace Trinity
     [DataContract]
     public class TrinityCacheObject
     {
+        public TrinityCacheObject(DiaObject _DiaObject = null)
+        {
+            if (_DiaObject != null)
+                this.RActorGuid = _DiaObject.RActorGuid;
+        }
+
         [NoCopy]
         private DiaObject _object;
+
         [NoCopy]
         public DiaObject Object
         {
@@ -45,6 +52,7 @@ namespace Trinity
                 return default(DiaUnit);
             }
         }
+
         [NoCopy]
         public DiaGizmo Gizmo
         {
@@ -98,8 +106,6 @@ namespace Trinity
         [DataMember]
         public int ActorSNO { get; set; }
 
-        // Generic stuff applicable to all objects
-
         [DataMember]
         public GObjectType Type { get; set; }
 
@@ -122,20 +128,25 @@ namespace Trinity
         public Vector3 Position { get; set; }
 
         [DataMember]
+        public float ZDiff { get; set; }
+
+        [DataMember]
         public AABB AABBBounds { get; set; }
 
         [DataMember]
-        private float distance = -1f;
+        private float _distance = -1f;
+
+        [NoCopy]
         public float Distance
         {
             get
             {
-                if (distance >= 0f)
-                    return distance;
-                distance = Trinity.Player.Position.Distance2D(Position);
+                if (_distance >= 0f)
+                    return _distance;
+                _distance = Trinity.Player.Position.Distance2D(Position);
                 return Distance;
             }
-            set { distance = value; }
+            set { _distance = value; }
         }
 
         [NoCopy]
@@ -166,7 +177,7 @@ namespace Trinity
 
         [DataMember]
         public bool OneHanded { get; set; }
-        
+
         [DataMember]
         public bool TwoHanded { get; set; }
 
@@ -239,16 +250,10 @@ namespace Trinity
         [DataMember]
         public Vector2 DirectionVector { get; set; }
 
-        /// <summary>
-        /// If unit is facing player
-        /// </summary>
         [DataMember]
         public bool IsFacingPlayer { get; set; }
 
-        /// <summary>
-        /// If Player is facing unit
-        /// </summary>
-        [DataMember] 
+        [DataMember]
         public bool ForceLeapAgainst { get; set; }
 
         [DataMember]
@@ -277,7 +282,7 @@ namespace Trinity
         [DataMember]
         public bool HasBeenInLoS { get; set; }
 
-        [NoCopy]        
+        [NoCopy]
         public bool IsBossOrEliteRareUnique { get { return (this.IsUnit && (IsEliteRareUnique || IsBoss)); } }
 
         [NoCopy]
@@ -325,6 +330,12 @@ namespace Trinity
         [DataMember]
         public bool IsQuestGiver { get; set; }
 
+        [DataMember]
+        public bool IsMarker { get; set; }
+
+        [DataMember]
+        public bool InLineOfSight { get; set; }
+
         [NoCopy]
         public bool IsCursedChest { get { return Type == GObjectType.CursedChest; } }
 
@@ -339,14 +350,14 @@ namespace Trinity
         {
             if (DirectionVector != Vector2.Zero)
             {
-                Vector3 u = targetPosition - this.Position;
+                Vector3 u = targetPosition - Position;
                 u.Z = 0f;
                 Vector3 v = new Vector3(DirectionVector.X, DirectionVector.Y, 0f);
-                bool result = ((MathEx.ToDegrees(Vector3.AngleBetween(u, v)) <= arcDegrees) ? 1 : 0) != 0;
-                return result;
+
+                return ((MathEx.ToDegrees(Vector3.AngleBetween(u, v)) <= arcDegrees) ? 1 : 0) != 0;
             }
-            else
-                return false;
+
+            return false;
         }
 
         [NoCopy]
@@ -356,28 +367,10 @@ namespace Trinity
         }
 
         [NoCopy]
-        public bool IsStandingInAvoidance
-        {
-            get
-            {
-                return CacheData.TimeBoundAvoidance.Any(a => a.Position.Distance2D(this.Position) <= a.Radius);
-            }
-        }
+        public bool IsStandingInAvoidance { get { return CacheData.AvoidanceObstacles.Any(a => a.Position.Distance2D(this.Position) <= a.Radius); } }
 
         [NoCopy]
-        public AvoidanceType AvoidanceType
-        {
-            get
-            {
-                return AvoidanceManager.GetAvoidanceType(this.ActorSNO);
-            }
-        }
-
-        public TrinityCacheObject(DiaObject _DiaObject = null)
-        {
-            if (_DiaObject != null)
-                this.RActorGuid = _DiaObject.RActorGuid;
-        }
+        public AvoidanceType AvoidanceType { get { return AvoidanceManager.GetAvoidanceType(this.ActorSNO); } }
 
         [NoCopy]
         public Vector3 ClusterPosition(float range = 20f)
@@ -420,7 +413,8 @@ namespace Trinity
                 count++;
             }
 
-            try { CacheData.NearbyUnitsWithinDistanceRecorded.Add(new Tuple<int, int>(RActorGuid, (int)range), count); } catch { }
+            try { CacheData.NearbyUnitsWithinDistanceRecorded.Add(new Tuple<int, int>(RActorGuid, (int)range), count); }
+            catch { }
             return count;
         }
 
@@ -451,7 +445,8 @@ namespace Trinity
                     count++;
                 }
 
-                try { CacheData.NearbyUnitsRecorded.Add(RActorGuid, count); } catch { }
+                try { CacheData.NearbyUnitsRecorded.Add(RActorGuid, count); }
+                catch { }
                 return count;
             }
         }
@@ -498,7 +493,7 @@ namespace Trinity
                     if (!_dir.Equals(MathUtil.GetHeadingToPoint(_o.Position)))
                         continue;
 
-                    float _radius = Math.Min(_o.Radius, 8f);
+                    float _radius = Math.Min(Math.Max(_o.Radius, 5f), 8f);
                     if (NavHelper.CanRayCast(_o.Position, Trinity.Player.Position) && MathUtil.IntersectsPath(_o.Position, _radius, Trinity.Player.Position, _locAway))
                     {
                         if (_o.IsBoss || (_o.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze))
@@ -558,18 +553,6 @@ namespace Trinity
         }
 
         [NoCopy]
-        public override string ToString()
-        {
-            return string.Format("{0}, Type={1} Dist={2} IsBossOrEliteRareUnique={3} IsAttackable={4}", InternalName, Type, RadiusDistance, IsBossOrEliteRareUnique, IsAttackable);
-        }
-
-        [DataMember]
-        public bool IsMarker { get; set; }
-
-        [DataMember]
-        public bool InLineOfSight { get; set; }
-
-        [NoCopy]
         public bool IsInLineOfSight(bool forceUpdate = false)
         {
             if (this.InLineOfSight || this.HasBeenRaycastable || this.HasBeenInLoS)
@@ -588,78 +571,9 @@ namespace Trinity
         }
 
         [NoCopy]
-        public bool HasAnimationToAvoid
+        public override string ToString()
         {
-            get
-            {
-                try
-                {
-                    return DataDictionary.AvoidAnimationsTitles.Any(n => this.Animation.ToString().Contains(n));
-                }
-                catch (Exception) { }
-                return false;
-            }
-        }
-
-        [NoCopy]
-        public bool HasAnimationToAvoidAtPlayer
-        {
-            get
-            {
-                try
-                {
-                    return this.Distance < 50f && (DataDictionary.AvoidancesAtPlayerTitles.Any(n => this.Animation.ToString().Contains(n)) ||
-                        (this.InternalName.Contains("dash") || this.Animation.ToString().Contains("dash")) && this.IsFacingPlayer && this.IsInLineOfSight());
-                }
-                catch (Exception) { }
-                return false;
-            }
-        }
-
-        [NoCopy]
-        public bool IsAvoidanceAtPlayer
-        {
-            get
-            {
-                try
-                {
-                    return this.Distance < 50f && this.Type == GObjectType.Avoidance && DataDictionary.AvoidancesAtPlayerTitles.Any(n => this.InternalName.Contains(n));
-                }
-                catch (Exception) { }
-                return false;
-            }
-        }
-
-        [NoCopy]
-        public bool IsCharging
-        {
-            get
-            {
-                try
-                {
-                    return this.IsUnit && this.IsFacingPlayer &&
-                        (this.Animation.ToString().Contains("charge") || this.Animation.ToString().Contains("Charge"));
-                }
-                catch (Exception) { }
-                return false;
-            }
-        }
-
-        [NoCopy]
-        public bool HasBasicAttackAnimation
-        {
-            get
-            {
-                try
-                {
-                    return this.IsUnit && 
-                        (this.Animation.ToString().Contains("attack") || this.Animation.ToString().Contains("Attack") ||
-                        this.Animation.ToString().Contains("knockback") || this.Animation.ToString().Contains("Knockback") ||
-                        this.Animation.ToString().Contains("cast") || this.Animation.ToString().Contains("Cast"));
-                }
-                catch (Exception) { }
-                return false;
-            }
+            return string.Format("{0}, Type={1} Dist={2} IsBossOrEliteRareUnique={3} IsAttackable={4}", InternalName, Type, RadiusDistance, IsBossOrEliteRareUnique, IsAttackable);
         }
 
         [NoCopy]

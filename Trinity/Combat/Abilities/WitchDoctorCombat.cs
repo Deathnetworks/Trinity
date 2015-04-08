@@ -629,7 +629,7 @@ namespace Trinity.Combat.Abilities
                     MoveToSoulHarvestPoint(SoulHarvestBestCluster);
                     if (CurrentTarget == null)
                     {
-                        Trinity.CurrentTarget = TargetUtil.GetClosestTarget(150f);
+                        CombatBase.SwitchToTarget(TargetUtil.GetClosestTarget(150f));
                         Trinity.CurrentTarget.Position = SoulHarvestBestCluster.Position;
                     }
                 }
@@ -647,7 +647,7 @@ namespace Trinity.Combat.Abilities
                     TrinityCacheObject getTargetWithoutDebuffs = Enemies.BestCluster.GetTargetWithoutDebuffs(HarvesterCoreDebuffs);
                     if (getTargetWithoutDebuffs != null && getTargetWithoutDebuffs != default(TrinityCacheObject))
                     {
-                        Trinity.CurrentTarget = getTargetWithoutDebuffs;
+                        CombatBase.SwitchToTarget(getTargetWithoutDebuffs);
                     }
 
                     // Locust Swarm

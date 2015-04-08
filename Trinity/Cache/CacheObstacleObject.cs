@@ -27,6 +27,7 @@ namespace Trinity
         public GObjectType ObjectType { get; set; }
         public bool IsAvoidanceAnimations { get; set; }
         public SNOAnim Animation { get; set; }
+        public AvoidType AvoidType { get; set; }
 
         public AvoidanceType AvoidanceType
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Trinity.Technicals;
 using Zeta.Common;
 using Zeta.Game;
 
@@ -21,10 +22,10 @@ namespace Trinity
                 {
                     CacheData.VisitedZones.Add(playerLoc, Trinity.Player.WorldID);
                     Position = playerLoc;
-                RecordedAt = DateTime.UtcNow;
-                WorldId = Trinity.Player.WorldID;
+                    RecordedAt = DateTime.UtcNow;
+                    WorldId = Trinity.Player.WorldID;
+                }
             }
-        }
         }
 
         public static HashSet<PositionCache> Cache = new HashSet<PositionCache>();
@@ -55,7 +56,7 @@ namespace Trinity
         {
             try
             {
-            int worldId = ZetaDia.CurrentWorldId;
+                int worldId = ZetaDia.CurrentWorldId;
                 /*foreach (PositionCache p in Cache.Where(p => p.Position.Distance2D(Trinity.Player.Position) > 200))
                 {
                     CacheData.VisitedZone.Remove(p.Position);

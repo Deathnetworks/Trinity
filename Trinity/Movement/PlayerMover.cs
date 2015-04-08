@@ -390,7 +390,8 @@ namespace Trinity.DbProvider
                 return;
             }
 
-            OffsetSpecialMovement(vMoveToTarget);
+            if (UsedSpecialMovement(vMoveToTarget))
+                return;
 
             TimeLastUsedPlayerMover = DateTime.UtcNow;
             LastMoveToTarget = vMoveToTarget;
@@ -647,8 +648,8 @@ namespace Trinity.DbProvider
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Moved to:{0} dir:{1} Speed:{2:0.00} Dist:{3:0} ZDiff:{4:0} CanStand:{5} Raycast:{6}",
                     NavHelper.PrettyPrintVector3(vMoveToTarget), MathUtil.GetHeadingToPoint(vMoveToTarget), MovementSpeed, MyPosition.Distance2D(vMoveToTarget),
                     Math.Abs(MyPosition.Z - vMoveToTarget.Z),
-                    true, //Trinity.MainGridProvider.CanStandAt(Trinity.MainGridProvider.WorldToGrid(vMoveToTarget.ToVector2())),
-                    true//!Navigator.Raycast(MyPosition, vMoveToTarget)
+                    Trinity.MainGridProvider.CanStandAt(Trinity.MainGridProvider.WorldToGrid(vMoveToTarget.ToVector2())),
+                    !Navigator.Raycast(MyPosition, vMoveToTarget)
                     );
             }
             else
@@ -702,55 +703,58 @@ namespace Trinity.DbProvider
 
         internal static MoveResult NavigateTo(Vector3 destination, string destinationName = "")
         {
-            OffsetSpecialMovement(destination);
-            PositionCache.AddPosition();
-            MoveResult result;
-
-            LastMoveToTarget = destination;
-
-            try
+            using (new MemorySpy("PlayerMover.NavigateTo()"))
             {
-                Stopwatch t1 = new Stopwatch();
-                t1.Start();
+                if (UsedSpecialMovement(destination))
+                    return MoveResult.Moved;
 
-                using (new PerformanceLogger("Navigator.MoveTo"))
+                PositionCache.AddPosition();
+                MoveResult result;
+
+                LastMoveToTarget = destination;
+
+                try
                 {
+                    Stopwatch t1 = new Stopwatch();
+                    t1.Start();
+
                     result = Navigator.MoveTo(destination, destinationName, false);
-                }
-                t1.Stop();
 
-                const float maxTime = 750;
+                    t1.Stop();
 
-                // Shit was slow, make it slower but tell us why :)
-                string pathCheck = "";
-                if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Navigator) && t1.ElapsedMilliseconds > maxTime)
-                {
-                    if (Navigator.GetNavigationProviderAs<DefaultNavigationProvider>().CanFullyClientPathTo(destination))
-                        pathCheck = "CanFullyPath";
+                    const float maxTime = 750;
+
+                    // Shit was slow, make it slower but tell us why :)
+                    string pathCheck = "";
+                    if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Navigator) && t1.ElapsedMilliseconds > maxTime)
+                    {
+                        if (Navigator.GetNavigationProviderAs<DefaultNavigationProvider>().CanFullyClientPathTo(destination))
+                            pathCheck = "CanFullyPath";
+                        else
+                            pathCheck = "CannotFullyPath";
+                    }
+
+                    LogCategory lc;
+                    if (t1.ElapsedMilliseconds > maxTime)
+                        lc = LogCategory.UserInformation;
                     else
-                        pathCheck = "CannotFullyPath";
+                        lc = LogCategory.Navigator;
+
+                    Logger.Log(TrinityLogLevel.Verbose, lc, "{0} in {1:0}ms {2} dist={3:0} {4}",
+                        result, t1.ElapsedMilliseconds, destinationName, destination.Distance2D(Trinity.Player.Position), pathCheck);
                 }
-
-                LogCategory lc;
-                if (t1.ElapsedMilliseconds > maxTime)
-                    lc = LogCategory.UserInformation;
-                else
-                    lc = LogCategory.Navigator;
-
-                Logger.Log(lc, "{0} in {1:0}ms {2} dist={3:0} {4}",
-                    result, t1.ElapsedMilliseconds, destinationName, destination.Distance2D(Trinity.Player.Position), pathCheck);
+                catch (OutOfMemoryException)
+                {
+                    Logger.LogDebug("Navigator ran out of memory!");
+                    return MoveResult.Failed;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log("{0}", ex);
+                    return MoveResult.Failed;
+                }
+                return result;
             }
-            catch (OutOfMemoryException)
-            {
-                Logger.LogDebug("Navigator ran out of memory!");
-                return MoveResult.Failed;
-            }
-            catch (Exception ex)
-            {
-                Logger.Log("{0}", ex);
-                return MoveResult.Failed;
-            }
-            return result;
         }
 
         private static DateTime lastRecordedSkipAheadCache = DateTime.MinValue;
@@ -774,10 +778,6 @@ namespace Trinity.DbProvider
                 Name = CurrentTarget != null ? CurrentTarget.InternalName : post,
                 Infos = CurrentTarget != null ? CurrentTarget.Infos : "Avoidance/Kite movement",
                 Destination = CurrentTarget != null ? CurrentTarget.Position : GridMap.GetBestMoveNode().Position,
-                /*OnUpdate = m =>
-                {
-                    m.Destination = GridMap.GetBestMoveNode().Position;
-                },*/
                 StopCondition = m =>
                     m.Destination == Vector3.Zero ||
                     m.Destination.Distance2D(Trinity.Player.Position) <= 1f ||
@@ -785,6 +785,7 @@ namespace Trinity.DbProvider
                 ,
                 Options = new QueuedMovementOptions
                 {
+                    FailureBlacklistSeconds = 0,
                     Logging = LogLevel.Info,
                     AcceptableDistance = 3f,
                     Type = CurrentTarget != null && CurrentTarget.IsKite ? MoveType.Kite : MoveType.Avoidance,
@@ -792,21 +793,17 @@ namespace Trinity.DbProvider
             });
         }
 
-        internal static Vector3 OffsetSpecialMovement(Vector3 loc)
+        internal static bool UsedSpecialMovement(Vector3 loc)
         {
-            Vector3 offSetLocation = OffsetSpecialMovement(GridMap.GetPointAt(loc));
-            if (offSetLocation != Vector3.Zero)
-                return offSetLocation;
-
-            return loc;
+            return UsedSpecialMovement(GridMap.GetPointAt(loc));
         }
 
-        internal static Vector3 OffsetSpecialMovement(GridNode _gridNode)
+        internal static bool UsedSpecialMovement(GridNode _gridNode)
         {
-            using (new PerformanceLogger("PlayerMover.OffsetSpecialMovement"))
+            using (new MemorySpy("PlayerMover.OffsetSpecialMovement()"))
             {
                 if (_gridNode == null || _gridNode.Position == Vector3.Zero)
-                    return Vector3.Zero;
+                    return false;
 
                 #region Vault
                 // COMBAT
@@ -821,29 +818,31 @@ namespace Trinity.DbProvider
                         if (_cMove || _kMove || _aMove)
                         {
                             GridNode _newGridLoc = _gridNode;
-                            if ((_kMove || (_aMove && !Trinity.Player.TryToAvoidProjectile)) && _gridNode.Position.Distance(Trinity.Player.Position) <= 34f)
+                            if ((_kMove || (_aMove && !Trinity.Player.TryToAvoidProjectile)) && 
+                                (_gridNode.Distance <= 33f || _gridNode.Distance >= 40f))
                             {
-                                _newGridLoc = GridMap.GetBestMoveNode(35f);
-                                if (_kMove)
-                                    _kMove = DemonHunterCombat.IsVaultAptKiteMovement(_newGridLoc.Position);
+                                _newGridLoc = GridMap.GetBestMoveNode(35f, _prioritizeDist: true);
                             }
 
                             if (_newGridLoc != null && _newGridLoc.Position != Vector3.Zero)
                             {
                                 GridNode _gVault = _newGridLoc;
-                                if (_newGridLoc.Position.Distance(Trinity.Player.Position) > 30f)
-                                    _gVault = GridMap.GetPointAt(MathEx.CalculatePointFrom(_newGridLoc.Position, Trinity.Player.Position, 33f));
+                                _gVault = GridMap.GetPointAt(MathEx.CalculatePointFrom(_newGridLoc.Position, Trinity.Player.Position, 35f));
 
                                 if (_gVault != null && _gVault.Position != Vector3.Zero)
                                 {
-                                    bool adequateMovement = _cMove || _aMove ||
-                                        (_kMove && !IsMovementToTarget(_gVault.Position) && !IsMovementToUnit(_gVault.Position) &&
-                                        (_gVault.DynamicWeightInfos.Contains("Target") || Trinity.Player.NeedToKite) && GridMap.GetWeightAtPlayer <= _gVault.DynamicWeight);
+                                    _cMove = DemonHunterCombat.IsVaultAptCombatMovement(_gVault.Position);
+                                    _kMove = DemonHunterCombat.IsVaultAptKiteMovement(_gVault.Position);
+
+                                    bool adequateMovement = _cMove || ((_aMove || _kMove) && GridMap.GetWeightAtPlayer <= _gVault.DynamicWeight);
 
                                     if (NavHelper.CanRayCast(_gVault.Position) && adequateMovement)
                                     {
                                         if (CombatBase.Cast(new TrinityPower(SNOPower.DemonHunter_Vault, 0f, _gVault.Position)))
-                                            return _gVault.Position;
+                                        {
+                                            DemonHunterCombat.LogVault(_gVault.Position, _cMove, _kMove, _aMove, _gVault.WeightInfos);
+                                            return true;
+                                        }
                                     }
                                 }
                             }
@@ -861,7 +860,11 @@ namespace Trinity.DbProvider
                             MathEx.CalculatePointFrom(_gridNode.Position, Trinity.Player.Position, 35f) : _gridNode.Position;
 
                         if (CombatBase.Cast(new TrinityPower(SNOPower.DemonHunter_Vault, 0f, _vVaultTarget)))
-                            return _gridNode.Position;
+                        {
+                            DemonHunterCombat.LogVault(_gridNode.Position);
+                            return true;
+                        }
+                            
                     }
                 }
                 #endregion
@@ -869,17 +872,18 @@ namespace Trinity.DbProvider
                 #region DashingStrike
                 if (Trinity.Player.ActorClass == ActorClass.Monk)
                 {
-                    if (((CurrentTarget != null && !CurrentTarget.IsUnit && CombatBase.TimeSincePowerUse(SNOPower.X1_Monk_DashingStrike) > 750) ||
-                        (CurrentTarget == null && CombatBase.TimeSincePowerUse(SNOPower.X1_Monk_DashingStrike) > 1250)) &&
-                        CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike) && Trinity.Settings.Combat.Monk.UseDashingStrikeOOC && _gridNode.Distance >= 25f)
+                    if (((CurrentTarget != null && !CurrentTarget.IsUnit && _gridNode.Distance >= 10f) ||
+                        (CurrentTarget == null && CombatBase.TimeSincePowerUse(SNOPower.X1_Monk_DashingStrike) > 1250 && _gridNode.Distance >= 25f)) &&
+                        CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike) && Trinity.Settings.Combat.Monk.UseDashingStrikeOOC &&
+                        NavHelper.VectorIsLos(Trinity.Player.Position, _gridNode.Position))
                     {
                         if (CombatBase.Cast(new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, _gridNode.Position)))
-                            return _gridNode.Position;
+                            return true;
                     }
                 }
                 #endregion
 
-                return _gridNode.Position; 
+                return false; 
             }
         }
 
@@ -890,7 +894,7 @@ namespace Trinity.DbProvider
 
         internal static bool IsMovementToUnit(Vector3 loc)
         {
-            return Trinity.ObjectCache != null && Trinity.ObjectCache.Any(o => o.IsUnit && o.Weight > 0 && loc.Distance(CurrentTarget.Position) < o.Distance);
+            return Trinity.ObjectCache != null && Trinity.ObjectCache.Any(o => o.IsUnit && o.Weight > 0 && loc.Distance(o.Position) < o.Distance);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Trinity.Cache;
 using Trinity.Helpers;
 using Trinity.Items;
@@ -17,14 +18,14 @@ namespace Trinity
         /// <summary>
         /// This will eventually be come our single source of truth and we can get rid of most/all of the below "c_" variables
         /// </summary>
-        private static TrinityCacheObject CurrentCacheObject = new TrinityCacheObject();
+        private static TrinityCacheObject c_CacheObject = new TrinityCacheObject();
 
         private static double c_HitPointsPct = 0d;
         private static double c_HitPoints = 0d;
         private static float c_ZDiff = 0f;
         private static string c_ItemDisplayName = "";
         private static string c_IgnoreReason = "";
-        private static string c_IgnoreSubStep = "";
+        private static string c_InfosSubStep = "";
         private static int c_ItemLevel = 0;
         private static string c_ItemLink = String.Empty;
         private static int c_GoldStackSize = 0;
@@ -57,246 +58,268 @@ namespace Trinity
         private static bool c_HasDotDPS = false;
         private static MonsterAffixes c_MonsterAffixes = MonsterAffixes.None;
         private static bool c_IsFacingPlayer;
-        private static float c_Rotation;
+        private static float c_Rotation = 0f;
         private static Vector2 c_DirectionVector = Vector2.Zero;
+        private static int c_TargetACDGuid = -1;
+        private static Vector3 c_TargetACDPosition = Vector3.Zero;
+        private static ActorMovement c_Movement = null;
+        private static ACD c_CommonData = null;
+        private static float c_Radius = 0f;
+        private static Avoidance c_Avoidance = null;
+        private static SNORecordMonster c_unit_MonsterInfo = null;
 
-        private static bool CacheDiaObject(DiaObject freshObject)
+        private static bool GetReturnIgnore(string reason)
         {
-            if (!freshObject.IsValid)
+            c_IgnoreReason = reason;
+
+            using (new MemorySpy("CacheDiaObject().GetReturnIgnore()"))
             {
-                c_IgnoreReason = "InvalidRActor";
-                return false;
-            }
-            if (freshObject.CommonData == null)
-            {
-                c_IgnoreReason = "ACDNull";
-                return false;
-            }
-            if (!freshObject.CommonData.IsValid)
-            {
-                c_IgnoreReason = "InvalidACD";
-                return false;
+                bool b_ContainsKey = CacheData.ObjectsIgnored.TryGetValue(c_CacheObject.RActorGuid, out reason);
+                if (c_CacheObject.RActorGuid != -1)
+                {
+                    if (!b_ContainsKey) CacheData.ObjectsIgnored.Add(c_CacheObject.RActorGuid, c_IgnoreReason);
+                    else c_IgnoreReason += " " + reason;
+                }
             }
 
-            /*
-             *  Initialize Variables
-             */
+            return false;
+        }
+
+        private static bool CacheDiaObject(DiaObject n_diaObject)
+        {
             bool AddToCache = true;
-
             RefreshStepInit();
-            /*
-             *  Get primary reference objects and keys
-             */
-            c_diaObject = freshObject;
 
-            try
+            using (new MemorySpy("CacheDiaObject().CheckValid"))
             {
-                CurrentCacheObject.RActorGuid = freshObject.RActorGuid;
-                CurrentCacheObject.InternalName = NameNumberTrimRegex.Replace(freshObject.Name, "");
-
-                CurrentCacheObject.ActorSNO = freshObject.ActorSNO;
-                CurrentCacheObject.ActorType = freshObject.ActorType;
-                CurrentCacheObject.ACDGuid = freshObject.ACDGuid;
-            }
-            catch (Exception)
-            {
-                c_IgnoreReason = "Error reading IDs";
-                return false;
+                AddToCache = n_diaObject.IsValid;
+                if (!AddToCache) { return GetReturnIgnore("InvalidRActor"); }
             }
 
-            CurrentCacheObject.LastSeenTime = DateTime.UtcNow;
-            CurrentCacheObject.Position = c_diaObject.Position;
-
-            float radius;
-            if (!DataDictionary.CustomObjectRadius.TryGetValue(CurrentCacheObject.ActorSNO, out radius))
+            using (new MemorySpy("CacheDiaObject().CheckCommonData"))
             {
-                try
+                c_CommonData = n_diaObject.CommonData;
+
+                AddToCache = c_CommonData != null;
+                if (!AddToCache) { return GetReturnIgnore("ACDNull"); }
+
+                AddToCache = c_CommonData.IsValid;
+                if (!AddToCache) { return GetReturnIgnore("InvalidACD"); }
+            }
+
+            using (new MemorySpy("CacheDiaObject().CheckName"))
+            {
+                try { c_CacheObject.InternalName = NameNumberTrimRegex.Replace(n_diaObject.Name, ""); }
+                catch { return GetReturnIgnore("InvalidName"); }
+
+                AddToCache = !IgnoreNames.Any(i => c_CacheObject.InternalName.ToLower().StartsWith(i, StringComparison.Ordinal));
+                if (!AddToCache) { return GetReturnIgnore("IgnoreName"); }
+            }
+
+            using (new MemorySpy("CacheDiaObject().GetInfosInit"))
+            {
+                try 
                 {
-                    radius = c_diaObject.CollisionSphere.Radius;
+                    c_diaObject = n_diaObject;
+
+                    c_CacheObject.RActorGuid = c_diaObject.RActorGuid;
+                    c_CacheObject.ActorSNO = c_diaObject.ActorSNO;
+                    c_CacheObject.ActorType = c_diaObject.ActorType;
+                    c_CacheObject.ACDGuid = c_diaObject.ACDGuid;
+
+                    c_CacheObject.LastSeenTime = DateTime.UtcNow;
+                    c_CacheObject.Position = c_diaObject.Position; 
                 }
-                catch (Exception ex)
+                catch { return GetReturnIgnore("InvalidObject"); }
+            }
+
+            using (new MemorySpy("CacheDiaObject().GetRadius"))
+            {
+                try 
                 {
-                    Logger.LogError(LogCategory.CacheManagement, "Error refreshing Radius: {0}", ex.Message);
+                    if (!DataDictionary.CustomObjectRadius.TryGetValue(c_CacheObject.ActorSNO, out c_Radius))
+                         c_Radius = c_diaObject.CollisionSphere.Radius;
                 }
+                catch { return GetReturnIgnore("InvalidCollisionSphere"); }
+
+                c_CacheObject.Radius = c_Radius;
             }
 
-            // Radius Distance
-            CurrentCacheObject.Radius = radius;
-
-            // Have ActorSNO Check for SNO based navigation obstacle hashlist
-            c_IsObstacle = DataDictionary.NavigationObstacleIds.Contains(CurrentCacheObject.ActorSNO);
-
-            // Add Cell Weight for Obstacle
-            if (c_IsObstacle)
+            using (new MemorySpy("CacheDiaObject().CheckNavObstacles"))
             {
-                Vector3 pos;
-                if (!CacheData.Position.TryGetValue(CurrentCacheObject.RActorGuid, out pos))
+                AddToCache = RefreshStepNavigationObstacle();
+                if (!AddToCache) { return GetReturnIgnore("NavObstacle"); }
+            }
+
+            using (new MemorySpy("CacheDiaObject().StepObjectType"))
+            {
+                AddToCache = RefreshStepCachedObjectType();
+                if (!AddToCache) { return GetReturnIgnore("CachedObjectType"); }
+            }
+
+            using (new MemorySpy("CacheDiaObject().StepPlayerSummons"))
+            {
+                AddToCache = RefreshStepCachedSummons();
+                if (!AddToCache) { return GetReturnIgnore("CachedPlayerSummons"); }
+            }
+
+            using (new MemorySpy("CacheDiaObject().StepCheckBlacklists"))
+            {
+                AddToCache = RefreshStepCheckBlacklists();
+                if (!AddToCache) { return GetReturnIgnore("CheckBlacklists"); }
+
+                if (CacheData.ObjectsIgnored.ContainsKey(c_CacheObject.RActorGuid))
+                { return GetReturnIgnore("AlreadyIgnored"); }
+            }
+
+            using (new MemorySpy("CacheDiaObject().StepZDiff"))
+            {
+                AddToCache = RefreshStepObjectTypeZDiff(AddToCache);
+                if (!AddToCache) { return GetReturnIgnore("ZDiff"); }
+            }
+
+            using (new MemorySpy("CacheDiaObject().GetComplex"))
+            {
+                if (c_CacheObject.IsUnit || c_CacheObject.Type == GObjectType.Unknown)
                 {
-                    CurrentCacheObject.Position = c_diaObject.Position;
-                    //CacheData.Position.Add(CurrentCacheObject.RActorGuid, CurrentCacheObject.Position);
-                }
-                if (pos != Vector3.Zero)
-                    CurrentCacheObject.Position = pos;
+                    try { c_CurrentAnimation = c_diaObject.CommonData.CurrentAnimation; }
+                    catch { c_InfosSubStep += "InvalidAnimation "; }
 
-                // add methode & Dictionary check
-                AddObjectToNavigationObstacleCache();
+                    try { c_IsFacingPlayer = c_diaObject.IsFacingPlayer; }
+                    catch { c_InfosSubStep += "ErrorGettingFacing "; }
 
-                ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
-
-                c_IgnoreReason = "NavigationObstacle";
-                AddToCache = false;
-                return AddToCache;
-            }
-
-
-            using (new PerformanceLogger("RefreshDiaObject.CachedType"))
-            {
-                /*
-                 * Set Object Type
-                 */
-                AddToCache = RefreshStepCachedObjectType(AddToCache);
-                if (!AddToCache) { c_IgnoreReason = "CachedObjectType"; return AddToCache; }
-            }
-
-            // Summons by the player 
-            AddToCache = RefreshStepCachedSummons();
-            if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return false; }
-
-            CurrentCacheObject.Type = CurrentCacheObject.Type;
-            if (CurrentCacheObject.Type != GObjectType.Item)
-            {
-                CurrentCacheObject.ObjectHash = HashGenerator.GenerateWorldObjectHash(CurrentCacheObject.ActorSNO, CurrentCacheObject.Position, CurrentCacheObject.Type.ToString(), Trinity.CurrentWorldDynamicId);
-            }
-
-            // Check Blacklists
-            AddToCache = RefreshStepCheckBlacklists(AddToCache);
-            if (!AddToCache) { c_IgnoreReason = "CheckBlacklists"; return AddToCache; }
-
-            if (CurrentCacheObject.Type == GObjectType.Item)
-            {
-                if (GenericBlacklist.ContainsKey(CurrentCacheObject.ObjectHash))
-                {
-                    AddToCache = false;
-                    c_IgnoreReason = "GenericBlacklist";
-                    return AddToCache;
+                    try
+                    {
+                        if (c_diaObject.Movement.IsValid)
+                        {
+                            c_Movement = c_diaObject.Movement;
+                            c_Rotation = c_Movement.Rotation;
+                            c_DirectionVector = c_Movement.DirectionVector;
+                            c_TargetACDGuid = c_Movement.ACDTargetGuid;
+                            c_TargetACDPosition = c_Movement.ACDTarget.Position;
+                        }
+                    }
+                    catch { c_InfosSubStep += "ErrorGettingMovement "; }
                 }
             }
 
-            // Always Refresh ZDiff for every object
-            AddToCache = RefreshStepObjectTypeZDiff(AddToCache);
-            if (!AddToCache) { c_IgnoreReason = "ZDiff"; return AddToCache; }
-
-            using (new PerformanceLogger("RefreshDiaObject.MainObjectType"))
+            using (new MemorySpy("CacheDiaObject().StepMainObjectType"))
             {
-                /* 
-                 * Main Switch on Object Type - Refresh individual object types (Units, Items, Gizmos)
-                 */
                 RefreshStepMainObjectType(ref AddToCache);
-
-                // Avoidance animations (experimental)
-                RefreshAvoidanceAnimations();
-
-                if (!AddToCache) { c_IgnoreReason = "MainObjectType"; return AddToCache; }
+                if (!AddToCache) { return GetReturnIgnore("MainObjectType"); }
             }
 
-            if (CurrentCacheObject.ObjectHash != String.Empty && GenericBlacklist.ContainsKey(CurrentCacheObject.ObjectHash))
+            using (new MemorySpy("CacheDiaObject().StepIgnoreUnknown"))
             {
-                AddToCache = false;
-                c_IgnoreSubStep += "GenericBlacklist";
-                return AddToCache;
+                AddToCache = RefreshStepIgnoreUnknown(AddToCache);
+                if (!AddToCache) { return GetReturnIgnore("IgnoreUnknown"); }
             }
 
-            // Ignore anything unknown
-            AddToCache = RefreshStepIgnoreUnknown(AddToCache);
-            if (!AddToCache) { c_IgnoreReason = "IgnoreUnknown"; return AddToCache; }
-
-            using (new PerformanceLogger("RefreshDiaObject.LoS"))
+            using (new MemorySpy("CacheDiaObject().LoSCheck"))
             {
-                // Ignore all LoS
                 AddToCache = RefreshStepIgnoreLoS(AddToCache);
-                if (!AddToCache) { c_IgnoreReason = "IgnoreLoS"; return AddToCache; }
+                if (!AddToCache) { return GetReturnIgnore("IgnoreLoS"); }
             }
 
-            // If it's a unit, add it to the monster cache
             AddUnitToMonsterObstacleCache();
 
             c_IgnoreReason = "None";
+            c_CacheObject.ACDGuid = c_CacheObject.ACDGuid;
+            c_CacheObject.ActorSNO = c_CacheObject.ActorSNO;
+            c_CacheObject.Animation = c_CurrentAnimation;
+            c_CacheObject.DBItemBaseType = c_DBItemBaseType;
+            c_CacheObject.DBItemType = c_DBItemType;
+            c_CacheObject.DirectionVector = c_DirectionVector;
+            c_CacheObject.Distance = c_CacheObject.Distance;
+            c_CacheObject.DynamicID = c_CacheObject.DynamicID;
+            c_CacheObject.FollowerType = c_item_tFollowerType;
+            c_CacheObject.GameBalanceID = c_CacheObject.GameBalanceID;
+            c_CacheObject.GoldAmount = c_GoldStackSize;
+            c_CacheObject.HasAffixShielded = c_unit_HasShieldAffix;
+            c_CacheObject.HasBeenInLoS = c_HasBeenInLoS;
+            c_CacheObject.HasBeenNavigable = c_HasBeenNavigable;
+            c_CacheObject.HasBeenRaycastable = c_HasBeenRaycastable;
+            c_CacheObject.HasDotDPS = c_HasDotDPS;
+            c_CacheObject.HitPoints = c_HitPoints;
+            c_CacheObject.HitPointsPct = c_HitPointsPct;
+            c_CacheObject.InternalName = c_CacheObject.InternalName;
+            c_CacheObject.IsAttackable = c_unit_IsAttackable;
+            c_CacheObject.IsElite = c_unit_IsElite;
+            c_CacheObject.IsEliteRareUnique = c_IsEliteRareUnique;
+            c_CacheObject.IsFacingPlayer = c_IsFacingPlayer;
+            c_CacheObject.IsMinion = c_unit_IsMinion;
+            c_CacheObject.IsRare = c_unit_IsRare;
+            c_CacheObject.IsTreasureGoblin = c_unit_IsTreasureGoblin;
+            c_CacheObject.IsUnique = c_unit_IsUnique;
+            c_CacheObject.ItemLevel = c_ItemLevel;
+            c_CacheObject.ItemLink = c_ItemLink;
+            c_CacheObject.ItemQuality = c_ItemQuality;
+            c_CacheObject.MonsterAffixes = c_MonsterAffixes;
+            c_CacheObject.MonsterSize = c_unit_MonsterSize;
+            c_CacheObject.OneHanded = c_IsOneHandedItem;
+            c_CacheObject.RActorGuid = c_CacheObject.RActorGuid;
+            c_CacheObject.Radius = c_CacheObject.Radius;
+            c_CacheObject.Rotation = c_Rotation;
+            c_CacheObject.TrinityItemType = c_item_GItemType;
+            c_CacheObject.TwoHanded = c_IsTwoHandedItem;
+            c_CacheObject.Type = c_CacheObject.Type;
+            c_CacheObject.IsAncient = c_IsAncient;
+            c_CacheObject.InLineOfSight = c_diaObject.InLineOfSight || c_HasBeenInLoS;
+            c_CacheObject.ZDiff = c_ZDiff;
 
-            CurrentCacheObject.ACDGuid = CurrentCacheObject.ACDGuid;
-            CurrentCacheObject.ActorSNO = CurrentCacheObject.ActorSNO;
-            CurrentCacheObject.Animation = c_CurrentAnimation;
-            CurrentCacheObject.DBItemBaseType = c_DBItemBaseType;
-            CurrentCacheObject.DBItemType = c_DBItemType;
-            CurrentCacheObject.DirectionVector = c_DirectionVector;
-            CurrentCacheObject.Distance = CurrentCacheObject.Distance;
-            CurrentCacheObject.DynamicID = CurrentCacheObject.DynamicID;
-            CurrentCacheObject.FollowerType = c_item_tFollowerType;
-            CurrentCacheObject.GameBalanceID = CurrentCacheObject.GameBalanceID;
-            CurrentCacheObject.GoldAmount = c_GoldStackSize;
-            CurrentCacheObject.HasAffixShielded = c_unit_HasShieldAffix;
-            CurrentCacheObject.HasBeenInLoS = c_HasBeenInLoS;
-            CurrentCacheObject.HasBeenNavigable = c_HasBeenNavigable;
-            CurrentCacheObject.HasBeenRaycastable = c_HasBeenRaycastable;
-            CurrentCacheObject.HasDotDPS = c_HasDotDPS;
-            CurrentCacheObject.HitPoints = c_HitPoints;
-            CurrentCacheObject.HitPointsPct = c_HitPointsPct;
-            CurrentCacheObject.InternalName = CurrentCacheObject.InternalName;
-            CurrentCacheObject.IsAttackable = c_unit_IsAttackable;
-            CurrentCacheObject.IsElite = c_unit_IsElite;
-            CurrentCacheObject.IsEliteRareUnique = c_IsEliteRareUnique;
-            CurrentCacheObject.IsFacingPlayer = c_IsFacingPlayer;
-            CurrentCacheObject.IsMinion = c_unit_IsMinion;
-            CurrentCacheObject.IsRare = c_unit_IsRare;
-            CurrentCacheObject.IsTreasureGoblin = c_unit_IsTreasureGoblin;
-            CurrentCacheObject.IsUnique = c_unit_IsUnique;
-            CurrentCacheObject.ItemLevel = c_ItemLevel;
-            CurrentCacheObject.ItemLink = c_ItemLink;
-            CurrentCacheObject.ItemQuality = c_ItemQuality;
-            CurrentCacheObject.MonsterAffixes = c_MonsterAffixes;
-            CurrentCacheObject.MonsterSize = c_unit_MonsterSize;
-            CurrentCacheObject.OneHanded = c_IsOneHandedItem;
-            CurrentCacheObject.RActorGuid = CurrentCacheObject.RActorGuid;
-            CurrentCacheObject.Radius = CurrentCacheObject.Radius;
-            CurrentCacheObject.Rotation = c_Rotation;
-            CurrentCacheObject.TrinityItemType = c_item_GItemType;
-            CurrentCacheObject.TwoHanded = c_IsTwoHandedItem;
-            CurrentCacheObject.Type = CurrentCacheObject.Type;
-            CurrentCacheObject.IsAncient = c_IsAncient;
-            CurrentCacheObject.InLineOfSight = c_diaObject.InLineOfSight || c_HasBeenInLoS;
+            ObjectCache.Add(c_CacheObject);
+            return true;
+        }
 
-            ObjectCache.Add(CurrentCacheObject);
+        private static bool RefreshStepNavigationObstacle()
+        {
+            c_IsObstacle = DataDictionary.NavigationObstacleIds.Contains(c_CacheObject.ActorSNO);
+            if (c_IsObstacle)
+            {
+                try { c_CurrentAnimation = c_diaObject.CommonData.CurrentAnimation; }
+                catch { c_InfosSubStep += "Obstacle.InvalidAnimation "; }
+
+                try { c_IsFacingPlayer = c_diaObject.IsFacingPlayer; }
+                catch { c_InfosSubStep += "Obstacle.ErrorGettingFacing "; }
+
+                RAAvoidances();
+
+                AddObjectToNavigationObstacleCache();
+                return false;
+            }
+
             return true;
         }
 
         private static void AddObjectToNavigationObstacleCache()
         {
-            MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, (float)CurrentCacheObject.Radius);
+            MainGridProvider.AddCellWeightingObstacle(c_CacheObject.ActorSNO, c_CacheObject.Radius);
 
             CacheData.AddToNavigationObstacles(new CacheObstacleObject()
-                    {
-                        ActorSNO = CurrentCacheObject.ActorSNO,
-                RActorGUID = CurrentCacheObject.RActorGuid,
-                Name = CurrentCacheObject.InternalName,
-                Position = CurrentCacheObject.Position,
-                        Radius = CurrentCacheObject.Radius,
-                        ObjectType = CurrentCacheObject.Type,
-                    });
+            {
+                ActorSNO = c_CacheObject.ActorSNO,
+                RActorGUID = c_CacheObject.RActorGuid,
+                Name = c_CacheObject.InternalName,
+                Position = c_CacheObject.Position,
+                Radius = c_CacheObject.Radius,
+                ObjectType = c_CacheObject.Type,
+            });
         }
         /// <summary>
         /// Adds a unit to cache hashMonsterObstacleCache
         /// </summary>
         private static void AddUnitToMonsterObstacleCache()
         {
-            if (CurrentCacheObject.Type == GObjectType.Unit)
+            if (c_CacheObject.Type == GObjectType.Unit)
             {
                 // Add to the collision-list
                 CacheData.MonsterObstacles.Add(new CacheObstacleObject()
                 {
-                    ActorSNO = CurrentCacheObject.ActorSNO,
-                    Name = CurrentCacheObject.InternalName,
-                    Position = CurrentCacheObject.Position,
-                    Radius = CurrentCacheObject.Radius,
-                    ObjectType = CurrentCacheObject.Type,
+                    ActorSNO = c_CacheObject.ActorSNO,
+                    Name = c_CacheObject.InternalName,
+                    Position = c_CacheObject.Position,
+                    Radius = c_CacheObject.Radius,
+                    ObjectType = c_CacheObject.Type,
                 });
             }
         }
@@ -305,23 +328,22 @@ namespace Trinity
         /// </summary>
         private static void RefreshStepInit()
         {
-            CurrentCacheObject = new TrinityCacheObject();
-            // Start this object as off as unknown type
-            CurrentCacheObject.Type = GObjectType.Unknown;
+            c_CacheObject = new TrinityCacheObject();
+            c_CacheObject.Type = GObjectType.Unknown;
+            c_CacheObject.Distance = -1f;
+            c_CacheObject.Radius = 0f;
+            c_CacheObject.ACDGuid = -1;
+            c_CacheObject.RActorGuid = -1;
+            c_CacheObject.DynamicID = -1;
+            c_CacheObject.GameBalanceID = -1;
+            c_CacheObject.ActorSNO = -1;
 
-            CurrentCacheObject.Distance = -1f;
-            CurrentCacheObject.Radius = 0f;
             c_ZDiff = 0f;
             c_ItemDisplayName = "";
             c_ItemLink = "";
-            CurrentCacheObject.InternalName = "";
+            c_CacheObject.InternalName = "";
             c_IgnoreReason = "";
-            c_IgnoreSubStep = "";
-            CurrentCacheObject.ACDGuid = -1;
-            CurrentCacheObject.RActorGuid = -1;
-            CurrentCacheObject.DynamicID = -1;
-            CurrentCacheObject.GameBalanceID = -1;
-            CurrentCacheObject.ActorSNO = -1;
+            c_InfosSubStep = "";
             c_ItemLevel = -1;
             c_GoldStackSize = -1;
             c_HitPointsPct = -1;
@@ -356,291 +378,178 @@ namespace Trinity
             c_IsFacingPlayer = false;
             c_Rotation = 0f;
             c_DirectionVector = Vector2.Zero;
+            c_TargetACDGuid = -1;
+            c_TargetACDPosition = Vector3.Zero;
+            c_Movement = null;
+            c_CommonData = null;
+            c_Radius = 0f;
+            c_Avoidance = null;
+            c_unit_MonsterInfo = null;
         }
 
-        private static bool RefreshStepIgnoreNullCommonData(bool AddToCache)
+        private static bool RefreshStepCachedObjectType()
         {
-            // Null Common Data makes a DiaUseless!
-            if (CurrentCacheObject.Type == GObjectType.Unit || CurrentCacheObject.Type == GObjectType.Item || CurrentCacheObject.Type == GObjectType.Gold)
+            bool b_IsAvoidance = false;
+            using (new MemorySpy("StepObjectType().Avoidance"))
             {
-                if (c_diaObject.CommonData == null)
-                {
-                    AddToCache = false;
-                }
-                if (c_diaObject.CommonData != null && !c_diaObject.CommonData.IsValid)
-                {
-                    AddToCache = false;
-                }
-            }
-            return AddToCache;
-        }
-
-        private static bool RefreshStepCachedObjectType(bool AddToCache)
-        {
-            // Set the object type
-            // begin with default... 
-            CurrentCacheObject.Type = GObjectType.Unknown;
-
-            var currentInternalName = CurrentCacheObject.InternalName.ToLower();
-            foreach (var ignoreName in ignoreNames)
-            {
-                if (currentInternalName.StartsWith(ignoreName, StringComparison.Ordinal))
-                {
-                    AddToCache = false;
-                    c_IgnoreSubStep += "IgnoreNames";
-                    return AddToCache;
-                }
+                b_IsAvoidance = DataDictionary.ActorAvoidances.TryGetValue((SNOActor)c_CacheObject.ActorSNO, out c_Avoidance);
             }
 
-            // Either get the cached object type, or calculate it fresh
-            if (!c_IsObstacle)
+            if (b_IsAvoidance)
             {
-                // See if it's an avoidance first from the SNO
-                bool isAvoidanceSNO = DataDictionary.Avoidances.Contains(CurrentCacheObject.ActorSNO) ||
-                    DataDictionary.ButcherFloorPanels.Contains(CurrentCacheObject.ActorSNO) ||
-                    DataDictionary.AvoidanceProjectiles.Contains(CurrentCacheObject.ActorSNO);
-
-                // We're avoiding AoE and this is an AoE
-                if (Settings.Combat.Misc.AvoidAOE && isAvoidanceSNO)
+                if (!Settings.Combat.Misc.AvoidAOE) { c_InfosSubStep += "AvoidanceDisabled "; return false; }
+                c_CacheObject.Type = GObjectType.Avoidance;
+            }
+            else
+            {
+                using (new MemorySpy("StepObjectType().Check"))
                 {
-                    using (new PerformanceLogger("RefreshCachedType.0"))
+                    if (DataDictionary.ButcherFloorPanels.Contains(c_CacheObject.ActorSNO))
                     {
-                        // Checking for BuffVisualEffect - for Butcher, maybe useful other places?
-                        if (DataDictionary.ButcherFloorPanels.Contains(CurrentCacheObject.ActorSNO))
+                        if (Settings.Combat.Misc.AvoidAOE)
                         {
-                            bool hasBuff = false;
-                            try
-                            {
-                                hasBuff = c_diaObject.CommonData.GetAttribute<int>(ActorAttributeType.HasLookOverride) > 0;
-                            }
-                            catch
-                            {
+                            bool b_HasBuff = false;
+                            try { b_HasBuff = c_diaObject.CommonData.GetAttribute<int>(ActorAttributeType.HasLookOverride) > 0; }
+                            catch { c_InfosSubStep += "ErrorGettingButcherBEffect"; return false; }
 
-                            }
-                            if (hasBuff)
-                            {
-                                AddToCache = true;
-                                CurrentCacheObject.Type = GObjectType.Avoidance;
-                            }
-                            else
-                            {
-                                AddToCache = false;
-                                c_IgnoreSubStep += "NoBuffVisualEffect";
-                            }
+                            if (!b_HasBuff) { c_InfosSubStep += "ButcherFloorUnbuffed "; return false; }
+                            c_CacheObject.Type = GObjectType.Avoidance;
                         }
-                        else
-                        {
-                            // Avoidance isn't disabled, so set this object type to avoidance
-                            AddToCache = true;
-                            CurrentCacheObject.Type = GObjectType.Avoidance;
-                        }
+                        else { c_InfosSubStep += "AvoidanceDisabled "; return false; }
                     }
-                }
-                else if (!Settings.Combat.Misc.AvoidAOE && isAvoidanceSNO)
-                {
-                    AddToCache = false;
-                    c_IgnoreSubStep += "IgnoreAvoidance";
-                }
-                // It's not an avoidance, so let's calculate it's object type "properly"
-                else
-                {
-                    if (c_diaObject.ActorType == ActorType.Monster)
-                    //if (c_diaObject is DiaUnit)
+                    else if (c_diaObject.ActorType == ActorType.Monster)
                     {
-                        using (new PerformanceLogger("RefreshCachedType.1"))
-                        {
-                            if (c_diaObject.CommonData == null)
-                            {
-                                c_IgnoreSubStep += "InvalidUnitCommonData";
-                                AddToCache = false;
-                            }
-                            else if (c_diaObject.ACDGuid != c_diaObject.CommonData.ACDGuid)
-                            {
-                                c_IgnoreSubStep += "InvalidUnitACDGuid";
-                                AddToCache = false;
-                            }
-                            else
-                            {
-                                AddToCache = true;
-                                c_diaUnit = c_diaObject as DiaUnit;
-                                CurrentCacheObject.Type = GObjectType.Unit;
-                            }
-                        }
+                        if (c_diaObject.ACDGuid != c_diaObject.CommonData.ACDGuid)
+                        { c_InfosSubStep += "InvalidUnitACD "; return false; }
+
+                        c_diaUnit = c_diaObject as DiaUnit;
+                        c_CacheObject.Type = GObjectType.Unit;
                     }
                     else if (c_diaObject.ActorType == ActorType.Player)
                     {
-                        CurrentCacheObject.Type = GObjectType.Player;
+                        if (c_diaObject.ACDGuid != c_diaObject.CommonData.ACDGuid)
+                        { c_InfosSubStep += "InvalidUnitACD "; return false; }
+
+                        c_diaUnit = c_diaObject as DiaUnit;
+                        c_CacheObject.Type = GObjectType.Player;
                     }
-                    else if (DataDictionary.ForceToItemOverrideIds.Contains(CurrentCacheObject.ActorSNO) || (c_diaObject.ActorType == ActorType.Item))
+                    else if (DataDictionary.ForceToItemOverrideIds.Contains(c_CacheObject.ActorSNO) || (c_diaObject.ActorType == ActorType.Item))
                     {
-                        using (new PerformanceLogger("RefreshCachedType.2"))
+                        if (c_diaObject.ACDGuid != c_diaObject.CommonData.ACDGuid)
+                        { c_InfosSubStep += "InvalidItemACD "; return false; }
+
+                        if (c_CacheObject.InternalName.ToLower().StartsWith("gold"))
                         {
-                            CurrentCacheObject.Type = GObjectType.Item;
-
-                            if (c_diaObject.CommonData == null)
-                            {
-                                AddToCache = false;
-                            }
-                            if (c_diaObject.CommonData != null && c_diaObject.ACDGuid != c_diaObject.CommonData.ACDGuid)
-                            {
-                                AddToCache = false;
-                            }
-
-                            if (CurrentCacheObject.InternalName.ToLower().StartsWith("gold"))
-                            {
-                                CurrentCacheObject.Type = GObjectType.Gold;
-                            }
+                            c_CacheObject.Type = GObjectType.Gold;
+                        }
+                        else
+                        {
+                            c_CacheObject.Type = GObjectType.Item;
                         }
                     }
-                    else if (DataDictionary.InteractWhiteListIds.Contains(CurrentCacheObject.ActorSNO))
+                    else if (DataDictionary.InteractWhiteListIds.Contains(c_CacheObject.ActorSNO))
                     {
-                        CurrentCacheObject.Type = GObjectType.Interactable;
+                        c_CacheObject.Type = GObjectType.Interactable;
                     }
-                    else if (c_diaObject is DiaGizmo && c_diaObject.ActorType == ActorType.Gizmo && CurrentCacheObject.Distance <= 90)
+                    else if (c_diaObject.ActorType == ActorType.Gizmo && c_CacheObject.Distance <= 90)
                     {
+                        c_diaGizmo = c_diaObject as DiaGizmo;
 
-                        c_diaGizmo = (DiaGizmo)c_diaObject;
-
-                        if (CurrentCacheObject.InternalName.Contains("CursedChest"))
+                        if (c_CacheObject.InternalName.Contains("CursedChest"))
                         {
-                            CurrentCacheObject.Type = GObjectType.CursedChest;
-                            return true;
+                            c_CacheObject.Type = GObjectType.CursedChest;
                         }
-
-                        if (CurrentCacheObject.InternalName.Contains("CursedShrine"))
+                        else if (c_CacheObject.InternalName.Contains("CursedShrine"))
                         {
-                            CurrentCacheObject.Type = GObjectType.CursedShrine;
-                            return true;
+                            c_CacheObject.Type = GObjectType.CursedShrine;
                         }
-
-                        if (c_diaGizmo.IsBarricade)
+                        else if (c_diaGizmo.IsBarricade)
                         {
-                            CurrentCacheObject.Type = GObjectType.Barricade;
+                            c_CacheObject.Type = GObjectType.Barricade;
                         }
                         else
                         {
                             switch (c_diaGizmo.ActorInfo.GizmoType)
                             {
                                 case GizmoType.HealingWell:
-                                    CurrentCacheObject.Type = GObjectType.HealthWell;
+                                    c_CacheObject.Type = GObjectType.HealthWell;
                                     break;
                                 case GizmoType.Door:
-                                    CurrentCacheObject.Type = GObjectType.Door;
-                                    CurrentCacheObject.Radius = 35f;
+                                    c_CacheObject.Type = GObjectType.Door;
                                     break;
                                 case GizmoType.PoolOfReflection:
                                 case GizmoType.PowerUp:
-                                    CurrentCacheObject.Type = GObjectType.Shrine;
+                                    c_CacheObject.Type = GObjectType.Shrine;
                                     break;
                                 case GizmoType.Chest:
-                                    CurrentCacheObject.Type = GObjectType.Container;
+                                    c_CacheObject.Type = GObjectType.Container;
                                     break;
                                 case GizmoType.BreakableDoor:
-                                    CurrentCacheObject.Type = GObjectType.Barricade;
+                                    c_CacheObject.Type = GObjectType.Barricade;
                                     break;
                                 case GizmoType.BreakableChest:
-                                    CurrentCacheObject.Type = GObjectType.Destructible;
+                                    c_CacheObject.Type = GObjectType.Destructible;
                                     break;
                                 case GizmoType.DestroyableObject:
-                                    CurrentCacheObject.Type = GObjectType.Destructible;
+                                    c_CacheObject.Type = GObjectType.Destructible;
                                     break;
                                 case GizmoType.PlacedLoot:
                                 case GizmoType.Switch:
                                 case GizmoType.Headstone:
-                                    CurrentCacheObject.Type = GObjectType.Interactable;
+                                    c_CacheObject.Type = GObjectType.Interactable;
                                     break;
                                 default:
-                                    CurrentCacheObject.Type = GObjectType.Unknown;
+                                    c_CacheObject.Type = GObjectType.Unknown;
                                     break;
                             }
                         }
                     }
-                    else if (c_diaObject.Name.Contains("Door") || c_diaObject.Name.Contains("Gate"))
+                    else if (DataDictionary.ForceAtDoorType.Contains(c_CacheObject.ActorSNO) ||
+                        c_CacheObject.InternalName.Contains("door") || c_CacheObject.InternalName.Contains("gate"))
                     {
-                        CurrentCacheObject.Type = GObjectType.Door;
-                        CurrentCacheObject.Radius = 35f;
+                        c_CacheObject.Type = GObjectType.Door;
                     }
-                    else
-                    {
-                        CurrentCacheObject.Type = GObjectType.Unknown;
-                }
-                }
-                if (CurrentCacheObject.Type != GObjectType.Unknown)
-                {  // Now cache the object type if it's on the screen and we know what it is
-                    //CacheData.ObjectType.Add(CurrentCacheObject.RActorGuid, CurrentCacheObject.Type);
                 }
             }
-            return AddToCache;
+
+            return true;
         }
 
         private static void RefreshStepMainObjectType(ref bool AddToCache)
         {
             // Now do stuff specific to object types
-            switch (CurrentCacheObject.Type)
+            switch (c_CacheObject.Type)
             {
                 case GObjectType.Player:
                     {
-                        AddToCache = RefreshUnit();
+                        using (new MemorySpy("StepMainObjectType().Player")) { AddToCache = RefreshUnit(); }
                         break;
                     }
                 // Handle Unit-type Objects
                 case GObjectType.Unit:
                     {
-                        // Not allowed to kill monsters due to profile settings
                         if (!Combat.Abilities.CombatBase.IsCombatAllowed)
-                        {
-                            AddToCache = false;
-                            c_IgnoreSubStep += "CombatDisabled";
-                            break;
-                        }
+                        { c_InfosSubStep += "CombatDisabled"; AddToCache = false; 
+                        break; }
 
-                        AddToCache = RefreshUnit();
-                        CurrentCacheObject.RequiredRange = 30f;
-
-                        if (Combat.Abilities.CombatBase.CurrentPower.MinimumRange > 0)
-                            CurrentCacheObject.RequiredRange = Combat.Abilities.CombatBase.CurrentPower.MinimumRange;
-                        else if (Combat.Abilities.CombatBase.LastPowerRange > 0)
-                            CurrentCacheObject.RequiredRange = Combat.Abilities.CombatBase.LastPowerRange;
-
-                        if (Player.ActorClass == ActorClass.DemonHunter && Trinity.Settings.Combat.DemonHunter.RangedAttackRange > 0)
-                            CurrentCacheObject.RequiredRange = Math.Min(Trinity.Settings.Combat.DemonHunter.RangedAttackRange, CurrentCacheObject.RequiredRange);
+                        using (new MemorySpy("StepMainObjectType().UnitAAvoidance")) { RAAvoidances(); }
+                        using (new MemorySpy("StepMainObjectType().Unit")) { AddToCache = RefreshUnit(); }
                         break;
                     }
                 // Handle Item-type Objects
                 case GObjectType.Item:
                     {
-                        // Not allowed to loot due to profile settings
-                        // rrrix disabled this since noobs can't figure out their profile is broken... looting is always enabled now
-                        //if (!LootTargeting.Instance.AllowedToLoot || LootTargeting.Instance.DisableLooting)
-                        //{
-                        //    AddToCache = false;
-                        //    c_IgnoreSubStep += "LootingDisabled";
-                        //    break;
-                        //}
-
                         if (TrinityItemManager.FindValidBackpackLocation(true) == new Vector2(-1, -1))
-                        {
-                            AddToCache = false;
-                            c_IgnoreSubStep += "NoFreeSlots";
-                            break;
-                        }
-                        AddToCache = RefreshItem();
-                        CurrentCacheObject.RequiredRange = Player.GoldPickupRadius;
-                        break;
+                        { c_InfosSubStep += "NoFreeSlots"; AddToCache = false;
+                        break; }
 
+                        using (new MemorySpy("StepMainObjectType().Item")) { AddToCache = RefreshItem(); }
+                        break;
                     }
                 // Handle Gold
                 case GObjectType.Gold:
                     {
-                        // Not allowed to loot due to profile settings
-                        //if (!LootTargeting.Instance.AllowedToLoot || LootTargeting.Instance.DisableLooting)
-                        //{
-                        //    AddToCache = false;
-                        //    c_IgnoreSubStep += "LootingDisabled";
-                        //    break;
-                        //}
-                        AddToCache = RefreshGold();
-                        CurrentCacheObject.RequiredRange = Player.GoldPickupRadius;
+                        using (new MemorySpy("StepMainObjectType().Gold")) { AddToCache = RefreshGold(); }
                         break;
                     }
                 case GObjectType.PowerGlobe:
@@ -648,19 +557,26 @@ namespace Trinity
                 case GObjectType.ProgressionGlobe:
                     {
                         AddToCache = true;
-                        CurrentCacheObject.RequiredRange = Player.GoldPickupRadius;
                         break;
                     }
                 // Handle Avoidance Objects
                 case GObjectType.Avoidance:
                     {
-                        AddToCache = RefreshAvoidance();
-                        if (!AddToCache) { c_IgnoreSubStep += "RefreshAvoidance"; }
+                        using (new MemorySpy("StepMainObjectType().AAvoidance")) { RAAvoidances(); }
+                        using (new MemorySpy("StepMainObjectType().Avoidance")) { AddToCache = RefreshAvoidance(); }
+                        break;
+                    }
+                // Handle Door
+                case GObjectType.Door:
+                    {
+                        c_CacheObject.Radius = 30f;
+                        AddObjectToNavigationObstacleCache();
+                        
+                        using (new MemorySpy("StepMainObjectType().Gizmo")) { AddToCache = RefreshGizmo(AddToCache); }
                         break;
                     }
                 // Handle Other-type Objects
                 case GObjectType.Destructible:
-                case GObjectType.Door:
                 case GObjectType.Barricade:
                 case GObjectType.Container:
                 case GObjectType.Shrine:
@@ -669,23 +585,21 @@ namespace Trinity
                 case GObjectType.CursedChest:
                 case GObjectType.CursedShrine:
                     {
-                        AddToCache = RefreshGizmo(AddToCache);
-                        CurrentCacheObject.RequiredRange = 3f;
-                        if (CurrentCacheObject.Type == GObjectType.Door)
-                        {
-                            // add methode & Dictionary check
-                            AddObjectToNavigationObstacleCache();
-                        }
+                        AddObjectToNavigationObstacleCache();
+                        using (new MemorySpy("StepMainObjectType().Gizmo")) { AddToCache = RefreshGizmo(AddToCache); }
                         break;
                     }
                 // Object switch on type (to seperate shrines, destructibles, barricades etc.)
                 default:
                     {
+                        using (new MemorySpy("StepMainObjectType().UnknownAAvoidance")) { RAAvoidances(); }
                         DebugUtil.LogUnknown(c_diaObject);
-                        c_IgnoreSubStep += "Unknown." + c_diaObject.ActorType;
+
+                        c_InfosSubStep += "Unknown." + c_diaObject.ActorType;
                         AddToCache = false;
                         break;
                     }
+
             }
         }
 
@@ -705,33 +619,33 @@ namespace Trinity
                     // Add all objects
                     AddToCache = true;
 
-                // Everything except items and the current target
-                if (CurrentCacheObject.RActorGuid != LastTargetRactorGUID && CurrentCacheObject.Type != GObjectType.Unknown)
-                {
-                        if (c_diaObject.InLineOfSight || CurrentCacheObject.IsInLineOfSight(true))
-                                    {
-                                        c_HasBeenRaycastable = true;
-                                    c_HasBeenInLoS = true;
+                    // Everything except unknowns
+                    if (c_CacheObject.Type != GObjectType.Unknown)
+                    {
+                        if (c_diaObject.InLineOfSight || c_CacheObject.IsInLineOfSight(true))
+                        {
+                            c_HasBeenRaycastable = true;
+                            c_HasBeenInLoS = true;
+                        }
                     }
-                }
 
-                // Simple whitelist for LoS 
-                if (DataDictionary.LineOfSightWhitelist.Contains(CurrentCacheObject.ActorSNO))
-                {
+                    // Simple whitelist for LoS 
+                    if (DataDictionary.LineOfSightWhitelist.Contains(c_CacheObject.ActorSNO))
+                    {
                         c_HasBeenInLoS = true;
-                    AddToCache = true;
-                }
-                // Always pickup Infernal Keys whether or not in LoS
-                if (DataDictionary.ForceToItemOverrideIds.Contains(CurrentCacheObject.ActorSNO))
-                {
-                    AddToCache = true;
-                }
+                        AddToCache = true;
+                    }
+                    // Always pickup Infernal Keys whether or not in LoS
+                    if (DataDictionary.ForceToItemOverrideIds.Contains(c_CacheObject.ActorSNO))
+                    {
+                        AddToCache = true;
+                    }
                 }
             }
             catch (Exception ex)
             {
                 AddToCache = true;
-                c_IgnoreSubStep += "IgnoreLoSException";
+                c_InfosSubStep += "IgnoreLoSException ";
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
             }
             return AddToCache;
@@ -740,7 +654,7 @@ namespace Trinity
         private static bool RefreshStepIgnoreUnknown(bool AddToCache)
         {
             // We couldn't get a valid object type, so ignore it
-            if (!c_IsObstacle && CurrentCacheObject.Type == GObjectType.Unknown)
+            if (!c_IsObstacle && c_CacheObject.Type == GObjectType.Unknown)
             {
                 AddToCache = false;
             }
@@ -751,29 +665,29 @@ namespace Trinity
         {
             c_ZDiff = c_diaObject.ZDiff;
             // always take current target regardless if ZDiff changed
-            if (CurrentCacheObject.RActorGuid == LastTargetRactorGUID)
+            if (c_CacheObject.RActorGuid == LastTargetRactorGUID)
             {
                 AddToCache = true;
                 return AddToCache;
             }
 
             // Special whitelist for always getting stuff regardless of ZDiff or LoS
-            if (DataDictionary.LineOfSightWhitelist.Contains(CurrentCacheObject.ActorSNO))
+            if (DataDictionary.LineOfSightWhitelist.Contains(c_CacheObject.ActorSNO))
             {
                 AddToCache = true;
                 return AddToCache;
             }
             // Ignore stuff which has a Z-height-difference too great, it's probably on a different level etc. - though not avoidance!
-            if (CurrentCacheObject.Type != GObjectType.Avoidance)
+            if (c_CacheObject.Type != GObjectType.Avoidance)
             {
                 // Calculate the z-height difference between our current position, and this object's position
-                switch (CurrentCacheObject.Type)
+                switch (c_CacheObject.Type)
                 {
                     case GObjectType.Door:
                     case GObjectType.Unit:
                     case GObjectType.Barricade:
                         // Ignore monsters (units) who's Z-height is 14 foot or more than our own z-height except bosses
-                        if (c_ZDiff >= 14f && !CurrentCacheObject.IsBoss)
+                        if (c_ZDiff >= 11f && !c_CacheObject.IsBoss)
                         {
                             AddToCache = true;
                         }
@@ -826,72 +740,71 @@ namespace Trinity
             return AddToCache;
         }
 
-        private static bool RefreshStepCheckBlacklists(bool AddToCache)
+        private static bool RefreshStepCheckBlacklists()
         {
-            if (!DataDictionary.Avoidances.Contains(CurrentCacheObject.ActorSNO) && !DataDictionary.ButcherFloorPanels.Contains(CurrentCacheObject.ActorSNO) && !CurrentCacheObject.IsBountyObjective && !CurrentCacheObject.IsQuestMonster)
+            if (!c_CacheObject.IsAvoidance && !c_CacheObject.IsBountyObjective && !c_CacheObject.IsQuestMonster)
             {
-                // See if it's something we should always ignore like ravens etc.
-                if (!c_IsObstacle && DataDictionary.BlackListIds.Contains(CurrentCacheObject.ActorSNO))
-                {
-                    AddToCache = false;
-                    c_IgnoreSubStep += "Blacklist";
-                    return AddToCache;
-                }
                 // Temporary ractor GUID ignoring, to prevent 2 interactions in a very short time which can cause stucks
-                if (_ignoreTargetForLoops > 0 && _ignoreRactorGuid == CurrentCacheObject.RActorGuid)
+                if (_ignoreTargetForLoops > 0 && _ignoreRactorGuid == c_CacheObject.RActorGuid)
                 {
-                    AddToCache = false;
-                    c_IgnoreSubStep += "IgnoreRactorGUID";
-                    return AddToCache;
+                    c_InfosSubStep += "IgnoreRactorGUID ";
+                    return false;
                 }
                 // Check our extremely short-term destructible-blacklist
-                if (_destructible3SecBlacklist.Contains(CurrentCacheObject.RActorGuid))
+                if (_destructible3SecBlacklist.Contains(c_CacheObject.RActorGuid))
                 {
-                    AddToCache = false;
-                    c_IgnoreSubStep += "Destructible3SecBlacklist";
-                    return AddToCache;
+                    c_InfosSubStep += "Destructible3SecBlacklist ";
+                    return false;
                 }
                 // Check our extremely short-term destructible-blacklist
-                if (Blacklist1Second.Contains(CurrentCacheObject.RActorGuid))
+                if (Blacklist1Second.Contains(c_CacheObject.RActorGuid))
                 {
-                    AddToCache = false;
-                    c_IgnoreSubStep += "hashRGUIDBlacklist3";
-                    return AddToCache;
+                    c_InfosSubStep += "hashRGUIDBlacklist1 ";
+                    return false;
                 }
                 // Check our extremely short-term destructible-blacklist
-                if (Blacklist3Seconds.Contains(CurrentCacheObject.RActorGuid))
+                if (Blacklist3Seconds.Contains(c_CacheObject.RActorGuid))
                 {
-                    AddToCache = false;
-                    c_IgnoreSubStep += "hashRGUIDBlacklist3";
-                    return AddToCache;
+                    c_InfosSubStep += "hashRGUIDBlacklist3 ";
+                    return false;
                 }
                 // See if it's on our 90 second blacklist (from being stuck targeting it), as long as it's distance is not extremely close
-                if (Blacklist90Seconds.Contains(CurrentCacheObject.RActorGuid))
+                if (Blacklist90Seconds.Contains(c_CacheObject.RActorGuid))
                 {
-                    AddToCache = false;
-                    c_IgnoreSubStep += "Blacklist90Seconds";
-                    return AddToCache;
+                    c_InfosSubStep += "Blacklist90Seconds ";
+                    return false;
                 }
                 // 60 second blacklist
-                if (Blacklist60Seconds.Contains(CurrentCacheObject.RActorGuid))
+                if (Blacklist60Seconds.Contains(c_CacheObject.RActorGuid))
                 {
-                    AddToCache = false;
-                    c_IgnoreSubStep += "Blacklist60Seconds";
-                    return AddToCache;
+                    c_InfosSubStep += "Blacklist60Seconds ";
+                    return false;
                 }
                 // 15 second blacklist
-                if (Blacklist15Seconds.Contains(CurrentCacheObject.RActorGuid))
+                if (Blacklist15Seconds.Contains(c_CacheObject.RActorGuid))
                 {
-                    AddToCache = false;
-                    c_IgnoreSubStep += "Blacklist15Seconds";
-                    return AddToCache;
+                    c_InfosSubStep += "Blacklist15Seconds ";
+                    return false;
+                }
+                // See if it's something we should always ignore like ravens etc.
+                if (DataDictionary.BlackListIds.Contains(c_CacheObject.ActorSNO))
+                {
+                    c_InfosSubStep += "Blacklist ";
+                    return false;
                 }
             }
-            else
+
+            if (c_CacheObject.Type != GObjectType.Item)
             {
-                AddToCache = true;
+                c_CacheObject.ObjectHash = HashGenerator.GenerateWorldObjectHash(c_CacheObject.ActorSNO, c_CacheObject.Position, c_CacheObject.Type.ToString(), Trinity.CurrentWorldDynamicId);
+                if (c_CacheObject.ObjectHash != String.Empty && GenericBlacklist.ContainsKey(c_CacheObject.ObjectHash))
+                {
+                    c_InfosSubStep += "GenericBlacklist ";
+                    return false;
+                }
             }
-            return AddToCache;
+
+            return true;
         }
 
 
@@ -911,20 +824,20 @@ namespace Trinity
         {
             if (!bHasCachedHealth)
             {
-                CacheData.CurrentUnitHealth.Add(CurrentCacheObject.RActorGuid, dThisCurrentHealth);
-                CacheData.LastCheckedUnitHealth.Add(CurrentCacheObject.RActorGuid, iLastCheckedHealth);
+                CacheData.CurrentUnitHealth.Add(c_CacheObject.RActorGuid, dThisCurrentHealth);
+                CacheData.LastCheckedUnitHealth.Add(c_CacheObject.RActorGuid, iLastCheckedHealth);
             }
             else
             {
-                CacheData.CurrentUnitHealth[CurrentCacheObject.RActorGuid] = dThisCurrentHealth;
-                CacheData.LastCheckedUnitHealth[CurrentCacheObject.RActorGuid] = iLastCheckedHealth;
+                CacheData.CurrentUnitHealth[c_CacheObject.RActorGuid] = dThisCurrentHealth;
+                CacheData.LastCheckedUnitHealth[c_CacheObject.RActorGuid] = iLastCheckedHealth;
             }
         }
         private static void CacheObjectMinimapActive()
         {
             try
             {
-                CurrentCacheObject.IsMinimapActive = c_diaObject.CommonData.GetAttribute<int>(ActorAttributeType.MinimapActive) > 0;
+                c_CacheObject.IsMinimapActive = c_diaObject.CommonData.GetAttribute<int>(ActorAttributeType.MinimapActive) > 0;
             }
             catch
             {
@@ -936,9 +849,9 @@ namespace Trinity
         {
             try
             {
-                CurrentCacheObject.IsBountyObjective = (c_diaObject.CommonData.GetAttribute<int>(ActorAttributeType.BountyObjective) != 0);
-                if (CurrentCacheObject.IsBountyObjective)
-                    CurrentCacheObject.KillRange = CurrentCacheObject.RadiusDistance + 10f;
+                c_CacheObject.IsBountyObjective = (c_diaObject.CommonData.GetAttribute<int>(ActorAttributeType.BountyObjective) != 0);
+                if (c_CacheObject.IsBountyObjective)
+                    c_CacheObject.KillRange = c_CacheObject.RadiusDistance + 10f;
             }
             catch
             {
@@ -950,3 +863,34 @@ namespace Trinity
 
     }
 }
+
+/* [Trinity][UnknownObjects] 
+ * RefreshDiaObjects().Maintain=00,01ms 
+ * RefreshDiaObjects().Init=00,01ms 
+ * RefreshDiaObjects().Loop=17,98ms 
+ * CacheDiaObject().CheckValid=00,04ms 
+ * CacheDiaObject().CheckCommonData=00,02ms 
+ * CacheDiaObject().CheckName=03,06ms 
+ * CacheDiaObject().GetInfosInit=02,14ms 
+ * CacheDiaObject().GetRadius=00,33ms 
+ * CacheDiaObject().CheckNavObstacles=00,05ms 
+ * CacheDiaObject().StepObjectType=00,43ms 
+ * StepObjectType().Avoidance=00,04ms 
+ * StepObjectType().Check=00,31ms 
+ * CacheDiaObject().StepPlayerSummons=02,63ms 
+ * CacheDiaObject().StepCheckBlacklists=00,85ms 
+ * CacheDiaObject().StepZDiff=00,10ms 
+ * CacheDiaObject().GetComplex=04,06ms 
+ * CacheDiaObject().StepMainObjectType=01,84ms 
+ * StepMainObjectType().UnknownAAvoidance=00,03ms 
+ * StepMainObjectType().Gizmo=00,14ms 
+ * CacheDiaObject().LoSCheck=00,25ms 
+ * StepMainObjectType().Item=01,00ms 
+ * RefreshDiaObjects().Markers=00,64ms 
+ * RefreshDiaObjects().Weight=01,63ms 
+ * RefreshDiaObjects().Grid=07,59ms 
+ * RefreshDiaObjects().InvokeEvents=00,23ms 
+ * RefreshDiaObjects().FinalCheck=00,18ms 
+ * HandleTarget()=32,17ms 
+ * RefreshDiaObjects()=28,37ms 
+*/

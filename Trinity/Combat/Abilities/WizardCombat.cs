@@ -510,7 +510,7 @@ namespace Trinity.Combat.Abilities
 
             // Arcane Strike Rapid Spam at close-range only, and no AoE inbetween us and target
             if (!Player.IsIncapacitated && !Settings.Combat.Wizard.NoArcaneStrike && CanCast(strikePower, CanCastFlags.NoTimer) &&
-                !CacheData.TimeBoundAvoidance.Any(aoe => MathUtil.IntersectsPath(aoe.Position, aoe.Radius, Player.Position, CurrentTarget.Position)))
+                !CacheData.AvoidanceObstacles.Any(aoe => MathUtil.IntersectsPath(aoe.Position, aoe.Radius, Player.Position, CurrentTarget.Position)))
             {
                 return new TrinityPower(strikePower, 7f, CurrentTarget.ACDGuid);
             }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Trinity.Technicals;
 using Zeta.Common;
 
 namespace Trinity
@@ -32,89 +33,107 @@ namespace Trinity
 
         public static bool HasTickValue_GetBestClusterNode(out GridNode gridPoint, float maxRange = 100f, Vector3 loc = new Vector3())
         {
-            gridPoint = new GridNode(new Vector3());
-
-            if (!TickValues_GetBestClusterNode.Any())
-                return false;
-
-            var p = gridPoint;
-            try { p = TickValues_GetBestClusterNode.FirstOrDefault(r => r != null && r.Equals(maxRange, loc)).GridLocation; }
-            catch { return false; }
-
-            if (p != null)
+            using (new MemorySpy("HasTickValue_GetBestClusterNode"))
             {
-                gridPoint = p;
-                return true;
-            }
+                gridPoint = new GridNode(new Vector3());
 
-            return false;
+                if (!TickValues_GetBestClusterNode.Any())
+                    return false;
+
+                var p = gridPoint;
+                try { p = TickValues_GetBestClusterNode.FirstOrDefault(r => r != null && r.Equals(maxRange, loc)).GridLocation; }
+                catch { return false; }
+
+                if (p != null)
+                {
+                    gridPoint = p;
+                    return true;
+                }
+
+                return false;
+            }
         }
 
         public static bool HasTickValue_GetBestNode(out GridNode gridPoint, float miRange = 5f, float maRange = 100f, Vector3 loc = new Vector3())
         {
-            gridPoint = new GridNode(new Vector3());
-
-            if (!TickValues_GetBestNode.Any())
-                return false;
-
-            var p = gridPoint;
-            try { p = TickValues_GetBestNode.FirstOrDefault(r => r != null && r.Equals(miRange, maRange, loc)).GridLocation; }
-            catch { return false; }
-
-            if (p != null)
+            using (new MemorySpy("HasTickValue_GetBestNode"))
             {
-                gridPoint = p;
-                return true;
-            }
+                gridPoint = new GridNode(new Vector3());
 
-            return false;
+                if (!TickValues_GetBestNode.Any())
+                    return false;
+
+                var p = gridPoint;
+                try { p = TickValues_GetBestNode.FirstOrDefault(r => r != null && r.Equals(miRange, maRange, loc)).GridLocation; }
+                catch { return false; }
+
+                if (p != null)
+                {
+                    gridPoint = p;
+                    return true;
+                }
+
+                return false;
+            }
         }
 
         public static bool HasTickValue_GetWeightAtPoint(out float weight, Vector3 loc = new Vector3())
         {
-            weight = 0f;
-
-            if (!TickValues_GetWeightAtPoint.Any())
-                return false;
-
-            var w = weight;
-            try { w = TickValues_GetWeightAtPoint.FirstOrDefault(r => r != null && r.Equals(loc)).Weight; }
-            catch { return false; }
-             
-            if (w != 0f)
+            using (new MemorySpy("HasTickValue_GetWeightAtPoint"))
             {
-                weight = w;
-                return true;
-            }
+                weight = 0f;
 
-            return false;
+                if (!TickValues_GetWeightAtPoint.Any())
+                    return false;
+
+                var w = weight;
+                try { w = TickValues_GetWeightAtPoint.FirstOrDefault(r => r != null && r.Equals(loc)).Weight; }
+                catch { return false; }
+
+                if (w != 0f)
+                {
+                    weight = w;
+                    return true;
+                }
+
+                return false;
+            }
         }
 
         public static bool HasTickValue_GetWeightAtPlayer(out float weight)
         {
-            weight = TickValue_GetWeightAtPlayer;
-            if (weight != 0f)
-                return true;
+            using (new MemorySpy("HasTickValue_GetWeightAtPlayer"))
+            {
+                weight = TickValue_GetWeightAtPlayer;
+                if (weight != 0f)
+                    return true;
 
-            return false;
+                return false;
+            }
         }
 
         public static bool HasTickValue_ToDictionary(out Dictionary<Vector3, float> dict)
         {
-            dict = TickValue_ToDictionary;
-            if (dict != new Dictionary<Vector3, float>())
-                return true;
+            using (new MemorySpy("HasTickValue_ToDictionary"))
+            {
+                dict = TickValue_ToDictionary;
+                if (dict != new Dictionary<Vector3, float>())
+                    return true;
 
-            return false;
+                return false;
+            }
         }
 
         public static bool HasTickValue_ClusterExist(out bool exist)
         {
-            exist = TickValue_ClusterExist;
-            if (IsTickRecorded_ClusterExist)
-                return true;
+            using (new MemorySpy("HasTickValue_ClusterExist"))
+            {
+                exist = TickValue_ClusterExist;
+                if (IsTickRecorded_ClusterExist)
+                    return true;
 
-            return false;
+                return false;
+            }
         }
     }
 

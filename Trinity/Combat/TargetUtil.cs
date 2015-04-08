@@ -60,6 +60,12 @@ namespace Trinity
         }
         #endregion
 
+        private static Dictionary<Tuple<Vector3, float, bool>, List<TrinityCacheObject>> ListObjectResults = new Dictionary<Tuple<Vector3, float, bool>, List<TrinityCacheObject>>();
+        public static void ResetTickValues()
+        {
+            ListObjectResults = new Dictionary<Tuple<Vector3, float, bool>, List<TrinityCacheObject>>();
+        }
+
         /// <summary>
         /// Gets the number of units facing player
         /// </summary>
@@ -67,7 +73,8 @@ namespace Trinity
         /// <returns></returns>
         internal static int UnitsFacingPlayer(float _range)
         {
-            try { return ListUnitsInRangeOfPosition(_range: _range).Count(u => u.IsFacingPlayer); } catch { return 0; }
+            if (Trinity.ObjectCache == null || !Trinity.ObjectCache.Any()) return 0; 
+            return ListUnitsInRangeOfPosition(_range: _range).Count(u => u.IsFacingPlayer);
         }
 
         /// <summary>
@@ -77,7 +84,8 @@ namespace Trinity
         /// <returns></returns>
         internal static int UnitsPlayerFacing(float _range, float _arcDegrees = 70f)
         {
-            try { return ListUnitsInRangeOfPosition(_range: _range).Count(u => u.IsPlayerFacing(_arcDegrees)); } catch { return 0; } 
+            if (Trinity.ObjectCache == null || !Trinity.ObjectCache.Any()) return 0; 
+            return ListUnitsInRangeOfPosition(_range: _range).Count(u => u.IsPlayerFacing(_arcDegrees));
         }
 
         /// <summary>
@@ -105,7 +113,8 @@ namespace Trinity
         internal static bool ClusterExists(float _radius = 15f, float _range = 90f, int _minCount = 2)
         {
             if (_radius < 5f) { _radius = 5f; }
-            try { return ListUnitsInRangeOfPosition(_range: _range).Any(u => u.NearbyUnitsWithinDistance(_radius) >= _minCount); } catch { return false; }
+            if (Trinity.ObjectCache == null || !Trinity.ObjectCache.Any()) return false; 
+            return ListUnitsInRangeOfPosition(_range: _range).Any(u => u.NearbyUnitsWithinDistance(_radius) >= _minCount);
         }
 
 
@@ -119,7 +128,7 @@ namespace Trinity
                 (from _u in _list
                  where
                     _u.IsInLineOfSight() &&
-                    (!Trinity.Settings.Combat.Misc.KillMonstersInAoE || !LocOrPathInAoE(_u))
+                    (Trinity.KillMonstersInAoE || !LocOrPathInAoE(_u))
                  orderby
                     _u.CountUnitsInFront() descending,
                     _u.NearbyUnitsWithinDistance(8f) descending,
@@ -152,7 +161,7 @@ namespace Trinity
                 (from _o in _list
                  where
                     _o.IsInLineOfSight() &&
-                    (!Trinity.Settings.Combat.Misc.KillMonstersInAoE || !LocOrPathInAoE(_o))
+                    (Trinity.KillMonstersInAoE || !LocOrPathInAoE(_o))
                  orderby
                     _o.CountUnitsInFront() descending,
                     _o.NearbyUnitsWithinDistance(8f) descending,
@@ -203,11 +212,11 @@ namespace Trinity
                 from u in ListObjectsInRangeOfPosition(Player.Position, _range, _useWeights)
                 where
                     u.Type == GObjectType.HealthGlobe &&
-                    (!Trinity.Settings.Combat.Misc.KillMonstersInAoE || !LocOrPathInAoE(u))
+                    (Trinity.KillMonstersInAoE || !LocOrPathInAoE(u))
                 orderby
                     u.NearbyUnitsWithinDistance(_radius),
-                     u.Distance descending
-                     select u).ToList();
+                    u.Distance descending
+                select u).ToList();
 
             if (_results.Any())
                 return _results.FirstOrDefault().ClusterPosition(Player.GoldPickupRadius - 3f);
@@ -228,10 +237,10 @@ namespace Trinity
                 from u in _list
                 where
                     u.Type == GObjectType.PowerGlobe &&
-                    (!Trinity.Settings.Combat.Misc.KillMonstersInAoE || !LocOrPathInAoE(u))
+                    (Trinity.KillMonstersInAoE || !LocOrPathInAoE(u))
                 orderby
                     u.NearbyUnitsWithinDistance(_radius),
-                 u.Distance descending
+                    u.Distance descending
                 select u).ToList();
 
             if (_results.Any())
@@ -239,6 +248,7 @@ namespace Trinity
 
             return GetBestClusterPoint(_radius, _range, _useWeights: _useWeights);
         }
+
         /// <summary>
         /// Checks to see if there is a health globe around to grab
         /// </summary>
@@ -246,7 +256,8 @@ namespace Trinity
         /// <returns></returns>
         internal static bool HealthGlobeClusterExists(float _range = 15f, int _size = 2, bool _useWeights = true)
         {
-            try { return ListObjectsInRangeOfPosition(_range: _range, _useWeights: _useWeights).Any(o => o.Type == GObjectType.HealthGlobe && o.NearbyUnits >= _size); } catch { return false; }
+            if (Trinity.ObjectCache == null || !Trinity.ObjectCache.Any()) return false; 
+            return ListObjectsInRangeOfPosition(_range: _range, _useWeights: _useWeights).Any(o => o.Type == GObjectType.HealthGlobe && o.NearbyUnits >= _size);
         }
 
         /// <summary>
@@ -256,7 +267,8 @@ namespace Trinity
         /// <returns></returns>
         internal static bool PowerGlobeClusterExists(float _range = 15f, int _size = 2, bool _useWeights = true)
         {
-            try { return ListObjectsInRangeOfPosition(_range: _range, _useWeights: _useWeights).Any(o => o.Type == GObjectType.PowerGlobe && o.NearbyUnits >= _size); } catch { return false; }
+            if (Trinity.ObjectCache == null || !Trinity.ObjectCache.Any()) return false; 
+            return ListObjectsInRangeOfPosition(_range: _range, _useWeights: _useWeights).Any(o => o.Type == GObjectType.PowerGlobe && o.NearbyUnits >= _size);
         }
 
 
@@ -281,7 +293,7 @@ namespace Trinity
             var _results = (
                 from _u in _list
                 where
-                    (!Trinity.Settings.Combat.Misc.KillMonstersInAoE || !_u.IsStandingInAvoidance) &&
+                    (Trinity.KillMonstersInAoE || !_u.IsStandingInAvoidance) &&
                     (_size <= 1 || _u.IsBossOrEliteRareUnique || _u.NearbyUnitsWithinDistance(_radius) >= _size)
                 orderby
                     _u.NearbyUnitsWithinDistance(_radius) descending,
@@ -321,7 +333,7 @@ namespace Trinity
             var _results = (
                 from _o in _list
                 where
-                    (!Trinity.Settings.Combat.Misc.KillMonstersInAoE || !_o.IsStandingInAvoidance || !_o.IsUnit) &&
+                    (Trinity.KillMonstersInAoE || !_o.IsStandingInAvoidance || !_o.IsUnit) &&
                     (_size <= 1 || _o.IsBossOrEliteRareUnique || _o.NearbyUnitsWithinDistance(_radius) >= _size)
                 orderby
                     _o.NearbyUnitsWithinDistance(_radius) descending,
@@ -397,6 +409,7 @@ namespace Trinity
 
             return NumElitesInRangeOfPosition(_loc, _range, _useWeights) >= _minCount;
         }
+
         /// <summary>
         /// Count unit by type or other fields
         /// </summary>
@@ -407,19 +420,19 @@ namespace Trinity
 
         /// MOBS
         internal static int NumMobsInRangeOfPosition(Vector3 _loc = new Vector3(), float _range = 10f, bool _useWeights = true)
-        { try { return ListUnitsInRangeOfPosition(_loc, _range, _useWeights).Count(); } catch { return 0; } }
+        { if (Trinity.ObjectCache == null || !Trinity.ObjectCache.Any()) return 0; return ListUnitsInRangeOfPosition(_loc, _range, _useWeights).Count(); }
         /// TRASH
         internal static int NumTrashInRangeOfPosition(Vector3 _loc = new Vector3(), float _range = 10f, bool _useWeights = true)
-        { try { return ListUnitsInRangeOfPosition(_loc, _range, _useWeights).Count(u => u.IsTrashMob); } catch { return 0; } }
+        { if (Trinity.ObjectCache == null || !Trinity.ObjectCache.Any()) return 0; return ListUnitsInRangeOfPosition(_loc, _range, _useWeights).Count(u => u.IsTrashMob); }
         /// ELITES
         internal static int NumElitesInRangeOfPosition(Vector3 _loc = new Vector3(), float _range = 10f, bool _useWeights = true)
-        { try { return ListUnitsInRangeOfPosition(_loc, _range, _useWeights).Count(u => u.IsBoss); } catch { return 0; } }
+        { if (Trinity.ObjectCache == null || !Trinity.ObjectCache.Any()) return 0; return ListUnitsInRangeOfPosition(_loc, _range, _useWeights).Count(u => u.IsBoss); }
         /// BOSS
         internal static int NumBossInRangeOfPosition(Vector3 _loc = new Vector3(), float _range = 10f, bool _useWeights = true)
-        { try { return ListUnitsInRangeOfPosition(_loc, _range, _useWeights).Count(u => u.IsBoss); } catch { return 0; } }
+        { if (Trinity.ObjectCache == null || !Trinity.ObjectCache.Any()) return 0; return ListUnitsInRangeOfPosition(_loc, _range, _useWeights).Count(u => u.IsBoss); }
         /// IN LoS
         internal static int NumMobsInLosInRangeOfPosition(Vector3 _loc = new Vector3(), float _range = 10f, bool _useWeights = true)
-        { try { return ListUnitsInRangeOfPosition(_loc, _range, _useWeights).Count(u => u.IsInLineOfSight()); } catch { return 0; } }
+        { if (Trinity.ObjectCache == null || !Trinity.ObjectCache.Any()) return 0; return ListUnitsInRangeOfPosition(_loc, _range, _useWeights).Count(u => u.IsInLineOfSight()); }
 
         /// <summary>
         /// List all objects by type in range of point
@@ -448,21 +461,31 @@ namespace Trinity
             if (_loc == new Vector3()) { _loc = Player.Position; }
             bool _atPlayer = _loc == Player.Position;
 
-            if (!ObjectCache.Any())
+            if (Trinity.ObjectCache == null || !Trinity.ObjectCache.Any())
                 return null;
 
-            try
-        {
-                return (
-                from _u in ObjectCache
-                where
-                    (!_useWeights || _u.Weight > 0) &&
-                    (_atPlayer && _u.RadiusDistance <= _range ||
-                    !_atPlayer && _u.Position.Distance2D(_loc) - _u.Radius <= _range)
-                select _u).ToList();
+            Tuple<Vector3, float, bool> _source = new Tuple<Vector3, float, bool>(_loc, _range, _useWeights);
+
+            List<TrinityCacheObject> _result; ;
+            if (ListObjectResults.TryGetValue(_source, out _result))
+            {
+                return _result;
             }
-            catch { return null; }
+
+            _result = (
+            from _u in ObjectCache
+            where
+                (!_useWeights || _u.Weight > 0) &&
+                (_atPlayer && _u.RadiusDistance <= _range ||
+                !_atPlayer && _u.Position.Distance2D(_loc) - _u.Radius <= _range)
+            select _u).ToList();
+
+            if (!ListObjectResults.ContainsKey(_source))
+                ListObjectResults.Add(_source, _result);
+
+            return _result;
         }
+
         /// <summary>
         /// Returns true if there is any elite units within the given range
         /// </summary>
@@ -536,7 +559,7 @@ namespace Trinity
 
             if (useTargetBasedZigZag && shouldZigZagElites && !AnyTreasureGoblinsPresent && ObjectCache.Count(o => o.IsUnit) >= minTargets)
             {
-                bool attackInAoe = Trinity.Settings.Combat.Misc.KillMonstersInAoE;
+                bool attackInAoe = Trinity.KillMonstersInAoE;
                 var clusterNode = GridMap.GetBestClusterNode(Player.Position, ringDistance, maxDistance, minDistance, _useDefault: false);
                 if (clusterNode != null)
                 {
@@ -630,7 +653,7 @@ namespace Trinity
                         continue;
 
                     // Ignore point if any AoE in this point position
-                    if (CacheData.TimeBoundAvoidance.Any(m => m.Position.Distance(zigZagPoint) <= m.Radius && Player.CurrentHealthPct <= AvoidanceManager.GetAvoidanceHealthBySNO(m.ActorSNO, 1)))
+                    if (CacheData.AvoidanceObstacles.Any(m => m.Position.Distance(zigZagPoint) <= m.Radius && Player.CurrentHealthPct <= AvoidanceManager.GetAvoidanceHealthBySNO(m.ActorSNO, 1)))
                         continue;
 
                     // Make sure this point is in LoS/walkable (not around corners or into a wall)
@@ -679,13 +702,14 @@ namespace Trinity
         /// <returns></returns>
         internal static bool LocOrPathInAoE(Vector3 _loc)
         {
-            return CacheData.TimeBoundAvoidance.Any(aoe => aoe.Position.Distance2D(_loc) <= aoe.Radius + 2f) ||
-                CacheData.TimeBoundAvoidance.Any(aoe => MathUtil.IntersectsPath(aoe.Position, aoe.Radius, _loc, Player.Position));
+            return CacheData.AvoidanceObstacles.Any(aoe => aoe.Position.Distance2D(_loc) <= aoe.Radius + 2f) ||
+                CacheData.AvoidanceObstacles.Any(aoe => MathUtil.IntersectsPath(aoe.Position, aoe.Radius, _loc, Player.Position));
         }
         internal static bool LocOrPathInAoE(TrinityCacheObject _o)
         {
             return _o.IsStandingInAvoidance || PathToObjectIntersectsAoe(_o);
         }
+
 
         /// <summary>
         /// Checks to see if the path-line to a unit goes through AoE
@@ -694,7 +718,7 @@ namespace Trinity
         /// <returns></returns>
         internal static bool PathToObjectIntersectsAoe(TrinityCacheObject _o)
         {
-            return CacheData.TimeBoundAvoidance.Any(aoe => MathUtil.IntersectsPath(aoe.Position, aoe.Radius, _o.Position, Player.Position));
+            return CacheData.AvoidanceObstacles.Any(aoe => MathUtil.IntersectsPath(aoe.Position, aoe.Radius, _o.Position, Player.Position));
         }
 
         /// <summary>
@@ -702,7 +726,8 @@ namespace Trinity
         /// </summary>
         internal static bool IsUnitWithDebuffInRangeOfPosition(float _range, Vector3 _loc, SNOPower _power, int _minCount = 1)
         {
-            try { return ListUnitsInRangeOfPosition(_loc, _range).Count(u => SpellTracker.IsUnitTracked(u.ACDGuid, _power) || u.HasDebuff(_power)) >= _minCount; } catch { return false; }
+            if (Trinity.ObjectCache == null || !Trinity.ObjectCache.Any()) return false; 
+            return ListUnitsInRangeOfPosition(_loc, _range).Count(u => SpellTracker.IsUnitTracked(u.ACDGuid, _power) || u.HasDebuff(_power)) >= _minCount;
         }
 
         /// <summary>
@@ -766,6 +791,15 @@ namespace Trinity
                     select u).Count();
         }
 
+        internal static int MobsWithDebuff(Vector3 at, SNOPower power, float maxRange = 30f)
+        {
+            return (from u in ObjectCache
+                    where u.IsUnit && u.CommonDataIsValid &&
+                    u.Position.Distance2D(at) <= maxRange &&
+                    u.HasDebuff(power)
+                    select u).Count();
+        }
+
         internal static int MobsWithDebuff(IEnumerable<SNOPower> powers, float maxRange = 30f)
         {
             return (from u in ObjectCache
@@ -822,7 +856,7 @@ namespace Trinity
         // revised
         internal static TrinityCacheObject BestExploadingPalmTarget(float _range, Vector3 _loc = new Vector3())
         {
-            var _list = ListUnitsInRangeOfPosition(_loc, _range, false);
+            var _list = ListUnitsInRangeOfPosition(_loc, _range);
             if (_list == null)
                 return default(TrinityCacheObject);
 
@@ -831,22 +865,62 @@ namespace Trinity
                 where
                     u.CommonDataIsValid &&
                     !u.HasDebuff(SNOPower.Monk_ExplodingPalm) &&
-                    u.IsInLineOfSight()
+                    u.IsInLineOfSight() &&
+                    u.IsTrashPackOrBossEliteRareUnique
                 orderby
-                    u.HitPoints ascending,
-                    u.Weight descending
+                    u.HitPointsPct,
+                    u.NearbyUnitsWithinDistance(16f) descending
                 select u).ToList();
 
-            if (Passives.Monk.Momentum.IsActive && Skills.Monk.DashingStrike.CanCast())
+            /*if (Passives.Monk.Momentum.IsActive && Skills.Monk.DashingStrike.CanCast())
             {
                 _results = (
                 from u in _results
                 orderby
-                    u.HitPoints ascending,
-                    u.Distance descending,
-                    u.Weight descending
-                                 select u).ToList();
-            }
+                    u.HitPointsPct,
+                    u.NearbyUnitsWithinDistance(15f) descending,
+                    u.Distance descending
+                select u).ToList();
+            }*/
+
+            if (_results.Any())
+                return _results.FirstOrDefault();
+
+            if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
+                return Trinity.CurrentTarget;
+
+            return default(TrinityCacheObject);
+        }
+
+        // revised
+        internal static TrinityCacheObject BestExploadingPalmDebuffedTarget(float _range, Vector3 _loc = new Vector3())
+        {
+            var _list = ListUnitsInRangeOfPosition(_loc, _range);
+            if (_list == null)
+                return default(TrinityCacheObject);
+
+            var _results = (
+                from u in _list
+                where
+                    u.CommonDataIsValid &&
+                    u.HasDebuff(SNOPower.Monk_ExplodingPalm) &&
+                    u.IsInLineOfSight() &&
+                    u.IsTrashPackOrBossEliteRareUnique
+                orderby
+                    MobsWithDebuff(u.Position, SNOPower.Monk_ExplodingPalm, 10f) descending,
+                    u.HitPointsPct
+                select u).ToList();
+
+            /*if (Passives.Monk.Momentum.IsActive && Skills.Monk.DashingStrike.CanCast())
+            {
+                _results = (
+                from u in _results
+                orderby
+                    u.HitPointsPct,
+                    u.NearbyUnitsWithinDistance(15f) descending,
+                    u.Distance descending
+                select u).ToList();
+            }*/
 
             if (_results.Any())
                 return _results.FirstOrDefault();
@@ -871,11 +945,11 @@ namespace Trinity
                 where
                     u.CommonDataIsValid &&
                     !_debuffs.All(u.HasDebuff) &&
-                                        u.IsInLineOfSight()
+                    u.IsInLineOfSight()
                 orderby
                     u.Weight descending,
                     u.Position.Distance2D(_loc)
-                                 select u).ToList();
+                select u).ToList();
 
             if (_results.Any())
                 return _results.FirstOrDefault();
@@ -887,11 +961,11 @@ namespace Trinity
         }
 
         // Revised
-        internal static TrinityCacheObject GetClosestTarget(float _range, Vector3 _loc = new Vector3())
+        internal static TrinityCacheObject GetClosestTarget(float _range, Vector3 _loc = new Vector3(), bool _useWeights = true)
         {
             if (_loc == new Vector3()) { _loc = Player.Position; }
 
-            var _list = ListUnitsInRangeOfPosition(_loc, _range);
+            var _list = ListUnitsInRangeOfPosition(_loc, _range, _useWeights);
             if (_list == null)
                 return default(TrinityCacheObject);
 
@@ -899,7 +973,7 @@ namespace Trinity
                 from u in _list
                 orderby
                     u.Position.Distance2D(_loc)
-                                 select u).ToList();
+                select u).ToList();
 
             if (_results.Any())
                 return _results.FirstOrDefault();
@@ -913,120 +987,163 @@ namespace Trinity
         // Revised
         internal static TrinityCacheObject GetDashStrikeFarthestTarget(float _maxRange, float _minRange = 33f)
         {
-            var _list = ListUnitsInRangeOfPosition(Player.Position, _maxRange);
-            if (_list == null)
+            using (new MemorySpy("TargetUtil.GetDashStrikeFarthestTarget()"))
+            {
+                var _list = ListUnitsInRangeOfPosition(Player.Position, _maxRange);
+                if (_list == null)
+                    return default(TrinityCacheObject);
+
+                var _results = (
+                    from u in _list
+                    where
+                        u.Distance >= _minRange &&
+                        u.Weight > 0 &&
+                        u.IsInLineOfSight()
+                    orderby
+                        u.NearbyUnits descending,
+                        u.Weight descending,
+                        u.Distance descending
+                    select u).ToList();
+
+                if (_results.Any())
+                    return _results.FirstOrDefault();
+
+                if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
+                    return Trinity.CurrentTarget;
+
                 return default(TrinityCacheObject);
-
-            var _results = (
-                from u in _list
-                where
-                    u.Distance >= _minRange
-                orderby
-                    u.NearbyUnits descending,
-                    u.Weight descending,
-                    u.RadiusDistance descending
-                select u).ToList();
-
-            if (_results.Any())
-                return _results.FirstOrDefault();
-
-            if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
-                return Trinity.CurrentTarget;
-
-            return default(TrinityCacheObject);
+            }
         }
 
         // new 03 2015
         internal static List<GridNode> GetNodesCircleAroudPosition(Vector3 _loc = new Vector3(), float _radius = 80f, float _arcDegree = 18f)
         {
-            if (_loc == new Vector3()) _loc = Player.Position;
-            bool _atPlayer = _loc.Distance2D(Player.Position) <= 3f;
-
-            List<GridNode> _result = new List<GridNode>();
-            for (float _alpha = 0f; _alpha <= 360f; _alpha = _alpha + _arcDegree)
+            using (new MemorySpy("TargetUtil.GetNodesCircleAroudPosition()"))
             {
-                Vector3 _projPoint = MathEx.GetPointAt(_loc, _radius, (float)MathUtil.DegreeToRadian(_alpha));
-                _result.Add(new GridNode(_projPoint));
-            }
+                if (_loc == new Vector3()) _loc = Player.Position;
+                bool _atPlayer = _loc.Distance2D(Player.Position) <= 3f;
 
-            if (_result.Any())
-                return _result;
+                List<GridNode> _result = new List<GridNode>();
+                for (float _alpha = 0f; _alpha <= 360f; _alpha = _alpha + _arcDegree)
+                {
+                    Vector3 _projPoint = MathEx.GetPointAt(_loc, _radius, (float)MathUtil.DegreeToRadian(_alpha));
+                    _result.Add(new GridNode(_projPoint));
+                }
 
-            return null;
+                if (_result.Any())
+                    return _result;
+
+                return null;
             }
+        }
 
         // new 03 2015
         internal static GridNode GetBestFuriousChargeNode(float _range, Vector3 _loc = new Vector3(), bool _useFcWeights = true)
         {
-            if (_loc == new Vector3()) _loc = Player.Position;
-            bool _atPlayer = _loc.Distance2D(Player.Position) <= 3f;
-
-            var _list = ListObjectsInRangeOfPosition(_range: _range + 10f, _useWeights: false);
-            if (_list == null)
-                return null;
-
-            List<GridNode> _nodes = GetNodesCircleAroudPosition(_loc, _range);
-            if (_nodes != null)
+            using (new MemorySpy("TargetUtil.GetBestFuriousChargeNode()"))
             {
-                foreach (var _n in _nodes)
+                if (_loc == new Vector3()) _loc = Player.Position;
+                bool _atPlayer = _loc.Distance2D(Player.Position) <= 2f;
+
+                var _list = ListObjectsInRangeOfPosition(_range: _range + 10f, _useWeights: false);
+                if (_list == null)
+                    return null;
+
+                List<GridNode> _nodes = GetNodesCircleAroudPosition(_loc, _range);
+                if (_nodes != null)
                 {
-                    string _dir = MathUtil.GetHeadingToPoint(_loc, _n.Position);
-                    foreach (var _o in _list)
+                    foreach (var _n in _nodes)
                     {
-                        if (_o.Type == GObjectType.Destructible || _o.IsUnit)
+                        string _dir = MathUtil.GetHeadingToPoint(_loc, _n.Position);
+                        foreach (var _o in _list)
                         {
-                            if (_o.IsUnit && (!_o.CommonDataIsValid || _o.HitPointsPct <= 0f))
-                                continue;
-
-                            if (!_dir.Equals(MathUtil.GetHeadingToPoint(_loc, _o.Position)))
-                                continue;
-
-                            float _radius = Math.Min(_o.Radius, 8f);
-                            if (NavHelper.CanRayCast(_o.Position, _loc) && MathUtil.IntersectsPath(_o.Position, _radius, _loc, _n.Position))
+                            if (_o.Type == GObjectType.Destructible || _o.IsUnit)
                             {
-                                Vector3 _lineProj = MathEx.CalculatePointFrom(_n.Position, _loc, _o.Position.Distance2D(_loc));
-                                _n.SpecialWeight += (_radius - _lineProj.Distance2D(_o.Position)) * Math.Max(_o.Weight, 1000f);
+                                if (_o.IsUnit && (!_o.CommonDataIsValid || _o.HitPointsPct <= 0f))
+                                    continue;
 
-                                if (_o.IsBoss || (_o.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze))
-                                    _n.SpecialCount += 3;
-                                else if (_o.IsEliteRareUnique || _o.Type == GObjectType.Destructible || (_o.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Prioritize))
-                                    _n.SpecialCount += 2;
-            else
-                                    _n.SpecialCount++;
+                                if (!_dir.Equals(MathUtil.GetHeadingToPoint(_loc, _o.Position)))
+                                    continue;
 
-                                if (TownRun.IsTryingToTownPortal() || Trinity.Player.StandingInAvoidance)
-                                    _n.SpecialCount++;
-                            }  
-        }
+                                float _radius = Math.Min(Math.Max(_o.Radius, 5f), 8f);
+                                if (_o.IsInLineOfSight() && (Trinity.KillMonstersInAoE || !_o.IsStandingInAvoidance))
+                                {
+                                    if (MathUtil.IntersectsPath(_o.Position, _radius, _loc, _n.Position))
+                                    {
+                                        Vector3 _lineProj = MathEx.CalculatePointFrom(_n.Position, _loc, _o.Position.Distance2D(_loc));
+                                        _n.SpecialWeight += (_radius - _lineProj.Distance2D(_o.Position)) * Math.Max(_o.Weight, 1000f);
 
-                        _n.SpecialWeight *= _n.SpecialCount;
-                        if (_n.SpecialCount < 2 && _useFcWeights) { _n.SpecialWeight = 0; }
+                                        if (_o.IsBoss || (_o.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze))
+                                            _n.SpecialCount += 3;
+                                        else if (_o.IsEliteRareUnique || _o.Type == GObjectType.Destructible || (_o.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Prioritize))
+                                            _n.SpecialCount += 2;
+                                        else
+                                            _n.SpecialCount++;
+
+                                        if (TownRun.IsTryingToTownPortal() || Trinity.Player.StandingInAvoidance)
+                                            _n.SpecialCount++;
+
+                                        if (!_atPlayer && _o.Position.Distance2D(_loc) <= 15)
+                                        {
+                                            if (_o.IsBoss)
+                                                _n.SpecialCount -= 3;
+                                            else if (_o.IsEliteRareUnique)
+                                                _n.SpecialCount -= 2;
+                                        }
+                                            
+                                    }
+                                }
+                            }
+
+                            _n.SpecialWeight *= _n.SpecialCount;
+                            if (_n.SpecialCount < 3 && _useFcWeights) { _n.SpecialWeight = 0; }
+                        }
                     }
+
+                    if (_nodes.Any(n => n.SpecialWeight > 0))
+                        return _nodes.OrderByDescending(n => n.SpecialWeight).FirstOrDefault();
                 }
 
-                if (_nodes.Any(n => n.SpecialWeight > 0))
-                    return _nodes.OrderByDescending(n => n.SpecialWeight).FirstOrDefault();
+                return null;
             }
-
-            return null;
         }
 
         // new 03 2015
-        internal static GridNode GetBestFuriousChargePreNode(float _range, bool _useFcWeights = true)
+        internal static GridNode GetBestFuriousChargeMoveNode(float _range, Vector3 _loc = new Vector3(), bool _useFcWeights = true)
         {
-            try
+            using (new MemorySpy("TargetUtil.GetBestFuriousChargeMoveNode()"))
             {
+                if (!MainGrid.MapAsList.Any())
+                    return null;
+
+                if (_loc == new Vector3()) _loc = Player.Position;
+                bool _atPlayer = _loc.Distance2D(Player.Position) <= 3f;
+
+                HashSet<GridNode> _listResult = new HashSet<GridNode>();
+                var _rnd = new Random();
+
                 var _gridResult = (
                     from _o in MainGrid.MapAsList
                     where
-                        _o.Weight > 500f &&
-                        _o.SafeWeightMonsterRelated >= 0 &&
-                        !_o.IsInMonsterRadius &&
+                        _o.Distance > 3f &&
+                        _o.MonsterWeight >= 0 &&
+                        _o.Weight >= 0 &&
+                        !_o.HasMonsterRelated &&
                         !_o.HasAvoidanceRelated &&
-                        _o.Distance < 15f
+                        _o.NearbyGridPointsCount > 0 &&
+                        (_atPlayer && _o.Distance <= 30f ||
+                        !_atPlayer && _o.Position.Distance2D(_loc) <= 30f)
+                    orderby
+                        _rnd.Next()
                     select _o).ToList();
 
-                if (_gridResult.Any())
+                foreach (var _g in _gridResult)
+                {
+                    if (_listResult.Count() > 35) { break; }
+                    _listResult.Add(_g);
+                }
+
+                if (_listResult.Any())
                 {
                     foreach (var _n in _gridResult)
                     {
@@ -1049,12 +1166,12 @@ namespace Trinity
                         return _gridResult.FirstOrDefault();
                     }
                 }
-            }
-            catch { }
-            if (!_useFcWeights && CurrentTarget != null)
-                return new GridNode(CurrentTarget.Position);
 
-            return null;
+                if (!_useFcWeights && CurrentTarget != null)
+                    return new GridNode(CurrentTarget.Position);
+
+                return null;
+            }
         }
     }
 }

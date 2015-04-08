@@ -744,16 +744,16 @@ namespace Trinity.Combat.Abilities
                 if (_SentryCastArea != null)
                     return _SentryCastArea;
 
-                TrinityCacheObject targetCacheObject = TargetUtil.GetClosestTarget(150f);
+                TrinityCacheObject targetCacheObject = TargetUtil.GetClosestTarget(150f, Player.Position, false);
 
                 if (Runes.DemonHunter.PolarStation.IsActive && TargetUtil.ClusterExists(20f, 3))
                     _SentryCastArea = Enemies.BestCluster;
 
                 else if (TargetUtil.ClusterExists(20f, DHSettings.RangedAttackRange))
-                    _SentryCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, DHSettings.RangedAttackRange + 5f).Position);
+                    _SentryCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, DHSettings.RangedAttackRange + 5f, _useWeights: false).Position);
 
                 else if (TargetUtil.ClusterExists(20f, 65f))
-                    _SentryCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, 65f + 5f).Position);
+                    _SentryCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, 65f + 5f, _useWeights: false).Position);
 
                 else if (CurrentTarget != null && CurrentTarget.IsUnit)
                     _SentryCastArea = new TargetArea(60f, CurrentTarget.Position);
@@ -779,25 +779,25 @@ namespace Trinity.Combat.Abilities
                     if (Skills.DemonHunter.ElementalArrow.IsActive && Runes.DemonHunter.BallLightning.IsActive)
                         targetCacheObject = TargetUtil.GetBestPierceTarget(DHSettings.RangedAttackRange);
                     else
-                        targetCacheObject = TargetUtil.GetClosestTarget(150f);
+                        targetCacheObject = TargetUtil.GetClosestTarget(150f, _useWeights: false);
 
                     if (Skills.DemonHunter.ClusterArrow.IsActive && TargetUtil.ClusterExists(20f, DHSettings.RangedAttackRange))
-                        _SentryCastSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, DHSettings.RangedAttackRange + 5f).Position);
+                        _SentryCastSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, DHSettings.RangedAttackRange + 5f, _useWeights: false).Position);
 
                     else if (Skills.DemonHunter.Multishot.IsActive && TargetUtil.ClusterExists(40f, DHSettings.RangedAttackRange))
-                        _SentryCastSkillsCastArea = new TargetArea(40f, TargetUtil.GetBestClusterUnit(40f, DHSettings.RangedAttackRange + 5f).Position);
+                        _SentryCastSkillsCastArea = new TargetArea(40f, TargetUtil.GetBestClusterUnit(40f, DHSettings.RangedAttackRange + 5f, _useWeights: false).Position);
 
                     else if (Skills.DemonHunter.Chakram.IsActive && TargetUtil.ClusterExists(20f, Math.Min(DHSettings.RangedAttackRange, 50f)))
-                        _SentryCastSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, Math.Min(DHSettings.RangedAttackRange + 5f, 50f)).Position);
+                        _SentryCastSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, Math.Min(DHSettings.RangedAttackRange + 5f, 50f), _useWeights: false).Position);
 
                     if (Skills.DemonHunter.ClusterArrow.IsActive && TargetUtil.ClusterExists(20f, 90f))
-                        _SentryCastSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, 65f).Position);
+                        _SentryCastSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, 65f, _useWeights: false).Position);
 
                     else if (Skills.DemonHunter.Multishot.IsActive && TargetUtil.ClusterExists(40f, 90f))
-                        _SentryCastSkillsCastArea = new TargetArea(40f, TargetUtil.GetBestClusterUnit(40f, 65f).Position);
+                        _SentryCastSkillsCastArea = new TargetArea(40f, TargetUtil.GetBestClusterUnit(40f, 65f, _useWeights: false).Position);
 
                     else if (Skills.DemonHunter.Chakram.IsActive && TargetUtil.ClusterExists(20f, 90f))
-                        _SentryCastSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, 65f).Position);
+                        _SentryCastSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, 65f, _useWeights: false).Position);
 
                     else if (targetCacheObject != null && targetCacheObject != default(TrinityCacheObject) && targetCacheObject.Position != Vector3.Zero)
                         _SentryCastSkillsCastArea = new TargetArea(20f, targetCacheObject.Position);
@@ -944,8 +944,8 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return Hotbar.Contains(SNOPower.DemonHunter_Vault) && Player.ActorClass == ActorClass.DemonHunter &&
-                    CombatBase.TimeSincePowerUse(SNOPower.DemonHunter_Vault) < 650;
+                return Player.ActorClass == ActorClass.DemonHunter && Hotbar.Contains(SNOPower.DemonHunter_Vault) && 
+                    CombatBase.TimeSincePowerUse(SNOPower.DemonHunter_Vault) < 400;
             }
         }
 
@@ -965,7 +965,7 @@ namespace Trinity.Combat.Abilities
             {
                 return CombatBase.TimeSincePowerUse(SNOPower.DemonHunter_Vault) >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
                     Settings.Combat.DemonHunter.VaultMode != DemonHunterVaultMode.CombatOnly &&
-                    !TargetUtil.AnyMobsInRange(85f) &&
+                    !TargetUtil.AnyMobsInRange(85f, false) &&
                     Skills.DemonHunter.Vault.CanCast() &&
                     Trinity.Settings.Combat.DemonHunter.VaultMode != DemonHunterVaultMode.CombatOnly &&
                     ((Player.SecondaryResourcePct > Settings.Combat.DemonHunter.MinDiciplineOOCVaultPct && !Sets.DanettasHatred.IsFullyEquipped) ||
@@ -1005,7 +1005,12 @@ namespace Trinity.Combat.Abilities
                         break;
                     case GObjectType.HealthWell:
                     case GObjectType.HealthGlobe:
-                        if (Player.CurrentHealthPct < 0.6)
+                        if (Player.AvoidDeath || Player.CurrentHealthPct < 0.4)
+                        {
+                            minCombatDist = 0f;
+                            specialTimeSinceUse = CombatBase.TimeSincePowerUse(SNOPower.DemonHunter_Vault) >= 100;
+                        }
+                        else if (Player.CurrentHealthPct < 0.6)
                         {
                             minCombatDist = Trinity.Settings.Combat.DemonHunter.MinDistVaultHealth + CurrentTarget.RequiredRange;
                             specialTimeSinceUse = CombatBase.TimeSincePowerUse(SNOPower.DemonHunter_Vault) >= 1000;
@@ -1031,30 +1036,49 @@ namespace Trinity.Combat.Abilities
                 specialTimeSinceUse = CombatBase.TimeSincePowerUse(SNOPower.DemonHunter_Vault) >= 2000;
             }
 
-            return !Trinity.Player.StandingInAvoidance && !Trinity.Player.AvoidDeath && !Trinity.Player.NeedToKite &&
-                PlayerMover.IsMovementToTarget(loc) && Player.SecondaryResourcePct > minDicipline && inLoS &&
-                loc.Distance2D(Trinity.Player.Position) >= minCombatDist && loc.Distance2D(Trinity.Player.Position) < 150 &&
-                !Trinity.ObjectCache.Any(o => o.IsAvoidance && loc.Distance2D(o.Position) <= o.Radius + 2f) &&
+            return 
+                /* Real combat movement */
+                !Trinity.Player.StandingInAvoidance && !Trinity.Player.AvoidDeath && !Trinity.Player.NeedToKite &&
+                /* Move to target & target in LoS */
+                PlayerMover.IsMovementToTarget(loc) && inLoS &&
+                /* Save dicipline for avoid vault movement */
+                Player.SecondaryResourcePct > minDicipline && 
+                /* Distance to target respect dh settings */
+                loc.Distance2D(Trinity.Player.Position) >= minCombatDist && loc.Distance2D(Trinity.Player.Position) < 150 && specialTimeSinceUse &&
+                /* target not in 0.8 kite monster zone */
                 !Trinity.ObjectCache.Any(o => o.IsUnit && loc.Distance2D(o.Position) <= CombatBase.KiteDistance * 0.8) &&
+                /* Loc not in aoe and not intersect aoe */
                 !TargetUtil.LocOrPathInAoE(loc);
         }
 
         public static bool IsVaultAptKiteMovement(Vector3 loc)
         {
-            return Player.CurrentHealthPct <= DHSettings.MinHealthVaultKite &&
-                ((!Trinity.Player.StandingInAvoidance && !Trinity.Player.AvoidDeath && Trinity.Player.NeedToKite) ||
-                (CurrentTarget != null && CurrentTarget.IsUnit && !PlayerMover.IsMovementToTarget(loc) &&
-                loc.Distance2D(Trinity.Player.Position) >= Trinity.Settings.Combat.DemonHunter.MinDistVaultKite) &&
-                !Trinity.ObjectCache.Any(o => o.IsUnit && loc.Distance2D(o.Position) <= CombatBase.KiteDistance * 0.8) &&
-                !Trinity.ObjectCache.Any(o => o.IsAvoidance && loc.Distance2D(o.Position) <= o.Radius + 2f)) &&
-                !TargetUtil.LocOrPathInAoE(loc);
+            return 
+                /* Vault only at min dh settings health AND */
+                Player.CurrentHealthPct <= DHSettings.MinHealthVaultKite &&
+
+                /* 1) A real kite movement OR */
+                (!Trinity.Player.StandingInAvoidance && !Trinity.Player.AvoidDeath && Trinity.Player.NeedToKite) ||
+
+                /* 2) Target not null and not move to target */
+                (CurrentTarget != null && CurrentTarget.IsUnit && !PlayerMover.IsMovementToTarget(loc) && CurrentTarget.Distance <= CombatBase.KiteDistance &&
+                /* Distance to target respect dh settings */
+                loc.Distance2D(Trinity.Player.Position) >= Trinity.Settings.Combat.DemonHunter.MinDistVaultKite &&
+                /* Loc not in aoe and not intersect aoe OR */
+                !TargetUtil.LocOrPathInAoE(loc)) ||
+
+                /* 3) Target is kite */
+                (CurrentTarget != null && CurrentTarget.IsKite &&
+                /* Distance to target respect dh settings */
+                loc.Distance2D(Trinity.Player.Position) >= Trinity.Settings.Combat.DemonHunter.MinDistVaultKite);
         }
 
         public static bool IsVaultAptAvoidanceMovement(Vector3 loc)
         {
             return Player.CurrentHealthPct <= DHSettings.MinHealthVaultAvoidance &&
-                (Trinity.Player.AvoidDeath || ((CombatBase.PlayerIsSurrounded || Trinity.Player.StandingInAvoidance) &&
-                loc.Distance2D(Trinity.Player.Position) >= Trinity.Settings.Combat.DemonHunter.MinDistVaultAvoidance));
+                (Trinity.Player.AvoidDeath || CombatBase.PlayerIsSurrounded || Trinity.Player.StandingInAvoidance || 
+                (CurrentTarget != null && CurrentTarget.IsAvoidance && !CurrentTarget.IsKite)) &&
+                loc.Distance2D(Trinity.Player.Position) >= Trinity.Settings.Combat.DemonHunter.MinDistVaultAvoidance;
         }
 
         public static void LogVault(Vector3 loc, bool cMove = false, bool kMove = false, bool aMove = false, string wI = "")
@@ -1062,8 +1086,8 @@ namespace Trinity.Combat.Abilities
             string log = "";
             if (aMove)
                 log = string.Format("Using vault for avoidance movement{1}, Dist={0:0.0}", Vector3.Distance(loc, Trinity.Player.Position),
-                    CacheData.TimeBoundAvoidance.Any() ?
-                    " (" + CacheData.TimeBoundAvoidance.OrderBy(a => Vector3.Distance(a.Position, Trinity.Player.Position)).FirstOrDefault().Name + ") " : "");
+                    CacheData.AvoidanceObstacles.Any() ?
+                    " (" + CacheData.AvoidanceObstacles.OrderBy(a => Vector3.Distance(a.Position, Trinity.Player.Position)).FirstOrDefault().Name + ") " : "");
 
             else if (kMove)
                 log = string.Format("Using vault for kite movement, Dist={0:0.0}", Vector3.Distance(loc, Trinity.Player.Position));
@@ -1073,13 +1097,13 @@ namespace Trinity.Combat.Abilities
                     CurrentTarget != null ?
                     " (" + CurrentTarget.Type.ToString() + " Attempt) " : "");
 
-            else if (!TargetUtil.AnyMobsInRange(85f))
+            else if (!TargetUtil.AnyMobsInRange(85f, false))
                 log = string.Format("Using vault for ooc movement, Dist={0:0.0}", Vector3.Distance(loc, Trinity.Player.Position));
 
             else
                 log = string.Format("Using vault for unknown reason ?_?, Dist={0:0.0}", Vector3.Distance(loc, Trinity.Player.Position));
 
-            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, log);
+            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, log + (wI != "" ? " WeightsInfos:" + wI : ""));
         }
         #endregion
     }

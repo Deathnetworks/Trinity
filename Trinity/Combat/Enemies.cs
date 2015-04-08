@@ -17,13 +17,13 @@ namespace Trinity.Combat
         public static HashSet<int> AliveGuids = new HashSet<int>();
         public static TargetArea Nearby = new TargetArea(70f);
         public static TargetArea CloseNearby = new TargetArea(15f);
+        public static TargetArea AtPlayerNearby = new TargetArea(10f);
         public static TargetCluster BestCluster = new TargetCluster(20f);
         public static TargetCluster BestLargeCluster = new TargetCluster(24f, 8);
 
         public static void Update()
         {
-
-            if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || !Trinity.ObjectCache.Any())
+            if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || Trinity.ObjectCache == null || !Trinity.ObjectCache.Any())
                 return;
 
             List<TrinityCacheObject> units = Trinity.ObjectCache.Where(o => o.IsUnit && o.CommonDataIsValid || o.IsBossOrEliteRareUnique).ToList();
@@ -44,6 +44,7 @@ namespace Trinity.Combat
 
             Nearby.Update();
             CloseNearby.Update();
+            AtPlayerNearby.Update();
             BestCluster.Update();
             BestLargeCluster.Update();
 
@@ -87,7 +88,7 @@ namespace Trinity.Combat
             if (Position == Vector3.Zero)
                 return;
 
-            if (!Trinity.ObjectCache.Any())
+            if (Trinity.ObjectCache == null || !Trinity.ObjectCache.Any())
                 return;
 
             Units = TargetUtil.ListUnitsInRangeOfPosition(Position, Range);
