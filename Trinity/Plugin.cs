@@ -6,7 +6,6 @@ using System.IO;
 using System.Windows;
 using Trinity.Cache;
 using Trinity.Combat;
-using Trinity.Combat.Abilities;
 using Trinity.Configuration;
 using Trinity.DbProvider;
 using Trinity.Helpers;
@@ -30,7 +29,7 @@ namespace Trinity
         {
             get
             {
-                return new Version(2, 6, 0);
+                return new Version(2, 6, 1);
             }
         }
 
@@ -38,7 +37,7 @@ namespace Trinity
         {
             get
             {
-                return "rrrix, xzjv, jubisman, and many more";
+                return "rrrix, xzjv, jubisman, BuddyMe, and many more";
             }
         }
 

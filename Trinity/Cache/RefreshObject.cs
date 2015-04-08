@@ -264,7 +264,7 @@ namespace Trinity
             c_CacheObject.TwoHanded = c_IsTwoHandedItem;
             c_CacheObject.Type = c_CacheObject.Type;
             c_CacheObject.IsAncient = c_IsAncient;
-            c_CacheObject.InLineOfSight = c_diaObject.InLineOfSight || c_HasBeenInLoS;
+            c_CacheObject.InLineOfSight = c_HasBeenInLoS;
             c_CacheObject.ZDiff = c_ZDiff;
 
             ObjectCache.Add(c_CacheObject);
@@ -622,7 +622,7 @@ namespace Trinity
                     // Everything except unknowns
                     if (c_CacheObject.Type != GObjectType.Unknown)
                     {
-                        if (c_diaObject.InLineOfSight || c_CacheObject.IsInLineOfSight(true))
+                        if (c_CacheObject.IsInLineOfSight(true))
                         {
                             c_HasBeenRaycastable = true;
                             c_HasBeenInLoS = true;

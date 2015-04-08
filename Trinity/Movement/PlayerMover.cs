@@ -130,7 +130,6 @@ namespace Trinity.DbProvider
 
             // Update the last time we generated a path
             LastGeneratedStuckPosition = DateTime.UtcNow;
-            Navigator.Clear();
 
             Trinity.CurrentTarget = TargetUtil.GetClosestTarget(25f);
             if (CurrentTarget != null && CurrentTarget.IsUnit)
@@ -207,7 +206,6 @@ namespace Trinity.DbProvider
             if (TimesReachedMaxUnstucks == 1)
             {
                 Navigator.Clear();
-                GridSegmentation.Reset();
                 Logger.Log(TrinityLogLevel.Info, LogCategory.Movement, "Anti-stuck measures now attempting to kickstart DB's path-finder into action.");
                 Navigator.MoveTo(vOriginalDestination, "original destination", false);
                 CancelUnstuckerForSeconds = 40;

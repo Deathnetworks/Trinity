@@ -71,7 +71,7 @@ namespace Trinity
 			public bool IsInGame { get; private set; }
 			public bool IsDead { get; private set; }
 			public bool IsLoadingWorld { get; private set; }
-			public int Coinage { get; private set; }
+			public long Coinage { get; private set; }
 			public float GoldPickupRadius { get; private set; }
 			public bool IsHidden { get; private set; }
 			public int CurrentExperience { get; private set; }
@@ -230,7 +230,7 @@ namespace Trinity
                 ParticipatingInTieredLootRun = _me.IsParticipatingInTieredLootRun;
                 TieredLootRunlevel = _me.InTieredLootRunLevel;
 
-                Coinage = _me.Inventory.Coinage;
+                Coinage = ZetaDia.CPlayer.Coinage;
                 CurrentExperience = ZetaDia.Me.CurrentExperience;
 
                 IsInPandemoniumFortress = DataDictionary.PandemoniumFortressWorlds.Contains(WorldID) ||
