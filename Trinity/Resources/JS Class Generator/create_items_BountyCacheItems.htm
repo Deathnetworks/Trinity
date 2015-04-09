@@ -5,8 +5,8 @@
         <script src="jquery.xdomainajax.js"></script>
         <script src="handlebars.js"></script>
         <script src="handlebars_helper.js"></script>
-        <script src="item-parse.js"></script> 
-		<script src="ItemReference.js"></script>  
+        <script src="item-SpecificPage.js"></script>    
+		<script src="ItemReference.js"></script>    
         <style>            
              span, .class, .skill, .rune, .passive { padding-left: 25px; display: block }
              .template { display: none; }
@@ -61,18 +61,29 @@
         <script>
             
             $(document).ready(function () {
-
-                Items.HandleItemData(function (data) {
-
+				
+				// Bounty Cache Items
+                Items.GetItemPages([				
+				"http://us.battle.net/d3/en/item/ring-of-royal-grandeur-3qRFop",
+				"http://us.battle.net/d3/en/item/sanguinary-vambraces-1385JU",
+				"http://us.battle.net/d3/en/item/avarice-band-3qROK2",
+				"http://us.battle.net/d3/en/item/gloves-of-worship-FA37P",
+				"http://us.battle.net/d3/en/item/golden-gorget-of-leoric-1I0CCL",
+				"http://us.battle.net/d3/en/item/helltrapper-3tfdaj",
+				"http://us.battle.net/d3/en/item/illusory-boots-29WYI0",
+				"http://us.battle.net/d3/en/item/pauldrons-of-the-skeleton-king-2AGH0r",
+				"http://us.battle.net/d3/en/item/prides-fall-pgClp"				
+				],function (data) {
                     var container = $(".container");
                     var template = $(".template").html();
                     var compiledTemplate = Handlebars.compile(template);
                     var renderedElement = $(compiledTemplate(data));
                     container.append(renderedElement);
-
                 });
 
             });
+			
+			
 
         </script>        
     </body>    

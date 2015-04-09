@@ -517,13 +517,13 @@ namespace Trinity
             { SNOAnim.lacuniFemale_attack_01, new Anim(SNOAnim.lacuniFemale_attack_01, AvoidType.Attack, Element.Physical) },
             { SNOAnim.lacuniFemale_attack_02_throw, new Anim(SNOAnim.lacuniFemale_attack_02_throw, AvoidType.Attack, Element.Physical) },
             { SNOAnim.lacuniFemale_attack_03, new Anim(SNOAnim.lacuniFemale_attack_03, AvoidType.Attack, Element.Physical) },
-            { SNOAnim.lacuniFemale_attack_05_Leap_intro, new Anim(SNOAnim.lacuniFemale_attack_05_Leap_intro, AvoidType.Attack, Element.Physical) },
-            { SNOAnim.lacuniFemale_attack_05_Leap_intro_grass, new Anim(SNOAnim.lacuniFemale_attack_05_Leap_intro_grass, AvoidType.Attack, Element.Physical) },
-            { SNOAnim.lacuniFemale_attack_05_Leap_intro_snow, new Anim(SNOAnim.lacuniFemale_attack_05_Leap_intro_snow, AvoidType.Attack, Element.Physical) },
-            { SNOAnim.lacuniFemale_attack_05_Leap_middle, new Anim(SNOAnim.lacuniFemale_attack_05_Leap_middle, AvoidType.Attack, Element.Physical) },
-            { SNOAnim.lacuniFemale_attack_05_Leap_out, new Anim(SNOAnim.lacuniFemale_attack_05_Leap_out, AvoidType.Attack, Element.Physical) },
-            { SNOAnim.lacuniFemale_attack_05_Leap_out_grass, new Anim(SNOAnim.lacuniFemale_attack_05_Leap_out_grass, AvoidType.Attack, Element.Physical) },
-            { SNOAnim.lacuniFemale_attack_05_Leap_out_snow, new Anim(SNOAnim.lacuniFemale_attack_05_Leap_out_snow, AvoidType.Attack, Element.Physical) },
+            { SNOAnim.lacuniFemale_attack_05_Leap_intro, new Anim(SNOAnim.lacuniFemale_attack_05_Leap_intro, AvoidType.Leap, Element.Physical) },
+            { SNOAnim.lacuniFemale_attack_05_Leap_intro_grass, new Anim(SNOAnim.lacuniFemale_attack_05_Leap_intro_grass, AvoidType.Leap, Element.Physical) },
+            { SNOAnim.lacuniFemale_attack_05_Leap_intro_snow, new Anim(SNOAnim.lacuniFemale_attack_05_Leap_intro_snow, AvoidType.Leap, Element.Physical) },
+            { SNOAnim.lacuniFemale_attack_05_Leap_middle, new Anim(SNOAnim.lacuniFemale_attack_05_Leap_middle, AvoidType.Leap, Element.Physical) },
+            { SNOAnim.lacuniFemale_attack_05_Leap_out, new Anim(SNOAnim.lacuniFemale_attack_05_Leap_out, AvoidType.Leap, Element.Physical) },
+            { SNOAnim.lacuniFemale_attack_05_Leap_out_grass, new Anim(SNOAnim.lacuniFemale_attack_05_Leap_out_grass, AvoidType.Leap, Element.Physical) },
+            { SNOAnim.lacuniFemale_attack_05_Leap_out_snow, new Anim(SNOAnim.lacuniFemale_attack_05_Leap_out_snow, AvoidType.Leap, Element.Physical) },
             { SNOAnim.lacuniFemale_generic_cast, new Anim(SNOAnim.lacuniFemale_generic_cast, AvoidType.GenericCast, Element.Physical) },
             { SNOAnim.lacuniMale_attack_01, new Anim(SNOAnim.lacuniMale_attack_01, AvoidType.Attack, Element.Physical) },
             { SNOAnim.lacuniMale_attack_combo, new Anim(SNOAnim.lacuniMale_attack_combo, AvoidType.Attack, Element.Physical) },
@@ -707,9 +707,9 @@ namespace Trinity
             { SNOAnim.Spider_spiderbomb, new Anim(SNOAnim.Spider_spiderbomb, AvoidType.Attack, Element.Physical) },
             { SNOAnim.Spiderling_attack_01, new Anim(SNOAnim.Spiderling_attack_01, AvoidType.Attack, Element.Physical) },
             { SNOAnim.Spiderling_attack_cleave, new Anim(SNOAnim.Spiderling_attack_cleave, AvoidType.Attack, Element.Physical) },
-            { SNOAnim.Spiderling_attack_leap_air, new Anim(SNOAnim.Spiderling_attack_leap_air, AvoidType.Attack, Element.Physical) },
-            { SNOAnim.Spiderling_attack_leap_intro, new Anim(SNOAnim.Spiderling_attack_leap_intro, AvoidType.Attack, Element.Physical) },
-            { SNOAnim.Spiderling_attack_leap_land, new Anim(SNOAnim.Spiderling_attack_leap_land, AvoidType.Attack, Element.Physical) },
+            { SNOAnim.Spiderling_attack_leap_air, new Anim(SNOAnim.Spiderling_attack_leap_air, AvoidType.Leap, Element.Physical) },
+            { SNOAnim.Spiderling_attack_leap_intro, new Anim(SNOAnim.Spiderling_attack_leap_intro, AvoidType.Leap, Element.Physical) },
+            { SNOAnim.Spiderling_attack_leap_land, new Anim(SNOAnim.Spiderling_attack_leap_land, AvoidType.Leap, Element.Physical) },
             { SNOAnim.Spiderling_generic_cast_01, new Anim(SNOAnim.Spiderling_generic_cast_01, AvoidType.GenericCast, Element.Physical) },
             { SNOAnim.SpiderQueen_attack_02, new Anim(SNOAnim.SpiderQueen_attack_02, AvoidType.Attack, Element.Physical) },
             { SNOAnim.SpiderQueen_attack_bite_01, new Anim(SNOAnim.SpiderQueen_attack_bite_01, AvoidType.Attack, Element.Physical) },
@@ -720,10 +720,10 @@ namespace Trinity
             { SNOAnim.Stitch_Attack_Punch, new Anim(SNOAnim.Stitch_Attack_Punch, AvoidType.Attack, Element.Physical) },
             { SNOAnim.Stitch_Attack_Push, new Anim(SNOAnim.Stitch_Attack_Push, AvoidType.Attack, Element.Physical) },
             { SNOAnim.Stitch_generic_cast, new Anim(SNOAnim.Stitch_generic_cast, AvoidType.GenericCast, Element.Physical) },
-            { SNOAnim.Stitch_Suicide_Bomb, new Anim(SNOAnim.Stitch_Suicide_Bomb, AvoidType.Bomb, Element.Physical) },
-            { SNOAnim.Stitch_Suicide_Bomb_Frost, new Anim(SNOAnim.Stitch_Suicide_Bomb_Frost, AvoidType.Bomb, Element.Physical) },
-            { SNOAnim.Stitch_Suicide_Bomb_Imps, new Anim(SNOAnim.Stitch_Suicide_Bomb_Imps, AvoidType.Bomb, Element.Physical) },
-            { SNOAnim.Stitch_Suicide_Bomb_spiders, new Anim(SNOAnim.Stitch_Suicide_Bomb_spiders, AvoidType.Bomb, Element.Physical) },
+            { SNOAnim.Stitch_Suicide_Bomb, new Anim(SNOAnim.Stitch_Suicide_Bomb, AvoidType.Bomb, Element.Physical, customRadius: 25f) },
+            { SNOAnim.Stitch_Suicide_Bomb_Frost, new Anim(SNOAnim.Stitch_Suicide_Bomb_Frost, AvoidType.Bomb, Element.Physical, customRadius: 25f) },
+            { SNOAnim.Stitch_Suicide_Bomb_Imps, new Anim(SNOAnim.Stitch_Suicide_Bomb_Imps, AvoidType.Bomb, Element.Physical, customRadius: 25f) },
+            { SNOAnim.Stitch_Suicide_Bomb_spiders, new Anim(SNOAnim.Stitch_Suicide_Bomb_spiders, AvoidType.Bomb, Element.Physical, customRadius: 25f) },
             { SNOAnim.Succubus_attack_cast_01, new Anim(SNOAnim.Succubus_attack_cast_01, AvoidType.Attack, Element.Physical) },
             { SNOAnim.Succubus_attack_melee_01, new Anim(SNOAnim.Succubus_attack_melee_01, AvoidType.Attack, Element.Physical) },
             { SNOAnim.Succubus_generic_cast_01, new Anim(SNOAnim.Succubus_generic_cast_01, AvoidType.GenericCast, Element.Physical) },
@@ -865,10 +865,10 @@ namespace Trinity
             { SNOAnim.x1_lacuniMale_plagued_attack_02, new Anim(SNOAnim.x1_lacuniMale_plagued_attack_02, AvoidType.Attack, Element.Physical) },
             { SNOAnim.x1_lacuniMale_plagued_generic_cast, new Anim(SNOAnim.x1_lacuniMale_plagued_generic_cast, AvoidType.GenericCast, Element.Physical) },
             { SNOAnim.x1_LeaperAngel_GenericCast_01, new Anim(SNOAnim.x1_LeaperAngel_GenericCast_01, AvoidType.GenericCast, Element.Physical) },
-            { SNOAnim.x1_LeaperAngel_LeapAttack_In, new Anim(SNOAnim.x1_LeaperAngel_LeapAttack_In, AvoidType.Attack, Element.Physical) },
-            { SNOAnim.x1_LeaperAngel_LeapAttack_Mid, new Anim(SNOAnim.x1_LeaperAngel_LeapAttack_Mid, AvoidType.Attack, Element.Physical) },
-            { SNOAnim.x1_LeaperAngel_LeapAttack_Out, new Anim(SNOAnim.x1_LeaperAngel_LeapAttack_Out, AvoidType.Attack, Element.Physical) },
-            { SNOAnim.x1_LeaperAngel_LeapAttack_Out_rage, new Anim(SNOAnim.x1_LeaperAngel_LeapAttack_Out_rage, AvoidType.Attack, Element.Physical) },
+            { SNOAnim.x1_LeaperAngel_LeapAttack_In, new Anim(SNOAnim.x1_LeaperAngel_LeapAttack_In, AvoidType.Leap, Element.Physical) },
+            { SNOAnim.x1_LeaperAngel_LeapAttack_Mid, new Anim(SNOAnim.x1_LeaperAngel_LeapAttack_Mid, AvoidType.Leap, Element.Physical) },
+            { SNOAnim.x1_LeaperAngel_LeapAttack_Out, new Anim(SNOAnim.x1_LeaperAngel_LeapAttack_Out, AvoidType.Leap, Element.Physical) },
+            { SNOAnim.x1_LeaperAngel_LeapAttack_Out_rage, new Anim(SNOAnim.x1_LeaperAngel_LeapAttack_Out_rage, AvoidType.Leap, Element.Physical) },
             { SNOAnim.x1_LeaperAngel_Melee_01, new Anim(SNOAnim.x1_LeaperAngel_Melee_01, AvoidType.Attack, Element.Physical) },
             { SNOAnim.x1_LeaperAngel_Melee_01_rage, new Anim(SNOAnim.x1_LeaperAngel_Melee_01_rage, AvoidType.Attack, Element.Physical) },
             { SNOAnim.x1_LeaperAngel_Melee_AttackLong, new Anim(SNOAnim.x1_LeaperAngel_Melee_AttackLong, AvoidType.Attack, Element.Physical) },
@@ -1077,7 +1077,7 @@ namespace Trinity
         public static Dictionary<SNOActor, Avoidance> ActorAvoidances { get { return actorAvoidances; } }
         private static readonly Dictionary<SNOActor, Avoidance> actorAvoidances = new Dictionary<SNOActor, Avoidance>
         {
-            /*	Physical		*/							
+            /* Physical	*/							
             { SNOActor.monsterAffix_Avenger_glowSphere, new Avoidance(SNOActor.monsterAffix_Avenger_glowSphere, AvoidType.GroundCircle, Element.Physical) },
             { SNOActor.X1_MonsterAffix_TeleportMines, new Avoidance(SNOActor.X1_MonsterAffix_TeleportMines, AvoidType.Teleport, Element.Physical) },
             { SNOActor.monsterAffix_missileDampening_outsideGeo, new Avoidance(SNOActor.monsterAffix_missileDampening_outsideGeo, AvoidType.Projectile, Element.Physical) },
@@ -1095,16 +1095,16 @@ namespace Trinity
             { SNOActor.monsterAffix_ghostly_distGeo, new Avoidance(SNOActor.monsterAffix_ghostly_distGeo, AvoidType.GroundCircle, Element.Physical) },
             { SNOActor.monsterAffix_healthLink_jumpActor, new Avoidance(SNOActor.monsterAffix_healthLink_jumpActor, AvoidType.GroundCircle, Element.Physical) },
             { SNOActor.monsterAffix_linked_chainHit, new Avoidance(SNOActor.monsterAffix_linked_chainHit, AvoidType.GroundCircle, Element.Physical) },
-            { SNOActor.Corpulent_suicide_blood, new Avoidance(SNOActor.Corpulent_suicide_blood, AvoidType.Bomb, Element.Physical, customRadius: 30f) },
-            { SNOActor.Corpulent_suicide_frost, new Avoidance(SNOActor.Corpulent_suicide_frost, AvoidType.Bomb, Element.Physical, customRadius: 30f) },
-            { SNOActor.Corpulent_suicide_imps, new Avoidance(SNOActor.Corpulent_suicide_imps, AvoidType.Bomb, Element.Physical, customRadius: 30f) },
-            { SNOActor.Corpulent_suicide_spiders, new Avoidance(SNOActor.Corpulent_suicide_spiders, AvoidType.Bomb, Element.Physical, customRadius: 30f) },
+            { SNOActor.Corpulent_suicide_blood, new Avoidance(SNOActor.Corpulent_suicide_blood, AvoidType.Bomb, Element.Physical, customRadius: 25f) },
+            { SNOActor.Corpulent_suicide_frost, new Avoidance(SNOActor.Corpulent_suicide_frost, AvoidType.Bomb, Element.Physical, customRadius: 25f) },
+            { SNOActor.Corpulent_suicide_imps, new Avoidance(SNOActor.Corpulent_suicide_imps, AvoidType.Bomb, Element.Physical, customRadius: 25f) },
+            { SNOActor.Corpulent_suicide_spiders, new Avoidance(SNOActor.Corpulent_suicide_spiders, AvoidType.Bomb, Element.Physical, customRadius: 25f) },
             { SNOActor.BoneCage_Proxy, new Avoidance(SNOActor.BoneCage_Proxy, AvoidType.Grab, Element.Physical) },
             { SNOActor.ThousandPounder_ribCage, new Avoidance(SNOActor.ThousandPounder_ribCage, AvoidType.Grab, Element.Physical) },
             { SNOActor.ZK_tornado_antimatter, new Avoidance(SNOActor.ZK_tornado_antimatter, AvoidType.Projectile, Element.Physical) },
             { SNOActor.ZK_tornado_model, new Avoidance(SNOActor.ZK_tornado_model, AvoidType.Projectile, Element.Physical) },
 
-            /*	Arcane		*/							
+            /* Arcane */							
             { SNOActor.MonsterAffix_ArcaneEnchanted_PetSweep, new Avoidance(SNOActor.MonsterAffix_ArcaneEnchanted_PetSweep, AvoidType.RotateRight, Element.Arcane) },
             { SNOActor.MonsterAffix_ArcaneEnchanted_PetSweep_reverse, new Avoidance(SNOActor.MonsterAffix_ArcaneEnchanted_PetSweep_reverse, AvoidType.RotateLeft, Element.Arcane) },
             { SNOActor.MonsterAffix_ArcaneEnchanted_Proxy, new Avoidance(SNOActor.MonsterAffix_ArcaneEnchanted_Proxy, AvoidType.GroundCircle, Element.Arcane) },
@@ -1122,7 +1122,7 @@ namespace Trinity
             { SNOActor.x1_adria_arcane_pool_rageSphere, new Avoidance(SNOActor.x1_adria_arcane_pool_rageSphere, AvoidType.GroundCircle, Element.Arcane) },
             { SNOActor.X1_Adria_arcanePool, new Avoidance(SNOActor.X1_Adria_arcanePool, AvoidType.GroundCircle, Element.Arcane) },
 
-            /*	Poison		*/							
+            /* Poison */							
             { SNOActor.monsterAffix_Plagued_endCloud, new Avoidance(SNOActor.monsterAffix_Plagued_endCloud, AvoidType.GroundCircle, Element.Poison, true) },
             { SNOActor.monsterAffix_plagued_groundGeo, new Avoidance(SNOActor.monsterAffix_plagued_groundGeo, AvoidType.GroundCircle, Element.Poison, true) },
             { SNOActor.Evacuation_PoisonLaser, new Avoidance(SNOActor.Evacuation_PoisonLaser, AvoidType.GroundCircle, Element.Poison) },
@@ -1130,7 +1130,7 @@ namespace Trinity
             { SNOActor.UnholyShield_model_poison, new Avoidance(SNOActor.UnholyShield_model_poison, AvoidType.GroundCircle, Element.Poison) },
             { SNOActor.Gluttony_gasCloud_proxy, new Avoidance(SNOActor.Gluttony_gasCloud_proxy, AvoidType.GroundCircle, Element.Poison) },
 
-            /*	Cold		*/							
+            /* Cold */							
             { SNOActor.monsterAffix_Frozen_deathExplosion_Proxy, new Avoidance(SNOActor.monsterAffix_Frozen_deathExplosion_Proxy, AvoidType.Bomb, Element.Cold) },
             { SNOActor.monsterAffix_frozen_iceClusters, new Avoidance(SNOActor.monsterAffix_frozen_iceClusters, AvoidType.GroundCircle, Element.Cold) },
             { SNOActor.x1_MonsterAffix_frozenPulse_monster, new Avoidance(SNOActor.x1_MonsterAffix_frozenPulse_monster, AvoidType.GroundCircle, Element.Cold) },
@@ -1142,7 +1142,7 @@ namespace Trinity
             { SNOActor.x1_skeletonArcher_arrow_cold, new Avoidance(SNOActor.x1_skeletonArcher_arrow_cold, AvoidType.Projectile, Element.Cold) },
             { SNOActor.x1_skeletonArcher_arrow_cold_impact, new Avoidance(SNOActor.x1_skeletonArcher_arrow_cold_impact, AvoidType.Projectile, Element.Cold) },
 
-            /*	Fire		*/							
+            /* Fire */							
             { SNOActor.monsterAffix_Desecrator_damage_AOE, new Avoidance(SNOActor.monsterAffix_Desecrator_damage_AOE, AvoidType.GroundCircle, Element.Fire, true) },
             { SNOActor.monsterAffix_Desecrator_telegraph, new Avoidance(SNOActor.monsterAffix_Desecrator_telegraph, AvoidType.GroundCircle, Element.Fire, true) },
             { SNOActor.monsterAffix_molten_bomb_buildUp_geo, new Avoidance(SNOActor.monsterAffix_molten_bomb_buildUp_geo, AvoidType.Bomb, Element.Fire, true) },
@@ -1158,21 +1158,17 @@ namespace Trinity
             { SNOActor.Diablo_ringofFire_damageArea, new Avoidance(SNOActor.Diablo_ringofFire_damageArea, AvoidType.GroundCircle, Element.Fire) },
             { SNOActor.Diablo_ringofFire_damageArea_stage3, new Avoidance(SNOActor.Diablo_ringofFire_damageArea_stage3, AvoidType.GroundCircle, Element.Fire) },
             { SNOActor.DiabloArena_Firewall_HeatDist, new Avoidance(SNOActor.DiabloArena_Firewall_HeatDist, AvoidType.GroundCircle, Element.Fire) },
-            { SNOActor.fallenShaman_fireBall_obj, new Avoidance(SNOActor.fallenShaman_fireBall_obj, AvoidType.GroundCircle, Element.Fire) },
             { SNOActor.Fire_AlphaTorch_Pole, new Avoidance(SNOActor.Fire_AlphaTorch_Pole, AvoidType.GroundCircle, Element.Fire) },
-            { SNOActor.fireBall_meteor_shard, new Avoidance(SNOActor.fireBall_meteor_shard, AvoidType.GroundCircle, Element.Fire) },
             { SNOActor.Uber_BossWorld3_st_Demon_ChainPylon_Fire_Azmodan, new Avoidance(SNOActor.Uber_BossWorld3_st_Demon_ChainPylon_Fire_Azmodan, AvoidType.GroundCircle, Element.Fire) },
             { SNOActor.UnholyShield_model_fire, new Avoidance(SNOActor.UnholyShield_model_fire, AvoidType.GroundCircle, Element.Fire) },
             { SNOActor.x1_Abattoir_furnaceSpinner_fireBeam_clockwise, new Avoidance(SNOActor.x1_Abattoir_furnaceSpinner_fireBeam_clockwise, AvoidType.GroundCircle, Element.Fire) },
             { SNOActor.x1_Abattoir_furnaceSpinner_fireBeam_counterClockwise, new Avoidance(SNOActor.x1_Abattoir_furnaceSpinner_fireBeam_counterClockwise, AvoidType.GroundCircle, Element.Fire) },
-            { SNOActor.x1_bloodScratch_deathMaiden_fire_attack01, new Avoidance(SNOActor.x1_bloodScratch_deathMaiden_fire_attack01, AvoidType.GroundCircle, Element.Fire) },
-            { SNOActor.x1_bloodScratch_deathMaiden_fire_attack01_b, new Avoidance(SNOActor.x1_bloodScratch_deathMaiden_fire_attack01_b, AvoidType.GroundCircle, Element.Fire) },
             { SNOActor.x1_Urzael_teleport_fireTrails, new Avoidance(SNOActor.x1_Urzael_teleport_fireTrails, AvoidType.GroundCircle, Element.Fire) },
             { SNOActor.x1_Urzael_teleport_fireTrails_blue, new Avoidance(SNOActor.x1_Urzael_teleport_fireTrails_blue, AvoidType.GroundCircle, Element.Fire) },
             { SNOActor.x1_Urzael_teleport_fireTrails2, new Avoidance(SNOActor.x1_Urzael_teleport_fireTrails2, AvoidType.GroundCircle, Element.Fire) },
             { SNOActor.x1_Urzael_teleport_fireTrails2_blue, new Avoidance(SNOActor.x1_Urzael_teleport_fireTrails2_blue, AvoidType.GroundCircle, Element.Fire) },
 
-            /*	Lightning		*/							
+            /* Lightning */							
             { SNOActor.monsterAffix_Electrified_deathExplosion_proxy, new Avoidance(SNOActor.monsterAffix_Electrified_deathExplosion_proxy, AvoidType.Bomb, Element.Lightning) },
             { SNOActor.X1_MonsterAffix_LightningStorm_Wanderer, new Avoidance(SNOActor.X1_MonsterAffix_LightningStorm_Wanderer, AvoidType.GroundCircle, Element.Lightning) },
             { SNOActor.x1_MonsterAffix_Thunderstorm_Impact, new Avoidance(SNOActor.x1_MonsterAffix_Thunderstorm_Impact, AvoidType.GroundCircle, Element.Lightning) },
@@ -1184,7 +1180,19 @@ namespace Trinity
             { SNOActor.hoodedNightmare_lightningAtk_cast_sphere, new Avoidance(SNOActor.hoodedNightmare_lightningAtk_cast_sphere, AvoidType.GroundCircle, Element.Lightning) },
             { SNOActor.diablo_lightningBreath_buff_glowBurst, new Avoidance(SNOActor.diablo_lightningBreath_buff_glowBurst, AvoidType.GroundCircle, Element.Lightning)		 },
 	
-            /*	AOE		*/							
+            /* Leap */	
+            { SNOActor.MastaBlasta_Rider_leap_trailActor, new Avoidance(SNOActor.MastaBlasta_Rider_leap_trailActor, AvoidType.Leap, Element.Physical) },
+            { SNOActor.LacuniFemale_C_CliffLeap, new Avoidance(SNOActor.LacuniFemale_C_CliffLeap, AvoidType.Leap, Element.Physical) },
+            { SNOActor.LacuniFemale_A_CliffLeap, new Avoidance(SNOActor.LacuniFemale_A_CliffLeap, AvoidType.Leap, Element.Physical) },
+            { SNOActor.x1_westmarchBrute_leap_telegraph, new Avoidance(SNOActor.x1_westmarchBrute_leap_telegraph, AvoidType.Leap, Element.Physical) },
+            { SNOActor.x1_westmarchBrute_B_leap_trailActor, new Avoidance(SNOActor.x1_westmarchBrute_B_leap_trailActor, AvoidType.Leap, Element.Physical) },
+            { SNOActor.x1_leaperAngel_leap_trailActor, new Avoidance(SNOActor.x1_leaperAngel_leap_trailActor, AvoidType.Leap, Element.Physical) },
+            { SNOActor.x1_westmarchBrute_leap_trailActor, new Avoidance(SNOActor.x1_westmarchBrute_leap_trailActor, AvoidType.Leap, Element.Physical) },
+            { SNOActor.x1_Spawner_leaperAngel_A_FortressUnique, new Avoidance(SNOActor.x1_Spawner_leaperAngel_A_FortressUnique, AvoidType.Leap, Element.Physical) },
+            { SNOActor.x1_Urzael_leap_trailActor, new Avoidance(SNOActor.x1_Urzael_leap_trailActor, AvoidType.Leap, Element.Physical) },
+            { SNOActor.x1_westmarch_rat_leap_trailActor, new Avoidance(SNOActor.x1_westmarch_rat_leap_trailActor, AvoidType.Leap, Element.Physical) },
+
+            /* AOE */							
             { SNOActor.X1_Unique_Monster_Generic_AOE_DOT_Cold_10foot, new Avoidance(SNOActor.X1_Unique_Monster_Generic_AOE_DOT_Cold_10foot, AvoidType.GroundCircle, Element.Cold, customRadius: 12f) },
             { SNOActor.X1_Unique_Monster_Generic_AOE_DOT_Cold_20foot, new Avoidance(SNOActor.X1_Unique_Monster_Generic_AOE_DOT_Cold_20foot, AvoidType.GroundCircle, Element.Cold, customRadius: 22f) },
             { SNOActor.X1_Unique_Monster_Generic_AOE_DOT_Fire_10foot, new Avoidance(SNOActor.X1_Unique_Monster_Generic_AOE_DOT_Fire_10foot, AvoidType.GroundCircle, Element.Fire, customRadius: 12f) },
@@ -1197,11 +1205,11 @@ namespace Trinity
             { SNOActor.X1_Unique_Monster_Generic_AOE_Lightning_Ring, new Avoidance(SNOActor.X1_Unique_Monster_Generic_AOE_Lightning_Ring, AvoidType.GroundCircle, Element.Lightning) },
             { SNOActor.X1_Unique_Monster_Generic_AOE_Sphere_Distortion, new Avoidance(SNOActor.X1_Unique_Monster_Generic_AOE_Sphere_Distortion, AvoidType.GroundCircle, Element.Physical) },
 
-            /*	Orb		*/							
+            /* Orb */							
             { SNOActor.x1_unique_orb_myken_sphere, new Avoidance(SNOActor.x1_unique_orb_myken_sphere, AvoidType.Projectile, Element.Physical) },
             { SNOActor.Azmodan_OA_fire_orb, new Avoidance(SNOActor.Azmodan_OA_fire_orb, AvoidType.Projectile, Element.Fire) },
             { SNOActor.arcanumOrb_model, new Avoidance(SNOActor.arcanumOrb_model, AvoidType.Projectile, Element.Arcane) },
-            { SNOActor.Azmodan_orbofAnnihilation_groundExplode, new Avoidance(SNOActor.Azmodan_orbofAnnihilation_groundExplode, AvoidType.Projectile, Element.Physical) },
+            { SNOActor.Azmodan_orbofAnnihilation_groundExplode, new Avoidance(SNOActor.Azmodan_orbofAnnihilation_groundExplode, AvoidType.GroundCircle, Element.Physical) },
             { SNOActor.Azmodan_orbOfAnnihilation_projectile, new Avoidance(SNOActor.Azmodan_orbOfAnnihilation_projectile, AvoidType.Projectile, Element.Physical) },
             { SNOActor.cupcakeOrb_model, new Avoidance(SNOActor.cupcakeOrb_model, AvoidType.Projectile, Element.Physical) },
             { SNOActor.goatWarrior_shaman_orb, new Avoidance(SNOActor.goatWarrior_shaman_orb, AvoidType.Projectile, Element.Physical) },
@@ -1212,9 +1220,9 @@ namespace Trinity
             { SNOActor.Spawner_X1_ZombieCrawler_Orb, new Avoidance(SNOActor.Spawner_X1_ZombieCrawler_Orb, AvoidType.Projectile, Element.Physical) },
             { SNOActor.x1_deathMaiden_orb_summon_rope_head_glow, new Avoidance(SNOActor.x1_deathMaiden_orb_summon_rope_head_glow, AvoidType.Projectile, Element.Physical) },
             { SNOActor.x1_sniperAngel_shardBolt_orb, new Avoidance(SNOActor.x1_sniperAngel_shardBolt_orb, AvoidType.Projectile, Element.Physical) },
-
             { SNOActor.X1_ZombieCrawler_Orb, new Avoidance(SNOActor.X1_ZombieCrawler_Orb, AvoidType.Projectile, Element.Physical) },
-            /*	Arrow		*/							
+
+            /* Arrow */							
             { SNOActor.BoneArcher_arrow, new Avoidance(SNOActor.BoneArcher_arrow, AvoidType.Projectile, Element.Physical) },
             { SNOActor.Ranger_BombArrow, new Avoidance(SNOActor.Ranger_BombArrow, AvoidType.Projectile, Element.Physical) },
             { SNOActor.Scoundrel_arrow_cripplingShot, new Avoidance(SNOActor.Scoundrel_arrow_cripplingShot, AvoidType.Projectile, Element.Physical) },
@@ -1226,7 +1234,31 @@ namespace Trinity
             { SNOActor.x1_PandExt_Ballista_Angelic_B_formingEnergyArrow, new Avoidance(SNOActor.x1_PandExt_Ballista_Angelic_B_formingEnergyArrow, AvoidType.Projectile, Element.Physical) },
             { SNOActor.BoneArcher_arrow_lightning, new Avoidance(SNOActor.BoneArcher_arrow_lightning, AvoidType.Projectile, Element.Lightning) },
 
-            /*	Projectile		*/							
+            /* Ball */
+            { SNOActor.TriuneSummoner_fireBall_obj, new Avoidance(SNOActor.TriuneSummoner_fireBall_obj, AvoidType.Projectile, Element.Fire) },
+            { SNOActor.fallenShaman_fireBall_obj, new Avoidance(SNOActor.fallenShaman_fireBall_obj, AvoidType.Projectile, Element.Fire) },
+            { SNOActor.fireBall_meteor_shard, new Avoidance(SNOActor.fireBall_meteor_shard, AvoidType.Projectile, Element.Fire) },
+            { SNOActor.Zombie_female_barfBall, new Avoidance(SNOActor.Zombie_female_barfBall, AvoidType.Projectile, Element.Physical) },
+            { SNOActor.Goatman_Shaman_Iceball_Explosion, new Avoidance(SNOActor.Goatman_Shaman_Iceball_Explosion, AvoidType.Projectile, Element.Cold) },
+            { SNOActor.x1_Urzael_Cannonball, new Avoidance(SNOActor.x1_Urzael_Cannonball, AvoidType.Projectile, Element.Physical) },
+            { SNOActor.x1_Urzael_Cannonball_burning, new Avoidance(SNOActor.x1_Urzael_Cannonball_burning, AvoidType.Projectile, Element.Fire) },
+            { SNOActor.x1_urzael_cannonball_burning_model, new Avoidance(SNOActor.x1_urzael_cannonball_burning_model, AvoidType.Projectile, Element.Fire) },
+            { SNOActor.x1_Wickerman_turnIntoFireBall_swirl, new Avoidance(SNOActor.x1_Wickerman_turnIntoFireBall_swirl, AvoidType.Projectile, Element.Fire) },
+            { SNOActor.x1_Wickerman_turnIntoFireBall_corona, new Avoidance(SNOActor.x1_Wickerman_turnIntoFireBall_corona, AvoidType.Projectile, Element.Fire) },
+            { SNOActor.x1_bloodGolem_shaman_bloodBall, new Avoidance(SNOActor.x1_bloodGolem_shaman_bloodBall, AvoidType.Projectile, Element.Physical) },
+            { SNOActor.x1_urzael_cannonball_dummy, new Avoidance(SNOActor.x1_urzael_cannonball_dummy, AvoidType.Projectile, Element.Physical) },
+            { SNOActor.x1_Urzael_Cannonball_burning_invisible, new Avoidance(SNOActor.x1_Urzael_Cannonball_burning_invisible, AvoidType.Projectile, Element.Fire) },
+            { SNOActor.x1_malthael_deathBall_head, new Avoidance(SNOActor.x1_malthael_deathBall_head, AvoidType.Projectile, Element.Physical) },
+            { SNOActor.x1_malthael_deathBall_spawn, new Avoidance(SNOActor.x1_malthael_deathBall_spawn, AvoidType.Projectile, Element.Physical) },
+            { SNOActor.x1_malthael_deathBall_spawn_ghost, new Avoidance(SNOActor.x1_malthael_deathBall_spawn_ghost, AvoidType.Projectile, Element.Physical) },
+            { SNOActor.x1_malthael_deathBall_gatherStorm, new Avoidance(SNOActor.x1_malthael_deathBall_gatherStorm, AvoidType.Projectile, Element.Physical) },
+            { SNOActor.x1_malthael_gratesOfHell_darkBall, new Avoidance(SNOActor.x1_malthael_gratesOfHell_darkBall, AvoidType.Projectile, Element.Physical) },
+            { SNOActor.x1_malthael_gratesOfHell_darkBall_glowOuter, new Avoidance(SNOActor.x1_malthael_gratesOfHell_darkBall_glowOuter, AvoidType.Projectile, Element.Physical) },
+            { SNOActor.x1_malthael_gratesOfHell_darkBall_glow, new Avoidance(SNOActor.x1_malthael_gratesOfHell_darkBall_glow, AvoidType.Projectile, Element.Physical) },
+            { SNOActor.x1_malthael_deathBall_explosion, new Avoidance(SNOActor.x1_malthael_deathBall_explosion, AvoidType.Projectile, Element.Physical) },
+            { SNOActor.x1_malthael_deathBall_explosion_blastWave, new Avoidance(SNOActor.x1_malthael_deathBall_explosion_blastWave, AvoidType.Projectile, Element.Physical) },
+
+            /* Projectile */							
             { SNOActor.Grenadier_Proj, new Avoidance(SNOActor.Grenadier_Proj, AvoidType.Projectile, Element.Physical) },
             { SNOActor.grenadier_proj_trail, new Avoidance(SNOActor.grenadier_proj_trail, AvoidType.Projectile, Element.Physical) },
             { SNOActor.BelialFireBomb, new Avoidance(SNOActor.BelialFireBomb, AvoidType.Projectile, Element.Fire) },
@@ -1315,7 +1347,7 @@ namespace Trinity
             { SNOActor.zoltunKulle_fieryBoulder_projectile, new Avoidance(SNOActor.zoltunKulle_fieryBoulder_projectile, AvoidType.Projectile, Element.Physical) },
             { SNOActor.zombie_female_barfBall_projectile, new Avoidance(SNOActor.zombie_female_barfBall_projectile, AvoidType.Projectile, Element.Physical) },
 
-            /*	Impact		*/							
+            /* Impact */							
             { SNOActor.Grenadier_Proj_mortar_inpact, new Avoidance(SNOActor.Grenadier_Proj_mortar_inpact, AvoidType.Projectile, Element.Physical) },
             { SNOActor.Beast_impactWave, new Avoidance(SNOActor.Beast_impactWave, AvoidType.Projectile, Element.Physical) },
             { SNOActor.Belial_GroundBomb_Impact, new Avoidance(SNOActor.Belial_GroundBomb_Impact, AvoidType.Projectile, Element.Physical) },

@@ -59,13 +59,13 @@ namespace Trinity.Technicals
     {
         public static int LastIndex = 0;
         public static Dictionary<string, int> IndexOf = new Dictionary<string, int>();
-        public static TaskTimer[] TaskTimers = new TaskTimer[250];
+        public static TaskTimer[] TaskTimers = new TaskTimer[300];
 
         public static void ClearSpy()
         {
             LastIndex = 0;
             IndexOf.Clear();
-            TaskTimers = new TaskTimer[250];
+            TaskTimers = new TaskTimer[300];
         }
 
         public static void LogSpy()

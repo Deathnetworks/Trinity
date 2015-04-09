@@ -5,8 +5,8 @@
         <script src="jquery.xdomainajax.js"></script>
         <script src="handlebars.js"></script>
         <script src="handlebars_helper.js"></script>
-        <script src="item-parse.js"></script> 
-		<script src="ItemReference.js"></script>  
+        <script src="item-SpecificPage.js"></script>    
+		<script src="ItemReference.js"></script>    
         <style>            
              span, .class, .skill, .rune, .passive { padding-left: 25px; display: block }
              .template { display: none; }
@@ -62,14 +62,15 @@
             
             $(document).ready(function () {
 
-                Items.HandleItemData(function (data) {
-
+                Items.GetItemPages([
+				"http://us.battle.net/d3/en/item/boots-of-disregard-29WPmn",
+				"http://us.battle.net/d3/en/item/immortal-kings-stature",
+				],function (data) {
                     var container = $(".container");
                     var template = $(".template").html();
                     var compiledTemplate = Handlebars.compile(template);
                     var renderedElement = $(compiledTemplate(data));
                     container.append(renderedElement);
-
                 });
 
             });
