@@ -14,8 +14,9 @@ namespace Trinity
 
         public static void ResetTickValues()
         {
-            TickValues_GetBestClusterNode = new HashSet<GetBestClusterNodeResult>();
-            TickValues_GetBestNode = new HashSet<GetBestNodeResult>();
+            RecordedValues_GetBestClusterNode.RemoveWhere(n => n.GridLocation.Distance > 150);
+            RecordedValues_GetBestNode.RemoveWhere(n => n.GridLocation.Distance > 150);
+
             TickValues_GetWeightAtPoint = new HashSet<GetWeightResult>();
             TickValue_GetWeightAtPlayer = 0f;
             TickValue_ToDictionary = new Dictionary<Vector3, float>();
@@ -23,25 +24,26 @@ namespace Trinity
             TickValue_ClusterExist = false;
         }
 
-        public static HashSet<GetBestClusterNodeResult> TickValues_GetBestClusterNode = new HashSet<GetBestClusterNodeResult>();
-        public static HashSet<GetBestNodeResult> TickValues_GetBestNode = new HashSet<GetBestNodeResult>();
+        public static HashSet<GetBestClusterNodeResult> RecordedValues_GetBestClusterNode = new HashSet<GetBestClusterNodeResult>();
+        public static HashSet<GetBestNodeResult> RecordedValues_GetBestNode = new HashSet<GetBestNodeResult>();
+
         public static HashSet<GetWeightResult> TickValues_GetWeightAtPoint = new HashSet<GetWeightResult>();
         public static float TickValue_GetWeightAtPlayer = 0f;
         public static Dictionary<Vector3, float> TickValue_ToDictionary = new Dictionary<Vector3, float>();
         public static bool IsTickRecorded_ClusterExist = false;
         public static bool TickValue_ClusterExist = false;
 
-        public static bool HasTickValue_GetBestClusterNode(out GridNode gridPoint, float maxRange = 100f, Vector3 loc = new Vector3())
+        public static bool HasRecordedValue_GetBestClusterNode(out GridNode gridPoint, float maxRange = 100f, Vector3 loc = new Vector3())
         {
-            using (new MemorySpy("HasTickValue_GetBestClusterNode"))
+            using (new MemorySpy("HasRecordedValue_GetBestClusterNode"))
             {
                 gridPoint = new GridNode(new Vector3());
 
-                if (!TickValues_GetBestClusterNode.Any())
+                if (!RecordedValues_GetBestClusterNode.Any())
                     return false;
 
                 var p = gridPoint;
-                try { p = TickValues_GetBestClusterNode.FirstOrDefault(r => r != null && r.Equals(maxRange, loc)).GridLocation; }
+                try { p = RecordedValues_GetBestClusterNode.FirstOrDefault(r => r != null && r.Equals(maxRange, loc)).GridLocation; }
                 catch { return false; }
 
                 if (p != null)
@@ -54,17 +56,17 @@ namespace Trinity
             }
         }
 
-        public static bool HasTickValue_GetBestNode(out GridNode gridPoint, float miRange = 5f, float maRange = 100f, Vector3 loc = new Vector3())
+        public static bool HasRecordedValue_GetBestNode(out GridNode gridPoint, float miRange = 5f, float maRange = 100f, Vector3 loc = new Vector3())
         {
-            using (new MemorySpy("HasTickValue_GetBestNode"))
+            using (new MemorySpy("HasRecordedValue_GetBestNode"))
             {
                 gridPoint = new GridNode(new Vector3());
 
-                if (!TickValues_GetBestNode.Any())
+                if (!RecordedValues_GetBestNode.Any())
                     return false;
 
                 var p = gridPoint;
-                try { p = TickValues_GetBestNode.FirstOrDefault(r => r != null && r.Equals(miRange, maRange, loc)).GridLocation; }
+                try { p = RecordedValues_GetBestNode.FirstOrDefault(r => r != null && r.Equals(miRange, maRange, loc)).GridLocation; }
                 catch { return false; }
 
                 if (p != null)

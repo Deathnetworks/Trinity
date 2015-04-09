@@ -210,7 +210,7 @@ namespace Trinity
                             }
                         }
 
-                        _g.OperateWeight(WeightType.Dynamic, "BaseDistanceWeight", (MainGrid.GridRange - _g.Distance) * 5f);
+                        _g.OperateWeight(WeightType.Dynamic, "BaseDistanceWeight", (MainGrid.GridRange - _g.Distance) * 2f);
 
                         using (new MemorySpy("MainGrid.Refresh().SetTargetWeights"))
                         {

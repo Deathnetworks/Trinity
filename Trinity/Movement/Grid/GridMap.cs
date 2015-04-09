@@ -63,8 +63,14 @@ namespace Trinity
                 bool _atPlayer = _loc == Trinity.Player.Position;
 
                 GridNode _cluster;
-                if (GridResults.HasTickValue_GetBestClusterNode(out _cluster, _range, _loc))
-                    return _cluster;
+                if (GridResults.HasRecordedValue_GetBestClusterNode(out _cluster, _range, _loc))
+                {
+                    /* Keep last safe point */
+                    if (_cluster.ClusterWeight >= (GetPointAt(_cluster.Position).ClusterWeight * 0.9))
+                        return _cluster;
+
+                    GridResults.RecordedValues_GetBestClusterNode.RemoveWhere(p => p.GridLocation.Equals(_cluster));
+                }
 
                 if (ClusterNodeExist)
                 {
@@ -82,7 +88,7 @@ namespace Trinity
 
                     if (_cluster != null && _cluster.ClusterWeight > 0f)
                     {
-                        GridResults.TickValues_GetBestClusterNode.Add(new GetBestClusterNodeResult(_cluster, _range, _loc));
+                        GridResults.RecordedValues_GetBestClusterNode.Add(new GetBestClusterNodeResult(_cluster, _range, _loc));
                         return _cluster;
                     }
                 }
@@ -165,25 +171,39 @@ namespace Trinity
                 if (_loc == Vector3.Zero)
                     _loc = Trinity.Player.Position;
 
-                GridNode _result = new GridNode(Vector3.Zero);
-                if (GridResults.HasTickValue_GetBestNode(out _result, _minRange, _maxRange, _loc))
-                    return _result;
+                bool _atPlayer = _loc == Trinity.Player.Position;
+
+                GridNode _result = new GridNode();
+                if (GridResults.HasRecordedValue_GetBestNode(out _result, _minRange, _maxRange, _loc))
+                {
+                    /* Keep last safe point */
+                    if (_result.Weight >= (GetWeightAt(_result.Position) * 0.9))
+                        return _result;
+
+                    GridResults.RecordedValues_GetBestNode.RemoveWhere(p => p.GridLocation.Equals(_result));
+                }
 
                 var _results = 
                     (from p in MainGrid.MapAsList
-                    where p.Position.Distance2D(_loc) >= _minRange && p.Position.Distance2D(_loc) < _maxRange
+                    where
+                        (_atPlayer && p.Distance >= _minRange ||
+                        !_atPlayer && p.Position.Distance2D(_loc) >= _minRange) &&
+                        (_atPlayer && p.Distance < _maxRange ||
+                        !_atPlayer && p.Position.Distance2D(_loc) < _maxRange)
                     select p).ToList();
 
                 if (_prioritizeDist)
                     _results = 
                         (from p in _results
-                        orderby p.Position.Distance2D(_loc),
-                        p.Weight descending
+                        orderby 
+                            p.Weight descending, 
+                            p.Position.Distance2D(_loc)
                         select p).ToList();
                 else
                     _results = 
                         (from p in _results
-                        orderby p.Weight descending
+                        orderby 
+                            p.Weight descending
                         select p).ToList();
 
                 if (_results != null)
@@ -198,7 +218,7 @@ namespace Trinity
                     );
                 }
 
-                GridResults.TickValues_GetBestNode.Add(new GetBestNodeResult(_result, _minRange, _maxRange, _loc));
+                GridResults.RecordedValues_GetBestNode.Add(new GetBestNodeResult(_result, _minRange, _maxRange, _loc));
                 return _result;
             }
         }

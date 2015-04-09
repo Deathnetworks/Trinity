@@ -79,7 +79,7 @@ namespace Trinity
         public double UnchangeableWeight = 0;
         public string UnchangeableWeightInfos = string.Empty;
 
-        /* Does not set by grid generationcan be used for other thing */
+        /* Does not set by grid generation, can be used for other thing */
         public double SpecialWeight = 0;
         public int SpecialCount = 0;
 
@@ -102,7 +102,7 @@ namespace Trinity
                         return UnchangeableWeight;
 
                     double _w = DynamicWeight + UnchangeableWeight;
-                    if (!HasAvoidanceRelated && !Trinity.Player.NeedToKite) _w += ClusterWeight;
+                    if (!Trinity.Player.NeedToKite && !HasAvoidanceRelated) _w += ClusterWeight;
                     if (Trinity.Player.NeedToKite || MainGrid.ShouldBeAwayFromAoE) _w += MonsterWeight;
                     if (!Trinity.Player.NeedToKite && !MainGrid.ShouldAvoidAoE) _w += TargetWeight;
 
@@ -120,7 +120,7 @@ namespace Trinity
                         return UnchangeableWeightInfos;
 
                     string _wi = DynamicWeightInfos + UnchangeableWeightInfos;
-                    if (!HasAvoidanceRelated && !Trinity.Player.NeedToKite) _wi += ClusterWeightInfos;
+                    if (!Trinity.Player.NeedToKite && !HasAvoidanceRelated) _wi += ClusterWeightInfos;
                     if (Trinity.Player.NeedToKite || MainGrid.ShouldBeAwayFromAoE) _wi += MonsterWeightInfos;
                     if (!Trinity.Player.NeedToKite && !MainGrid.ShouldAvoidAoE) _wi += TargetWeightInfos;
 
@@ -241,7 +241,7 @@ namespace Trinity
 
         public bool Equals(GridNode other)
         {
-            return Equals(Position.X, other.Position.X) && Equals(Position.Y, other.Position.Y);
+            return Equals((int)Position.X, (int)other.Position.X) && Equals((int)Position.Y, (int)other.Position.Y);
         }
 
         public bool ObjectOOR(Vector3 _loc, float _r)
@@ -331,7 +331,7 @@ namespace Trinity
                 return;
 
             DynamicWeight _w;
-            if (LastTargetWeightValues.TryGetValue(Trinity.CurrentTarget.RActorGuid + 99999, out _w))
+            if (LastTargetWeightValues.TryGetValue(Trinity.CurrentTarget.RActorGuid, out _w))
             {
                 _w.IncreaseLoopCount();
                 if (_w.KeepObject)
@@ -340,7 +340,7 @@ namespace Trinity
                     return;
                 }
 
-                LastTargetWeightValues.Remove(Trinity.CurrentTarget.RActorGuid + 99999);
+                LastTargetWeightValues.Remove(Trinity.CurrentTarget.RActorGuid);
             }
 
             float _weight = 0f;
@@ -367,7 +367,7 @@ namespace Trinity
                 }
             }
 
-            OperateWeight(WeightType.Target, _weightInfos, _weight, Trinity.CurrentTarget.RActorGuid + 99999, 3);
+            OperateWeight(WeightType.Target, _weightInfos, _weight, Trinity.CurrentTarget.RActorGuid, 3);
         }
         public void SetAvoidancesWeights()
         {
@@ -518,20 +518,20 @@ namespace Trinity
                             {
                                 if (_o.IsBoss && MainGrid.ShouldKiteBosses)
                                 {
-                                    OperateWeight(WeightType.Monster, "IsInBossKiteRange", (MainGrid.BaseWeight - _dstFromObj + CombatBase.KiteDistance + _o.Radius) * -11f, _o.RActorGuid, 3);
+                                    OperateWeight(WeightType.Monster, "IsInBossKiteRange", (MainGrid.BaseWeight - _dstFromObj + CombatBase.KiteDistance + _o.Radius) * -13f, _o.RActorGuid, 3);
                                 }
                                 else if (_o.IsBossOrEliteRareUnique && MainGrid.ShouldKiteElites)
                                 {
-                                    OperateWeight(WeightType.Monster, "IsInEliteKiteRange", (MainGrid.BaseWeight - _dstFromObj + CombatBase.KiteDistance + _o.Radius) * -9f, _o.RActorGuid, 3);
+                                    OperateWeight(WeightType.Monster, "IsInEliteKiteRange", (MainGrid.BaseWeight - _dstFromObj + CombatBase.KiteDistance + _o.Radius) * -11f, _o.RActorGuid, 3);
                                 }
                                 else if (MainGrid.ShouldKiteTrashs)
                                 {
-                                    OperateWeight(WeightType.Monster, "IsInMobKiteRange", (MainGrid.BaseWeight - _dstFromObj + CombatBase.KiteDistance + _o.Radius) * -7f, _o.RActorGuid, 3);
+                                    OperateWeight(WeightType.Monster, "IsInMobKiteRange", (MainGrid.BaseWeight - _dstFromObj + CombatBase.KiteDistance + _o.Radius) * -9f, _o.RActorGuid, 3);
                                 }
                             }
                             else if (_o.Distance < Distance && MathUtil.IntersectsPath(_o.Position, _o.Radius + 2f, Trinity.Player.Position, Position))
                             {
-                                OperateWeight(WeightType.Monster, "IsIntersectMonsterRadius", (MainGrid.BaseWeight - _dstFromObj + _o.Radius) * -6f, _o.RActorGuid, 3);
+                                OperateWeight(WeightType.Monster, "IsIntersectMonsterRadius", (MainGrid.BaseWeight - _dstFromObj + _o.Radius) * -13f, _o.RActorGuid, 3);
                             }
                             else if (MainGrid.ShouldFlee)
                             {
