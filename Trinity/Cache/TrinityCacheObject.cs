@@ -4,7 +4,6 @@ using System.Runtime.Serialization;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.DbProvider;
-using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
@@ -19,10 +18,10 @@ namespace Trinity
     [DataContract]
     public class TrinityCacheObject
     {
-        public TrinityCacheObject(DiaObject _DiaObject = null)
+        public TrinityCacheObject(DiaObject diaObject = null)
         {
-            if (_DiaObject != null)
-                this.RActorGuid = _DiaObject.RActorGuid;
+            if (diaObject != null)
+                RActorGuid = diaObject.RActorGuid;
         }
 
         [NoCopy]
@@ -158,6 +157,7 @@ namespace Trinity
         [DataMember]
         public string InternalName { get; set; }
 
+        [DataMember]
         public SNOAnim Animation { get; set; }
 
         [DataMember]
@@ -271,6 +271,7 @@ namespace Trinity
         [DataMember]
         public double KillRange { get; set; }
 
+        [DataMember]
         public MonsterSize MonsterSize { get; set; }
 
         [DataMember]
@@ -288,7 +289,7 @@ namespace Trinity
         [NoCopy]
         public bool IsTrashMob { get { return (this.IsUnit && !(IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
 
-        [NoCopy]
+        [DataMember]
         public bool IsMe { get { return RActorGuid == Trinity.Player.RActorGuid; } }
 
         [DataMember]
@@ -555,7 +556,7 @@ namespace Trinity
         [NoCopy]
         public bool IsInLineOfSight(bool forceUpdate = false)
         {
-            if (this.InLineOfSight || this.HasBeenRaycastable || this.HasBeenInLoS)
+            if (InLineOfSight || HasBeenRaycastable || HasBeenInLoS)
                 return true;
 
             if (forceUpdate)

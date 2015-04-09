@@ -47,8 +47,7 @@ namespace Trinity
             {
                 if (ObjectCache != null)
                     return ObjectCache.Any(u => u.IsTreasureGoblin);
-                else
-                    return false;
+                return false;
             }
         }
         private static TrinityCacheObject CurrentTarget
@@ -65,7 +64,7 @@ namespace Trinity
                 return CacheData.Hotbar.ActivePowers;
             }
         }
-        private static Zeta.Bot.Navigation.MainGridProvider MainGridProvider
+        private static MainGridProvider MainGridProvider
         {
             get
             {
@@ -93,14 +92,8 @@ namespace Trinity
 
             using (new MemorySpy("NavHelper.CanRayCast()"))
             {
-                foreach (var cacheObstacle in CacheData.NavRayCastObstacles.OrderBy(o => o.Key.Distance2D(vStartLocation)))
+                foreach (var cacheObstacle in CacheData.NavRayCastObstacles.Where(o => o.Value > 3f && o.Key.Distance2D(vStartLocation) > 60f).OrderBy(o => o.Key.Distance2D(vStartLocation)))
                 {
-                    if (cacheObstacle.Value <= 3f)
-                        continue;
-
-                    if (cacheObstacle.Key.Distance2D(vStartLocation) > 60f)
-                        continue;
-                    
                     if (MathEx.IntersectsPath(cacheObstacle.Key, cacheObstacle.Value, vStartLocation, vDestination))
                         return false;
                 }
@@ -116,10 +109,10 @@ namespace Trinity
         internal static bool ObjectIsInLos(TrinityCacheObject o)
         {
             return ObjectIsInLosOfPoint(Player.Position, o);
-        } 
+        }
         internal static bool ObjectIsInLos(CacheObstacleObject o)
         {
-            TrinityCacheObject obj = new TrinityCacheObject()
+            TrinityCacheObject obj = new TrinityCacheObject
             {
                 Position = o.Position,
                 Radius = o.Radius,
@@ -131,7 +124,7 @@ namespace Trinity
         }
         internal static bool ObjectIsInLosOfPoint(Vector3 origin, CacheObstacleObject o)
         {
-            TrinityCacheObject obj = new TrinityCacheObject()
+            TrinityCacheObject obj = new TrinityCacheObject
             {
                 Position = o.Position,
                 Radius = o.Radius,
@@ -147,7 +140,7 @@ namespace Trinity
         }
         internal static bool VectorIsLos(Vector3 origin, Vector3 target)
         {
-            TrinityCacheObject obj = new TrinityCacheObject()
+            TrinityCacheObject obj = new TrinityCacheObject
             {
                 Position = target,
                 Radius = 5f,
@@ -175,7 +168,6 @@ namespace Trinity
                     return true;
 
                 bool isPlayerLocation = false;
-                float lastLoSDistance = 0f;
                 float distFromOToOrigin = origin.Distance2D(o.Position);
 
                 // Origin is player
@@ -189,6 +181,7 @@ namespace Trinity
                     if (DataDictionary.LineOfSightWhitelist.Contains(o.ActorSNO))
                         return true;
 
+                    float lastLoSDistance;
                     if (CacheData.HasBeenInLoS.TryGetValue(o.RActorGuid, out lastLoSDistance) &&
                         lastLoSDistance > 0 && Math.Abs(lastLoSDistance - distFromOToOrigin) <= 5f)
                     {
@@ -208,7 +201,7 @@ namespace Trinity
 
                     // Always LoS Units during events
                     //if (o.Type == GObjectType.Unit && Player.InActiveEvent)
-                     //   return true;
+                    //   return true;
                 }
 
                 if (distFromOToOrigin <= 100)
@@ -234,7 +227,7 @@ namespace Trinity
                         Vector3 originPos = new Vector3(origin.X, origin.Y, origin.Z + 2.5f);
                         Vector3 cPos = new Vector3(o.Position.X, o.Position.Y, o.Position.Z + 2.5f);
 
-                        if (NavHelper.CanRayCast(originPos, cPos))
+                        if (CanRayCast(originPos, cPos))
                         {
                             if (isPlayerLocation && !CacheData.HasBeenInLoS.ContainsKey(o.RActorGuid))
                                 CacheData.HasBeenInLoS.Add(o.RActorGuid, o.Distance);
@@ -242,9 +235,9 @@ namespace Trinity
                             return true;
                         }
                     }
-                    else 
+                    else
                     {
-                        if (NavHelper.CanRayCast(origin, o.Position))
+                        if (CanRayCast(origin, o.Position))
                         {
                             if (isPlayerLocation && !CacheData.HasBeenInLoS.ContainsKey(o.RActorGuid))
                                 CacheData.HasBeenInLoS.Add(o.RActorGuid, o.Distance);
@@ -623,13 +616,13 @@ namespace Trinity
                     }
 
                     string bestSafeDirection = directions[nodesDirection.IndexOf(nodesDirection.Max())].ToUpper();
-                    bool playerIsInBadWay = Player.AvoidDeath || 
-                        (nearbyMonsterCount > 8 && Player.CurrentHealthPct <= 0.6) || Player.CurrentHealthPct <= 0.5 || 
+                    bool playerIsInBadWay = Player.AvoidDeath ||
+                        (nearbyMonsterCount > 8 && Player.CurrentHealthPct <= 0.6) || Player.CurrentHealthPct <= 0.5 ||
                         Player.StandingInAvoidance || minimumRange >= 35f;
 
                     bestPoint = SetGridWeight(SafeGrid, bestSafeDirection, playerIsInBadWay, minimumRange);
 
-                    if (bestPoint.Position == Vector3.Zero && 
+                    if (bestPoint.Position == Vector3.Zero &&
                         SafeGrid.Any(p => p.Distance >= minimumRange))
                     {
                         Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "SafeGrid Attempt");
@@ -665,11 +658,11 @@ namespace Trinity
                             .FirstOrDefault()
                             .Position;
                     }
-                        
+
                     if (isStuck && bestPoint.Position != Vector3.Zero)
                     {
                         UsedStuckSpots.Add(bestPoint);
-                    } 
+                    }
 
                     timers[0].Stop();
 
@@ -805,7 +798,7 @@ namespace Trinity
 
             bool collectHealthGlobe = false;
             if (Trinity.Settings.Combat.Misc.HiPriorityHG ||
-                (Player.CurrentHealthPct < CombatBase.EmergencyHealthGlobeLimit || 
+                (Player.CurrentHealthPct < CombatBase.EmergencyHealthGlobeLimit ||
                 (Player.PrimaryResourcePct < CombatBase.HealthGlobeResource &&
                 (Legendary.ReapersWraps.IsEquipped ||
                 (Player.ActorClass == ActorClass.Witchdoctor && CacheData.Hotbar.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GruesomeFeast)) ||
@@ -892,7 +885,7 @@ namespace Trinity
                                 }
                                 timers[6].Stop();
                                 timers[7].Start();
-                                if (currentPowerMinimumRange > 2f && dstFromObjectToPoint <= currentPowerMinimumRange && 
+                                if (currentPowerMinimumRange > 2f && dstFromObjectToPoint <= currentPowerMinimumRange &&
                                     CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && CurrentTarget.RActorGuid == cacheObject.RActorGuid)
                                 {
                                     if (cacheObject.IsInLineOfSightOfPoint(gridPoint.Position))
@@ -915,15 +908,15 @@ namespace Trinity
                                 {
                                     if (cacheObject.IsBoss && CombatBase.KiteMode != KiteMode.Never)
                                     {
-                                        gridPoint.OperateWeight(WeightType.Dynamic, "InBossKiteRange", (maxWeight - dstFromObjectToPoint + CombatBase.KiteDistance) * -11f);                                        
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "InBossKiteRange", (maxWeight - dstFromObjectToPoint + CombatBase.KiteDistance) * -11f);
                                     }
                                     else if (cacheObject.IsBossOrEliteRareUnique && (CombatBase.KiteMode == KiteMode.Elites || CombatBase.KiteMode == KiteMode.Always))
                                     {
-                                        gridPoint.OperateWeight(WeightType.Dynamic, "InEliteKiteRange", (maxWeight - dstFromObjectToPoint + CombatBase.KiteDistance) * -9f);                                        
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "InEliteKiteRange", (maxWeight - dstFromObjectToPoint + CombatBase.KiteDistance) * -9f);
                                     }
                                     else if (CombatBase.KiteMode == KiteMode.Always)
                                     {
-                                        gridPoint.OperateWeight(WeightType.Dynamic, "InMobKiteRange", (maxWeight - dstFromObjectToPoint + CombatBase.KiteDistance) * -7f);   
+                                        gridPoint.OperateWeight(WeightType.Dynamic, "InMobKiteRange", (maxWeight - dstFromObjectToPoint + CombatBase.KiteDistance) * -7f);
                                     }
                                 }
                                 timers[8].Stop();
@@ -1029,7 +1022,7 @@ namespace Trinity
                                 break;
                             }
                             #endregion
-                        case GObjectType.Gold: 
+                        case GObjectType.Gold:
                             #region Gold
                             {
                                 timers[17].Start();
@@ -1126,7 +1119,7 @@ namespace Trinity
                             {
                                 timers[22].Start();
                                 if (dstFromObjectToPoint <= cacheObject.Radius + 5f && !playerIsInBadWay && !cacheObject.IsNavBlocking() &&
-                                    (Trinity.Settings.WorldObject.HiPriorityContainers || 
+                                    (Trinity.Settings.WorldObject.HiPriorityContainers ||
                                     ((Legendary.HarringtonWaistguard.IsEquipped && !Legendary.HarringtonWaistguard.IsBuffActive))))
                                 {
                                     gridPoint.OperateWeight(WeightType.Dynamic, "IntersectsPathObstacles", (maxWeight - dstFromPlayerToPoint) * 10f);

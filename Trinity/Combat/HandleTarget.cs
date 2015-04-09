@@ -573,7 +573,6 @@ namespace Trinity
         /// <returns></returns>
         private static bool HandleTargetTimeoutTask()
         {
-            // Obsolet ?
             //using (new PerformanceLogger("HandleTarget.TargetTimeout"))
             //{
             //    // Been trying to handle the same target for more than 30 seconds without damaging/reaching it? Blacklist it!
@@ -1164,7 +1163,7 @@ namespace Trinity
                             Options = new QueuedMovementOptions
                             {
                                 Logging = LogLevel.Info,
-                                AcceptableDistance = 0f,
+                                AcceptableDistance = CurrentTarget.RequiredRange,
                                 Type = CurrentTarget.IsUnit ? MoveType.BasicCombat : MoveType.TargetAttempt
                             }
                         });
@@ -1189,7 +1188,7 @@ namespace Trinity
                 CurrentTarget.RequiredRange = 2f;
 
                 TargetCurrentDistance = CurrentTarget.RadiusDistance;
-                CurrentTargetIsInLoS = CurrentTarget.IsInLineOfSight();
+                CurrentTargetIsInLoS = CurrentTarget.IsInLineOfSight(true);
 
                 TargetCurrentDestination = CurrentTarget.Position;
                 MoveCurrentDestination = CurrentTarget.Position;
@@ -1219,7 +1218,7 @@ namespace Trinity
                     // * Item - need to get within 6 feet and then interact with it
                     case GObjectType.Item:
                         {
-                            CurrentTarget.RequiredRange = 2f;
+                            CurrentTarget.RequiredRange = 6f;
                             TargetCurrentDistance = CurrentTarget.Distance;
                             break;
                         }
@@ -1262,6 +1261,8 @@ namespace Trinity
                             {
                                 CurrentTarget.RequiredRange = range;
                             }
+                            if (CurrentTarget.RequiredRange <= 1)
+                                CurrentTarget.RequiredRange = 2f;
                             break;
                         }
                     case GObjectType.Interactable:

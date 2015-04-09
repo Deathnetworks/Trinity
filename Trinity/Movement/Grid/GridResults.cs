@@ -14,8 +14,10 @@ namespace Trinity
 
         public static void ResetTickValues()
         {
-            RecordedValues_GetBestClusterNode.RemoveWhere(n => n.GridLocation.Distance > 150);
-            RecordedValues_GetBestNode.RemoveWhere(n => n.GridLocation.Distance > 150);
+            if (RecordedValues_GetBestClusterNode != null)
+                RecordedValues_GetBestClusterNode.RemoveWhere(n => n != null && n.GridLocation != null && n.GridLocation.Distance > 150);
+            if (RecordedValues_GetBestNode != null)
+                RecordedValues_GetBestNode.RemoveWhere(n => n != null && n.GridLocation != null && n.GridLocation.Distance > 150);
 
             TickValues_GetWeightAtPoint = new HashSet<GetWeightResult>();
             TickValue_GetWeightAtPlayer = 0f;
@@ -164,7 +166,7 @@ namespace Trinity
 
     class GetBestNodeResult : IEquatable<GetBestNodeResult>
     {
-        public GridNode GridLocation { get; set; } 
+        public GridNode GridLocation { get; set; }
         public float MiRange { get; set; }
         public float MaRange { get; set; }
         public Vector3 Location { get; set; }
