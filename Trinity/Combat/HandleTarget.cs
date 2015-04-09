@@ -573,118 +573,118 @@ namespace Trinity
         /// <returns></returns>
         private static bool HandleTargetTimeoutTask()
         {
-            //using (new PerformanceLogger("HandleTarget.TargetTimeout"))
-            //{
-            //    // Been trying to handle the same target for more than 30 seconds without damaging/reaching it? Blacklist it!
-            //    // Note: The time since target picked updates every time the current target loses health, if it's a monster-target
-            //    // Don't blacklist stuff if we're playing a cutscene
+            using (new PerformanceLogger("HandleTarget.TargetTimeout"))
+            {
+                // Been trying to handle the same target for more than 30 seconds without damaging/reaching it? Blacklist it!
+                // Note: The time since target picked updates every time the current target loses health, if it's a monster-target
+                // Don't blacklist stuff if we're playing a cutscene
 
-            //    bool shouldTryBlacklist = false;
+                bool shouldTryBlacklist = false;
 
-            //    // don't timeout on avoidance
-            //    if (CurrentTarget.Type == GObjectType.Avoidance)
+                // don't timeout on avoidance
+                if (CurrentTarget.Type == GObjectType.Avoidance)
 
 
 
-            //    // don't timeout on legendary items
-            //    if (CurrentTarget.Type == GObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary)
-            //    {
-            //        return false;
-            //    }
+                    // don't timeout on legendary items
+                    if (CurrentTarget.Type == GObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary)
+                    {
+                        return false;
+                    }
 
-            //    // don't timeout if we're actively moving
-            //    if (PlayerMover.GetMovementSpeed() > 1)
-            //    {
-            //        return false;
-            //    }
+                // don't timeout if we're actively moving
+                if (PlayerMover.GetMovementSpeed() > 1)
+                {
+                    return false;
+                }
 
-            //    if (CurrentTargetIsNonUnit() && GetSecondsSinceTargetUpdate() > 6)
-            //        shouldTryBlacklist = true;
+                if (CurrentTargetIsNonUnit() && GetSecondsSinceTargetUpdate() > 6)
+                    shouldTryBlacklist = true;
 
-            //    if ((CurrentTargetIsUnit() && CurrentTarget.IsBoss && GetSecondsSinceTargetUpdate() > 45))
-            //        shouldTryBlacklist = true;
+                if ((CurrentTargetIsUnit() && CurrentTarget.IsBoss && GetSecondsSinceTargetUpdate() > 45))
+                    shouldTryBlacklist = true;
 
-            //    // special raycast check for current target after 10 sec
-            //    if ((CurrentTargetIsUnit() && !CurrentTarget.IsBoss && GetSecondsSinceTargetUpdate() > 10))
-            //        shouldTryBlacklist = true;
+                // special raycast check for current target after 10 sec
+                if ((CurrentTargetIsUnit() && !CurrentTarget.IsBoss && GetSecondsSinceTargetUpdate() > 10))
+                    shouldTryBlacklist = true;
 
-            //    if (CurrentTarget.Type == GObjectType.HotSpot)
-            //        shouldTryBlacklist = false;
+                if (CurrentTarget.Type == GObjectType.HotSpot)
+                    shouldTryBlacklist = false;
 
-            //    if (shouldTryBlacklist)
-            //    {
-            //        // NOTE: This only blacklists if it's remained the PRIMARY TARGET that we are trying to actually directly attack!
-            //        // So it won't blacklist a monster "on the edge of the screen" who isn't even being targetted
-            //        // Don't blacklist monsters on <= 50% health though, as they can't be in a stuck location... can they!? Maybe give them some extra time!
+                if (shouldTryBlacklist)
+                {
+                    // NOTE: This only blacklists if it's remained the PRIMARY TARGET that we are trying to actually directly attack!
+                    // So it won't blacklist a monster "on the edge of the screen" who isn't even being targetted
+                    // Don't blacklist monsters on <= 50% health though, as they can't be in a stuck location... can they!? Maybe give them some extra time!
 
-            //        bool isNavigable = NavHelper.CanRayCast(MoveCurrentDestination);
+                    bool isNavigable = NavHelper.CanRayCast(MoveCurrentDestination);
 
-            //        bool addTargetToBlacklist = true;
+                    bool addTargetToBlacklist = true;
 
-            //        // PREVENT blacklisting a monster on less than 90% health unless we haven't damaged it for more than 2 minutes
-            //        if (CurrentTarget.IsUnit && isNavigable && CurrentTarget.IsTreasureGoblin && Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Kamikaze)
-            //        {
-            //            addTargetToBlacklist = false;
-            //        }
+                    // PREVENT blacklisting a monster on less than 90% health unless we haven't damaged it for more than 2 minutes
+                    if (CurrentTarget.IsUnit && isNavigable && CurrentTarget.IsTreasureGoblin && Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Kamikaze)
+                    {
+                        addTargetToBlacklist = false;
+                    }
 
-            //        int interactAttempts;
-            //        CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out interactAttempts);
+                    int interactAttempts;
+                    CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out interactAttempts);
 
-            //        if ((CurrentTarget.Type == GObjectType.Door || CurrentTarget.Type == GObjectType.Interactable || CurrentTarget.Type == GObjectType.Container) &&
-            //            interactAttempts < 45 && DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalSeconds > 15)
-            //        {
-            //            addTargetToBlacklist = false;
-            //        }
+                    if ((CurrentTarget.Type == GObjectType.Door || CurrentTarget.Type == GObjectType.Interactable || CurrentTarget.Type == GObjectType.Container) &&
+                        interactAttempts < 45 && DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalSeconds > 15)
+                    {
+                        addTargetToBlacklist = false;
+                    }
 
-            //        if (addTargetToBlacklist)
-            //        {
-            //            if (CurrentTarget.IsBoss)
-            //            {
-            //                Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "Blacklisted Target, Returning Failure");
+                    if (addTargetToBlacklist)
+                    {
+                        if (CurrentTarget.IsBoss)
+                        {
+                            Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "Blacklisted Target, Returning Failure");
 
-            //                Blacklist3Seconds.Add(CurrentTarget.RActorGuid);
-            //                Blacklist3LastClear = DateTime.UtcNow;
-            //                CurrentTarget = null;
-            //                return true;
-            //            }
-            //            if (CurrentTarget.Type == GObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary)
-            //            {
-            //                return false;
-            //            }
+                            Blacklist3Seconds.Add(CurrentTarget.RActorGuid);
+                            Blacklist3LastClear = DateTime.UtcNow;
+                            CurrentTarget = null;
+                            return true;
+                        }
+                        if (CurrentTarget.Type == GObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary)
+                        {
+                            return false;
+                        }
 
-            //            if (CurrentTarget.IsUnit)
-            //            {
-            //                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, 
-            //                    "Blacklisting a monster because of possible stuck issues. Monster={0} [{1}] Range={2:0} health %={3:0} RActorGUID={4}",
-            //                    CurrentTarget.InternalName,         // 0
-            //                    CurrentTarget.ActorSNO,             // 1
-            //                    CurrentTarget.Distance,       // 2
-            //                    CurrentTarget.HitPointsPct,            // 3
-            //                    CurrentTarget.RActorGuid            // 4
-            //                    );
-            //            }
-            //            else
-            //            {
-            //                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, 
-            //                    "Blacklisting an object because of possible stuck issues. Object={0} [{1}]. Range={2:0} RActorGUID={3}",
-            //                    CurrentTarget.InternalName,         // 0
-            //                    CurrentTarget.ActorSNO,             // 1 
-            //                    CurrentTarget.Distance,       // 2
-            //                    CurrentTarget.RActorGuid            // 3
-            //                    );
-            //            }
+                        if (CurrentTarget.IsUnit)
+                        {
+                            Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation,
+                                "Blacklisting a monster because of possible stuck issues. Monster={0} [{1}] Range={2:0} health %={3:0} RActorGUID={4}",
+                                CurrentTarget.InternalName,         // 0
+                                CurrentTarget.ActorSNO,             // 1
+                                CurrentTarget.Distance,       // 2
+                                CurrentTarget.HitPointsPct,            // 3
+                                CurrentTarget.RActorGuid            // 4
+                                );
+                        }
+                        else
+                        {
+                            Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation,
+                                "Blacklisting an object because of possible stuck issues. Object={0} [{1}]. Range={2:0} RActorGUID={3}",
+                                CurrentTarget.InternalName,         // 0
+                                CurrentTarget.ActorSNO,             // 1 
+                                CurrentTarget.Distance,       // 2
+                                CurrentTarget.RActorGuid            // 3
+                                );
+                        }
 
-            //            Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Blacklisted Target, Returning Failure");
+                        Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Blacklisted Target, Returning Failure");
 
-            //            Blacklist3Seconds.Add(CurrentTarget.RActorGuid);
-            //            Blacklist3LastClear = DateTime.UtcNow;
-            //            CurrentTarget = null;
-            //            return true;
-            //        }
-            //    }
+                        Blacklist3Seconds.Add(CurrentTarget.RActorGuid);
+                        Blacklist3LastClear = DateTime.UtcNow;
+                        CurrentTarget = null;
+                        return true;
+                    }
+                }
 
-            //    return false;
-            //}
+                return false;
+            }
 
             return false;
         }
@@ -1163,7 +1163,7 @@ namespace Trinity
                             Options = new QueuedMovementOptions
                             {
                                 Logging = LogLevel.Info,
-                                AcceptableDistance = CurrentTarget.RadiusDistance,
+                                AcceptableDistance = TargetRangeRequired,
                                 Type = CurrentTarget.IsUnit ? MoveType.BasicCombat : MoveType.TargetAttempt
                             }
                         });
@@ -1454,6 +1454,30 @@ namespace Trinity
                 _forceTargetUpdate = true;
                 return iInteractAttempts;
             }
+        }
+
+        private static bool CurrentTargetIsNotAvoidance()
+        {
+            return !CurrentTarget.IsAvoidance;
+        }
+
+        private static bool CurrentTargetIsNonUnit()
+        {
+            return !CurrentTarget.IsUnit;
+        }
+
+        private static bool CurrentTargetIsUnit()
+        {
+            return CurrentTarget.IsUnit;
+        }
+
+        /// <summary>
+        /// Returns the number of seconds since our current target was updated
+        /// </summary>
+        /// <returns></returns>
+        private static double GetSecondsSinceTargetUpdate()
+        {
+            return DateTime.UtcNow.Subtract(LastPickedTargetTime).TotalSeconds;
         }
     }
 }

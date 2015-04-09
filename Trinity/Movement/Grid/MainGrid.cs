@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Reference;
 using Trinity.Technicals;
-using Zeta.Bot.Dungeons;
-using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;

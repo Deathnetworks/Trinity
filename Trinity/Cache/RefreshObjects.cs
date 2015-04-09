@@ -455,6 +455,26 @@ namespace Trinity
                     });
                 }
             }
+
+            // Bounty POI
+            if (ZetaDia.ActInfo.ActiveBounty != null && ZetaDia.ActInfo.ActiveBounty.LevelAreas.Contains((SNOLevelArea)Player.LevelAreaId) && 
+                ZetaDia.Minimap.Markers.CurrentWorldMarkers.Any(m => m.IsPointOfInterest))
+            {
+                foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsPointOfInterest && !Blacklist60Seconds.Contains(m.NameHash)))
+                {
+                    ObjectCache.Add(new TrinityCacheObject()
+                    {
+                        Position = marker.Position,
+                        InternalName = "Bounty Objective",
+                        RActorGuid = marker.NameHash,
+                        ActorType = ActorType.Monster,
+                        Type = GObjectType.Unit,
+                        Radius = 10f,
+                        Weight = 5000,
+                        IsBoss = true,
+                    });
+                }
+            }
         }
 
         private static void RefreshCacheMainLoop()

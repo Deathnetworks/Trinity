@@ -161,6 +161,11 @@ namespace Trinity
                 if (o == null)
                     return false;
 
+                if (DataDictionary.AlwaysRaycastWorlds.Contains(Player.WorldID))
+                {
+                    return CanRayCast(origin, o.Position);
+                }
+
                 if (o.Type == GObjectType.Item && o.ItemQuality >= ItemQuality.Legendary)
                     return true;
 

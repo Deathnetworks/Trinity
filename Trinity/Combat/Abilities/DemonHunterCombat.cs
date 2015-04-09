@@ -590,7 +590,11 @@ namespace Trinity.Combat.Abilities
 
             if (CurrentTarget != null)
                 power = GetCombatBuffPower();
-            if (!IsNull(power)) { return power; }
+
+            if (!IsNull(power))
+            {
+                return power;
+            }
 
             if (CurrentTarget == null)
                 return null;
@@ -765,38 +769,38 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                    if (_SentryCastSkillsCastArea != null)
-                        return _SentryCastSkillsCastArea;
+                if (_SentryCastSkillsCastArea != null)
+                    return _SentryCastSkillsCastArea;
 
-                    TrinityCacheObject targetCacheObject = default(TrinityCacheObject);
-                    if (Skills.DemonHunter.ElementalArrow.IsActive && Runes.DemonHunter.BallLightning.IsActive)
-                        targetCacheObject = TargetUtil.GetBestPierceTarget(DHSettings.RangedAttackRange);
-                    else
-                        targetCacheObject = TargetUtil.GetClosestTarget(150f, _useWeights: false);
+                TrinityCacheObject targetCacheObject = default(TrinityCacheObject);
+                if (Skills.DemonHunter.ElementalArrow.IsActive && Runes.DemonHunter.BallLightning.IsActive)
+                    targetCacheObject = TargetUtil.GetBestPierceTarget(DHSettings.RangedAttackRange);
+                else
+                    targetCacheObject = TargetUtil.GetClosestTarget(150f, _useWeights: false);
 
-                    if (Skills.DemonHunter.ClusterArrow.IsActive && TargetUtil.ClusterExists(20f, DHSettings.RangedAttackRange))
-                        _SentryCastSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, DHSettings.RangedAttackRange + 5f, _useWeights: false).Position);
+                if (Skills.DemonHunter.ClusterArrow.IsActive && TargetUtil.ClusterExists(20f, DHSettings.RangedAttackRange))
+                    _SentryCastSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, DHSettings.RangedAttackRange + 5f, _useWeights: false).Position);
 
-                    else if (Skills.DemonHunter.Multishot.IsActive && TargetUtil.ClusterExists(40f, DHSettings.RangedAttackRange))
-                        _SentryCastSkillsCastArea = new TargetArea(40f, TargetUtil.GetBestClusterUnit(40f, DHSettings.RangedAttackRange + 5f, _useWeights: false).Position);
+                else if (Skills.DemonHunter.Multishot.IsActive && TargetUtil.ClusterExists(40f, DHSettings.RangedAttackRange))
+                    _SentryCastSkillsCastArea = new TargetArea(40f, TargetUtil.GetBestClusterUnit(40f, DHSettings.RangedAttackRange + 5f, _useWeights: false).Position);
 
-                    else if (Skills.DemonHunter.Chakram.IsActive && TargetUtil.ClusterExists(20f, Math.Min(DHSettings.RangedAttackRange, 50f)))
-                        _SentryCastSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, Math.Min(DHSettings.RangedAttackRange + 5f, 50f), _useWeights: false).Position);
+                else if (Skills.DemonHunter.Chakram.IsActive && TargetUtil.ClusterExists(20f, Math.Min(DHSettings.RangedAttackRange, 50f)))
+                    _SentryCastSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, Math.Min(DHSettings.RangedAttackRange + 5f, 50f), _useWeights: false).Position);
 
-                    if (Skills.DemonHunter.ClusterArrow.IsActive && TargetUtil.ClusterExists(20f, 90f))
-                        _SentryCastSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, 65f, _useWeights: false).Position);
+                if (Skills.DemonHunter.ClusterArrow.IsActive && TargetUtil.ClusterExists(20f, 90f))
+                    _SentryCastSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, 65f, _useWeights: false).Position);
 
-                    else if (Skills.DemonHunter.Multishot.IsActive && TargetUtil.ClusterExists(40f, 90f))
-                        _SentryCastSkillsCastArea = new TargetArea(40f, TargetUtil.GetBestClusterUnit(40f, 65f, _useWeights: false).Position);
+                else if (Skills.DemonHunter.Multishot.IsActive && TargetUtil.ClusterExists(40f, 90f))
+                    _SentryCastSkillsCastArea = new TargetArea(40f, TargetUtil.GetBestClusterUnit(40f, 65f, _useWeights: false).Position);
 
-                    else if (Skills.DemonHunter.Chakram.IsActive && TargetUtil.ClusterExists(20f, 90f))
-                        _SentryCastSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, 65f, _useWeights: false).Position);
+                else if (Skills.DemonHunter.Chakram.IsActive && TargetUtil.ClusterExists(20f, 90f))
+                    _SentryCastSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, 65f, _useWeights: false).Position);
 
-                    else if (targetCacheObject != null && targetCacheObject != default(TrinityCacheObject) && targetCacheObject.Position != Vector3.Zero)
-                        _SentryCastSkillsCastArea = new TargetArea(20f, targetCacheObject.Position);
+                else if (targetCacheObject != null && targetCacheObject != default(TrinityCacheObject) && targetCacheObject.Position != Vector3.Zero)
+                    _SentryCastSkillsCastArea = new TargetArea(20f, targetCacheObject.Position);
 
-                    else if (CurrentTarget != null && CurrentTarget.IsUnit)
-                        _SentryCastSkillsCastArea = new TargetArea(20f, CurrentTarget.Position);
+                else if (CurrentTarget != null && CurrentTarget.IsUnit)
+                    _SentryCastSkillsCastArea = new TargetArea(20f, CurrentTarget.Position);
                 return _SentryCastSkillsCastArea;
             }
         }
