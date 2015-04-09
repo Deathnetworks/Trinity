@@ -37,9 +37,8 @@ namespace Trinity
                 return false;
 
             // Always set this, otherwise we divide by zero later
-            using (new MemorySpy("RefreshUnit().CheckKillRange"))
-            { c_CacheObject.KillRange = CurrentBotKillRange; }
-            
+            c_CacheObject.KillRange = CurrentBotKillRange;
+
 
             // See if this is a boss
             using (new MemorySpy("RefreshUnit().CheckIsBoss"))
@@ -52,7 +51,7 @@ namespace Trinity
 
             // hax for Diablo_shadowClone
             using (new MemorySpy("RefreshUnit().CheckIsAttackable"))
-            { 
+            {
                 c_unit_IsAttackable = c_CacheObject.InternalName.StartsWith("Diablo_shadowClone");
             }
 
@@ -82,7 +81,9 @@ namespace Trinity
             }
 
             using (new MemorySpy("RefreshUnit().CheckIsBountyObjective"))
-            { CacheObjectIsBountyObjective(); }
+            {
+                CacheObjectIsBountyObjective();
+            }
 
             using (new MemorySpy("RefreshUnit().CheckIsNPC"))
             {
@@ -194,7 +195,7 @@ namespace Trinity
                 // Only set treasure goblins to true *IF* they haven't disabled goblins! Then check the SNO in the goblin hash list!
                 c_unit_IsTreasureGoblin = false;
                 // Flag this as a treasure goblin *OR* ignore this object altogether if treasure goblins are set to ignore
-                if (DataDictionary.GoblinIds.Contains(c_CacheObject.ActorSNO))
+                if (DataDictionary.GoblinIds.Contains(c_CacheObject.ActorSNO) || c_CacheObject.InternalName.ToLower().StartsWith("treasuregoblin"))
                 {
                     if (Settings.Combat.Misc.GoblinPriority != 0)
                     {
@@ -258,7 +259,9 @@ namespace Trinity
 
             // Set Kill range
             using (new MemorySpy("RefreshUnit().CheckKillRange"))
-            { c_CacheObject.KillRange = SetKillRange(); }
+            {
+                c_CacheObject.KillRange = SetKillRange();
+            }
 
             if (c_CacheObject.RadiusDistance <= c_CacheObject.KillRange)
                 AnyMobsInRange = true;
@@ -287,7 +290,7 @@ namespace Trinity
         {
             if (!CacheData.MonsterSizes.TryGetValue(c_CacheObject.RActorGuid, out c_unit_MonsterSize))
             {
-                if (c_unit_MonsterInfo == null) 
+                if (c_unit_MonsterInfo == null)
                     c_unit_MonsterInfo = c_diaUnit.MonsterInfo;
 
                 c_unit_MonsterSize = c_unit_MonsterInfo != null ? c_unit_MonsterInfo.MonsterSize : MonsterSize.Unknown;
@@ -444,11 +447,11 @@ namespace Trinity
                 int i_SummonedByACDId;
                 if (!CacheData.SummonedByACDId.TryGetValue(c_CacheObject.RActorGuid, out i_SummonedByACDId))
                 {
-                    try 
-                    { 
+                    try
+                    {
                         i_SummonedByACDId = c_diaUnit.SummonedByACDId;
                         CacheData.SummonedByACDId.Add(c_CacheObject.RActorGuid, i_SummonedByACDId);
-                    } 
+                    }
                     catch {/* Continue */}
                 }
 

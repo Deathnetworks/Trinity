@@ -73,8 +73,6 @@ namespace Trinity
                     if (lastUpdateMs <= 5000 && CombatBase.TimeSincePowerUse(SNOPower.Wizard_Archon) > 20000)
 						return;
 
-				    Clear();
-
 					try
 					{
                         RefreshHotbar();
@@ -90,13 +88,15 @@ namespace Trinity
 			{			   
 				using (new PerformanceLogger("RefreshHotbar"))
 				{
+                    Clear();
+                    
                     var cPlayer = ZetaDia.CPlayer;
 
                     LastUpdated = DateTime.UtcNow;
 
                     PassiveSkills = new HashSet<SNOPower>(cPlayer.PassiveSkills);
 
-                    for (int i = 0; i <= 5; i++)
+				    for (int i = 0; i <= 5; i++)
                     {
                         var diaActiveSkill = cPlayer.GetActiveSkillByIndex(i, ZetaDia.Me.SkillOverrideActive);                        
                         if (diaActiveSkill == null)
@@ -105,7 +105,7 @@ namespace Trinity
                         var power = diaActiveSkill.Power;
                         var runeIndex = diaActiveSkill.RuneIndex;
 
-                        var hotbarskill = new HotbarSkill
+                        HotbarSkill hotbarSkill = new HotbarSkill
                         {
                             Power = diaActiveSkill.Power,
                             Slot = (HotbarSlot) i,
@@ -115,9 +115,9 @@ namespace Trinity
                         };
 
                         ActivePowers.Add(power);
-                        ActiveSkills.Add(hotbarskill);
-                        _skillBySNOPower.Add(power, hotbarskill);
-                        _skillBySlot.Add((HotbarSlot)i, hotbarskill);
+                        ActiveSkills.Add(hotbarSkill);
+                        _skillBySNOPower.Add(power, hotbarSkill);
+                        _skillBySlot.Add((HotbarSlot)i, hotbarSkill);
 
                         if (!DataDictionary.LastUseAbilityTimeDefaults.ContainsKey(power))
                             DataDictionary.LastUseAbilityTimeDefaults.Add(power, DateTime.MinValue);

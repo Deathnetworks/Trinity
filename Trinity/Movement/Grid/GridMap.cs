@@ -54,47 +54,48 @@ namespace Trinity
         /// <summary>
         /// Search the grid point with higher cluster weight
         /// </summary>
-        public static GridNode GetBestClusterNode(Vector3 _loc = new Vector3(), float _radius = 15f, float _range = 65f, float _minRange = 0f, int _size = 1, bool _useWeights = true, bool _useDefault = true)
+        public static GridNode GetBestClusterNode(Vector3 loc = new Vector3(), float radius = 15f, float range = 65f, float minRange = 0f, int size = 1, bool useWeights = true, bool useDefault = true)
         {
             using (new MemorySpy("GridMap.GetBestClusterNode()"))
             {
-                if (_loc == new Vector3())
-                    _loc = Trinity.Player.Position;
-                bool _atPlayer = _loc == Trinity.Player.Position;
+                if (loc == new Vector3())
+                    loc = Trinity.Player.Position;
+                bool atPlayer = loc == Trinity.Player.Position;
 
-                GridNode _cluster;
-                if (GridResults.HasRecordedValue_GetBestClusterNode(out _cluster, _range, _loc))
+                GridNode cluster;
+                if (GridResults.HasRecordedValue_GetBestClusterNode(out cluster, range, loc))
                 {
                     /* Keep last safe point */
-                    if (_cluster.ClusterWeight >= (GetPointAt(_cluster.Position).ClusterWeight * 0.9))
-                        return _cluster;
+                    var point = GetPointAt(cluster.Position);
+                    if (point != null && cluster.ClusterWeight >= (point.ClusterWeight * 0.9))
+                        return cluster;
 
-                    GridResults.RecordedValues_GetBestClusterNode.RemoveWhere(p => p.GridLocation.Equals(_cluster));
+                    GridResults.RecordedValues_GetBestClusterNode.RemoveWhere(p => p != null && p.GridLocation != null && p.GridLocation.Equals(cluster));
                 }
 
                 if (ClusterNodeExist)
                 {
-                    _cluster = (
-                        from _g in MainGrid.MapAsList
+                    cluster = (
+                        from g in MainGrid.MapAsList
                         where
-                            _g.ClusterWeight > 0 &&
-                            (_atPlayer && _g.Distance >= _minRange ||
-                            !_atPlayer && _g.Position.Distance2D(_loc) >= _minRange) &&
-                            (_atPlayer && _g.Distance < _range ||
-                            !_atPlayer && _g.Position.Distance2D(_loc) < _range)
+                            g.ClusterWeight > 0 &&
+                            (atPlayer && g.Distance >= minRange ||
+                            !atPlayer && g.Position.Distance2D(loc) >= minRange) &&
+                            (atPlayer && g.Distance < range ||
+                            !atPlayer && g.Position.Distance2D(loc) < range)
                         orderby
-                            _g.ClusterWeight descending
-                        select _g).ToList().FirstOrDefault();
+                            g.ClusterWeight descending
+                        select g).ToList().FirstOrDefault();
 
-                    if (_cluster != null && _cluster.ClusterWeight > 0f)
+                    if (cluster != null && cluster.ClusterWeight > 0f)
                     {
-                        GridResults.RecordedValues_GetBestClusterNode.Add(new GetBestClusterNodeResult(_cluster, _range, _loc));
-                        return _cluster;
+                        GridResults.RecordedValues_GetBestClusterNode.Add(new GetBestClusterNodeResult(cluster, range, loc));
+                        return cluster;
                     }
                 }
 
-                if (_useDefault)
-                    return new GridNode(TargetUtil.GetBestClusterPoint(_radius, _range, _size, _useWeights, _loc));
+                if (useDefault)
+                    return new GridNode(TargetUtil.GetBestClusterPoint(radius, range, size, useWeights, loc));
 
                 return null;
             }

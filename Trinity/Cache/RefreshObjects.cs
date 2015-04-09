@@ -37,7 +37,8 @@ namespace Trinity
         }
 
         /// <summary>
-        /// This method will add and update necessary information about all available actors. Determines ObjectType, sets ranges, updates blacklists, determines avoidance, kiting, target weighting
+        /// This method will add and update necessary information about all available actors. Determines ObjectType, 
+        /// sets ranges, updates blacklists, determines avoidance, kiting, target weighting
         /// and the result is we will have a new target for the Target Handler. Returns true if the cache was refreshed.
         /// </summary>
         /// <returns>True if the cache was updated</returns>
@@ -105,17 +106,25 @@ namespace Trinity
                         /* Now pull up all the data and store anything we want to handle in the super special cache list
                         Also use many cache dictionaries to minimize DB<->D3 memory hits, and speed everything up a lot */
                         using (new MemorySpy("RefreshDiaObjects().Init"))
-                        { RefreshCacheInit(); }
+                        {
+                            RefreshCacheInit();
+                        }
                         using (new MemorySpy("RefreshDiaObjects().Loop"))
-                        { RefreshCacheMainLoop(); }
+                        {
+                            RefreshCacheMainLoop();
+                        }
 
                         /* Add Legendary & Set Minimap Markers to ObjectCache */
                         using (new MemorySpy("RefreshDiaObjects().Markers"))
-                        { RefreshCacheMarkers(); }
+                        {
+                            RefreshCacheMarkers();
+                        }
 
                         /* Add Team HotSpots to the cache */
                         using (new MemorySpy("RefreshDiaObjects().HotSpots"))
-                        { ObjectCache.AddRange(GroupHotSpots.GetCacheObjectHotSpots()); }
+                        {
+                            ObjectCache.AddRange(GroupHotSpots.GetCacheObjectHotSpots());
+                        }
 
                         /* Fire Chains Experimental Avoidance */
                         using (new MemorySpy("RefreshDiaObjects().FireChains"))
@@ -154,31 +163,43 @@ namespace Trinity
 
                         /* Clear animation at player obsolete */
                         using (new MemorySpy("RefreshDiaObjects().Obsolete"))
-                        { CacheData.ClearObsolete(); }
+                        {
+                            CacheData.ClearObsolete();
+                        }
 
                         /* Add avoidances and usafe zones to dictionary (faster check / HashSet) */
                         using (new MemorySpy("RefreshDiaObjects().SetDictionary"))
-                        { CacheData.SetDictionary(); }
+                        {
+                            CacheData.SetDictionary();
+                        }
 
                         /* Combat helper values */
                         using (new MemorySpy("RefreshDiaObjects().RefreshCombatValues"))
-                        { CombatBase.RefreshValues(); }
+                        {
+                            CombatBase.RefreshValues();
+                        }
 
                         /* Set Weights, assign CurrentTarget */
                         using (new MemorySpy("RefreshDiaObjects().Weight"))
-                        { RefreshDiaGetWeights(); }
+                        {
+                            RefreshDiaGetWeights();
+                        }
 
                         /* Invoke all methode called in cache update */
                         using (new MemorySpy("RefreshDiaObjects().InvokeEvents"))
-                        { Events.OnCacheUpdatedHandler.Invoke(); }
+                        {
+                            Events.OnCacheUpdatedHandler.Invoke();
+                        }
                     }
                     /* Refresh at Tick impair */
                     else
                     {
                         /* Refresh grid map fields */
                         using (new MemorySpy("RefreshDiaObjects().Grid"))
-                        { GridMap.RefreshGridMainLoop(); }
-                    }                    
+                        {
+                            GridMap.RefreshGridMainLoop();
+                        }
+                    }
                 }
 
                 using (new MemorySpy("RefreshDiaObjects().FinalCheck"))
@@ -189,7 +210,8 @@ namespace Trinity
                         if (!Player.IsInTown && TownRun.PreTownRunPosition != Vector3.Zero && TownRun.PreTownRunWorldId == Player.WorldID && !ForceVendorRunASAP
                             && TownRun.PreTownRunPosition.Distance2D(Player.Position) <= V.F("Cache.PretownRun.MaxDistance"))
                         {
-                            Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Pre-TownRun position is more than {0} yards away, canceling", V.I("Cache.PretownRun.MaxDistance"));
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation,
+                                "Pre-TownRun position is more than {0} yards away, canceling", V.I("Cache.PretownRun.MaxDistance"));
                             TownRun.PreTownRunPosition = Vector3.Zero;
                             TownRun.PreTownRunWorldId = -1;
                         }
@@ -338,7 +360,8 @@ namespace Trinity
 
                     if (GenericBlacklist.ContainsKey(hash))
                     {
-                        Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Ignoring Marker because it's blacklisted {0} {1} at {2} distance {3}", name, marker.NameHash, marker.Position, marker.Position.Distance(Player.Position));
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Ignoring Marker because it's blacklisted {0} {1} at {2} distance {3}",
+                            name, marker.NameHash, marker.Position, marker.Position.Distance(Player.Position));
                         continue;
                     }
 
@@ -592,19 +615,19 @@ namespace Trinity
                 // Reset all variables for target-weight finding
                 CurrentBotKillRange = Settings.Combat.Misc.NonEliteRange;
 
-                if (AnyTreasureGoblinsPresent && Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze && CurrentBotKillRange < 60f)
-                    CurrentBotKillRange = 60f;
+                //if (AnyTreasureGoblinsPresent && Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze && CurrentBotKillRange < 60f)
+                //    CurrentBotKillRange = 60f;
 
                 AnyTreasureGoblinsPresent = false;
 
                 // Max kill range if we're questing
-                if (DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId))
+                if (DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId) && CombatBase.IsQuestingMode)
                     CurrentBotKillRange = 300f;
 
                 CurrentBotLootRange = Zeta.Bot.Settings.CharacterSettings.Instance.LootRadius;
                 _shouldStayPutDuringAvoidance = false;
 
-                // Not allowed to kill monsters due to profile/routine/combat targeting settings - just set the kill range to a third
+                // Not allowed to kill monsters due to profile/routine/combat targeting settings
                 if (!ProfileManager.CurrentProfile.KillMonsters || !CombatTargeting.Instance.AllowedToKillMonsters)
                 {
                     CurrentBotKillRange = 0;
@@ -732,7 +755,8 @@ namespace Trinity
 
             // End of backtracking check
             // Finally, a special check for waiting for wrath of the berserker cooldown before engaging Azmodan
-            if (CurrentTarget == null && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && Settings.Combat.Barbarian.WaitWOTB && !SNOPowerUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) &&
+            if (CurrentTarget == null && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker)
+                && Settings.Combat.Barbarian.WaitWOTB && !SNOPowerUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) &&
                 Player.WorldID == 121214 &&
                 (Vector3.Distance(Player.Position, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(Player.Position, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {

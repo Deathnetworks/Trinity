@@ -560,7 +560,7 @@ namespace Trinity
             if (useTargetBasedZigZag && shouldZigZagElites && !AnyTreasureGoblinsPresent && ObjectCache.Count(o => o.IsUnit) >= minTargets)
             {
                 bool attackInAoe = Trinity.KillMonstersInAoE;
-                var clusterNode = GridMap.GetBestClusterNode(Player.Position, ringDistance, maxDistance, minDistance, _useDefault: false);
+                var clusterNode = GridMap.GetBestClusterNode(Player.Position, ringDistance, maxDistance, minDistance, useDefault: false);
                 if (clusterNode != null)
                 {
                     Logger.Log(LogCategory.Movement, "Returning ZigZag: BestClusterNode {0} r-dist={1} t-dist={2}", clusterNode.Position, ringDistance, clusterNode.Distance);

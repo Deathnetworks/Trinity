@@ -320,7 +320,7 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0, CombatBase.QueuedMovement.CurrentMovement.Destination);
                 }
 
-                GridNode bestCluster = GridMap.GetBestClusterNode(_useDefault: false);
+                GridNode bestCluster = GridMap.GetBestClusterNode(useDefault: false);
                 float range = Passives.Monk.Momentum.IsActive && !Passives.Monk.Momentum.IsBuffActive ? 25f : 20f;
                 if (bestCluster != null && bestCluster.Distance >= range)
                 {

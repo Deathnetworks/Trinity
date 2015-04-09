@@ -161,8 +161,8 @@ namespace Trinity
                 if (o == null)
                     return false;
 
-                //if (o.Type == GObjectType.Item || o.Type == GObjectType.Gold)
-                //    return true;
+                if (o.Type == GObjectType.Item && o.ItemQuality >= ItemQuality.Legendary)
+                    return true;
 
                 if (o.Type == GObjectType.Unit && DataDictionary.NeverRaycastLevelAreaIds.Contains(Player.LevelAreaId))
                     return true;
@@ -192,16 +192,16 @@ namespace Trinity
                 if (!DataDictionary.AlwaysRaycastWorlds.Contains(Player.WorldID))
                 {
                     // Bounty Objectives should always be on the weight list
-                    //if (o.IsBountyObjective)
-                    //    return true;
+                    if (o.IsBountyObjective)
+                        return true;
 
                     // Quest Monsters should get LoS white-listed
-                    //if (o.IsQuestMonster)
-                    //    return true;
+                    if (o.IsQuestMonster)
+                        return true;
 
                     // Always LoS Units during events
-                    //if (o.Type == GObjectType.Unit && Player.InActiveEvent)
-                    //   return true;
+                    if (o.Type == GObjectType.Unit && Player.InActiveEvent)
+                        return true;
                 }
 
                 if (distFromOToOrigin <= 100)

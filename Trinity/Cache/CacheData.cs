@@ -299,11 +299,11 @@ namespace Trinity
         {
             if (Tick % 3 == 0 && Trinity.ObjectCache != null)
             {
-                ObsoleteAvoidancesAtPlayer.RemoveWhere(a => !Trinity.ObjectCache.Any(o => o.ActorSNO == a));
+                ObsoleteAvoidancesAtPlayer.RemoveWhere(a => Trinity.ObjectCache.All(o => o.ActorSNO != a));
                 HasBeenInLoS.ToList()
-                    .Where(i => !Trinity.ObjectCache.Any(o => o.RActorGuid == i.Key))
+                    .Where(i => Trinity.ObjectCache.All(o => o.RActorGuid != i.Key))
                     .ToList()
-                    .ForEach(i => CacheData.HasBeenInLoS.Remove(i.Key));
+                    .ForEach(i => HasBeenInLoS.Remove(i.Key));
             }
         }
 

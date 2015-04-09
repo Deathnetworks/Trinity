@@ -69,7 +69,7 @@ namespace Trinity
                         };
                     }
                 }
-            } 
+            }
             #endregion
 
             if (CurrentTarget != null && CurrentTarget.IsAvoidance && Trinity.Player.StandingInAvoidance)
@@ -260,6 +260,16 @@ namespace Trinity
                                         cacheObject.Weight = 0;
                                         break;
                                     }
+                                }
+                                
+                                // Monster is in cache but not within kill range
+                                if (!cacheObject.IsBoss && !cacheObject.IsTreasureGoblin && LastTargetRactorGUID != cacheObject.RActorGuid &&
+                                    cacheObject.RadiusDistance > cacheObject.KillRange &&
+                                    !cacheObject.IsQuestMonster &&
+                                    !cacheObject.IsBountyObjective)
+                                {
+                                    objWeightInfo += "KillRange ";
+                                    break;
                                 }
 
                                 if (cacheObject.HitPointsPct <= 0)
@@ -1459,7 +1469,7 @@ namespace Trinity
                     }
                 }
 
-                if (CurrentTarget != null && !CurrentTarget.IsUnit && !CurrentTarget.IsAvoidance && 
+                if (CurrentTarget != null && !CurrentTarget.IsUnit && !CurrentTarget.IsAvoidance &&
                     CurrentTarget.Weight == 1 &&
                     CacheData.AvoidanceObstacles.Any(a => MathUtil.IntersectsPath(a.Position, a.Radius + 2f, Player.Position, CurrentTarget.Position) ||
                     CacheData.AvoidanceObstacles.Any(aoe => CurrentTarget.Position.Distance2D(aoe.Position) <= aoe.Radius)))
@@ -1473,12 +1483,12 @@ namespace Trinity
                     RecordTargetHistory();
                     Logger.Log(TrinityLogLevel.Verbose, LogCategory.Weight, "Target changed to {0} // {1} ({2}) {3}", CurrentTarget.ActorSNO, CurrentTarget.InternalName, CurrentTarget.Type, CurrentTarget.WeightInfo);
                 }
-            } 
+            }
             #endregion
 
             #region StayingPutDuringAvoidance
-            bool shouldStayPutDuringAvoidance = 
-                CurrentTarget != null && CombatBase.IsCombatAllowed && 
+            bool shouldStayPutDuringAvoidance =
+                CurrentTarget != null && CombatBase.IsCombatAllowed &&
                 Settings.Combat.Misc.AvoidAoEOutOfCombat && _shouldStayPutDuringAvoidance &&
                 !(Player.StandingInAvoidance || Player.AvoidDeath || Player.NeedToKite || CombatBase.PlayerIsSurrounded);
 
@@ -1486,12 +1496,12 @@ namespace Trinity
             {
                 var _pathIntersect = (
                     from p in MainGrid.MapAsList
-                    where 
+                    where
                         p.Position.Distance2D(CurrentTarget.Position) < CurrentTarget.Distance &&
                         p.Weight > 0 &&
                         !p.HasAvoidanceRelated &&
                         !CacheData.AvoidanceObstacles.Any(a => MathUtil.IntersectsPath(a.Position, a.Radius + 2f, Player.Position, p.Position))
-                    orderby 
+                    orderby
                         p.Position.Distance2D(CurrentTarget.Position)
                     select p).ToList().FirstOrDefault();
 
@@ -1512,8 +1522,8 @@ namespace Trinity
                         Radius = 2f,
                         InternalName = "StayPutPoint"
                     };
-                }                
-            } 
+                }
+            }
             #endregion
 
             // Kite

@@ -376,7 +376,7 @@ namespace Trinity
         [NoCopy]
         public Vector3 ClusterPosition(float range = 20f)
         {
-            var cluster = GridMap.GetBestClusterNode(Position, _range: range, _useDefault: false);
+            var cluster = GridMap.GetBestClusterNode(Position, range: range, useDefault: false);
             if (cluster != null)
                 return cluster.Position;
 
@@ -556,11 +556,11 @@ namespace Trinity
         [NoCopy]
         public bool IsInLineOfSight(bool forceUpdate = false)
         {
-            if (InLineOfSight || HasBeenRaycastable || HasBeenInLoS)
-                return true;
-
             if (forceUpdate)
                 InLineOfSight = NavHelper.ObjectIsInLos(this);
+
+            if (InLineOfSight || HasBeenRaycastable || HasBeenInLoS)
+                return true;
 
             return InLineOfSight;
         }

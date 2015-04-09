@@ -1058,7 +1058,7 @@ namespace Trinity
                         Infos = "(Keep moving) " + CurrentTarget.Infos,
                         Destination = Player.IsRanged ?
                         GridMap.GetBestMoveNode().Position :
-                        GridMap.GetBestClusterNode(_radius: Settings.Combat.Misc.TrashPackClusterRadius, _size: Settings.Combat.Misc.TrashPackSize, _range: TargetCurrentDistance + 5f).Position,
+                        GridMap.GetBestClusterNode(radius: Settings.Combat.Misc.TrashPackClusterRadius, size: Settings.Combat.Misc.TrashPackSize, range: TargetCurrentDistance + 5f).Position,
                         OnUpdate = m =>
                         {
                             var _safeNode = GridMap.GetBestMoveNode();
@@ -1163,7 +1163,7 @@ namespace Trinity
                             Options = new QueuedMovementOptions
                             {
                                 Logging = LogLevel.Info,
-                                AcceptableDistance = CurrentTarget.RequiredRange,
+                                AcceptableDistance = CurrentTarget.RadiusDistance,
                                 Type = CurrentTarget.IsUnit ? MoveType.BasicCombat : MoveType.TargetAttempt
                             }
                         });
