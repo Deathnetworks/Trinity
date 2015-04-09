@@ -705,7 +705,7 @@ namespace Trinity
                             if (!MainGrid.ShouldAvoidAoE)
                             {
                                 int _dstFromObj = (int)Position.Distance2D(_o.Position);
-                                if (_dstFromObj <= _o.Radius + 5f && !MainGrid.ShouldAvoidAoE && !_o.IsNavBlocking() &&
+                                if (_dstFromObj <= _o.Radius + 5f && !MainGrid.ShouldAvoidAoE && _o.IsNavigable &&
                                     (Trinity.Settings.WorldObject.HiPriorityContainers ||
                                     ((Legendary.HarringtonWaistguard.IsEquipped && !Legendary.HarringtonWaistguard.IsBuffActive))))
                                 {

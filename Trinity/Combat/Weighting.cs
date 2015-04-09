@@ -21,21 +21,6 @@ using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
-    public static class TrinityCacheObjectUtils
-    {
-        private static TrinityCacheObject _currentCacheObject;
-        private static bool _isNavBlocking;
-        public static bool IsNavBlocking(this TrinityCacheObject o)
-        {
-            if (_currentCacheObject != null && _currentCacheObject.RActorGuid == o.RActorGuid)
-                return _isNavBlocking;
-
-            _isNavBlocking = Trinity.LastTargetACDGuid != o.ACDGuid && !NavHelper.CanRayCast(o.Position);
-            _currentCacheObject = o;
-            return _isNavBlocking;
-        }
-    }
-
     public partial class Trinity
     {
         private static void RefreshDiaGetWeights()
@@ -199,7 +184,7 @@ namespace Trinity
                                         ignoring = true;
                                     }
 
-                                    bool ignoreSummoner = cacheObject.IsSummoner && !Settings.Combat.Misc.ForceKillSummoners || cacheObject.IsNavBlocking();
+                                    bool ignoreSummoner = cacheObject.IsSummoner && !Settings.Combat.Misc.ForceKillSummoners || !cacheObject.IsNavigable;
 
                                     // Ignore Solitary Trash mobs (no elites present)
                                     // Except if has been primary target or if already low on health (<= 20%)
@@ -213,7 +198,7 @@ namespace Trinity
                                     else if (Player.ActorClass == ActorClass.Barbarian && Sets.TheLegacyOfRaekor.IsMaxBonusActive &&
                                         !TownRun.IsTryingToTownPortal() &&
                                         Skills.Barbarian.FuriousCharge.IsActive && !(cacheObject.IsPlayerFacing(20f) && cacheObject.Distance < cacheObject.Radius) &&
-                                        (TargetUtil.NumMobsInRangeOfPosition(cacheObject.Position, 40f) <= 1 || cacheObject.CountFCObjectsInFront() < 3 || !cacheObject.IsInLineOfSight()))
+                                        (TargetUtil.NumMobsInRangeOfPosition(cacheObject.Position, 40f) <= 1 || cacheObject.CountFCObjectsInFront() < 3 || !cacheObject.IsInLineOfSight))
                                     {
                                         objWeightInfo += "BarbIgnoring ";
                                         ignoring = true;
@@ -263,7 +248,7 @@ namespace Trinity
                                 }
 
                                 // Monster is in cache but not within kill range
-                                if (!cacheObject.IsBoss && !cacheObject.IsTreasureGoblin && LastTargetRactorGUID != cacheObject.RActorGuid &&
+                                if (!Player.IsRanged && !cacheObject.IsBoss && !cacheObject.IsTreasureGoblin && LastTargetRactorGUID != cacheObject.RActorGuid &&
                                     cacheObject.RadiusDistance > cacheObject.KillRange &&
                                     !cacheObject.IsQuestMonster &&
                                     !cacheObject.IsBountyObjective)
@@ -279,7 +264,7 @@ namespace Trinity
                                     break;
                                 }
 
-                                if (Player.IsRanged && !cacheObject.IsInLineOfSight())
+                                if (Player.IsRanged && !cacheObject.IsInLineOfSight)
                                 {
                                     objWeightInfo += "NotInLoS ";
                                     cacheObject.Weight = 0;
@@ -358,7 +343,7 @@ namespace Trinity
                                         }
 
                                         // Bounty Objectives goooo
-                                        if (cacheObject.IsBountyObjective && !cacheObject.IsNavBlocking())
+                                        if (cacheObject.IsBountyObjective && !!cacheObject.IsNavigable)
                                         {
                                             objWeightInfo += "BountyObjective ";
                                             cacheObject.Weight += 15000d;
@@ -770,7 +755,7 @@ namespace Trinity
                                     break;
                                 }
 
-                                if (cacheObject.IsNavBlocking())
+                                if (!cacheObject.IsNavigable)
                                 {
                                     objWeightInfo += " NavBlocking";
                                     cacheObject.Weight = 0;
@@ -815,7 +800,7 @@ namespace Trinity
                                 if (CacheData.MonsterObstacles.Any(cp => MathUtil.IntersectsPath(cp.Position, cp.Radius * 1.2f, Player.Position, cacheObject.Position)))
                                     cacheObject.Weight = 0;
 
-                                if (cacheObject.IsNavBlocking())
+                                if (!cacheObject.IsNavigable)
                                 {
                                     objWeightInfo += " NavBlocking";
                                     cacheObject.Weight = 0;
@@ -888,7 +873,7 @@ namespace Trinity
                                 }
 
                                 // Weight Health Globes
-                                if (cacheObject.IsNavBlocking() || TownRun.IsTryingToTownPortal())
+                                if (!cacheObject.IsNavigable || TownRun.IsTryingToTownPortal())
                                 {
                                     objWeightInfo += " NavBlocking";
                                     cacheObject.Weight = 0;
@@ -1034,7 +1019,7 @@ namespace Trinity
                                         cacheObject.Weight = 1;
                                         break;
                                     }
-                                    if (cacheObject.IsNavBlocking())
+                                    if (!cacheObject.IsNavigable)
                                     {
                                         objWeightInfo += " NavBlocking";
                                         cacheObject.Weight = 0;
@@ -1361,7 +1346,7 @@ namespace Trinity
                                 if (cacheObject.InternalName.ToLower().Contains("chest_rare"))
                                     maxRange = 250f;
 
-                                if (cacheObject.IsNavBlocking())
+                                if (!cacheObject.IsNavigable)
                                 {
                                     objWeightInfo += " NavBlocking";
                                     cacheObject.Weight = 0;
@@ -1431,7 +1416,7 @@ namespace Trinity
                     }
 
                     // Prevent current target dynamic ranged weighting flip-flop 
-                    if (LastTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight < 1 && !cacheObject.IsNavBlocking() && !cacheObject.IsInLineOfSight())
+                    if (LastTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight < 1 && !!cacheObject.IsNavigable && !cacheObject.IsInLineOfSight)
                     {
                         cacheObject.Weight = 100;
                     }

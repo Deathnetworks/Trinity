@@ -74,15 +74,15 @@ namespace Trinity
         #endregion
 
         #region CanRayCast Fields
-        internal static bool CanRayCast(Vector3 destination)
+        internal static bool CanRayCast(Vector3 destination, bool offSet = false)
         {
-            return CanRayCast(Player.Position, destination);
+            return CanRayCast(Player.Position, destination, offSet);
         }
         #endregion
         /// <summary>
         /// Checks the Navigator to see if the destination is in LoS (walkable)
         /// </summary>
-        internal static bool CanRayCast(Vector3 vStartLocation, Vector3 vDestination)
+        internal static bool CanRayCast(Vector3 vStartLocation, Vector3 vDestination, bool offSet = false)
         {
             // Navigator.Raycast is REVERSE Of ZetaDia.Physics.Raycast
             // Navigator.Raycast returns True if it "hits" an edge
@@ -92,8 +92,20 @@ namespace Trinity
 
             using (new MemorySpy("NavHelper.CanRayCast()"))
             {
-                foreach (var cacheObstacle in CacheData.NavRayCastObstacles.Where(o => o.Value > 3f && o.Key.Distance2D(vStartLocation) > 60f).OrderBy(o => o.Key.Distance2D(vStartLocation)))
+                if (offSet)
                 {
+                    vStartLocation.Z += 2.5f;
+                    vDestination.Z += 2.5f;
+                }
+
+                foreach (var cacheObstacle in CacheData.NavRayCastObstacles.OrderBy(o => o.Key.Distance2D(vStartLocation)))
+                {
+                    if (cacheObstacle.Value <= 3f)
+                        continue;
+
+                    if (cacheObstacle.Key.Distance2D(vStartLocation) > 60f)
+                        continue;
+
                     if (MathEx.IntersectsPath(cacheObstacle.Key, cacheObstacle.Value, vStartLocation, vDestination))
                         return false;
                 }
@@ -102,160 +114,6 @@ namespace Trinity
                     return false;
 
                 return true;
-            }
-        }
-
-        #region IsInLosField
-        internal static bool ObjectIsInLos(TrinityCacheObject o)
-        {
-            return ObjectIsInLosOfPoint(Player.Position, o);
-        }
-        internal static bool ObjectIsInLos(CacheObstacleObject o)
-        {
-            TrinityCacheObject obj = new TrinityCacheObject
-            {
-                Position = o.Position,
-                Radius = o.Radius,
-                ActorSNO = o.ActorSNO,
-                Type = GObjectType.Unknown
-            };
-
-            return ObjectIsInLosOfPoint(Player.Position, obj);
-        }
-        internal static bool ObjectIsInLosOfPoint(Vector3 origin, CacheObstacleObject o)
-        {
-            TrinityCacheObject obj = new TrinityCacheObject
-            {
-                Position = o.Position,
-                Radius = o.Radius,
-                ActorSNO = o.ActorSNO,
-                Type = GObjectType.Unknown
-            };
-
-            return ObjectIsInLosOfPoint(origin, obj);
-        }
-        internal static bool IsInLos(Vector3 target)
-        {
-            return VectorIsLos(Player.Position, target);
-        }
-        internal static bool VectorIsLos(Vector3 origin, Vector3 target)
-        {
-            TrinityCacheObject obj = new TrinityCacheObject
-            {
-                Position = target,
-                Radius = 5f,
-                ActorSNO = 1,
-                Type = GObjectType.Unknown
-            };
-
-            return ObjectIsInLosOfPoint(origin, obj);
-        }
-        #endregion
-        /// <summary>
-        /// Checks the Navigator to see if the destination is in LoS
-        /// </summary>
-        internal static bool ObjectIsInLosOfPoint(Vector3 origin, TrinityCacheObject o)
-        {
-            using (new MemorySpy("NavHelper.ObjectIsInLosOfPoint()"))
-            {
-                if (o == null)
-                    return false;
-
-                if (DataDictionary.AlwaysRaycastWorlds.Contains(Player.WorldID))
-                {
-                    return CanRayCast(origin, o.Position);
-                }
-
-                if (o.Type == GObjectType.Item && o.ItemQuality >= ItemQuality.Legendary)
-                    return true;
-
-                if (o.Type == GObjectType.Unit && DataDictionary.NeverRaycastLevelAreaIds.Contains(Player.LevelAreaId))
-                    return true;
-
-                bool isPlayerLocation = false;
-                float distFromOToOrigin = origin.Distance2D(o.Position);
-
-                // Origin is player
-                if (origin.Distance2D(Player.Position) <= 6f)
-                {
-                    isPlayerLocation = true;
-
-                    //if (o.InLineOfSight || o.HasBeenRaycastable || o.HasBeenInLoS)
-                    //    return true;
-
-                    if (DataDictionary.LineOfSightWhitelist.Contains(o.ActorSNO))
-                        return true;
-
-                    float lastLoSDistance;
-                    if (CacheData.HasBeenInLoS.TryGetValue(o.RActorGuid, out lastLoSDistance) &&
-                        lastLoSDistance > 0 && Math.Abs(lastLoSDistance - distFromOToOrigin) <= 5f)
-                    {
-                        return true;
-                    }
-                }
-
-                if (!DataDictionary.AlwaysRaycastWorlds.Contains(Player.WorldID))
-                {
-                    // Bounty Objectives should always be on the weight list
-                    if (o.IsBountyObjective)
-                        return true;
-
-                    // Quest Monsters should get LoS white-listed
-                    if (o.IsQuestMonster)
-                        return true;
-
-                    // Always LoS Units during events
-                    if (o.Type == GObjectType.Unit && Player.InActiveEvent)
-                        return true;
-                }
-
-                if (distFromOToOrigin <= 100)
-                {
-                    if (distFromOToOrigin >= 1f && distFromOToOrigin <= 5f)
-                    {
-                        if (isPlayerLocation && !CacheData.HasBeenInLoS.ContainsKey(o.RActorGuid))
-                            CacheData.HasBeenInLoS.Add(o.RActorGuid, o.Distance);
-
-                        return true;
-                    }
-
-                    if (o.Type == GObjectType.Unit)
-                    {
-                        if (Math.Abs(origin.Z - o.Position.Z) > 12f || o.ZDiff > 11f)
-                        {
-                            if (isPlayerLocation && CacheData.HasBeenInLoS.ContainsKey(o.RActorGuid))
-                                CacheData.HasBeenInLoS.Remove(o.RActorGuid);
-
-                            return false;
-                        }
-
-                        Vector3 originPos = new Vector3(origin.X, origin.Y, origin.Z + 2.5f);
-                        Vector3 cPos = new Vector3(o.Position.X, o.Position.Y, o.Position.Z + 2.5f);
-
-                        if (CanRayCast(originPos, cPos))
-                        {
-                            if (isPlayerLocation && !CacheData.HasBeenInLoS.ContainsKey(o.RActorGuid))
-                                CacheData.HasBeenInLoS.Add(o.RActorGuid, o.Distance);
-
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        if (CanRayCast(origin, o.Position))
-                        {
-                            if (isPlayerLocation && !CacheData.HasBeenInLoS.ContainsKey(o.RActorGuid))
-                                CacheData.HasBeenInLoS.Add(o.RActorGuid, o.Distance);
-
-                            return true;
-                        }
-                    }
-                }
-
-                if (isPlayerLocation && CacheData.HasBeenInLoS.ContainsKey(o.RActorGuid))
-                    CacheData.HasBeenInLoS.Remove(o.RActorGuid);
-
-                return false;
             }
         }
 
@@ -941,7 +799,7 @@ namespace Trinity
                                 timers[10].Start();
                                 if (dstFromObjectToPoint <= 5f && Player.CurrentHealthPct < 0.3)
                                 {
-                                    if (cacheObject.IsNavBlocking())
+                                    if (!cacheObject.IsNavigable)
                                     {
                                         break;
                                     }
@@ -1123,7 +981,7 @@ namespace Trinity
                             #region Container
                             {
                                 timers[22].Start();
-                                if (dstFromObjectToPoint <= cacheObject.Radius + 5f && !playerIsInBadWay && !cacheObject.IsNavBlocking() &&
+                                if (dstFromObjectToPoint <= cacheObject.Radius + 5f && !playerIsInBadWay && cacheObject.IsNavigable &&
                                     (Trinity.Settings.WorldObject.HiPriorityContainers ||
                                     ((Legendary.HarringtonWaistguard.IsEquipped && !Legendary.HarringtonWaistguard.IsBuffActive))))
                                 {

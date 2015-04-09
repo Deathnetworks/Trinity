@@ -201,7 +201,7 @@ namespace Trinity
                         GridMap.GetBestClusterNode().ClusterWeightInfos + " Dist:" + GridMap.GetBestClusterNode().Distance);
                 }
 
-                if (MainGrid.MapAsList.Any() && GridMap.GetBestClusterNode() != null)
+                if (MainGrid.MapAsList.Any() && GridMap.GetBestMoveNode() != null)
                 {
                     Logger.Log(TrinityLogLevel.Info, LogCategory.Targetting,
                         "| =>   MoveNode       : {0}",
@@ -685,8 +685,6 @@ namespace Trinity
 
                 return false;
             }
-
-            return false;
         }
 
         /// <summary>
@@ -1148,7 +1146,7 @@ namespace Trinity
                                 {
                                     Navigator.PlayerMover.MoveStop();
                                 }
-                                else if (CurrentTarget != null && !CurrentTarget.IsAvoidance && !(CurrentTarget.IsUnit && CurrentTargetIsInRange))
+                                else if (CurrentTarget != null && !CurrentTarget.IsAvoidance && !CurrentTargetIsInRange)
                                 {
                                     SetTargetFields();
                                     m.Name = CurrentTarget.InternalName;
@@ -1158,12 +1156,12 @@ namespace Trinity
                                 }
                             },
                             StopCondition = m =>
-                                CurrentTarget == null || CurrentTarget.IsKite || CurrentTarget.IsAvoidance || CurrentTarget.Type == GObjectType.Player || CurrentTarget.Type == GObjectType.OocAvoidance || (CurrentTarget.IsUnit && CurrentTargetIsInRange)
+                                CurrentTarget == null || CurrentTarget.IsAvoidance || CurrentTarget.Type == GObjectType.Player || CurrentTarget.Type == GObjectType.OocAvoidance || CurrentTargetIsInRange
                             ,
                             Options = new QueuedMovementOptions
                             {
                                 Logging = LogLevel.Info,
-                                AcceptableDistance = TargetRangeRequired,
+                                AcceptableDistance = 2f,
                                 Type = CurrentTarget.IsUnit ? MoveType.BasicCombat : MoveType.TargetAttempt
                             }
                         });
@@ -1188,7 +1186,7 @@ namespace Trinity
                 CurrentTarget.RequiredRange = 2f;
 
                 TargetCurrentDistance = CurrentTarget.RadiusDistance;
-                CurrentTargetIsInLoS = CurrentTarget.IsInLineOfSight(true);
+                CurrentTargetIsInLoS = CurrentTarget.IsInLineOfSight;
 
                 TargetCurrentDestination = CurrentTarget.Position;
                 MoveCurrentDestination = CurrentTarget.Position;

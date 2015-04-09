@@ -296,7 +296,7 @@ namespace Trinity.Combat.Abilities
                     return JawBreakerDashingStrike();
                 }
 
-                if (CurrentTarget.IsTrashPackOrBossEliteRareUnique && CurrentTarget.Distance >= MaxDashingStrikeRange && CurrentTarget.IsInLineOfSight())
+                if (CurrentTarget.IsTrashPackOrBossEliteRareUnique && CurrentTarget.Distance >= MaxDashingStrikeRange && CurrentTarget.IsInLineOfSight)
                 {
                     return new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, CurrentTarget.Position);
                 }

@@ -24,6 +24,10 @@ namespace Trinity
         {
             return new Tuple<int, int>((int)_loc.X, (int)_loc.Y);
         }
+        public static Tuple<int, int> VectorToTuple(Vector2 _loc)
+        {
+            return new Tuple<int, int>((int)_loc.X, (int)_loc.Y);
+        }
 
         private static List<TrinityCacheObject> ObjectCache
         {
@@ -168,21 +172,22 @@ namespace Trinity
                             _xy.X = ((int)_xy.X & 1) == 1 ? (int)_xy.X + 1 : (int)_xy.X;
                             _xy.Y = ((int)_xy.Y & 1) == 1 ? (int)_xy.Y + 1 : (int)_xy.Y;
 
-                            _xyz = new Vector3(_xy.X, _xy.Y, MainGridProvider.GetHeight(_xy));
-                            _g = new GridNode(_xyz);
+                            _g = new GridNode();
                         }
 
                         GridNode _nodeRecorded;
                         bool _recorded = false;
 
                         using (new MemorySpy("MainGrid.Refresh().CheckRecorded"))
-                        { _recorded = MainGrid.NodesRecorded.TryGetValue(MainGrid.VectorToTuple(_g.Position), out _nodeRecorded); }
+                        { _recorded = MainGrid.NodesRecorded.TryGetValue(MainGrid.VectorToTuple(_xy), out _nodeRecorded); }
 
                         if (_recorded)
                         {
                             using (new MemorySpy("MainGrid.Refresh().GetRecordedValues"))
                             {
                                 _nodeRecorded.ResetTickValues();
+
+                                _g.Position = _nodeRecorded.Position;
 
                                 _g.UnchangeableWeight = _nodeRecorded.UnchangeableWeight;
                                 _g.UnchangeableWeightInfos = _nodeRecorded.UnchangeableWeightInfos;
@@ -202,6 +207,9 @@ namespace Trinity
                         {
                             using (new MemorySpy("MainGrid.Refresh().GetNewValues"))
                             {
+                                _xyz = new Vector3(_xy.X, _xy.Y, Player.Position.Z + 4/*MainGridProvider.GetHeight(_xy)*/);
+                                _g.Position = _xyz;
+
                                 _g.ResetTickValues();
                                 _g.SetUnchangeableWeight();
                             }

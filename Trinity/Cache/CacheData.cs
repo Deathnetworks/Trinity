@@ -91,19 +91,14 @@ namespace Trinity
         internal static Dictionary<int, int> SummonedByACDId = new Dictionary<int, int>();
 
         /// <summary>
-        /// If a unit, item, or other object has been navigable/visible before, this will contain true value and will be considered for targetting, otherwise we will continue to check
+        /// If a unit, item, or other object has been raycastable before, this will contain true value and will be considered for targetting, otherwise we will continue to check
         /// </summary>
-        internal static Dictionary<int, float> HasBeenNavigable = new Dictionary<int, float>();
+        //internal static Dictionary<int, Tuple<bool, int>> RayCastResultsFromObjects = new Dictionary<int, Tuple<bool, int>>();
 
         /// <summary>
         /// If a unit, item, or other object has been raycastable before, this will contain true value and will be considered for targetting, otherwise we will continue to check
         /// </summary>
-        internal static Dictionary<int, float> HasBeenRayCasted = new Dictionary<int, float>();
-
-        /// <summary>
-        /// If a unit, item, or other object has been in LoS before, this will contain true value and will be considered for targetting, otherwise we will continue to check
-        /// </summary>
-        internal static Dictionary<int, float> HasBeenInLoS = new Dictionary<int, float>();
+        internal static Dictionary<int, Tuple<bool, int>> RayCastResultsFromObjects = new Dictionary<int, Tuple<bool, int>>();
 
         /// <summary>
         /// Record of items that have been on the ground
@@ -268,7 +263,7 @@ namespace Trinity
                 NearbyUnitsRecorded.Clear();
                 NearbyUnitsWithinDistanceRecorded.Clear();
 
-                ObjectsIgnored.Clear();
+                //RayCastResultsFromObjects.Clear();
             }
 
             /* Every 10 ticks */
@@ -300,10 +295,10 @@ namespace Trinity
             if (Tick % 3 == 0 && Trinity.ObjectCache != null)
             {
                 ObsoleteAvoidancesAtPlayer.RemoveWhere(a => Trinity.ObjectCache.All(o => o.ActorSNO != a));
-                HasBeenInLoS.ToList()
+                RayCastResultsFromObjects.ToList()
                     .Where(i => Trinity.ObjectCache.All(o => o.RActorGuid != i.Key))
                     .ToList()
-                    .ForEach(i => HasBeenInLoS.Remove(i.Key));
+                    .ForEach(i => RayCastResultsFromObjects.Remove(i.Key));
             }
         }
 
@@ -312,9 +307,6 @@ namespace Trinity
             AbilityLastUsed = new Dictionary<SNOPower, DateTime>(DataDictionary.LastUseAbilityTimeDefaults);
             AvoidanceObstacles.Clear();
             GoldStack.Clear();
-            HasBeenInLoS.Clear();
-            HasBeenNavigable.Clear();
-            HasBeenRayCasted.Clear();
             InteractAttempts.Clear();
             IsSummoner.Clear();
             ItemLinkQuality.Clear();

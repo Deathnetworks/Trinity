@@ -132,9 +132,6 @@ namespace Trinity
         [DataMember]
         public AABB AABBBounds { get; set; }
 
-        [DataMember]
-        private float _distance = -1f;
-
         [NoCopy]
         public float Distance
         {
@@ -274,22 +271,13 @@ namespace Trinity
         [DataMember]
         public MonsterSize MonsterSize { get; set; }
 
-        [DataMember]
-        public bool HasBeenNavigable { get; set; }
-
-        [DataMember]
-        public bool HasBeenRaycastable { get; set; }
-
-        [DataMember]
-        public bool HasBeenInLoS { get; set; }
-
         [NoCopy]
         public bool IsBossOrEliteRareUnique { get { return (this.IsUnit && (IsEliteRareUnique || IsBoss)); } }
 
         [NoCopy]
         public bool IsTrashMob { get { return (this.IsUnit && !(IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
 
-        [DataMember]
+        [NoCopy]
         public bool IsMe { get { return RActorGuid == Trinity.Player.RActorGuid; } }
 
         [DataMember]
@@ -334,9 +322,6 @@ namespace Trinity
         [DataMember]
         public bool IsMarker { get; set; }
 
-        [DataMember]
-        public bool InLineOfSight { get; set; }
-
         [NoCopy]
         public bool IsCursedChest { get { return Type == GObjectType.CursedChest; } }
 
@@ -345,6 +330,161 @@ namespace Trinity
 
         [NoCopy]
         public bool IsEventObject { get { return IsCursedChest || IsCursedShrine; } }
+
+        [NoCopy]
+        public bool IsNavigable
+        {
+            get
+            {
+                if (_byteResult_IsNavigable >= 0)
+                    return _byteResult_IsNavigable > 0 ? true : false;
+
+                bool isNavigable = false;
+                Tuple<bool, int> rayCastResult;
+
+                if (ZDiff > 11f)
+                {
+                    _byteResult_IsNavigable = 0;
+                    return false;
+                }
+
+                if (!DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
+                {
+                    // Bounty Objectives should always be on the weight list
+                    if (IsBountyObjective)
+                    {
+                        _byteResult_IsNavigable = 1;
+                        return true;
+                    }
+
+                    // Quest Monsters should get LoS white-listed
+                    if (IsQuestMonster)
+                    {
+                        _byteResult_IsNavigable = 1;
+                        return true;
+                    }
+
+                    // Always LoS Units during events
+                    if (IsUnit && Trinity.Player.InActiveEvent)
+                    {
+                        _byteResult_IsNavigable = 1;
+                        return true;
+                    }
+                }
+
+                if (CacheData.RayCastResultsFromObjects.TryGetValue(RActorGuid, out rayCastResult))
+                {
+                    if (MathUtil.GetDiff(rayCastResult.Item2, Distance) <= 5f)
+                        isNavigable = rayCastResult.Item1;
+
+                    CacheData.RayCastResultsFromObjects[RActorGuid] = new Tuple<bool, int>(isNavigable, (int)Distance);
+                }
+                else
+                {
+                    isNavigable = Distance < 5f || (Distance < 95f && NavHelper.CanRayCast(Position, (Trinity.Player.IsRanged || (Distance <= 16f && Distance > 1f))));
+
+                    if (!CacheData.RayCastResultsFromObjects.ContainsKey(RActorGuid))
+                        CacheData.RayCastResultsFromObjects.Add(RActorGuid, new Tuple<bool, int>(isNavigable, (int)Distance));
+                }
+
+                _byteResult_IsNavigable = isNavigable ? 1 : 0;
+                return isNavigable;
+            }
+            set
+            {
+                _byteResult_IsNavigable = value ? 1 : 0;
+            }
+        }
+
+        [NoCopy]
+        public bool IsInLineOfSight
+        {
+            get
+            {
+                if (!IsUnit)
+                    return IsNavigable;
+
+                if (_byteResult_IsInLineOfSight >= 0)
+                    return _byteResult_IsInLineOfSight > 0 ? true : false;
+
+                bool isInLoS = false;
+                Tuple<bool, int> rayCastResult;
+
+                if (ZDiff > 11f)
+                {
+                    _byteResult_IsInLineOfSight = 0;
+                    return false;
+                }
+
+                if (!DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
+                {
+                    // Bounty Objectives should always be on the weight list
+                    if (IsBountyObjective)
+                    {
+                        _byteResult_IsInLineOfSight = 1;
+                        return true;
+                    }
+
+                    // Quest Monsters should get LoS white-listed
+                    if (IsQuestMonster)
+                    {
+                        _byteResult_IsInLineOfSight = 1;
+                        return true;
+                    }
+
+                    // Always LoS Units during events
+                    if (Trinity.Player.InActiveEvent)
+                    {
+                        _byteResult_IsInLineOfSight = 1;
+                        return true;
+                    }
+                }
+
+                if (CacheData.RayCastResultsFromObjects.TryGetValue(RActorGuid, out rayCastResult))
+                {
+                    if (MathUtil.GetDiff(rayCastResult.Item2, Distance) <= 5f)
+                        isInLoS = rayCastResult.Item1;
+
+                    CacheData.RayCastResultsFromObjects[RActorGuid] = new Tuple<bool, int>(isInLoS, (int)Distance);
+                }
+                else
+                {
+                    isInLoS = Distance < 5f || (Distance < 95f && NavHelper.CanRayCast(Position, (Trinity.Player.IsRanged || (Distance <= 16f && Distance > 1f))));
+
+                    if (!CacheData.RayCastResultsFromObjects.ContainsKey(RActorGuid))
+                        CacheData.RayCastResultsFromObjects.Add(RActorGuid, new Tuple<bool, int>(isInLoS, (int)Distance));
+                }
+
+                _byteResult_IsInLineOfSight = isInLoS ? 1 : 0;
+                return isInLoS;
+            }
+            set
+            {
+                _byteResult_IsInLineOfSight = value ? 1 : 0;
+            }
+        }
+
+        [NoCopy]
+        public bool IsInLineOfSightOfPoint(Vector3 origin)
+        {
+            Vector3 target = Position;
+
+            if (MathUtil.GetDiff((float)origin.Z, (float)target.Z) > 11f)
+                return false;
+
+            float dist = origin.Distance2D(target);
+            if (dist > 95f)
+                return false;
+
+            if (dist >= 1f && dist <= 6f)
+                return true;
+
+            if (origin.Distance2D(Trinity.Player.Position) <= 6f)
+                return IsInLineOfSight;
+
+            // RayCast check
+            return NavHelper.CanRayCast(origin, target, (Trinity.Player.IsRanged || (Distance <= 16f && Distance > 1f)));
+        }
 
         [NoCopy]
         public bool IsFacing(Vector3 targetPosition, float arcDegrees = 70f)
@@ -554,24 +694,6 @@ namespace Trinity
         }
 
         [NoCopy]
-        public bool IsInLineOfSight(bool forceUpdate = false)
-        {
-            if (forceUpdate)
-                InLineOfSight = NavHelper.ObjectIsInLos(this);
-
-            if (InLineOfSight || HasBeenRaycastable || HasBeenInLoS)
-                return true;
-
-            return InLineOfSight;
-        }
-
-        [NoCopy]
-        public bool IsInLineOfSightOfPoint(Vector3 pos)
-        {
-            return NavHelper.ObjectIsInLosOfPoint(pos, this);
-        }
-
-        [NoCopy]
         public override string ToString()
         {
             return string.Format("{0}, Type={1} Dist={2} IsBossOrEliteRareUnique={3} IsAttackable={4}", InternalName, Type, RadiusDistance, IsBossOrEliteRareUnique, IsAttackable);
@@ -590,7 +712,7 @@ namespace Trinity
                         CombatBase.CurrentPower.SNOPower,
                         Type,
                         IsBossOrEliteRareUnique,
-                        IsInLineOfSight(),
+                        IsInLineOfSight,
                         HitPointsPct,
                         Weight);
 
@@ -602,5 +724,16 @@ namespace Trinity
                     Weight);
             }
         }
+
+        /* private member */
+
+        [DataMember]
+        private int _byteResult_IsNavigable = -1;
+
+        [DataMember]
+        private int _byteResult_IsInLineOfSight = -1;
+
+        [DataMember]
+        private float _distance = -1;
     }
 }

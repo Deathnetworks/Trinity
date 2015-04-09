@@ -29,9 +29,6 @@ namespace Trinity
         private static DiaUnit c_diaUnit = null;
         private static Vector2 c_DirectionVector = Vector2.Zero;
         private static int c_GoldStackSize = 0;
-        private static bool c_HasBeenInLoS = false;
-        private static bool c_HasBeenNavigable = false;
-        private static bool c_HasBeenRaycastable = false;
         private static bool c_HasDotDPS = false;
         private static double c_HitPoints = 0d;
         private static double c_HitPointsPct = 0d;
@@ -68,17 +65,20 @@ namespace Trinity
         private static MonsterSize c_unit_MonsterSize = MonsterSize.Unknown;
         private static float c_ZDiff = 0f;
 
-        private static bool GetReturnIgnore(string reason)
+        private static bool GetReturnIgnore(string reason, bool addToIgnoreCache = true)
         {
             c_IgnoreReason = reason;
 
             using (new MemorySpy("CacheDiaObject().GetReturnIgnore()"))
             {
-                bool b_ContainsKey = CacheData.ObjectsIgnored.TryGetValue(c_CacheObject.RActorGuid, out reason);
-                if (c_CacheObject.RActorGuid != -1)
+                if (addToIgnoreCache)
                 {
-                    if (!b_ContainsKey) CacheData.ObjectsIgnored.Add(c_CacheObject.RActorGuid, c_IgnoreReason);
-                    else c_IgnoreReason += " " + reason;
+                    bool b_ContainsKey = CacheData.ObjectsIgnored.TryGetValue(c_CacheObject.RActorGuid, out reason);
+                    if (c_CacheObject.RActorGuid != -1)
+                    {
+                        if (!b_ContainsKey) CacheData.ObjectsIgnored.Add(c_CacheObject.RActorGuid, c_IgnoreReason);
+                        else c_IgnoreReason += " " + reason;
+                    }
                 }
             }
 
@@ -198,7 +198,9 @@ namespace Trinity
                 }
 
                 if (CacheData.ObjectsIgnored.ContainsKey(c_CacheObject.RActorGuid))
-                { return GetReturnIgnore("AlreadyIgnored"); }
+                { 
+                    return GetReturnIgnore("AlreadyIgnored"); 
+                }
             }
 
             using (new MemorySpy("CacheDiaObject().StepZDiff"))
@@ -227,9 +229,11 @@ namespace Trinity
                             c_Movement = c_diaObject.Movement;
                             c_Rotation = c_Movement.Rotation;
                             c_DirectionVector = c_Movement.DirectionVector;
-                            c_TargetACDGuid = c_Movement.ACDTargetGuid;
                             if (c_Movement.ACDTarget != null)
+                            {
+                                c_TargetACDGuid = c_Movement.ACDTargetGuid;
                                 c_TargetACDPosition = c_Movement.ACDTarget.Position;
+                            }
                         }
                     }
                     catch { c_InfosSubStep += "ErrorGettingMovement "; }
@@ -256,10 +260,10 @@ namespace Trinity
 
             using (new MemorySpy("CacheDiaObject().LoSCheck"))
             {
-                AddToCache = RefreshStepIgnoreLoS(AddToCache);
+                AddToCache = RefreshStepIgnoreLoS();
                 if (!AddToCache)
                 {
-                    return GetReturnIgnore("IgnoreLoS");
+                    return GetReturnIgnore("IgnoreLoS", false);
                 }
             }
 
@@ -278,9 +282,6 @@ namespace Trinity
             c_CacheObject.GameBalanceID = c_CacheObject.GameBalanceID;
             c_CacheObject.GoldAmount = c_GoldStackSize;
             c_CacheObject.HasAffixShielded = c_unit_HasShieldAffix;
-            c_CacheObject.HasBeenInLoS = c_HasBeenInLoS;
-            c_CacheObject.HasBeenNavigable = c_HasBeenNavigable;
-            c_CacheObject.HasBeenRaycastable = c_HasBeenRaycastable;
             c_CacheObject.HasDotDPS = c_HasDotDPS;
             c_CacheObject.HitPoints = c_HitPoints;
             c_CacheObject.HitPointsPct = c_HitPointsPct;
@@ -306,7 +307,6 @@ namespace Trinity
             c_CacheObject.TwoHanded = c_IsTwoHandedItem;
             c_CacheObject.Type = c_CacheObject.Type;
             c_CacheObject.IsAncient = c_IsAncient;
-            c_CacheObject.InLineOfSight = c_HasBeenInLoS;
             c_CacheObject.ZDiff = c_ZDiff;
 
             ObjectCache.Add(c_CacheObject);
@@ -378,7 +378,7 @@ namespace Trinity
             c_CacheObject.RActorGuid = -1;
             c_CacheObject.DynamicID = -1;
             c_CacheObject.GameBalanceID = -1;
-            c_CacheObject.ActorSNO = -1;
+            c_CacheObject.ActorSNO = -1;            
 
             c_ZDiff = 0f;
             c_ItemDisplayName = "";
@@ -401,9 +401,6 @@ namespace Trinity
             c_unit_HasShieldAffix = false;
             c_IsEliteRareUnique = false;
             c_IsObstacle = false;
-            c_HasBeenNavigable = false;
-            c_HasBeenRaycastable = false;
-            c_HasBeenInLoS = false;
             c_ItemMd5Hash = string.Empty;
             c_ItemQuality = ItemQuality.Invalid;
             c_DBItemBaseType = ItemBaseType.None;
@@ -699,51 +696,23 @@ namespace Trinity
         /// <param name="c_diaObject"></param>
         /// <param name="AddToCache"></param>
         /// <returns></returns>
-        private static bool RefreshStepIgnoreLoS(bool AddToCache = false)
+        private static bool RefreshStepIgnoreLoS()
         {
-            try
+            // Force navigable/los
+            if (c_diaObject.InLineOfSight)
             {
-                using (new PerformanceLogger("RefreshLoS"))
-                {
-                    // Add all objects
-                    AddToCache = true;
-
-                    // Everything except unknowns
-                    if (c_CacheObject.Type != GObjectType.Unknown)
-                    {
-                        if (c_CacheObject.IsInLineOfSight(true))
-                        {
-                            c_HasBeenRaycastable = true;
-                            c_HasBeenInLoS = true;
-                        }
-                    }
-
-                    // Simple whitelist for LoS 
-                    if (DataDictionary.LineOfSightWhitelist.Contains(c_CacheObject.ActorSNO))
-                    {
-                        c_HasBeenInLoS = true;
-                        AddToCache = true;
-                    }
-                    // Always pickup Infernal Keys whether or not in LoS
-                    if (DataDictionary.ForceToItemOverrideIds.Contains(c_CacheObject.ActorSNO))
-                    {
-                        AddToCache = true;
-                    }
-                }
+                c_CacheObject.IsNavigable = true;
+                c_CacheObject.IsInLineOfSight = true;
             }
-            catch (Exception ex)
-            {
-                AddToCache = true;
-                c_InfosSubStep += "IgnoreLoSException ";
-                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
-            }
-            return AddToCache;
+
+            // add everythings, new IsNavigable & IsInLineOfSight are use in weighting just when needed, reduce usage from memory
+            return true;
         }
 
         private static bool RefreshStepIgnoreUnknown(bool AddToCache)
         {
             // We couldn't get a valid object type, so ignore it
-            if (!c_IsObstacle && c_CacheObject.Type == GObjectType.Unknown)
+            if (c_CacheObject.Type == GObjectType.Unknown)
             {
                 AddToCache = false;
             }
@@ -760,12 +729,6 @@ namespace Trinity
                 return AddToCache;
             }
 
-            // Special whitelist for always getting stuff regardless of ZDiff or LoS
-            if (DataDictionary.LineOfSightWhitelist.Contains(c_CacheObject.ActorSNO))
-            {
-                AddToCache = true;
-                return AddToCache;
-            }
             // Ignore stuff which has a Z-height-difference too great, it's probably on a different level etc. - though not avoidance!
             if (c_CacheObject.Type != GObjectType.Avoidance)
             {
@@ -952,34 +915,3 @@ namespace Trinity
 
     }
 }
-
-/* [Trinity][UnknownObjects] 
- * RefreshDiaObjects().Maintain=00,01ms 
- * RefreshDiaObjects().Init=00,01ms 
- * RefreshDiaObjects().Loop=17,98ms 
- * CacheDiaObject().CheckValid=00,04ms 
- * CacheDiaObject().CheckCommonData=00,02ms 
- * CacheDiaObject().CheckName=03,06ms 
- * CacheDiaObject().GetInfosInit=02,14ms 
- * CacheDiaObject().GetRadius=00,33ms 
- * CacheDiaObject().CheckNavObstacles=00,05ms 
- * CacheDiaObject().StepObjectType=00,43ms 
- * StepObjectType().Avoidance=00,04ms 
- * StepObjectType().Check=00,31ms 
- * CacheDiaObject().StepPlayerSummons=02,63ms 
- * CacheDiaObject().StepCheckBlacklists=00,85ms 
- * CacheDiaObject().StepZDiff=00,10ms 
- * CacheDiaObject().GetComplex=04,06ms 
- * CacheDiaObject().StepMainObjectType=01,84ms 
- * StepMainObjectType().UnknownAAvoidance=00,03ms 
- * StepMainObjectType().Gizmo=00,14ms 
- * CacheDiaObject().LoSCheck=00,25ms 
- * StepMainObjectType().Item=01,00ms 
- * RefreshDiaObjects().Markers=00,64ms 
- * RefreshDiaObjects().Weight=01,63ms 
- * RefreshDiaObjects().Grid=07,59ms 
- * RefreshDiaObjects().InvokeEvents=00,23ms 
- * RefreshDiaObjects().FinalCheck=00,18ms 
- * HandleTarget()=32,17ms 
- * RefreshDiaObjects()=28,37ms 
-*/
