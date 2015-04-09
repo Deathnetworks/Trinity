@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Trinity.Objects;
 using Trinity.Reference;
 using Trinity.Technicals;
@@ -164,5 +165,44 @@ namespace Trinity.Helpers
             Logger.Log(level, LogCategory.UserInformation, "Resolution: " + SystemInformation.Resolution);
         }
 
+
+        internal static void DumpReferenceItems(TrinityLogLevel level = TrinityLogLevel.Debug)
+        {
+
+            var path = Path.Combine(FileManager.DemonBuddyPath, "ItemReference.js");
+
+            if(File.Exists(path))
+                File.Delete(path);
+
+            using (StreamWriter w = File.AppendText(path))
+            {
+                w.WriteLine("var itemLookup = {");
+
+                foreach (var item in Legendary.ToList())
+                {
+                    if(item.Id!=0)
+                        w.WriteLine(string.Format("     \"{0}\": [\"{1}\", {2}, \"{3}\"],",item.Slug, item.Name, item.Id, item.InternalName));
+                }
+
+                w.WriteLine("}");                
+            }
+
+            Logger.Log("Dumped Reference Items to: {0}", path);
+        }
+
+        internal static void LogInvalidItems(TrinityLogLevel level = TrinityLogLevel.Debug)
+        {
+            var p = Logger.Prefix;
+            Logger.Prefix = "";
+
+            var items = Legendary.ToList().OrderBy(i => i.GItemType);
+
+            foreach (var item in items)
+            {
+                if (item.Id == 0)
+                    Logger.Log("{0} {1} = 0", item.GItemType, item.Name);                    
+            }
+            Logger.Prefix = p;
+        }
     }
 }

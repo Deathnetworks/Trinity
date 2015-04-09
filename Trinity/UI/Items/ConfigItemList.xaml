@@ -5,7 +5,7 @@
              xmlns:ut="clr-namespace:Trinity.UIComponents"
              xmlns:themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero"             
              xmlns:mock="clr-namespace:Trinity.Settings.Mock"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"             
              mc:Ignorable="d" Foreground="{DynamicResource TextBrush}" Background="DarkGray"             
              d:DesignHeight="500" d:DesignWidth="420">
     <UserControl.Resources>

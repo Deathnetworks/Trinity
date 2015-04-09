@@ -34,11 +34,13 @@ namespace Trinity.Reference
                 Legendary.InnasTemperance,
                 Legendary.InnasReach,
                 Legendary.InnasRadiance,
-                Legendary.InnasFavor
+                Legendary.InnasFavor,
+                Legendary.InnasHold,
+                Legendary.InnasSandals
             },
             FirstBonusItemCount = 2,
-            SecondBonusItemCount = 3,
-            ThirdBonusItemCount = 4
+            SecondBonusItemCount = 4,
+            ThirdBonusItemCount = 6
         };
 
         public static Set RaimentOfTheJadeHarvester = new Set
@@ -80,7 +82,7 @@ namespace Trinity.Reference
                 Legendary.TheShadowsBane,
                 Legendary.TheShadowsCoil,
                 Legendary.TheShadowsHeels,
-                //The Shadow’s Grasp
+                Legendary.TheShadowsGrasp
             },
             FirstBonusItemCount = 2,
             SecondBonusItemCount = 4
@@ -91,10 +93,10 @@ namespace Trinity.Reference
             Name = "Might of the Earth",
             Items = new List<Item>
             {
-                //Eyes of the Earth
-                //Pull of the Earth
-                //Spires of the Earth
-                //Weight of the Earth
+                Legendary.EyesOfTheEarth,
+                Legendary.PullOfTheEarth,
+                Legendary.SpiresOfTheEarth,
+                Legendary.WeightOfTheEarth
             },
             FirstBonusItemCount = 2,
             SecondBonusItemCount = 4
@@ -165,11 +167,30 @@ namespace Trinity.Reference
                 Legendary.ZunimassasPox,
                 Legendary.ZunimassasStringOfSkulls,
                 Legendary.ZunimassasTrail,
-                Legendary.ZunimassasVision
+                Legendary.ZunimassasVision,
+                Legendary.ZunimassasCloth,
+                Legendary.ZunimassasFingerWraps
             },
             FirstBonusItemCount = 2,
-            SecondBonusItemCount = 3,
-            ThirdBonusItemCount = 4
+            SecondBonusItemCount = 4,
+            ThirdBonusItemCount = 6
+        };
+
+        public static Set DelseresMagnumOpus = new Set
+        {
+            Name = "Delsere's Magnum Opus",
+            Items = new List<Item>
+            {
+                Legendary.DashingPauldronsOfDespair,
+                Legendary.HarnessOfTruth,
+                Legendary.FierceGauntlets,
+                Legendary.LegGuardsOfMystery,
+                Legendary.ShroudedMask,
+                Legendary.StridersOfDestiny
+            },
+            FirstBonusItemCount = 2,
+            SecondBonusItemCount = 4,
+            ThirdBonusItemCount = 6
         };
 
         public static Set NatalyasVengeance = new Set
@@ -180,12 +201,41 @@ namespace Trinity.Reference
                 Legendary.NatalyasBloodyFootprints,
                 Legendary.NatalyasEmbrace,
                 Legendary.NatalyasSight,
-                Legendary.NatalyasReflection,                
-                //Natalya's Slayer  
+                Legendary.NatalyasReflection,   
+                Legendary.NatalyasSlayer,
+                Legendary.NatalyasLeggings
             },
             FirstBonusItemCount = 2,
-            SecondBonusItemCount = 3,
-            ThirdBonusItemCount = 4
+            SecondBonusItemCount = 4,
+            ThirdBonusItemCount = 6
+        };
+
+        public static Set UnhallowedEssence = new Set
+        {
+            Name = "Unhallowed Essence",
+            Items = new List<Item>
+            {
+                Legendary.UnsanctifiedShoulders,
+                Legendary.CageOfTheHellborn,
+                Legendary.FiendishGrips,
+                Legendary.UnholyPlates,   
+                Legendary.AccursedVisage,
+                Legendary.HellWalkers
+            },
+            FirstBonusItemCount = 2,
+            SecondBonusItemCount = 4,
+            ThirdBonusItemCount = 6
+        };
+
+        public static Set BastionsOfWill = new Set
+        {
+            Name = "Bastions of Will",
+            Items = new List<Item>
+            {
+                Legendary.Focus,  
+                Legendary.Restraint
+            },
+            FirstBonusItemCount = 2
         };
 
         public static Set LegacyOfNightmares = new Set
@@ -404,14 +454,16 @@ namespace Trinity.Reference
             Items = new List<Item>
             {
                 Legendary.TalRashasAllegiance,
+                Legendary.TalRashasGrasp,
+                Legendary.TalRashasStride,
                 Legendary.TalRashasBrace,
                 Legendary.TalRashasGuiseOfWisdom,
                 Legendary.TalRashasRelentlessPursuit,
                 Legendary.TalRashasUnwaveringGlare
             },
             FirstBonusItemCount = 2,
-            SecondBonusItemCount = 3,
-            ThirdBonusItemCount = 4
+            SecondBonusItemCount = 4,
+            ThirdBonusItemCount = 6
         };
 
         public static Set EndlessWalk = new Set
@@ -451,12 +503,30 @@ namespace Trinity.Reference
                 Legendary.ImmortalKingsEternalReign,
                 Legendary.ImmortalKingsIrons,
                 Legendary.ImmortalKingsStride,
+                Legendary.ImmortalKingsStature,
                 Legendary.ImmortalKingsTribalBinding,
                 Legendary.ImmortalKingsTriumph,
             },
             FirstBonusItemCount = 2,
-            SecondBonusItemCount = 3,
-            ThirdBonusItemCount = 4
+            SecondBonusItemCount = 4,
+            ThirdBonusItemCount = 6
+        };
+
+        public static Set WrathOfTheWastes = new Set
+        {
+            Name = "Wrath of the Wastes",
+            Items = new List<Item>
+            {
+                Legendary.CuirassOfTheWastes,
+                Legendary.GauntletOfTheWastes,
+                Legendary.HelmOfTheWastes,
+                Legendary.PauldronsOfTheWastes,
+                Legendary.SabatonOfTheWastes,
+                Legendary.TassetOfTheWastes,
+            },
+            FirstBonusItemCount = 2,
+            SecondBonusItemCount = 4,
+            ThirdBonusItemCount = 6
         };
 
         public static Set MonkeyKingsGarb = new Set
