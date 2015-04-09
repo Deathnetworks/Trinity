@@ -36,10 +36,10 @@ namespace Trinity
 
                 _aAvoidance.Radius = (float)GetAvoidanceRadius(_aAvoidance.Id, (float)(c_CacheObject.Radius * 1.5));
 
-                bool b_IsStandingInAvoidance = false;
-                bool b_IsFacingPlayer = c_IsFacingPlayer || c_CacheObject.IsFacing(Player.Position, 15f);
-                double d_MinAvoidanceHealth = GetAvoidanceHealth(c_CacheObject.ActorSNO);
-                bool b_HealthRequireAvoidance = Player.CurrentHealthPct <= d_MinAvoidanceHealth;
+                bool isStandingInAvoidance = false;
+                bool isFacingPlayer = c_IsFacingPlayer || c_CacheObject.IsFacing(Player.Position, 15f);
+                double minAvoidanceHealth = GetAvoidanceHealth(c_CacheObject.ActorSNO);
+                bool isBelowHealthThreshold = Player.CurrentHealthPct <= minAvoidanceHealth;
 
                 /* Set avoidance */
                 switch (_aAvoidance.Type)
@@ -48,7 +48,7 @@ namespace Trinity
                     case AvoidType.Teleport:
                     case AvoidType.Dash:
                         {
-                            if (b_HealthRequireAvoidance)
+                            if (isBelowHealthThreshold)
                             {
                                 if (c_TargetACDGuid != -1 && c_TargetACDGuid != Player.ACDGuid)
                                     return GetReturn("targetACDGuid isn't player", _aAvoidance);
@@ -56,7 +56,7 @@ namespace Trinity
                                 if (c_TargetACDPosition != Vector3.Zero && c_TargetACDPosition.Distance2D(Player.Position) > _aAvoidance.Radius)
                                     return GetReturn("Anim targetACDPosition isn't player", _aAvoidance);
 
-                                b_IsStandingInAvoidance = b_IsFacingPlayer || c_TargetACDGuid == Player.ACDGuid || c_TargetACDPosition.Distance2D(Player.Position) <= _aAvoidance.Radius; 
+                                isStandingInAvoidance = isFacingPlayer || c_TargetACDGuid == Player.ACDGuid || c_TargetACDPosition.Distance2D(Player.Position) <= _aAvoidance.Radius; 
                             }
 
                         } break;
@@ -69,7 +69,7 @@ namespace Trinity
                     case AvoidType.StrafeLeft:
                     case AvoidType.StrafeRight:
                         {
-                            if (b_HealthRequireAvoidance)
+                            if (isBelowHealthThreshold)
                             {
                                 if (c_TargetACDGuid != -1 && c_TargetACDGuid != Player.ACDGuid)
                                     return GetReturn("targetACDGuid isn't player", _aAvoidance);
@@ -77,7 +77,7 @@ namespace Trinity
                                 if (c_TargetACDPosition != Vector3.Zero && c_TargetACDPosition.Distance2D(Player.Position) > _aAvoidance.Radius)
                                     return GetReturn("Anim targetACDPosition isn't player", _aAvoidance);
 
-                                b_IsStandingInAvoidance = (b_IsFacingPlayer || c_TargetACDGuid == Player.ACDGuid || c_TargetACDPosition.Distance2D(Player.Position) <= _aAvoidance.Radius) &&
+                                isStandingInAvoidance = (isFacingPlayer || c_TargetACDGuid == Player.ACDGuid || c_TargetACDPosition.Distance2D(Player.Position) <= _aAvoidance.Radius) &&
                                     c_CacheObject.Distance <= _aAvoidance.Radius; 
                             }
 
@@ -86,7 +86,7 @@ namespace Trinity
                     case AvoidType.Projectile:
                     case AvoidType.RangedAttack:
                         {
-                            if (b_HealthRequireAvoidance)
+                            if (isBelowHealthThreshold)
                             {
                                 if (c_TargetACDGuid != -1 && c_TargetACDGuid != Player.ACDGuid)
                                     return GetReturn("Anim target isn't player", _aAvoidance);
@@ -94,7 +94,7 @@ namespace Trinity
                                 if (c_TargetACDPosition != new Vector3() && c_TargetACDPosition.Distance2D(Player.Position) > _aAvoidance.Radius)
                                     return GetReturn("Anim targetACDPosition isn't player", _aAvoidance);
 
-                                b_IsStandingInAvoidance = (b_IsFacingPlayer || c_TargetACDGuid == Player.ACDGuid || c_TargetACDPosition.Distance2D(Player.Position) <= _aAvoidance.Radius) &&
+                                isStandingInAvoidance = (isFacingPlayer || c_TargetACDGuid == Player.ACDGuid || c_TargetACDPosition.Distance2D(Player.Position) <= _aAvoidance.Radius) &&
                                     c_CacheObject.Distance <= _aAvoidance.Radius; 
                             }
 
@@ -103,9 +103,9 @@ namespace Trinity
 
                             for (float i = 0; i <= c_CacheObject.Position.Distance2D(_targetPoint); i += 5f)
                             {
-                                Vector3 _pathSpot = MathEx.CalculatePointFrom(c_CacheObject.Position, _targetPoint, i);
+                                Vector3 pathSpot = MathEx.CalculatePointFrom(c_CacheObject.Position, _targetPoint, i);
 
-                                CacheData.AvoidanceObstacles.Add(new CacheObstacleObject(_pathSpot, _aAvoidance.Radius, c_CacheObject.ActorSNO, c_CurrentAnimation.ToString())
+                                CacheData.AvoidanceObstacles.Add(new CacheObstacleObject(pathSpot, _aAvoidance.Radius, c_CacheObject.ActorSNO, c_CurrentAnimation.ToString())
                                 {
                                     ObjectType = GObjectType.Avoidance,
                                     Rotation = c_CacheObject.Rotation,
@@ -115,7 +115,7 @@ namespace Trinity
                                 });
 
                                 /* Player standing in avoidance ? */
-                                b_IsStandingInAvoidance = b_HealthRequireAvoidance && Player.Position.Distance2D(_pathSpot) <= _aAvoidance.Radius;
+                                isStandingInAvoidance = isBelowHealthThreshold && Player.Position.Distance2D(pathSpot) <= _aAvoidance.Radius;
                             }
 
                         } break;
@@ -125,12 +125,12 @@ namespace Trinity
                     case AvoidType.RotateRight:
                     default:
                         {
-                            b_IsStandingInAvoidance = b_HealthRequireAvoidance && c_CacheObject.Distance <= _aAvoidance.Radius;
+                            isStandingInAvoidance = isBelowHealthThreshold && c_CacheObject.Distance <= _aAvoidance.Radius;
                         }
                         break;
                 }
 
-                if (b_IsStandingInAvoidance)
+                if (isStandingInAvoidance)
                 {
                     Logger.Log(TrinityLogLevel.Info, LogCategory.Avoidance,
                         "Is Standing in avoidance of Anim={0} - {1} Type={2} Elmt={3} Rad={4}",

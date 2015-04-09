@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using Trinity.Cache;
 using Trinity.Combat.Abilities;
-using Trinity.Config.Combat;
 using Trinity.Configuration;
 using Trinity.DbProvider;
 using Trinity.Helpers;
@@ -46,18 +45,6 @@ namespace Trinity
         {
             if (Tick > 10) Tick = 0;
             Tick++;
-
-            if (ZetaDia.Service.Hero == null)
-            {
-                Logger.LogError("Hero is null!");
-                return false;
-            }
-
-            if (!ZetaDia.Service.Hero.IsValid)
-            {
-                Logger.LogError("Hero is invalid!");
-                return false;
-            }
 
             if (!ZetaDia.IsInGame)
                 return false;
@@ -457,24 +444,25 @@ namespace Trinity
             }
 
             // Bounty POI
-            if (ZetaDia.ActInfo.ActiveBounty != null && ZetaDia.ActInfo.ActiveBounty.LevelAreas.Contains((SNOLevelArea)Player.LevelAreaId) && 
-                ZetaDia.Minimap.Markers.CurrentWorldMarkers.Any(m => m.IsPointOfInterest))
-            {
-                foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsPointOfInterest && !Blacklist60Seconds.Contains(m.NameHash)))
-                {
-                    ObjectCache.Add(new TrinityCacheObject()
-                    {
-                        Position = marker.Position,
-                        InternalName = "Bounty Objective",
-                        RActorGuid = marker.NameHash,
-                        ActorType = ActorType.Monster,
-                        Type = GObjectType.Unit,
-                        Radius = 10f,
-                        Weight = 5000,
-                        IsBoss = true,
-                    });
-                }
-            }
+            // ZetaDia.ActInfo.ActiveBounty is insanely slow. It iterates over all Quests for the current active LevelAreaId. Need to find a faster way to do this.
+            //if (ZetaDia.ActInfo.ActiveBounty != null && ZetaDia.ActInfo.ActiveBounty.LevelAreas.Contains((SNOLevelArea)Player.LevelAreaId) && 
+            //    ZetaDia.Minimap.Markers.CurrentWorldMarkers.Any(m => m.IsPointOfInterest))
+            //{
+            //    foreach (var marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsPointOfInterest && !Blacklist60Seconds.Contains(m.NameHash)))
+            //    {
+            //        ObjectCache.Add(new TrinityCacheObject()
+            //        {
+            //            Position = marker.Position,
+            //            InternalName = "Bounty Objective",
+            //            RActorGuid = marker.NameHash,
+            //            ActorType = ActorType.Monster,
+            //            Type = GObjectType.Unit,
+            //            Radius = 10f,
+            //            Weight = 5000,
+            //            IsBoss = true,
+            //        });
+            //    }
+            //}
         }
 
         private static void RefreshCacheMainLoop()
@@ -497,8 +485,6 @@ namespace Trinity
                 {
                     try
                     {
-                        bool addToCache;
-
                         // Objects deemed of low importance are stored from the last refresh
                         TrinityCacheObject cachedObject;
                         if (CacheData.LowPriorityObjectCache.TryGetValue(currentObject.RActorGuid, out cachedObject))
@@ -531,7 +517,7 @@ namespace Trinity
                             /*
                              *  Main Cache Function
                              */
-                            addToCache = CacheDiaObject(currentObject);
+                            bool addToCache = CacheDiaObject(currentObject);
 
                             if (t1.IsRunning)
                                 t1.Stop();

@@ -74,10 +74,10 @@ namespace Trinity
 
             using (new MemorySpy("CacheDiaObject().GetReturnIgnore()"))
             {
-                bool b_ContainsKey = CacheData.ObjectsIgnored.TryGetValue(c_CacheObject.RActorGuid, out reason);
+                bool containsKey = CacheData.ObjectsIgnored.TryGetValue(c_CacheObject.RActorGuid, out reason);
                 if (c_CacheObject.RActorGuid != -1)
                 {
-                    if (!b_ContainsKey) CacheData.ObjectsIgnored.Add(c_CacheObject.RActorGuid, c_IgnoreReason);
+                    if (!containsKey) CacheData.ObjectsIgnored.Add(c_CacheObject.RActorGuid, c_IgnoreReason);
                     else c_IgnoreReason += " " + reason;
                 }
             }
@@ -90,68 +90,56 @@ namespace Trinity
             bool AddToCache = true;
             RefreshStepInit();
 
-            using (new MemorySpy("CacheDiaObject().CheckValid"))
+            AddToCache = diaObject.IsValid;
+            if (!AddToCache)
             {
-                AddToCache = diaObject.IsValid;
-                if (!AddToCache)
-                {
-                    return GetReturnIgnore("InvalidRActor");
-                }
+                return GetReturnIgnore("InvalidRActor");
             }
 
-            using (new MemorySpy("CacheDiaObject().CheckCommonData"))
+            c_CommonData = diaObject.CommonData;
+
+            AddToCache = c_CommonData != null;
+            if (!AddToCache)
             {
-                c_CommonData = diaObject.CommonData;
-
-                AddToCache = c_CommonData != null;
-                if (!AddToCache)
-                {
-                    return GetReturnIgnore("ACDNull");
-                }
-
-                AddToCache = c_CommonData.IsValid;
-                if (!AddToCache)
-                {
-                    return GetReturnIgnore("InvalidACD");
-                }
+                return GetReturnIgnore("ACDNull");
             }
 
-            using (new MemorySpy("CacheDiaObject().CheckName"))
+            AddToCache = c_CommonData.IsValid;
+            if (!AddToCache)
             {
-                try
-                {
-                    c_CacheObject.InternalName = NameNumberTrimRegex.Replace(diaObject.Name, "");
-                }
-                catch
-                {
-                    return GetReturnIgnore("InvalidName");
-                }
-
-                AddToCache = !IgnoreNames.Any(i => c_CacheObject.InternalName.ToLower().StartsWith(i, StringComparison.Ordinal));
-                if (!AddToCache)
-                {
-                    return GetReturnIgnore("IgnoreName");
-                }
+                return GetReturnIgnore("InvalidACD");
             }
 
-            using (new MemorySpy("CacheDiaObject().GetInfosInit"))
+            try
             {
-                try
-                {
-                    c_diaObject = diaObject;
+                c_CacheObject.InternalName = NameNumberTrimRegex.Replace(diaObject.Name, "");
+            }
+            catch
+            {
+                return GetReturnIgnore("InvalidName");
+            }
 
-                    c_CacheObject.RActorGuid = c_diaObject.RActorGuid;
-                    c_CacheObject.ActorSNO = c_diaObject.ActorSNO;
-                    c_CacheObject.ActorType = c_diaObject.ActorType;
-                    c_CacheObject.ACDGuid = c_diaObject.ACDGuid;
+            AddToCache = !IgnoreNames.Any(i => c_CacheObject.InternalName.ToLower().StartsWith(i, StringComparison.OrdinalIgnoreCase));
+            if (!AddToCache)
+            {
+                return GetReturnIgnore("IgnoreName");
+            }
 
-                    c_CacheObject.LastSeenTime = DateTime.UtcNow;
-                    c_CacheObject.Position = c_diaObject.Position;
-                }
-                catch
-                {
-                    return GetReturnIgnore("InvalidObject");
-                }
+            try
+            {
+                c_diaObject = diaObject;
+
+                c_CacheObject.RActorGuid = c_diaObject.RActorGuid;
+                c_CacheObject.ActorSNO = c_diaObject.ActorSNO;
+                c_CacheObject.ActorType = c_diaObject.ActorType;
+                c_CacheObject.ACDGuid = c_diaObject.ACDGuid;
+
+                c_CacheObject.LastSeenTime = DateTime.UtcNow;
+                c_CacheObject.Position = c_diaObject.Position;
+            }
+            catch
+            {
+                return GetReturnIgnore("InvalidObject");
             }
 
             using (new MemorySpy("CacheDiaObject().GetRadius"))

@@ -34,6 +34,11 @@ namespace Trinity
         //[1F03C1A0] Mouseover: 0x6DA3168427892076, Name: Root.NormalLayer.GreaterRifts_VictoryScreen.LayoutRoot.Middle_Frame.button_exit
         private const ulong riftCompleteOkButton = 0x6DA3168427892076;
 
+        //[1DB5A7F0] Mouseover: 0x16C4B9DB83655800, Name: Root.NormalLayer.BattleNetWhatsNewPatches_main.LayoutRoot.OverlayContainer.Ok
+        private const ulong patchOKButton = 0x16C4B9DB83655800;
+
+        public static UIElement PatchOKButton { get { return UIElement.FromHash(patchOKButton); } }
+
         public static UIElement RiftCompleteOkButton
         {
             get { return UIElement.FromHash(riftCompleteOkButton); }
@@ -231,6 +236,8 @@ namespace Trinity
 
             // These buttons should be clicked with no delay
 
+            if (SafeClickElement(PatchOKButton, "Patch Update OK Button"))
+                return;
             if (ZetaDia.IsInGame && SafeClickElement(BountyRewardDialog, "Bounty Reward Dialog"))
                 return;
             if (ZetaDia.IsInGame && SafeClickElement(ConversationSkipButton, "Conversation Button"))

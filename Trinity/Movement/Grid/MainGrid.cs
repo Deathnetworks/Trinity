@@ -16,13 +16,13 @@ namespace Trinity
     {
         #region Helper fields
 
-        public static Vector3 VectorToGrid(Vector3 _loc)
+        public static Vector3 VectorToGrid(Vector3 loc)
         {
-            return new Vector3((int)Math.Round(_loc.X), (int)Math.Round(_loc.Y), (int)Math.Round(_loc.Z));
+            return new Vector3((int)Math.Round(loc.X), (int)Math.Round(loc.Y), (int)Math.Round(loc.Z));
         }
-        public static Tuple<int, int> VectorToTuple(Vector3 _loc)
+        public static Tuple<int, int> VectorToTuple(Vector3 loc)
         {
-            return new Tuple<int, int>((int)_loc.X, (int)_loc.Y);
+            return new Tuple<int, int>((int)loc.X, (int)loc.Y);
         }
 
         private static List<TrinityCacheObject> ObjectCache
@@ -45,8 +45,7 @@ namespace Trinity
             {
                 if (ObjectCache != null)
                     return ObjectCache.Any(u => u.IsTreasureGoblin);
-                else
-                    return false;
+                return false;
             }
         }
         private static TrinityCacheObject CurrentTarget
@@ -98,139 +97,135 @@ namespace Trinity
         /// <summary>
         /// Refresh canStandAt point
         /// </summary>
-        /// <param name="_center"></param>
+        /// <param name="center"></param>
         /// <returns>Return true if grid has been refresh</returns>
-        public static bool Refresh(Vector3 _center)
+        public static bool Refresh(Vector3 center)
         {
             using (new MemorySpy("MainGrid.Refresh()"))
             {
                 #region Fields
 
-                Vector2 _minWorld;
-                Point _minPoint;
-                Vector2 _maxWorld;
-                Point _maxPoint;
-                Point _centerPos;
-                GridNode _bestNode;
+                Point minPoint;
+                Point maxPoint;
+                Point centerPos;
+                GridNode bestNode;
 
                 using (new MemorySpy("MainGrid.Refresh().SetInit"))
                 {
                     /* corner 1 */
-                    _minWorld = new Vector2(_center.X - GridRange, _center.Y - GridRange);
-                    _minPoint = MainGridProvider.WorldToGrid(_minWorld);
-                    _minPoint.X = Math.Max(_minPoint.X, 0);
-                    _minPoint.Y = Math.Max(_minPoint.Y, 0);
+                    Vector2 minWorld = new Vector2(center.X - GridRange, center.Y - GridRange);
+                    minPoint = MainGridProvider.WorldToGrid(minWorld);
+                    minPoint.X = Math.Max(minPoint.X, 0);
+                    minPoint.Y = Math.Max(minPoint.Y, 0);
 
                     /* corner 2 */
-                    _maxWorld = new Vector2(_center.X + GridRange, _center.Y + GridRange);
-                    _maxPoint = MainGridProvider.WorldToGrid(_maxWorld);
-                    _maxPoint.X = Math.Min(_maxPoint.X, MainGridProvider.Width - 1);
-                    _maxPoint.Y = Math.Min(_maxPoint.Y, MainGridProvider.Height - 1);
+                    Vector2 maxWorld = new Vector2(center.X + GridRange, center.Y + GridRange);
+                    maxPoint = MainGridProvider.WorldToGrid(maxWorld);
+                    maxPoint.X = Math.Min(maxPoint.X, MainGridProvider.Width - 1);
+                    maxPoint.Y = Math.Min(maxPoint.Y, MainGridProvider.Height - 1);
 
-                    _centerPos = MainGridProvider.WorldToGrid(_center.ToVector2());
-                    _bestNode = new GridNode(new Vector3());
+                    centerPos = MainGridProvider.WorldToGrid(center.ToVector2());
+                    bestNode = new GridNode();
                 }
                 #endregion
 
                 MapAsList.Clear();
-                for (int _y = _minPoint.Y; _y <= _maxPoint.Y; _y = _y + (int)GridSquareSize)
+                for (int y = minPoint.Y; y <= maxPoint.Y; y = y + (int)GridSquareSize)
                 {
-                    int _searchAreaBasis = _y * MainGridProvider.Width;
-                    for (int _x = _minPoint.X; _x <= _maxPoint.X; _x = _x + (int)GridSquareSize)
+                    int searchAreaBasis = y * MainGridProvider.Width;
+                    for (int x = minPoint.X; x <= maxPoint.X; x = x + (int)GridSquareSize)
                     {
 
-                        int _dx = _centerPos.X - _x;
-                        int _dy = _centerPos.Y - _y;
+                        int dx = centerPos.X - x;
+                        int dy = centerPos.Y - y;
 
                         /* Out of range */
                         using (new MemorySpy("MainGrid.Refresh().OutOfRangeCheck"))
                         {
-                            if (_dx * _dx + _dy * _dy > (GridRange / 2f) * (GridRange / 2f))
+                            if (dx * dx + dy * dy > (GridRange / 2f) * (GridRange / 2f))
                                 continue;
                         }
 
                         /* Cant stand at */
                         using (new MemorySpy("MainGrid.Refresh().CantStandAtCheck"))
                         {
-                            if (!MainGridProvider.SearchArea[_searchAreaBasis + _x])
+                            if (!MainGridProvider.SearchArea[searchAreaBasis + x])
                                 continue;
                         }
 
-                        Vector2 _xy;
-                        Vector3 _xyz;
-                        GridNode _g;
+                        GridNode gridNode;
 
                         using (new MemorySpy("MainGrid.Refresh().SetPosition"))
                         {
-                            _xy = MainGridProvider.GridToWorld(new Point(_x, _y));
+                            Vector2 xy = MainGridProvider.GridToWorld(new Point(x, y));
 
                             /* Round to int pair sup, require to no change GridSquareSize value (2) */
-                            _xy.X = ((int)_xy.X & 1) == 1 ? (int)_xy.X + 1 : (int)_xy.X;
-                            _xy.Y = ((int)_xy.Y & 1) == 1 ? (int)_xy.Y + 1 : (int)_xy.Y;
+                            xy.X = ((int)xy.X & 1) == 1 ? (int)xy.X + 1 : (int)xy.X;
+                            xy.Y = ((int)xy.Y & 1) == 1 ? (int)xy.Y + 1 : (int)xy.Y;
 
-                            _xyz = new Vector3(_xy.X, _xy.Y, MainGridProvider.GetHeight(_xy));
-                            _g = new GridNode(_xyz);
+                            Vector3 xyz = new Vector3(xy.X, xy.Y, MainGridProvider.GetHeight(xy));
+                            gridNode = new GridNode(xyz);
                         }
 
-                        GridNode _nodeRecorded;
-                        bool _recorded = false;
+                        GridNode nodeRecorded;
+                        bool recorded;
 
                         using (new MemorySpy("MainGrid.Refresh().CheckRecorded"))
-                        { _recorded = MainGrid.NodesRecorded.TryGetValue(MainGrid.VectorToTuple(_g.Position), out _nodeRecorded); }
+                        { recorded = NodesRecorded.TryGetValue(VectorToTuple(gridNode.Position), out nodeRecorded); }
 
-                        if (_recorded)
+                        if (recorded)
                         {
                             using (new MemorySpy("MainGrid.Refresh().GetRecordedValues"))
                             {
-                                _nodeRecorded.ResetTickValues();
+                                nodeRecorded.ResetTickValues();
 
-                                _g.UnchangeableWeight = _nodeRecorded.UnchangeableWeight;
-                                _g.UnchangeableWeightInfos = _nodeRecorded.UnchangeableWeightInfos;
+                                gridNode.UnchangeableWeight = nodeRecorded.UnchangeableWeight;
+                                gridNode.UnchangeableWeightInfos = nodeRecorded.UnchangeableWeightInfos;
 
-                                _g.NearbyExitsCount = _nodeRecorded.NearbyExitsCount;
-                                _g.NearbyGridPointsCount = _nodeRecorded.NearbyGridPointsCount;
+                                gridNode.NearbyExitsCount = nodeRecorded.NearbyExitsCount;
+                                gridNode.NearbyGridPointsCount = nodeRecorded.NearbyGridPointsCount;
 
-                                _g.LastDynamicWeightValues = _nodeRecorded.LastDynamicWeightValues;
-                                _g.LastTargetWeightValues = _nodeRecorded.LastTargetWeightValues;
-                                _g.LastClusterWeightValues = _nodeRecorded.LastClusterWeightValues;
-                                _g.LastMonsterWeightValues = _nodeRecorded.LastMonsterWeightValues;
+                                gridNode.LastDynamicWeightValues = nodeRecorded.LastDynamicWeightValues;
+                                gridNode.LastTargetWeightValues = nodeRecorded.LastTargetWeightValues;
+                                gridNode.LastClusterWeightValues = nodeRecorded.LastClusterWeightValues;
+                                gridNode.LastMonsterWeightValues = nodeRecorded.LastMonsterWeightValues;
 
-                                MainGrid.NodesRecorded.Remove(MainGrid.VectorToTuple(_g.Position));
+                                NodesRecorded.Remove(VectorToTuple(gridNode.Position));
                             }
                         }
                         else
                         {
                             using (new MemorySpy("MainGrid.Refresh().GetNewValues"))
                             {
-                                _g.ResetTickValues();
-                                _g.SetUnchangeableWeight();
+                                gridNode.ResetTickValues();
+                                gridNode.SetUnchangeableWeight();
                             }
                         }
 
-                        _g.OperateWeight(WeightType.Dynamic, "BaseDistanceWeight", (MainGrid.GridRange - _g.Distance) * 2f);
+                        gridNode.OperateWeight(WeightType.Dynamic, "BaseDistanceWeight", (GridRange - gridNode.Distance) * 2f);
 
                         using (new MemorySpy("MainGrid.Refresh().SetTargetWeights"))
                         {
-                            _g.SetTargetWeights();
+                            gridNode.SetTargetWeights();
                         }
 
                         using (new MemorySpy("MainGrid.Refresh().SetAvoidancesWeights"))
                         {
-                            _g.SetAvoidancesWeights();
+                            gridNode.SetAvoidancesWeights();
                         }
 
                         using (new MemorySpy("MainGrid.Refresh().SetCacheObjectsWeights"))
                         {
-                            _g.SetCacheObjectsWeights();
+                            gridNode.SetCacheObjectsWeights();
                         }
 
-                        MapAsList.Add(_g);
+                        MapAsList.Add(gridNode);
 
                         /* Check best nav location */
-                        if (_g.Weight > _bestNode.Weight ||
-                            (_g.Weight == _bestNode.Weight && _g.Distance < _bestNode.Distance))
+                        if (gridNode.Weight > bestNode.Weight ||
+                            (gridNode.Weight == bestNode.Weight && gridNode.Distance < bestNode.Distance))
                         {
-                            _bestNode = _g;
+                            bestNode = gridNode;
                         }
                     }
                 }
@@ -238,28 +233,28 @@ namespace Trinity
                 /* low, so reduce list to minimum with dist & weight limit */
                 using (new MemorySpy("MainGrid.Refresh().LowWeighting"))
                 {
-                    foreach (var _g in MapAsList)
+                    foreach (var gridNode in MapAsList)
                     {
                         /* Something to do */
-                        _g.FinalCheck();
+                        gridNode.FinalCheck();
 
-                        if (_g.Weight <= _bestNode.Weight * 0.75)
+                        if (gridNode.Weight <= bestNode.Weight * 0.75)
                         {
                             using (new MemorySpy("MainGrid.Refresh().DictionaryAdd"))
                             {
-                                if (!MainGrid.NodesRecorded.ContainsKey(MainGrid.VectorToTuple(_g.Position)))
-                                    MainGrid.NodesRecorded.Add(MainGrid.VectorToTuple(_g.Position), _g);
+                                if (!NodesRecorded.ContainsKey(VectorToTuple(gridNode.Position)))
+                                    NodesRecorded.Add(VectorToTuple(gridNode.Position), gridNode);
                             }
 
                             continue;
                         }
 
-                        if (_g.Distance > 40f)
+                        if (gridNode.Distance > 40f)
                         {
                             using (new MemorySpy("MainGrid.Refresh().DictionaryAdd"))
                             {
-                                if (!MainGrid.NodesRecorded.ContainsKey(MainGrid.VectorToTuple(_g.Position)))
-                                    MainGrid.NodesRecorded.Add(MainGrid.VectorToTuple(_g.Position), _g);
+                                if (!NodesRecorded.ContainsKey(VectorToTuple(gridNode.Position)))
+                                    NodesRecorded.Add(VectorToTuple(gridNode.Position), gridNode);
                             }
 
                             continue;
@@ -268,29 +263,29 @@ namespace Trinity
                         /* Ray cast */
                         using (new MemorySpy("MainGrid.Refresh().SetNavWeight"))
                         {
-                            _g.SetNavWeight();
+                            gridNode.SetNavWeight();
                         }
 
                         /* Count ray casted points within distance */
                         using (new MemorySpy("MainGrid.Refresh().SetSafeZoneWeight"))
                         {
-                            if (_g.NearbyExitsCount < 0)
+                            if (gridNode.NearbyExitsCount < 0)
                             {
-                                _g.NearbyExitsCount = _g.NearbyExitsWithinDistance((float)(_bestNode.Weight * 0.75), 30f);
+                                gridNode.NearbyExitsCount = gridNode.NearbyExitsWithinDistance((float)(bestNode.Weight * 0.75), 30f);
 
-                                if (_g.NearbyExitsCount > 0)
-                                    _g.OperateWeight(WeightType.Unchangeable, String.Format("HasExits[{0}]", _g.NearbyExitsCount), MainGrid.BaseWeight * _g.NearbyExitsCount);
+                                if (gridNode.NearbyExitsCount > 0)
+                                    gridNode.OperateWeight(WeightType.Unchangeable, String.Format("HasExits[{0}]", gridNode.NearbyExitsCount), BaseWeight * gridNode.NearbyExitsCount);
 
-                                if (_g.NearbyGridPointsCount > 0)
-                                    _g.OperateWeight(WeightType.Unchangeable, String.Format("CloseToOtherPoints[{0}]", _g.NearbyGridPointsCount), MainGrid.BaseWeight * _g.NearbyGridPointsCount);
+                                if (gridNode.NearbyGridPointsCount > 0)
+                                    gridNode.OperateWeight(WeightType.Unchangeable, String.Format("CloseToOtherPoints[{0}]", gridNode.NearbyGridPointsCount), BaseWeight * gridNode.NearbyGridPointsCount);
                             }
                         }
 
                         /* try catch fastest to check key in collection */
                         using (new MemorySpy("MainGrid.Refresh().AddToDictionary"))
                         {
-                            if (!MainGrid.NodesRecorded.ContainsKey(MainGrid.VectorToTuple(_g.Position)))
-                                MainGrid.NodesRecorded.Add(MainGrid.VectorToTuple(_g.Position), _g);
+                            if (!NodesRecorded.ContainsKey(VectorToTuple(gridNode.Position)))
+                                NodesRecorded.Add(VectorToTuple(gridNode.Position), gridNode);
                         }
                     }
                 }
@@ -306,11 +301,11 @@ namespace Trinity
                 /* at every tick */
                 GridResults.ResetTickValues();
 
-                tickValue_MinRangeToTarget = -1f;
-                isTickRecorded_PlayerShouldKite = false;
-                isTickRecorded_ShouldAvoidAoE = false;
-                isTickRecorded_ShouldCollectHealthGlobe = false;
-                tickValue_HealthGlobeWeightPct = -1f;
+                _tickValueMinRangeToTarget = -1f;
+                _isTickRecordedPlayerShouldKite = false;
+                _isTickRecordedShouldAvoidAoE = false;
+                _isTickRecordedShouldCollectHealthGlobe = false;
+                TickValueHealthGlobeWeightPct = -1f;
 
                 ObjectCacheIsEmpty = ObjectCache != null && !ObjectCache.Any();
                 AvoidancesCacheIsEmpty = !CacheData.AvoidanceObstacles.Any();
@@ -356,103 +351,103 @@ namespace Trinity
 
         public static bool PlayerIsInTrialRift { get; set; }
 
-        private static float tickValue_MinRangeToTarget = -1f;
+        private static float _tickValueMinRangeToTarget = -1f;
         public static float MinRangeToTarget
         {
             get
             {
-                if (tickValue_MinRangeToTarget >= 0)
-                    return tickValue_MinRangeToTarget;
+                if (_tickValueMinRangeToTarget >= 0)
+                    return _tickValueMinRangeToTarget;
 
-                tickValue_MinRangeToTarget = 30f;
+                _tickValueMinRangeToTarget = 30f;
 
                 if (CombatBase.CurrentPower.MinimumRange > 0)
-                    tickValue_MinRangeToTarget = CombatBase.CurrentPower.MinimumRange;
+                    _tickValueMinRangeToTarget = CombatBase.CurrentPower.MinimumRange;
                 else if (CombatBase.LastPowerRange > 0)
-                    tickValue_MinRangeToTarget = CombatBase.LastPowerRange;
+                    _tickValueMinRangeToTarget = CombatBase.LastPowerRange;
 
                 if (Player.ActorClass == ActorClass.DemonHunter && Trinity.Settings.Combat.DemonHunter.RangedAttackRange > 0)
-                    tickValue_MinRangeToTarget = Math.Min(Trinity.Settings.Combat.DemonHunter.RangedAttackRange, tickValue_MinRangeToTarget);
+                    _tickValueMinRangeToTarget = Math.Min(Trinity.Settings.Combat.DemonHunter.RangedAttackRange, _tickValueMinRangeToTarget);
 
-                return tickValue_MinRangeToTarget;
+                return _tickValueMinRangeToTarget;
             }
         }
-        private static bool isTickRecorded_PlayerShouldKite = false;
-        private static bool tickValue_PlayerShouldKite { get; set; }
+        private static bool _isTickRecordedPlayerShouldKite;
+        private static bool TickValuePlayerShouldKite { get; set; }
         public static bool PlayerShouldKite
         {
             get
             {
-                if (isTickRecorded_PlayerShouldKite)
-                    return tickValue_PlayerShouldKite;
+                if (_isTickRecordedPlayerShouldKite)
+                    return TickValuePlayerShouldKite;
 
-                tickValue_PlayerShouldKite = Player.AvoidDeath ||
+                TickValuePlayerShouldKite = Player.AvoidDeath ||
                     (CombatBase.CurrentPower.SNOPower != SNOPower.None &&
                     CombatBase.KiteDistance > 0 &&
                     MinRangeToTarget > 1f &&
                     MinRangeToTarget > CombatBase.KiteDistance);
 
-                isTickRecorded_PlayerShouldKite = true;
-                return tickValue_PlayerShouldKite;
+                _isTickRecordedPlayerShouldKite = true;
+                return TickValuePlayerShouldKite;
             }
         }
-        private static bool isTickRecorded_ShouldAvoidAoE = false;
-        private static bool tickValue_ShouldAvoidAoE { get; set; }
+        private static bool _isTickRecordedShouldAvoidAoE;
+        private static bool TickValueShouldAvoidAoE { get; set; }
         public static bool ShouldAvoidAoE
         {
             get
             {
-                if (isTickRecorded_ShouldAvoidAoE)
-                    return tickValue_ShouldAvoidAoE;
+                if (_isTickRecordedShouldAvoidAoE)
+                    return TickValueShouldAvoidAoE;
                 
-                tickValue_ShouldAvoidAoE = Player.AvoidDeath || Player.CurrentHealthPct <= 0.3 || Player.StandingInAvoidance ||
+                TickValueShouldAvoidAoE = Player.AvoidDeath || Player.CurrentHealthPct <= 0.3 || Player.StandingInAvoidance ||
                     (CurrentTarget != null && CurrentTarget.IsAvoidance);
 
-                isTickRecorded_ShouldAvoidAoE = true;
-                return tickValue_ShouldAvoidAoE;
+                _isTickRecordedShouldAvoidAoE = true;
+                return TickValueShouldAvoidAoE;
             }
         }
-        private static bool isTickRecorded_ShouldCollectHealthGlobe = false;
-        private static bool tickValue_ShouldCollectHealthGlobe { get; set; }
+        private static bool _isTickRecordedShouldCollectHealthGlobe;
+        private static bool TickValueShouldCollectHealthGlobe { get; set; }
         public static bool ShouldCollectHealthGlobe
         {
             get
             {
-                if (isTickRecorded_ShouldCollectHealthGlobe)
-                    return tickValue_ShouldCollectHealthGlobe;
+                if (_isTickRecordedShouldCollectHealthGlobe)
+                    return TickValueShouldCollectHealthGlobe;
 
                 if (Trinity.Settings.Combat.Misc.HiPriorityHG)
-                    tickValue_ShouldCollectHealthGlobe = true;
+                    TickValueShouldCollectHealthGlobe = true;
 
                 else if (Player.CurrentHealthPct < CombatBase.EmergencyHealthGlobeLimit)
-                    tickValue_ShouldCollectHealthGlobe = true;
+                    TickValueShouldCollectHealthGlobe = true;
 
                 else
-                    tickValue_ShouldCollectHealthGlobe = Player.PrimaryResourcePct < CombatBase.HealthGlobeResource &&
+                    TickValueShouldCollectHealthGlobe = Player.PrimaryResourcePct < CombatBase.HealthGlobeResource &&
                         (Legendary.ReapersWraps.IsEquipped ||
                         (Player.ActorClass == ActorClass.Witchdoctor && CacheData.Hotbar.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GruesomeFeast)) ||
                         (Player.ActorClass == ActorClass.DemonHunter && CacheData.Hotbar.PassiveSkills.Contains(SNOPower.DemonHunter_Passive_Vengeance)));
 
-                isTickRecorded_ShouldCollectHealthGlobe = true;
-                return tickValue_ShouldCollectHealthGlobe;
+                _isTickRecordedShouldCollectHealthGlobe = true;
+                return TickValueShouldCollectHealthGlobe;
             }
         }
-        public static float tickValue_HealthGlobeWeightPct = -1f;
+        public static float TickValueHealthGlobeWeightPct = -1f;
         public static float HealthGlobeWeightPct
         {
             get
             {
-                if (tickValue_HealthGlobeWeightPct >= 0)
-                    return tickValue_HealthGlobeWeightPct;
+                if (TickValueHealthGlobeWeightPct >= 0)
+                    return TickValueHealthGlobeWeightPct;
 
-                tickValue_HealthGlobeWeightPct = (float)(1f - Player.CurrentHealthPct) * 10f;
+                TickValueHealthGlobeWeightPct = (float)(1f - Player.CurrentHealthPct) * 10f;
                 if (Player.CurrentHealthPct > 1 && Player.PrimaryResourcePct > 1)
                 {
-                    tickValue_HealthGlobeWeightPct += (float)(1f - Player.PrimaryResourcePct) * 10f;
-                    tickValue_HealthGlobeWeightPct = (float)tickValue_HealthGlobeWeightPct * 0.5f;
+                    TickValueHealthGlobeWeightPct += (float)(1f - Player.PrimaryResourcePct) * 10f;
+                    TickValueHealthGlobeWeightPct = TickValueHealthGlobeWeightPct * 0.5f;
                 }
 
-                return tickValue_HealthGlobeWeightPct;
+                return TickValueHealthGlobeWeightPct;
             }
         }
     }
