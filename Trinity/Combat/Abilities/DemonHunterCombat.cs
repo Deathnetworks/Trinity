@@ -592,6 +592,9 @@ namespace Trinity.Combat.Abilities
                 power = GetCombatBuffPower();
             if (!IsNull(power)) { return power; }
 
+            if (CurrentTarget == null)
+                return null;
+
             // Sentry
             if (Skills.DemonHunter.Sentry.CanCast(CanCastFlags.NoTimer) && Trinity.PlayerOwnedDHSentryCount < MaxSentryCount)
             {

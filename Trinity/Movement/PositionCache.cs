@@ -54,8 +54,10 @@ namespace Trinity
         /// </summary>
         public static void MaintainCache()
         {
-            int worldId = ZetaDia.CurrentWorldId;
-            foreach (PositionCache p in Cache.Where(p => p.WorldId != worldId))
+            if (Trinity.Player.WorldID == null)
+                return;
+
+            foreach (PositionCache p in Cache.Where(p => p.WorldId != Trinity.Player.WorldID))
             {
                 CacheData.VisitedZones.Remove(p.Position);
                 Cache.Remove(p);

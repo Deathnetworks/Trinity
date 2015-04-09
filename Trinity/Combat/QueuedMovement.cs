@@ -106,7 +106,7 @@ namespace Trinity.Combat
             FailureBlacklistSeconds = 0.5;
             SuccessBlacklistSeconds = 0;
             ChangeInDistanceLimit = 2f;
-            TimeBeforeBlocked = 1500;
+            TimeBeforeBlocked = 2500;
             Logging = LogLevel.Info;
             AcceptableDistance = 8f;
             MaxDistance = 150f;
