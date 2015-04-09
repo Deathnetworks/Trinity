@@ -157,69 +157,65 @@ namespace Trinity
         /// <summary>
         /// Search in grid map the best safe grid point by weight
         /// </summary>
-        /// <param name="_minRange">minimum search range of point</param>
-        /// <param name="_maxRange">maximum search range of point</param>
-        /// <param name="_loc">origin search location</param>
+        /// <param name="minRange">minimum search range of point</param>
+        /// <param name="maxRange">maximum search range of point</param>
+        /// <param name="loc">origin search location</param>
+        /// <param name="prioritizeDist"></param>
         /// <returns></returns>
-        public static GridNode GetBestMoveNode(float _minRange = 6f, float _maxRange = 100f, Vector3 _loc = new Vector3(), bool _prioritizeDist = false)
+        public static GridNode GetBestMoveNode(float minRange = 6f, float maxRange = 100f, Vector3 loc = new Vector3(), bool prioritizeDist = false)
         {
             using (new MemorySpy("GridMap.GetBestMoveNode()"))
             {
-                if (_loc == new Vector3())
-                    _loc = Trinity.Player.Position;
+                if (loc == Vector3.Zero)
+                    loc = Trinity.Player.Position;
 
-                if (_loc == Vector3.Zero)
-                    _loc = Trinity.Player.Position;
+                bool atPlayer = loc == Trinity.Player.Position;
 
-                bool _atPlayer = _loc == Trinity.Player.Position;
-
-                GridNode _result = new GridNode();
-                if (GridResults.HasRecordedValue_GetBestNode(out _result, _minRange, _maxRange, _loc))
+                GridNode result;
+                if (GridResults.HasRecordedValue_GetBestNode(out result, minRange, maxRange, loc))
                 {
                     /* Keep last safe point */
-                    if (_result.Weight >= (GetWeightAt(_result.Position) * 0.9))
-                        return _result;
+                    if (result.Weight >= (GetWeightAt(result.Position) * 0.9))
+                        return result;
 
-                    GridResults.RecordedValues_GetBestNode.RemoveWhere(p => p.GridLocation.Equals(_result));
+                    GridResults.RecordedValues_GetBestNode.RemoveWhere(p => p != null && p.GridLocation != null && p.GridLocation.Equals(result));
                 }
 
-                var _results = 
+                var results = 
                     (from p in MainGrid.MapAsList
                     where
-                        (_atPlayer && p.Distance >= _minRange ||
-                        !_atPlayer && p.Position.Distance2D(_loc) >= _minRange) &&
-                        (_atPlayer && p.Distance < _maxRange ||
-                        !_atPlayer && p.Position.Distance2D(_loc) < _maxRange)
+                        (atPlayer && p.Distance >= minRange ||
+                        !atPlayer && p.Position.Distance2D(loc) >= minRange) &&
+                        (atPlayer && p.Distance < maxRange ||
+                        !atPlayer && p.Position.Distance2D(loc) < maxRange)
                     select p).ToList();
 
-                if (_prioritizeDist)
-                    _results = 
-                        (from p in _results
+                if (prioritizeDist)
+                    results = 
+                        (from p in results
                         orderby 
                             p.Weight descending, 
-                            p.Position.Distance2D(_loc)
+                            p.Position.Distance2D(loc)
                         select p).ToList();
                 else
-                    _results = 
-                        (from p in _results
-                        orderby 
-                            p.Weight descending
+                    results = 
+                        (from p in results
+                        orderby p.Weight descending
                         select p).ToList();
 
-                if (_results != null)
-                    _result = _results.FirstOrDefault();
+                result = results.FirstOrDefault();
 
-                if (_result != null && _result.Position != Vector3.Zero && _result.Position != MainGrid.LastResult.Position)
+                if (result != null && result.Position != Vector3.Zero && result.Position != MainGrid.LastResult.Position)
                 {
-                    MainGrid.LastResult = _result;
+                    MainGrid.LastResult = result;
                     Logger.Log(TrinityLogLevel.Info, LogCategory.Movement, "Best safe gPoint : Loc={0} Dist={1:1} Weight={2} Infos={3}",
-                        _result.Position, _result.Position.Distance2D(_loc).ToString("F0"),
-                        _result.Weight.ToString("F0"), _result.WeightInfos
+                        result.Position, result.Position.Distance2D(loc).ToString("F0"),
+                        result.Weight.ToString("F0"), result.WeightInfos
                     );
                 }
 
-                GridResults.RecordedValues_GetBestNode.Add(new GetBestNodeResult(_result, _minRange, _maxRange, _loc));
-                return _result;
+                GridResults.RecordedValues_GetBestNode.Add(new GetBestNodeResult(result, minRange, maxRange, loc));
+                return result;
             }
         }
 

@@ -819,7 +819,7 @@ namespace Trinity.DbProvider
                             if ((_kMove || (_aMove && !Trinity.Player.TryToAvoidProjectile)) && 
                                 (_gridNode.Distance <= 33f || _gridNode.Distance >= 40f))
                             {
-                                _newGridLoc = GridMap.GetBestMoveNode(35f, _prioritizeDist: true);
+                                _newGridLoc = GridMap.GetBestMoveNode(35f, prioritizeDist: true);
                             }
 
                             if (_newGridLoc != null && _newGridLoc.Position != Vector3.Zero)

@@ -187,7 +187,7 @@ namespace Trinity.Combat.Abilities
             if (IsNull(power) && CurrentTarget != null && 
                 Sets.TheLegacyOfRaekor.IsMaxBonusActive && Skills.Barbarian.FuriousCharge.IsActive)
             {
-                var _kiteNode = GridMap.GetBestMoveNode(20f, _prioritizeDist: true);
+                var _kiteNode = GridMap.GetBestMoveNode(20f, prioritizeDist: true);
 
                 if (IsNull(power) && _kiteNode != null && TargetUtil.NumMobsInLosInRangeOfPosition(CurrentTarget.Position, 35f) == 1 &&
                     !(CurrentTarget.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize) &&
@@ -206,7 +206,7 @@ namespace Trinity.Combat.Abilities
                     CombatBase.QueuedMovement.Queue(new QueuedMovement
                     {
                         Name = CurrentTarget.InternalName,
-                        Infos = "(Barbarian Kite) " + CurrentTarget.Infos + " WeightInfos: " + GridMap.GetBestMoveNode(20f, _prioritizeDist: true).WeightInfos,
+                        Infos = "(Barbarian Kite) " + CurrentTarget.Infos + " WeightInfos: " + GridMap.GetBestMoveNode(20f, prioritizeDist: true).WeightInfos,
                         Destination = power.TargetPosition,
                         StopCondition = m =>
                             m.Destination == Vector3.Zero ||

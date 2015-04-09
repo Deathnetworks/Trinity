@@ -179,7 +179,7 @@ namespace Trinity
 
         private static Vector3 GetBestAoEMovementPosition()
         {
-            GridNode _moveNode = GridMap.GetBestMoveNode(_maxRange: 25f);
+            GridNode _moveNode = GridMap.GetBestMoveNode(maxRange: 25f);
             if (_moveNode.Position != Vector3.Zero)
                 return _moveNode.Position;
 
