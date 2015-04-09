@@ -93,11 +93,6 @@ namespace Trinity
         /// <summary>
         /// If a unit, item, or other object has been raycastable before, this will contain true value and will be considered for targetting, otherwise we will continue to check
         /// </summary>
-        //internal static Dictionary<int, Tuple<bool, int>> RayCastResultsFromObjects = new Dictionary<int, Tuple<bool, int>>();
-
-        /// <summary>
-        /// If a unit, item, or other object has been raycastable before, this will contain true value and will be considered for targetting, otherwise we will continue to check
-        /// </summary>
         internal static Dictionary<int, Tuple<bool, int>> RayCastResultsFromObjects = new Dictionary<int, Tuple<bool, int>>();
 
         /// <summary>
