@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Trinity.Technicals;
 using Zeta.Common;
 using Zeta.Game;
 
@@ -54,10 +53,7 @@ namespace Trinity
         /// </summary>
         public static void MaintainCache()
         {
-            if (Trinity.Player.WorldID == null)
-                return;
-
-            foreach (PositionCache p in Cache.Where(p => p.WorldId != Trinity.Player.WorldID))
+            foreach (PositionCache p in Cache.ToList().Where(p => p.WorldId != Trinity.Player.WorldID))
             {
                 CacheData.VisitedZones.Remove(p.Position);
                 Cache.Remove(p);
@@ -67,7 +63,7 @@ namespace Trinity
 
         public bool Equals(PositionCache other)
         {
-            return this.Position == other.Position && this.WorldId == other.WorldId;
+            return Position == other.Position && WorldId == other.WorldId;
         }
     }
 }
