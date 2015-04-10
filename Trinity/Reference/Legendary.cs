@@ -73,29 +73,29 @@ namespace Trinity.Reference
             SetName = "",
         };
 
-        public static Item EunJangDo = new Item
-        {
-            Id = 410960,
-            Name = "Eun-Jang-Do",
-            Quality = ItemQuality.Legendary,
-            ItemType = ItemType.Dagger,
-            BaseType = ItemBaseType.Weapon,
-            GItemType = GItemType.Dagger,
-            LegendaryAffix = "Attacking enemies below 17-20% life freezes them for 3 seconds",
-            SetName = "",
-        };
+        //public static Item EunJangDo = new Item
+        //{
+        //    Id = 410960,
+        //    Name = "Eun-Jang-Do",
+        //    Quality = ItemQuality.Legendary,
+        //    ItemType = ItemType.Dagger,
+        //    BaseType = ItemBaseType.Weapon,
+        //    GItemType = GItemType.Dagger,
+        //    LegendaryAffix = "Attacking enemies below 17-20% life freezes them for 3 seconds",
+        //    SetName = "",
+        //};
 
-        public static Item InGeom = new Item
-        {
-            Id = 410946,
-            Name = "In-Geom",
-            Quality = ItemQuality.Legendary,
-            ItemType = ItemType.Sword,
-            BaseType = ItemBaseType.Weapon,
-            GItemType = GItemType.Sword,
-            LegendaryAffix = "Cooldowns are reduced by 8-10 seconds for 15 seconds after killing an elite pack",
-            SetName = "",
-        };
+        //public static Item InGeom = new Item
+        //{
+        //    Id = 410946,
+        //    Name = "In-Geom",
+        //    Quality = ItemQuality.Legendary,
+        //    ItemType = ItemType.Sword,
+        //    BaseType = ItemBaseType.Weapon,
+        //    GItemType = GItemType.Sword,
+        //    LegendaryAffix = "Cooldowns are reduced by 8-10 seconds for 15 seconds after killing an elite pack",
+        //    SetName = "",
+        //};
 
 
         /// <summary>
@@ -14912,9 +14912,18 @@ namespace Trinity.Reference
         /// </summary>
         public static HashSet<int> ItemIds
         {
-            get { return _itemIds ?? (_itemIds = new HashSet<int>(ToList().Select(i => i.Id))); }
+            get { return _itemIds ?? (_itemIds = new HashSet<int>(ToList().Where(i => i.Id != 0).Select(i => i.Id))); }
         }
         private static HashSet<int> _itemIds;
+
+        /// <summary>
+        /// Dictionary of all Legendaries Items
+        /// </summary>
+        public static Dictionary<int,Item> Items
+        {
+            get { return _items ?? (_items = ToList().Where(i => i.Id != 0).DistinctBy(i => i.Id).ToDictionary(k => k.Id, v => v)); }
+        }
+        private static Dictionary<int,Item> _items;
 
         /// <summary>
         /// Gets equipped legendaries
