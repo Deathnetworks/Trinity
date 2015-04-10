@@ -152,12 +152,6 @@ namespace Trinity
                             return false;
                         }
 
-                        // This is causing bugs I think? Maybe need to check a combination of attribute....
-                        //if (gizmoDoor != null && !gizmoDoor.Operatable)
-                        //{
-                        //    c_InfosSubStep += "IsNotOperatable";
-                        //    return false;
-                        //}
                         if (c_diaObject is DiaGizmo && ((DiaGizmo)c_diaObject).HasBeenOperated)
                         {
                             c_InfosSubStep += "Door has been operated";
