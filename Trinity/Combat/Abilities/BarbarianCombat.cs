@@ -12,6 +12,17 @@ namespace Trinity.Combat.Abilities
 {
     class BarbarianCombat : CombatBase
     {
+        public static bool BastionOfWillRequirePrimary
+        {
+            get
+            {
+                return Sets.BastionsOfWill.IsMaxBonusActive && TargetUtil.AnyMobsInRange(30, false) &&
+                    (TimeSincePowerUse(SNOPower.Barbarian_Bash) < 0 || TimeSincePowerUse(SNOPower.Barbarian_Bash) >= 4500 ||
+                    TimeSincePowerUse(SNOPower.Barbarian_Frenzy) < 0 || TimeSincePowerUse(SNOPower.Barbarian_Frenzy) >= 4500 ||
+                    TimeSincePowerUse(SNOPower.X1_Barbarian_WeaponThrow) < 0 || TimeSincePowerUse(SNOPower.X1_Barbarian_WeaponThrow) >= 4500 ||
+                    TimeSincePowerUse(SNOPower.Barbarian_Cleave) < 0 || TimeSincePowerUse(SNOPower.Barbarian_Cleave) >= 4500);
+            }
+        }
         public static bool CurrentlyUseFuriousCharge
         {
             get
@@ -54,6 +65,22 @@ namespace Trinity.Combat.Abilities
                 // Refresh Frenzy
                 if (IsNull(power) && CanCast(SNOPower.Barbarian_Frenzy) && TimeSincePowerUse(SNOPower.Barbarian_Frenzy) > 3000 && TimeSincePowerUse(SNOPower.Barbarian_Frenzy) < 4000)
                     power = PowerFrenzy;
+
+                // Bastion Of Will require primary usage
+                if (BastionOfWillRequirePrimary)
+                {
+                    if (IsNull(power) && CanCast(SNOPower.Barbarian_Frenzy, CanCastFlags.NoTimer))
+                        power = new TrinityPower(SNOPower.Barbarian_Frenzy, 0f, CurrentTarget.ACDGuid);
+
+                    if (IsNull(power) && CanCast(SNOPower.Barbarian_Bash, CanCastFlags.NoTimer))
+                        power = new TrinityPower(SNOPower.Barbarian_Bash, 0f, CurrentTarget.ACDGuid);
+
+                    if (IsNull(power) && CanCast(SNOPower.Barbarian_Cleave, CanCastFlags.NoTimer))
+                        power = new TrinityPower(SNOPower.Barbarian_Cleave, 0f, CurrentTarget.ACDGuid);
+
+                    if (IsNull(power) && CanCast(SNOPower.X1_Barbarian_WeaponThrow, CanCastFlags.NoTimer))
+                        power = new TrinityPower(SNOPower.X1_Barbarian_WeaponThrow, 0f, CurrentTarget.ACDGuid);
+                }
             }
             // Ignore Pain when low on health
             if (IsNull(power) && CanCastIgnorePain)

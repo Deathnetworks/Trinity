@@ -13,6 +13,17 @@ namespace Trinity.Combat.Abilities
 {
     public class DemonHunterCombat : CombatBase
     {
+        public static bool BastionOfWillRequirePrimary
+        {
+            get
+            {
+                return Sets.BastionsOfWill.IsMaxBonusActive && TargetUtil.AnyMobsInRange(55f, false) &&
+                    (TimeSincePowerUse(SNOPower.DemonHunter_HungeringArrow) < 0 || TimeSincePowerUse(SNOPower.DemonHunter_HungeringArrow) >= 4500 ||
+                    TimeSincePowerUse(SNOPower.X1_DemonHunter_EntanglingShot) < 0 || TimeSincePowerUse(SNOPower.X1_DemonHunter_EntanglingShot) >= 4500 ||
+                    TimeSincePowerUse(SNOPower.DemonHunter_Bolas) < 0 || TimeSincePowerUse(SNOPower.DemonHunter_Bolas) >= 4500 ||
+                    TimeSincePowerUse(SNOPower.X1_DemonHunter_EvasiveFire) < 0 || TimeSincePowerUse(SNOPower.X1_DemonHunter_EvasiveFire) >= 4500);
+            }
+        }
         #region Fields
         public static DemonHunterSetting DHSettings
         {
@@ -75,6 +86,8 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         public static TrinityPower GetPower()
         {
+            TrinityPower power = null;
+
             // Destructible
             if (UseDestructiblePower)
             {
@@ -84,20 +97,20 @@ namespace Trinity.Combat.Abilities
             // Buffs
             if ((!Player.IsInCombat || UseOOCBuff) && !IsCurrentlyAvoiding)
             {
-                TrinityPower power = GetBuffPower();
+                power = GetBuffPower();
                 if (!IsNull(power)) { return power; }
             }
 
             // In Combat, Avoiding
             if (IsCurrentlyAvoiding)
             {
-                TrinityPower power = GetCombatAvoidancePower();
+                power = GetCombatAvoidancePower();
                 if (!IsNull(power)) { return power; }
             }
 
             if (Player.IsRooted || Player.IsIncapacitated)
             {
-                TrinityPower power = GetCombatAvoidancePower();
+                power = GetCombatAvoidancePower();
                 if (!IsNull(power)) { return power; }
             }
 
@@ -107,14 +120,21 @@ namespace Trinity.Combat.Abilities
             // Marauder cast/move routine
             if ((CurrentTarget != null || Player.IsInCombat) && Sets.EmbodimentOfTheMarauder.IsMaxBonusActive)
             {
-                TrinityPower power = RunMarauderRoutine();
+                power = RunMarauderRoutine();
+                if (!IsNull(power)) { return power; }
+            }
+
+            // Bastion Of Will require primary usage
+            if (BastionOfWillRequirePrimary)
+            {
+                power = GetPrimaryPower();
                 if (!IsNull(power)) { return power; }
             }
 
             // In combat, Not Avoiding
             if (CurrentTarget != null)
             {
-                TrinityPower power = GetCombatBuffPower();
+                power = GetCombatBuffPower();
                 if (!IsNull(power)) { return power; }
 
                 if (CurrentTarget.IsUnit)
@@ -177,7 +197,7 @@ namespace Trinity.Combat.Abilities
             // Evasive Fire
             if (Hotbar.Contains(SNOPower.X1_DemonHunter_EvasiveFire))
             {
-                float range = (Player.PrimaryResourceMissing > 5 || Sets.EmbodimentOfTheMarauder.IsMaxBonusActive) ? RangedAttackRange : 10f;
+                float range = (Player.PrimaryResourceMissing > 5 || Sets.EmbodimentOfTheMarauder.IsMaxBonusActive || BastionOfWillRequirePrimary) ? RangedAttackRange : 10f;
                 return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, RangedAttackRange, SentryCastSkillsCastArea.Position);
             }
 
@@ -196,14 +216,14 @@ namespace Trinity.Combat.Abilities
             // Bola Shot
             if (Hotbar.Contains(SNOPower.DemonHunter_Bolas))
             {
-                float range = RangedAttackRange > 50f ? 50f : RangedAttackRange;
+                float range = !BastionOfWillRequirePrimary && RangedAttackRange > 50f ? 50f : RangedAttackRange;
                 return new TrinityPower(SNOPower.DemonHunter_Bolas, range, SentryCastSkillsCastArea.Position);
             }
 
             // Grenades
             if (Hotbar.Contains(SNOPower.DemonHunter_Grenades))
             {
-                float range = RangedAttackRange > 30f ? 30f : RangedAttackRange;
+                float range = !BastionOfWillRequirePrimary && RangedAttackRange > 30f ? 30f : RangedAttackRange;
                 return new TrinityPower(SNOPower.DemonHunter_Grenades, RangedAttackRange, SentryCastSkillsCastArea.Position);
             }
 

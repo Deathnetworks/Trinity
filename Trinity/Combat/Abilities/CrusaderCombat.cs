@@ -10,6 +10,18 @@ namespace Trinity.Combat.Abilities
     public class CrusaderCombat : CombatBase
     {
 
+        public static bool BastionOfWillRequirePrimary
+        {
+            get
+            {
+                return Sets.BastionsOfWill.IsMaxBonusActive && TargetUtil.AnyMobsInRange(30, false) &&
+                    (TimeSincePowerUse(SNOPower.X1_Crusader_Punish) < 0 || TimeSincePowerUse(SNOPower.X1_Crusader_Punish) >= 4500 ||
+                    TimeSincePowerUse(SNOPower.X1_Crusader_Slash) < 0 || TimeSincePowerUse(SNOPower.X1_Crusader_Slash) >= 4500 ||
+                    TimeSincePowerUse(SNOPower.X1_Crusader_Smite) < 0 || TimeSincePowerUse(SNOPower.X1_Crusader_Smite) >= 4500 ||
+                    TimeSincePowerUse(SNOPower.X1_Crusader_Justice) < 0 || TimeSincePowerUse(SNOPower.X1_Crusader_Justice) >= 4500);
+            }
+        }
+
         public static Config.Combat.CrusaderSetting CrusaderSettings
         {
             get { return Trinity.Settings.Combat.Crusader; }
@@ -29,8 +41,28 @@ namespace Trinity.Combat.Abilities
                 }
             }
 
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && CurrentTarget != null)
+            if (!UseOOCBuff && !IsCurrentlyAvoiding)
             {
+                // Bastion Of Will require primary usage
+                if (BastionOfWillRequirePrimary)
+                {
+                    // Justice
+                    if (CanCast(SNOPower.X1_Crusader_Justice))
+                        return new TrinityPower(SNOPower.X1_Crusader_Justice, 0f, CurrentTarget.ACDGuid);
+
+                    // Smite
+                    if (CanCast(SNOPower.X1_Crusader_Smite))
+                        return new TrinityPower(SNOPower.X1_Crusader_Smite, 0f, TargetUtil.GetBestClusterUnit(15f, 15f).ACDGuid);
+
+                    // Slash
+                    if (CanCast(SNOPower.X1_Crusader_Slash))
+                        return new TrinityPower(SNOPower.X1_Crusader_Slash, 0f, TargetUtil.GetBestClusterUnit(5f, 8f).ACDGuid);
+
+                    // Punish
+                    if (CanCast(SNOPower.X1_Crusader_Punish))
+                        return new TrinityPower(SNOPower.X1_Crusader_Punish, 0f, CurrentTarget.ACDGuid);
+                }
+
                 /*
                  *  Laws for Active Buff
                  */

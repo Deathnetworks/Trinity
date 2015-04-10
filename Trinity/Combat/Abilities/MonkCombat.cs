@@ -18,6 +18,17 @@ namespace Trinity.Combat.Abilities
 {
     public class MonkCombat : CombatBase
     {
+        public static bool BastionOfWillRequirePrimary
+        {
+            get
+            {
+                return Sets.BastionsOfWill.IsMaxBonusActive && TargetUtil.AnyMobsInRange(30, false) &&
+                    (TimeSincePowerUse(SNOPower.Monk_CripplingWave) < 0 || TimeSincePowerUse(SNOPower.Monk_CripplingWave) >= 4500 ||
+                    TimeSincePowerUse(SNOPower.Monk_FistsofThunder) < 0 || TimeSincePowerUse(SNOPower.Monk_FistsofThunder) >= 4500 ||
+                    TimeSincePowerUse(SNOPower.Monk_DeadlyReach) < 0 || TimeSincePowerUse(SNOPower.Monk_DeadlyReach) >= 4500 ||
+                    TimeSincePowerUse(SNOPower.Monk_WayOfTheHundredFists) < 0 || TimeSincePowerUse(SNOPower.Monk_WayOfTheHundredFists) >= 4500);
+            }
+        }
         public static bool CurrentlyUseDashingStrike
         {
             get
@@ -75,6 +86,22 @@ namespace Trinity.Combat.Abilities
                 }
 
                 return GetMonkDestroyPower();
+            }
+
+            // Bastion Of Will require primary usage
+            if (!UseOOCBuff && BastionOfWillRequirePrimary)
+            {
+                if (CanCast(SNOPower.Monk_FistsofThunder))
+                    return new TrinityPower(SNOPower.Monk_FistsofThunder, 0f, CurrentTarget.ClusterPosition(15f), CurrentTarget.ACDGuid);
+
+                if (CanCast(SNOPower.Monk_DeadlyReach))
+                    return new TrinityPower(SNOPower.Monk_DeadlyReach, 0f, CurrentTarget.ClusterPosition(14f), CurrentTarget.ACDGuid);
+
+                if (CanCast(SNOPower.Monk_WayOfTheHundredFists))
+                    return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 0f, CurrentTarget.ClusterPosition(14f), CurrentTarget.ACDGuid);
+
+                if (CanCast(SNOPower.Monk_CripplingWave))
+                    return new TrinityPower(SNOPower.Monk_CripplingWave, 0f, CurrentTarget.ClusterPosition(28f), CurrentTarget.ACDGuid);
             }
 
             // Dashing strike avoidance
@@ -470,8 +497,7 @@ namespace Trinity.Combat.Abilities
             // Fists of Thunder:Thunder Clap - Fly to Target
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Monk_FistsofThunder) && Runes.Monk.Thunderclap.IsActive && CurrentTarget.Distance > 16f)
             {
-                // RefreshSweepingWind();
-                return new TrinityPower(SNOPower.Monk_FistsofThunder, 30f, CurrentTarget.ClusterPosition(28f), CurrentTarget.ACDGuid);
+                return new TrinityPower(SNOPower.Monk_FistsofThunder, 30f, CurrentTarget.ClusterPosition(15f), CurrentTarget.ACDGuid);
             }
 
             // Deadly Reach: Foresight, every 27 seconds or 2.7 seconds with combo strike
@@ -479,7 +505,6 @@ namespace Trinity.Combat.Abilities
                 (SpellHistory.TimeSinceUse(SNOPower.Monk_DeadlyReach) > TimeSpan.FromMilliseconds(drInterval) ||
                 (SpellHistory.SpellUseCountInTime(SNOPower.Monk_DeadlyReach, TimeSpan.FromMilliseconds(27000)) < 3) && Runes.Monk.Foresight.IsActive))
             {
-                // RefreshSweepingWind();
                 return new TrinityPower(SNOPower.Monk_DeadlyReach, 16f, CurrentTarget.ClusterPosition(14f), CurrentTarget.ACDGuid);
             }
 
@@ -488,7 +513,6 @@ namespace Trinity.Combat.Abilities
                 (GetBuffStacks(SNOPower.Monk_WayOfTheHundredFists) < 3 ||
                 SpellHistory.TimeSinceUse(SNOPower.Monk_WayOfTheHundredFists) > TimeSpan.FromMilliseconds(wothfInterval)))
             {
-                // RefreshSweepingWind();
                 return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 16f, CurrentTarget.ClusterPosition(14f), CurrentTarget.ACDGuid);
             }
 
@@ -496,35 +520,30 @@ namespace Trinity.Combat.Abilities
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Monk_CripplingWave) &&
                 SpellHistory.TimeSinceUse(SNOPower.Monk_CripplingWave) > TimeSpan.FromMilliseconds(cwInterval))
             {
-                // RefreshSweepingWind();
                 return new TrinityPower(SNOPower.Monk_CripplingWave, 20f, CurrentTarget.ClusterPosition(18f), CurrentTarget.ACDGuid);
             }
 
             // Fists of Thunder
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Monk_FistsofThunder))
             {
-                // RefreshSweepingWind();
-                return new TrinityPower(SNOPower.Monk_FistsofThunder, 30f, CurrentTarget.ClusterPosition(28f), CurrentTarget.ACDGuid);
+                return new TrinityPower(SNOPower.Monk_FistsofThunder, 30f, CurrentTarget.ClusterPosition(15f), CurrentTarget.ACDGuid);
             }
 
             // Deadly Reach normal
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Monk_DeadlyReach))
             {
-                // RefreshSweepingWind();
                 return new TrinityPower(SNOPower.Monk_DeadlyReach, 16f, CurrentTarget.ClusterPosition(14f), CurrentTarget.ACDGuid);
             }
 
             // Way of the Hundred Fists normal
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Monk_WayOfTheHundredFists))
             {
-                // RefreshSweepingWind();
                 return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 16f, CurrentTarget.ClusterPosition(14f), CurrentTarget.ACDGuid);
             }
 
             // Crippling Wave Normal
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Monk_CripplingWave))
             {
-                // RefreshSweepingWind();
                 return new TrinityPower(SNOPower.Monk_CripplingWave, 30f, CurrentTarget.ClusterPosition(28f), CurrentTarget.ACDGuid);
             }
 
@@ -610,12 +629,10 @@ namespace Trinity.Combat.Abilities
             {
                 if (farthestTarget != null) // found a target within 33-49 yards.
                 {
-                    // RefreshSweepingWind();
                     return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, farthestTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 2);
                 }
                 // no free target found, get a nearby cluster point instead.
                 var bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, procDistance);
-                // RefreshSweepingWind();
                 return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, bestClusterPoint, Trinity.CurrentWorldDynamicId, -1, 2, 2);
             }
 
@@ -625,7 +642,6 @@ namespace Trinity.Combat.Abilities
                 var dashStrikeBestClusterPoint = TargetUtil.GetBestClusterPoint(20f, 20f);
                 if (dashStrikeBestClusterPoint != Trinity.Player.Position)
                 {
-                    // RefreshSweepingWind();
                     return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, dashStrikeBestClusterPoint, Trinity.CurrentWorldDynamicId, -1, 2, 2);
                 }
             }
@@ -633,7 +649,6 @@ namespace Trinity.Combat.Abilities
             // dash to anything which is free.               
             if (farthestTarget != null)
             {
-                // RefreshSweepingWind();
                 return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, farthestTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 2);
             }
 
