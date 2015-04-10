@@ -29,10 +29,6 @@ namespace Trinity
         {
             return new Tuple<int, int>((int)loc.X, (int)loc.Y);
         }
-        public static Tuple<int, int> VectorToTuple(Vector2 _loc)
-        {
-            return new Tuple<int, int>((int)_loc.X, (int)_loc.Y);
-        }
 
         private static List<TrinityCacheObject> ObjectCache
         {
@@ -169,9 +165,6 @@ namespace Trinity
                             gridNode.UnchangeableWeight = nodeRecorded.UnchangeableWeight;
                             gridNode.UnchangeableWeightInfos = nodeRecorded.UnchangeableWeightInfos;
                             gridNode.Position = nodeRecorded.Position;
-
-                                _g.Position = _nodeRecorded.Position;
-
 
                             gridNode.NearbyExitsCount = nodeRecorded.NearbyExitsCount;
                             gridNode.NearbyGridPointsCount = nodeRecorded.NearbyGridPointsCount;
