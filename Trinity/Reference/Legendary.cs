@@ -15,6 +15,29 @@ namespace Trinity.Reference
         #region TempItems
         /***************  START TEMP ITEMS FOR 2.20 Patch ****************/
 
+        // Slave bonds is currently not in teh game guide, it may be being renamed.
+
+        /// <summary>
+        /// Slave Bonds 
+        /// </summary>
+        public static Item SlaveBonds = new Item
+        {
+            Id = 193685,
+            Name = "Slave Bonds",
+            Quality = ItemQuality.Legendary,
+            Slug = "slave-bonds",
+            ItemType = ItemType.Bracer,
+            BaseType = ItemBaseType.Armor,
+            GItemType = GItemType.Bracer,
+            InternalName = "Bracers_norm_unique_03",
+            DataUrl = "https://us.battle.net/api/d3/data/item/slave-bonds",
+            Url = "https://us.battle.net/d3/en/item/slave-bonds",
+            RelativeUrl = "/d3/en/item/slave-bonds",
+            IsCrafted = false,
+            LegendaryAffix = "",
+            SetName = "",
+        };
+
         public static Item ConventionOfTheElements = new Item
         {
             Id = 0,
@@ -29,7 +52,7 @@ namespace Trinity.Reference
 
         public static Item EunJangDo = new Item
         {
-            Id = 0,
+            Id = 410960,
             Name = "Eun-Jang-Do",
             Quality = ItemQuality.Legendary,
             ItemType = ItemType.Dagger,
@@ -41,8 +64,8 @@ namespace Trinity.Reference
 
         public static Item InGeom = new Item
         {
-            Id = 0,
-            Name = "Eun-Jang-Do",
+            Id = 410946,
+            Name = "In-Geom",
             Quality = ItemQuality.Legendary,
             ItemType = ItemType.Sword,
             BaseType = ItemBaseType.Weapon,
@@ -786,7 +809,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item CuirassOfTheWastes = new Item
         {
-            Id = 0,
+            Id = 408860,
             Name = "Cuirass of the Wastes",
             Quality = ItemQuality.Legendary,
             Slug = "cuirass-of-the-wastes",
@@ -1246,7 +1269,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item CrownOfThePrimus = new Item
         {
-            Id = 0,
+            Id = 349951,
             Name = "Crown of the Primus",
             Quality = ItemQuality.Legendary,
             Slug = "crown-of-the-primus",
@@ -1982,7 +2005,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item BornsPrivilege = new Item
         {
-            Id = 0,
+            Id = 222948,
             Name = "Born's Privilege",
             Quality = ItemQuality.Legendary,
             Slug = "borns-privilege",
@@ -2212,7 +2235,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item PauldronsOfTheWastes = new Item
         {
-            Id = 0,
+            Id = 414921,
             Name = "Pauldrons of the Wastes",
             Quality = ItemQuality.Legendary,
             Slug = "pauldrons-of-the-wastes",
@@ -3063,7 +3086,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HelmOfTheWastes = new Item
         {
-            Id = 0,
+            Id = 414926,
             Name = "Helm of the Wastes",
             Quality = ItemQuality.Legendary,
             Slug = "helm-of-the-wastes",
@@ -3776,7 +3799,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item GauntletOfTheWastes = new Item
         {
-            Id = 0,
+            Id = 408861,
             Name = "Gauntlet of the Wastes",
             Quality = ItemQuality.Legendary,
             Slug = "gauntlet-of-the-wastes",
@@ -4558,7 +4581,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item BeltOfTheTrove = new Item
         {
-            Id = 0,
+            Id = 193675,
             Name = "Belt of the Trove",
             Quality = ItemQuality.Legendary,
             Slug = "belt-of-the-trove",
@@ -4788,7 +4811,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item DemonsRestraint = new Item
         {
-            Id = 0,
+            Id = 222740,
             Name = "Demon's Restraint",
             Quality = ItemQuality.Legendary,
             Slug = "demons-restraint",
@@ -6260,7 +6283,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item SabatonOfTheWastes = new Item
         {
-            Id = 0,
+            Id = 408859,
             Name = "Sabaton of the Wastes",
             Quality = ItemQuality.Legendary,
             Slug = "sabaton-of-the-wastes",
@@ -6605,7 +6628,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item ImmortalKingsStature = new Item
         {
-            Id = 0,
+            Id = 205645,
             Name = "Immortal King's Stature",
             Quality = ItemQuality.Legendary,
             Slug = "immortal-kings-stature",
@@ -6973,7 +6996,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item LegGuardsOfMystery = new Item
         {
-            Id = 0,
+            Id = 408878,
             Name = "Leg Guards of Mystery",
             Quality = ItemQuality.Legendary,
             Slug = "leg-guards-of-mystery",
@@ -7548,7 +7571,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item KymbosGold = new Item
         {
-            Id = 216525,
+            Id = 197812,//216525,
             Name = "Kymbo's Gold",
             Quality = ItemQuality.Legendary,
             Slug = "kymbos-gold",
@@ -10216,7 +10239,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item Eunjangdo = new Item
         {
-            Id = 0,
+            Id = 410960,
             Name = "Eun-jang-do",
             Quality = ItemQuality.Legendary,
             Slug = "eunjangdo",
@@ -11688,7 +11711,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item Remorseless = new Item
         {
-            Id = 0,
+            Id = 271979,
             Name = "Remorseless",
             Quality = ItemQuality.Legendary,
             Slug = "remorseless",
@@ -12355,7 +12378,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item BloodBrother = new Item
         {
-            Id = 0,
+            Id = 271645,
             Name = "Blood Brother",
             Quality = ItemQuality.Legendary,
             Slug = "blood-brother",
@@ -12378,7 +12401,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item CorruptedAshbringer = new Item
         {
-            Id = 0,
+            Id = 430567,
             Name = "Corrupted Ashbringer",
             Quality = ItemQuality.Legendary,
             Slug = "corrupted-ashbringer",
@@ -14517,7 +14540,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item Ingeom = new Item
         {
-            Id = 0,
+            Id = 410946,
             Name = "In-geom",
             Quality = ItemQuality.Legendary,
             Slug = "ingeom",

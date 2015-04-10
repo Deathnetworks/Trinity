@@ -129,31 +129,9 @@ namespace Trinity.UI
 
         private static void BtnGetNewActorSnOsOnClick(object sender, RoutedEventArgs routedEventArgs)
         {
-            var knownIds = Legendary.ItemIds;
-
-            using (new MemoryHelper())
-            {
-                if (ZetaDia.Me == null || !ZetaDia.Me.IsValid)
-                    return;
-                
-                Logger.Log("Checking items Stashed/Backpacked/Equipped, this may take a while...");
-
-                var allItems = new List<ACDItem>();
-                allItems.AddRange(ZetaDia.Me.Inventory.StashItems);
-                allItems.AddRange(ZetaDia.Me.Inventory.Equipped);
-                allItems.AddRange(ZetaDia.Me.Inventory.Backpack);
-
-                var newItems = allItems.Where(i => i != null && i.IsValid && i.ItemQualityLevel == ItemQuality.Legendary && (i.ItemBaseType == ItemBaseType.Jewelry || i.ItemBaseType == ItemBaseType.Armor || i.ItemBaseType == ItemBaseType.Weapon) && !knownIds.Contains(i.ActorSNO)).DistinctBy(p => p.ActorSNO).OrderBy(i => i.ItemType).ToList();
-
-                if (!newItems.Any())
-                    Logger.Log("{0} NEW item(s) please report it on the forums: https://www.thebuddyforum.com/demonbuddy-forum/plugins/trinity/210028-help-collecting-item-ids.html", newItems.Count);
-
-                newItems.ForEach(i =>
-                {
-                    Logger.Log(string.Format("Item: {0}: {1} ({2})", i.ItemType, i.Name, i.ActorSNO));
-                });                
-            }
+            DebugUtil.LogNewItems();
         }
+
 
         static void _btnSortBackpack_Click(object sender, RoutedEventArgs e)
         {

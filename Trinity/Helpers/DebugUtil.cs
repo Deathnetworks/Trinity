@@ -6,6 +6,7 @@ using System.Text;
 using Trinity.Objects;
 using Trinity.Reference;
 using Trinity.Technicals;
+using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using Zeta.TreeSharp;
 using Logger = Trinity.Technicals.Logger;
@@ -169,7 +170,7 @@ namespace Trinity.Helpers
         internal static void DumpReferenceItems(TrinityLogLevel level = TrinityLogLevel.Debug)
         {
 
-            var path = Path.Combine(FileManager.DemonBuddyPath, "ItemReference.js");
+            var path = Path.Combine(FileManager.DemonBuddyPath, "Resources\\JS Class Generator\\ItemReference.js");
 
             if(File.Exists(path))
                 File.Delete(path);
@@ -195,14 +196,59 @@ namespace Trinity.Helpers
             var p = Logger.Prefix;
             Logger.Prefix = "";
 
-            var items = Legendary.ToList().OrderBy(i => i.GItemType);
+            var dropItems = Legendary.ToList().Where(i => !i.IsCrafted && i.Id==0).OrderBy(i => i.GItemType).ToList();
+            var craftedItems = Legendary.ToList().Where(i => i.IsCrafted && i.Id==0).OrderBy(i => i.GItemType).ToList();
 
-            foreach (var item in items)
+            Logger.Log("Dropped Items: {0}", dropItems.Count);
+            foreach (var item in dropItems)
             {
-                if (item.Id == 0)
-                    Logger.Log("{0} {1} = 0", item.GItemType, item.Name);                    
+                    Logger.Log("{0} - {1} = 0", item.GItemType, item.Name);                    
             }
+
+            Logger.Log(" ");
+            Logger.Log("Crafted Items: {0}", craftedItems.Count);
+            foreach (var item in craftedItems)
+            {
+                    Logger.Log("{0} - {1} = 0", item.GItemType, item.Name);
+            }
+
             Logger.Prefix = p;
         }
+
+        internal static void LogNewItems()
+        {
+            var knownIds = Legendary.ItemIds;
+
+            using (new MemoryHelper())
+            {
+                if (ZetaDia.Me == null || !ZetaDia.Me.IsValid)
+                {
+                    Logger.Log("Not in game, can't check right now.");
+                    return;
+                }
+
+                Logger.Log("Checking items Stashed/Backpacked/Equipped:");
+
+                var allItems = new List<ACDItem>();
+                allItems.AddRange(ZetaDia.Me.Inventory.StashItems);
+                allItems.AddRange(ZetaDia.Me.Inventory.Equipped);
+                allItems.AddRange(ZetaDia.Me.Inventory.Backpack);
+
+                if (!allItems.Any())
+                {
+                    Logger.Log("No new items found.");
+                    return;
+                }
+                    
+                var newItems = allItems.Where(i => i != null && i.IsValid && i.ItemQualityLevel == ItemQuality.Legendary && (i.ItemBaseType == ItemBaseType.Jewelry || i.ItemBaseType == ItemBaseType.Armor || i.ItemBaseType == ItemBaseType.Weapon) && !knownIds.Contains(i.ActorSNO)).DistinctBy(p => p.ActorSNO).OrderBy(i => i.ItemType).ToList();
+
+                newItems.ForEach(i =>
+                {
+                    Logger.Log(string.Format("Item: {0}: {1} ({2})", i.ItemType, i.Name, i.ActorSNO));
+                });                
+            }        
+        }
+
+
     }
 }
