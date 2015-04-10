@@ -19,6 +19,8 @@ namespace Trinity
         {
             _lastTickValueDistance = -1f;
 
+            weight = 0;
+
             /* Infos fields */
             HasAvoidanceRelated = false;
             HasMonsterRelated = false;
@@ -90,12 +92,16 @@ namespace Trinity
         public double TargetWeight = 0;
         public string TargetWeightInfos = string.Empty;
 
+        private double weight = 0;
         public double Weight
         {
             get
             {
                 using (new MemorySpy("GridNode.Weight"))
                 {
+                    if (weight != 0)
+                        return weight;
+
                     if (Distance >= MainGrid.GridRange)
                         return UnchangeableWeight;
 
@@ -110,6 +116,7 @@ namespace Trinity
                     return w;
                 }
             }
+            set { weight = value; }
         }
 
         public string WeightInfos

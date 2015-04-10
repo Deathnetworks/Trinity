@@ -9,6 +9,7 @@ using Trinity.Technicals;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
@@ -77,8 +78,8 @@ namespace Trinity
 
         public static GridNode LastResult = new GridNode();
 
-        public const float GridRange = 75f;
-        public const float GridSquareSize = 5f;
+        public const int GridRange = 70;
+        public const int GridSquareSize = 5;
         public const float BaseWeight = GridRange + 10f;
 
         #endregion
@@ -108,23 +109,25 @@ namespace Trinity
                 Point centerPos;
                 GridNode bestNode;
 
-                using (new MemorySpy("MainGrid.Refresh().SetInit"))
-                {
-                    /* corner 1 */
-                    Vector2 minWorld = new Vector2(center.X - GridRange, center.Y - GridRange);
-                    minPoint = MainGridProvider.WorldToGrid(minWorld);
-                    minPoint.X = Math.Max(minPoint.X, 0);
-                    minPoint.Y = Math.Max(minPoint.Y, 0);
+                /* offSet to re-peek recorded */
+                var offSet = GridMap.GetPointAt(center);
+                if (offSet != null && offSet.Position.Distance2D(center) <= 5f)
+                    center = offSet.Position;
 
-                    /* corner 2 */
-                    Vector2 maxWorld = new Vector2(center.X + GridRange, center.Y + GridRange);
-                    maxPoint = MainGridProvider.WorldToGrid(maxWorld);
-                    maxPoint.X = Math.Min(maxPoint.X, MainGridProvider.Width - 1);
-                    maxPoint.Y = Math.Min(maxPoint.Y, MainGridProvider.Height - 1);
+                /* corner 1 */
+                Vector2 minWorld = new Vector2(center.X - GridRange, center.Y - GridRange);
+                minPoint = MainGridProvider.WorldToGrid(minWorld);
+                minPoint.X = Math.Max(minPoint.X, 0);
+                minPoint.Y = Math.Max(minPoint.Y, 0);
 
-                    centerPos = MainGridProvider.WorldToGrid(center.ToVector2());
-                    bestNode = new GridNode();
-                }
+                /* corner 2 */
+                Vector2 maxWorld = new Vector2(center.X + GridRange, center.Y + GridRange);
+                maxPoint = MainGridProvider.WorldToGrid(maxWorld);
+                maxPoint.X = Math.Min(maxPoint.X, MainGridProvider.Width - 1);
+                maxPoint.Y = Math.Min(maxPoint.Y, MainGridProvider.Height - 1);
+
+                centerPos = MainGridProvider.WorldToGrid(center.ToVector2());
+                bestNode = new GridNode();
 
                 #endregion
 
@@ -147,21 +150,15 @@ namespace Trinity
 
                         Vector2 xy = MainGridProvider.GridToWorld(new Point(x, y));
 
-                        /* Round to int pair sup, require to no change GridSquareSize value (2) */
-                        //xy.X = ((int)xy.X & 1) == 1 ? (int)xy.X + 1 : (int)xy.X;
-                        //xy.Y = ((int)xy.Y & 1) == 1 ? (int)xy.Y + 1 : (int)xy.Y;
-
-                        Vector3 xyz = new Vector3(xy.X, xy.Y, MainGridProvider.GetHeight(xy));
-                        GridNode gridNode = new GridNode(xyz);
-
+                        GridNode gridNode = new GridNode();
                         GridNode nodeRecorded;
 
-                        bool isRecorded = NodesRecorded.TryGetValue(VectorToTuple(gridNode.Position), out nodeRecorded);
+                        bool isRecorded = NodesRecorded.TryGetValue(VectorToTuple(xy), out nodeRecorded);
 
                         if (isRecorded)
                         {
                             nodeRecorded.ResetTickValues();
-							gridNode.Position = nodeRecorded.Position;
+                            gridNode.Position = nodeRecorded.Position;
                             gridNode.UnchangeableWeight = nodeRecorded.UnchangeableWeight;
                             gridNode.UnchangeableWeightInfos = nodeRecorded.UnchangeableWeightInfos;
                             gridNode.Position = nodeRecorded.Position;
@@ -178,32 +175,17 @@ namespace Trinity
                         }
                         else
                         {
-                            using (new MemorySpy("MainGrid.Refresh().GetNewValues"))
-                            {
-                                xyz = new Vector3(xy.X, xy.Y, Player.Position.Z + 4);
-                                gridNode.Position = xyz;
-                                gridNode.ResetTickValues();
-                                gridNode.SetUnchangeableWeight();
-
-                            }
+                            Vector3 xyz = new Vector3((int)xy.X, (int)xy.Y, Player.Position.Z + 2);
+                            gridNode.Position = xyz;
+                            gridNode.ResetTickValues();
+                            gridNode.SetUnchangeableWeight();
                         }
 
                         gridNode.OperateWeight(WeightType.Dynamic, "BaseDistanceWeight", (GridRange - gridNode.Distance) * 2f);
 
-                        //using (new MemorySpy("MainGrid.Refresh().SetTargetWeights"))
-                        //{
                         gridNode.SetTargetWeights();
-                        //}
-
-                        //using (new MemorySpy("MainGrid.Refresh().SetAvoidancesWeights"))
-                        //{
                         gridNode.SetAvoidancesWeights();
-                        //}
-
-                        //using (new MemorySpy("MainGrid.Refresh().SetCacheObjectsWeights"))
-                        //{
                         gridNode.SetCacheObjectsWeights();
-                        //}
 
                         MapAsList.Add(gridNode);
 
@@ -217,68 +199,159 @@ namespace Trinity
                 }
 
                 /* low, so reduce list to minimum with dist & weight limit */
-                using (new MemorySpy("MainGrid.Refresh().LowWeighting"))
+                foreach (var gridNode in MapAsList)
                 {
-                    foreach (var gridNode in MapAsList)
+                    /* Something to do */
+                    gridNode.FinalCheck();
+
+                    if (gridNode.Weight <= bestNode.Weight * 0.75)
                     {
-                        /* Something to do */
-                        gridNode.FinalCheck();
+                        if (!NodesRecorded.ContainsKey(VectorToTuple(gridNode.Position)))
+                            NodesRecorded.Add(VectorToTuple(gridNode.Position), gridNode);
 
-                        if (gridNode.Weight <= bestNode.Weight * 0.75)
+                        continue;
+                    }
+
+                    if (gridNode.Distance > 40f)
+                    {
+                        if (!NodesRecorded.ContainsKey(VectorToTuple(gridNode.Position)))
+                            NodesRecorded.Add(VectorToTuple(gridNode.Position), gridNode);
+
+                        continue;
+                    }
+
+                    /* Ray cast */
+                    gridNode.SetNavWeight();
+
+                    /* Count ray casted points within distance */
+                    if (gridNode.NearbyExitsCount < 0)
+                    {
+                        gridNode.NearbyExitsCount = gridNode.NearbyExitsWithinDistance((float)(bestNode.Weight * 0.75), 30f);
+
+                        if (gridNode.NearbyExitsCount > 0)
+                            gridNode.OperateWeight(WeightType.Unchangeable, String.Format("HasExits[{0}]", gridNode.NearbyExitsCount), BaseWeight * gridNode.NearbyExitsCount);
+
+                        if (gridNode.NearbyGridPointsCount > 0)
+                            gridNode.OperateWeight(WeightType.Unchangeable, String.Format("CloseToOtherPoints[{0}]", gridNode.NearbyGridPointsCount), BaseWeight * gridNode.NearbyGridPointsCount);
+                    }
+
+                    /* try catch fastest to check key in collection */
+                    if (!NodesRecorded.ContainsKey(VectorToTuple(gridNode.Position)))
+                        NodesRecorded.Add(VectorToTuple(gridNode.Position), gridNode);
+                }
+
+                /* test ! */
+                using (new MemorySpy("MainGrid.Refresh().Substitue"))
+                {
+                    /* create substitue */
+                    HashSet<GridNode> subList = new HashSet<GridNode>();
+                    for (int y = minPoint.Y; y <= maxPoint.Y; y += (int)(GridSquareSize * 0.5))
+                    {
+                        int searchAreaBasis = y * MainGridProvider.Width;
+                        for (int x = minPoint.X; x <= maxPoint.X; x += (int)(GridSquareSize * 0.5))
                         {
-                            using (new MemorySpy("MainGrid.Refresh().DictionaryAdd"))
+                            int dx = centerPos.X - x;
+                            int dy = centerPos.Y - y;
+
+                            /* Out of range */
+                            if (dx * dx + dy * dy > (GridRange / 2f) * (GridRange / 2f))
+                                continue;
+
+                            /* Cant stand at */
+                            if (!MainGridProvider.SearchArea[searchAreaBasis + x])
+                                continue;
+
+                            Vector2 xy = MainGridProvider.GridToWorld(new Point(x, y));
+                            if (NodesRecorded.ContainsKey(VectorToTuple(xy)))
+                                continue;
+
+                            GridNode cornerNE = null;
+                            GridNode cornerNW = null;
+                            GridNode cornerSW = null;
+                            GridNode cornerSE = null;
+
+                            bool goal = false;
+
+                            using (new MemorySpy("MainGrid.Refresh().Corner"))
                             {
-                                if (!NodesRecorded.ContainsKey(VectorToTuple(gridNode.Position)))
-                                    NodesRecorded.Add(VectorToTuple(gridNode.Position), gridNode);
+                                for (int _y = (int)(xy.Y - GridSquareSize); _y <= (int)(xy.Y); _y++)
+                                {
+                                    if (goal) break;
+
+                                    for (int _x = (int)(xy.X - GridSquareSize); _x <= (int)(xy.X); _x++)
+                                    {
+                                        if (goal) break;
+
+                                        var key = new Tuple<int, int>(_x, _y);
+
+                                        if (!goal && NodesRecorded.ContainsKey(key))
+                                        {
+                                            cornerNW = NodesRecorded[key];
+
+                                            key = new Tuple<int, int>((int)(_x + GridSquareSize), _y);
+                                            if (NodesRecorded.ContainsKey(key))
+                                                cornerNE = NodesRecorded[key];
+
+                                            key = new Tuple<int, int>(_x, (int)(_y + GridSquareSize));
+                                            if (NodesRecorded.ContainsKey(key))
+                                                cornerSW = NodesRecorded[key];
+
+                                            key = new Tuple<int, int>((int)(_x + GridSquareSize), (int)(_y + GridSquareSize));
+                                            if (NodesRecorded.ContainsKey(key))
+                                                cornerSE = NodesRecorded[key];
+
+                                            goal = true;
+                                            break;
+                                        }
+                                    }
+                                }
                             }
 
-                            continue;
-                        }
-
-                        if (gridNode.Distance > 40f)
-                        {
-                            using (new MemorySpy("MainGrid.Refresh().DictionaryAdd"))
+                            using (new MemorySpy("MainGrid.Refresh().Goal"))
                             {
-                                if (!NodesRecorded.ContainsKey(VectorToTuple(gridNode.Position)))
-                                    NodesRecorded.Add(VectorToTuple(gridNode.Position), gridNode);
-                            }
+                                if (goal)
+                                {
+                                    GridNode substitue = new GridNode(new Vector3(xy.X, xy.Y, Player.Position.Z + 2));
 
-                            continue;
-                        }
+                                    double kNW = cornerNW != null ? mK - cornerNW.Position.Distance2D(substitue.Position) : 0;
+                                    double kNE = cornerNE != null ? mK - cornerNE.Position.Distance2D(substitue.Position) : 0;
+                                    double kSW = cornerSW != null ? mK - cornerSW.Position.Distance2D(substitue.Position) : 0;
+                                    double kSE = cornerSE != null ? mK - cornerSE.Position.Distance2D(substitue.Position) : 0;
 
-                        /* Ray cast */
-                        using (new MemorySpy("MainGrid.Refresh().SetNavWeight"))
-                        {
-                            gridNode.SetNavWeight();
-                        }
+                                    double weight = cornerNW != null ? (kNW * cornerNW.Weight) : 0;
+                                    weight += cornerNE != null ? (kNE * cornerNE.Weight) : 0;
+                                    weight += cornerSW != null ? (kSW * cornerSW.Weight) : 0;
+                                    weight += cornerSE != null ? (kSE * cornerSE.Weight) : 0;
 
-                        /* Count ray casted points within distance */
-                        using (new MemorySpy("MainGrid.Refresh().SetSafeZoneWeight"))
-                        {
-                            if (gridNode.NearbyExitsCount < 0)
-                            {
-                                gridNode.NearbyExitsCount = gridNode.NearbyExitsWithinDistance((float)(bestNode.Weight * 0.75), 30f);
+                                    weight = weight / (kNW + kNE + kSW + kSE);
 
-                                if (gridNode.NearbyExitsCount > 0)
-                                    gridNode.OperateWeight(WeightType.Unchangeable, String.Format("HasExits[{0}]", gridNode.NearbyExitsCount), BaseWeight * gridNode.NearbyExitsCount);
+                                    double clusterWeight = cornerNW != null ? (kNW * cornerNW.ClusterWeight) : 0;
+                                    clusterWeight += cornerNE != null ? (kNE * cornerNE.ClusterWeight) : 0;
+                                    clusterWeight += cornerSW != null ? (kSW * cornerSW.ClusterWeight) : 0;
+                                    clusterWeight += cornerSE != null ? (kSE * cornerSE.ClusterWeight) : 0;
 
-                                if (gridNode.NearbyGridPointsCount > 0)
-                                    gridNode.OperateWeight(WeightType.Unchangeable, String.Format("CloseToOtherPoints[{0}]", gridNode.NearbyGridPointsCount), BaseWeight * gridNode.NearbyGridPointsCount);
+                                    clusterWeight = clusterWeight / (kNW + kNE + kSW + kSE);
+
+                                    substitue.Weight = weight;
+                                    substitue.ClusterWeight = clusterWeight;
+                                    subList.Add(substitue);
+                                }
                             }
                         }
+                    }
 
-                        /* try catch fastest to check key in collection */
-                        using (new MemorySpy("MainGrid.Refresh().AddToDictionary"))
-                        {
-                            if (!NodesRecorded.ContainsKey(VectorToTuple(gridNode.Position)))
-                                NodesRecorded.Add(VectorToTuple(gridNode.Position), gridNode);
-                        }
+                    if (subList.Any())
+                    {
+                        subList.ForEach(n => MapAsList.Add(n));
                     }
                 }
             }
 
             return true;
         }
+
+        // test !
+        internal static double mK = Math.Sqrt(((GridSquareSize - 1) * (GridSquareSize - 1)) + (GridSquareSize * GridSquareSize));
 
         internal static void ResetTickValues()
         {

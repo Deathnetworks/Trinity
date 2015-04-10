@@ -143,7 +143,6 @@ namespace Trinity
                 return null;
 
             return MainGrid.MapAsList.OrderBy(g => g.Position.Distance2D(loc)).FirstOrDefault();
-            ;
         }
 
         /// <summary>
