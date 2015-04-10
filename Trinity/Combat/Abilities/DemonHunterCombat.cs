@@ -197,7 +197,7 @@ namespace Trinity.Combat.Abilities
             if (Hotbar.Contains(SNOPower.DemonHunter_Bolas))
             {
                 float range = RangedAttackRange > 50f ? 50f : RangedAttackRange;
-                return new TrinityPower(SNOPower.DemonHunter_Bolas, RangedAttackRange, SentryCastSkillsCastArea.Position);
+                return new TrinityPower(SNOPower.DemonHunter_Bolas, range, SentryCastSkillsCastArea.Position);
             }
 
             // Grenades
