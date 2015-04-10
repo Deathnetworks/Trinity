@@ -422,7 +422,7 @@ namespace Trinity.Settings.Loot
         public static void CacheReferenceItems()
         {
             if (_cachedItems == null)
-                _cachedItems = Legendary.ToList().Where(i => !i.IsCrafted).Select(i => new LItem(i)).ToList();
+                _cachedItems = Legendary.ToList().Where(i => !i.IsCrafted && i.Id != 0).Select(i => new LItem(i)).ToList();
         }
 
         /// <summary>
