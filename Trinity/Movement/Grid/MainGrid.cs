@@ -25,6 +25,10 @@ namespace Trinity
         {
             return new Tuple<int, int>((int)loc.X, (int)loc.Y);
         }
+        public static Tuple<int, int> VectorToTuple(Vector2 _loc)
+        {
+            return new Tuple<int, int>((int)_loc.X, (int)_loc.Y);
+        }
 
         private static List<TrinityCacheObject> ObjectCache
         {
@@ -157,7 +161,7 @@ namespace Trinity
                         if (isRecorded)
                         {
                             nodeRecorded.ResetTickValues();
-
+							gridNode.Position = _nodeRecorded.Position;
                             gridNode.UnchangeableWeight = nodeRecorded.UnchangeableWeight;
                             gridNode.UnchangeableWeightInfos = nodeRecorded.UnchangeableWeightInfos;
 
@@ -175,8 +179,11 @@ namespace Trinity
                         {
                             using (new MemorySpy("MainGrid.Refresh().GetNewValues"))
                             {
+                                xyz = new Vector3(xy.X, xy.Y, Player.Position.Z + 4);
+                                gridNode.Position = xyz;
                                 gridNode.ResetTickValues();
                                 gridNode.SetUnchangeableWeight();
+
                             }
                         }
 

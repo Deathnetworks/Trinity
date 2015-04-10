@@ -28,10 +28,13 @@ namespace Trinity
 
         internal static void RefreshKiteValue()
         {
+            if (Trinity.ObjectCache == null)
+                return;
+
             foreach (var u in Trinity.ObjectCache.Where(u => u.IsUnit))
             {
                 // Kite (can make it in navHelper, avoid to re loop twice)
-                if (u.RadiusDistance < CombatBase.KiteDistance * 0.75 && u.IsInLineOfSight(true))
+                if (u.RadiusDistance < CombatBase.KiteDistance * 0.75 && u.IsInLineOfSight)
                 {
                     if (u.IsBoss && CombatBase.KiteMode != KiteMode.Never)
                     {

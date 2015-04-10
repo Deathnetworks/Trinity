@@ -127,7 +127,7 @@ namespace Trinity
             var _results =
                 (from _u in _list
                  where
-                    _u.IsInLineOfSight() &&
+                    _u.IsInLineOfSight &&
                     (Trinity.KillMonstersInAoE || !LocOrPathInAoE(_u))
                  orderby
                     _u.CountUnitsInFront() descending,
@@ -160,7 +160,7 @@ namespace Trinity
             var _results =
                 (from _o in _list
                  where
-                    _o.IsInLineOfSight() &&
+                    _o.IsInLineOfSight &&
                     (Trinity.KillMonstersInAoE || !LocOrPathInAoE(_o))
                  orderby
                     _o.CountUnitsInFront() descending,
@@ -432,7 +432,7 @@ namespace Trinity
         { if (Trinity.ObjectCache == null || !Trinity.ObjectCache.Any()) return 0; return ListUnitsInRangeOfPosition(_loc, _range, _useWeights).Count(u => u.IsBoss); }
         /// IN LoS
         internal static int NumMobsInLosInRangeOfPosition(Vector3 _loc = new Vector3(), float _range = 10f, bool _useWeights = true)
-        { if (Trinity.ObjectCache == null || !Trinity.ObjectCache.Any()) return 0; return ListUnitsInRangeOfPosition(_loc, _range, _useWeights).Count(u => u.IsInLineOfSight()); }
+        { if (Trinity.ObjectCache == null || !Trinity.ObjectCache.Any()) return 0; return ListUnitsInRangeOfPosition(_loc, _range, _useWeights).Count(u => u.IsInLineOfSight); }
 
         /// <summary>
         /// List all objects by type in range of point
@@ -865,7 +865,7 @@ namespace Trinity
                 where
                     u.CommonDataIsValid &&
                     !u.HasDebuff(SNOPower.Monk_ExplodingPalm) &&
-                    u.IsInLineOfSight() &&
+                    u.IsInLineOfSight &&
                     u.IsTrashPackOrBossEliteRareUnique
                 orderby
                     u.HitPointsPct,
@@ -904,7 +904,7 @@ namespace Trinity
                 where
                     u.CommonDataIsValid &&
                     u.HasDebuff(SNOPower.Monk_ExplodingPalm) &&
-                    u.IsInLineOfSight() &&
+                    u.IsInLineOfSight &&
                     u.IsTrashPackOrBossEliteRareUnique
                 orderby
                     MobsWithDebuff(u.Position, SNOPower.Monk_ExplodingPalm, 10f) descending,
@@ -945,7 +945,7 @@ namespace Trinity
                 where
                     u.CommonDataIsValid &&
                     !_debuffs.All(u.HasDebuff) &&
-                    u.IsInLineOfSight()
+                    u.IsInLineOfSight
                 orderby
                     u.Weight descending,
                     u.Position.Distance2D(_loc)
@@ -998,7 +998,7 @@ namespace Trinity
                     where
                         u.Distance >= _minRange &&
                         u.Weight > 0 &&
-                        u.IsInLineOfSight()
+                        u.IsInLineOfSight
                     orderby
                         u.NearbyUnits descending,
                         u.Weight descending,
@@ -1066,7 +1066,7 @@ namespace Trinity
                                     continue;
 
                                 float _radius = Math.Min(Math.Max(_o.Radius, 5f), 8f);
-                                if (_o.IsInLineOfSight() && (Trinity.KillMonstersInAoE || !_o.IsStandingInAvoidance))
+                                if (_o.IsInLineOfSight && (Trinity.KillMonstersInAoE || !_o.IsStandingInAvoidance))
                                 {
                                     if (MathUtil.IntersectsPath(_o.Position, _radius, _loc, _n.Position))
                                     {

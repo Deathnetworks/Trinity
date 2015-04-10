@@ -113,6 +113,8 @@ namespace Trinity
                             ObjectCache.AddRange(GroupHotSpots.GetCacheObjectHotSpots());
                         }
 
+                        RefreshKiteValue();
+
                         /* Fire Chains Experimental Avoidance */
                         using (new MemorySpy("RefreshDiaObjects().FireChains"))
                         {
@@ -181,6 +183,8 @@ namespace Trinity
                     /* Refresh at Tick impair */
                     else
                     {
+                        RefreshKiteValue();
+
                         /* Refresh grid map fields */
                         using (new MemorySpy("RefreshDiaObjects().Grid"))
                         {
@@ -385,8 +389,8 @@ namespace Trinity
                             RActorGuid = diaItem.RActorGuid,
                             ActorSNO = diaItem.ActorSNO,
                             ACDGuid = diaItem.ACDGuid,
-                            HasBeenNavigable = true,
-                            HasBeenInLoS = true,
+                            IsNavigable = true,
+                            IsInLineOfSight = true,
                             Distance = diaItem.Distance,
                             ActorType = ActorType.Item,
                             Type = GObjectType.Item,
@@ -543,7 +547,7 @@ namespace Trinity
                                         if (c_HasDotDPS)
                                             extraData += " HasDotDPS";
 
-                                        if (c_HasBeenInLoS)
+                                        if (c_CacheObject.IsInLineOfSight)
                                             extraData += " HasBeenInLoS";
 
                                         extraData += " HP=" + c_HitPoints.ToString("0") + " (" + c_HitPointsPct.ToString("0.00") + ")";

@@ -873,7 +873,7 @@ namespace Trinity.DbProvider
                     if (((CurrentTarget != null && !CurrentTarget.IsUnit && _gridNode.Distance >= 10f) ||
                         (CurrentTarget == null && CombatBase.TimeSincePowerUse(SNOPower.X1_Monk_DashingStrike) > 1250 && _gridNode.Distance >= 25f)) &&
                         CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike) && Trinity.Settings.Combat.Monk.UseDashingStrikeOOC &&
-                        NavHelper.VectorIsLos(Trinity.Player.Position, _gridNode.Position))
+                        NavHelper.CanRayCast(Trinity.Player.Position, _gridNode.Position, true))
                     {
                         if (CombatBase.Cast(new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, _gridNode.Position)))
                             return true;

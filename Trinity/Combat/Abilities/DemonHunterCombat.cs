@@ -48,7 +48,7 @@ namespace Trinity.Combat.Abilities
             if (!CacheData.SentryTurret.Any())
                 return false;
 
-            return CacheData.SentryTurret.Count(s => s.Position.Distance2D(CurrentTarget.Position) <= range && NavHelper.VectorIsLos(s.Position, loc)) >= minCount;
+            return CacheData.SentryTurret.Count(s => s.Position.Distance2D(CurrentTarget.Position) <= range && NavHelper.CanRayCast(s.Position, loc, true)) >= minCount;
         }
         private static float _RangedAttackRange = -1f;
         private static float RangedAttackRange
@@ -359,11 +359,11 @@ namespace Trinity.Combat.Abilities
         private static TrinityPower GetCombatPower()
         {
             // Sentry Turret
-            if (CanCast(SNOPower.DemonHunter_Sentry, CanCastFlags.NoTimer) && Trinity.PlayerOwnedDHSentryCount < MaxSentryCount)
+            if (SentryCastArea != null && CanCast(SNOPower.DemonHunter_Sentry, CanCastFlags.NoTimer) && Trinity.PlayerOwnedDHSentryCount < MaxSentryCount)
             {
                 Vector3 zeiOfStoneNewTarget = MathEx.CalculatePointFrom(Player.Position, SentryCastArea.Position, 51f);
                 if (ZeisOfStoneIsEquipped && !Runes.DemonHunter.PolarStation.IsActive && zeiOfStoneNewTarget.Distance2D(LastZeiOfStoneLocation) >= 25f &&
-                    NavHelper.ObjectIsInLosOfPoint(zeiOfStoneNewTarget, SentryCastArea.Units.OrderByDescending(u => u.Distance).FirstOrDefault()))
+                    SentryCastArea.Units.OrderByDescending(u => u.Distance).FirstOrDefault().IsInLineOfSightOfPoint(zeiOfStoneNewTarget))
                 {
                     LastZeiOfStoneLocation = zeiOfStoneNewTarget;
                     return new TrinityPower(SNOPower.DemonHunter_Sentry, DHSettings.RangedAttackRange, zeiOfStoneNewTarget);
@@ -600,13 +600,13 @@ namespace Trinity.Combat.Abilities
                 return null;
 
             // Sentry
-            if (Skills.DemonHunter.Sentry.CanCast(CanCastFlags.NoTimer) && Trinity.PlayerOwnedDHSentryCount < MaxSentryCount)
+            if (SentryCastArea != null && Skills.DemonHunter.Sentry.CanCast(CanCastFlags.NoTimer) && Trinity.PlayerOwnedDHSentryCount < MaxSentryCount)
             {
                 Vector3 zeiOfStoneNewTarget = MathEx.CalculatePointFrom(Player.Position, SentryCastArea.Position, 51f);
                 if (AreaHasCastCriteria(SentryCastArea, true))
                 {
                     if (ZeisOfStoneIsEquipped && !Runes.DemonHunter.PolarStation.IsActive && zeiOfStoneNewTarget.Distance2D(LastZeiOfStoneLocation) >= 25f &&
-                        NavHelper.ObjectIsInLosOfPoint(zeiOfStoneNewTarget, SentryCastArea.Units.OrderByDescending(u => u.Distance).FirstOrDefault()))
+                        SentryCastArea.Units.OrderByDescending(u => u.Distance).FirstOrDefault().IsInLineOfSightOfPoint(zeiOfStoneNewTarget))
                     {
                         if (!Skills.DemonHunter.Sentry.Cast(zeiOfStoneNewTarget))
                         {
@@ -622,7 +622,7 @@ namespace Trinity.Combat.Abilities
                 else if (SentryCastArea != null && SentryCastArea.Position != Vector3.Zero)
                 {
                     if (ZeisOfStoneIsEquipped && !Runes.DemonHunter.PolarStation.IsActive && zeiOfStoneNewTarget.Distance2D(LastZeiOfStoneLocation) >= 25f &&
-                        NavHelper.ObjectIsInLosOfPoint(zeiOfStoneNewTarget, SentryCastArea.Units.OrderByDescending(u => u.Distance).FirstOrDefault()))
+                        SentryCastArea.Units.OrderByDescending(u => u.Distance).FirstOrDefault().IsInLineOfSightOfPoint(zeiOfStoneNewTarget))
                     {
                         LastZeiOfStoneLocation = zeiOfStoneNewTarget;
                         power = new TrinityPower(SNOPower.DemonHunter_Sentry, DHSettings.RangedAttackRange, zeiOfStoneNewTarget);
@@ -645,8 +645,6 @@ namespace Trinity.Combat.Abilities
                                 Radius = 20f,
                                 InternalName = "SentryCastArea"
                             };
-
-                            CurrentTarget.HasBeenInLoS = CurrentTarget.IsInLineOfSight(true);
                         }
                 }
             }
@@ -693,8 +691,6 @@ namespace Trinity.Combat.Abilities
                         Radius = 20f,
                         InternalName = "SentryCastSkillsCastArea",
                     };
-
-                    CurrentTarget.HasBeenInLoS = CurrentTarget.IsInLineOfSight(true);
                 }
             }
 
@@ -721,17 +717,25 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                if (_ZeisOfStoneChecked)
+                try
+                {
+                    if (_ZeisOfStoneChecked)
+                        return _ZeisOfStoneIsEquipped;
+
+                    _ZeisOfStoneChecked = true;
+                    _ZeisOfStoneIsEquipped = ZetaDia.Actors.GetActorsOfType<ACDItem>().Any(item =>
+                        item != null && item.IsValid &&
+                        item.ItemType == ItemType.LegendaryGem &&
+                        item.ActorSNO == 405801 &&
+                        item.InventorySlot == (InventorySlot)20);
+
                     return _ZeisOfStoneIsEquipped;
-
-                _ZeisOfStoneChecked = true;
-
-                return ZetaDia.Actors.GetActorsOfType<ACDItem>().Any(item =>
-                    item.ItemType == ItemType.LegendaryGem &&
-                    item.ActorSNO == 405801 &&
-                    item.InventorySlot == (InventorySlot)20);
-
-                return false;
+                }
+                catch
+                {
+                    _ZeisOfStoneChecked = true;
+                    return false;
+                }
             }
         }
 
@@ -810,7 +814,7 @@ namespace Trinity.Combat.Abilities
             return !CombatBase.PlayerShouldNotFight &&
                 (area != null && area.Position != Vector3.Zero && area.UnitCount >= 1 &&
                 (area.Position.Distance2D(Trinity.Player.Position) <= DHSettings.RangedAttackRange &&
-                NavHelper.ObjectIsInLos(area.Units.OrderByDescending(u => u.Distance).FirstOrDefault()) ||
+                area.Units.OrderByDescending(u => u.Distance).FirstOrDefault().IsInLineOfSight ||
                 RangedAttackRange <= 1f && !rangeRequired));
         }
 
@@ -977,7 +981,7 @@ namespace Trinity.Combat.Abilities
             bool specialTimeSinceUse = true;
             if (CurrentTarget != null)
             {
-                inLoS = CurrentTarget.IsInLineOfSight();
+                inLoS = CurrentTarget.IsInLineOfSight;
                 switch (CurrentTarget.Type)
                 {
                     case GObjectType.Player:
@@ -1053,7 +1057,7 @@ namespace Trinity.Combat.Abilities
                 Player.CurrentHealthPct <= DHSettings.MinHealthVaultKite &&
 
                 /* 1) A real kite movement OR */
-                (!Trinity.Player.StandingInAvoidance && !Trinity.Player.AvoidDeath && Trinity.Player.NeedToKite) ||
+                ((!Trinity.Player.StandingInAvoidance && !Trinity.Player.AvoidDeath && Trinity.Player.NeedToKite) ||
 
                 /* 2) Target not null and not move to target */
                 (CurrentTarget != null && CurrentTarget.IsUnit && !PlayerMover.IsMovementToTarget(loc) && CurrentTarget.Distance <= CombatBase.KiteDistance &&
@@ -1065,7 +1069,7 @@ namespace Trinity.Combat.Abilities
                 /* 3) Target is kite */
                 (CurrentTarget != null && CurrentTarget.IsKite &&
                 /* Distance to target respect dh settings */
-                loc.Distance2D(Trinity.Player.Position) >= Trinity.Settings.Combat.DemonHunter.MinDistVaultKite);
+                loc.Distance2D(Trinity.Player.Position) >= Trinity.Settings.Combat.DemonHunter.MinDistVaultKite));
         }
 
         public static bool IsVaultAptAvoidanceMovement(Vector3 loc)

@@ -240,5 +240,15 @@ namespace Trinity
 
             return new Vector3(x, y, z);
         }
+
+        internal static float GetDiff(float item1, float item2)
+        {
+            return Math.Abs(Math.Max(item1, item2)) - Math.Abs(Math.Min(item1, item2));
+        }
+
+        internal static int GetHash(Vector3 v1, Vector3 v2)
+        {
+            return (int)(Math.Abs(v1.X) + Math.Abs(v1.Y) + Math.Abs(v2.X) + Math.Abs(v2.Y));
+        }
     }
 }

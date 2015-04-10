@@ -158,7 +158,6 @@ namespace Trinity
                         //    c_InfosSubStep += "IsNotOperatable";
                         //    return false;
                         //}
-
                         if (c_diaObject is DiaGizmo && ((DiaGizmo)c_diaObject).HasBeenOperated)
                         {
                             c_InfosSubStep += "Door has been operated";
