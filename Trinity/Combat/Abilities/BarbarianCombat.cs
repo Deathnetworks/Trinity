@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Trinity.Config.Combat;
+using Trinity.DbProvider;
 using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Common;
@@ -27,7 +28,12 @@ namespace Trinity.Combat.Abilities
         {
             TrinityPower power = null;
 
-            if (UseDestructiblePower)
+            if (Sets.ImmortalKingsCall.IsMaxBonusActive && Skills.Barbarian.Whirlwind.IsActive)
+            {
+                power = SpamPowerWhirlwind;
+            }
+
+            if (IsNull(power) && UseDestructiblePower)
                 power = DestroyObjectPower;
 
             if (UseOOCBuff)
@@ -876,23 +882,57 @@ namespace Trinity.Combat.Abilities
 
                 if (shouldGetNewZigZag)
                 {
+                    LastZigZagUnitAcdGuid = CurrentTarget.ACDGuid;
+                    LastChangedZigZag = DateTime.UtcNow;
+
                     if (hasRLTW)
                     {
                         var wwdist = V.F("Barbarian.Whirlwind.RLTWZigZag");
                         ZigZagPosition = TargetUtil.GetZigZagTarget(CurrentTarget.Position, wwdist);
                         return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), ZigZagPosition);
                     }
-                    if (!hasRLTW)
+                    else
                     {
                         var wwdist = V.F("Barbarian.Whirlwind.ZigZagDistance");
                         ZigZagPosition = TargetUtil.GetZigZagTarget(CurrentTarget.Position, wwdist);
                         return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), ZigZagPosition);
                     }
 
-                    LastZigZagUnitAcdGuid = CurrentTarget.ACDGuid;
-                    LastChangedZigZag = DateTime.UtcNow;
+                   
                 }
                 return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), ZigZagPosition);
+            }
+        }
+        public static TrinityPower SpamPowerWhirlwind
+        {
+            get
+            {
+                if (CanCast(SNOPower.Barbarian_Whirlwind, CanCastFlags.NoTimer) && 
+                    !GetHasBuff(SNOPower.Barbarian_Whirlwind) && 
+                    !Skills.Barbarian.Whirlwind.IsBuffActive && !Player.HasDebuff(SNOPower.Barbarian_Whirlwind))
+                {
+                    if (CurrentTarget != null && CurrentTarget.IsUnit && TargetUtil.AnyMobsInRange(15f, false))
+                    {
+                        bool shouldGetNewZigZag =
+                        DateTime.UtcNow.Subtract(LastChangedZigZag).TotalMilliseconds >= 1000 ||
+                        ZigZagPosition.Distance2D(Player.Position) <= 2f;
+
+                        if (shouldGetNewZigZag)
+                        {
+                            LastChangedZigZag = DateTime.UtcNow;
+
+                            ZigZagPosition = TargetUtil.GetZigZagTarget(CurrentTarget.Position, 15f);
+                            return new TrinityPower(SNOPower.Barbarian_Whirlwind, 0f, ZigZagPosition);
+                        }
+
+                        return new TrinityPower(SNOPower.Barbarian_Whirlwind, 0f, ZigZagPosition);
+                    }
+
+                    if (TargetUtil.AnyMobsInRange(10f, false) && Player.MovementSpeed > 0 && PlayerMover.LastMoveToTarget != Vector3.Zero)
+                        return new TrinityPower(SNOPower.Barbarian_Whirlwind, 0f, MathEx.GetPointAt(Player.Position, 15f, Player.Rotation));
+                }
+
+                return null;
             }
         }
         public static TrinityPower PowerHammerOfTheAncients 
@@ -939,7 +979,7 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.Barbarian_Overpower, 9);
 
                 if (CanCast(SNOPower.Barbarian_Whirlwind))
-                    return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), LastZigZagLocation);
+                    return new TrinityPower(SNOPower.Barbarian_Whirlwind, 10f, CurrentTarget.ACDGuid);
 
                 if (CanCast(SNOPower.Barbarian_Rend) && Player.PrimaryResourcePct >= 0.65)
                     return new TrinityPower(SNOPower.Barbarian_Rend, V.F("Barbarian.Rend.UseRange"));
