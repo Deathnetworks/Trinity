@@ -161,7 +161,7 @@ namespace Trinity
                         if (isRecorded)
                         {
                             nodeRecorded.ResetTickValues();
-							gridNode.Position = _nodeRecorded.Position;
+							gridNode.Position = nodeRecorded.Position;
                             gridNode.UnchangeableWeight = nodeRecorded.UnchangeableWeight;
                             gridNode.UnchangeableWeightInfos = nodeRecorded.UnchangeableWeightInfos;
 
