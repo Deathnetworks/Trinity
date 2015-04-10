@@ -1001,8 +1001,7 @@ namespace Trinity
                         u.IsInLineOfSight
                     orderby
                         u.NearbyUnits descending,
-                        u.Weight descending,
-                        u.Distance descending
+                        u.Weight descending
                     select u).ToList();
 
                 if (_results.Any())

@@ -306,11 +306,8 @@ namespace Trinity.Combat.Abilities
                     !NavHelper.CanRayCast(CurrentTarget.Position) ||
                     CacheData.MonsterObstacles.Any(m => m.RActorGUID != CurrentTarget.RActorGuid && MathUtil.IntersectsPath(m.Position, 5f, CurrentTarget.Position, Player.Position))))
                 {
-                    // RefreshSweepingWind(true);
                     if (Passives.Monk.Momentum.IsActive && !Passives.Monk.Momentum.IsBuffActive)
-                    {
-                        Trinity.CurrentTarget = TargetUtil.GetDashStrikeFarthestTarget(MaxDashingStrikeRange, 25f);
-                    }
+                        CombatBase.SwitchToTarget(TargetUtil.GetDashStrikeFarthestTarget(MaxDashingStrikeRange, 25f));
 
                     return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.ClusterPosition(5f));
                 }
@@ -321,7 +318,7 @@ namespace Trinity.Combat.Abilities
                 }
 
                 GridNode bestCluster = GridMap.GetBestClusterNode(useDefault: false);
-                float range = Passives.Monk.Momentum.IsActive && !Passives.Monk.Momentum.IsBuffActive ? 25f : 20f;
+                float range = Passives.Monk.Momentum.IsActive && !Passives.Monk.Momentum.IsBuffActive ? 25f : 15f;
                 if (bestCluster != null && bestCluster.Distance >= range)
                 {
                     return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, bestCluster.Position);
@@ -337,6 +334,12 @@ namespace Trinity.Combat.Abilities
                     }
                 }
 
+                    if (Passives.Monk.Momentum.IsActive && !Passives.Monk.Momentum.IsBuffActive)
+                        CombatBase.SwitchToTarget(TargetUtil.GetDashStrikeFarthestTarget(MaxDashingStrikeRange, 25f));
+                    else
+                        CombatBase.SwitchToTarget(TargetUtil.GetDashStrikeFarthestTarget(MaxDashingStrikeRange, 2f));
+
+                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.ClusterPosition(5f));
             }
 
             // Exploding Palm
