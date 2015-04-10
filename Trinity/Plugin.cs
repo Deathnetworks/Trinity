@@ -6,6 +6,7 @@ using System.IO;
 using System.Windows;
 using Trinity.Cache;
 using Trinity.Combat;
+using Trinity.Combat.Abilities;
 using Trinity.Configuration;
 using Trinity.DbProvider;
 using Trinity.Helpers;
@@ -94,7 +95,7 @@ namespace Trinity
                     UsedProfileManager.RecordProfile();
 
                     DebugUtil.LogOnPulse();
-
+                    MonkCombat.RunOngoingPowers();
                 }
                 catch (AccessViolationException)
                 {
