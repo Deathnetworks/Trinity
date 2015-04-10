@@ -6,7 +6,7 @@ using Zeta.Common;
 
 namespace Trinity
 {
-    class GridResults
+    internal class GridResults
     {
         static GridResults()
         {
@@ -45,8 +45,14 @@ namespace Trinity
                     return false;
 
                 var p = gridPoint;
-                try { p = RecordedValues_GetBestClusterNode.FirstOrDefault(r => r != null && r.Equals(maxRange, loc)).GridLocation; }
-                catch { return false; }
+                try
+                {
+                    p = RecordedValues_GetBestClusterNode.FirstOrDefault(r => r != null && r.Equals(maxRange, loc)).GridLocation;
+                }
+                catch
+                {
+                    return false;
+                }
 
                 if (p != null)
                 {
@@ -68,8 +74,14 @@ namespace Trinity
                     return false;
 
                 var p = gridPoint;
-                try { p = RecordedValues_GetBestNode.FirstOrDefault(r => r != null && r.Equals(miRange, maRange, loc)).GridLocation; }
-                catch { return false; }
+                try
+                {
+                    p = RecordedValues_GetBestNode.FirstOrDefault(r => r != null && r.Equals(miRange, maRange, loc)).GridLocation;
+                }
+                catch
+                {
+                    return false;
+                }
 
                 if (p != null)
                 {
@@ -91,8 +103,14 @@ namespace Trinity
                     return false;
 
                 var w = weight;
-                try { w = TickValues_GetWeightAtPoint.FirstOrDefault(r => r != null && r.Equals(loc)).Weight; }
-                catch { return false; }
+                try
+                {
+                    w = TickValues_GetWeightAtPoint.FirstOrDefault(r => r != null && r.Equals(loc)).Weight;
+                }
+                catch
+                {
+                    return false;
+                }
 
                 if (w != 0f)
                 {
@@ -141,11 +159,12 @@ namespace Trinity
         }
     }
 
-    class GetBestClusterNodeResult : IEquatable<GetBestClusterNodeResult>
+    internal class GetBestClusterNodeResult : IEquatable<GetBestClusterNodeResult>
     {
         public GridNode GridLocation { get; set; }
         public float MaxRange { get; set; }
         public Vector3 Location { get; set; }
+
         public GetBestClusterNodeResult(GridNode gridLocation, float maxRange = 100f, Vector3 loc = new Vector3())
         {
             GridLocation = gridLocation;
@@ -164,7 +183,7 @@ namespace Trinity
         }
     }
 
-    class GetBestNodeResult : IEquatable<GetBestNodeResult>
+    internal class GetBestNodeResult : IEquatable<GetBestNodeResult>
     {
         public GridNode GridLocation { get; set; }
         public float MiRange { get; set; }
@@ -192,7 +211,7 @@ namespace Trinity
         }
     }
 
-    class GetWeightResult : IEquatable<GetWeightResult>
+    internal class GetWeightResult : IEquatable<GetWeightResult>
     {
         public float Weight { get; set; }
         public Vector3 Location { get; set; }

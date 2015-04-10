@@ -12,7 +12,7 @@ using Zeta.Game.Internals.Actors;
 
 namespace Trinity
 {
-    class MainGrid
+    internal class MainGrid
     {
         #region Helper fields
 
@@ -20,6 +20,7 @@ namespace Trinity
         {
             return new Vector3((int)Math.Round(loc.X), (int)Math.Round(loc.Y), (int)Math.Round(loc.Z));
         }
+
         public static Tuple<int, int> VectorToTuple(Vector3 loc)
         {
             return new Tuple<int, int>((int)loc.X, (int)loc.Y);
@@ -27,18 +28,14 @@ namespace Trinity
 
         private static List<TrinityCacheObject> ObjectCache
         {
-            get
-            {
-                return Trinity.ObjectCache;
-            }
+            get { return Trinity.ObjectCache; }
         }
+
         private static CacheData.PlayerCache Player
         {
-            get
-            {
-                return CacheData.Player;
-            }
+            get { return CacheData.Player; }
         }
+
         private static bool AnyTreasureGoblinsPresent
         {
             get
@@ -48,31 +45,27 @@ namespace Trinity
                 return false;
             }
         }
+
         private static TrinityCacheObject CurrentTarget
         {
-            get
-            {
-                return Trinity.CurrentTarget;
-            }
+            get { return Trinity.CurrentTarget; }
         }
+
         private static HashSet<SNOPower> Hotbar
         {
-            get
-            {
-                return CacheData.Hotbar.ActivePowers;
-            }
+            get { return CacheData.Hotbar.ActivePowers; }
         }
+
         private static Zeta.Bot.Navigation.MainGridProvider MainGridProvider
         {
-            get
-            {
-                return Trinity.MainGridProvider;
-            }
+            get { return Trinity.MainGridProvider; }
         }
+
         #endregion
+
         #region Fields
 
-        public static Dictionary<Tuple<int,int>,GridNode> NodesRecorded = new Dictionary<Tuple<int,int>,GridNode>();
+        public static Dictionary<Tuple<int, int>, GridNode> NodesRecorded = new Dictionary<Tuple<int, int>, GridNode>();
         public static Dictionary<Vector3, float> NavZones = new Dictionary<Vector3, float>();
 
         public static HashSet<GridNode> MapAsList = new HashSet<GridNode>();
@@ -81,8 +74,9 @@ namespace Trinity
         public static GridNode LastResult = new GridNode();
 
         public const float GridRange = 75f;
-        public const float GridSquareSize = 2f;
+        public const float GridSquareSize = 5f;
         public const float BaseWeight = GridRange + 10f;
+
         #endregion
 
         /// <summary>
@@ -127,6 +121,7 @@ namespace Trinity
                     centerPos = MainGridProvider.WorldToGrid(center.ToVector2());
                     bestNode = new GridNode();
                 }
+
                 #endregion
 
                 MapAsList.Clear();
@@ -135,63 +130,46 @@ namespace Trinity
                     int searchAreaBasis = y * MainGridProvider.Width;
                     for (int x = minPoint.X; x <= maxPoint.X; x = x + (int)GridSquareSize)
                     {
-
                         int dx = centerPos.X - x;
                         int dy = centerPos.Y - y;
 
                         /* Out of range */
-                        using (new MemorySpy("MainGrid.Refresh().OutOfRangeCheck"))
-                        {
-                            if (dx * dx + dy * dy > (GridRange / 2f) * (GridRange / 2f))
-                                continue;
-                        }
+                        if (dx * dx + dy * dy > (GridRange / 2f) * (GridRange / 2f))
+                            continue;
 
                         /* Cant stand at */
-                        using (new MemorySpy("MainGrid.Refresh().CantStandAtCheck"))
-                        {
-                            if (!MainGridProvider.SearchArea[searchAreaBasis + x])
-                                continue;
-                        }
+                        if (!MainGridProvider.SearchArea[searchAreaBasis + x])
+                            continue;
 
-                        GridNode gridNode;
+                        Vector2 xy = MainGridProvider.GridToWorld(new Point(x, y));
 
-                        using (new MemorySpy("MainGrid.Refresh().SetPosition"))
-                        {
-                            Vector2 xy = MainGridProvider.GridToWorld(new Point(x, y));
+                        /* Round to int pair sup, require to no change GridSquareSize value (2) */
+                        //xy.X = ((int)xy.X & 1) == 1 ? (int)xy.X + 1 : (int)xy.X;
+                        //xy.Y = ((int)xy.Y & 1) == 1 ? (int)xy.Y + 1 : (int)xy.Y;
 
-                            /* Round to int pair sup, require to no change GridSquareSize value (2) */
-                            xy.X = ((int)xy.X & 1) == 1 ? (int)xy.X + 1 : (int)xy.X;
-                            xy.Y = ((int)xy.Y & 1) == 1 ? (int)xy.Y + 1 : (int)xy.Y;
-
-                            Vector3 xyz = new Vector3(xy.X, xy.Y, MainGridProvider.GetHeight(xy));
-                            gridNode = new GridNode(xyz);
-                        }
+                        Vector3 xyz = new Vector3(xy.X, xy.Y, MainGridProvider.GetHeight(xy));
+                        GridNode gridNode = new GridNode(xyz);
 
                         GridNode nodeRecorded;
-                        bool recorded;
 
-                        using (new MemorySpy("MainGrid.Refresh().CheckRecorded"))
-                        { recorded = NodesRecorded.TryGetValue(VectorToTuple(gridNode.Position), out nodeRecorded); }
+                        bool isRecorded = NodesRecorded.TryGetValue(VectorToTuple(gridNode.Position), out nodeRecorded);
 
-                        if (recorded)
+                        if (isRecorded)
                         {
-                            using (new MemorySpy("MainGrid.Refresh().GetRecordedValues"))
-                            {
-                                nodeRecorded.ResetTickValues();
+                            nodeRecorded.ResetTickValues();
 
-                                gridNode.UnchangeableWeight = nodeRecorded.UnchangeableWeight;
-                                gridNode.UnchangeableWeightInfos = nodeRecorded.UnchangeableWeightInfos;
+                            gridNode.UnchangeableWeight = nodeRecorded.UnchangeableWeight;
+                            gridNode.UnchangeableWeightInfos = nodeRecorded.UnchangeableWeightInfos;
 
-                                gridNode.NearbyExitsCount = nodeRecorded.NearbyExitsCount;
-                                gridNode.NearbyGridPointsCount = nodeRecorded.NearbyGridPointsCount;
+                            gridNode.NearbyExitsCount = nodeRecorded.NearbyExitsCount;
+                            gridNode.NearbyGridPointsCount = nodeRecorded.NearbyGridPointsCount;
 
-                                gridNode.LastDynamicWeightValues = nodeRecorded.LastDynamicWeightValues;
-                                gridNode.LastTargetWeightValues = nodeRecorded.LastTargetWeightValues;
-                                gridNode.LastClusterWeightValues = nodeRecorded.LastClusterWeightValues;
-                                gridNode.LastMonsterWeightValues = nodeRecorded.LastMonsterWeightValues;
+                            gridNode.LastDynamicWeightValues = nodeRecorded.LastDynamicWeightValues;
+                            gridNode.LastTargetWeightValues = nodeRecorded.LastTargetWeightValues;
+                            gridNode.LastClusterWeightValues = nodeRecorded.LastClusterWeightValues;
+                            gridNode.LastMonsterWeightValues = nodeRecorded.LastMonsterWeightValues;
 
-                                NodesRecorded.Remove(VectorToTuple(gridNode.Position));
-                            }
+                            NodesRecorded.Remove(VectorToTuple(gridNode.Position));
                         }
                         else
                         {
@@ -204,20 +182,20 @@ namespace Trinity
 
                         gridNode.OperateWeight(WeightType.Dynamic, "BaseDistanceWeight", (GridRange - gridNode.Distance) * 2f);
 
-                        using (new MemorySpy("MainGrid.Refresh().SetTargetWeights"))
-                        {
-                            gridNode.SetTargetWeights();
-                        }
+                        //using (new MemorySpy("MainGrid.Refresh().SetTargetWeights"))
+                        //{
+                        gridNode.SetTargetWeights();
+                        //}
 
-                        using (new MemorySpy("MainGrid.Refresh().SetAvoidancesWeights"))
-                        {
-                            gridNode.SetAvoidancesWeights();
-                        }
+                        //using (new MemorySpy("MainGrid.Refresh().SetAvoidancesWeights"))
+                        //{
+                        gridNode.SetAvoidancesWeights();
+                        //}
 
-                        using (new MemorySpy("MainGrid.Refresh().SetCacheObjectsWeights"))
-                        {
-                            gridNode.SetCacheObjectsWeights();
-                        }
+                        //using (new MemorySpy("MainGrid.Refresh().SetCacheObjectsWeights"))
+                        //{
+                        gridNode.SetCacheObjectsWeights();
+                        //}
 
                         MapAsList.Add(gridNode);
 
@@ -329,7 +307,7 @@ namespace Trinity
                 }
 
                 if (NavZonePosition == new Vector3() ||
-                NavZonePosition.Distance2D(Player.Position) >= 5f)
+                    NavZonePosition.Distance2D(Player.Position) >= 5f)
                 {
                     NavZonePosition = Player.Position;
                     NavZones.Clear();
@@ -352,6 +330,7 @@ namespace Trinity
         public static bool PlayerIsInTrialRift { get; set; }
 
         private static float _tickValueMinRangeToTarget = -1f;
+
         public static float MinRangeToTarget
         {
             get
@@ -372,8 +351,10 @@ namespace Trinity
                 return _tickValueMinRangeToTarget;
             }
         }
+
         private static bool _isTickRecordedPlayerShouldKite;
         private static bool TickValuePlayerShouldKite { get; set; }
+
         public static bool PlayerShouldKite
         {
             get
@@ -382,33 +363,37 @@ namespace Trinity
                     return TickValuePlayerShouldKite;
 
                 TickValuePlayerShouldKite = Player.AvoidDeath ||
-                    (CombatBase.CurrentPower.SNOPower != SNOPower.None &&
-                    CombatBase.KiteDistance > 0 &&
-                    MinRangeToTarget > 1f &&
-                    MinRangeToTarget > CombatBase.KiteDistance);
+                                            (CombatBase.CurrentPower.SNOPower != SNOPower.None &&
+                                             CombatBase.KiteDistance > 0 &&
+                                             MinRangeToTarget > 1f &&
+                                             MinRangeToTarget > CombatBase.KiteDistance);
 
                 _isTickRecordedPlayerShouldKite = true;
                 return TickValuePlayerShouldKite;
             }
         }
+
         private static bool _isTickRecordedShouldAvoidAoE;
         private static bool TickValueShouldAvoidAoE { get; set; }
+
         public static bool ShouldAvoidAoE
         {
             get
             {
                 if (_isTickRecordedShouldAvoidAoE)
                     return TickValueShouldAvoidAoE;
-                
+
                 TickValueShouldAvoidAoE = Player.AvoidDeath || Player.CurrentHealthPct <= 0.3 || Player.StandingInAvoidance ||
-                    (CurrentTarget != null && CurrentTarget.IsAvoidance);
+                                          (CurrentTarget != null && CurrentTarget.IsAvoidance);
 
                 _isTickRecordedShouldAvoidAoE = true;
                 return TickValueShouldAvoidAoE;
             }
         }
+
         private static bool _isTickRecordedShouldCollectHealthGlobe;
         private static bool TickValueShouldCollectHealthGlobe { get; set; }
+
         public static bool ShouldCollectHealthGlobe
         {
             get
@@ -424,15 +409,17 @@ namespace Trinity
 
                 else
                     TickValueShouldCollectHealthGlobe = Player.PrimaryResourcePct < CombatBase.HealthGlobeResource &&
-                        (Legendary.ReapersWraps.IsEquipped ||
-                        (Player.ActorClass == ActorClass.Witchdoctor && CacheData.Hotbar.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GruesomeFeast)) ||
-                        (Player.ActorClass == ActorClass.DemonHunter && CacheData.Hotbar.PassiveSkills.Contains(SNOPower.DemonHunter_Passive_Vengeance)));
+                                                        (Legendary.ReapersWraps.IsEquipped ||
+                                                         (Player.ActorClass == ActorClass.Witchdoctor && CacheData.Hotbar.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GruesomeFeast)) ||
+                                                         (Player.ActorClass == ActorClass.DemonHunter && CacheData.Hotbar.PassiveSkills.Contains(SNOPower.DemonHunter_Passive_Vengeance)));
 
                 _isTickRecordedShouldCollectHealthGlobe = true;
                 return TickValueShouldCollectHealthGlobe;
             }
         }
+
         public static float TickValueHealthGlobeWeightPct = -1f;
+
         public static float HealthGlobeWeightPct
         {
             get

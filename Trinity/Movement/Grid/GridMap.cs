@@ -1,22 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Trinity.Combat.Abilities;
-using Trinity.Config.Combat;
-using Trinity.DbProvider;
-using Trinity.Reference;
 using Trinity.Technicals;
-using Zeta.Bot.Navigation;
 using Zeta.Common;
-using Zeta.Game;
-using Zeta.Game.Internals.Actors;
 using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
-    class GridMap
+    internal class GridMap
     {
         /// <summary>
         /// Return _map to a dictionary with Key > Position & Value > Weight
@@ -28,7 +18,7 @@ namespace Trinity
             if (!MainGrid.MapAsList.Any())
                 return new Dictionary<Vector3, float>();
 
-            return MainGrid.MapAsList.Select(p => new { p.Position, Weight = p.DynamicWeight }).ToDictionary(p => p.Position, p => (float)p.Weight);
+            return MainGrid.MapAsList.Select(p => new {p.Position, Weight = p.DynamicWeight}).ToDictionary(p => p.Position, p => (float) p.Weight);
         }
 
         /// <summary>
@@ -67,7 +57,7 @@ namespace Trinity
                 {
                     /* Keep last safe point */
                     var point = GetPointAt(cluster.Position);
-                    if (point != null && cluster.ClusterWeight >= (point.ClusterWeight * 0.9))
+                    if (point != null && cluster.ClusterWeight >= (point.ClusterWeight*0.9))
                         return cluster;
 
                     GridResults.RecordedValues_GetBestClusterNode.RemoveWhere(p => p != null && p.GridLocation != null && p.GridLocation.Equals(cluster));
@@ -80,9 +70,9 @@ namespace Trinity
                         where
                             g.ClusterWeight > 0 &&
                             (atPlayer && g.Distance >= minRange ||
-                            !atPlayer && g.Position.Distance2D(loc) >= minRange) &&
+                             !atPlayer && g.Position.Distance2D(loc) >= minRange) &&
                             (atPlayer && g.Distance < range ||
-                            !atPlayer && g.Position.Distance2D(loc) < range)
+                             !atPlayer && g.Position.Distance2D(loc) < range)
                         orderby
                             g.ClusterWeight descending
                         select g).ToList().FirstOrDefault();
@@ -137,7 +127,7 @@ namespace Trinity
             GridNode gPoint = GetPointAt(loc);
             if (gPoint != null)
             {
-                weightAtPoint = (float)gPoint.DynamicWeight;
+                weightAtPoint = (float) gPoint.DynamicWeight;
                 GridResults.TickValues_GetWeightAtPoint.Add(new GetWeightResult(weightAtPoint, loc));
             }
 
@@ -152,7 +142,8 @@ namespace Trinity
             if (!MainGrid.MapAsList.Any())
                 return null;
 
-            return MainGrid.MapAsList.OrderBy(g => g.Position.Distance2D(loc)).FirstOrDefault(); ;
+            return MainGrid.MapAsList.OrderBy(g => g.Position.Distance2D(loc)).FirstOrDefault();
+            ;
         }
 
         /// <summary>
@@ -176,33 +167,33 @@ namespace Trinity
                 if (GridResults.HasRecordedValue_GetBestNode(out result, minRange, maxRange, loc))
                 {
                     /* Keep last safe point */
-                    if (result.Weight >= (GetWeightAt(result.Position) * 0.9))
+                    if (result.Weight >= (GetWeightAt(result.Position)*0.9))
                         return result;
 
                     GridResults.RecordedValues_GetBestNode.RemoveWhere(p => p != null && p.GridLocation != null && p.GridLocation.Equals(result));
                 }
 
-                var results = 
+                var results =
                     (from p in MainGrid.MapAsList
-                    where
-                        (atPlayer && p.Distance >= minRange ||
-                        !atPlayer && p.Position.Distance2D(loc) >= minRange) &&
-                        (atPlayer && p.Distance < maxRange ||
-                        !atPlayer && p.Position.Distance2D(loc) < maxRange)
-                    select p).ToList();
+                        where
+                            (atPlayer && p.Distance >= minRange ||
+                             !atPlayer && p.Position.Distance2D(loc) >= minRange) &&
+                            (atPlayer && p.Distance < maxRange ||
+                             !atPlayer && p.Position.Distance2D(loc) < maxRange)
+                        select p).ToList();
 
                 if (prioritizeDist)
-                    results = 
+                    results =
                         (from p in results
-                        orderby 
-                            p.Weight descending, 
-                            p.Position.Distance2D(loc)
-                        select p).ToList();
+                            orderby
+                                p.Weight descending,
+                                p.Position.Distance2D(loc)
+                            select p).ToList();
                 else
-                    results = 
+                    results =
                         (from p in results
-                        orderby p.Weight descending
-                        select p).ToList();
+                            orderby p.Weight descending
+                            select p).ToList();
 
                 result = results.FirstOrDefault();
 
@@ -212,7 +203,7 @@ namespace Trinity
                     Logger.Log(TrinityLogLevel.Info, LogCategory.Movement, "Best safe gPoint : Loc={0} Dist={1:1} Weight={2} Infos={3}",
                         result.Position, result.Position.Distance2D(loc).ToString("F0"),
                         result.Weight.ToString("F0"), result.WeightInfos
-                    );
+                        );
                 }
 
                 GridResults.RecordedValues_GetBestNode.Add(new GetBestNodeResult(result, minRange, maxRange, loc));
