@@ -32,8 +32,8 @@ namespace Trinity
                     Trinity.Player.StandingInAvoidance = true;
 
                 // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
-                if (Trinity.Player.StandingInAvoidance || Player.AvoidDeath && (!AnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize)/* &&
-                    DateTime.UtcNow.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= cancelledEmergencyMoveForMilliseconds*/)
+                if (Trinity.Player.StandingInAvoidance || Player.AvoidDeath && (!AnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
+                    !Combat.QueuedMovementManager.Stuck.IsStuck(2f, 1500))
                 {
                     var _safeNode = GridMap.GetBestMoveNode();
                     if (_safeNode != null)
@@ -1497,7 +1497,7 @@ namespace Trinity
             if (shouldStayPutDuringAvoidance)
             {
                 var _pathIntersect = (
-                    from p in MainGrid.MapAsList
+                    from p in MainGrid.Map
                     where
                         p.Position.Distance2D(CurrentTarget.Position) < CurrentTarget.Distance &&
                         p.Weight > 0 &&

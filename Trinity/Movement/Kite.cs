@@ -130,7 +130,7 @@ namespace Trinity
                 double msCancelledKite = DateTime.UtcNow.Subtract(timeCancelledKiteMove).TotalMilliseconds;
                 bool shouldKite = msCancelledKite >= cancelledKiteMoveForMilliseconds && TryToKite;
 
-                if (shouldKamikazeTreasureGoblins && (shouldEmergencyMove || shouldKite))
+                if (shouldKamikazeTreasureGoblins && (shouldEmergencyMove || shouldKite) && !Combat.QueuedMovementManager.Stuck.IsStuck(2f, 1500))
                 {
                     Vector3 vAnySafePoint = GridMap.GetBestMoveNode().Position;
 
