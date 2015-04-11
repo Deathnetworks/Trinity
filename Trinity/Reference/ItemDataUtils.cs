@@ -32,13 +32,13 @@ namespace Trinity.Reference
 
         public static int GetMinBaseDamage(ACDItem item)
         {
-            var min = item.Stats.MinDamageElemental;
+            var min = Math.Min(item.Stats.MinDamageElemental, item.Stats.MaxDamageElemental);
             return (min != 0) ? (int) min : (int) item.Stats.MinDamage;
         }
 
         public static int GetMaxBaseDamage(ACDItem item)
         {
-            var max = item.Stats.MaxDamageElemental;
+            var max = Math.Max(item.Stats.MinDamageElemental, item.Stats.MaxDamageElemental);
             return (max != 0) ? (int)max : (int)item.Stats.MaxDamage;
         }
 

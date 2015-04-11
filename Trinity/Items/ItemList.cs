@@ -20,16 +20,16 @@ namespace Trinity.Items
         {
             if (cItem.AcdItem != null && cItem.AcdItem.IsValid)
             {
-                bool result = false;
+                bool result = false;                
+
                 var item = new Item(cItem.AcdItem);
+
                 var wrappedItem = new ItemWrapper(cItem.AcdItem);
 
                 result = ShouldStashItem(item, cItem);                
 
                 string action = result ? "KEEP" : "TRASH";
 
-                //Logger.Log("List Item - {0} - {1}", action, item.Name);
-                
                 return result;
             }
             return false;
@@ -37,8 +37,19 @@ namespace Trinity.Items
 
         internal static bool ShouldStashItem(Item referenceItem, CachedACDItem cItem)
         {
-            if (referenceItem == null)
-                return false;
+            Item item;
+
+            if (!Legendary.Items.TryGetValue(cItem.AcdItem.ActorSNO, out item))
+            {
+                Logger.LogDebug("  >>  Unknown Item {0} {1} - Auto-keeping", cItem.RealName, cItem.AcdItem.ActorSNO);
+                return true;   
+            }
+
+            if (cItem.AcdItem.IsCrafted)
+            {
+                Logger.LogDebug("  >>  Crafted Item {0} {1} - Auto-keeping", cItem.RealName, cItem.AcdItem.ActorSNO);
+                return true;                       
+            }
 
             var itemSetting = Trinity.Settings.Loot.ItemList.SelectedItems.FirstOrDefault(i => referenceItem.Id == i.Id);
             if (itemSetting != null)
@@ -223,6 +234,9 @@ namespace Trinity.Items
                 }
                 return true;
             }
+
+            Logger.LogDebug("  >>  Unselected ListItem {0} {1}", cItem.RealName, cItem.AcdItem.ActorSNO);
+
             return false;
         }
 
