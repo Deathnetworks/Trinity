@@ -939,7 +939,7 @@ namespace Trinity.Combat.Abilities
                 if (!IsCurrentlyAvoiding && CanCast(SNOPower.Barbarian_Whirlwind, CanCastFlags.NoTimer))
                 {
                     if (TargetUtil.AnyMobsInRange(15f, false) ||
-                       (Player.MovementSpeed > 0))
+                       (Sets.BulKathossOath.IsEquipped && Player.MovementSpeed > 0))
                     {
                         if (CurrentTarget != null && CurrentTarget.IsUnit &&
                             (DateTime.UtcNow.Subtract(LastChangedZigZag).TotalMilliseconds >= 1500 ||
