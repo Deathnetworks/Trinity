@@ -1158,7 +1158,6 @@ namespace Trinity
             { SNOActor.Diablo_ringofFire_damageArea, new Avoidance(SNOActor.Diablo_ringofFire_damageArea, AvoidType.GroundCircle, Element.Fire) },
             { SNOActor.Diablo_ringofFire_damageArea_stage3, new Avoidance(SNOActor.Diablo_ringofFire_damageArea_stage3, AvoidType.GroundCircle, Element.Fire) },
             { SNOActor.DiabloArena_Firewall_HeatDist, new Avoidance(SNOActor.DiabloArena_Firewall_HeatDist, AvoidType.GroundCircle, Element.Fire) },
-            { SNOActor.Fire_AlphaTorch_Pole, new Avoidance(SNOActor.Fire_AlphaTorch_Pole, AvoidType.GroundCircle, Element.Fire) },
             { SNOActor.Uber_BossWorld3_st_Demon_ChainPylon_Fire_Azmodan, new Avoidance(SNOActor.Uber_BossWorld3_st_Demon_ChainPylon_Fire_Azmodan, AvoidType.GroundCircle, Element.Fire) },
             { SNOActor.UnholyShield_model_fire, new Avoidance(SNOActor.UnholyShield_model_fire, AvoidType.GroundCircle, Element.Fire) },
             { SNOActor.x1_Abattoir_furnaceSpinner_fireBeam_clockwise, new Avoidance(SNOActor.x1_Abattoir_furnaceSpinner_fireBeam_clockwise, AvoidType.GroundCircle, Element.Fire) },
@@ -1899,7 +1898,19 @@ namespace Trinity
             (int)SNOActor.treasureGoblin_B,
             (int)SNOActor.treasureGoblin_C,
             (int)SNOActor.treasureGoblin_C_Unique_DevilsHand,
-            (int)SNOActor.treasureGoblin_D,
+            (int)SNOActor.treasureGoblin_C_WhatsNew,
+            (int)SNOActor.treasureGoblin_D_Splitter,
+            (int)SNOActor.treasureGoblin_D_Splitter_02,
+            (int)SNOActor.treasureGoblin_D_Splitter_03,
+            (int)SNOActor.treasureGoblin_D_WhatsNew,
+            (int)SNOActor.treasureGoblin_E_WhatsNew,
+            (int)SNOActor.treasureGoblin_F,
+            (int)SNOActor.treasureGoblin_F_WhatsNew,
+            (int)SNOActor.treasureGoblin_H,
+            (int)SNOActor.treasureGoblin_I,
+            (int)SNOActor.treasureGoblin_J,
+            (int)SNOActor.treasureGoblin_J_FX_WhatsNew,
+            (int)SNOActor.treasureGoblin_J_WhatsNew,
          };
 
         /// <summary>
