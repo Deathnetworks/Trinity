@@ -18,17 +18,6 @@ namespace Trinity.Combat.Abilities
 {
     public class MonkCombat : CombatBase
     {
-        public static bool BastionOfWillRequirePrimary
-        {
-            get
-            {
-                return Sets.BastionsOfWill.IsMaxBonusActive && TargetUtil.AnyMobsInRange(30, false) &&
-                    (TimeSincePowerUse(SNOPower.Monk_CripplingWave) < 0 || TimeSincePowerUse(SNOPower.Monk_CripplingWave) >= 4500 ||
-                    TimeSincePowerUse(SNOPower.Monk_FistsofThunder) < 0 || TimeSincePowerUse(SNOPower.Monk_FistsofThunder) >= 4500 ||
-                    TimeSincePowerUse(SNOPower.Monk_DeadlyReach) < 0 || TimeSincePowerUse(SNOPower.Monk_DeadlyReach) >= 4500 ||
-                    TimeSincePowerUse(SNOPower.Monk_WayOfTheHundredFists) < 0 || TimeSincePowerUse(SNOPower.Monk_WayOfTheHundredFists) >= 4500);
-            }
-        }
         public static bool CurrentlyUseDashingStrike
         {
             get
@@ -86,22 +75,6 @@ namespace Trinity.Combat.Abilities
                 }
 
                 return GetMonkDestroyPower();
-            }
-
-            // Bastion Of Will require primary usage
-            if (!UseOOCBuff && BastionOfWillRequirePrimary)
-            {
-                if (CanCast(SNOPower.Monk_FistsofThunder))
-                    return new TrinityPower(SNOPower.Monk_FistsofThunder, 0f, CurrentTarget.ClusterPosition(15f), CurrentTarget.ACDGuid);
-
-                if (CanCast(SNOPower.Monk_DeadlyReach))
-                    return new TrinityPower(SNOPower.Monk_DeadlyReach, 0f, CurrentTarget.ClusterPosition(14f), CurrentTarget.ACDGuid);
-
-                if (CanCast(SNOPower.Monk_WayOfTheHundredFists))
-                    return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 0f, CurrentTarget.ClusterPosition(14f), CurrentTarget.ACDGuid);
-
-                if (CanCast(SNOPower.Monk_CripplingWave))
-                    return new TrinityPower(SNOPower.Monk_CripplingWave, 0f, CurrentTarget.ClusterPosition(28f), CurrentTarget.ACDGuid);
             }
 
             // Dashing strike avoidance
@@ -339,9 +312,9 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.ClusterPosition(5f));
                 }
 
-                if (CombatBase.QueuedMovement.IsQueuedMovement && Combat.QueuedMovementManager.Stuck.IsStuck(2f, 250))
+                if (Combat.QueuedMovementManager.Stuck.IsStuck(2f, 250) && NavHelper.CanRayCast(PlayerMover.LastMoveToTarget))
                 {
-                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0, CombatBase.QueuedMovement.CurrentMovement.Destination);
+                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0, PlayerMover.LastMoveToTarget);
                 }
 
                 GridNode bestCluster = GridMap.GetBestClusterNode(useDefault: false);
@@ -367,6 +340,23 @@ namespace Trinity.Combat.Abilities
                         CombatBase.SwitchToTarget(TargetUtil.GetDashStrikeFarthestTarget(MaxDashingStrikeRange, 2f));
 
                     return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.ClusterPosition(5f));
+            }
+
+            // Bastion Of Will require primary usage
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && 
+                IsBastionsPrimaryBuffWillExpire)
+            {
+                if (CanCast(SNOPower.Monk_FistsofThunder))
+                    return new TrinityPower(SNOPower.Monk_FistsofThunder, 30f, CurrentTarget.ClusterPosition(15f), CurrentTarget.ACDGuid);
+
+                if (CanCast(SNOPower.Monk_DeadlyReach))
+                    return new TrinityPower(SNOPower.Monk_DeadlyReach, 16f, CurrentTarget.ClusterPosition(14f), CurrentTarget.ACDGuid);
+
+                if (CanCast(SNOPower.Monk_WayOfTheHundredFists))
+                    return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 16f, CurrentTarget.ClusterPosition(14f), CurrentTarget.ACDGuid);
+
+                if (CanCast(SNOPower.Monk_CripplingWave))
+                    return new TrinityPower(SNOPower.Monk_CripplingWave, 20f, CurrentTarget.ClusterPosition(15f), CurrentTarget.ACDGuid);
             }
 
             // Exploding Palm

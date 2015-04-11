@@ -69,6 +69,13 @@ namespace Trinity.Combat.Abilities
                 return DestroyObjectPower;
             }
 
+            // Bastions of will
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && IsBastionsPrimaryBuffWillExpire)
+            {
+                power = GetPrimaryPower();
+                if (!IsNull(power)) { return power; }
+            }
+
             // Jade Harvester special logic
             if (Player.IsInCombat && Sets.RaimentOfTheJadeHarvester.IsMaxBonusActive)
             {

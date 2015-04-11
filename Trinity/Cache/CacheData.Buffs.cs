@@ -108,7 +108,7 @@ namespace Trinity
                             HasInvulnerableShrine = true;
                         if (cachedBuff.Id == (int)SNOPower.Pages_Buff_Infinite_Casting)
                             HasCastingShrine = true;
-                        if (cachedBuff.Id == (int)SNOPower.Pages_Buff_Electrified)
+                        if (cachedBuff.Id == (int)SNOPower.Pages_Buff_Electrified) 
                             HasCastingShrine = true;                        
 
                         if (!_buffsById.ContainsKey(buff.SNOId))
@@ -118,6 +118,9 @@ namespace Trinity
                             Logger.LogDebug(LogCategory.CacheManagement, "Duplicate buff detected: {0}", cachedBuff);
                         }
                         ActiveBuffs.Add(cachedBuff);
+
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
+                            "ActiveBuffs: Id={0} Name={1} Stacks={2}", cachedBuff.Id, cachedBuff.InternalName, cachedBuff.StackCount);
                     }
 
                     LastUpdated = DateTime.UtcNow;

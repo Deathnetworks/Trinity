@@ -69,7 +69,6 @@ namespace Trinity.Combat.Abilities
 
                 string powerResultInfo = _power.TargetPosition != Vector3.Zero ? "at " + NavHelper.PrettyPrintVector3(_power.TargetPosition) + " dist=" + (int)_distToTarget : "";
                 powerResultInfo += _power.TargetACDGUID != -1 ? " on " + _power.TargetACDGUID : "";
-                Logger.Log(TrinityLogLevel.Info, LogCategory.Targetting, "Used Power {0} " + powerResultInfo, _power.SNOPower);
 
                 SpellTracker.TrackSpellOnUnit(_power.TargetACDGUID, _power.SNOPower);
                 SpellHistory.RecordSpell(_power);
@@ -81,24 +80,29 @@ namespace Trinity.Combat.Abilities
 
                 Trinity.IsWaitingAfterPower = _power.ShouldWaitAfterUse;
 
-                if (IsTaegukEquipped)
+                Skill _currentSkill = new Skill();
+                switch (Player.ActorClass)
                 {
-                    Skill _currentSkill = new Skill();
-                    switch (Player.ActorClass)
-                    {
-                        case ActorClass.Barbarian: _currentSkill = Skills.Barbarian.Where(s => s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
-                        case ActorClass.Crusader: _currentSkill = Skills.Crusader.Where(s => s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
-                        case ActorClass.Monk: _currentSkill = Skills.Monk.Where(s => s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
-                        case ActorClass.Wizard: _currentSkill = Skills.Wizard.Where(s => s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
-                        case ActorClass.Witchdoctor: _currentSkill = Skills.WitchDoctor.Where(s => s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
-                        case ActorClass.DemonHunter: _currentSkill = Skills.DemonHunter.Where(s => s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
-                    }
-
-                    if (_currentSkill != null && _currentSkill.IsCostPrimary)
-                        LastTaegukDebuffedTime = DateTime.UtcNow;
+                    case ActorClass.Barbarian: _currentSkill = Skills.Barbarian.Where(s => s.IsActive && s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
+                    case ActorClass.Crusader: _currentSkill = Skills.Crusader.Where(s => s.IsActive && s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
+                    case ActorClass.Monk: _currentSkill = Skills.Monk.Where(s => s.IsActive && s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
+                    case ActorClass.Wizard: _currentSkill = Skills.Wizard.Where(s => s.IsActive && s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
+                    case ActorClass.Witchdoctor: _currentSkill = Skills.WitchDoctor.Where(s => s.IsActive && s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
+                    case ActorClass.DemonHunter: _currentSkill = Skills.DemonHunter.Where(s => s.IsActive && s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
                 }
-                
-                
+
+                if (_currentSkill != null)
+                {
+                    if (_currentSkill.IsCostPrimary)
+                        LastCostSkillUseTime = DateTime.UtcNow;
+
+                    else if (_currentSkill.Category == SpellCategory.Primary && (_power.MinimumRange <= 1 || (CurrentTarget != null && _power.TargetPosition.Distance2D(Player.Position) - CurrentTarget.Radius <= _power.MinimumRange)))
+                        LastPrimaryUseTime = DateTime.UtcNow;
+                }
+
+                //powerResultInfo += String.Format(" T1={0} T2={1}", DateTime.UtcNow.Subtract(LastPrimaryUseTime).TotalMilliseconds, DateTime.UtcNow.Subtract(LastCostSkillUseTime).TotalMilliseconds);
+                Logger.Log(TrinityLogLevel.Error, LogCategory.Targetting, "Used Power {0} " + powerResultInfo, _power.SNOPower);
+
                 return true;
             }
 
@@ -317,18 +321,39 @@ namespace Trinity.Combat.Abilities
 
         public static bool IsQuestingMode { get; set; }
 
+        private static DateTime LastCostSkillUseTime = DateTime.MinValue;
+        private static DateTime LastPrimaryUseTime = DateTime.MinValue;
+
         /// <summary>
         /// Determines whether [is taeguk equipped].
         /// </summary>
-        /// <returns><c>true</c> if [is taeguk equipped]; otherwise, <c>false</c>.</returns>
-        private static DateTime LastTaegukDebuffedTime = DateTime.MinValue;
         private static bool IsTaegukEquipped
         {
             get { return CacheData.Inventory.EquippedIds.Contains(405804); }
         }
+
+        /// <summary>
+        /// Retrun sets equipped and time sup 2500
+        /// </summary>
         public static bool IsTaegukBuffWillExpire
         {
-            get { return IsTaegukEquipped && DateTime.UtcNow.Subtract(LastTaegukDebuffedTime).TotalMilliseconds >= 2500; }
+            get { return IsTaegukEquipped && DateTime.UtcNow.Subtract(LastCostSkillUseTime).TotalMilliseconds >= 2500; }
+        }
+
+        /// <summary>
+        /// Retrun sets equipped and time sup 4500
+        /// </summary>
+        public static bool IsBastionsPrimaryBuffWillExpire
+        {
+            get { return Sets.BastionsOfWill.IsFullyEquipped && DateTime.UtcNow.Subtract(LastPrimaryUseTime).TotalMilliseconds >= 4500; }
+        }
+
+        /// <summary>
+        /// Retrun sets equipped and time sup 4500
+        /// </summary>
+        public static bool IsBastionsSpendingBuffWillExpire
+        {
+            get { return Sets.BastionsOfWill.IsFullyEquipped && DateTime.UtcNow.Subtract(LastCostSkillUseTime).TotalMilliseconds >= 4500; }
         }
 
         /// <summary>

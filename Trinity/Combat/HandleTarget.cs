@@ -64,6 +64,9 @@ namespace Trinity
                     if (BarbarianCombat.CurrentlyUseFuriousCharge) // Wait a little
                         return GetRunStatus("HeroCharge", RunStatus.Running);
 
+                    if (UsePotionIfNeededTask()) // Pop a potion when necessary
+                        return GetRunStatus("UsePotion", RunStatus.Running);
+
                     using (new MemorySpy("HandleTarget().CheckAvoidDeath"))
                     {
                         if (Settings.Combat.Misc.AvoidDeath &&
@@ -90,9 +93,6 @@ namespace Trinity
 
                     using (new MemorySpy("HandleTarget().SetQueuedSpecialMovement"))
                     { SetQueuedSpecialMovement(); }
-
-                    if (UsePotionIfNeededTask()) // Pop a potion when necessary
-                        return GetRunStatus("UsePotion", RunStatus.Running);
 
                     if (HandlePowerWaitTask()) // Waiting for/after power            
                         return GetRunStatus("WaitForPower", RunStatus.Running);
@@ -194,14 +194,14 @@ namespace Trinity
                         ObjectCache.Count().ToString() + " objects");
                 }
 
-                if (MainGrid.MapAsList.Any() && GridMap.GetBestClusterNode() != null)
+                if (MainGrid.Map.Any() && GridMap.GetBestClusterNode() != null)
                 {
                     Logger.Log(TrinityLogLevel.Info, LogCategory.Targetting,
                         "| =>   ClusterNode    : {0}",
                         GridMap.GetBestClusterNode().ClusterWeightInfos + " Dist:" + GridMap.GetBestClusterNode().Distance);
                 }
 
-                if (MainGrid.MapAsList.Any() && GridMap.GetBestMoveNode() != null)
+                if (MainGrid.Map.Any() && GridMap.GetBestMoveNode() != null)
                 {
                     Logger.Log(TrinityLogLevel.Info, LogCategory.Targetting,
                         "| =>   MoveNode       : {0}",
@@ -1047,7 +1047,7 @@ namespace Trinity
                 // Keep kiting option
                 if (Settings.Combat.Misc.KeepMovingInCombat && CurrentTarget.IsUnit &&
                     CurrentTargetIsInRange && !CombatBase.IsNull(CombatBase.CurrentPower) &&
-                    MainGrid.MapAsList.Any() &&
+                    MainGrid.Map.Any() &&
                     (Player.IsRanged || TargetUtil.ClusterExists(Settings.Combat.Misc.TrashPackClusterRadius, TargetCurrentDistance + 5f, Settings.Combat.Misc.TrashPackSize)))
                 {
                     CombatBase.QueuedMovement.Queue(new QueuedMovement
@@ -1056,7 +1056,7 @@ namespace Trinity
                         Infos = "(Keep moving) " + CurrentTarget.Infos,
                         Destination = Player.IsRanged ?
                         GridMap.GetBestMoveNode().Position :
-                        GridMap.GetBestClusterNode(radius: Settings.Combat.Misc.TrashPackClusterRadius, size: Settings.Combat.Misc.TrashPackSize, range: TargetCurrentDistance + 5f).Position,
+                        GridMap.GetBestClusterNode(radius: Settings.Combat.Misc.TrashPackClusterRadius, size: Settings.Combat.Misc.TrashPackSize, maxRange: TargetCurrentDistance + 5f).Position,
                         OnUpdate = m =>
                         {
                             var _safeNode = GridMap.GetBestMoveNode();

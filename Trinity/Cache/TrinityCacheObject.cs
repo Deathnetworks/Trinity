@@ -516,7 +516,7 @@ namespace Trinity
         [NoCopy]
         public Vector3 ClusterPosition(float range = 20f)
         {
-            var cluster = GridMap.GetBestClusterNode(Position, range: range, useDefault: false);
+            var cluster = GridMap.GetBestClusterNode(Position, maxRange: range, useDefault: false);
             if (cluster != null)
                 return cluster.Position;
 

@@ -178,7 +178,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(0)]
+        [DefaultValue(15)]
         public int KiteLimit
         {
             get
@@ -196,7 +196,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(65)]
+        [DefaultValue(35)]
         public int RangedAttackRange
         {
             get

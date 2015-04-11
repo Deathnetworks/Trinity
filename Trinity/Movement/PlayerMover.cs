@@ -703,13 +703,13 @@ namespace Trinity.DbProvider
         {
             using (new MemorySpy("PlayerMover.NavigateTo()"))
             {
-                if (UsedSpecialMovement(destination))
-                    return MoveResult.Moved;
-
                 PositionCache.AddPosition();
                 MoveResult result;
 
                 LastMoveToTarget = destination;
+
+                if (UsedSpecialMovement(destination))
+                    return MoveResult.Moved;
 
                 try
                 {
@@ -793,7 +793,7 @@ namespace Trinity.DbProvider
 
         internal static bool UsedSpecialMovement(Vector3 loc)
         {
-            return UsedSpecialMovement(GridMap.GetPointAt(loc));
+            return UsedSpecialMovement(GridMap.GetNodeAt(loc));
         }
 
         internal static bool UsedSpecialMovement(GridNode _gridNode)
@@ -825,7 +825,7 @@ namespace Trinity.DbProvider
                             if (_newGridLoc != null && _newGridLoc.Position != Vector3.Zero)
                             {
                                 GridNode _gVault = _newGridLoc;
-                                _gVault = GridMap.GetPointAt(MathEx.CalculatePointFrom(_newGridLoc.Position, Trinity.Player.Position, 35f));
+                                _gVault = GridMap.GetNodeAt(MathEx.CalculatePointFrom(_newGridLoc.Position, Trinity.Player.Position, 35f));
 
                                 if (_gVault != null && _gVault.Position != Vector3.Zero)
                                 {

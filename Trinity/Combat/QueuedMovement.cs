@@ -177,7 +177,7 @@ namespace Trinity.Combat
                 SuccessHandler("StopWhen");
             }
 
-            if (movement != null && movement.Destination != Vector3.Zero && IsHigherMoveTypePriority(movement))
+            if (movement != null && movement.Destination != Vector3.Zero && IsHigherMoveTypePriority(movement) && !IsBlacklisted(movement))
             {
                 if (CurrentMovement != null)
                     FinishedHandler();

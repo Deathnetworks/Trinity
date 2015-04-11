@@ -44,23 +44,23 @@ namespace Trinity.Combat.Abilities
             if (!UseOOCBuff && !IsCurrentlyAvoiding)
             {
                 // Bastion Of Will require primary usage
-                if (BastionOfWillRequirePrimary)
+                if (IsBastionsPrimaryBuffWillExpire)
                 {
                     // Justice
                     if (CanCast(SNOPower.X1_Crusader_Justice))
-                        return new TrinityPower(SNOPower.X1_Crusader_Justice, 0f, CurrentTarget.ACDGuid);
+                        return new TrinityPower(SNOPower.X1_Crusader_Justice, 7f, CurrentTarget.ACDGuid);
 
                     // Smite
                     if (CanCast(SNOPower.X1_Crusader_Smite))
-                        return new TrinityPower(SNOPower.X1_Crusader_Smite, 0f, TargetUtil.GetBestClusterUnit(15f, 15f).ACDGuid);
+                        return new TrinityPower(SNOPower.X1_Crusader_Smite, 15f, TargetUtil.GetBestClusterUnit(15f, 15f).ACDGuid);
 
                     // Slash
                     if (CanCast(SNOPower.X1_Crusader_Slash))
-                        return new TrinityPower(SNOPower.X1_Crusader_Slash, 0f, TargetUtil.GetBestClusterUnit(5f, 8f).ACDGuid);
+                        return new TrinityPower(SNOPower.X1_Crusader_Slash, 15f, TargetUtil.GetBestClusterUnit(5f, 8f).ACDGuid);
 
                     // Punish
                     if (CanCast(SNOPower.X1_Crusader_Punish))
-                        return new TrinityPower(SNOPower.X1_Crusader_Punish, 0f, CurrentTarget.ACDGuid);
+                        return new TrinityPower(SNOPower.X1_Crusader_Punish, 7f, CurrentTarget.ACDGuid);
                 }
 
                 /*

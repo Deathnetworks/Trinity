@@ -533,7 +533,7 @@ namespace Trinity
         /// <returns></returns>
         internal static Vector3 GetZigZagTarget(Vector3 origin, float ringDistance, bool randomizeDistance = false)
         {
-            var minDistance = 20f;
+            var minDistance = 12f;
             Vector3 myPos = Player.Position;
             float distanceToTarget = origin.Distance2D(myPos);
 
@@ -560,12 +560,7 @@ namespace Trinity
             if (useTargetBasedZigZag && shouldZigZagElites && !AnyTreasureGoblinsPresent && ObjectCache.Count(o => o.IsUnit) >= minTargets)
             {
                 bool attackInAoe = Trinity.KillMonstersInAoE;
-                var clusterNode = GridMap.GetBestClusterNode(Player.Position, ringDistance, maxDistance, minDistance, useDefault: false);
-                if (clusterNode != null)
-                {
-                    Logger.Log(LogCategory.Movement, "Returning ZigZag: BestClusterNode {0} r-dist={1} t-dist={2}", clusterNode.Position, ringDistance, clusterNode.Distance);
-                    return clusterNode.Position;
-                }
+
                 var clusterPoint = TargetUtil.GetBestClusterPoint(ringDistance, ringDistance);
                 if (clusterPoint.Distance2D(Player.Position) >= minDistance)
                 {
@@ -1112,7 +1107,7 @@ namespace Trinity
         {
             using (new MemorySpy("TargetUtil.GetBestFuriousChargeMoveNode()"))
             {
-                if (!MainGrid.MapAsList.Any())
+                if (!MainGrid.Map.Any())
                     return null;
 
                 if (_loc == new Vector3()) _loc = Player.Position;
@@ -1122,7 +1117,7 @@ namespace Trinity
                 var _rnd = new Random();
 
                 var _gridResult = (
-                    from _o in MainGrid.MapAsList
+                    from _o in MainGrid.Map
                     where
                         _o.Distance > 3f &&
                         _o.MonsterWeight >= 0 &&
