@@ -73,7 +73,7 @@ namespace Trinity
         public static Dictionary<Tuple<int, int>, GridNode> NodesRecorded = new Dictionary<Tuple<int, int>, GridNode>();
         public static Dictionary<Vector3, float> NavZones = new Dictionary<Vector3, float>();
 
-        public static HashSet<GridNode> MapAsList = new HashSet<GridNode>();
+        public static HashSet<GridNode> Map = new HashSet<GridNode>();
         public static Vector3 NavZonePosition = new Vector3();
 
         public static GridNode LastResult = new GridNode();
@@ -110,7 +110,7 @@ namespace Trinity
                 GridNode bestNode;
 
                 /* offSet to re-peek recorded */
-                var offSet = GridMap.GetPointAt(center);
+                var offSet = GridMap.GetNodeAt(center);
                 if (offSet != null && offSet.Position.Distance2D(center) <= 5f)
                     center = offSet.Position;
 
@@ -131,7 +131,7 @@ namespace Trinity
 
                 #endregion
 
-                MapAsList.Clear();
+                Map.Clear();
                 for (int y = minPoint.Y; y <= maxPoint.Y; y = y + (int)GridSquareSize)
                 {
                     int searchAreaBasis = y * MainGridProvider.Width;
@@ -141,7 +141,7 @@ namespace Trinity
                         int dy = centerPos.Y - y;
 
                         /* Out of range */
-                        if (dx * dx + dy * dy > (GridRange / 2f) * (GridRange / 2f))
+                        if (dx * dx + dy * dy > (GridRange / 2.5f) * (GridRange / 2.5f))
                             continue;
 
                         /* Cant stand at */
@@ -187,7 +187,7 @@ namespace Trinity
                         gridNode.SetAvoidancesWeights();
                         gridNode.SetCacheObjectsWeights();
 
-                        MapAsList.Add(gridNode);
+                        Map.Add(gridNode);
 
                         /* Check best nav location */
                         if (gridNode.Weight > bestNode.Weight ||
@@ -199,7 +199,7 @@ namespace Trinity
                 }
 
                 /* low, so reduce list to minimum with dist & weight limit */
-                foreach (var gridNode in MapAsList)
+                foreach (var gridNode in Map)
                 {
                     /* Something to do */
                     gridNode.FinalCheck();
@@ -254,7 +254,7 @@ namespace Trinity
                             int dy = centerPos.Y - y;
 
                             /* Out of range */
-                            if (dx * dx + dy * dy > (GridRange / 2f) * (GridRange / 2f))
+                            if (dx * dx + dy * dy > (GridRange / 2.5f) * (GridRange / 2.5f))
                                 continue;
 
                             /* Cant stand at */
@@ -271,78 +271,102 @@ namespace Trinity
                             GridNode cornerSE = null;
 
                             bool goal = false;
+                            int cornerCount = 1;
 
-                            using (new MemorySpy("MainGrid.Refresh().Corner"))
+
+                            for (int _y = (int)(xy.Y - GridSquareSize); _y <= (int)(xy.Y); _y++)
                             {
-                                for (int _y = (int)(xy.Y - GridSquareSize); _y <= (int)(xy.Y); _y++)
+                                if (goal) break;
+
+                                for (int _x = (int)(xy.X - GridSquareSize); _x <= (int)(xy.X); _x++)
                                 {
                                     if (goal) break;
 
-                                    for (int _x = (int)(xy.X - GridSquareSize); _x <= (int)(xy.X); _x++)
+                                    var key = new Tuple<int, int>(_x, _y);
+
+                                    if (!goal && NodesRecorded.ContainsKey(key))
                                     {
-                                        if (goal) break;
+                                        cornerNW = NodesRecorded[key];
 
-                                        var key = new Tuple<int, int>(_x, _y);
-
-                                        if (!goal && NodesRecorded.ContainsKey(key))
+                                        key = new Tuple<int, int>((int)(_x + GridSquareSize), _y);
+                                        if (NodesRecorded.ContainsKey(key))
                                         {
-                                            cornerNW = NodesRecorded[key];
-
-                                            key = new Tuple<int, int>((int)(_x + GridSquareSize), _y);
-                                            if (NodesRecorded.ContainsKey(key))
-                                                cornerNE = NodesRecorded[key];
-
-                                            key = new Tuple<int, int>(_x, (int)(_y + GridSquareSize));
-                                            if (NodesRecorded.ContainsKey(key))
-                                                cornerSW = NodesRecorded[key];
-
-                                            key = new Tuple<int, int>((int)(_x + GridSquareSize), (int)(_y + GridSquareSize));
-                                            if (NodesRecorded.ContainsKey(key))
-                                                cornerSE = NodesRecorded[key];
-
-                                            goal = true;
-                                            break;
+                                            cornerNE = NodesRecorded[key];
+                                            cornerCount++;
                                         }
+
+                                        key = new Tuple<int, int>(_x, (int)(_y + GridSquareSize));
+                                        if (NodesRecorded.ContainsKey(key))
+                                        {
+                                            cornerSW = NodesRecorded[key];
+                                            cornerCount++;
+                                        }
+
+                                        key = new Tuple<int, int>((int)(_x + GridSquareSize), (int)(_y + GridSquareSize));
+                                        if (NodesRecorded.ContainsKey(key))
+                                        {
+                                            cornerSE = NodesRecorded[key];
+                                            cornerCount++;
+                                        }
+
+                                        goal = true;
+                                        break;
                                     }
                                 }
                             }
 
-                            using (new MemorySpy("MainGrid.Refresh().Goal"))
+                            if (goal)
                             {
-                                if (goal)
-                                {
-                                    GridNode substitue = new GridNode(new Vector3(xy.X, xy.Y, Player.Position.Z + 2));
+                                GridNode substitue = new GridNode(new Vector3(xy.X, xy.Y, Player.Position.Z + 2));
 
-                                    double kNW = cornerNW != null ? mK - cornerNW.Position.Distance2D(substitue.Position) : 0;
-                                    double kNE = cornerNE != null ? mK - cornerNE.Position.Distance2D(substitue.Position) : 0;
-                                    double kSW = cornerSW != null ? mK - cornerSW.Position.Distance2D(substitue.Position) : 0;
-                                    double kSE = cornerSE != null ? mK - cornerSE.Position.Distance2D(substitue.Position) : 0;
+                                double kNW = cornerNW != null ? cornerNW.Position.Distance2D(substitue.Position) : 0d;
+                                double kNE = cornerNE != null ? cornerNE.Position.Distance2D(substitue.Position) : 0d;
+                                double kSW = cornerSW != null ? cornerSW.Position.Distance2D(substitue.Position) : 0d;
+                                double kSE = cornerSE != null ? cornerSE.Position.Distance2D(substitue.Position) : 0d;
 
-                                    double weight = cornerNW != null ? (kNW * cornerNW.Weight) : 0;
-                                    weight += cornerNE != null ? (kNE * cornerNE.Weight) : 0;
-                                    weight += cornerSW != null ? (kSW * cornerSW.Weight) : 0;
-                                    weight += cornerSE != null ? (kSE * cornerSE.Weight) : 0;
+                                kNW = kNW > 0d ? mK - kNW : 0d;
+                                kNE = kNE > 0d ? mK - kNE : 0d;
+                                kSW = kSW > 0d ? mK - kSW : 0d;
+                                kSE = kSE > 0d ? mK - kSE : 0d;
 
-                                    weight = weight / (kNW + kNE + kSW + kSE);
+                                double div = kNW + kNE + kSW + kSE;
 
-                                    double clusterWeight = cornerNW != null ? (kNW * cornerNW.ClusterWeight) : 0;
-                                    clusterWeight += cornerNE != null ? (kNE * cornerNE.ClusterWeight) : 0;
-                                    clusterWeight += cornerSW != null ? (kSW * cornerSW.ClusterWeight) : 0;
-                                    clusterWeight += cornerSE != null ? (kSE * cornerSE.ClusterWeight) : 0;
+                                double weight = cornerNW != null ? (kNW * cornerNW.Weight) : 0d;
+                                weight += cornerNE != null ? (kNE * cornerNE.Weight) : 0d;
+                                weight += cornerSW != null ? (kSW * cornerSW.Weight) : 0d;
+                                weight += cornerSE != null ? (kSE * cornerSE.Weight) : 0d;
 
-                                    clusterWeight = clusterWeight / (kNW + kNE + kSW + kSE);
+                                weight = div != 0d ? weight / div : 0d;
 
-                                    substitue.Weight = weight;
-                                    substitue.ClusterWeight = clusterWeight;
-                                    subList.Add(substitue);
-                                }
+                                double clusterWeight = cornerNW != null ? (kNW * cornerNW.ClusterWeight) : 0d;
+                                clusterWeight += cornerNE != null ? (kNE * cornerNE.ClusterWeight) : 0d;
+                                clusterWeight += cornerSW != null ? (kSW * cornerSW.ClusterWeight) : 0d;
+                                clusterWeight += cornerSE != null ? (kSE * cornerSE.ClusterWeight) : 0d;
+
+                                clusterWeight = div != 0d ? clusterWeight / div : 0d;
+
+                                substitue.Weight = weight;
+                                substitue.ClusterWeight = clusterWeight;
+                                substitue.WeightInfos = String.Format("Fake weighted node generated with {0} corner(s), Weight={1:0} wNW={6:0}-{2:0} wNE={7:0}-{3:0} wSW={8:0}-{4:0} wSE={9:0}-{5:0}", 
+                                    cornerCount,
+                                    weight,
+                                    cornerNW != null ? cornerNW.Weight : 0,
+                                    cornerNE != null ? cornerNE.Weight : 0,
+                                    cornerSW != null ? cornerSW.Weight : 0,
+                                    cornerSE != null ? cornerSE.Weight : 0,
+                                    kNW,
+                                    kNE,
+                                    kSW,
+                                    kSE);
+
+                                subList.Add(substitue);
                             }
                         }
                     }
 
                     if (subList.Any())
                     {
-                        subList.ForEach(n => MapAsList.Add(n));
+                        subList.ForEach(n => Map.Add(n));
                     }
                 }
             }
@@ -351,7 +375,7 @@ namespace Trinity
         }
 
         // test !
-        internal static double mK = Math.Sqrt(((GridSquareSize - 1) * (GridSquareSize - 1)) + (GridSquareSize * GridSquareSize));
+        internal static double mK = GridSquareSize * GridSquareSize;
 
         internal static void ResetTickValues()
         {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Trinity.Technicals;
 using Zeta.Common;
@@ -15,10 +16,10 @@ namespace Trinity
         /// <returns></returns>
         public static Dictionary<Vector3, float> ToDictionary()
         {
-            if (!MainGrid.MapAsList.Any())
+            if (!MainGrid.Map.Any())
                 return new Dictionary<Vector3, float>();
 
-            return MainGrid.MapAsList.Select(p => new {p.Position, Weight = p.DynamicWeight}).ToDictionary(p => p.Position, p => (float) p.Weight);
+            return MainGrid.Map.Select(p => new {p.Position, Weight = p.DynamicWeight}).ToDictionary(p => p.Position, p => (float) p.Weight);
         }
 
         /// <summary>
@@ -28,66 +29,7 @@ namespace Trinity
         {
             get
             {
-                bool exist = false;
-                if (GridResults.HasTickValue_ClusterExist(out exist))
-                {
-                    return exist;
-                }
-
-                GridResults.TickValue_ClusterExist = MainGrid.MapAsList.Any(g => g.ClusterWeight > 0);
-                GridResults.IsTickRecorded_ClusterExist = true;
-
-                return GridResults.TickValue_ClusterExist;
-            }
-        }
-
-        /// <summary>
-        /// Search the grid point with higher cluster weight
-        /// </summary>
-        public static GridNode GetBestClusterNode(Vector3 loc = new Vector3(), float radius = 15f, float range = 65f, float minRange = 0f, int size = 1, bool useWeights = true, bool useDefault = true)
-        {
-            using (new MemorySpy("GridMap.GetBestClusterNode()"))
-            {
-                if (loc == new Vector3())
-                    loc = Trinity.Player.Position;
-                bool atPlayer = loc == Trinity.Player.Position;
-
-                GridNode cluster;
-                if (GridResults.HasRecordedValue_GetBestClusterNode(out cluster, range, loc))
-                {
-                    /* Keep last safe point */
-                    var point = GetPointAt(cluster.Position);
-                    if (point != null && cluster.ClusterWeight >= (point.ClusterWeight*0.9))
-                        return cluster;
-
-                    GridResults.RecordedValues_GetBestClusterNode.RemoveWhere(p => p != null && p.GridLocation != null && p.GridLocation.Equals(cluster));
-                }
-
-                if (ClusterNodeExist)
-                {
-                    cluster = (
-                        from g in MainGrid.MapAsList
-                        where
-                            g.ClusterWeight > 0 &&
-                            (atPlayer && g.Distance >= minRange ||
-                             !atPlayer && g.Position.Distance2D(loc) >= minRange) &&
-                            (atPlayer && g.Distance < range ||
-                             !atPlayer && g.Position.Distance2D(loc) < range)
-                        orderby
-                            g.ClusterWeight descending
-                        select g).ToList().FirstOrDefault();
-
-                    if (cluster != null && cluster.ClusterWeight > 0f)
-                    {
-                        GridResults.RecordedValues_GetBestClusterNode.Add(new GetBestClusterNodeResult(cluster, range, loc));
-                        return cluster;
-                    }
-                }
-
-                if (useDefault)
-                    return new GridNode(TargetUtil.GetBestClusterPoint(radius, range, size, useWeights, loc));
-
-                return null;
+                return MainGrid.Map.Any(g => g.ClusterWeight > 0);
             }
         }
 
@@ -98,15 +40,7 @@ namespace Trinity
         {
             get
             {
-                float weightAtPlayer = 0f;
-                if (GridResults.HasTickValue_GetWeightAtPlayer(out weightAtPlayer))
-                {
-                    return weightAtPlayer;
-                }
-
-                GridResults.TickValue_GetWeightAtPlayer = GetWeightAt(Trinity.Player.Position);
-
-                return GridResults.TickValue_GetWeightAtPlayer;
+                return GetWeightAt(Trinity.Player.Position);
             }
         }
 
@@ -115,34 +49,38 @@ namespace Trinity
         /// </summary>
         public static float GetWeightAt(Vector3 loc)
         {
-            if (!MainGrid.MapAsList.Any())
-                return 0f;
+            float weight = 0f;
 
-            float weightAtPoint = 0f;
-            if (GridResults.HasTickValue_GetWeightAtPoint(out weightAtPoint, loc))
+            if (MainGrid.Map.Any())
             {
-                return weightAtPoint;
+                GridNode node = GetNodeAt(loc);
+                if (node != null)
+                    weight = (float)node.Weight;
             }
 
-            GridNode gPoint = GetPointAt(loc);
-            if (gPoint != null)
-            {
-                weightAtPoint = (float) gPoint.DynamicWeight;
-                GridResults.TickValues_GetWeightAtPoint.Add(new GetWeightResult(weightAtPoint, loc));
-            }
-
-            return weightAtPoint;
+            return weight;
         }
 
         /// <summary>
         /// Search closest grid point to point
         /// </summary>
-        public static GridNode GetPointAt(Vector3 loc)
+        public static GridNode GetNodeAt(Vector3 loc)
         {
-            if (!MainGrid.MapAsList.Any())
-                return null;
+            if (MainGrid.Map.Any())
+            {
+                GridNode result;
+                if (GridResults.RecordedValues_GetNodeAt.TryGetValue(loc, out result))
+                    return result;
 
-            return MainGrid.MapAsList.OrderBy(g => g.Position.Distance2D(loc)).FirstOrDefault();
+                result = MainGrid.Map.OrderBy(g => g.Position.Distance2D(loc)).First();
+                if (result != null && result.Position != Vector3.Zero)
+                {
+                    GridResults.RecordedValues_GetNodeAt.Add(loc, result);
+                    return result;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -163,17 +101,19 @@ namespace Trinity
                 bool atPlayer = loc == Trinity.Player.Position;
 
                 GridNode result;
-                if (GridResults.HasRecordedValue_GetBestNode(out result, minRange, maxRange, loc))
+                var key = new Tuple<float, float, Vector3>(minRange, maxRange, loc);
+
+                if (GridResults.RecordedValues_GetBestSafeNode.TryGetValue(key, out result))
                 {
-                    /* Keep last safe point */
+                    /* Keep last safe node */
                     if (result.Weight >= (GetWeightAt(result.Position)*0.9))
                         return result;
 
-                    GridResults.RecordedValues_GetBestNode.RemoveWhere(p => p != null && p.GridLocation != null && p.GridLocation.Equals(result));
+                    GridResults.RecordedValues_GetBestSafeNode.Remove(key);
                 }
 
                 var results =
-                    (from p in MainGrid.MapAsList
+                    (from p in MainGrid.Map
                         where
                             (atPlayer && p.Distance >= minRange ||
                              !atPlayer && p.Position.Distance2D(loc) >= minRange) &&
@@ -194,19 +134,76 @@ namespace Trinity
                             orderby p.Weight descending
                             select p).ToList();
 
-                result = results.FirstOrDefault();
-
-                if (result != null && result.Position != Vector3.Zero && result.Position != MainGrid.LastResult.Position)
+                if (results != null && results.Count() > 0)
                 {
-                    MainGrid.LastResult = result;
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.Movement, "Best safe gPoint : Loc={0} Dist={1:1} Weight={2} Infos={3}",
-                        result.Position, result.Position.Distance2D(loc).ToString("F0"),
-                        result.Weight.ToString("F0"), result.WeightInfos
-                        );
+                    result = results.First();
+                    GridResults.RecordedValues_GetBestSafeNode.Add(key, result);
+
+                    if (result.Position != MainGrid.LastResult.Position)
+                    {
+                        MainGrid.LastResult = result;
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.Movement, "Best safe node : Loc={0} Dist={1:0} Weight={2:0} Infos={3}",
+                            result.Position, result.Position.Distance2D(loc),
+                            result.Weight, result.WeightInfos
+                            );
+                    }
                 }
 
-                GridResults.RecordedValues_GetBestNode.Add(new GetBestNodeResult(result, minRange, maxRange, loc));
                 return result;
+            }
+        }
+
+        /// <summary>
+        /// Search the grid point with higher cluster weight
+        /// </summary>
+        public static GridNode GetBestClusterNode(Vector3 loc = new Vector3(), float radius = 15f, float maxRange = 65f, float minRange = 0f, int size = 1, bool useWeights = true, bool useDefault = true)
+        {
+            using (new MemorySpy("GridMap.GetBestClusterNode()"))
+            {
+                if (loc == new Vector3())
+                    loc = Trinity.Player.Position;
+
+                bool atPlayer = loc == Trinity.Player.Position;
+
+                GridNode result;
+                var key = new Tuple<float, float, Vector3>(minRange, maxRange, loc);
+
+                if (GridResults.RecordedValues_GetBestClusterNode.TryGetValue(key, out result))
+                {
+                    /* Keep last cluster */
+                    var point = GetNodeAt(result.Position);
+                    if (point != null && result.ClusterWeight >= (point.ClusterWeight * 0.9))
+                        return result;
+
+                    GridResults.RecordedValues_GetBestClusterNode.Remove(key);
+                }
+
+                if (ClusterNodeExist)
+                {
+                    var results = (
+                        from g in MainGrid.Map
+                        where
+                            g.ClusterWeight > 0 &&
+                            (atPlayer && g.Distance >= minRange ||
+                             !atPlayer && g.Position.Distance2D(loc) >= minRange) &&
+                            (atPlayer && g.Distance < maxRange ||
+                             !atPlayer && g.Position.Distance2D(loc) < maxRange)
+                        orderby
+                            g.ClusterWeight descending
+                        select g).ToList();
+
+                    if (results != null && results.Count() > 0)
+                    {
+                        result = results.First();
+                        GridResults.RecordedValues_GetBestClusterNode.Add(key, result);
+                        return result;
+                    }
+                }
+
+                if (useDefault)
+                    return new GridNode(TargetUtil.GetBestClusterPoint(radius, maxRange, size, useWeights, loc));
+
+                return null;
             }
         }
 

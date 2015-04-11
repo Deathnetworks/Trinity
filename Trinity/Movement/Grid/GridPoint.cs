@@ -19,7 +19,8 @@ namespace Trinity
         {
             _lastTickValueDistance = -1f;
 
-            weight = 0;
+            weight = 0d;
+            weightInfos = string.Empty;
 
             /* Infos fields */
             HasAvoidanceRelated = false;
@@ -30,16 +31,16 @@ namespace Trinity
             DynamicWeightInfos = string.Empty;
 
             /* Special weight */
-            ClusterWeight = 0;
+            ClusterWeight = 0f;
             ClusterWeightInfos = string.Empty;
 
-            MonsterWeight = 0;
+            MonsterWeight = 0f;
             MonsterWeightInfos = string.Empty;
 
-            TargetWeight = 0;
+            TargetWeight = 0f;
             TargetWeightInfos = string.Empty;
 
-            SpecialWeight = 0;
+            SpecialWeight = 0f;
             SpecialCount = 0;
         }
 
@@ -63,6 +64,10 @@ namespace Trinity
             }
         }
 
+        /* Does not set by grid generation, can be used for other thing */
+        public double SpecialWeight = 0f;
+        public int SpecialCount = 0;
+
         /* Infos fields */
         public bool HasAvoidanceRelated = false;
         public bool HasMonsterRelated = false;
@@ -73,36 +78,32 @@ namespace Trinity
         public Dictionary<int, DynamicWeight> LastMonsterWeightValues = new Dictionary<int, DynamicWeight>();
         public Dictionary<int, DynamicWeight> LastTargetWeightValues = new Dictionary<int, DynamicWeight>();
 
-        public double DynamicWeight = 0;
+        public double DynamicWeight = 0f;
         public string DynamicWeightInfos = string.Empty;
 
-        public double UnchangeableWeight = 0;
+        public double UnchangeableWeight = 0f;
         public string UnchangeableWeightInfos = string.Empty;
 
-        /* Does not set by grid generation, can be used for other thing */
-        public double SpecialWeight = 0;
-        public int SpecialCount = 0;
-
-        public double ClusterWeight = 0;
+        public double ClusterWeight = 0f;
         public string ClusterWeightInfos = string.Empty;
 
-        public double MonsterWeight = 0;
+        public double MonsterWeight = 0f;
         public string MonsterWeightInfos = string.Empty;
 
-        public double TargetWeight = 0;
+        public double TargetWeight = 0f;
         public string TargetWeightInfos = string.Empty;
 
-        private double weight = 0;
+        private double weight = 0d;
         public double Weight
         {
             get
             {
                 using (new MemorySpy("GridNode.Weight"))
                 {
-                    if (weight != 0)
+                    if (weight != 0d)
                         return weight;
 
-                    if (Distance >= MainGrid.GridRange)
+                    if (Distance > MainGrid.GridRange)
                         return UnchangeableWeight;
 
                     double w = DynamicWeight + UnchangeableWeight;
@@ -119,13 +120,17 @@ namespace Trinity
             set { weight = value; }
         }
 
+        private string weightInfos = string.Empty;
         public string WeightInfos
         {
             get
             {
                 using (new MemorySpy("GridNode.WeightInfos"))
                 {
-                    if (Distance >= MainGrid.GridRange)
+                    if (weightInfos != string.Empty)
+                        return weightInfos;
+
+                    if (Distance > MainGrid.GridRange)
                         return UnchangeableWeightInfos;
 
                     string wi = DynamicWeightInfos + UnchangeableWeightInfos;
@@ -139,75 +144,73 @@ namespace Trinity
                     return wi;
                 }
             }
+            set { weightInfos = value; }
         }
 
         public void OperateWeight(WeightType type, string weightInfos, float weight, int saveAsKey = 0, int _keepDuringLoop = 5)
         {
-            //using (new MemorySpy("GridNode.OperateWeight()"))
-            //{
-                switch (type)
+            switch (type)
+            {
+                case WeightType.Target:
                 {
-                    case WeightType.Target:
+                    if (weight != 0)
                     {
-                        if (weight != 0)
-                        {
-                            TargetWeight += weight;
-                            TargetWeightInfos += " " + weightInfos + "(" + weight.ToString("F0") + ")";
-                        }
+                        TargetWeight += weight;
+                        TargetWeightInfos += " " + weightInfos + "(" + weight.ToString("F0") + ")";
+                    }
 
-                        if (saveAsKey != 0 && !LastTargetWeightValues.ContainsKey(saveAsKey))
-                            LastTargetWeightValues.Add(saveAsKey, new DynamicWeight(weight, weightInfos, _keepDuringLoop));
-                    }
-                        break;
-                    case WeightType.Cluster:
-                    {
-                        if (weight != 0)
-                        {
-                            ClusterWeight += weight;
-                            ClusterWeightInfos += " " + weightInfos + "(" + weight.ToString("F0") + ")";
-                        }
-
-                        if (saveAsKey != 0 && !LastClusterWeightValues.ContainsKey(saveAsKey))
-                            LastClusterWeightValues.Add(saveAsKey, new DynamicWeight(weight, weightInfos, _keepDuringLoop));
-                    }
-                        break;
-                    case WeightType.Monster:
-                    {
-                        if (weight != 0)
-                        {
-                            MonsterWeight += weight;
-                            MonsterWeightInfos += " " + weightInfos + "(" + weight.ToString("F0") + ")";
-                        }
-
-                        if (saveAsKey != 0 && !LastMonsterWeightValues.ContainsKey(saveAsKey))
-                            LastMonsterWeightValues.Add(saveAsKey, new DynamicWeight(weight, weightInfos, _keepDuringLoop));
-                    }
-                        break;
-                    case WeightType.Unchangeable:
-                    {
-                        if (weight != 0)
-                        {
-                            UnchangeableWeight += weight;
-                            UnchangeableWeightInfos += " " + weightInfos + "(" + weight.ToString("F0") + ")";
-                        }
-                    }
-                        break;
-                    case WeightType.Dynamic:
-                    {
-                        if (weight != 0)
-                        {
-                            DynamicWeight += weight;
-                            DynamicWeightInfos += " " + weightInfos + "(" + weight.ToString("F0") + ")";
-                        }
-
-                        if (saveAsKey != 0 && !LastDynamicWeightValues.ContainsKey(saveAsKey))
-                            LastDynamicWeightValues.Add(saveAsKey, new DynamicWeight(weight, weightInfos, _keepDuringLoop));
-                    }
-                        break;
-                    default:
-                        break;
+                    if (saveAsKey != 0 && !LastTargetWeightValues.ContainsKey(saveAsKey))
+                        LastTargetWeightValues.Add(saveAsKey, new DynamicWeight(weight, weightInfos, _keepDuringLoop));
                 }
-            //}
+                    break;
+                case WeightType.Cluster:
+                {
+                    if (weight != 0)
+                    {
+                        ClusterWeight += weight;
+                        ClusterWeightInfos += " " + weightInfos + "(" + weight.ToString("F0") + ")";
+                    }
+
+                    if (saveAsKey != 0 && !LastClusterWeightValues.ContainsKey(saveAsKey))
+                        LastClusterWeightValues.Add(saveAsKey, new DynamicWeight(weight, weightInfos, _keepDuringLoop));
+                }
+                    break;
+                case WeightType.Monster:
+                {
+                    if (weight != 0)
+                    {
+                        MonsterWeight += weight;
+                        MonsterWeightInfos += " " + weightInfos + "(" + weight.ToString("F0") + ")";
+                    }
+
+                    if (saveAsKey != 0 && !LastMonsterWeightValues.ContainsKey(saveAsKey))
+                        LastMonsterWeightValues.Add(saveAsKey, new DynamicWeight(weight, weightInfos, _keepDuringLoop));
+                }
+                    break;
+                case WeightType.Unchangeable:
+                {
+                    if (weight != 0)
+                    {
+                        UnchangeableWeight += weight;
+                        UnchangeableWeightInfos += " " + weightInfos + "(" + weight.ToString("F0") + ")";
+                    }
+                }
+                    break;
+                case WeightType.Dynamic:
+                {
+                    if (weight != 0)
+                    {
+                        DynamicWeight += weight;
+                        DynamicWeightInfos += " " + weightInfos + "(" + weight.ToString("F0") + ")";
+                    }
+
+                    if (saveAsKey != 0 && !LastDynamicWeightValues.ContainsKey(saveAsKey))
+                        LastDynamicWeightValues.Add(saveAsKey, new DynamicWeight(weight, weightInfos, _keepDuringLoop));
+                }
+                    break;
+                default:
+                    break;
+            }
         }
 
         public int NearbyGridPointsCount = -1;
@@ -219,7 +222,7 @@ namespace Trinity
             {
                 int _count = 0;
                 int _nodesCount = 0;
-                foreach (var _i in MainGrid.MapAsList)
+                foreach (var _i in MainGrid.Map)
                 {
                     if (_count >= 10)
                         break;
@@ -519,7 +522,7 @@ namespace Trinity
                             }
 
                             float _clusterWeight = 0f;
-                            if (!HasAvoidanceRelated && _dstFromObj <= Trinity.Settings.Combat.Misc.TrashPackClusterRadius && o.IsTrashPackOrBossEliteRareUnique)
+                            if (!HasAvoidanceRelated && _dstFromObj <= Trinity.Settings.Combat.Misc.TrashPackClusterRadius && o.IsTrashPackOrBossEliteRareUnique && o.IsInLineOfSight)
                             {
                                 _clusterWeight = (float) (((Trinity.Settings.Combat.Misc.TrashPackClusterRadius - _dstFromObj)*Trinity.Settings.Combat.Misc.TrashPackClusterRadius) + o.Radius + ((o.Weight*100)/50000))*o.NearbyUnits*10f;
                                 OperateWeight(WeightType.Cluster, "Clustering", _clusterWeight, o.RActorGuid + (int) o.Position.X + (int) o.Position.Y, 3);
