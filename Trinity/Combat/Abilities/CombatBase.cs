@@ -101,7 +101,7 @@ namespace Trinity.Combat.Abilities
                 }
 
                 //powerResultInfo += String.Format(" T1={0} T2={1}", DateTime.UtcNow.Subtract(LastPrimaryUseTime).TotalMilliseconds, DateTime.UtcNow.Subtract(LastCostSkillUseTime).TotalMilliseconds);
-                Logger.Log(TrinityLogLevel.Error, LogCategory.Targetting, "Used Power {0} " + powerResultInfo, _power.SNOPower);
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Used Power {0} " + powerResultInfo, _power.SNOPower);
 
                 return true;
             }
