@@ -759,29 +759,27 @@ namespace Trinity
                     var legendaryPotions = CacheData.Inventory.Backpack.Where(i => i.InternalName.ToLower()
                         .Contains("healthpotion_legendary_")).ToList();
 
-                    var regularPotions = CacheData.Inventory.Backpack.Where(i => i.InternalName.ToLower()
-                        .Contains("healthpotion_") && !i.InternalName.ToLower().Contains("legendary")).ToList();
-
 
                     int dynamicId;
                     if (legendaryPotions.Any())
                     {
-                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Legendary Potion", 0);
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Using Legendary Potion", 0);
                         dynamicId = legendaryPotions.FirstOrDefault().DynamicId;
                         ZetaDia.Me.Inventory.UseItem(dynamicId);
                         SpellHistory.RecordSpell(new TrinityPower(SNOPower.DrinkHealthPotion));
                         return true;
                     }
-                    if (regularPotions.Any())
+
+                    ACDItem potion = ZetaDia.Me.Inventory.BaseHealthPotion;
+                    if (potion != null)
                     {
-                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Potion", 0);
-                        dynamicId = regularPotions.FirstOrDefault().DynamicId;
-                        ZetaDia.Me.Inventory.UseItem(dynamicId);
-                        SpellHistory.RecordSpell(new TrinityPower(SNOPower.DrinkHealthPotion));
+                        int id = potion.DynamicId;
+                        ZetaDia.Me.Inventory.UseItem(id);
+
                         return true;
                     }
 
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "No Available potions!", 0);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "No Available potions!", 0);
                 }
                 return false;
             }
