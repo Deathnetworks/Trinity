@@ -400,7 +400,7 @@ namespace Trinity.Combat
             private static bool _isMoving;
             private static Vector3 _lastPosition = Vector3.Zero;
             public static float ChangeInDistance { get; set; }
-            private const int MaxPossibleDistanceTravelled = 1;
+            private const int MaxPossibleDistanceTravelled = 2;
             static readonly Stopwatch StuckTime = new Stopwatch();
             private static string _log;
 
