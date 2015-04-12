@@ -151,50 +151,50 @@ namespace Trinity
         /// <returns></returns>
         private static RunStatus GetRunStatus(string post, RunStatus status)
         {
-            Logger.Log(TrinityLogLevel.Info, LogCategory.Targetting, "| HandleTarget returning {0} reason:{1}", status, post);
+            Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "| HandleTarget returning {0} reason:{1}", status, post);
 
             if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Targetting))
             {
                 if (CurrentTarget != null)
                 {
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.Targetting,
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting,
                         "| =>   CurrentTarget  : {0}",
                         CurrentTarget.Infos);
                 }
 
                 if (!CombatBase.IsNull(CombatBase.CurrentPower))
                 {
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.Targetting,
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting,
                         "| =>   CurrentPower   : {0}", CombatBase.CurrentPower.SNOPower + " InRange:" + CurrentTargetIsInRange + " Dist:" + TargetCurrentDistance);
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.Targetting,
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting,
                         "| =>   MCD:{0} TCD{1} TCDi:{2} CPTP:{3} CPMP:{4} ACD:{5}",
                         MoveCurrentDestination, TargetCurrentDestination, TargetCurrentDistance, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.MovePosition, CombatBase.CurrentPower.TargetACDGUID);
                 }
 
                 if (CombatBase.QueuedMovement.IsQueuedMovement)
                 {
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.Targetting,
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting,
                         "| =>   QueuedMovement : {0}",
                         "Type: " + CombatBase.QueuedMovement.CurrentMovement.Options.Type + " Infos: " + CombatBase.QueuedMovement.CurrentMovement.Infos);
                 }
 
                 if (ObjectCache != null)
                 {
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.Targetting,
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting,
                         "| =>   ObjectCache    : {0}",
                         ObjectCache.Count().ToString() + " objects");
                 }
 
                 if (MainGrid.Map.Any() && GridMap.GetBestClusterNode() != null)
                 {
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.Targetting,
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting,
                         "| =>   ClusterNode    : {0}",
                         GridMap.GetBestClusterNode().ClusterWeightInfos + " Dist:" + GridMap.GetBestClusterNode().Distance);
                 }
 
                 if (MainGrid.Map.Any() && GridMap.GetBestMoveNode() != null)
                 {
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.Targetting,
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting,
                         "| =>   MoveNode       : {0}",
                         GridMap.GetBestMoveNode().WeightInfos + " Dist:" + GridMap.GetBestMoveNode().Distance);
                 }
