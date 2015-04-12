@@ -9,6 +9,7 @@ using Trinity.Helpers;
 using Trinity.Technicals;
 using Zeta.Bot.Logic;
 using Zeta.Game;
+using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 using Logger = Trinity.Technicals.Logger;
@@ -215,6 +216,15 @@ namespace Trinity
                 RefreshAffixes();
                 if (c_MonsterAffixes.HasFlag(MonsterAffixes.Shielding))
                     c_unit_HasShieldAffix = true;
+
+                if (c_IsEliteRareUnique && ZetaDia.CurrentQuest.QuestSNO == 337492 && ZetaDia.CurrentQuest.StepId == 16)
+                {
+                    c_CacheObject.IsBoss = true;
+                }
+                else if (c_IsEliteRareUnique && testHasBossMarker)
+                {
+                    c_CacheObject.IsBoss = testHasBossMarker;
+                }
             }
 
             using (new MemorySpy("RefreshUnit().CheckMonsterSize"))
