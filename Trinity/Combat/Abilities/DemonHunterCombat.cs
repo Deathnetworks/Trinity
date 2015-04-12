@@ -371,7 +371,7 @@ namespace Trinity.Combat.Abilities
             if (SentryCastArea != null && CanCast(SNOPower.DemonHunter_Sentry, CanCastFlags.NoTimer) && Trinity.PlayerOwnedDHSentryCount < MaxSentryCount)
             {
                 Vector3 zeiOfStoneNewTarget = MathEx.CalculatePointFrom(Player.Position, SentryCastArea.Position, 51f);
-                if (ZeisOfStoneIsEquipped && !Runes.DemonHunter.PolarStation.IsActive && zeiOfStoneNewTarget.Distance2D(LastZeiOfStoneLocation) >= 25f &&
+                if (IsZeisOfStoneEquipped && !Runes.DemonHunter.PolarStation.IsActive && zeiOfStoneNewTarget.Distance2D(LastZeiOfStoneLocation) >= 25f &&
                     SentryCastArea.Units.OrderByDescending(u => u.Distance).FirstOrDefault().IsInLineOfSightOfPoint(zeiOfStoneNewTarget))
                 {
                     LastZeiOfStoneLocation = zeiOfStoneNewTarget;
@@ -614,7 +614,7 @@ namespace Trinity.Combat.Abilities
                 Vector3 zeiOfStoneNewTarget = MathEx.CalculatePointFrom(Player.Position, SentryCastArea.Position, 51f);
                 if (AreaHasCastCriteria(SentryCastArea, true))
                 {
-                    if (ZeisOfStoneIsEquipped && !Runes.DemonHunter.PolarStation.IsActive && zeiOfStoneNewTarget.Distance2D(LastZeiOfStoneLocation) >= 25f &&
+                    if (IsZeisOfStoneEquipped && !Runes.DemonHunter.PolarStation.IsActive && zeiOfStoneNewTarget.Distance2D(LastZeiOfStoneLocation) >= 25f &&
                         SentryCastArea.Units.OrderByDescending(u => u.Distance).FirstOrDefault().IsInLineOfSightOfPoint(zeiOfStoneNewTarget))
                     {
                         if (!Skills.DemonHunter.Sentry.Cast(zeiOfStoneNewTarget))
@@ -630,7 +630,7 @@ namespace Trinity.Combat.Abilities
                 }
                 else if (SentryCastArea != null && SentryCastArea.Position != Vector3.Zero)
                 {
-                    if (ZeisOfStoneIsEquipped && !Runes.DemonHunter.PolarStation.IsActive && zeiOfStoneNewTarget.Distance2D(LastZeiOfStoneLocation) >= 25f &&
+                    if (IsZeisOfStoneEquipped && !Runes.DemonHunter.PolarStation.IsActive && zeiOfStoneNewTarget.Distance2D(LastZeiOfStoneLocation) >= 25f &&
                         SentryCastArea.Units.OrderByDescending(u => u.Distance).FirstOrDefault().IsInLineOfSightOfPoint(zeiOfStoneNewTarget))
                     {
                         LastZeiOfStoneLocation = zeiOfStoneNewTarget;
@@ -716,36 +716,7 @@ namespace Trinity.Combat.Abilities
         {
             _SentryCastArea = null;
             _SentryCastSkillsCastArea = null;
-            _ZeisOfStoneChecked = false;
             _RangedAttackRange = -1f;
-        }
-
-        private static bool _ZeisOfStoneChecked { get; set; }
-        private static bool _ZeisOfStoneIsEquipped { get; set; }
-        private static bool ZeisOfStoneIsEquipped
-        {
-            get
-            {
-                try
-                {
-                    if (_ZeisOfStoneChecked)
-                        return _ZeisOfStoneIsEquipped;
-
-                    _ZeisOfStoneChecked = true;
-                    _ZeisOfStoneIsEquipped = ZetaDia.Actors.GetActorsOfType<ACDItem>().Any(item =>
-                        item != null && item.IsValid &&
-                        item.ItemType == ItemType.LegendaryGem &&
-                        item.ActorSNO == 405801 &&
-                        item.InventorySlot == (InventorySlot)20);
-
-                    return _ZeisOfStoneIsEquipped;
-                }
-                catch
-                {
-                    _ZeisOfStoneChecked = true;
-                    return false;
-                }
-            }
         }
 
         private static TargetArea _SentryCastArea { get; set; }
