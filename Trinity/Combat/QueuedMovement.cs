@@ -230,7 +230,7 @@ namespace Trinity.Combat
 
                 Vector3 _destination = CurrentMovement.Destination;
 
-                _status.DistanceToObjective = ZetaDia.Me.Position.Distance(_destination);
+                _status.DistanceToObjective = Trinity.Player.Position.Distance(_destination);
 
                 if (_status.DistanceToObjective < _options.AcceptableDistance)
                 {
@@ -245,7 +245,7 @@ namespace Trinity.Combat
                 }
 
                 _status.ChangeInDistance = _status.LastPosition.Distance(_destination) - _status.DistanceToObjective;
-                _status.LastPosition = ZetaDia.Me.Position;
+                _status.LastPosition = Trinity.Player.Position;
 
                 bool _straightLinePathing = DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) ||
                     _destination.Distance2DSqr(Trinity.Player.Position) <= 10f * 10f ||
@@ -352,7 +352,7 @@ namespace Trinity.Combat
                 LogLocation("Queueing", movement);
 
             CurrentMovement = _internalQueue.Dequeue();
-            CurrentMovement.StartPosition = ZetaDia.Me.Position;
+            CurrentMovement.StartPosition = Trinity.Player.Position;
             CurrentMovement.LastStartedTime = DateTime.UtcNow;
             Stuck.Reset();
         }
@@ -364,7 +364,7 @@ namespace Trinity.Combat
                 movement.Destination.X,
                 movement.Destination.Y,
                 movement.Destination.Z,
-                ZetaDia.Me.Position.Distance(movement.Destination),
+                Trinity.Player.Position.Distance(movement.Destination),
                 post);
         }
 
@@ -406,8 +406,8 @@ namespace Trinity.Combat
 
             private static void Pulse()
             {
-                ChangeInDistance = _lastPosition.Distance(ZetaDia.Me.Position);
-                _lastPosition = ZetaDia.Me.Position;
+                ChangeInDistance = _lastPosition.Distance(Trinity.Player.Position);
+                _lastPosition = Trinity.Player.Position;
                 IsStuck();
             }
 

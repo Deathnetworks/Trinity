@@ -17,7 +17,7 @@ namespace Trinity.Helpers
         {
             _frameLockRelease = ZetaDia.Memory.ReleaseFrame(true);
 
-            if (ZetaDia.Service.IsInGame)
+            if (Trinity.Player.IsInGame)
             {
                 ZetaDia.Actors.Update();
                 _externalReadCache = ZetaDia.Memory.SaveCacheState();

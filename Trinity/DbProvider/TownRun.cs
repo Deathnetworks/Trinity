@@ -99,7 +99,7 @@ namespace Trinity.DbProvider
             {
                 using (new PerformanceLogger("TownRunOverlord"))
                 {
-                    if (ZetaDia.Me == null || !ZetaDia.Me.IsValid)
+                    if (!Trinity.Player.IsValid)
                         return false;
 
                     Trinity.WantToTownRun = false;
@@ -146,7 +146,7 @@ namespace Trinity.DbProvider
                                 SetPreTownRunPosition();
                             }
                         }
-                        if (ZetaDia.Me.IsValid)
+                        if (Trinity.Player.IsValid)
                         {
                             List<ACDItem> equippedItems = ZetaDia.Me.Inventory.Equipped.Where(i => i.DurabilityMax > 0 && i.DurabilityCurrent != i.DurabilityMax).ToList();
                             if (equippedItems.Any())

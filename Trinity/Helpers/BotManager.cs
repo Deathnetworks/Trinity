@@ -63,7 +63,7 @@ namespace Trinity.Helpers
         private static async Task<bool> MainCombatTask()
         {
             // If we aren't in the game or a world is loading, don't do anything yet
-            if (!ZetaDia.IsInGame || ZetaDia.IsLoadingWorld || !ZetaDia.Me.IsValid)
+            if (!Trinity.Player.IsInGame || Trinity.Player.IsLoadingWorld || !Trinity.Player.IsValid)
             {
                 Logger.LogDebug(LogCategory.GlobalHandler, "Not in game, IsLoadingWorld, or Me is Invalid");
                 return true;

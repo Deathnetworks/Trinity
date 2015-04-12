@@ -22,10 +22,10 @@ namespace Trinity.DbProvider
 
         public static RunStatus TrinityDeathSafetyCheck()
         {
-            if (!ZetaDia.Me.IsDead)
+            if (!Trinity.Player.IsDead)
                 return RunStatus.Failure;
 
-            if (ZetaDia.IsInTown)
+            if (Trinity.Player.IsInTown)
                 return RunStatus.Failure;
 
             // Items with "Ignore Durability Loss" should not be considered, or if all items are at 100%

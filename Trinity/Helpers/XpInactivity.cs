@@ -47,13 +47,13 @@ namespace Trinity.Helpers
             }
             try
             {
-                if (!ZetaDia.IsInGame)
+                if (!Trinity.Player.IsInGame)
                 {
                     Logger.Log("Not in game, XP inactivity reset", 0);
                     ResetCheckXp(); //If not in game, reset the timer
                     return false;
                 }
-                if (ZetaDia.IsLoadingWorld)
+                if (Trinity.Player.IsLoadingWorld)
                 {
                     Logger.Log("Loading world, XP inactivity reset");
                     return false;
@@ -75,9 +75,9 @@ namespace Trinity.Helpers
 
                 Int64 exp;
                 if (Trinity.Player.Level < 60)
-                    exp = ZetaDia.Me.CurrentExperience;
+                    exp = Trinity.Player.CurrentExperience;
                 else
-                    exp = ZetaDia.Me.ParagonCurrentExperience;
+                    exp = Trinity.Player.ParagonCurrentExperience;
 
                 if (exp != _lastXpAmount && exp != 0)
                 {

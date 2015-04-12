@@ -46,16 +46,16 @@ namespace Trinity
             if (Tick > 10) Tick = 0;
             Tick++;
 
-            if (!ZetaDia.IsInGame)
+            if (!Player.IsInGame)
                 return false;
 
-            if (ZetaDia.IsLoadingWorld)
+            if (Player.IsLoadingWorld)
                 return false;
 
-            if (!ZetaDia.Me.IsValid)
+            if (!Player.IsValid)
                 return false;
 
-            if (!ZetaDia.Me.CommonData.IsValid)
+            if (!Player.CommonData.IsValid)
                 return false;
 
             if (Player.CurrentHealthPct <= 0)

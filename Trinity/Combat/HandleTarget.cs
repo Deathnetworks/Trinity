@@ -31,26 +31,17 @@ namespace Trinity
             {
                 try
                 {
-                    if (ZetaDia.Service.Hero == null)
-                        return GetRunStatus("HeroNull", RunStatus.Failure);
-
-                    if (!ZetaDia.Service.Hero.IsValid)
-                        return GetRunStatus("HeroInvalid", RunStatus.Failure);
-
-                    if (!ZetaDia.IsInGame)
+                    if (!Player.IsInGame)
                         return GetRunStatus("NotInGame", RunStatus.Failure);
 
-                    if (ZetaDia.IsLoadingWorld)
+                    if (Player.IsLoadingWorld)
                         return GetRunStatus("LoadingWorld", RunStatus.Failure);
 
-                    if (!ZetaDia.Me.IsValid)
+                    if (!Player.IsValid)
                         return GetRunStatus("MeInvalid", RunStatus.Failure);
 
-                    if (!ZetaDia.Me.CommonData.IsValid)
+                    if (!Player.CommonData.IsValid)
                         return GetRunStatus("CDInvalid", RunStatus.Failure);
-
-                    if (!Player.IsValid)
-                        return GetRunStatus("NotInGameWorld", RunStatus.Failure);
 
                     if (Player.IsDead)
                         return GetRunStatus("HeroIsDead", RunStatus.Failure);
@@ -776,6 +767,7 @@ namespace Trinity
                         int id = potion.DynamicId;
                         ZetaDia.Me.Inventory.UseItem(id);
 
+                        SpellHistory.RecordSpell(new TrinityPower(SNOPower.DrinkHealthPotion));
                         return true;
                     }
 
@@ -1065,7 +1057,7 @@ namespace Trinity
                             m.Destination == Vector3.Zero ||
                             m.Destination.Distance2D(Trinity.Player.Position) <= 1f ||
                             CurrentTarget == null ||
-                            CombatBase.IsNull(CombatBase.CurrentPower) || CurrentTarget == null || CurrentTarget.IsAvoidance ||
+                            CombatBase.IsNull(CombatBase.CurrentPower) || CurrentTarget.IsAvoidance ||
                             !CurrentTarget.IsUnit || (CurrentTarget.IsUnit && !CurrentTargetIsInRange)
                         ,
                         Options = new QueuedMovementOptions

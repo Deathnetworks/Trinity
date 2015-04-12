@@ -216,7 +216,7 @@ namespace Trinity
         /// <returns></returns>
         public static bool SafeClickElement(UIElement element, string name = "", bool fireWorldTransfer = false)
         {
-            if (!ZetaDia.Me.IsValid)
+            if (!Trinity.Player.IsValid)
                 return false;
             if (!IsElementVisible(element))
                 return false;
@@ -231,26 +231,26 @@ namespace Trinity
         private static DateTime _lastCheckedUiButtons = DateTime.MinValue;
         public static void SafeClickUIButtons()
         {
-            if (ZetaDia.IsLoadingWorld)
+            if (Trinity.Player.IsLoadingWorld)
                 return;
 
             // These buttons should be clicked with no delay
 
             if (SafeClickElement(PatchOKButton, "Patch Update OK Button"))
                 return;
-            if (ZetaDia.IsInGame && SafeClickElement(BountyRewardDialog, "Bounty Reward Dialog"))
+            if (Trinity.Player.IsInGame && SafeClickElement(BountyRewardDialog, "Bounty Reward Dialog"))
                 return;
-            if (ZetaDia.IsInGame && SafeClickElement(ConversationSkipButton, "Conversation Button"))
+            if (Trinity.Player.IsInGame && SafeClickElement(ConversationSkipButton, "Conversation Button"))
                 return;
-            if (ZetaDia.IsInGame && SafeClickElement(PartyLeaderBossAccept, "Party Leader Boss Accept", true))
+            if (Trinity.Player.IsInGame && SafeClickElement(PartyLeaderBossAccept, "Party Leader Boss Accept", true))
                 return;
-            if (ZetaDia.IsInGame && SafeClickElement(PartyFollowerBossAccept, "Party Follower Boss Accept", true))
+            if (Trinity.Player.IsInGame && SafeClickElement(PartyFollowerBossAccept, "Party Follower Boss Accept", true))
                 return;
-            if (ZetaDia.IsInGame && SafeClickElement(TalktoInteractButton1, "Conversation Button"))
+            if (Trinity.Player.IsInGame && SafeClickElement(TalktoInteractButton1, "Conversation Button"))
                 return;
             if (DateTime.UtcNow.Subtract(_lastCheckedUiButtons).TotalMilliseconds <= 500)
                 return;
-            if (ZetaDia.IsInGame && SafeClickElement(JoinRiftButton, "Join Rift Accept Button", true))
+            if (Trinity.Player.IsInGame && SafeClickElement(JoinRiftButton, "Join Rift Accept Button", true))
                 return;
 
             _lastCheckedUiButtons = DateTime.UtcNow;

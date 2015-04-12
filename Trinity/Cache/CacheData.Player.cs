@@ -21,7 +21,7 @@ namespace Trinity
         {
             static PlayerCache()
             {
-                Pulsator.OnPulse += (sender, args) => Instance.UpdatePlayerCache();            
+                Pulsator.OnPulse += (sender, args) => Instance.UpdatePlayerCache();
             }
 
             public PlayerCache()
@@ -103,6 +103,8 @@ namespace Trinity
             public bool TryToAvoidProjectile { get; set; }
             public bool AvoidDeath { get; set; }
             public bool NeedToKite { get; set; }
+
+            public bool IsFullyValid { get { return IsValid && CommonData.IsValid && IsInGame && !IsLoadingWorld && !IsDead; } }
 
             public bool HasDebuff(SNOPower debuffSNO)
             {

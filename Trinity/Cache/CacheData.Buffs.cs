@@ -79,9 +79,7 @@ namespace Trinity
 
             public void UpdateBuffsCache()
             {
-                if (ZetaDia.Me == null)
-                    return;
-                if (!ZetaDia.Me.IsFullyValid())
+                if (!Player.IsFullyValid)
                     return;
 
                 using (new PerformanceLogger("UpdateCachedBuffsData"))
