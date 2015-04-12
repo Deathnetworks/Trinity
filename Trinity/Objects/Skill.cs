@@ -178,6 +178,14 @@ namespace Trinity.Objects
         }
 
         /// <summary>
+        /// Gets the current skill charge count
+        /// </summary>
+        public int Charges
+        {
+            get { return CombatBase.GetSkillCharges(SNOPower); }
+        }
+
+        /// <summary>
         /// The currently selected rune for this skill.        
         /// </summary>
         public Rune CurrentRune
