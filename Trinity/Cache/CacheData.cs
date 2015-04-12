@@ -251,15 +251,8 @@ namespace Trinity
             UnSafeZones.Clear();
             SentryTurret.Clear();
             Voodoo.Clear();
-
-            /* Every 3 ticks */
-            if (Tick % 3 == 0)
-            {
-                NearbyUnitsRecorded.Clear();
-                NearbyUnitsWithinDistanceRecorded.Clear();
-
-                //RayCastResultsFromObjects.Clear();
-            }
+            NearbyUnitsRecorded.Clear();
+            NearbyUnitsWithinDistanceRecorded.Clear();
 
             /* Every 10 ticks */
             if (Tick % 10 == 0)

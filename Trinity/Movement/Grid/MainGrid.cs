@@ -79,7 +79,7 @@ namespace Trinity
         public static GridNode LastResult = new GridNode();
 
         public const int GridRange = 70;
-        public const int GridSquareSize = 5;
+        public const int GridSquareSize = 6;
         public const float BaseWeight = GridRange + 10f;
 
         #endregion
