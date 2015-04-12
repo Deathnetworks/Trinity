@@ -699,16 +699,30 @@ namespace Trinity.DbProvider
 
         private static TrinityCacheObject CurrentTarget { get { return Trinity.CurrentTarget; } }
 
+        private static Vector3 LastNavigateToTarget = Vector3.Zero;
+        private static DateTime LastNavigateToResult = DateTime.MinValue;
         internal static MoveResult NavigateTo(Vector3 destination, string destinationName = "")
         {
             using (new MemorySpy("PlayerMover.NavigateTo()"))
             {
                 PositionCache.AddPosition();
                 MoveResult result;
-
                 LastMoveToTarget = destination;
 
-                if (UsedSpecialMovement(destination))
+                if (NavHelper.CanRayCast(destination))
+                {
+                    Navigator.PlayerMover.MoveTowards(destination);
+                    return MoveResult.Moved;
+                }
+
+                if (LastNavigateToTarget != destination && LastNavigateToTarget.Distance2D(destination) >= 3f)
+                {
+                    Navigator.Clear();
+                    LastNavigateToResult = DateTime.MinValue;
+                    LastNavigateToTarget = destination;
+                }
+
+                if (DateTime.UtcNow.Subtract(LastNavigateToResult).TotalMilliseconds < 250)
                     return MoveResult.Moved;
 
                 try
@@ -716,7 +730,7 @@ namespace Trinity.DbProvider
                     Stopwatch t1 = new Stopwatch();
                     t1.Start();
 
-                    result = Navigator.MoveTo(destination, destinationName, false);
+                    result = Navigator.MoveTo(LastNavigateToTarget, destinationName, false);
 
                     t1.Stop();
 
@@ -726,7 +740,7 @@ namespace Trinity.DbProvider
                     string pathCheck = "";
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Navigator) && t1.ElapsedMilliseconds > maxTime)
                     {
-                        if (Navigator.GetNavigationProviderAs<DefaultNavigationProvider>().CanFullyClientPathTo(destination))
+                        if (Navigator.GetNavigationProviderAs<DefaultNavigationProvider>().CanFullyClientPathTo(LastNavigateToTarget))
                             pathCheck = "CanFullyPath";
                         else
                             pathCheck = "CannotFullyPath";
@@ -739,7 +753,7 @@ namespace Trinity.DbProvider
                         lc = LogCategory.Navigator;
 
                     Logger.Log(TrinityLogLevel.Verbose, lc, "{0} in {1:0}ms {2} dist={3:0} {4}",
-                        result, t1.ElapsedMilliseconds, destinationName, destination.Distance2D(Trinity.Player.Position), pathCheck);
+                        result, t1.ElapsedMilliseconds, destinationName, LastNavigateToTarget.Distance2D(Trinity.Player.Position), pathCheck);
                 }
                 catch (OutOfMemoryException)
                 {
@@ -751,6 +765,8 @@ namespace Trinity.DbProvider
                     Logger.Log("{0}", ex);
                     return MoveResult.Failed;
                 }
+
+                LastNavigateToResult = DateTime.UtcNow;
                 return result;
             }
         }
