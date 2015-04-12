@@ -173,7 +173,7 @@ namespace Trinity
             if (CurrentTarget != null)
                 return CurrentTarget;
 
-            return GetBestClusterObject(15f);
+            return GetBestClusterObject(15f, _range);
         }
 
         private static Vector3 GetBestAoEMovementPosition()
@@ -868,21 +868,27 @@ namespace Trinity
                     !u.HasDebuff(SNOPower.Monk_ExplodingPalm) &&
                     u.IsInLineOfSight &&
                     u.IsTrashPackOrBossEliteRareUnique
-                orderby
-                    u.HitPointsPct,
-                    u.NearbyUnitsWithinDistance(16f) descending
                 select u).ToList();
 
-            /*if (Passives.Monk.Momentum.IsActive && Skills.Monk.DashingStrike.CanCast())
+            if (_range <= 15f)
             {
                 _results = (
-                from u in _results
-                orderby
-                    u.HitPointsPct,
-                    u.NearbyUnitsWithinDistance(15f) descending,
-                    u.Distance descending
-                select u).ToList();
-            }*/
+                    from u in _results
+                    orderby
+                        u.HitPointsPct,
+                        u.NearbyUnitsWithinDistance(16f) descending,
+                        u.CountUnitsInFront()
+                    select u).ToList();
+            }
+            else
+            {
+                _results = (
+                   from u in _results
+                   orderby
+                       u.HitPointsPct,
+                       u.NearbyUnitsWithinDistance(16f) descending
+                   select u).ToList();
+            }
 
             if (_results.Any())
                 return _results.FirstOrDefault();
@@ -908,20 +914,9 @@ namespace Trinity
                     u.IsInLineOfSight &&
                     u.IsTrashPackOrBossEliteRareUnique
                 orderby
-                    MobsWithDebuff(u.Position, SNOPower.Monk_ExplodingPalm, 10f) descending,
+                    MobsWithDebuff(u.Position, SNOPower.Monk_ExplodingPalm, 12f) descending,
                     u.HitPointsPct
                 select u).ToList();
-
-            /*if (Passives.Monk.Momentum.IsActive && Skills.Monk.DashingStrike.CanCast())
-            {
-                _results = (
-                from u in _results
-                orderby
-                    u.HitPointsPct,
-                    u.NearbyUnitsWithinDistance(15f) descending,
-                    u.Distance descending
-                select u).ToList();
-            }*/
 
             if (_results.Any())
                 return _results.FirstOrDefault();
@@ -1085,6 +1080,9 @@ namespace Trinity
                                             _n.SpecialCount++;
 
                                         if (TownRun.IsTryingToTownPortal() || Trinity.Player.StandingInAvoidance)
+                                            _n.SpecialCount++;
+
+                                        if (Skills.Barbarian.FuriousCharge.Charges > 1)
                                             _n.SpecialCount++;
 
                                         if (!_atPlayer && _o.Position.Distance2D(_loc) <= 15)
