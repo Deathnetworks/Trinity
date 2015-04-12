@@ -321,8 +321,8 @@ namespace Trinity.Combat.Abilities
 
         public static bool IsQuestingMode { get; set; }
 
-        private static DateTime LastCostSkillUseTime = DateTime.MinValue;
-        private static DateTime LastPrimaryUseTime = DateTime.MinValue;
+        public static DateTime LastCostSkillUseTime = DateTime.MinValue;
+        public static DateTime LastPrimaryUseTime = DateTime.MinValue;
 
         /// <summary>
         /// Determines whether [is taeguk equipped].
@@ -709,6 +709,11 @@ namespace Trinity.Combat.Abilities
             return
                 (!CacheData.Hotbar.ActivePowers.Contains(snoPower) || (CacheData.Hotbar.ActivePowers.Contains(snoPower) && GetHasBuff(snoPower)));
 
+        }
+
+        internal static double TimeSincePrimaryUse
+        {
+            get { return DateTime.UtcNow.Subtract(LastPrimaryUseTime).TotalMilliseconds;  }
         }
 
         /// <summary>

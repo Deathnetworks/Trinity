@@ -110,7 +110,7 @@ namespace Trinity.Combat.Abilities
                 Player.CurrentHealthPct <= 0.50 &&
                 (CurrentTarget.IsBossOrEliteRareUnique || TargetUtil.IsEliteTargetInRange(75f)))
             {
-                var target = KiteDistance == 0 ? ZetaDia.Me.Position : GridMap.GetBestMoveNode(KiteDistance).Position;
+                var target = KiteDistance == 0 ? Player.Position : GridMap.GetBestMoveNode(KiteDistance).Position;
                 return new TrinityPower(SNOPower.Wizard_Teleport, 65f, target);
             }
 

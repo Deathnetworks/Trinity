@@ -29,14 +29,6 @@ namespace Trinity.Combat.Abilities
         {
             TrinityPower power = null;
 
-            if (CanCast(SNOPower.Barbarian_Bash, CanCastFlags.NoTimer) && Runes.Barbarian.Punish.IsActive &&
-                TimeSincePowerUse(SNOPower.Barbarian_Bash) >= 4500)
-            {
-                // Bash Fury Generator
-                if (IsNull(power) && CanUseBash)
-                    power = PowerBash;
-            }
-
             if (IsNull(power) && UseDestructiblePower)
                 power = DestroyObjectPower;
 
@@ -59,34 +51,37 @@ namespace Trinity.Combat.Abilities
                     power = PowerFrenzy;
 
                 // Bastion Of Will require primary usage
-                if (IsBastionsPrimaryBuffWillExpire)
+                if (IsNull(power) && IsBastionsPrimaryBuffWillExpire)
                 {
-                    // Weapon Throw
-                    if (IsNull(power) && CanUseWeaponThrow)
-                        power = PowerWeaponThrow;
+                    var closestTarget = TargetUtil.GetClosestTarget(40f, _useWeights: false);
 
-                    // Frenzy Fury Generator
-                    if (IsNull(power) && CanUseFrenzy)
-                        power = PowerFrenzy;
+                    if (closestTarget != null)
+                    {
+                        // Weapon Throw
+                        if (IsNull(power) && CanUseWeaponThrow && closestTarget.RadiusDistance < V.F("Barbarian.WeaponThrow.UseRange"))
+                            power = PowerWeaponThrow;
 
-                    // Bash Fury Generator
-                    if (IsNull(power) && CanUseBash)
-                        power = PowerBash;
+                        // Frenzy Fury Generator
+                        if (IsNull(power) && CanUseFrenzy && closestTarget.RadiusDistance < V.F("Barbarian.Frenzy.UseRange"))
+                            power = PowerFrenzy;
 
-                    // Cleave Fury Generator
-                    if (IsNull(power) && CanUseCleave)
-                        power = PowerCleave;
+                        // Bash Fury Generator
+                        if (IsNull(power) && CanUseBash && closestTarget.RadiusDistance < V.F("Barbarian.Bash.UseRange"))
+                            power = PowerBash;
+
+                        // Cleave Fury Generator
+                        if (IsNull(power) && CanUseCleave && closestTarget.RadiusDistance < V.F("Barbarian.Cleave.UseRange"))
+                            power = PowerCleave;
+                    }
+
+                    if (!IsNull(power))
+                        SwitchToTarget(closestTarget);
                 }
             }
 
             // Ignore Pain when low on health
             if (IsNull(power) && CanCastIgnorePain)
                 power = PowerIgnorePain;
-
-            if (IsNull(power) && Sets.ImmortalKingsCall.IsSecondBonusActive && Skills.Barbarian.Whirlwind.IsActive)
-            {
-                power = SpamPowerWhirlwind;
-            }
 
             IsWaitingForSpecial = false;
 
@@ -179,8 +174,8 @@ namespace Trinity.Combat.Abilities
                 power = PowerSeismicSlam;
 
             // Bash to 3 stacks (Punish)
-            if (IsNull(power) && CanUseBashTo3)
-                power = PowerBash;
+            if (IsNull(power))
+                power = PowerBashTo3;
 
             // Frenzy to 5 stacks (Maniac)
             if (IsNull(power) && CanUseFrenzyTo5)
@@ -193,6 +188,10 @@ namespace Trinity.Combat.Abilities
             // HOTA Elites
             if (IsNull(power) && CanUseHammerOfTheAncientsElitesOnly)
                 power = PowerHammerOfTheAncients;
+
+            // Whirlwind spam
+            if (IsNull(power))
+                power = SpamPowerWhirlwind;
 
             // Whirlwind
             if (IsNull(power) && CanUseWhirlwind)
@@ -704,67 +703,21 @@ namespace Trinity.Combat.Abilities
                     TargetUtil.AnyMobsInRange(15f) && GetBuffStacks(SNOPower.Barbarian_Frenzy) < 5;
             }
         }
-        public static bool CanUseBashTo3
-        {
-            get
-            {
-                // minimum checks
-                if (UseOOCBuff)
-                    return false;
-                if (IsCurrentlyAvoiding)
-                    return false;
-                if (!Hotbar.Contains(SNOPower.Barbarian_Bash))
-                    return false;
-
-                //skillDict.Add("Bash", SNOPower.Barbarian_Bash);
-                //runeDict.Add("Clobber", 2);
-                //runeDict.Add("Onslaught", 0);
-                //runeDict.Add("Punish", 1);
-                //runeDict.Add("Instigation", 3);
-                //runeDict.Add("Pulverize", 4);
-
-                bool hasPunish = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Barbarian_Bash && s.RuneIndex == 1);
-
-                // for combo use with Frenzy or Cleave
-                if (hasPunish)
-                {
-                    // haven't bashed, ever
-                    if (!SpellHistory.HasUsedSpell(SNOPower.Barbarian_Bash))
-                        return true;
-
-                    int timeSinceUse = SpellHistory.TimeSinceUse(SNOPower.Barbarian_Bash).Milliseconds;
-
-                    // been almost 5 seconds since our last bash (keep the Punish buff up)
-                    if (timeSinceUse >= 4600)
-                        return true;
-
-                    // if it's been less than 5 seconds, check if we have used 2 in 10 seconds
-                    if (SpellHistory.HistoryQueue.Count(i => i.TimeSinceUse.TotalMilliseconds < 9600) <= 2)
-                        return true;
-
-                    // if it's been less than 5 seconds, check if we have used 3 in 15 seconds (for full stack)
-                    if (SpellHistory.HistoryQueue.Count(i => i.TimeSinceUse.TotalSeconds < 14600) <= 3)
-                        return true;
-                }
-
-                return false;
-            }
-        }
         public static bool CanUseWhirlwind
         {
             get
             {
-                return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && !Player.IsIncapacitated && !Player.IsRooted && Player.PrimaryResource >= 10 &&
-                    (!IsWaitingForSpecial || (IsWaitingForSpecial && Player.PrimaryResource > MinEnergyReserve)) &&
-                    //(!IsWaitingForSpecial || (IsWaitingForSpecial && !(TargetUtil.AnyMobsInRange(3, 15) || ForceCloseRangeTarget))) && // make sure we're not surrounded if waiting for special
-                    // Only if within 25 yards of main target
-                    ((CurrentTarget.RadiusDistance <= 25f || TargetUtil.AnyMobsInRange(V.F("Barbarian.Whirlwind.TrashRange"), V.I("Barbarian.Whirlwind.TrashCount")))) &&
+                return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && !Player.IsIncapacitated && !Player.IsRooted && 
+
+                    (!IsWaitingForSpecial || Sets.ImmortalKingsCall.IsSecondBonusActive || Sets.BulKathossOath.IsEquipped || (IsWaitingForSpecial && Player.PrimaryResource > MinEnergyReserve)) &&
+
+                    (CurrentTarget.IsInLineOfSight && (CurrentTarget.RadiusDistance <= 25f || TargetUtil.AnyMobsInRange(V.F("Barbarian.Whirlwind.TrashRange"), V.I("Barbarian.Whirlwind.TrashCount")))) &&
+
                     (TargetUtil.AnyMobsInRange(50, 2) || CurrentTarget.HitPointsPct >= 0.30 || CurrentTarget.IsBossOrEliteRareUnique || Player.CurrentHealthPct <= 0.60) &&
-                    // Check for energy reservation amounts
-                    //((playerStatus.dCurrentEnergy >= 20 && !playerStatus.bWaitingForReserveEnergy) || playerStatus.dCurrentEnergy >= iWaitingReservedAmount) &&
-                    Player.PrimaryResource >= V.D("Barbarian.Whirlwind.MinFury") &&
-                    // If they have battle-rage, make sure it's up
-                    (!Hotbar.Contains(SNOPower.Barbarian_BattleRage) || (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage)));
+
+                    (Player.PrimaryResource >= V.D("Barbarian.Whirlwind.MinFury") || Sets.BulKathossOath.IsEquipped) &&
+
+                    (!Hotbar.Contains(SNOPower.Barbarian_BattleRage) || GetHasBuff(SNOPower.Barbarian_BattleRage) || Sets.ImmortalKingsCall.IsSecondBonusActive);
             }
         }
         // Dreadbomb build support
@@ -926,9 +879,8 @@ namespace Trinity.Combat.Abilities
                         ZigZagPosition = TargetUtil.GetZigZagTarget(CurrentTarget.Position, wwdist);
                         return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), ZigZagPosition);
                     }
-
-                   
                 }
+
                 return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), ZigZagPosition);
             }
         }
@@ -936,12 +888,13 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                if (!IsCurrentlyAvoiding && CanCast(SNOPower.Barbarian_Whirlwind, CanCastFlags.NoTimer))
+                if (Sets.ImmortalKingsCall.IsSecondBonusActive && Skills.Barbarian.Whirlwind.IsActive &&
+                    !IsCurrentlyAvoiding && CanCast(SNOPower.Barbarian_Whirlwind, CanCastFlags.NoTimer))
                 {
                     if (TargetUtil.AnyMobsInRange(15f, false) ||
                        (Sets.BulKathossOath.IsEquipped && Player.MovementSpeed > 0))
                     {
-                        if (CurrentTarget != null && CurrentTarget.IsUnit &&
+                        if (CurrentTarget != null && CurrentTarget.IsUnit && CurrentTarget.IsInLineOfSight &&
                             (DateTime.UtcNow.Subtract(LastChangedZigZag).TotalMilliseconds >= 1500 ||
                             ZigZagPosition.Distance2D(Player.Position) <= 3f))
                         {
@@ -949,7 +902,7 @@ namespace Trinity.Combat.Abilities
                             ZigZagPosition = TargetUtil.GetZigZagTarget(CurrentTarget.Position, 15f);
                         }
 
-                        if (CurrentTarget != null && CurrentTarget.IsUnit)
+                        if (CurrentTarget != null && CurrentTarget.IsUnit && CurrentTarget.IsInLineOfSight)
                         {
                             return new TrinityPower(SNOPower.Barbarian_Whirlwind, 0f, ZigZagPosition);
                         }
@@ -981,6 +934,53 @@ namespace Trinity.Combat.Abilities
         public static TrinityPower PowerFrenzy 
         {
             get { return new TrinityPower(SNOPower.Barbarian_Frenzy, V.F("Barbarian.Frenzy.UseRange"), CurrentTarget.ClusterPosition(V.F("Barbarian.Frenzy.UseRange") - 3f), CurrentTarget.Position); } 
+        }
+        public static TrinityPower PowerBashTo3
+        {
+            get 
+            {
+                if (UseOOCBuff || IsCurrentlyAvoiding || !Hotbar.Contains(SNOPower.Barbarian_Bash) || !Runes.Barbarian.Punish.IsActive)
+                    return null;
+
+                bool canWW = CanCast(SNOPower.Barbarian_Whirlwind, CanCastFlags.NoTimer);
+
+                // Prioritize ww
+                if (canWW && !TargetUtil.AnyMobsInRange(V.F("Barbarian.Bash.UseRange")))
+                    return null;
+
+                TrinityPower power = null;
+
+                var closestTarget = TargetUtil.GetClosestTarget(25f, _useWeights: false);
+                if (closestTarget != null)
+                { 
+                    // haven't bashed, ever
+                    if (IsNull(power) && !SpellHistory.HasUsedSpell(SNOPower.Barbarian_Bash))
+                        power = new TrinityPower(SNOPower.Barbarian_Bash, V.F("Barbarian.Bash.UseRange"), CurrentTarget.ClusterPosition(V.F("Barbarian.Bash.UseRange") - 3f), CurrentTarget.Position);
+
+                    // been almost 5 seconds since our last bash (keep the Punish buff up)
+                    if (IsNull(power) && SpellHistory.TimeSinceUse(SNOPower.Barbarian_Bash).Milliseconds >= 4600)
+                        power = new TrinityPower(SNOPower.Barbarian_Bash, V.F("Barbarian.Bash.UseRange"), CurrentTarget.ClusterPosition(V.F("Barbarian.Bash.UseRange") - 3f), CurrentTarget.Position);
+
+                    // if it's been less than 5 seconds, check if we have used 2 in 10 seconds
+                    if (IsNull(power) && SpellHistory.HistoryQueue.Count(i => i.TimeSinceUse.TotalMilliseconds < 9600) <= 2 &&
+                        (!canWW || closestTarget.RadiusDistance < V.F("Barbarian.Bash.UseRange")))
+                    {
+                        power = new TrinityPower(SNOPower.Barbarian_Bash, V.F("Barbarian.Bash.UseRange"), CurrentTarget.ClusterPosition(V.F("Barbarian.Bash.UseRange") - 3f), CurrentTarget.Position);
+                    }
+
+                    // if it's been less than 5 seconds, check if we have used 3 in 15 seconds (for full stack)
+                    if (IsNull(power) && SpellHistory.HistoryQueue.Count(i => i.TimeSinceUse.TotalSeconds < 14600) <= 3 &&
+                        (!canWW || closestTarget.RadiusDistance < V.F("Barbarian.Bash.UseRange")))
+                    {
+                        power = new TrinityPower(SNOPower.Barbarian_Bash, V.F("Barbarian.Bash.UseRange"), CurrentTarget.ClusterPosition(V.F("Barbarian.Bash.UseRange") - 3f), CurrentTarget.Position);
+                    }
+
+                    if (!IsNull(power))
+                        SwitchToTarget(closestTarget);
+                }
+
+                return power;
+            } 
         }
         public static TrinityPower PowerBash 
         {

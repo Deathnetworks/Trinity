@@ -145,7 +145,7 @@ namespace Trinity.Combat
 
         public new void Update()
         {
-            Position = GridMap.GetBestClusterNode(new Vector3(), Radius, Size).Position;
+            Position = TargetUtil.GetBestClusterPoint(Radius, _size: Size);
             NearMe = false;
             Range = Radius;
             base.Update();

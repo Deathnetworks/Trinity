@@ -164,8 +164,7 @@ namespace Trinity
                     (Trinity.KillMonstersInAoE || !LocOrPathInAoE(_o))
                  orderby
                     _o.CountUnitsInFront() descending,
-                    _o.NearbyUnitsWithinDistance(8f) descending,
-                    _o.IsBossOrEliteRareUnique descending
+                    _o.NearbyUnitsWithinDistance(8f) descending
                  select _o).ToList();
 
             if (_results.Any())
@@ -552,6 +551,13 @@ namespace Trinity
             if (Trinity.Player.ActorClass == ActorClass.Barbarian)
             {
                 useTargetBasedZigZag = Trinity.Settings.Combat.Barbarian.TargetBasedZigZag;
+            }
+
+            var bestPierceNode = GetBestFuriousChargeNode(maxDistance + 10f, _useFcWeights: false);
+            if (bestPierceNode != null && bestPierceNode.Distance > minDistance)
+            {
+                Logger.Log(LogCategory.Movement, "Returning ZigZag: BestPierceNode {0} r-dist={1} t-dist={2} p_weight={3}", bestPierceNode.Position, ringDistance, bestPierceNode.Position.Distance2D(Player.Position), bestPierceNode.SpecialWeight);
+                return bestPierceNode.Position;
             }
 
             int eliteCount = ObjectCache.Count(u => u.IsUnit && u.IsBossOrEliteRareUnique);
@@ -1049,9 +1055,11 @@ namespace Trinity
                     foreach (var _n in _nodes)
                     {
                         string _dir = MathUtil.GetHeadingToPoint(_loc, _n.Position);
+                        bool _hasMob = false;
+
                         foreach (var _o in _list)
                         {
-                            if (_o.Type == GObjectType.Destructible || _o.IsUnit)
+                            if ((Skills.Barbarian.FuriousCharge.IsActive && _o.Type == GObjectType.Destructible) || _o.IsUnit)
                             {
                                 if (_o.IsUnit && (!_o.CommonDataIsValid || _o.HitPointsPct <= 0f))
                                     continue;
@@ -1064,6 +1072,8 @@ namespace Trinity
                                 {
                                     if (MathUtil.IntersectsPath(_o.Position, _radius, _loc, _n.Position))
                                     {
+                                        if (_o.IsUnit) _hasMob = true;
+
                                         Vector3 _lineProj = MathEx.CalculatePointFrom(_n.Position, _loc, _o.Position.Distance2D(_loc));
                                         _n.SpecialWeight += (_radius - _lineProj.Distance2D(_o.Position)) * Math.Max(_o.Weight, 1000f);
 
@@ -1083,14 +1093,13 @@ namespace Trinity
                                                 _n.SpecialCount -= 3;
                                             else if (_o.IsEliteRareUnique)
                                                 _n.SpecialCount -= 2;
-                                        }
-                                            
+                                        }  
                                     }
                                 }
                             }
 
                             _n.SpecialWeight *= _n.SpecialCount;
-                            if (_n.SpecialCount < 3 && _useFcWeights) { _n.SpecialWeight = 0; }
+                            if (!_hasMob || (_n.SpecialCount < 3 && _useFcWeights)) { _n.SpecialWeight = 0; }
                         }
                     }
 

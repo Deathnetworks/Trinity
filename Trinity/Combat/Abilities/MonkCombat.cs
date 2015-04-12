@@ -43,6 +43,8 @@ namespace Trinity.Combat.Abilities
         static bool _hasSwk;
         static float _minSweepingWindSpirit;
 
+        static bool _forceDashingStrike = false;
+
         public static MonkSetting MonkSettings
         {
             get { return Trinity.Settings.Combat.Monk; }
@@ -282,81 +284,114 @@ namespace Trinity.Combat.Abilities
                 }
             }
 
+            _forceDashingStrike = false;
+
             // Make a mega-splosion
             if (ShouldSpreadExplodingPalm())
             {
                 ChangeTarget();
             }
 
-            // Dashing Strike
-            if (CanCastDashingStrike)
+            if (_forceDashingStrike)
+            {
+                CombatBase.Cast(new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, CurrentTarget.ClusterPosition(5f)));
+            }
+            else if (CanCastDashingStrike)
             {
                 if (Legendary.Jawbreaker.IsEquipped)
                 {
                     return JawBreakerDashingStrike();
                 }
 
-                if (CurrentTarget.IsTrashPackOrBossEliteRareUnique && CurrentTarget.Distance >= MaxDashingStrikeRange && CurrentTarget.IsInLineOfSight)
+                // Thousand storm spam
+                if (Sets.ThousandStorms.IsSecondBonusActive && Player.PrimaryResource >= 85 &&
+                    (TargetUtil.AnyMobsInRange(MaxDashingStrikeRange, 2) || CurrentTarget.IsBossOrEliteRareUnique) &&
+                    (!Sets.ThousandStorms.IsMaxBonusActive || (TimeSincePrimaryUse > 0 && TimeSincePrimaryUse < 5950)))
                 {
-                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, CurrentTarget.Position);
-                }
-
-                if (CurrentTarget.IsTrashPackOrBossEliteRareUnique &&
-                    (CurrentTarget.Distance >= 10f ||
-                    !NavHelper.CanRayCast(CurrentTarget.Position) ||
-                    CacheData.MonsterObstacles.Any(m => m.RActorGUID != CurrentTarget.RActorGuid && MathUtil.IntersectsPath(m.Position, 5f, CurrentTarget.Position, Player.Position))))
-                {
-                    if (Passives.Monk.Momentum.IsActive && !Passives.Monk.Momentum.IsBuffActive)
-                        CombatBase.SwitchToTarget(TargetUtil.GetDashStrikeFarthestTarget(MaxDashingStrikeRange, 25f));
-
-                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.ClusterPosition(5f));
-                }
-
-                if (Combat.QueuedMovementManager.Stuck.IsStuck(2f, 250) && NavHelper.CanRayCast(PlayerMover.LastMoveToTarget))
-                {
-                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0, PlayerMover.LastMoveToTarget);
-                }
-
-                GridNode bestCluster = GridMap.GetBestClusterNode(useDefault: false);
-                float range = Passives.Monk.Momentum.IsActive && !Passives.Monk.Momentum.IsBuffActive ? 25f : 15f;
-                if (bestCluster != null && bestCluster.Distance >= range)
-                {
-                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, bestCluster.Position);
-                }
-
-                if (CurrentTarget.IsBoss ||
-                    (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.NearbyUnitsWithinDistance(25f) <= 1))
-                {
-                    GridNode gNode = GridMap.GetBestMoveNode(26f);
-                    if (gNode.Position != Vector3.Zero)
-                    {
-                        return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, gNode.Position);
-                    }
-                }
-
                     if (Passives.Monk.Momentum.IsActive && !Passives.Monk.Momentum.IsBuffActive)
                         CombatBase.SwitchToTarget(TargetUtil.GetDashStrikeFarthestTarget(MaxDashingStrikeRange, 25f));
                     else
-                        CombatBase.SwitchToTarget(TargetUtil.GetDashStrikeFarthestTarget(MaxDashingStrikeRange, 2f));
+                        CombatBase.SwitchToTarget(TargetUtil.GetDashStrikeFarthestTarget(MaxDashingStrikeRange, 5f));
 
-                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.ClusterPosition(5f));
+                    if (CurrentTarget.IsInLineOfSight)
+                        return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.ClusterPosition(5f));
+                }
+
+                // Other
+                if (!Sets.ThousandStorms.IsSecondBonusActive)
+                {
+                    // Far target
+                    if (CurrentTarget.IsTrashPackOrBossEliteRareUnique && CurrentTarget.Distance >= MaxDashingStrikeRange && CurrentTarget.IsInLineOfSight)
+                    {
+                        return new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, CurrentTarget.Position);
+                    }
+
+                    // Dash to active momentum
+                    if (Passives.Monk.Momentum.IsActive && !Passives.Monk.Momentum.IsBuffActive && TargetUtil.AnyMobsInRange(30f, 3))
+                    {
+                        CombatBase.SwitchToTarget(TargetUtil.GetDashStrikeFarthestTarget(MaxDashingStrikeRange, 25f));
+                        return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.ClusterPosition(5f));
+                    }
+
+                    // Dash to active momentum on boss or alone elite
+                    if (Passives.Monk.Momentum.IsActive && !Passives.Monk.Momentum.IsBuffActive &&
+                        (CurrentTarget.IsBoss ||
+                        (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.NearbyUnitsWithinDistance(25f) <= 1)))
+                    {
+                        GridNode gNode = GridMap.GetBestMoveNode(26f);
+                        if (gNode.Position != Vector3.Zero && NavHelper.CanRayCast(gNode.Position))
+                        {
+                            return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, gNode.Position);
+                        }
+                    }
+
+                    // Dash to target
+                    if ((CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.NearbyUnits > 3) &&
+                        CurrentTarget.IsInLineOfSight &&
+                        (CurrentTarget.Distance >= 15f ||
+                        CacheData.MonsterObstacles.Any(m => m.RActorGUID != CurrentTarget.RActorGuid && MathUtil.IntersectsPath(m.Position, 5f, CurrentTarget.Position, Player.Position))))
+                    {
+                        return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.ClusterPosition(5f));
+                    }
+
+                    float range = Passives.Monk.Momentum.IsActive && !Passives.Monk.Momentum.IsBuffActive ? 25f : 15f;
+                    GridNode bestCluster = GridMap.GetBestClusterNode(minRange: range, useDefault: false);
+
+                    // Dash to cluster
+                    if (Enemies.BestCluster.UnitInLosCount > Enemies.CloseNearby.UnitInLosCount && Enemies.BestCluster.Position.Distance2D(Player.Position) > 10f)
+                    {
+                        return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, Enemies.BestCluster.Position);
+                    }
+                }
             }
 
             // Bastion Of Will require primary usage
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && 
                 IsBastionsPrimaryBuffWillExpire)
             {
-                if (CanCast(SNOPower.Monk_FistsofThunder))
-                    return new TrinityPower(SNOPower.Monk_FistsofThunder, 30f, CurrentTarget.ClusterPosition(15f), CurrentTarget.ACDGuid);
+                TrinityPower power = null;
 
-                if (CanCast(SNOPower.Monk_DeadlyReach))
-                    return new TrinityPower(SNOPower.Monk_DeadlyReach, 16f, CurrentTarget.ClusterPosition(14f), CurrentTarget.ACDGuid);
+                var closestTarget = TargetUtil.GetClosestTarget(40f, _useWeights: false);
+                if (closestTarget != null)
+                {
+                    if (IsNull(power) && CanCast(SNOPower.Monk_FistsofThunder) && closestTarget.RadiusDistance < 30f)
+                        power = new TrinityPower(SNOPower.Monk_FistsofThunder, 30f, CurrentTarget.ClusterPosition(15f), CurrentTarget.ACDGuid);
 
-                if (CanCast(SNOPower.Monk_WayOfTheHundredFists))
-                    return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 16f, CurrentTarget.ClusterPosition(14f), CurrentTarget.ACDGuid);
+                    if (IsNull(power) && CanCast(SNOPower.Monk_DeadlyReach) && closestTarget.RadiusDistance < 16f)
+                        power = new TrinityPower(SNOPower.Monk_DeadlyReach, 16f, CurrentTarget.ClusterPosition(14f), CurrentTarget.ACDGuid);
 
-                if (CanCast(SNOPower.Monk_CripplingWave))
-                    return new TrinityPower(SNOPower.Monk_CripplingWave, 20f, CurrentTarget.ClusterPosition(15f), CurrentTarget.ACDGuid);
+                    if (IsNull(power) && CanCast(SNOPower.Monk_WayOfTheHundredFists) && closestTarget.RadiusDistance < 16f)
+                        power = new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 16f, CurrentTarget.ClusterPosition(14f), CurrentTarget.ACDGuid);
+
+                    if (IsNull(power) && CanCast(SNOPower.Monk_CripplingWave) && closestTarget.RadiusDistance < 20f)
+                        power = new TrinityPower(SNOPower.Monk_CripplingWave, 20f, CurrentTarget.ClusterPosition(15f), CurrentTarget.ACDGuid);
+                }
+
+                if (!IsNull(power))
+                {
+                    SwitchToTarget(closestTarget);
+                    return power;
+                }
             }
 
             // Exploding Palm
@@ -592,11 +627,18 @@ namespace Trinity.Combat.Abilities
 
             var bestExplodingPalmTarget = TargetUtil.BestExploadingPalmTarget(range);
             if (bestExplodingPalmTarget != default(TrinityCacheObject) &&
-                bestExplodingPalmTarget.RActorGuid != CurrentTarget.RActorGuid)
+                bestExplodingPalmTarget.RActorGuid != CurrentTarget.RActorGuid &&
+                bestExplodingPalmTarget.IsTrashPackOrBossEliteRareUnique)
             {
                 //Trinity.Blacklist1Second.Add(CurrentTarget.RActorGuid);
                 if (CombatBase.SwitchToTarget(bestExplodingPalmTarget))
                     _lastTargetChange = DateTime.UtcNow;
+
+                _forceDashingStrike = 
+                    CanCastDashingStrike && 
+                    CurrentTarget.IsInLineOfSight &&
+                    (CurrentTarget.RadiusDistance > 10f || 
+                    CacheData.MonsterObstacles.Any(m => m.RActorGUID != CurrentTarget.RActorGuid && MathUtil.IntersectsPath(m.Position, 5f, CurrentTarget.Position, Player.Position)));
             }
         }
 
@@ -710,7 +752,7 @@ namespace Trinity.Combat.Abilities
             if (!HasMantraAbilityAndBuff())
                 return false;
 
-            double currentSpirit = ZetaDia.Me.CurrentPrimaryResource;
+            double currentSpirit = Player.PrimaryResource;
 
             // Minimum 10 spirit to continue channeling tempest rush
             if (Trinity.TimeSinceUse(SNOPower.Monk_TempestRush) < 150 && currentSpirit > 10f)
@@ -753,25 +795,16 @@ namespace Trinity.Combat.Abilities
 
         internal static void RunOngoingPowers()
         {
-            if (ZetaDia.Service.Hero == null)
+            if (!Player.IsInGame)
                 return;
 
-            if (!ZetaDia.Service.Hero.IsValid)
-                return;
-
-            if (!ZetaDia.IsInGame)
-                return;
-
-            if (ZetaDia.IsLoadingWorld)
-                return;
-
-            if (!ZetaDia.Me.IsValid)
-                return;
-
-            if (!ZetaDia.Me.CommonData.IsValid)
+            if (Player.IsLoadingWorld)
                 return;
 
             if (!Player.IsValid)
+                return;
+
+            if (Player.CommonData.IsValid)
                 return;
 
             if (Player.IsDead)
@@ -850,7 +883,7 @@ namespace Trinity.Combat.Abilities
 
                 const string locationSource = "LastLocation";
 
-                if (target.Distance2D(ZetaDia.Me.Position) <= 1f)
+                if (target.Distance2D(Player.Position) <= 1f)
                 {
                     // rrrix edit: we can't maintain here
                     return;
@@ -859,11 +892,11 @@ namespace Trinity.Combat.Abilities
                 if (target == Vector3.Zero)
                     return;
 
-                float destinationDistance = target.Distance2D(ZetaDia.Me.Position);
+                float destinationDistance = target.Distance2D(Player.Position);
 
                 target = TargetUtil.FindTempestRushTarget();
 
-                if (destinationDistance > 10f && NavHelper.CanRayCast(ZetaDia.Me.Position, target))
+                if (destinationDistance > 10f && NavHelper.CanRayCast(Player.Position, target))
                 {
                     LogTempestRushStatus(String.Format("Using Tempest Rush to maintain channeling, source={0}, V3={1} dist={2:0}", locationSource, target, destinationDistance));
 

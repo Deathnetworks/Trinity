@@ -179,21 +179,33 @@ namespace Trinity.Combat.Abilities
                 // Bastion Of Will require primary usage
                 if (IsBastionsPrimaryBuffWillExpire)
                 {
-                    // Justice
-                    if (CanCast(SNOPower.X1_Crusader_Justice))
-                        return new TrinityPower(SNOPower.X1_Crusader_Justice, 7f, CurrentTarget.ACDGuid);
+                    TrinityPower bastionPower = null;
+                    var closestTarget = TargetUtil.GetClosestTarget(40f, _useWeights: false);
 
-                    // Smite
-                    if (CanCast(SNOPower.X1_Crusader_Smite))
-                        return new TrinityPower(SNOPower.X1_Crusader_Smite, 15f, TargetUtil.GetBestClusterUnit(15f, 15f).ACDGuid);
+                    if (closestTarget != null)
+                    {
+                        // Justice
+                        if (IsNull(bastionPower) && CanCast(SNOPower.X1_Crusader_Justice) && closestTarget.RadiusDistance < 7f)
+                            bastionPower = new TrinityPower(SNOPower.X1_Crusader_Justice, 7f, closestTarget.ACDGuid);
 
-                    // Slash
-                    if (CanCast(SNOPower.X1_Crusader_Slash))
-                        return new TrinityPower(SNOPower.X1_Crusader_Slash, 15f, TargetUtil.GetBestClusterUnit(5f, 8f).ACDGuid);
+                        // Smite
+                        if (IsNull(bastionPower) && CanCast(SNOPower.X1_Crusader_Smite) && closestTarget.RadiusDistance < 15f)
+                            bastionPower = new TrinityPower(SNOPower.X1_Crusader_Smite, 15f, closestTarget.ACDGuid);
 
-                    // Punish
-                    if (CanCast(SNOPower.X1_Crusader_Punish))
-                        return new TrinityPower(SNOPower.X1_Crusader_Punish, 7f, CurrentTarget.ACDGuid);
+                        // Slash
+                        if (IsNull(bastionPower) && CanCast(SNOPower.X1_Crusader_Slash) && closestTarget.RadiusDistance < 15f)
+                            bastionPower = new TrinityPower(SNOPower.X1_Crusader_Slash, 15f, closestTarget.ACDGuid);
+
+                        // Punish
+                        if (IsNull(bastionPower) && CanCast(SNOPower.X1_Crusader_Punish) && closestTarget.RadiusDistance < 7f)
+                            bastionPower = new TrinityPower(SNOPower.X1_Crusader_Punish, 7f, closestTarget.ACDGuid);
+                    }
+
+                    if (!IsNull(bastionPower))
+                    {
+                        SwitchToTarget(closestTarget);
+                        return bastionPower;
+                    }
                 }
 
                 // Provoke
@@ -205,7 +217,9 @@ namespace Trinity.Combat.Abilities
                 // Shield Bash
                 if (CanCast(SNOPower.X1_Crusader_ShieldBash2))
                 {
-                    return new TrinityPower(SNOPower.X1_Crusader_ShieldBash2, 65f, TargetUtil.GetBestPiercePoint(65f));
+                    var bestPierceNode = TargetUtil.GetBestFuriousChargeNode(65f, _useFcWeights: false);
+                    if (bestPierceNode != null && bestPierceNode.SpecialWeight > 0)
+                        return new TrinityPower(SNOPower.X1_Crusader_ShieldBash2, 65f, bestPierceNode.Position);
                 }
 
                 // Blessed Hammer, spin outwards 
@@ -260,7 +274,7 @@ namespace Trinity.Combat.Abilities
             // Buffs
             if (UseOOCBuff)
             {
-                if (CanCast(SNOPower.X1_Crusader_SteedCharge) && CrusaderSettings.SteedChargeOOC && ZetaDia.Me.Movement.SpeedXY > 0)
+                if (CanCast(SNOPower.X1_Crusader_SteedCharge) && CrusaderSettings.SteedChargeOOC && Player.IsMoving)
                 {
                     return new TrinityPower(SNOPower.X1_Crusader_SteedCharge);
                 }
