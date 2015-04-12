@@ -265,6 +265,7 @@ namespace Trinity.Combat.Abilities
                     TargetUtil.MobsWithDebuff(_target.Position, SNOPower.Monk_ExplodingPalm, 10f) >= 0.5 * TargetUtil.NumMobsInRangeOfPosition(_target.Position, 10f) &&
                     _target.RadiusDistance <= wolRange && _target.HasDebuff(SNOPower.Monk_ExplodingPalm))
                 {
+                    SwitchToTarget(_target);
                     return new TrinityPower(SNOPower.Monk_WaveOfLight, 0f, _target.ACDGuid);
                 }
 
@@ -280,6 +281,7 @@ namespace Trinity.Combat.Abilities
                     TargetUtil.MobsWithDebuff(_target.Position, SNOPower.Monk_ExplodingPalm, 10f) >= 0.5 * TargetUtil.NumMobsInRangeOfPosition(_target.Position, 10f) &&
                     _target.RadiusDistance <= 10f && _target.HasDebuff(SNOPower.Monk_ExplodingPalm))
                 {
+                    SwitchToTarget(_target);
                     return new TrinityPower(SNOPower.Monk_LashingTailKick, 0f, _target.ACDGuid);
                 }
             }
@@ -305,8 +307,8 @@ namespace Trinity.Combat.Abilities
 
                 // Thousand storm spam
                 if (Sets.ThousandStorms.IsSecondBonusActive && Player.PrimaryResource >= 85 &&
-                    (TargetUtil.AnyMobsInRange(MaxDashingStrikeRange, 2) || CurrentTarget.IsBossOrEliteRareUnique) &&
-                    (!Sets.ThousandStorms.IsMaxBonusActive || (TimeSincePrimaryUse > 0 && TimeSincePrimaryUse < 5950)))
+                    CurrentTarget.IsTrashPackOrBossEliteRareUnique &&
+                    (!Sets.ThousandStorms.IsMaxBonusActive || (TimeSincePrimaryUse >= 0 && TimeSincePrimaryUse < 5950 && Skills.Monk.DashingStrike.Charges > 0)))
                 {
                     if (Passives.Monk.Momentum.IsActive && !Passives.Monk.Momentum.IsBuffActive)
                         CombatBase.SwitchToTarget(TargetUtil.GetDashStrikeFarthestTarget(MaxDashingStrikeRange, 25f));
@@ -819,8 +821,8 @@ namespace Trinity.Combat.Abilities
             if (!CanCastRecurringPower())
                 return;
 
-            //if (Player.IsInTown)
-            //return;
+            if (Player.IsInTown)
+                return;
 
             // Sweeping Winds Refresh(wtf the last logic)
             if (Player.PrimaryResource >= _minSweepingWindSpirit &&
@@ -828,7 +830,7 @@ namespace Trinity.Combat.Abilities
                ((!GetHasBuff(SNOPower.Monk_SweepingWind) && (_hasInnaSet || (Trinity.ObjectCache != null && TargetUtil.AnyMobsInRange(18f)))) ||
                CombatBase.IsTaegukBuffWillExpire))
             {
-                Logger.Log("Sweeping Wind Out of Band Refresh {0}",
+                Logger.Log(LogCategory.UserInformation, "Sweeping Wind Out of Band Refresh {0}",
                     CombatBase.Cast(new TrinityPower(SNOPower.Monk_SweepingWind)) ?
                     "succeeded" : "failed");
             }

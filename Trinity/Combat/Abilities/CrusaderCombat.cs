@@ -186,19 +186,19 @@ namespace Trinity.Combat.Abilities
                     {
                         // Justice
                         if (IsNull(bastionPower) && CanCast(SNOPower.X1_Crusader_Justice) && closestTarget.RadiusDistance < 7f)
-                            bastionPower = new TrinityPower(SNOPower.X1_Crusader_Justice, 7f, closestTarget.ACDGuid);
+                            bastionPower = new TrinityPower(SNOPower.X1_Crusader_Justice, 7f, closestTarget.Position);
 
                         // Smite
                         if (IsNull(bastionPower) && CanCast(SNOPower.X1_Crusader_Smite) && closestTarget.RadiusDistance < 15f)
-                            bastionPower = new TrinityPower(SNOPower.X1_Crusader_Smite, 15f, closestTarget.ACDGuid);
+                            bastionPower = new TrinityPower(SNOPower.X1_Crusader_Smite, 15f, closestTarget.ClusterPosition(10f));
 
                         // Slash
                         if (IsNull(bastionPower) && CanCast(SNOPower.X1_Crusader_Slash) && closestTarget.RadiusDistance < 15f)
-                            bastionPower = new TrinityPower(SNOPower.X1_Crusader_Slash, 15f, closestTarget.ACDGuid);
+                            bastionPower = new TrinityPower(SNOPower.X1_Crusader_Slash, 15f, closestTarget.ClusterPosition(10f));
 
                         // Punish
                         if (IsNull(bastionPower) && CanCast(SNOPower.X1_Crusader_Punish) && closestTarget.RadiusDistance < 7f)
-                            bastionPower = new TrinityPower(SNOPower.X1_Crusader_Punish, 7f, closestTarget.ACDGuid);
+                            bastionPower = new TrinityPower(SNOPower.X1_Crusader_Punish, 7f, closestTarget.Position);
                     }
 
                     if (!IsNull(bastionPower))
@@ -217,9 +217,17 @@ namespace Trinity.Combat.Abilities
                 // Shield Bash
                 if (CanCast(SNOPower.X1_Crusader_ShieldBash2))
                 {
-                    var bestPierceNode = TargetUtil.GetBestFuriousChargeNode(65f, _useFcWeights: false);
-                    if (bestPierceNode != null && bestPierceNode.SpecialWeight > 0)
-                        return new TrinityPower(SNOPower.X1_Crusader_ShieldBash2, 65f, bestPierceNode.Position);
+                    var bestPiercePoint = TargetUtil.GetBestPiercePoint(45f);
+                    if (bestPiercePoint != Vector3.Zero && NavHelper.CanRayCast(bestPiercePoint, true))
+                        return new TrinityPower(SNOPower.X1_Crusader_ShieldBash2, 45f, bestPiercePoint);
+
+                    var bestMoveNode = TargetUtil.GetBestFuriousChargeMoveNode(45f, _useFcWeights: false);
+                    if (bestMoveNode != null)
+                    {
+                        var bestPierceNode = TargetUtil.GetBestFuriousChargeNode(45f, bestMoveNode.Position, _useFcWeights: false);
+                        if (bestPierceNode != null)
+                            return new TrinityPower(SNOPower.X1_Crusader_ShieldBash2, 3f, bestMoveNode.Position, bestPierceNode.Position);
+                    } 
                 }
 
                 // Blessed Hammer, spin outwards 

@@ -80,27 +80,19 @@ namespace Trinity.Combat.Abilities
 
                 Trinity.IsWaitingAfterPower = _power.ShouldWaitAfterUse;
 
-                Skill _currentSkill = new Skill();
-                switch (Player.ActorClass)
-                {
-                    case ActorClass.Barbarian: _currentSkill = Skills.Barbarian.Where(s => s.IsActive && s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
-                    case ActorClass.Crusader: _currentSkill = Skills.Crusader.Where(s => s.IsActive && s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
-                    case ActorClass.Monk: _currentSkill = Skills.Monk.Where(s => s.IsActive && s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
-                    case ActorClass.Wizard: _currentSkill = Skills.Wizard.Where(s => s.IsActive && s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
-                    case ActorClass.Witchdoctor: _currentSkill = Skills.WitchDoctor.Where(s => s.IsActive && s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
-                    case ActorClass.DemonHunter: _currentSkill = Skills.DemonHunter.Where(s => s.IsActive && s.SNOPower.Equals(_power.SNOPower)).FirstOrDefault(); break;
-                }
-
+                Skill _currentSkill = SkillUtils.ById(_power.SNOPower);
                 if (_currentSkill != null)
                 {
-                    if (_currentSkill.IsCostPrimary)
-                        LastCostSkillUseTime = DateTime.UtcNow;
+                    var dest = _power.TargetPosition != Vector3.Zero ? _power.TargetPosition : CurrentTarget != null ? CurrentTarget.Position : Vector3.Zero;
 
-                    else if (_currentSkill.Category == SpellCategory.Primary && (_power.MinimumRange <= 1 || (CurrentTarget != null && _power.TargetPosition.Distance2D(Player.Position) - CurrentTarget.Radius <= _power.MinimumRange)))
+                    if (_currentSkill.IsCostPrimary)
+                        LastSpendingSkillUseTime = DateTime.UtcNow;
+
+                    else if (_currentSkill.Category == SpellCategory.Primary && (_power.MinimumRange <= 1 || (CurrentTarget != null && dest.Distance2D(Player.Position) - CurrentTarget.Radius <= _power.MinimumRange + 2f)))
                         LastPrimaryUseTime = DateTime.UtcNow;
                 }
 
-                //powerResultInfo += String.Format(" T1={0} T2={1}", DateTime.UtcNow.Subtract(LastPrimaryUseTime).TotalMilliseconds, DateTime.UtcNow.Subtract(LastCostSkillUseTime).TotalMilliseconds);
+                powerResultInfo += String.Format(" TimeSincePrimaryUse={0} TimeSinceSpendSkillUse={1}", DateTime.UtcNow.Subtract(LastPrimaryUseTime).TotalMilliseconds, DateTime.UtcNow.Subtract(LastSpendingSkillUseTime).TotalMilliseconds);
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Used Power {0} " + powerResultInfo, _power.SNOPower);
 
                 return true;
@@ -321,13 +313,21 @@ namespace Trinity.Combat.Abilities
 
         public static bool IsQuestingMode { get; set; }
 
-        public static DateTime LastCostSkillUseTime = DateTime.MinValue;
+        public static DateTime LastSpendingSkillUseTime = DateTime.MinValue;
         public static DateTime LastPrimaryUseTime = DateTime.MinValue;
+
+        /// <summary>
+        /// Determines whether [is ZeisOfStone equipped].
+        /// </summary>
+        public static bool IsZeisOfStoneEquipped
+        {
+            get { return CacheData.Inventory.EquippedIds.Contains(405801); }
+        }
 
         /// <summary>
         /// Determines whether [is taeguk equipped].
         /// </summary>
-        private static bool IsTaegukEquipped
+        public static bool IsTaegukEquipped
         {
             get { return CacheData.Inventory.EquippedIds.Contains(405804); }
         }
@@ -337,7 +337,7 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         public static bool IsTaegukBuffWillExpire
         {
-            get { return IsTaegukEquipped && DateTime.UtcNow.Subtract(LastCostSkillUseTime).TotalMilliseconds >= 2500; }
+            get { return IsTaegukEquipped && DateTime.UtcNow.Subtract(LastSpendingSkillUseTime).TotalMilliseconds >= 2250; }
         }
 
         /// <summary>
@@ -353,7 +353,7 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         public static bool IsBastionsSpendingBuffWillExpire
         {
-            get { return Sets.BastionsOfWill.IsFullyEquipped && DateTime.UtcNow.Subtract(LastCostSkillUseTime).TotalMilliseconds >= 4500; }
+            get { return Sets.BastionsOfWill.IsFullyEquipped && DateTime.UtcNow.Subtract(LastSpendingSkillUseTime).TotalMilliseconds >= 4500; }
         }
 
         /// <summary>
@@ -654,6 +654,16 @@ namespace Trinity.Combat.Abilities
         public static int GetBuffStacks(SNOPower power)
         {
             return CacheData.Buffs.GetBuffStacks(power);
+        }
+
+        /// <summary>
+        /// Returns how many stacks of a particular skill there are
+        /// </summary>
+        /// <param name="power"></param>
+        /// <returns></returns>
+        public static int GetSkillCharges(SNOPower power)
+        {
+            return CacheData.Hotbar.GetSkillCharges(power);
         }
 
         /// <summary>

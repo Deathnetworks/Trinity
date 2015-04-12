@@ -133,10 +133,6 @@ namespace Trinity.Combat.Abilities
             if (IsNull(power) && CanUseBattleRage)
                 power = PowerBattleRage;
 
-            // Rend
-            if (IsNull(power) && CanUseRend)
-                power = PowerRend;
-
             // Overpower
             if (IsNull(power) && CanUseOverPower)
                 power = PowerOverpower;
@@ -181,14 +177,6 @@ namespace Trinity.Combat.Abilities
             if (IsNull(power) && CanUseFrenzyTo5)
                 power = PowerFrenzy;
 
-            // Weapon Throw: Dreadbomb
-            if (IsNull(power) && CanUseDreadbomb)
-                power = PowerWeaponThrow;
-
-            // HOTA Elites
-            if (IsNull(power) && CanUseHammerOfTheAncientsElitesOnly)
-                power = PowerHammerOfTheAncients;
-
             // Whirlwind spam
             if (IsNull(power))
                 power = SpamPowerWhirlwind;
@@ -196,6 +184,18 @@ namespace Trinity.Combat.Abilities
             // Whirlwind
             if (IsNull(power) && CanUseWhirlwind)
                 power = PowerWhirlwind;
+
+            // Rend
+            if (IsNull(power) && CanUseRend)
+                power = PowerRend;
+
+            // Weapon Throw: Dreadbomb
+            if (IsNull(power) && CanUseDreadbomb)
+                power = PowerWeaponThrow;
+
+            // HOTA Elites
+            if (IsNull(power) && CanUseHammerOfTheAncientsElitesOnly)
+                power = PowerHammerOfTheAncients;
 
             // Hammer of the Ancients
             if (IsNull(power) && CanUseHammerOfTheAncients)
@@ -888,10 +888,12 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                if (Sets.ImmortalKingsCall.IsSecondBonusActive && Skills.Barbarian.Whirlwind.IsActive &&
-                    !IsCurrentlyAvoiding && CanCast(SNOPower.Barbarian_Whirlwind, CanCastFlags.NoTimer))
+                if (IsTaegukBuffWillExpire ||
+                    (Sets.ImmortalKingsCall.IsSecondBonusActive && !IsCurrentlyAvoiding) && 
+                    CanCast(SNOPower.Barbarian_Whirlwind, CanCastFlags.NoTimer))
                 {
                     if (TargetUtil.AnyMobsInRange(15f, false) ||
+                        IsTaegukBuffWillExpire ||
                        (Sets.BulKathossOath.IsEquipped && Player.MovementSpeed > 0))
                     {
                         if (CurrentTarget != null && CurrentTarget.IsUnit && CurrentTarget.IsInLineOfSight &&
@@ -916,9 +918,12 @@ namespace Trinity.Combat.Abilities
                         }
                     }
 
-                    if (TargetUtil.AnyMobsInRange(10f, false) && Player.MovementSpeed > 0 && CurrentTarget != null && CurrentTarget.IsNavigable && CurrentTarget.Distance >= 5f)
+                    if (((TargetUtil.AnyMobsInRange(10f, false) && Player.MovementSpeed > 0) || IsTaegukBuffWillExpire) && CurrentTarget != null && CurrentTarget.IsNavigable && CurrentTarget.Distance >= 5f)
                         return new TrinityPower(SNOPower.Barbarian_Whirlwind, 0f, CurrentTarget.Position);
                 }
+
+                if (IsTaegukBuffWillExpire)
+                    return new TrinityPower(SNOPower.Barbarian_Whirlwind);
 
                 return null;
             }
