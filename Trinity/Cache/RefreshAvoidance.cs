@@ -138,8 +138,8 @@ namespace Trinity
 
                     Player.StandingInAvoidance = true;
 
-                    if (!Player.IsRanged && Trinity.KillMonstersInAoE)
-                        Trinity.KillMonstersInAoE = false;
+                    //if (!Player.IsRanged && Trinity.KillMonstersInAoE)
+                    //    Trinity.KillMonstersInAoE = false;
                 }
 
                 CacheData.AvoidanceObstacles.Add(new CacheObstacleObject(c_CacheObject.Position, c_CacheObject.Radius, c_CacheObject.ActorSNO, c_CurrentAnimation.ToString())

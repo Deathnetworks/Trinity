@@ -465,13 +465,14 @@ namespace Trinity
                                             cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius))
                                         {
                                             objWeightInfo += "InSpecialAoE ";
-                                            cacheObject.Weight = 1;
+                                            cacheObject.Weight *= 0.2;
                                         }
 
                                         // If any AoE between us and target, reduce weight, for melee only
                                         if (!KillMonstersInAoE &&
                                             CombatBase.KiteDistance <= 0 && cacheObject.RadiusDistance > 3f &&
                                             CacheData.AvoidanceObstacles.Any(aoe => aoe.AvoidanceType != AvoidanceType.PlagueCloud &&
+                                                !aoe.IsAvoidanceAnimations && 
                                                 MathUtil.IntersectsPath(aoe.Position, aoe.Radius, Player.Position, cacheObject.Position)))
                                         {
                                             objWeightInfo += "AoEPathLine ";
@@ -481,17 +482,32 @@ namespace Trinity
                                         if (!KillMonstersInAoE &&
                                             CombatBase.KiteDistance <= 0 && cacheObject.RadiusDistance > 3f &&
                                             CacheData.AvoidanceObstacles.Any(aoe => aoe.AvoidanceType != AvoidanceType.PlagueCloud &&
+                                                !aoe.IsAvoidanceAnimations && 
                                                 cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius))
                                         {
                                             objWeightInfo += "InAoE ";
                                             cacheObject.Weight = 1d;
                                         }
 
-                                        if (CacheData.AvoidanceObstacles.Any(a => MathUtil.IntersectsPath(a.Position, a.Radius + 2f, Player.Position, cacheObject.Position)))
+                                        // If any AoE between us and target, reduce weight, for melee only
+                                        if (KillMonstersInAoE &&
+                                            CombatBase.KiteDistance <= 0 && cacheObject.RadiusDistance > 3f &&
+                                            CacheData.AvoidanceObstacles.Any(aoe => aoe.AvoidanceType != AvoidanceType.PlagueCloud &&
+                                                !aoe.IsAvoidanceAnimations &&
+                                                MathUtil.IntersectsPath(aoe.Position, aoe.Radius, Player.Position, cacheObject.Position)))
                                         {
-                                            objWeightInfo += " InterAvoidance";
-                                            cacheObject.Weight = 1;
-                                            break;
+                                            objWeightInfo += "AoEPathLine ";
+                                            cacheObject.Weight *= 0.5;
+                                        }
+                                        // See if there's any AOE avoidance in that spot, if so reduce the weight to 1, for melee only
+                                        if (KillMonstersInAoE &&
+                                            CombatBase.KiteDistance <= 0 && cacheObject.RadiusDistance > 3f &&
+                                            CacheData.AvoidanceObstacles.Any(aoe => aoe.AvoidanceType != AvoidanceType.PlagueCloud &&
+                                                !aoe.IsAvoidanceAnimations &&
+                                                cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius))
+                                        {
+                                            objWeightInfo += "InAoE ";
+                                            cacheObject.Weight *= 0.5;
                                         }
 
                                         // Deal with treasure goblins - note, of priority is set to "0", then the is-a-goblin flag isn't even set for use here - the monster is ignored
@@ -1434,7 +1450,7 @@ namespace Trinity
                     objWeightInfo += cacheObject.IsNPC ? " IsNPC" : "";
                     objWeightInfo += cacheObject.NPCIsOperable ? " IsOperable" : "";
 
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight,
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Weight,
                         "Weight={0:0} name={1} sno={2} type={3} R-Dist={4:0} IsElite={5} RAGuid={6} {7}",
                             cacheObject.Weight, cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Type, cacheObject.RadiusDistance, cacheObject.IsEliteRareUnique,
                             cacheObject.RActorGuid, objWeightInfo);
@@ -1449,7 +1465,7 @@ namespace Trinity
                     if (pickNewTarget)
                     {
                         // Force the character to stay where it is if there is nothing available that is out of avoidance stuff and we aren't already in avoidance stuff
-                        if (cacheObject.Weight == 1)
+                        if (cacheObject.Weight == 1 && !cacheObject.IsUnit)
                         {
                             _shouldStayPutDuringAvoidance = true;
                             cacheObject.Weight = 0;
@@ -1531,6 +1547,9 @@ namespace Trinity
             // Kite
             if (CurrentTarget != null && (CurrentTarget.IsUnit || CurrentTarget.Type == GObjectType.OocAvoidance))
             {
+                if (CurrentTarget.IsUnit && CurrentTarget.Weight == 1)
+                    Trinity.Player.NeedToKite = true;
+
                 KiteAvoidDestination = Player.Position;
                 RefreshSetKiting(ref KiteAvoidDestination, Trinity.Player.NeedToKite);
             }

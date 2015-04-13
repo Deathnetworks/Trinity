@@ -1035,7 +1035,7 @@ namespace Trinity
                 }
 
                 // Keep kiting option
-                if (Settings.Combat.Misc.KeepMovingInCombat && CurrentTarget.IsUnit &&
+                if (Settings.Combat.Misc.KeepMovingInCombat && Player.IsRanged && CurrentTarget.IsUnit &&
                     CurrentTargetIsInRange && !CombatBase.IsNull(CombatBase.CurrentPower) &&
                     MainGrid.Map.Any() &&
                     (Player.IsRanged || TargetUtil.ClusterExists(Settings.Combat.Misc.TrashPackClusterRadius, TargetCurrentDistance + 5f, Settings.Combat.Misc.TrashPackSize)))
@@ -1044,9 +1044,7 @@ namespace Trinity
                     {
                         Name = CurrentTarget.InternalName,
                         Infos = "(Keep moving) " + CurrentTarget.Infos,
-                        Destination = Player.IsRanged ?
-                        GridMap.GetBestMoveNode().Position :
-                        GridMap.GetBestClusterNode(radius: Settings.Combat.Misc.TrashPackClusterRadius, size: Settings.Combat.Misc.TrashPackSize, maxRange: TargetCurrentDistance + 5f).Position,
+                        Destination = GridMap.GetBestMoveNode().Position,
                         OnUpdate = m =>
                         {
                             var _safeNode = GridMap.GetBestMoveNode();

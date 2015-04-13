@@ -524,16 +524,38 @@ namespace Trinity
         }
 
         [NoCopy]
+        public double UnitsWeightsWithinDistance(float range = 5f)
+        {
+            double weight = 0;
+            if (CacheData.UnitsWeightsWithinDistanceRecorded.TryGetValue(new Tuple<int, int>(RActorGuid, (int)range), out weight))
+            {
+                return weight;
+            }
+
+            weight = Weight;
+            foreach (var u in Trinity.ObjectCache)
+            {
+                if (!u.IsUnit)
+                    continue;
+                if (u.RActorGuid == RActorGuid)
+                    continue;
+
+                var dist = u.Position.Distance2D(Position);
+                if (dist <= range)
+                    weight += Math.Max(u.Weight, 100) * (range - dist);
+            }
+
+            if (!CacheData.UnitsWeightsWithinDistanceRecorded.ContainsKey(new Tuple<int, int>(RActorGuid, (int)range)))
+                CacheData.UnitsWeightsWithinDistanceRecorded.Add(new Tuple<int, int>(RActorGuid, (int)range), weight);
+
+            return weight;
+        }
+
+        [NoCopy]
         public int NearbyUnitsWithinDistance(float range = 5f)
         {
-            if (range == Trinity.Settings.Combat.Misc.TrashPackClusterRadius)
-                return NearbyUnits;
-
             if (range == 5f)
                 return NearbyUnits;
-
-            if (this.Type != GObjectType.Unit)
-                return 0;
 
             int count = 0;
             if (CacheData.NearbyUnitsWithinDistanceRecorded.TryGetValue(new Tuple<int, int>(RActorGuid, (int)range), out count))
@@ -543,53 +565,24 @@ namespace Trinity
 
             foreach (var u in CacheData.MonsterObstacles)
             {
-                if (count >= 8)
-                    break;
-
-                if (u.RActorGUID == this.RActorGuid)
+                if (u.RActorGUID == RActorGuid)
                     continue;
-                if (u.Position.Distance2D(this.Position) >= range)
+                if (u.Position.Distance2D(Position) > range)
                     continue;
 
                 count++;
             }
 
-            try { CacheData.NearbyUnitsWithinDistanceRecorded.Add(new Tuple<int, int>(RActorGuid, (int)range), count); }
-            catch { }
+            if (!CacheData.NearbyUnitsWithinDistanceRecorded.ContainsKey(new Tuple<int, int>(RActorGuid, (int)range)))
+                CacheData.NearbyUnitsWithinDistanceRecorded.Add(new Tuple<int, int>(RActorGuid, (int)range), count);
+
             return count;
         }
 
         [NoCopy]
         public int NearbyUnits
         {
-            get
-            {
-                if (this.Type != GObjectType.Unit)
-                    return 0;
-
-                int count = 0;
-                if (CacheData.NearbyUnitsRecorded.TryGetValue(RActorGuid, out count))
-                {
-                    return count;
-                }
-
-                foreach (var u in CacheData.MonsterObstacles)
-                {
-                    if (count >= 8)
-                        break;
-
-                    if (u.RActorGUID == this.RActorGuid)
-                        continue;
-                    if (u.Position.Distance2D(this.Position) >= Trinity.Settings.Combat.Misc.TrashPackClusterRadius)
-                        continue;
-
-                    count++;
-                }
-
-                try { CacheData.NearbyUnitsRecorded.Add(RActorGuid, count); }
-                catch { }
-                return count;
-            }
+            get { return NearbyUnitsWithinDistance(Trinity.Settings.Combat.Misc.TrashPackClusterRadius); }
         }
 
         [NoCopy]

@@ -213,7 +213,7 @@ namespace Trinity.Combat.Abilities
                 {
                     Trinity.RecordTargetHistory();
 
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.Targetting,
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.Weight,
                         "Found New Target {0} dist={1:0} IsElite={2} Radius={3:0.0} Weight={4:0} ActorSNO={5} " +
                         "Anim={6} TargetedCount={7} Type={8} ",
                         CurrentTarget.InternalName,
@@ -240,7 +240,7 @@ namespace Trinity.Combat.Abilities
                     // Check if the health has changed, if so update the target-pick time before we blacklist them again
                     if (CurrentTarget.HitPointsPct != Trinity.TargetLastHealth)
                     {
-                        Logger.Log(TrinityLogLevel.Info, LogCategory.Targetting, "Keeping Target {0} - CurrentTarget.HitPoints: {1:0.00} TargetLastHealth: {2:0.00} ",
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.Weight, "Keeping Target {0} - CurrentTarget.HitPoints: {1:0.00} TargetLastHealth: {2:0.00} ",
                                         CurrentTarget.RActorGuid, CurrentTarget.HitPointsPct, Trinity.TargetLastHealth);
                         Trinity.LastPickedTargetTime = DateTime.UtcNow;
                     }

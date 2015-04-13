@@ -168,8 +168,8 @@ namespace Trinity
         /// </summary>
         internal static HashSet<int> ObsoleteAvoidancesAtPlayer = new HashSet<int>();
 
-        internal static Dictionary<int, int> NearbyUnitsRecorded = new Dictionary<int, int>();
         internal static Dictionary<Tuple<int, int>, int> NearbyUnitsWithinDistanceRecorded = new Dictionary<Tuple<int, int>, int>();
+        internal static Dictionary<Tuple<int, int>, double> UnitsWeightsWithinDistanceRecorded = new Dictionary<Tuple<int, int>, double>();
 
         public static InventoryCache Inventory
         {
@@ -251,8 +251,8 @@ namespace Trinity
             UnSafeZones.Clear();
             SentryTurret.Clear();
             Voodoo.Clear();
-            NearbyUnitsRecorded.Clear();
             NearbyUnitsWithinDistanceRecorded.Clear();
+            UnitsWeightsWithinDistanceRecorded.Clear();
 
             /* Every 10 ticks */
             if (Tick % 10 == 0)

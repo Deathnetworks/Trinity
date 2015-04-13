@@ -479,7 +479,7 @@ namespace Trinity
                 !_atPlayer && _u.Position.Distance2D(_loc) - _u.Radius <= _range)
             select _u).ToList();
 
-            if (!ListObjectResults.ContainsKey(_source))
+            if (_result.Any() && !ListObjectResults.ContainsKey(_source))
                 ListObjectResults.Add(_source, _result);
 
             return _result;
@@ -859,7 +859,12 @@ namespace Trinity
         {
             var _list = ListUnitsInRangeOfPosition(_loc, _range);
             if (_list == null)
+            {
+                if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
+                    return Trinity.CurrentTarget;
+
                 return default(TrinityCacheObject);
+            }
 
             var _results = (
                 from u in _list
@@ -875,8 +880,8 @@ namespace Trinity
                 _results = (
                     from u in _results
                     orderby
-                        u.HitPointsPct,
-                        u.NearbyUnitsWithinDistance(16f) descending,
+                        u.HitPoints,
+                        u.UnitsWeightsWithinDistance(16f) descending,
                         u.CountUnitsInFront()
                     select u).ToList();
             }
@@ -885,8 +890,8 @@ namespace Trinity
                 _results = (
                    from u in _results
                    orderby
-                       u.HitPointsPct,
-                       u.NearbyUnitsWithinDistance(16f) descending
+                       u.HitPoints,
+                       u.UnitsWeightsWithinDistance(16f) descending
                    select u).ToList();
             }
 
@@ -904,7 +909,12 @@ namespace Trinity
         {
             var _list = ListUnitsInRangeOfPosition(_loc, _range);
             if (_list == null)
+            {
+                if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
+                    return Trinity.CurrentTarget;
+
                 return default(TrinityCacheObject);
+            }
 
             var _results = (
                 from u in _list
@@ -914,8 +924,9 @@ namespace Trinity
                     u.IsInLineOfSight &&
                     u.IsTrashPackOrBossEliteRareUnique
                 orderby
-                    MobsWithDebuff(u.Position, SNOPower.Monk_ExplodingPalm, 12f) descending,
-                    u.HitPointsPct
+                    u.HitPoints,
+                    u.UnitsWeightsWithinDistance(16f) descending,
+                    MobsWithDebuff(u.Position, SNOPower.Monk_ExplodingPalm, 12f) descending
                 select u).ToList();
 
             if (_results.Any())
@@ -934,7 +945,12 @@ namespace Trinity
 
             var _list = ListUnitsInRangeOfPosition(_loc, _range);
             if (_list == null)
+            {
+                if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
+                    return Trinity.CurrentTarget;
+
                 return default(TrinityCacheObject);
+            }
 
             var _results = (
                 from u in _list
@@ -963,12 +979,17 @@ namespace Trinity
 
             var _list = ListUnitsInRangeOfPosition(_loc, _range, _useWeights);
             if (_list == null)
+            {
+                if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
+                    return Trinity.CurrentTarget;
+
                 return default(TrinityCacheObject);
+            }
 
             var _results = (
                 from u in _list
                 orderby
-                    u.Position.Distance2D(_loc)
+                    u.Position.Distance2D(_loc) - u.Radius
                 select u).ToList();
 
             if (_results.Any())
@@ -983,31 +1004,78 @@ namespace Trinity
         // Revised
         internal static TrinityCacheObject GetDashStrikeFarthestTarget(float _maxRange, float _minRange = 33f)
         {
-            using (new MemorySpy("TargetUtil.GetDashStrikeFarthestTarget()"))
+            var _list = ListUnitsInRangeOfPosition(Player.Position, _maxRange);
+            if (_list == null)
             {
-                var _list = ListUnitsInRangeOfPosition(Player.Position, _maxRange);
-                if (_list == null)
-                    return default(TrinityCacheObject);
-
-                var _results = (
-                    from u in _list
-                    where
-                        u.Distance >= _minRange &&
-                        u.Weight > 0 &&
-                        u.IsInLineOfSight
-                    orderby
-                        u.NearbyUnits descending,
-                        u.Weight descending
-                    select u).ToList();
-
-                if (_results.Any())
-                    return _results.FirstOrDefault();
-
                 if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
                     return Trinity.CurrentTarget;
 
                 return default(TrinityCacheObject);
             }
+
+            var _results = (
+                from u in _list
+                where
+                    u.Distance >= _minRange &&
+                    u.Weight > 0 &&
+                    u.IsInLineOfSight &&
+                    u.IsTrashPackOrBossEliteRareUnique
+                orderby
+                    u.UnitsWeightsWithinDistance(16f) descending
+                select u).ToList();
+
+            if (_results.Any())
+                return _results.FirstOrDefault();
+
+            if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
+                return Trinity.CurrentTarget;
+
+            return default(TrinityCacheObject);
+        }
+
+        // Revised
+        internal static TrinityCacheObject GetDashStrikeThousandStormTarget(float _maxRange, float _minRange = 33f)
+        {
+            var _list = ListUnitsInRangeOfPosition(Player.Position, _maxRange);
+            if (_list == null)
+            {
+                if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
+                    return Trinity.CurrentTarget;
+
+                return default(TrinityCacheObject);
+            }
+
+            var _results = (
+                from u in _list
+                where
+                    u.Distance >= _minRange &&
+                    u.IsInLineOfSight &&
+                    u.IsTrashPackOrBossEliteRareUnique
+                orderby
+                    u.UnitsWeightsWithinDistance(16f) descending,
+                    u.CountUnitsInFront() descending
+                select u).ToList();
+
+            if (!_results.Any())
+            {
+                _results = (
+                    from u in _list
+                    where
+                        u.IsInLineOfSight &&
+                        u.IsTrashPackOrBossEliteRareUnique
+                    orderby
+                        u.UnitsWeightsWithinDistance(16f) descending,
+                        u.CountUnitsInFront() descending
+                    select u).ToList();
+            }
+
+            if (_results.Any())
+                return _results.FirstOrDefault();
+
+            if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
+                return Trinity.CurrentTarget;
+
+            return default(TrinityCacheObject);
         }
 
         // new 03 2015

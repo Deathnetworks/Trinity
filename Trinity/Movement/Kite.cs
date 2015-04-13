@@ -56,7 +56,7 @@ namespace Trinity
         {
             using (new PerformanceLogger("RefreshDiaObjectCache.Kiting"))
             {
-                if (Trinity.Settings.Combat.Misc.KeepMovingInCombat)
+                if (Trinity.Settings.Combat.Misc.KeepMovingInCombat && !Player.IsRanged)
                     return;
 
                 bool TryToKite = false;
@@ -110,7 +110,7 @@ namespace Trinity
                 }
 
                 // Avoid Death
-                if (Trinity.Player.AvoidDeath)
+                if (Trinity.Player.AvoidDeath || needToKite)
                 {
                     Trinity.Player.NeedToKite = true;
                     kiteMonsterList = (from m in ObjectCache
