@@ -761,7 +761,7 @@ namespace Trinity
                         return true;
                     }
 
-                    ACDItem potion = ZetaDia.Me.Inventory.BaseHealthPotion;
+                    /*ACDItem potion = ZetaDia.Me.Inventory.BaseHealthPotion;
                     if (potion != null)
                     {
                         int id = potion.DynamicId;
@@ -769,7 +769,7 @@ namespace Trinity
 
                         SpellHistory.RecordSpell(new TrinityPower(SNOPower.DrinkHealthPotion));
                         return true;
-                    }
+                    }*/
 
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "No Available potions!", 0);
                 }
