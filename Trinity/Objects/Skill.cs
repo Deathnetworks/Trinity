@@ -127,7 +127,7 @@ namespace Trinity.Objects
                 if (this == Skills.DemonHunter.ElementalArrow && Legendary.Kridershot.IsEquipped)
                     return true;
 
-                return Category == SpellCategory.Primary && !IsSignature && Resource == Resource.None;
+                return Category == SpellCategory.Primary;
             }
         }
 
