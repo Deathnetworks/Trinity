@@ -722,7 +722,7 @@ namespace Trinity.DbProvider
                     LastNavigateToTarget = destination;
                 }
 
-                if (DateTime.UtcNow.Subtract(LastNavigateToResult).TotalMilliseconds < 250)
+                if (DateTime.UtcNow.Subtract(LastNavigateToResult).TotalMilliseconds < 350)
                     return MoveResult.Moved;
 
                 try
@@ -809,7 +809,11 @@ namespace Trinity.DbProvider
 
         internal static bool UsedSpecialMovement(Vector3 loc)
         {
-            return UsedSpecialMovement(GridMap.GetNodeAt(loc));
+            var node = GridMap.GetNodeAt(loc);
+            if (node != null && node.Position.Distance2D(loc) <= 4f)
+                return UsedSpecialMovement(node);
+
+            return UsedSpecialMovement(new GridNode(loc));
         }
 
         internal static bool UsedSpecialMovement(GridNode _gridNode)
@@ -886,13 +890,37 @@ namespace Trinity.DbProvider
                 #region DashingStrike
                 if (Trinity.Player.ActorClass == ActorClass.Monk)
                 {
-                    if (((CurrentTarget != null && !CurrentTarget.IsUnit && _gridNode.Distance >= 10f) ||
-                        (CurrentTarget == null && CombatBase.TimeSincePowerUse(SNOPower.X1_Monk_DashingStrike) > 1250 && _gridNode.Distance >= 25f)) &&
-                        CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike) && Trinity.Settings.Combat.Monk.UseDashingStrikeOOC &&
-                        NavHelper.CanRayCast(Trinity.Player.Position, _gridNode.Position, true))
+                    if (CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike, CombatBase.CanCastFlags.NoTimer) &&
+                        CurrentTarget != null && !CurrentTarget.IsUnit && _gridNode.Distance >= 10f)
                     {
                         if (CombatBase.Cast(new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, _gridNode.Position)))
                             return true;
+                    }
+
+                    if (CurrentTarget == null && CombatBase.TimeSincePowerUse(SNOPower.X1_Monk_DashingStrike) > 150 &&
+                        CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike, CombatBase.CanCastFlags.NoTimer) && Trinity.Settings.Combat.Monk.UseDashingStrikeOOC)
+                    {
+                        string direction = MathUtil.GetHeadingToPoint(Trinity.Player.Position, _gridNode.Position);
+                        var nodes = (
+                            from node in MainGrid.Map
+                            where
+                                direction.Equals(MathUtil.GetHeadingToPoint(Trinity.Player.Position, node.Position)) &&
+                                NavHelper.CanRayCast(node.Position)
+                            orderby
+                                node.Distance descending
+                            select node).ToList();
+
+                        var target = _gridNode.Position;
+                        if (nodes.Any() && nodes.Count() > 0)
+                        {
+                            target = nodes.First().Position;
+                        }
+
+                        if (target.Distance2D(Trinity.Player.Position) >= 20f && NavHelper.CanRayCast(target) && 
+                            CombatBase.Cast(new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, target)))
+                        {
+                            return true;
+                        } 
                     }
                 }
                 #endregion
