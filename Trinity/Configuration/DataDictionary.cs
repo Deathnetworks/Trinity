@@ -1892,7 +1892,6 @@ namespace Trinity
         /// </summary>
         public static HashSet<int> GoblinIds { get { return goblinIds; } }
         private static readonly HashSet<int> goblinIds = new HashSet<int> {
-            (int)SNOActor.Lore_Bestiary_TreasureGoblin,
             (int)SNOActor.treasureGoblin_A,
             (int)SNOActor.treasureGoblin_A_Slave,
             (int)SNOActor.treasureGoblin_B,
