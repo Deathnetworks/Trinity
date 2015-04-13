@@ -103,7 +103,7 @@
 
                             <TextBlock Text="Ranged Attack Range" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center"/>
                             <Slider Grid.Column="1" Template="{DynamicResource Slider}"
-                              Interval="500" Maximum="65" Minimum="0"
+                              Interval="500" Maximum="65" Minimum="10"
                               SmallChange="1" LargeChange="5"
                               TickPlacement="BottomRight" TickFrequency="1"
                               Value="{Binding Path=DH.RangedAttackRange}"
