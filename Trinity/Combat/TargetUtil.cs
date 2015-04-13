@@ -119,7 +119,7 @@ namespace Trinity
 
         internal static GridNode GetBestPierceMoveTarget(float _range, Vector3 _loc = new Vector3())
         {
-            using (new MemorySpy("TargetUtil.GetBestFuriousChargeMoveNode()"))
+            using (new MemorySpy("TargetUtil.GetBestPierceMoveTarget()"))
             {
                 if (!MainGrid.Map.Any())
                     return null;
@@ -1180,8 +1180,11 @@ namespace Trinity
                     {
                         string _dir = MathUtil.GetHeadingToPoint(_loc, _n.Position);
                         bool _hasMob = false;
+                        float farDistance = 0f;
+                        Vector3 nodePosition = _n.Position;
+                        bool isLastUnit = true;
 
-                        foreach (var _o in _list)
+                        foreach (var _o in _list.OrderByDescending(o => o.Distance))
                         {
                             if ((Skills.Barbarian.FuriousCharge.IsActive && _o.Type == GObjectType.Destructible) || _o.IsUnit)
                             {
@@ -1192,13 +1195,20 @@ namespace Trinity
                                     continue;
 
                                 float _radius = Math.Min(Math.Max(_o.Radius, 5f), 8f);
-                                if (_o.IsInLineOfSight && (Trinity.KillMonstersInAoE || !_o.IsStandingInAvoidance))
+                                if (_o.IsInLineOfSight)
                                 {
-                                    if (MathUtil.IntersectsPath(_o.Position, _radius, _loc, _n.Position))
+                                    if (MathUtil.IntersectsPath(_o.Position, _radius, _loc, nodePosition))
                                     {
                                         if (_o.IsUnit) _hasMob = true;
 
-                                        Vector3 _lineProj = MathEx.CalculatePointFrom(_n.Position, _loc, _o.Position.Distance2D(_loc));
+                                        float dist = _o.Position.Distance2D(_loc);
+                                        if (dist > farDistance)
+                                        {
+                                            farDistance = dist;
+                                            _n.Position = MathEx.CalculatePointFrom(_loc, _o.Position, -5f);
+                                        }
+
+                                        Vector3 _lineProj = MathEx.CalculatePointFrom(nodePosition, _loc, dist);
                                         _n.SpecialWeight += (_radius - _lineProj.Distance2D(_o.Position)) * Math.Max(_o.Weight, 1000f);
 
                                         if (_o.IsBoss || (_o.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze))
@@ -1211,7 +1221,22 @@ namespace Trinity
                                         if (TownRun.IsTryingToTownPortal() || Trinity.Player.StandingInAvoidance)
                                             _n.SpecialCount++;
 
-                                        if (!_atPlayer && _o.Position.Distance2D(_loc) <= 10)
+                                        if (Skills.Monk.InnerSanctuary.IsActive && _o.HasDebuff(SNOPower.X1_Monk_InnerSanctuary))
+                                            _n.SpecialCount++;
+
+                                        if (CombatBase.IsBaneOfTrappedEquipped && Skills.Monk.BlindingFlash.IsActive && _o.HasDebuff(SNOPower.Monk_BlindingFlash))
+                                            _n.SpecialCount++;
+
+                                        if (isLastUnit && _o.IsUnit)
+                                        {
+                                            isLastUnit = false;
+                                            if ((!Trinity.KillMonstersInAoE || Trinity.Settings.Combat.Misc.AvoidAOE) && _o.IsStandingInAvoidance)
+                                            {
+                                                _n.SpecialCount--;
+                                            }
+                                        }
+
+                                        if (!_atPlayer && dist <= 10)
                                         {
                                             if (_o.IsBoss)
                                                 _n.SpecialCount -= 3;

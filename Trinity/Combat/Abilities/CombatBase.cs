@@ -322,6 +322,14 @@ namespace Trinity.Combat.Abilities
         /// <summary>
         /// Determines whether [is ZeisOfStone equipped].
         /// </summary>
+        public static bool IsBaneOfTrappedEquipped
+        {
+            get { return CacheData.Inventory.EquippedIds.Contains(405781); }
+        }
+
+        /// <summary>
+        /// Determines whether [is ZeisOfStone equipped].
+        /// </summary>
         public static bool IsZeisOfStoneEquipped
         {
             get { return CacheData.Inventory.EquippedIds.Contains(405801); }

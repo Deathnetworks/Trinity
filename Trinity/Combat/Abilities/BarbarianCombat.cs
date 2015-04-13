@@ -888,7 +888,6 @@ namespace Trinity.Combat.Abilities
             get
             {
                 if (IsTaegukBuffWillExpire ||
-                    (Sets.ImmortalKingsCall.IsSecondBonusActive && !IsCurrentlyAvoiding) && 
                     CanCast(SNOPower.Barbarian_Whirlwind, CanCastFlags.NoTimer))
                 {
                     if (TargetUtil.AnyMobsInRange(15f, false) ||
