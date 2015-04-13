@@ -198,7 +198,7 @@ namespace Trinity
                                     else if (Player.ActorClass == ActorClass.Barbarian && Sets.TheLegacyOfRaekor.IsMaxBonusActive &&
                                         !TownRun.IsTryingToTownPortal() &&
                                         Skills.Barbarian.FuriousCharge.IsActive && !(cacheObject.IsPlayerFacing(20f) && cacheObject.Distance < cacheObject.Radius) &&
-                                        (TargetUtil.NumMobsInRangeOfPosition(cacheObject.Position, 40f) <= 1 || cacheObject.CountFCObjectsInFront() < 3 || !cacheObject.IsInLineOfSight))
+                                        (TargetUtil.NumMobsInRangeOfPosition(cacheObject.Position, 40f) <= 1 || cacheObject.CountFCObjectsInFront < 3 || !cacheObject.IsInLineOfSight))
                                     {
                                         objWeightInfo += "BarbIgnoring ";
                                         ignoring = true;

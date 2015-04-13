@@ -215,19 +215,23 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Shield Bash
-                if (CanCast(SNOPower.X1_Crusader_ShieldBash2))
+                if (Skills.Crusader.ShieldBash.IsActive)
                 {
-                    var bestPiercePoint = TargetUtil.GetBestPiercePoint(45f);
-                    if (bestPiercePoint != Vector3.Zero && NavHelper.CanRayCast(bestPiercePoint, true))
-                        return new TrinityPower(SNOPower.X1_Crusader_ShieldBash2, 45f, bestPiercePoint);
-
-                    var bestMoveNode = TargetUtil.GetBestFuriousChargeMoveNode(45f, _useFcWeights: false);
-                    if (bestMoveNode != null)
+                    var target = TargetUtil.GetBestPierceTarget(40f);
+                    if (target.IsTrashPackOrBossEliteRareUnique || target.CountUnitsInFront > 1)
                     {
-                        var bestPierceNode = TargetUtil.GetBestFuriousChargeNode(45f, bestMoveNode.Position, _useFcWeights: false);
-                        if (bestPierceNode != null)
-                            return new TrinityPower(SNOPower.X1_Crusader_ShieldBash2, 3f, bestMoveNode.Position, bestPierceNode.Position);
-                    } 
+                        return new TrinityPower(SNOPower.X1_Crusader_ShieldBash2, 45f, target.ACDGuid);
+                    }
+
+                    var moveNode = TargetUtil.GetBestPierceMoveTarget(40f);
+                    if (moveNode != null)
+                    {
+                        target = TargetUtil.GetBestPierceTarget(40f, moveNode.Position);
+                        if (target.IsTrashPackOrBossEliteRareUnique || target.CountUnitsInFront > 1)
+                        {
+                            return new TrinityPower(SNOPower.X1_Crusader_ShieldBash2, 3f, moveNode.Position, target.ACDGuid);
+                        }
+                    }
                 }
 
                 // Blessed Hammer, spin outwards 

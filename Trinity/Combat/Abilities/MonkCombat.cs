@@ -313,9 +313,13 @@ namespace Trinity.Combat.Abilities
 
                 // Thousand storm spam
                 if (Sets.ThousandStorms.IsSecondBonusActive && Player.PrimaryResource >= 85 &&
-                    CurrentTarget.IsTrashPackOrBossEliteRareUnique &&
+                    (CurrentTarget.IsTrashPackOrBossEliteRareUnique || TargetUtil.AnyMobsInRange(MaxDashingStrikeRange, 2)) &&
                     (!Sets.ThousandStorms.IsMaxBonusActive || (TimeSincePrimaryUse >= 0 && TimeSincePrimaryUse < 5950 && Skills.Monk.DashingStrike.Charges > 0)))
                 {
+                    var castNode = TargetUtil.GetBestPierceNode(MaxDashingStrikeRange);
+                    if (castNode != null && castNode.SpecialWeight > 0)
+                        return new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, castNode.Position);
+
                     if (Passives.Monk.Momentum.IsActive && !Passives.Monk.Momentum.IsBuffActive)
                         CombatBase.SwitchToTarget(TargetUtil.GetDashStrikeThousandStormTarget(MaxDashingStrikeRange, 25f));
                     else
@@ -577,7 +581,7 @@ namespace Trinity.Combat.Abilities
             // Fists of Thunder
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Monk_FistsofThunder))
             {
-                return new TrinityPower(SNOPower.Monk_FistsofThunder, 30f, CurrentTarget.ClusterPosition(5f), CurrentTarget.ACDGuid);
+                return new TrinityPower(SNOPower.Monk_FistsofThunder, 30f, CurrentTarget.ClusterPosition(28f), CurrentTarget.ACDGuid);
             }
 
             // Deadly Reach normal

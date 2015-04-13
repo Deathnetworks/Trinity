@@ -232,72 +232,49 @@ namespace Trinity
             SNOPower = snoPower;
             MinimumRange = minimumRange;
             TargetPosition = position;
-            MovePosition = Vector3.Zero;
-            TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
-            TargetACDGUID = -1;
-            WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
-            WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
-            PowerAssignmentTime = DateTime.UtcNow;
-        }
-
-        /// <summary>
-        /// Create a TrinityPower for use at a specific location with specific ACDGuid
-        /// </summary>
-        /// <param name="snoPower"></param>
-        /// <param name="minimumRange"></param>
-        /// <param name="position"></param>
-        public TrinityPower(SNOPower snoPower, float minimumRange, Vector3 movePosition, int targetACDGUID)
-        {
-            SNOPower = snoPower;
-            MinimumRange = minimumRange;
-            TargetPosition = targetACDGUID != -1 ? Vector3.Zero : movePosition;
-            MovePosition = movePosition;
-            TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
-            TargetACDGUID = targetACDGUID;
-            WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
-            WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
-            PowerAssignmentTime = DateTime.UtcNow;
-        }
-
-        /// <summary>
-        /// Create a TrinityPower for use at a specific location with specific ACDGuid
-        /// </summary>
-        /// <param name="snoPower"></param>
-        /// <param name="minimumRange"></param>
-        /// <param name="position"></param>
-        public TrinityPower(SNOPower snoPower, float minimumRange, Vector3 movePosition, Vector3 position)
-        {
-            SNOPower = snoPower;
-            MinimumRange = minimumRange;
-            TargetPosition = position;
-            MovePosition = movePosition;
-            TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
-            TargetACDGUID = -1;
-            WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
-            WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
-            PowerAssignmentTime = DateTime.UtcNow;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TrinityPower" /> class.
-        /// </summary>
-        /// <param name="snoPower">The SNOPower to be used</param>
-        /// <param name="minimumRange">The minimum range required from the Position or Target to be used</param>
-        /// <param name="position">The Position to use the power at</param>
-        /// <param name="targetDynamicWorldId">Usually the CurrentDynamicWorlID</param>
-        /// <param name="targetACDGUID">The Unit we are targetting</param>
-        /// <param name="waitTicksBeforeUse">The number of "ticks" to wait before using a power - logically 1/10th of a second</param>
-        /// <param name="waitTicksAfterUse">The number of "ticks" to wait after using a power - logically 1/10th of a second</param>
-        public TrinityPower(SNOPower snoPower, float minimumRange, Vector3 position, int targetDynamicWorldId, int targetACDGUID, float waitTicksBeforeUse, float waitTicksAfterUse)
-        {
-            SNOPower = snoPower;
-            MinimumRange = minimumRange;
-            TargetPosition = position;
             MovePosition = position;
-            TargetDynamicWorldId = targetDynamicWorldId;
+            TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
+            TargetACDGUID = -1;
+            WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
+            WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
+            PowerAssignmentTime = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Create a TrinityPower for use at a specific location with specific ACDGuid
+        /// </summary>
+        /// <param name="snoPower"></param>
+        /// <param name="minimumRange"></param>
+        /// <param name="position"></param>
+        public TrinityPower(SNOPower snoPower, float minimumRangeToAcd, Vector3 movePosition, int targetACDGUID)
+        {
+            SNOPower = snoPower;
+            MinimumRange = minimumRangeToAcd;
+            TargetPosition = Vector3.Zero;
+            MovePosition = movePosition;
+            TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
             TargetACDGUID = targetACDGUID;
-            WaitTicksBeforeUse = waitTicksBeforeUse;
-            WaitTicksAfterUse = waitTicksAfterUse;
+            WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
+            WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
+            PowerAssignmentTime = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Create a TrinityPower for use at a specific location with specific position
+        /// </summary>
+        /// <param name="snoPower"></param>
+        /// <param name="minimumRange"></param>
+        /// <param name="position"></param>
+        public TrinityPower(SNOPower snoPower, float minimumRangeToMovePosition, Vector3 movePosition, Vector3 position)
+        {
+            SNOPower = snoPower;
+            MinimumRange = minimumRangeToMovePosition;
+            TargetPosition = position;
+            MovePosition = movePosition;
+            TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
+            TargetACDGUID = -1;
+            WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
+            WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
             PowerAssignmentTime = DateTime.UtcNow;
         }
 
@@ -311,11 +288,11 @@ namespace Trinity
         /// <param name="targetACDGUID">The Unit we are targetting</param>
         /// <param name="waitTicksBeforeUse">The number of "ticks" to wait before using a power - logically 1/10th of a second</param>
         /// <param name="waitTicksAfterUse">The number of "ticks" to wait after using a power - logically 1/10th of a second</param>
-        public TrinityPower(SNOPower snoPower, float minimumRange, Vector3 position, Vector3 movePosition, int targetDynamicWorldId, int targetACDGUID, float waitTicksBeforeUse, float waitTicksAfterUse)
+        public TrinityPower(SNOPower snoPower, float minimumRangeToAcd, Vector3 movePosition, int targetDynamicWorldId, int targetACDGUID, float waitTicksBeforeUse, float waitTicksAfterUse)
         {
             SNOPower = snoPower;
-            MinimumRange = minimumRange;
-            TargetPosition = position;
+            MinimumRange = minimumRangeToAcd;
+            TargetPosition = Vector3.Zero;
             MovePosition = movePosition;
             TargetDynamicWorldId = targetDynamicWorldId;
             TargetACDGUID = targetACDGUID;

@@ -117,22 +117,83 @@ namespace Trinity
             return ListUnitsInRangeOfPosition(_range: _range).Any(u => u.NearbyUnitsWithinDistance(_radius) >= _minCount);
         }
 
-
-        internal static TrinityCacheObject GetBestPierceTarget(float _range)
+        internal static GridNode GetBestPierceMoveTarget(float _range, Vector3 _loc = new Vector3())
         {
-            var _list = ListUnitsInRangeOfPosition(_range: _range);
+            using (new MemorySpy("TargetUtil.GetBestFuriousChargeMoveNode()"))
+            {
+                if (!MainGrid.Map.Any())
+                    return null;
+
+                if (_loc == new Vector3()) _loc = Player.Position;
+                bool _atPlayer = _loc.Distance2D(Player.Position) <= 3f;
+
+                HashSet<GridNode> _listResult = new HashSet<GridNode>();
+                var _rnd = new Random();
+
+                var _gridResult = (
+                    from _o in MainGrid.Map
+                    where
+                        _o.Distance > 3f &&
+                        _o.MonsterWeight >= 0 &&
+                        _o.Weight >= 0 &&
+                        !_o.HasMonsterRelated &&
+                        !_o.HasAvoidanceRelated &&
+                        _o.NearbyGridPointsCount > 0 &&
+                        (_atPlayer && _o.Distance <= 30f ||
+                        !_atPlayer && _o.Position.Distance2D(_loc) <= 30f)
+                    orderby
+                        _rnd.Next()
+                    select _o).ToList();
+
+                foreach (var _g in _gridResult)
+                {
+                    if (_listResult.Count() > 35) { break; }
+                    _listResult.Add(_g);
+                }
+
+                if (_listResult.Any())
+                {
+                    foreach (var _n in _gridResult)
+                    {
+                        var _target = GetBestPierceTarget(_range, _n.Position);
+                        _n.SpecialCount = _target.CountUnitsInFront;
+                    }
+
+                    if (_gridResult.Any(o => o.SpecialCount > 0))
+                    {
+                        _gridResult = (
+                            from _o in _gridResult
+                            orderby
+                                _o.SpecialCount descending
+                            select _o).ToList();
+
+                        return _gridResult.FirstOrDefault();
+                    }
+                }
+
+                if (CurrentTarget != null)
+                    return new GridNode(CurrentTarget.Position);
+
+                return null;
+            }
+        }
+        internal static TrinityCacheObject GetBestPierceTarget(float _range, Vector3 _loc = new Vector3())
+        {
+            if (_loc == new Vector3()) _loc = Player.Position;
+            bool _atPlayer = _loc.Distance2D(Player.Position) <= 3f;
+
+            var _list = ListUnitsInRangeOfPosition(_loc, _range, false);
             if (_list == null)
                 return default(TrinityCacheObject);
 
             var _results =
                 (from _u in _list
                  where
-                    _u.IsInLineOfSight &&
-                    (Trinity.KillMonstersInAoE || !LocOrPathInAoE(_u))
+                    (Trinity.KillMonstersInAoE || !LocOrPathInAoE(_u)) &&
+                    _u.IsInLineOfSight
                  orderby
-                    _u.CountUnitsInFront() descending,
-                    _u.NearbyUnitsWithinDistance(8f) descending,
-                    _u.IsBossOrEliteRareUnique descending
+                    _u.CountUnitsInFront descending,
+                    _u.NearbyUnitsWithinDistance(8f) descending
                  select _u).ToList();
 
             if (_results.Any())
@@ -153,7 +214,7 @@ namespace Trinity
         }
         internal static TrinityCacheObject GetBestPierceObject(float _range)
         {
-            var _list = ListObjectsInRangeOfPosition(_range: _range);
+            var _list = ListObjectsInRangeOfPosition(_range: _range, _useWeights: false);
             if (_list == null)
                 return default(TrinityCacheObject);
 
@@ -163,7 +224,7 @@ namespace Trinity
                     _o.IsInLineOfSight &&
                     (Trinity.KillMonstersInAoE || !LocOrPathInAoE(_o))
                  orderby
-                    _o.CountUnitsInFront() descending,
+                    _o.CountUnitsInFront descending,
                     _o.NearbyUnitsWithinDistance(8f) descending
                  select _o).ToList();
 
@@ -553,7 +614,7 @@ namespace Trinity
                 useTargetBasedZigZag = Trinity.Settings.Combat.Barbarian.TargetBasedZigZag;
             }
 
-            var bestPierceNode = GetBestFuriousChargeNode(maxDistance + 10f, _useFcWeights: false);
+            var bestPierceNode = GetBestPierceNode(maxDistance + 10f);
             if (bestPierceNode != null && bestPierceNode.Distance > minDistance)
             {
                 Logger.Log(LogCategory.Movement, "Returning ZigZag: BestPierceNode {0} r-dist={1} t-dist={2} p_weight={3}", bestPierceNode.Position, ringDistance, bestPierceNode.Position.Distance2D(Player.Position), bestPierceNode.SpecialWeight);
@@ -882,7 +943,7 @@ namespace Trinity
                     orderby
                         u.HitPoints,
                         u.UnitsWeightsWithinDistance(16f) descending,
-                        u.CountUnitsInFront()
+                        u.CountUnitsInFront
                     select u).ToList();
             }
             else
@@ -1052,8 +1113,8 @@ namespace Trinity
                     u.IsInLineOfSight &&
                     u.IsTrashPackOrBossEliteRareUnique
                 orderby
-                    u.UnitsWeightsWithinDistance(16f) descending,
-                    u.CountUnitsInFront() descending
+                    u.CountUnitsInFront descending,
+                    u.UnitsWeightsWithinDistance(16f) descending
                 select u).ToList();
 
             if (!_results.Any())
@@ -1064,8 +1125,8 @@ namespace Trinity
                         u.IsInLineOfSight &&
                         u.IsTrashPackOrBossEliteRareUnique
                     orderby
-                        u.UnitsWeightsWithinDistance(16f) descending,
-                        u.CountUnitsInFront() descending
+                        u.CountUnitsInFront descending,
+                        u.UnitsWeightsWithinDistance(16f) descending
                     select u).ToList();
             }
 
@@ -1101,9 +1162,9 @@ namespace Trinity
         }
 
         // new 03 2015
-        internal static GridNode GetBestFuriousChargeNode(float _range, Vector3 _loc = new Vector3(), bool _useFcWeights = true)
+        internal static GridNode GetBestPierceNode(float _range, Vector3 _loc = new Vector3())
         {
-            using (new MemorySpy("TargetUtil.GetBestFuriousChargeNode()"))
+            using (new MemorySpy("TargetUtil.GetBestPierceChargeNode()"))
             {
                 if (_loc == new Vector3()) _loc = Player.Position;
                 bool _atPlayer = _loc.Distance2D(Player.Position) <= 2f;
@@ -1150,10 +1211,7 @@ namespace Trinity
                                         if (TownRun.IsTryingToTownPortal() || Trinity.Player.StandingInAvoidance)
                                             _n.SpecialCount++;
 
-                                        if (Skills.Barbarian.FuriousCharge.Charges > 1)
-                                            _n.SpecialCount++;
-
-                                        if (!_atPlayer && _o.Position.Distance2D(_loc) <= 15)
+                                        if (!_atPlayer && _o.Position.Distance2D(_loc) <= 10)
                                         {
                                             if (_o.IsBoss)
                                                 _n.SpecialCount -= 3;
@@ -1164,8 +1222,11 @@ namespace Trinity
                                 }
                             }
 
+                            if (Skills.Barbarian.FuriousCharge.Charges > 1)
+                                _n.SpecialCount++;
+
                             _n.SpecialWeight *= _n.SpecialCount;
-                            if (!_hasMob || (_n.SpecialCount < 3 && _useFcWeights)) { _n.SpecialWeight = 0; }
+                            if (!_hasMob) { _n.SpecialWeight = 0; }
                         }
                     }
 
@@ -1178,7 +1239,7 @@ namespace Trinity
         }
 
         // new 03 2015
-        internal static GridNode GetBestFuriousChargeMoveNode(float _range, Vector3 _loc = new Vector3(), bool _useFcWeights = true)
+        internal static GridNode GetBestPierceMoveNode(float _range, Vector3 _loc = new Vector3())
         {
             using (new MemorySpy("TargetUtil.GetBestFuriousChargeMoveNode()"))
             {
@@ -1216,7 +1277,7 @@ namespace Trinity
                 {
                     foreach (var _n in _gridResult)
                     {
-                        var _node = GetBestFuriousChargeNode(_range, _n.Position, _useFcWeights);
+                        var _node = GetBestPierceNode(_range, _n.Position);
                         if (_node != null)
                         {
                             _n.SpecialWeight = _node.SpecialWeight;
@@ -1236,7 +1297,7 @@ namespace Trinity
                     }
                 }
 
-                if (!_useFcWeights && CurrentTarget != null)
+                if (CurrentTarget != null)
                     return new GridNode(CurrentTarget.Position);
 
                 return null;

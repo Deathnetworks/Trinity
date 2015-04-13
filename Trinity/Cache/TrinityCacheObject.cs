@@ -25,9 +25,6 @@ namespace Trinity
         }
 
         [NoCopy]
-        private DiaObject _object;
-
-        [NoCopy]
         public DiaObject Object
         {
             get
@@ -137,12 +134,12 @@ namespace Trinity
         {
             get
             {
-                if (_distance >= 0f)
-                    return _distance;
-                _distance = Trinity.Player.Position.Distance2D(Position);
+                if (distance >= 0f)
+                    return distance;
+                distance = Trinity.Player.Position.Distance2D(Position);
                 return Distance;
             }
-            set { _distance = value; }
+            set { distance = value; }
         }
 
         [NoCopy]
@@ -336,15 +333,15 @@ namespace Trinity
         {
             get
             {
-                if (_byteResult_IsNavigable >= 0)
-                    return _byteResult_IsNavigable > 0 ? true : false;
+                if (byteResult_IsNavigable >= 0)
+                    return byteResult_IsNavigable > 0 ? true : false;
 
                 bool isNavigable = false;
                 Tuple<bool, int> rayCastResult;
 
                 if (ZDiff > 11f)
                 {
-                    _byteResult_IsNavigable = 0;
+                    byteResult_IsNavigable = 0;
                     return false;
                 }
 
@@ -353,21 +350,21 @@ namespace Trinity
                     // Bounty Objectives should always be on the weight list
                     if (IsBountyObjective)
                     {
-                        _byteResult_IsNavigable = 1;
+                        byteResult_IsNavigable = 1;
                         return true;
                     }
 
                     // Quest Monsters should get LoS white-listed
                     if (IsQuestMonster)
                     {
-                        _byteResult_IsNavigable = 1;
+                        byteResult_IsNavigable = 1;
                         return true;
                     }
 
                     // Always LoS Units during events
                     if (IsUnit && Trinity.Player.InActiveEvent)
                     {
-                        _byteResult_IsNavigable = 1;
+                        byteResult_IsNavigable = 1;
                         return true;
                     }
                 }
@@ -387,12 +384,12 @@ namespace Trinity
                         CacheData.RayCastResultsFromObjects.Add(RActorGuid, new Tuple<bool, int>(isNavigable, (int)Distance));
                 }
 
-                _byteResult_IsNavigable = isNavigable ? 1 : 0;
+                byteResult_IsNavigable = isNavigable ? 1 : 0;
                 return isNavigable;
             }
             set
             {
-                _byteResult_IsNavigable = value ? 1 : 0;
+                byteResult_IsNavigable = value ? 1 : 0;
             }
         }
 
@@ -404,15 +401,15 @@ namespace Trinity
                 if (!IsUnit)
                     return IsNavigable;
 
-                if (_byteResult_IsInLineOfSight >= 0)
-                    return _byteResult_IsInLineOfSight > 0 ? true : false;
+                if (byteResult_IsInLineOfSight >= 0)
+                    return byteResult_IsInLineOfSight > 0 ? true : false;
 
                 bool isInLoS = false;
                 Tuple<bool, int> rayCastResult;
 
                 if (ZDiff > 11f)
                 {
-                    _byteResult_IsInLineOfSight = 0;
+                    byteResult_IsInLineOfSight = 0;
                     return false;
                 }
 
@@ -421,21 +418,21 @@ namespace Trinity
                     // Bounty Objectives should always be on the weight list
                     if (IsBountyObjective)
                     {
-                        _byteResult_IsInLineOfSight = 1;
+                        byteResult_IsInLineOfSight = 1;
                         return true;
                     }
 
                     // Quest Monsters should get LoS white-listed
                     if (IsQuestMonster)
                     {
-                        _byteResult_IsInLineOfSight = 1;
+                        byteResult_IsInLineOfSight = 1;
                         return true;
                     }
 
                     // Always LoS Units during events
                     if (Trinity.Player.InActiveEvent)
                     {
-                        _byteResult_IsInLineOfSight = 1;
+                        byteResult_IsInLineOfSight = 1;
                         return true;
                     }
                 }
@@ -455,12 +452,12 @@ namespace Trinity
                         CacheData.RayCastResultsFromObjects.Add(RActorGuid, new Tuple<bool, int>(isInLoS, (int)Distance));
                 }
 
-                _byteResult_IsInLineOfSight = isInLoS ? 1 : 0;
+                byteResult_IsInLineOfSight = isInLoS ? 1 : 0;
                 return isInLoS;
             }
             set
             {
-                _byteResult_IsInLineOfSight = value ? 1 : 0;
+                byteResult_IsInLineOfSight = value ? 1 : 0;
             }
         }
 
@@ -597,52 +594,68 @@ namespace Trinity
         }
 
         [NoCopy]
-        public int CountUnitsInFront()
+        public int CountUnitsInFront
         {
-            return
-                (from u in Trinity.ObjectCache
-                 where u.RActorGuid != RActorGuid &&
-                 u.IsUnit &&
-                 MathUtil.IntersectsPath(u.Position, u.Radius, Trinity.Player.Position, Position)
-                 select u).Count();
-        }
-
-        [NoCopy]
-        public int CountFCObjectsInFront()
-        {
-            int _count = 0;
-            Vector3 _locAway = MathEx.CalculatePointFrom(Position, Trinity.Player.Position, 40f);
-            string _dir = MathUtil.GetHeadingToPoint(Position);
-
-            foreach (var _o in Trinity.ObjectCache)
+            get
             {
-                if (_o.Type == GObjectType.Destructible || _o.IsUnit)
+                if (countUnitsInFront >= 0)
+                    return countUnitsInFront;
+
+                countUnitsInFront =
+                    (from u in Trinity.ObjectCache
+                     where u.RActorGuid != RActorGuid &&
+                     u.IsUnit &&
+                     MathUtil.IntersectsPath(u.Position, u.Radius, Trinity.Player.Position, Position)
+                     select u).Count();
+
+                return countUnitsInFront;
+            }
+        }
+        
+        [NoCopy]
+        public int CountFCObjectsInFront
+        {
+            get
+            {
+                if (countFCObjectsInFront >= 0)
+                    return countFCObjectsInFront;
+
+                int _count = 0;
+                Vector3 _locAway = MathEx.CalculatePointFrom(Position, Trinity.Player.Position, 40f);
+                string _dir = MathUtil.GetHeadingToPoint(Position);
+
+                foreach (var _o in Trinity.ObjectCache)
                 {
-                    if (_o.Position.Distance2D(Position) > 40f)
-                        continue;
-
-                    if (_o.IsUnit && (!_o.CommonDataIsValid || _o.HitPointsPct <= 0f))
-                        continue;
-
-                    if (!_dir.Equals(MathUtil.GetHeadingToPoint(_o.Position)))
-                        continue;
-
-                    float _radius = Math.Min(Math.Max(_o.Radius, 5f), 8f);
-                    if (NavHelper.CanRayCast(_o.Position, Trinity.Player.Position) && MathUtil.IntersectsPath(_o.Position, _radius, Trinity.Player.Position, _locAway))
+                    if (_o.Type == GObjectType.Destructible || _o.IsUnit)
                     {
-                        if (_o.IsBoss || (_o.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze))
-                            _count += 3;
-                        else if (_o.Type == GObjectType.Destructible || _o.IsEliteRareUnique || (_o.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Prioritize))
-                            _count += 2;
-                        else
-                            _count++;
+                        if (_o.Position.Distance2D(Position) > 40f)
+                            continue;
 
-                        if (TownRun.IsTryingToTownPortal())
-                            _count++;
+                        if (_o.IsUnit && (!_o.CommonDataIsValid || _o.HitPointsPct <= 0f))
+                            continue;
+
+                        if (!_dir.Equals(MathUtil.GetHeadingToPoint(_o.Position)))
+                            continue;
+
+                        float _radius = Math.Min(Math.Max(_o.Radius, 5f), 8f);
+                        if (NavHelper.CanRayCast(_o.Position, Trinity.Player.Position) && MathUtil.IntersectsPath(_o.Position, _radius, Trinity.Player.Position, _locAway))
+                        {
+                            if (_o.IsBoss || (_o.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze))
+                                _count += 3;
+                            else if (_o.Type == GObjectType.Destructible || _o.IsEliteRareUnique || (_o.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Prioritize))
+                                _count += 2;
+                            else
+                                _count++;
+
+                            if (TownRun.IsTryingToTownPortal())
+                                _count++;
+                        }
                     }
                 }
+
+                countFCObjectsInFront = _count;
+                return countFCObjectsInFront;
             }
-            return _count;
         }
 
         [NoCopy]
@@ -721,12 +734,21 @@ namespace Trinity
         /* private member */
 
         [DataMember]
-        private int _byteResult_IsNavigable = -1;
+        private DiaObject _object;
 
         [DataMember]
-        private int _byteResult_IsInLineOfSight = -1;
+        private int byteResult_IsNavigable = -1;
 
         [DataMember]
-        private float _distance = -1;
+        private int byteResult_IsInLineOfSight = -1;
+
+        [DataMember]
+        private float distance = -1;
+
+        [DataMember]
+        private int countUnitsInFront = -1;
+
+        [DataMember]
+        private int countFCObjectsInFront = -1;
     }
 }

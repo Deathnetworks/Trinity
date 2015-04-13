@@ -1187,16 +1187,41 @@ namespace Trinity
                         {
                             CurrentTarget.RequiredRange = CombatBase.CurrentPower.MinimumRange;
 
-                            if (CombatBase.CurrentPower.TargetPosition != Vector3.Zero)
+                            if (CombatBase.CurrentPower.TargetACDGUID != -1)
                             {
-                                TargetCurrentDestination = CombatBase.CurrentPower.TargetPosition;
-                                TargetCurrentDistance = TargetCurrentDestination.Distance2D(Player.Position) - CurrentTarget.Radius;
-                            }
+                                var target = ObjectCache.Where(u => u.ACDGuid == CombatBase.CurrentPower.TargetACDGUID).FirstOrDefault();
+                                if (target != null)
+                                {
+                                    // This move position is for an aoe movement
+                                    // the required range is not checked with this position but with the Acd position 
+                                    if (CombatBase.CurrentPower.MovePosition != Vector3.Zero)
+                                    {
+                                        TargetCurrentDestination = CombatBase.CurrentPower.MovePosition;
+                                    }
+                                    else
+                                    {
+                                        TargetCurrentDestination = target.Position;
+                                    }
 
-                            if (CombatBase.CurrentPower.MovePosition != Vector3.Zero)
+                                    // Distance to ACD
+                                    TargetCurrentDistance = target.Position.Distance2D(Player.Position) - target.Radius;
+                                    CombatBase.CurrentPower.TargetPosition = target.Position;
+                                }
+                            }
+                            else if (CombatBase.CurrentPower.TargetPosition != Vector3.Zero)
                             {
-                                MoveCurrentDestination = CombatBase.CurrentPower.MovePosition;
-                                TargetCurrentDistance = MoveCurrentDestination.Distance2D(Player.Position) - CurrentTarget.Radius;
+                                // This move position is for a required position before cast at the target position
+                                if (CombatBase.CurrentPower.MovePosition != Vector3.Zero)
+                                {
+                                    TargetCurrentDestination = CombatBase.CurrentPower.MovePosition;
+                                }
+                                else
+                                {
+                                    TargetCurrentDestination = CombatBase.CurrentPower.TargetPosition;
+                                }
+
+                                // Distance to destination
+                                TargetCurrentDistance = TargetCurrentDestination.Distance2D(Player.Position) - CurrentTarget.Radius;
                             }
 
                             break;

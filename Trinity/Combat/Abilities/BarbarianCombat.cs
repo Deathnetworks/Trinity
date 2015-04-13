@@ -177,6 +177,14 @@ namespace Trinity.Combat.Abilities
             if (IsNull(power) && CanUseFrenzyTo5)
                 power = PowerFrenzy;
 
+            // HOTA Elites
+            if (IsNull(power) && CanUseHammerOfTheAncientsElitesOnly)
+                power = PowerHammerOfTheAncients;
+
+            // Hammer of the Ancients
+            if (IsNull(power) && CanUseHammerOfTheAncients)
+                power = PowerHammerOfTheAncients;
+
             // Whirlwind spam
             if (IsNull(power))
                 power = SpamPowerWhirlwind;
@@ -192,14 +200,6 @@ namespace Trinity.Combat.Abilities
             // Weapon Throw: Dreadbomb
             if (IsNull(power) && CanUseDreadbomb)
                 power = PowerWeaponThrow;
-
-            // HOTA Elites
-            if (IsNull(power) && CanUseHammerOfTheAncientsElitesOnly)
-                power = PowerHammerOfTheAncients;
-
-            // Hammer of the Ancients
-            if (IsNull(power) && CanUseHammerOfTheAncients)
-                power = PowerHammerOfTheAncients;
 
             // Weapon Throw
             if (IsNull(power) && CanUseWeaponThrow)
@@ -536,40 +536,39 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                if (CombatBase.IsCombatAllowed && (CanCast(SNOPower.Barbarian_FuriousCharge) || 
-                    (Skills.Barbarian.FuriousCharge.IsActive && Sets.TheLegacyOfRaekor.IsMaxBonusActive)))
+                if (CombatBase.IsCombatAllowed && CanCast(SNOPower.Barbarian_FuriousCharge))
                 {
-                    var _moveNode = TargetUtil.GetBestFuriousChargeMoveNode(maxFuriousChargeDistance);
-                    var _castNode = TargetUtil.GetBestFuriousChargeNode(maxFuriousChargeDistance);
+                    var _moveNode = TargetUtil.GetBestPierceMoveNode(maxFuriousChargeDistance);
+                    var _castNode = TargetUtil.GetBestPierceNode(maxFuriousChargeDistance);
+
+                    bool isValideMove = _moveNode != null && _moveNode.SpecialCount > 2 && _moveNode.SpecialWeight > 0;
+                    bool isValideCast = _castNode != null && _castNode.SpecialCount > 2 && _castNode.SpecialWeight > 0;
 
                     if (CanCast(SNOPower.Barbarian_FuriousCharge))
                     {
                         // Cast without moving
-                        if (_castNode != null && (_moveNode == null || _moveNode.SpecialWeight <= _castNode.SpecialWeight ||
+                        if (isValideCast && _castNode.SpecialCount > 2 && (!isValideMove || _moveNode.SpecialWeight <= _castNode.SpecialWeight ||
                             !(_moveNode.SpecialWeight > _castNode.SpecialWeight && _moveNode.Distance <= 7f && _moveNode.Distance > 3f)))
                             return new TrinityPower(SNOPower.Barbarian_FuriousCharge, 0f, _castNode.Position);
 
-                        _castNode = _moveNode != null ? TargetUtil.GetBestFuriousChargeNode(maxFuriousChargeDistance, _moveNode.Position) : null;
+                        _castNode = isValideMove ? TargetUtil.GetBestPierceNode(maxFuriousChargeDistance, _moveNode.Position) : null;
+                        isValideCast = _castNode != null && _castNode.SpecialCount > 2 && _castNode.SpecialWeight > 0;
 
                         // New trinity power with a move position & a target position
-                        if (_moveNode != null && _castNode != null)
+                        if (isValideMove && isValideCast)
                             return new TrinityPower(SNOPower.Barbarian_FuriousCharge, 4f, _moveNode.Position, _castNode.Position);
                     }
 
-                    var _closestTarget = TargetUtil.GetClosestTarget(maxFuriousChargeDistance, _useWeights: false);
-                    _moveNode = _closestTarget != default(TrinityCacheObject) ? TargetUtil.GetBestFuriousChargeMoveNode(maxFuriousChargeDistance, _closestTarget.Position) : null;
-                    _castNode = _moveNode != null ? TargetUtil.GetBestFuriousChargeNode(maxFuriousChargeDistance, _moveNode.Position) : null;
+                    var _closestTarget = TargetUtil.GetClosestTarget(maxFuriousChargeDistance);
+                    _moveNode = _closestTarget != default(TrinityCacheObject) ? TargetUtil.GetBestPierceMoveNode(maxFuriousChargeDistance, _closestTarget.Position) : null;
+                    _castNode = _moveNode != null ? TargetUtil.GetBestPierceNode(maxFuriousChargeDistance, _moveNode.Position) : null;
+
+                    isValideMove = _moveNode != null && _moveNode.SpecialWeight > 0;
+                    isValideCast = _castNode != null && _castNode.SpecialWeight > 0;
 
                     // New trinity power with a move position & a target position
-                    if (_moveNode != null && _castNode != null)
+                    if (isValideMove && isValideCast)
                         return new TrinityPower(SNOPower.Barbarian_FuriousCharge, 4f, _moveNode.Position, _castNode.Position);
-
-                    /*_moveNode = TargetUtil.GetBestFuriousChargeMoveNode(maxFuriousChargeDistance, _useFcWeights: false);
-                    _castNode = _moveNode != null && _moveNode.SpecialWeight > 0 ? TargetUtil.GetBestFuriousChargeNode(maxFuriousChargeDistance, _moveNode.Position) : null;
-
-                    // New trinity power with a move position & a target position
-                    if (_moveNode != null && _castNode != null)
-                        return new TrinityPower(SNOPower.Barbarian_FuriousCharge, 4f, _moveNode.Position, _castNode.Position);*/
 
                     if (CanCast(SNOPower.Barbarian_FuriousCharge) && CurrentTarget != null && CurrentTarget.IsPlayerFacing(20f) && CurrentTarget.Distance < 10f)
                         return new TrinityPower(SNOPower.Barbarian_FuriousCharge, 4f, CurrentTarget.Position);
