@@ -901,7 +901,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HarnessOfTruth = new Item
         {
-            Id = 0,
+            Id = 408868,
             Name = "Harness of Truth",
             Quality = ItemQuality.Legendary,
             Slug = "harness-of-truth",
@@ -2074,7 +2074,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item DashingPauldronsOfDespair = new Item
         {
-            Id = 0,
+            Id = 414922,
             Name = "Dashing Pauldrons of Despair",
             Quality = ItemQuality.Legendary,
             Slug = "dashing-pauldrons-of-despair",
@@ -3270,7 +3270,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item ShroudedMask = new Item
         {
-            Id = 0,
+            Id = 414927,
             Name = "Shrouded Mask",
             Quality = ItemQuality.Legendary,
             Slug = "shrouded-mask",
@@ -5432,7 +5432,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item RanslorsFolly = new Item
         {
-            Id = 0,
+            Id = 298123,
             Name = "Ranslor's Folly",
             Quality = ItemQuality.Legendary,
             Slug = "ranslors-folly",
@@ -13344,7 +13344,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item AetherWalker = new Item
         {
-            Id = 0,
+            Id = 403781,
             Name = "Aether Walker",
             Quality = ItemQuality.Legendary,
             Slug = "aether-walker",
