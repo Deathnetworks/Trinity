@@ -85,14 +85,17 @@ namespace Trinity.Combat.Abilities
                 {
                     var dest = _power.TargetPosition != Vector3.Zero ? _power.TargetPosition : CurrentTarget != null ? CurrentTarget.Position : Vector3.Zero;
 
-                    if (_currentSkill.IsCostPrimary)
-                        LastSpendingSkillUseTime = DateTime.UtcNow;
+                    // todo: what is this for?
+                    //var withinMinimumRange = _power.MinimumRange <= 1 || (CurrentTarget != null && dest.Distance2D(Player.Position) - CurrentTarget.Radius <= _power.MinimumRange + 2f);
 
-                    else if (_currentSkill.Category == SpellCategory.Primary && (_power.MinimumRange <= 1 || (CurrentTarget != null && dest.Distance2D(Player.Position) - CurrentTarget.Radius <= _power.MinimumRange + 2f)))
-                        LastPrimaryUseTime = DateTime.UtcNow;
+                    if (_currentSkill.IsSpender)
+                        LastSpenderUseTime = DateTime.UtcNow;
+
+                    else if (_currentSkill.IsGenerator) // && withinMinimumRange)
+                        LastGeneratorUseTime = DateTime.UtcNow;
                 }
 
-                powerResultInfo += String.Format(" TimeSincePrimaryUse={0} TimeSinceSpendSkillUse={1}", DateTime.UtcNow.Subtract(LastPrimaryUseTime).TotalMilliseconds, DateTime.UtcNow.Subtract(LastSpendingSkillUseTime).TotalMilliseconds);
+                powerResultInfo += String.Format(" TimeSincePrimaryUse={0} TimeSinceSpendSkillUse={1}", DateTime.UtcNow.Subtract(LastGeneratorUseTime).TotalMilliseconds, DateTime.UtcNow.Subtract(LastSpenderUseTime).TotalMilliseconds);
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Used Power {0} " + powerResultInfo, _power.SNOPower);
 
                 return true;
@@ -313,8 +316,8 @@ namespace Trinity.Combat.Abilities
 
         public static bool IsQuestingMode { get; set; }
 
-        public static DateTime LastSpendingSkillUseTime = DateTime.MinValue;
-        public static DateTime LastPrimaryUseTime = DateTime.MinValue;
+        public static DateTime LastSpenderUseTime = DateTime.MinValue;
+        public static DateTime LastGeneratorUseTime = DateTime.MinValue;
 
         /// <summary>
         /// Determines whether [is ZeisOfStone equipped].
@@ -337,23 +340,41 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         public static bool IsTaegukBuffWillExpire
         {
-            get { return IsTaegukEquipped && DateTime.UtcNow.Subtract(LastSpendingSkillUseTime).TotalMilliseconds >= 2250; }
+            get { return IsTaegukEquipped && DateTime.UtcNow.Subtract(LastSpenderUseTime).TotalMilliseconds >= 2250; }
         }
 
         /// <summary>
         /// Retrun sets equipped and time sup 4500
         /// </summary>
-        public static bool IsBastionsPrimaryBuffWillExpire
+        public static bool IsBastionsPrimaryBuffWillExpired
         {
-            get { return Sets.BastionsOfWill.IsFullyEquipped && DateTime.UtcNow.Subtract(LastPrimaryUseTime).TotalMilliseconds >= 4500; }
+            get
+            {
+                if (!Sets.BastionsOfWill.IsFullyEquipped)
+                    return false;
+
+                var stacks = Legendary.Restraint.BuffStacks;
+                var timeSinceGenerator = DateTime.UtcNow.Subtract(LastGeneratorUseTime).TotalMilliseconds;
+
+                return stacks == 0 || timeSinceGenerator >= 4500;
+            }
         }
 
         /// <summary>
         /// Retrun sets equipped and time sup 4500
         /// </summary>
-        public static bool IsBastionsSpendingBuffWillExpire
+        public static bool IsBastionsSpendingBuffWillExpired
         {
-            get { return Sets.BastionsOfWill.IsFullyEquipped && DateTime.UtcNow.Subtract(LastSpendingSkillUseTime).TotalMilliseconds >= 4500; }
+            get
+            {
+                if (!Sets.BastionsOfWill.IsFullyEquipped)
+                    return false;
+
+                var stacks = Legendary.Restraint.BuffStacks;
+                var timeSinceSpender = DateTime.UtcNow.Subtract(LastSpenderUseTime).TotalMilliseconds;
+
+                return stacks == 0 || timeSinceSpender >= 4500;
+            }
         }
 
         /// <summary>
@@ -723,7 +744,7 @@ namespace Trinity.Combat.Abilities
 
         internal static double TimeSincePrimaryUse
         {
-            get { return DateTime.UtcNow.Subtract(LastPrimaryUseTime).TotalMilliseconds;  }
+            get { return DateTime.UtcNow.Subtract(LastGeneratorUseTime).TotalMilliseconds;  }
         }
 
         /// <summary>

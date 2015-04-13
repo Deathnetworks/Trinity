@@ -177,7 +177,7 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Bastion Of Will require primary usage
-                if (IsBastionsPrimaryBuffWillExpire)
+                if (IsBastionsPrimaryBuffWillExpired)
                 {
                     TrinityPower bastionPower = null;
                     var closestTarget = TargetUtil.GetClosestTarget(40f, _useWeights: false);

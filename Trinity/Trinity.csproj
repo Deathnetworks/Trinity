@@ -127,8 +127,11 @@
     <Compile Include="DbProvider\SearchAreaProvider.cs" />
     <Compile Include="Helpers\Attributes\NoCopy.cs" />
     <Compile Include="Helpers\ExportHelper.cs" />
+    <Compile Include="Objects\Build.cs" />
+    <Compile Include="Objects\CachedBuff.cs" />
     <Compile Include="Objects\IUnique.cs" />
     <Compile Include="Objects\ItemStatRange.cs" />
+    <Compile Include="Reference\Builds.cs" />
     <Compile Include="Resources\Battle.Net API\BNetDataObjects.cs" />
     <Compile Include="Helpers\Bounties\BountyType.cs" />
     <Compile Include="Helpers\Bounties\Extensions.cs" />

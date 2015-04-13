@@ -70,7 +70,7 @@ namespace Trinity.Combat.Abilities
             }
 
             // Bastions of will
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && IsBastionsPrimaryBuffWillExpire)
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && IsBastionsPrimaryBuffWillExpired)
             {
                 power = GetPrimaryPower();
                 if (!IsNull(power)) { return power; }

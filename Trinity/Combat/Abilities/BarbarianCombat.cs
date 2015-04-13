@@ -51,7 +51,7 @@ namespace Trinity.Combat.Abilities
                     power = PowerFrenzy;
 
                 // Bastion Of Will require primary usage
-                if (IsNull(power) && IsBastionsPrimaryBuffWillExpire)
+                if (IsNull(power) && IsBastionsPrimaryBuffWillExpired)
                 {
                     var closestTarget = TargetUtil.GetClosestTarget(40f, _useWeights: false);
 

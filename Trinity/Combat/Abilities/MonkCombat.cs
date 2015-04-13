@@ -369,7 +369,7 @@ namespace Trinity.Combat.Abilities
 
             // Bastion Of Will require primary usage
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && 
-                IsBastionsPrimaryBuffWillExpire)
+                IsBastionsPrimaryBuffWillExpired)
             {
                 TrinityPower power = null;
 

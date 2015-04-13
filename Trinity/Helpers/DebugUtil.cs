@@ -6,6 +6,7 @@ using System.Text;
 using Trinity.Objects;
 using Trinity.Reference;
 using Trinity.Technicals;
+using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using Zeta.TreeSharp;
@@ -16,7 +17,7 @@ namespace Trinity.Helpers
     class DebugUtil
     {
         private static DateTime _lastCacheClear = DateTime.MinValue;
-
+        private static Dictionary<int, CachedBuff> _lastBuffs = new Dictionary<int, CachedBuff>();
         private static Dictionary<string, DateTime> _seenAnimationCache = new Dictionary<string, DateTime>();
         private static Dictionary<int, DateTime> _seenUnknownCache = new Dictionary<int, DateTime>();
 
@@ -88,10 +89,43 @@ namespace Trinity.Helpers
             return Trinity.Settings != null && Trinity.Settings.Advanced.LogCategories.HasFlag(category);
         }
 
+
+
         internal static void LogOnPulse()
         {
+            LogBuffs();
+        }
+
+        public static void LogBuffs()
+        {
             if (CacheData.Buffs != null && CacheData.Buffs.ActiveBuffs != null)
-                CacheData.Buffs.ActiveBuffs.ForEach(b => Logger.Log(LogCategory.ActiveBuffs, "Buff '{0}' is Active", b.InternalName));
+            {
+                CacheData.Buffs.ActiveBuffs.ForEach(b =>
+                {
+                    CachedBuff lastBuff;
+                    if (_lastBuffs.TryGetValue(b.Id, out lastBuff))
+                    {
+                        if (b.StackCount != lastBuff.StackCount)
+                        {
+                            Logger.Log(LogCategory.ActiveBuffs, "Buff Stack Changed: '{0}' ({1}) Stacks={2}", b.InternalName, b.Id, b.StackCount);
+                        }
+                    }
+                    else
+                    {
+                        Logger.Log(LogCategory.ActiveBuffs, "Buff Gained '{0}' ({1}) Stacks={2}", b.InternalName, b.Id, b.StackCount);
+                    }
+                });
+
+                _lastBuffs.ForEach(b =>
+                {
+                    if (CacheData.Buffs.ActiveBuffs.Any(o => o.Id == b.Key))
+                        return;
+
+                    Logger.Log(LogCategory.ActiveBuffs, "Buff lost '{0}' ({1}) Stacks={2}", b.Value.InternalName, b.Value.Id, b.Value.StackCount);
+                });
+
+                _lastBuffs = CacheData.Buffs.ActiveBuffs.ToDictionary(k => k.Id, v => v);
+            }            
         }
 
         public static void LogBuildAndItems(TrinityLogLevel level = TrinityLogLevel.Debug)

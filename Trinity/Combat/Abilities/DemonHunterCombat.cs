@@ -122,7 +122,7 @@ namespace Trinity.Combat.Abilities
                 if (CurrentTarget.IsUnit)
                 {
                     // Bastion Of Will require primary usage
-                    if (IsBastionsPrimaryBuffWillExpire)
+                    if (Enemies.Nearby.Units.Any() && IsBastionsPrimaryBuffWillExpired)
                     {
                         power = GetPrimaryPower();
                         if (!IsNull(power)) { return power; }
@@ -216,7 +216,8 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.DemonHunter_Grenades, RangedAttackRange, SentryCastSkillsCastArea.Position);
             }
 
-            return DefaultPower;
+            var generator = SkillUtils.Active.FirstOrDefault(s => s.IsGenerator);
+            return generator != null ? generator.ToPower(RangedAttackRange, Enemies.BestCluster.Position) : DefaultPower;
         }
 
         /// <summary>
@@ -502,7 +503,8 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.DemonHunter_RainOfVengeance, 0f, bestClusterPoint);
             }*/
 
-            return null;
+            var spender = SkillUtils.Active.FirstOrDefault(s => s.IsSpender && s.CanCast());
+            return spender != null ? spender.ToPower(RangedAttackRange, Enemies.BestCluster.Position) : null;
         }
 
         /// <summary>

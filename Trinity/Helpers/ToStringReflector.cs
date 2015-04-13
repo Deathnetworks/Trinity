@@ -11,18 +11,24 @@ namespace Trinity.Helpers
     {
         public static string GetObjectString(object obj)
         {
+            if (obj == null)
+                return string.Empty;
+
             string output = "";
             Type t = obj.GetType();
             List<PropertyInfo> properties;
             foreach (var property in t.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
             {
-                output += property.Name + "=" + t.GetProperty(property.Name).GetValue(obj, null) + " ";
+                var p = t.GetProperty(property.Name);                
+                output += property.Name + "=" + ((p != null) ? p.GetValue(obj, null) : "Unknown") + " ";
             }
             foreach (var field in t.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
             {
-                output += field.Name + "=" + t.GetField(field.Name).GetValue(obj) + " ";
+                var f = t.GetField(field.Name);
+                output += field.Name + "=" + ((f != null) ? f.GetValue(obj) : "Unknown") +" ";
             }
             return output;
+
         }
     }
 }

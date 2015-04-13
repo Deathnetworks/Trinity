@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Trinity.Helpers;
+using Trinity.Objects;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Game;
@@ -35,38 +36,6 @@ namespace Trinity
                 set { _instance = value; }
             }
 
-            public class CachedBuff
-            {
-                public CachedBuff() { }
-
-                public CachedBuff(Buff buff)
-                {
-                    _buff = buff;
-                    InternalName = buff.InternalName;
-                    IsCancellable = buff.IsCancelable;
-                    StackCount = buff.StackCount;
-                    Id = buff.SNOId;
-                }
-
-                private readonly Buff _buff;
-                public string InternalName { get; set; }
-                public bool IsCancellable { get; set; }
-                public int StackCount { get; set; }
-                public int Id { get; set; }
-
-                public void Cancel()
-                {
-                    if (IsCancellable && _buff.IsValid)
-                        _buff.Cancel();
-                }
-
-                public override string ToString()
-                {
-                    return ToStringReflector.GetObjectString(this);
-                }
-            }
-
-            public List<CachedBuff> ActiveBuffs { get; private set; }
             public bool HasBlessedShrine { get; private set; }
             public bool HasFrenzyShrine { get; private set; }
             public bool HasArchon { get; private set; }
@@ -107,16 +76,18 @@ namespace Trinity
                         if (cachedBuff.Id == (int)SNOPower.Pages_Buff_Infinite_Casting)
                             HasCastingShrine = true;
                         if (cachedBuff.Id == (int)SNOPower.Pages_Buff_Electrified) 
-                            HasCastingShrine = true;                        
+                            HasCastingShrine = true;
 
-                        if (!_buffsById.ContainsKey(buff.SNOId))
-                            _buffsById.Add(buff.SNOId, cachedBuff);
+                        CachedBuff duplicateBuff;
+                        if (_buffsById.TryGetValue(cachedBuff.Id, out duplicateBuff))
+                        {
+                            duplicateBuff.StackCount++;
+                        }
                         else
                         {
-                            Logger.LogDebug(LogCategory.CacheManagement, "Duplicate buff detected: {0}", cachedBuff);
+                            _buffsById.Add(buff.SNOId, cachedBuff);
                         }
-                        ActiveBuffs.Add(cachedBuff);
-
+                       
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                             "ActiveBuffs: Id={0} Name={1} Stacks={2}", cachedBuff.Id, cachedBuff.InternalName, cachedBuff.StackCount);
                     }
@@ -128,10 +99,15 @@ namespace Trinity
                 }
             }
 
+            public List<CachedBuff> ActiveBuffs
+            {
+                get { return _buffsById.Values.ToList(); }
+            }
+
             public CachedBuff GetBuff(int id)
             {
                 CachedBuff buff;
-                return _buffsById.TryGetValue(id, out buff) ? new CachedBuff() : new CachedBuff();
+                return _buffsById.TryGetValue(id, out buff) ? buff : new CachedBuff();
             }
 
             public CachedBuff GetBuff(SNOPower id)
@@ -163,7 +139,7 @@ namespace Trinity
             {
                 using (new MemoryHelper())
                 {
-                    foreach (var hotbarskill in ActiveBuffs.ToList())
+                    foreach (var hotbarskill in ActiveBuffs)
                     {
                         Logger.Log("Id={0} InternalName={1} Cancellable={2} StackCount={3}",
                             hotbarskill.Id,
@@ -177,7 +153,6 @@ namespace Trinity
 
             public void Clear()
             {
-                ActiveBuffs = new List<CachedBuff>();
                 _buffsById = new Dictionary<int, CachedBuff>();
             }
 

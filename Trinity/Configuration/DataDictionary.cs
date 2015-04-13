@@ -2973,6 +2973,8 @@ namespace Trinity
             //{ Legendary.BottomlessPotionofKulleAid, SNOPower.X1_Legendary_Potion_06 },
             //{ Legendary.PridesFall, SNOPower.ItemPassive_Unique_Helm_017_x1 },
             { Legendary.KekegisUnbreakableSpirit, SNOPower.ItemPassive_Unique_Ring_569_x1 },
+            { Legendary.Focus, SNOPower.ItemPassive_Unique_Ring_735_x1 },
+            { Legendary.Restraint, SNOPower.ItemPassive_Unique_Ring_735_x1 },
         };
 
         public readonly static Dictionary<Item, string> MinionInternalNameTokenByItem = new Dictionary<Item, string>

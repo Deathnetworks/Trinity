@@ -97,11 +97,46 @@ namespace Trinity.Objects
         /// <summary>
         /// Check if skill spend primary ressource
         /// </summary>
-        public bool IsCostPrimary
+        public bool IsSpender
         {
-            get { return SNOPower != null && SNOPower > 0 && Resource != null && 
-                Resource != Resource.None && Resource != Resource.Discipline && Resource != Resource.Unknown && 
-                Cost > 0;  }
+            get
+            {
+                if (SNOPower == 0 || Resource == Resource.Discipline || Resource == Resource.Unknown)
+                    return false;
+
+                if (this == Skills.DemonHunter.Chakram && Legendary.SpinesOfSeethingHatred.IsEquipped)
+                    return false;
+
+                if (this == Skills.DemonHunter.ElementalArrow && Legendary.Kridershot.IsEquipped)
+                    return false;
+
+                return Cost > 0;
+            }
+        }
+
+        /// <summary>
+        /// Check if skill generates resource
+        /// </summary>
+        public bool IsGenerator
+        {
+            get
+            {
+                if (this == Skills.DemonHunter.Chakram && Legendary.SpinesOfSeethingHatred.IsEquipped)
+                    return true;
+
+                if (this == Skills.DemonHunter.ElementalArrow && Legendary.Kridershot.IsEquipped)
+                    return true;
+
+                return Category == SpellCategory.Primary && !IsSignature && Resource == Resource.None;
+            }
+        }
+
+        /// <summary>
+        /// Signature spells are free to cast (not classified generators)
+        /// </summary>
+        public bool IsSignature
+        {
+            get { return Category == SpellCategory.Primary && (Class == ActorClass.Witchdoctor || Class == ActorClass.Wizard); }           
         }
 
         /// <summary>
@@ -262,9 +297,25 @@ namespace Trinity.Objects
         /// <summary>
         /// This skill as TrinityPower
         /// </summary>
-        public TrinityPower ToPower
+        public TrinityPower ToPower(float minimumRange, Vector3 targetPosition)
         {
-            get { return new TrinityPower(SNOPower); }
+            return new TrinityPower(SNOPower, minimumRange, targetPosition);
+        }
+
+        /// <summary>
+        /// This skill as TrinityPower
+        /// </summary>
+        public TrinityPower ToPower(float minimumRange)
+        {
+            return new TrinityPower(SNOPower, minimumRange);
+        }
+
+        /// <summary>
+        /// This skill as TrinityPower
+        /// </summary>
+        public TrinityPower ToPower()
+        {
+            return new TrinityPower(SNOPower);
         }
 
         /// <summary>
