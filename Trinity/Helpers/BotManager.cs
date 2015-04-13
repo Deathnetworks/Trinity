@@ -81,6 +81,13 @@ namespace Trinity.Helpers
                 return true;
             }
 
+            // See if we should update the stats file
+            if (DateTime.UtcNow.Subtract(ItemDropStats.ItemStatsLastPostedReport).TotalSeconds > 10)
+            {
+                ItemDropStats.ItemStatsLastPostedReport = DateTime.UtcNow;
+                ItemDropStats.OutputReport();
+            }
+
             Trinity.ResetTickValues();
             return await new Decorator(Trinity.TargetCheck, new Action(ret => Trinity.HandleTarget())).ExecuteCoroutine();
         }
