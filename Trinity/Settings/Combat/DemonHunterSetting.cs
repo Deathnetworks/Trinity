@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Reflection;
 using System.Runtime.Serialization;
 
 namespace Trinity.Config.Combat
@@ -1164,15 +1165,24 @@ namespace Trinity.Config.Combat
         /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
         /// </summary>
         /// <param name="context"></param>
-        [OnDeserializing()]
+        [OnDeserializing]
         internal void OnDeserializingMethod(StreamingContext context)
         {
-            this.AvoidGrotesqueHealth = 1;
-            this.AvoidOrbiterHealth = 1;
-            this.AvoidWormholeHealth = 0.50f;
-            this.StrafeMinHatred = 48;
-            this.VaultMode = DemonHunterVaultMode.Always;
+            AvoidGrotesqueHealth = 1;
+            AvoidOrbiterHealth = 1;
+            AvoidWormholeHealth = 0.50f;
+            StrafeMinHatred = 48;
+            VaultMode = DemonHunterVaultMode.Always;
         }
+
+        [OnDeserialized]
+        internal void OnDeserializedMethod(StreamingContext context)
+        {
+            // Fix for type default
+            if (RangedAttackRange < 10f)
+                RangedAttackRange = 65;
+        }
+
         #endregion Methods
     }
 }
