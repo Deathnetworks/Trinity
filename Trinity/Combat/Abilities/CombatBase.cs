@@ -18,13 +18,13 @@ namespace Trinity.Combat.Abilities
     public class CombatBase
     {
         static CombatBase()
-        {
+		{
             GameEvents.OnGameJoined += (sender, args) => LoadCombatSettings();
             GameEvents.OnWorldChanged += (sender, args) => LoadCombatSettings();
             Pulsator.OnPulse += (sender, args) => MonkCombat.RunOngoingPowers();
             LoadCombatSettings();
-        }
-
+		}
+        
         private static TrinityPower _currentPower = new TrinityPower();
         private static Vector3 _lastZigZagLocation = Vector3.Zero;
         private static Vector3 _zigZagPosition = Vector3.Zero;
@@ -45,58 +45,61 @@ namespace Trinity.Combat.Abilities
             Timer = 16
         }
 
-        internal static bool Cast(TrinityPower _power)
+        internal static bool Cast(TrinityPower power)
         {
-            if (IsNull(_power))
+            if (IsNull(power))
                 return false;
 
-            if (_power.SNOPower == SNOPower.Walk && _power.TargetPosition == Vector3.Zero)
+            if (power.SNOPower == SNOPower.Walk && power.TargetPosition == Vector3.Zero)
             {
                 Navigator.PlayerMover.MoveStop();
                 return true;
             }
 
-            if (_power.SNOPower == SNOPower.Walk)
+            if (power.SNOPower == SNOPower.Walk)
                 return false;
 
-            if (ZetaDia.Me.UsePower(_power.SNOPower, _power.TargetPosition, _power.TargetDynamicWorldId, _power.TargetACDGUID))
+            if (ZetaDia.Me.UsePower(power.SNOPower, power.TargetPosition, power.TargetDynamicWorldId, power.TargetACDGUID))
             {
-                float _distToTarget = 0;
-                if (_power.TargetPosition != Vector3.Zero)
-                    _distToTarget = CombatBase.CurrentPower.TargetPosition.Distance2D(Player.Position);
-                else if (CurrentTarget != null)
-                    _distToTarget = CurrentTarget.Position.Distance2D(Player.Position);
-
-                string powerResultInfo = _power.TargetPosition != Vector3.Zero ? "at " + NavHelper.PrettyPrintVector3(_power.TargetPosition) + " dist=" + (int)_distToTarget : "";
-                powerResultInfo += _power.TargetACDGUID != -1 ? " on " + _power.TargetACDGUID : "";
-
-                SpellTracker.TrackSpellOnUnit(_power.TargetACDGUID, _power.SNOPower);
-                SpellHistory.RecordSpell(_power);
-
-                CacheData.AbilityLastUsed[_power.SNOPower] = DateTime.UtcNow;
+                SpellTracker.TrackSpellOnUnit(power.TargetACDGUID, power.SNOPower);
+                SpellHistory.RecordSpell(power);
 
                 Trinity.lastGlobalCooldownUse = DateTime.UtcNow;
-                Trinity.LastPowerUsed = _power.SNOPower;
+                Trinity.IsWaitingAfterPower = power.ShouldWaitAfterUse;
 
-                Trinity.IsWaitingAfterPower = _power.ShouldWaitAfterUse;
+                Vector3 target = power.TargetPosition != Vector3.Zero ? power.TargetPosition : CurrentTarget != null && power.TargetACDGUID != -1 ? CurrentTarget.Position : Vector3.Zero;
+                float distance = target != Vector3.Zero ? target.Distance2D(Player.Position) : 0f;
 
-                Skill _currentSkill = SkillUtils.ById(_power.SNOPower);
-                if (_currentSkill != null)
+                string info = CurrentTarget != null ? " TargetType=" + CurrentTarget.Type : "";
+                info += target != Vector3.Zero ? " at " + NavHelper.PrettyPrintVector3(target) : "";
+                info += power.TargetACDGUID != -1 ? " on " + power.TargetACDGUID : "";
+                info += (int)distance > 0 ? " Dist=" + (int)distance : "";
+                info += " Range=" + power.MinimumRange;
+
+                Skill skill = SkillUtils.ById(power.SNOPower);
+                if (skill != null)
                 {
-                    var dest = _power.TargetPosition != Vector3.Zero ? _power.TargetPosition : CurrentTarget != null ? CurrentTarget.Position : Vector3.Zero;
-
-                    // todo: what is this for? answer: example with DH evasive fire, he must be used for primary missing with a large range, bastions of will buff only cast when "hit"
-                    var withinMinimumRange = _power.MinimumRange <= 1 || (CurrentTarget != null && dest.Distance2D(Player.Position) - CurrentTarget.Radius <= _power.MinimumRange + 2f);
-
-                    if (_currentSkill.IsSpender)
+                    if (skill.IsSpender)
+                    {
                         LastSpenderUseTime = DateTime.UtcNow;
+                        info += " Cost=" + skill.Cost;
+                    }
 
-                    else if (_currentSkill.IsAttackGenerator && withinMinimumRange)
+                    else if (skill.IsAttackGenerator)
+                    {
                         LastGeneratorUseTime = DateTime.UtcNow;
+                        info += " IsAttackGenerator";
+                    }
+
+                    if (skill.Charges > 0)
+                        info += " Charges=" + skill.Charges;
                 }
 
-                powerResultInfo += String.Format(" TimeSincePrimaryUse={0} TimeSinceSpendSkillUse={1}", DateTime.UtcNow.Subtract(LastGeneratorUseTime).TotalMilliseconds, DateTime.UtcNow.Subtract(LastSpenderUseTime).TotalMilliseconds);
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Used Power {0} " + powerResultInfo, _power.SNOPower);
+                info += String.Format(" TimeSincePrimaryUse={0} TimeSinceSpendSkillUse={1}", 
+                    DateTime.UtcNow.Subtract(LastGeneratorUseTime).TotalMilliseconds, 
+                    DateTime.UtcNow.Subtract(LastSpenderUseTime).TotalMilliseconds);
+
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Used Power {0}" + info, power.SNOPower);
 
                 return true;
             }
@@ -513,7 +516,7 @@ namespace Trinity.Combat.Abilities
                     case GObjectType.Destructible:
                     case GObjectType.Barricade:
                         return true;
-                    default:
+                    default: 
                         return false;
                 }
             }
@@ -560,11 +563,6 @@ namespace Trinity.Combat.Abilities
                 // Default attacks
                 if (!UseOOCBuff && !IsCurrentlyAvoiding)
                 {
-                    if (Trinity.Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_SweepingWind))
-                    {
-                        MonkCombat.RefreshSweepingWind();
-                    }
-
                     return new TrinityPower
                     {
                         SNOPower = DefaultWeaponPower,
@@ -714,32 +712,15 @@ namespace Trinity.Combat.Abilities
 
         public static void SetSNOPowerUseDelay(SNOPower power, double delay)
         {
-            try
-            {
-                string key = "SpellDelay." + power.ToString();
-                TVar v;
-                if (V.ContainsKey(key))
-                {
-                    v = V.Data[key];
-                }
-                else
-                {
-                    Logger.LogError("WARNING: TVar {0} is missing! Setting default to {1}", key, delay);
-                    V.Set(new TVar(key, delay, ""));
-                    return;
-                }
+            string key = "SpellDelay." + power.ToString();
+            TVar v = V.Data[key];
 
-                bool hasDefaultValue = v.Value == v.DefaultValue;
+            bool hasDefaultValue = v.Value == v.DefaultValue;
 
-                if (hasDefaultValue)
-                {
-                    // Create a new TVar (changes the default value)
-                    V.Set(new TVar(v.Name, delay, v.Description));
-                }
-            }
-            catch (Exception ex)
+            if (hasDefaultValue)
             {
-                Logger.LogError("Error Getting SNOPower Use Delay for power {0}:{1}", power);
+                // Create a new TVar (changes the default value)
+                V.Set(new TVar(v.Name, delay, v.Description));
             }
         }
 
@@ -769,7 +750,7 @@ namespace Trinity.Combat.Abilities
 
         internal static double TimeSincePrimaryUse
         {
-            get { return DateTime.UtcNow.Subtract(LastGeneratorUseTime).TotalMilliseconds; }
+            get { return DateTime.UtcNow.Subtract(LastGeneratorUseTime).TotalMilliseconds;  }
         }
 
         /// <summary>

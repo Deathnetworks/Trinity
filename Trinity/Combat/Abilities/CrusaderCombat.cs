@@ -27,6 +27,10 @@ namespace Trinity.Combat.Abilities
                 }
             }
 
+            // Destructibles
+            if (UseDestructiblePower)
+                return DestroyObjectPower;
+
             if (!UseOOCBuff && !IsCurrentlyAvoiding)
             {
                 /*
@@ -180,7 +184,7 @@ namespace Trinity.Combat.Abilities
                 if (IsBastionsPrimaryBuffWillExpired)
                 {
                     TrinityPower bastionPower = null;
-                    var closestTarget = TargetUtil.GetClosestTarget(40f, _useWeights: false);
+                    var closestTarget = TargetUtil.GetClosestTarget(40f, useWeights: false);
 
                     if (closestTarget != null)
                     {
@@ -215,7 +219,7 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Shield Bash
-                if ((Skills.Crusader.ShieldBash.IsActive) && ((TargetUtil.EliteOrTrashInRange(45f) || TargetUtil.AnyMobsInRange(45f)) && Player.PrimaryResource >= 20))
+                if (Skills.Crusader.ShieldBash.IsActive && TargetUtil.AnyMobsInRange(45f) && Player.PrimaryResource >= 20)
                 {
                     return new TrinityPower(SNOPower.X1_Crusader_ShieldBash2, 45f, CurrentTarget.ACDGuid);
                 } 

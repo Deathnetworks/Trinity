@@ -9,7 +9,6 @@ using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
 using Zeta.Bot;
-using Zeta.Bot.Dungeons;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Game;
@@ -131,14 +130,14 @@ namespace Trinity.DbProvider
             // Update the last time we generated a path
             LastGeneratedStuckPosition = DateTime.UtcNow;
 
-            Trinity.CurrentTarget = TargetUtil.GetClosestTarget(25f, _useWeights: false);
+            Trinity.CurrentTarget = TargetUtil.GetClosestTarget(25f, useWeights: false);
             if (CurrentTarget != null && CurrentTarget.IsUnit)
             {
                 CombatBase.Cast(Trinity.AbilitySelector());
             }
             else
             {
-                Trinity.CurrentTarget = TargetUtil.GetClosestDestructible(25f, _useWeights: false);
+                Trinity.CurrentTarget = TargetUtil.GetClosestDestructible(25f);
                 if (CurrentTarget != null)
                 {
                     CombatBase.Cast(Trinity.AbilitySelector());
@@ -826,11 +825,11 @@ namespace Trinity.DbProvider
             return UsedSpecialMovement(new GridNode(loc));
         }
 
-        internal static bool UsedSpecialMovement(GridNode _gridNode)
+        internal static bool UsedSpecialMovement(GridNode node)
         {
             using (new MemorySpy("PlayerMover.OffsetSpecialMovement()"))
             {
-                if (_gridNode == null || _gridNode.Position == Vector3.Zero)
+                if (node == null || node.Position == Vector3.Zero)
                     return false;
 
                 #region Vault
@@ -839,36 +838,36 @@ namespace Trinity.DbProvider
                 {
                     if (DemonHunterCombat.CanCastCombatVaultMovement)
                     {
-                        bool _cMove = DemonHunterCombat.IsVaultAptCombatMovement(_gridNode.Position);
-                        bool _kMove = DemonHunterCombat.IsVaultAptKiteMovement(_gridNode.Position);
-                        bool _aMove = DemonHunterCombat.IsVaultAptAvoidanceMovement(_gridNode.Position);
+                        bool cMove = DemonHunterCombat.IsVaultAptCombatMovement(node.Position);
+                        bool kMove = DemonHunterCombat.IsVaultAptKiteMovement(node.Position);
+                        bool aMove = DemonHunterCombat.IsVaultAptAvoidanceMovement(node.Position);
 
-                        if (_cMove || _kMove || _aMove)
+                        if (cMove || kMove || aMove)
                         {
-                            GridNode _newGridLoc = _gridNode;
-                            if ((_kMove || (_aMove && !Trinity.Player.TryToAvoidProjectile)) && 
-                                (_gridNode.Distance <= 33f || _gridNode.Distance >= 40f))
+                            GridNode newNode = node;
+                            if ((kMove || (aMove && !Trinity.Player.TryToAvoidProjectile)) && 
+                                (node.Distance <= 33f || node.Distance >= 40f))
                             {
-                                _newGridLoc = GridMap.GetBestMoveNode(35f, prioritizeDist: true);
+                                newNode = GridMap.GetBestMoveNode(35f, prioritizeDist: true);
                             }
 
-                            if (_newGridLoc != null && _newGridLoc.Position != Vector3.Zero)
+                            if (newNode != null && newNode.Position != Vector3.Zero)
                             {
-                                GridNode _gVault = _newGridLoc;
-                                _gVault = GridMap.GetNodeAt(MathEx.CalculatePointFrom(_newGridLoc.Position, Trinity.Player.Position, 35f));
+                                GridNode vaultNode = newNode;
+                                vaultNode = GridMap.GetNodeAt(MathEx.CalculatePointFrom(newNode.Position, Trinity.Player.Position, 35f));
 
-                                if (_gVault != null && _gVault.Position != Vector3.Zero)
+                                if (vaultNode != null && vaultNode.Position != Vector3.Zero)
                                 {
-                                    _cMove = DemonHunterCombat.IsVaultAptCombatMovement(_gVault.Position);
-                                    _kMove = DemonHunterCombat.IsVaultAptKiteMovement(_gVault.Position);
+                                    cMove = DemonHunterCombat.IsVaultAptCombatMovement(vaultNode.Position);
+                                    kMove = DemonHunterCombat.IsVaultAptKiteMovement(vaultNode.Position);
 
-                                    bool adequateMovement = _cMove || ((_aMove || _kMove) && GridMap.GetWeightAtPlayer <= _gVault.DynamicWeight);
+                                    bool adequateMovement = cMove || ((aMove || kMove) && GridMap.GetWeightAtPlayer <= vaultNode.DynamicWeight);
 
-                                    if (NavHelper.CanRayCast(_gVault.Position) && adequateMovement)
+                                    if (NavHelper.CanRayCast(vaultNode.Position) && adequateMovement)
                                     {
-                                        if (CombatBase.Cast(new TrinityPower(SNOPower.DemonHunter_Vault, 0f, _gVault.Position)))
+                                        if (CombatBase.Cast(new TrinityPower(SNOPower.DemonHunter_Vault, 0f, vaultNode.Position)))
                                         {
-                                            DemonHunterCombat.LogVault(_gVault.Position, _cMove, _kMove, _aMove, _gVault.WeightInfos);
+                                            DemonHunterCombat.LogVault(vaultNode.Position, cMove, kMove, aMove, vaultNode.WeightInfos);
                                             return true;
                                         }
                                     }
@@ -879,17 +878,17 @@ namespace Trinity.DbProvider
                     // OOC
                     if (Trinity.Settings.Combat.Misc.AllowOOCMovement && !Trinity.DontMoveMeIAmDoingShit &&
                         CacheData.Hotbar.ActivePowers.Contains(SNOPower.DemonHunter_Vault) &&
-                        DemonHunterCombat.CanCastOocVaultMovement && !ShrinesInArea(_gridNode.Position) &&
-                        _gridNode.Position.Distance2D(Trinity.Player.Position) >= 35f && NavHelper.CanRayCast(_gridNode.Position) &&
-                        !TargetUtil.LocOrPathInAoE(_gridNode.Position))
+                        DemonHunterCombat.CanCastOocVaultMovement && !ShrinesInArea(node.Position) &&
+                        node.Position.Distance2D(Trinity.Player.Position) >= 35f && NavHelper.CanRayCast(node.Position) &&
+                        !TargetUtil.LocOrPathInAoE(node.Position))
                     {
 
-                        Vector3 _vVaultTarget = _gridNode.Position.Distance2D(Trinity.Player.Position) > 35f ?
-                            MathEx.CalculatePointFrom(_gridNode.Position, Trinity.Player.Position, 35f) : _gridNode.Position;
+                        Vector3 _vVaultTarget = node.Position.Distance2D(Trinity.Player.Position) > 35f ?
+                            MathEx.CalculatePointFrom(node.Position, Trinity.Player.Position, 35f) : node.Position;
 
                         if (CombatBase.Cast(new TrinityPower(SNOPower.DemonHunter_Vault, 0f, _vVaultTarget)))
                         {
-                            DemonHunterCombat.LogVault(_gridNode.Position);
+                            DemonHunterCombat.LogVault(node.Position);
                             return true;
                         }
                             
@@ -900,27 +899,27 @@ namespace Trinity.DbProvider
                 #region DashingStrike
                 if (Trinity.Player.ActorClass == ActorClass.Monk)
                 {
-                    if (CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike, CombatBase.CanCastFlags.NoTimer) &&
-                        CurrentTarget != null && !CurrentTarget.IsUnit && _gridNode.Distance >= 10f)
+                    if (!CombatBase.UseOOCBuff && MonkCombat.CanCastDashingStrike && !CurrentTarget.IsUnit && !CurrentTarget.IsAvoidance && node.Distance >= 15f &&
+                        CombatBase.TimeSincePowerUse(SNOPower.X1_Monk_DashingStrike) > 1250)
                     {
-                        if (CombatBase.Cast(new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, _gridNode.Position)))
+                        if (CombatBase.Cast(new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, node.Position)))
                             return true;
                     }
 
-                    if (CurrentTarget == null && CombatBase.TimeSincePowerUse(SNOPower.X1_Monk_DashingStrike) > 400 &&
-                        CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike, CombatBase.CanCastFlags.NoTimer) && Trinity.Settings.Combat.Monk.UseDashingStrikeOOC)
+                    if (CombatBase.UseOOCBuff && MonkCombat.CanCastDashingStrike && Trinity.Settings.Combat.Monk.UseDashingStrikeOOC && node.Distance >= 20f &&
+                        CombatBase.TimeSincePowerUse(SNOPower.X1_Monk_DashingStrike) > 1250)
                     {
-                        string direction = MathUtil.GetHeadingToPoint(Trinity.Player.Position, _gridNode.Position);
+                        string direction = MathUtil.GetHeadingToPoint(Trinity.Player.Position, node.Position);
                         var nodes = (
-                            from node in MainGrid.Map
+                            from n in MainGrid.Map
                             where
-                                direction.Equals(MathUtil.GetHeadingToPoint(Trinity.Player.Position, node.Position)) &&
-                                NavHelper.CanRayCast(node.Position)
+                                direction.Equals(MathUtil.GetHeadingToPoint(Trinity.Player.Position, n.Position)) &&
+                                NavHelper.CanRayCast(n.Position)
                             orderby
-                                node.Distance descending
-                            select node).ToList();
+                                n.Distance descending
+                            select n).ToList();
 
-                        var target = _gridNode.Position;
+                        var target = node.Position;
                         if (nodes.Any() && nodes.Count() > 0)
                         {
                             target = nodes.First().Position;
