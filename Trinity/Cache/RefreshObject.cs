@@ -680,12 +680,11 @@ namespace Trinity
         /// <returns></returns>
         private static bool RefreshStepIgnoreLoS()
         {
-            // Force navigable/los
-            if (NavHelper.CanRayCast(Player.Position, c_CacheObject.Position))
-            {
-                c_CacheObject.IsNavigable = true;
-                c_CacheObject.IsInLineOfSight = true;
-            }
+            //// Force navigable/los
+            //if (NavHelper.CanRayCast(Player.Position, c_CacheObject.Position))
+            //{
+            //    //c_CacheObject.IsInLineOfSight = true;
+            //}
 
             // add everything, new IsNavigable & IsInLineOfSight are use in weighting just when needed, reduce usage from memory
             return true;

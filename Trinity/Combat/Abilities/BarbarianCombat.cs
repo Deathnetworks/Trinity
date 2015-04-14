@@ -906,7 +906,7 @@ namespace Trinity.Combat.Abilities
                         {
                             return new TrinityPower(SNOPower.Barbarian_Whirlwind, 0f, ZigZagPosition);
                         }
-                        else if (CurrentTarget != null && CurrentTarget.IsNavigable && CurrentTarget.Distance >= 5f)
+                        else if (CurrentTarget != null && CurrentTarget.IsInLineOfSight && CurrentTarget.Distance >= 5f)
                         {
                             return new TrinityPower(SNOPower.Barbarian_Whirlwind, 0f, CurrentTarget.Position);
                         }
@@ -916,7 +916,7 @@ namespace Trinity.Combat.Abilities
                         }
                     }
 
-                    if (((TargetUtil.AnyMobsInRange(10f, false) && Player.MovementSpeed > 0) || IsTaegukBuffWillExpire) && CurrentTarget != null && CurrentTarget.IsNavigable && CurrentTarget.Distance >= 5f)
+                    if (((TargetUtil.AnyMobsInRange(10f, false) && Player.MovementSpeed > 0) || IsTaegukBuffWillExpire) && CurrentTarget != null && CurrentTarget.IsInLineOfSight && CurrentTarget.Distance >= 5f)
                         return new TrinityPower(SNOPower.Barbarian_Whirlwind, 0f, CurrentTarget.Position);
                 }
 

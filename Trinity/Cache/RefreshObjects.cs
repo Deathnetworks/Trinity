@@ -399,7 +399,6 @@ namespace Trinity
                             RActorGuid = diaItem.RActorGuid,
                             ActorSNO = diaItem.ActorSNO,
                             ACDGuid = diaItem.ACDGuid,
-                            IsNavigable = true,
                             IsInLineOfSight = true,
                             Distance = diaItem.Distance,
                             ActorType = ActorType.Item,

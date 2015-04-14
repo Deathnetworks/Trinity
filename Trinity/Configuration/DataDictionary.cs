@@ -2848,7 +2848,8 @@ namespace Trinity
             //x1_Westm_HeroWorship01_VO = 321451,
             //x1_Westm_HeroWorship02_VO = 321454,
             //x1_Westm_HeroWorship03_VO = 321479,
-            321451, 321454, 321479
+            321451, 321454, 321479,
+            117344, // a3dun_rmpt_Demon_Elevator_A
 
         };
 

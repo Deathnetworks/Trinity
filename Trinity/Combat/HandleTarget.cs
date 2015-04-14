@@ -123,24 +123,23 @@ namespace Trinity
                     if (UsedSpecialMovement())
                         return GetRunStatus("SpecialMovement", RunStatus.Running);
 
+                    if (TimeSinceUse(SNOPower.Monk_TempestRush) < 250)
+                        ForceNewMovement = true;
+
+                    using (new MemorySpy("HandleTarget().SetQueuedBasicMovement"))
+                    { SetQueuedBasicMovement(ForceNewMovement); }
+
+                    if (CombatBase.QueuedMovement.IsQueuedMovement)
+                        CombatBase.QueuedMovement.Execute();
+
+                    Logger.LogDebug(LogCategory.Behavior, "End of HandleTarget");
+                    return GetRunStatus("EndLoop", RunStatus.Running);
                 }
                 catch (Exception ex)
                 {
                     Logger.LogError("Error in HandleTarget: {0}", ex);
                     return GetRunStatus("Error", RunStatus.Running);
                 }
-
-                if (TimeSinceUse(SNOPower.Monk_TempestRush) < 250)
-                    ForceNewMovement = true;
-
-                using (new MemorySpy("HandleTarget().SetQueuedBasicMovement"))
-                { SetQueuedBasicMovement(ForceNewMovement); }
-
-                if (CombatBase.QueuedMovement.IsQueuedMovement)
-                    CombatBase.QueuedMovement.Execute();
-
-                Logger.LogDebug(LogCategory.Behavior, "End of HandleTarget");
-                return GetRunStatus("EndLoop", RunStatus.Running);
             }
         }
 
@@ -313,7 +312,7 @@ namespace Trinity
                     case GObjectType.Item:
                         {
                             // Check if we actually have room for this item first
-
+                            Logger.LogDebug(LogCategory.Behavior, "Entering HandleItem");
                             bool isTwoSlot = true;
                             if (CurrentTarget.Item != null && CurrentTarget.Item.CommonData != null)
                             {
@@ -342,6 +341,7 @@ namespace Trinity
                     case GObjectType.PowerGlobe:
                     case GObjectType.ProgressionGlobe:
                         {
+                            Logger.LogDebug(LogCategory.Behavior, "Entering Handle Pickup");
                             int interactAttempts;
                             // Count how many times we've tried interacting
                             if (!CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out interactAttempts))
@@ -369,6 +369,7 @@ namespace Trinity
                     case GObjectType.CursedChest:
                     case GObjectType.CursedShrine:
                         {
+                            Logger.LogDebug(LogCategory.Behavior, "Entering Handle Interact");
                             _forceTargetUpdate = true;
 
                             if (ZetaDia.Me.Movement.SpeedXY > 0.5)
@@ -429,6 +430,7 @@ namespace Trinity
                     case GObjectType.Destructible:
                     case GObjectType.Barricade:
                         {
+                            Logger.LogDebug(LogCategory.Behavior, "Entering Handle Destroy");
                             if (CombatBase.CurrentPower.SNOPower != SNOPower.None)
                             {
                                 // obsolet ?
@@ -1002,7 +1004,6 @@ namespace Trinity
         /// <summary>
         /// Moves our player if no special ability is available
         /// </summary>
-        /// <param name="bForceNewMovement"></param>
         private static void SetQueuedSpecialMovement()
         {
             if (CurrentTarget == null)
@@ -1097,7 +1098,10 @@ namespace Trinity
                     LastMoveToTarget = CombatBase.QueuedMovement.CurrentMovement.Destination;
                 }
             }
-            catch {/* not a big deal */}
+            catch (Exception ex)
+            {
+                Logger.LogError("Error in HandleTarget.SetQueuedSpecialMovement: " + ex);
+            }
         }
 
         /// <summary>
@@ -1121,9 +1125,8 @@ namespace Trinity
 
                 if (DateTime.UtcNow.Subtract(lastSentMovePower).TotalMilliseconds >= 250 || Vector3.Distance(LastMoveToTarget, CurrentMoveDestination) >= 2f || bForceNewMovement)
                 {
-                    if (!CurrentTarget.IsAvoidance && !(CurrentTarget.IsUnit && CurrentTargetIsInRange))
+                    if (!CurrentTarget.IsAvoidance && !(CurrentTarget.IsUnit && CurrentTargetIsInRange) && CurrentTarget.RequiredRange > TargetCurrentDistance)
                     {
-                        int rActorGuid = CurrentTarget.RActorGuid;
                         CombatBase.QueuedMovement.Queue(new QueuedMovement
                         {
                             Id = CurrentTarget.RActorGuid,
@@ -1151,7 +1154,7 @@ namespace Trinity
                             Options = new QueuedMovementOptions
                             {
                                 Logging = LogLevel.Info,
-                                AcceptableDistance = 2f,
+                                AcceptableDistance = CurrentTarget.RequiredRange,
                                 Type = CurrentTarget.IsUnit ? MoveType.BasicCombat : MoveType.TargetAttempt
                             }
                         });
@@ -1173,7 +1176,7 @@ namespace Trinity
                 if (CurrentTarget == null)
                     return;
 
-                CurrentTarget.RequiredRange = 2f;
+                CurrentTarget.RequiredRange = 5f;
 
                 TargetCurrentDistance = CurrentTarget.RadiusDistance;
                 CurrentTargetIsInLoS = CurrentTarget.IsInLineOfSight;
@@ -1191,7 +1194,7 @@ namespace Trinity
 
                             if (CombatBase.CurrentPower.TargetACDGUID != -1)
                             {
-                                var target = ObjectCache.Where(u => u.ACDGuid == CombatBase.CurrentPower.TargetACDGUID).FirstOrDefault();
+                                var target = ObjectCache.FirstOrDefault(u => u.ACDGuid == CombatBase.CurrentPower.TargetACDGUID);
                                 if (target != null)
                                 {
                                     // This move position is for an aoe movement
@@ -1313,7 +1316,7 @@ namespace Trinity
                         {
                             // Pick a range to try to reach + (tmp_fThisRadius * 0.70);
                             CurrentTarget.RequiredRange = CombatBase.CurrentPower.MinimumRange;
-                            CurrentTarget.Radius = 1f;
+                            //CurrentTarget.Radius = 1f;
                             TargetCurrentDistance = CurrentTarget.Distance;
                             break;
                         }
@@ -1325,6 +1328,7 @@ namespace Trinity
                         }
                     case GObjectType.Door:
                         CurrentTarget.RequiredRange = 2f;
+                        TargetCurrentDistance = CurrentTarget.Distance;
                         break;
                     default:
                         CurrentTarget.RequiredRange = CurrentTarget.Radius;
@@ -1339,6 +1343,7 @@ namespace Trinity
 
         private static bool HandleUnitInRange()
         {
+            Logger.LogDebug(LogCategory.Behavior, "Entering HandleUnit");
             using (new PerformanceLogger("HandleTarget.HandleUnitInRange"))
             {
                 bool usePowerResult = CombatBase.Cast(CombatBase.CurrentPower);

@@ -330,80 +330,10 @@ namespace Trinity
         public bool IsEventObject { get { return IsCursedChest || IsCursedShrine; } }
 
         [NoCopy]
-        public bool IsNavigable
-        {
-            get
-            {
-                if (_isNavigable != null)
-                    return (bool)_isNavigable;
-
-                bool isNavigable;
-                Tuple<bool, int> rayCastResult;
-
-                if (ZDiff > 11f)
-                {
-                    _isNavigable = false;
-                    return false;
-                }
-
-                if (!DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
-                {
-                    // Bounty Objectives should always be on the weight list
-                    if (IsBountyObjective)
-                    {
-                        _isNavigable = true;
-                        return true;
-                    }
-
-                    // Quest Monsters should get LoS white-listed
-                    if (IsQuestMonster)
-                    {
-                        _isNavigable = true;
-                        return true;
-                    }
-
-                    // Always LoS Units during events
-                    if (IsUnit && Trinity.Player.InActiveEvent)
-                    {
-                        _isNavigable = true;
-                        return true;
-                    }
-                }
-
-                if (CacheData.RayCastResultsFromObjects.TryGetValue(RActorGuid, out rayCastResult))
-                {
-                    if (MathUtil.GetDiff(rayCastResult.Item2, Distance) <= 5f)
-                        isNavigable = rayCastResult.Item1;
-                    else
-                        isNavigable = Distance < 5f || (Distance < 95f && NavHelper.CanRayCast(Position, (Trinity.Player.IsRanged || (Distance <= 16f && Distance > 1f))));
-
-                    CacheData.RayCastResultsFromObjects[RActorGuid] = new Tuple<bool, int>(isNavigable, (int)Distance);
-                }
-                else
-                {
-                    isNavigable = Distance < 5f || (Distance < 95f && NavHelper.CanRayCast(Position, (Trinity.Player.IsRanged || (Distance <= 16f && Distance > 1f))));
-
-                    if (!CacheData.RayCastResultsFromObjects.ContainsKey(RActorGuid))
-                        CacheData.RayCastResultsFromObjects.Add(RActorGuid, new Tuple<bool, int>(isNavigable, (int)Distance));
-                }
-
-                _isNavigable = isNavigable;
-                return isNavigable;
-            }
-            set
-            {
-                _isNavigable = value;
-            }
-        }
-
-        [NoCopy]
         public bool IsInLineOfSight
         {
             get
             {
-                if (!IsUnit)
-                    return IsNavigable;
-
                 if (_isInLineOfSight != null)
                     return (bool)_isInLineOfSight;
 
@@ -767,8 +697,6 @@ namespace Trinity
 
         [NoCopy]
         private DiaObject _object;
-
-        private bool? _isNavigable;
 
         private bool? _isInLineOfSight;
 

@@ -187,7 +187,7 @@ namespace Trinity
                                         ignoring = true;
                                     }
 
-                                    bool ignoreSummoner = cacheObject.IsSummoner && !Settings.Combat.Misc.ForceKillSummoners || !cacheObject.IsNavigable;
+                                    bool ignoreSummoner = cacheObject.IsSummoner && !Settings.Combat.Misc.ForceKillSummoners || !cacheObject.IsInLineOfSight;
 
                                     // Ignore Solitary Trash mobs (no elites present)
                                     // Except if has been primary target or if already low on health (<= 20%)
@@ -268,7 +268,7 @@ namespace Trinity
                                     break;
                                 }
 
-                                if (Player.IsRanged && !cacheObject.IsInLineOfSight)
+                                if (!cacheObject.IsInLineOfSight)
                                 {
                                     objWeightInfo += "NotInLoS ";
                                     cacheObject.Weight = 0;
@@ -347,7 +347,7 @@ namespace Trinity
                                         }
 
                                         // Bounty Objectives goooo
-                                        if (cacheObject.IsBountyObjective && !!cacheObject.IsNavigable)
+                                        if (cacheObject.IsBountyObjective && !!cacheObject.IsInLineOfSight)
                                         {
                                             objWeightInfo += "BountyObjective ";
                                             cacheObject.Weight += 15000d;
@@ -775,7 +775,7 @@ namespace Trinity
                                     break;
                                 }
 
-                                if (!cacheObject.IsNavigable)
+                                if (!cacheObject.IsInLineOfSight)
                                 {
                                     objWeightInfo += " NavBlocking";
                                     cacheObject.Weight = 0;
@@ -820,7 +820,7 @@ namespace Trinity
                                 if (CacheData.MonsterObstacles.Any(cp => MathUtil.IntersectsPath(cp.Position, cp.Radius * 1.2f, Player.Position, cacheObject.Position)))
                                     cacheObject.Weight = 0;
 
-                                if (!cacheObject.IsNavigable)
+                                if (!cacheObject.IsInLineOfSight)
                                 {
                                     objWeightInfo += " NavBlocking";
                                     cacheObject.Weight = 0;
@@ -893,7 +893,7 @@ namespace Trinity
                                 }
 
                                 // Weight Health Globes
-                                if (!cacheObject.IsNavigable || TownRun.IsTryingToTownPortal())
+                                if (!cacheObject.IsInLineOfSight || TownRun.IsTryingToTownPortal())
                                 {
                                     objWeightInfo += " NavBlocking";
                                     cacheObject.Weight = 0;
@@ -1039,7 +1039,7 @@ namespace Trinity
                                         cacheObject.Weight = 1;
                                         break;
                                     }
-                                    if (!cacheObject.IsNavigable)
+                                    if (!cacheObject.IsInLineOfSight)
                                     {
                                         objWeightInfo += " NavBlocking";
                                         cacheObject.Weight = 0;
@@ -1237,6 +1237,7 @@ namespace Trinity
                                     (DateTime.UtcNow.Subtract(PlayerMover.LastGeneratedStuckPosition).TotalSeconds > 3))
                                 {
                                     objWeightInfo += " NotStuck";
+                                    cacheObject.Weight = 0;
                                     break;
                                 }
 
@@ -1366,7 +1367,7 @@ namespace Trinity
                                 if (cacheObject.InternalName.ToLower().Contains("chest_rare"))
                                     maxRange = 250f;
 
-                                if (!cacheObject.IsNavigable)
+                                if (!cacheObject.IsInLineOfSight)
                                 {
                                     objWeightInfo += " NavBlocking";
                                     cacheObject.Weight = 0;
@@ -1436,7 +1437,7 @@ namespace Trinity
                     }
 
                     // Prevent current target dynamic ranged weighting flip-flop 
-                    if (LastTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight < 1 && !!cacheObject.IsNavigable && !cacheObject.IsInLineOfSight)
+                    if (LastTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight < 1 && !!cacheObject.IsInLineOfSight && !cacheObject.IsInLineOfSight)
                     {
                         cacheObject.Weight = 100;
                     }

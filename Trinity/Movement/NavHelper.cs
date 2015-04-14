@@ -797,7 +797,7 @@ namespace Trinity
                                 timers[10].Start();
                                 if (dstFromObjectToPoint <= 5f && Player.CurrentHealthPct < 0.3)
                                 {
-                                    if (!cacheObject.IsNavigable)
+                                    if (!cacheObject.IsInLineOfSight)
                                     {
                                         break;
                                     }
@@ -979,7 +979,7 @@ namespace Trinity
                             #region Container
                             {
                                 timers[22].Start();
-                                if (dstFromObjectToPoint <= cacheObject.Radius + 5f && !playerIsInBadWay && cacheObject.IsNavigable &&
+                                if (dstFromObjectToPoint <= cacheObject.Radius + 5f && !playerIsInBadWay && cacheObject.IsInLineOfSight &&
                                     (Trinity.Settings.WorldObject.HiPriorityContainers ||
                                     ((Legendary.HarringtonWaistguard.IsEquipped && !Legendary.HarringtonWaistguard.IsBuffActive))))
                                 {
