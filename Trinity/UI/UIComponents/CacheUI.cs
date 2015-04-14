@@ -21,7 +21,7 @@ namespace Trinity.UI.UIComponents
 
         private const int updateDelay = 1000;
 
-        private static Thread workerThread;
+        private static Thread _workerThread;
 
         public static Window CreateWindow()
         {
@@ -46,10 +46,10 @@ namespace Trinity.UI.UIComponents
 
 
                 var dgMainCache = new DataGrid { ItemsSource = DataModel.ObservableCache };
-                foreach (var column in TrinityCacheObjectColumns())
-                {
-                    dgMainCache.Columns.Add(column);
-                }
+                //foreach (var column in TrinityCacheObjectColumns())
+                //{
+                //    dgMainCache.Columns.Add(column);
+                //}
 
                 _window.Content = new TabControl
                 {
@@ -69,11 +69,11 @@ namespace Trinity.UI.UIComponents
                     DataModel = new CacheUIDataModel();
                 _userControl.DataContext = DataModel;
 
-                workerThread = new Thread(RunWorker)
+                _workerThread = new Thread(RunWorker)
                 {
                     IsBackground = true
                 };
-                workerThread.Start();
+                _workerThread.Start();
 
                 _window.Closed += Window_Closed;
 
@@ -142,8 +142,8 @@ namespace Trinity.UI.UIComponents
         {
             try
             {
-                if (workerThread.IsAlive)
-                    workerThread.Abort();
+                if (_workerThread.IsAlive)
+                    _workerThread.Abort();
                 _window = null;
             }
             catch (Exception ex)

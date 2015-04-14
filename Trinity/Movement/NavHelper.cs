@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
-using Trinity.DbProvider;
-using Trinity.Items;
 using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;

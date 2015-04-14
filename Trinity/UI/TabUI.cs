@@ -7,15 +7,17 @@ using Trinity.Helpers;
 using Trinity.Items;
 using Trinity.UI.UIComponents;
 using Zeta.Bot;
-using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
+using Zeta.Common;
+
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.UI
 {
     class TabUi
     {
-        private static UniformGrid _tabGrid = new UniformGrid();
+        private static UniformGrid _tabGrid;
         private static TabItem _tabItem;
         internal static void InstallTab()
         {
@@ -41,7 +43,7 @@ namespace Trinity.UI
                     CreateButton("Find New ActorIds", GetNewActorSNOsEventHandler);
                     CreateButton("Dump My Build", DumpBuildEventHandler);
                     CreateButton("Show Cache", ShowCacheWindowEventHandler);
-                    
+
 
                     _tabItem = new TabItem
                     {
@@ -87,15 +89,40 @@ namespace Trinity.UI
             _tabGrid.Children.Add(button);
         }
 
+
+        /**************
+         * 
+         * WARNING
+         * 
+         * ALWAYS surround your RoutedEventHandlers in try/catch. Failure to do so will result in Demonbuddy CRASHING if an exception is thrown.
+         * 
+         * WARNING
+         *  
+         *************/
+
         private static void ShowCacheWindowEventHandler(object sender, RoutedEventArgs routedEventArgs)
         {
-            CacheUI.CreateWindow().Show();
+            try
+            {
+                CacheUI.CreateWindow().Show();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error showing CacheUI:" + ex);
+            }
         }
 
         private static void ShowMainTrinityUIEventHandler(object sender, RoutedEventArgs routedEventArgs)
         {
-            var configWindow = UILoader.GetDisplayWindow();
-            configWindow.ShowDialog();
+            try
+            {
+                var configWindow = UILoader.GetDisplayWindow();
+                configWindow.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error showing Configuration from TabUI:" + ex);
+            }
         }
 
         private static void DumpBuildEventHandler(object sender, RoutedEventArgs routedEventArgs)
@@ -105,49 +132,91 @@ namespace Trinity.UI
 
         private static void GetNewActorSNOsEventHandler(object sender, RoutedEventArgs routedEventArgs)
         {
-            DebugUtil.LogNewItems();
+            try
+            {
+                DebugUtil.LogNewItems();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error logging new items:" + ex);
+            }
         }
 
         private static void SortBackEventHandler(object sender, RoutedEventArgs e)
         {
-            ItemSort.SortBackpack();
+            try
+            {
+                ItemSort.SortBackpack();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error sorting backpack:" + ex);
+            }
         }
 
         private static void DropLegendariesEventHandler(object sender, RoutedEventArgs e)
         {
-            using (new MemoryHelper())
+            try
             {
-                ZetaDia.Me.Inventory.Backpack.Where(i => i.ItemQualityLevel == ItemQuality.Legendary).ForEach(i => i.Drop());
+                using (new MemoryHelper())
+                {
+                    ZetaDia.Me.Inventory.Backpack.Where(i => i.ItemQualityLevel == ItemQuality.Legendary).ForEach(i => i.Drop());
 
-                if (BotMain.IsRunning && !BotMain.IsPausedForStateExecution)
-                    BotMain.PauseFor(TimeSpan.FromSeconds(2));
+                    if (BotMain.IsRunning && !BotMain.IsPausedForStateExecution)
+                        BotMain.PauseFor(TimeSpan.FromSeconds(2));
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error dropping legendaries:" + ex);
             }
         }
 
         private static void SortStashEventHandler(object sender, RoutedEventArgs e)
         {
-            ItemSort.SortStash();
+            try
+            {
+                ItemSort.SortStash();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error dropping legendaries:" + ex);
+            }
         }
 
         private static void CleanStashEventHandler(object sender, RoutedEventArgs e)
         {
-            var result = MessageBox.Show("Are you sure? This may remove and salvage/sell items from your stash! Permanently!", "Clean Stash Confirmation",
-                MessageBoxButton.OKCancel);
-
-            if (result == MessageBoxResult.OK)
+            try
             {
-                CleanStash.RunCleanStash();
+                var result = MessageBox.Show("Are you sure? This may remove and salvage/sell items from your stash! Permanently!", "Clean Stash Confirmation",
+                           MessageBoxButton.OKCancel);
+
+                if (result == MessageBoxResult.OK)
+                {
+                    CleanStash.RunCleanStash();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error Cleaning Stash:" + ex);
             }
         }
 
         private static void ReloadItemRulesEventHandler(object sender, RoutedEventArgs e)
         {
-            if (Trinity.StashRule == null)
-                Trinity.StashRule = new ItemRules.Interpreter();
-
-            if (Trinity.StashRule != null)
+            try
             {
-                BotMain.PauseWhile(Trinity.StashRule.reloadFromUI);
+                if (Trinity.StashRule == null)
+                    Trinity.StashRule = new ItemRules.Interpreter();
+
+                if (Trinity.StashRule != null)
+                {
+                    BotMain.PauseWhile(Trinity.StashRule.reloadFromUI);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error Reloading Item Rules:" + ex);
             }
         }
 

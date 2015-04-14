@@ -18,13 +18,13 @@ namespace Trinity.Combat.Abilities
     public class CombatBase
     {
         static CombatBase()
-		{
+        {
             GameEvents.OnGameJoined += (sender, args) => LoadCombatSettings();
             GameEvents.OnWorldChanged += (sender, args) => LoadCombatSettings();
             Pulsator.OnPulse += (sender, args) => MonkCombat.RunOngoingPowers();
             LoadCombatSettings();
-		}
-        
+        }
+
         private static TrinityPower _currentPower = new TrinityPower();
         private static Vector3 _lastZigZagLocation = Vector3.Zero;
         private static Vector3 _zigZagPosition = Vector3.Zero;
@@ -513,7 +513,7 @@ namespace Trinity.Combat.Abilities
                     case GObjectType.Destructible:
                     case GObjectType.Barricade:
                         return true;
-                    default: 
+                    default:
                         return false;
                 }
             }
@@ -714,15 +714,32 @@ namespace Trinity.Combat.Abilities
 
         public static void SetSNOPowerUseDelay(SNOPower power, double delay)
         {
-            string key = "SpellDelay." + power.ToString();
-            TVar v = V.Data[key];
-
-            bool hasDefaultValue = v.Value == v.DefaultValue;
-
-            if (hasDefaultValue)
+            try
             {
-                // Create a new TVar (changes the default value)
-                V.Set(new TVar(v.Name, delay, v.Description));
+                string key = "SpellDelay." + power.ToString();
+                TVar v;
+                if (V.ContainsKey(key))
+                {
+                    v = V.Data[key];
+                }
+                else
+                {
+                    Logger.LogError("WARNING: TVar {0} is missing! Setting default to {1}", key, delay);
+                    V.Set(new TVar(key, delay, ""));
+                    return;
+                }
+
+                bool hasDefaultValue = v.Value == v.DefaultValue;
+
+                if (hasDefaultValue)
+                {
+                    // Create a new TVar (changes the default value)
+                    V.Set(new TVar(v.Name, delay, v.Description));
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error Getting SNOPower Use Delay for power {0}:{1}", power);
             }
         }
 
@@ -752,7 +769,7 @@ namespace Trinity.Combat.Abilities
 
         internal static double TimeSincePrimaryUse
         {
-            get { return DateTime.UtcNow.Subtract(LastGeneratorUseTime).TotalMilliseconds;  }
+            get { return DateTime.UtcNow.Subtract(LastGeneratorUseTime).TotalMilliseconds; }
         }
 
         /// <summary>

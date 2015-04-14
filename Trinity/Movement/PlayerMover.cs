@@ -141,7 +141,7 @@ namespace Trinity.DbProvider
                 Trinity.CurrentTarget = TargetUtil.GetClosestDestructible(25f, _useWeights: false);
                 if (CurrentTarget != null)
                 {
-                    CombatBase.Cast(Trinity.AbilitySelector(UseDestructiblePower: true));
+                    CombatBase.Cast(Trinity.AbilitySelector());
                 }
             }
 
