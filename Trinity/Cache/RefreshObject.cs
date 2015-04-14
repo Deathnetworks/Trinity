@@ -548,11 +548,6 @@ namespace Trinity
                             }
                         }
                     }
-                    /*else if (DataDictionary.ForceAtDoorType.Contains(c_CacheObject.ActorSNO) ||
-                        c_CacheObject.InternalName.Contains("door") || c_CacheObject.InternalName.Contains("gate"))
-                    {
-                        c_CacheObject.Type = GObjectType.Door;
-                    }*/
                 }
             }
 

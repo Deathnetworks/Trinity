@@ -85,13 +85,13 @@ namespace Trinity.Combat.Abilities
                 {
                     var dest = _power.TargetPosition != Vector3.Zero ? _power.TargetPosition : CurrentTarget != null ? CurrentTarget.Position : Vector3.Zero;
 
-                    // todo: what is this for?
-                    //var withinMinimumRange = _power.MinimumRange <= 1 || (CurrentTarget != null && dest.Distance2D(Player.Position) - CurrentTarget.Radius <= _power.MinimumRange + 2f);
+                    // todo: what is this for? answer: example with DH evasive fire, he must be used for primary missing with a large range, bastions of will buff only cast when "hit"
+                    var withinMinimumRange = _power.MinimumRange <= 1 || (CurrentTarget != null && dest.Distance2D(Player.Position) - CurrentTarget.Radius <= _power.MinimumRange + 2f);
 
                     if (_currentSkill.IsSpender)
                         LastSpenderUseTime = DateTime.UtcNow;
 
-                    else if (_currentSkill.IsGenerator) // && withinMinimumRange)
+                    else if (_currentSkill.IsAttackGenerator && withinMinimumRange)
                         LastGeneratorUseTime = DateTime.UtcNow;
                 }
 

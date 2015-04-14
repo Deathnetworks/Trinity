@@ -119,9 +119,9 @@ namespace Trinity.Objects
         }
 
         /// <summary>
-        /// Check if skill generates resource
+        /// Check if skill generates resource and can hit
         /// </summary>
-        public bool IsGenerator
+        public bool IsAttackGenerator
         {
             get
             {
@@ -129,12 +129,6 @@ namespace Trinity.Objects
                     return true;
 
                 if (this == Skills.DemonHunter.ElementalArrow && Legendary.Kridershot.IsEquipped)
-                    return true;
-
-                if (this == Skills.DemonHunter.Preparation && Reference.Runes.DemonHunter.Punishment.IsActive)
-                    return true;
-
-                if (this == Skills.DemonHunter.Vengeance && Reference.Runes.DemonHunter.Seethe.IsActive)
                     return true;
 
                 return Category == SpellCategory.Primary;
@@ -365,7 +359,10 @@ namespace Trinity.Objects
         /// </summary>
         public bool Cast(Vector3 clickPosition, int targetAcdGuid)
         {
-            return CombatBase.Cast(new TrinityPower(SNOPower, 0f, clickPosition, targetAcdGuid));
+            if (targetAcdGuid != -1)
+                return CombatBase.Cast(new TrinityPower(SNOPower, 0f, targetAcdGuid));
+
+            return CombatBase.Cast(new TrinityPower(SNOPower, 0f, clickPosition));
         }
 
         private bool GameIsReady

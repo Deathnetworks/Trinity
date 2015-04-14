@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.Serialization;
+using Trinity.Cache;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.DbProvider;
@@ -697,6 +698,22 @@ namespace Trinity
             }
             catch (Exception) { }
             return false;
+        }
+
+        [NoCopy]
+        public bool IsBlacklisted
+        {
+            get
+            {
+                return 
+                    GenericBlacklist.ContainsKey(ObjectHash) ||
+                    Trinity.Blacklist90Seconds.Contains(RActorGuid) ||
+                    Trinity.Blacklist60Seconds.Contains(RActorGuid) ||
+                    Trinity.Blacklist15Seconds.Contains(RActorGuid) ||
+                    Trinity.Blacklist3Seconds.Contains(RActorGuid) ||
+                    Trinity.Blacklist1Second.Contains(RActorGuid) ||
+                    DataDictionary.BlackListIds.Contains(RActorGuid);
+            }
         }
 
         [NoCopy]

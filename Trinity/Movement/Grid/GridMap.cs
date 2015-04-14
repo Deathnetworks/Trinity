@@ -23,14 +23,19 @@ namespace Trinity
         }
 
         /// <summary>
+        /// return true if any grid point has a weight > 0 or better than weight at player
+        /// </summary>
+        public static bool HasSafeSpots
+        {
+            get { return MainGrid.Map.Any(g => g != null && g.Weight > 0 || g.Weight * 0.95 > GetWeightAtPlayer); }
+        }
+
+        /// <summary>
         /// return true if any grid point has a cluster weight > 0
         /// </summary>
         public static bool ClusterNodeExist
         {
-            get
-            {
-                return MainGrid.Map.Any(g => g.ClusterWeight > 0);
-            }
+            get { return MainGrid.Map.Any(g => g != null && g.ClusterWeight > 0); }
         }
 
         /// <summary>

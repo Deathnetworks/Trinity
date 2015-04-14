@@ -50,20 +50,20 @@ namespace Trinity.Combat.Abilities
 
             return CacheData.SentryTurret.Count(s => s.Position.Distance2D(CurrentTarget.Position) <= range && NavHelper.CanRayCast(s.Position, loc, true)) >= minCount;
         }
-        private static float _RangedAttackRange = -1f;
+        private static float rangedAttackRange = -1f;
         private static float RangedAttackRange
         {
             get
             {
-                if (_RangedAttackRange >= 0f)
-                    return _RangedAttackRange;
+                if (rangedAttackRange >= 0f)
+                    return rangedAttackRange;
 
                 if (Sets.EmbodimentOfTheMarauder.IsMaxBonusActive && IsSentryOnTarget(2))
-                    _RangedAttackRange = 0f;
+                    rangedAttackRange = 0f;
                 else
-                    _RangedAttackRange = DHSettings.RangedAttackRange;
+                    rangedAttackRange = DHSettings.RangedAttackRange;
 
-                return _RangedAttackRange;
+                return rangedAttackRange;
             }
         }
         private static Vector3 LastZeiOfStoneLocation = new Vector3();
@@ -146,77 +146,82 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         private static TrinityPower GetPrimaryPower()
         {
-            if (Sets.EmbodimentOfTheMarauder.IsMaxBonusActive && AreaHasCastCriteria(SentryCastSkillsCastArea))
+            if (Sets.EmbodimentOfTheMarauder.IsMaxBonusActive && AreaHasCastCriteria(RangedSkillsCastArea))
             {
-                if (Skills.DemonHunter.EvasiveFire.IsActive && !Skills.DemonHunter.EvasiveFire.Cast(SentryCastSkillsCastArea.Position))
-                    return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, RangedAttackRange, SentryCastSkillsCastArea.Position); ;
+                if (Skills.DemonHunter.EvasiveFire.IsActive && !Skills.DemonHunter.EvasiveFire.Cast(RangedSkillsCastArea.Position))
+                    return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, RangedAttackRange, RangedSkillsCastArea.Position); ;
 
-                if (Skills.DemonHunter.HungeringArrow.IsActive && !Skills.DemonHunter.HungeringArrow.Cast(SentryCastSkillsCastArea.Position))
-                    return new TrinityPower(SNOPower.DemonHunter_HungeringArrow, RangedAttackRange, SentryCastSkillsCastArea.Position);
+                if (Skills.DemonHunter.HungeringArrow.IsActive && !Skills.DemonHunter.HungeringArrow.Cast(RangedSkillsCastArea.Position))
+                    return new TrinityPower(SNOPower.DemonHunter_HungeringArrow, RangedAttackRange, RangedSkillsCastArea.Position);
 
-                if (Skills.DemonHunter.EntanglingShot.IsActive && !Skills.DemonHunter.EntanglingShot.Cast(SentryCastSkillsCastArea.Position))
-                    return new TrinityPower(SNOPower.X1_DemonHunter_EntanglingShot, RangedAttackRange, SentryCastSkillsCastArea.Position);
+                if (Skills.DemonHunter.EntanglingShot.IsActive && !Skills.DemonHunter.EntanglingShot.Cast(RangedSkillsCastArea.Position))
+                    return new TrinityPower(SNOPower.X1_DemonHunter_EntanglingShot, RangedAttackRange, RangedSkillsCastArea.Position);
 
-                if (Skills.DemonHunter.Bolas.IsActive && !Skills.DemonHunter.Bolas.Cast(SentryCastSkillsCastArea.Position))
-                    return new TrinityPower(SNOPower.DemonHunter_Bolas, RangedAttackRange, SentryCastSkillsCastArea.Position);
+                if (Skills.DemonHunter.Bolas.IsActive && !Skills.DemonHunter.Bolas.Cast(RangedSkillsCastArea.Position))
+                    return new TrinityPower(SNOPower.DemonHunter_Bolas, RangedAttackRange, RangedSkillsCastArea.Position);
 
-                if (Skills.DemonHunter.Grenade.IsActive && !Skills.DemonHunter.Grenade.Cast(SentryCastSkillsCastArea.Position))
-                    return new TrinityPower(SNOPower.DemonHunter_Grenades, RangedAttackRange, SentryCastSkillsCastArea.Position);
+                if (Skills.DemonHunter.Grenade.IsActive && !Skills.DemonHunter.Grenade.Cast(RangedSkillsCastArea.Position))
+                    return new TrinityPower(SNOPower.DemonHunter_Grenades, RangedAttackRange, RangedSkillsCastArea.Position);
             }
-            else if (Sets.EmbodimentOfTheMarauder.IsMaxBonusActive && SentryCastSkillsCastArea != null && SentryCastSkillsCastArea.Position != Vector3.Zero)
+            else if (Sets.EmbodimentOfTheMarauder.IsMaxBonusActive && RangedSkillsCastArea != null && RangedSkillsCastArea.Position != Vector3.Zero)
             {
-                //MoveToSentryCastSkillsCastArea(SentryCastSkillsCastArea);
-
                 if (Skills.DemonHunter.EvasiveFire.IsActive)
-                    return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, RangedAttackRange, SentryCastSkillsCastArea.Position); ;
+                    return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, RangedAttackRange, RangedSkillsCastArea.Position); ;
 
                 if (Skills.DemonHunter.HungeringArrow.IsActive)
-                    return new TrinityPower(SNOPower.DemonHunter_HungeringArrow, RangedAttackRange, SentryCastSkillsCastArea.Position);
+                    return new TrinityPower(SNOPower.DemonHunter_HungeringArrow, RangedAttackRange, RangedSkillsCastArea.Position);
 
                 if (Skills.DemonHunter.EntanglingShot.IsActive)
-                    return new TrinityPower(SNOPower.X1_DemonHunter_EntanglingShot, RangedAttackRange, SentryCastSkillsCastArea.Position);
+                    return new TrinityPower(SNOPower.X1_DemonHunter_EntanglingShot, RangedAttackRange, RangedSkillsCastArea.Position);
 
                 if (Skills.DemonHunter.Bolas.IsActive)
-                    return new TrinityPower(SNOPower.DemonHunter_Bolas, RangedAttackRange, SentryCastSkillsCastArea.Position);
+                    return new TrinityPower(SNOPower.DemonHunter_Bolas, RangedAttackRange, RangedSkillsCastArea.Position);
 
                 if (Skills.DemonHunter.Grenade.IsActive)
-                    return new TrinityPower(SNOPower.DemonHunter_Grenades, RangedAttackRange, SentryCastSkillsCastArea.Position);
+                    return new TrinityPower(SNOPower.DemonHunter_Grenades, RangedAttackRange, RangedSkillsCastArea.Position);
             }
 
-            // Evasive Fire
-            if (Hotbar.Contains(SNOPower.X1_DemonHunter_EvasiveFire))
+            var target = TargetUtil.GetClosestTarget(65f, _useWeights: false);
+            if (target != default(TrinityCacheObject))
             {
-                float range = (Player.PrimaryResourceMissing > 5 || Sets.EmbodimentOfTheMarauder.IsMaxBonusActive) ? RangedAttackRange : 10f;
-                return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, RangedAttackRange, SentryCastSkillsCastArea.Position);
+                // Evasive Fire
+                if (Hotbar.Contains(SNOPower.X1_DemonHunter_EvasiveFire))
+                {
+                    float range = !IsBastionsPrimaryBuffWillExpired && (Player.PrimaryResourceMissing > 5 || Sets.EmbodimentOfTheMarauder.IsMaxBonusActive) 
+                        ? RangedAttackRange 
+                        : 10f;
+
+                    return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, RangedAttackRange, RangedSkillsCastArea.Position);
+                }
+
+                // Hungering Arrow
+                if (Hotbar.Contains(SNOPower.DemonHunter_HungeringArrow))
+                {
+                    return new TrinityPower(SNOPower.DemonHunter_HungeringArrow, RangedAttackRange, RangedSkillsCastArea.Position);
+                }
+
+                // Entangling shot
+                if (Skills.DemonHunter.EntanglingShot.IsActive)
+                {
+                    return new TrinityPower(SNOPower.X1_DemonHunter_EntanglingShot, RangedAttackRange, RangedSkillsCastArea.Position);
+                }
+
+                // Bola Shot
+                if (Hotbar.Contains(SNOPower.DemonHunter_Bolas))
+                {
+                    float range = RangedAttackRange > 50f ? 50f : RangedAttackRange;
+                    return new TrinityPower(SNOPower.DemonHunter_Bolas, range, RangedSkillsCastArea.Position);
+                }
+
+                // Grenades
+                if (Hotbar.Contains(SNOPower.DemonHunter_Grenades))
+                {
+                    float range = RangedAttackRange > 30f ? 30f : RangedAttackRange;
+                    return new TrinityPower(SNOPower.DemonHunter_Grenades, range, RangedSkillsCastArea.Position);
+                }
             }
 
-            // Hungering Arrow
-            if (Hotbar.Contains(SNOPower.DemonHunter_HungeringArrow))
-            {
-                return new TrinityPower(SNOPower.DemonHunter_HungeringArrow, RangedAttackRange, SentryCastSkillsCastArea.Position);
-            }
-
-            // Entangling shot
-            if (Skills.DemonHunter.EntanglingShot.IsActive)
-            {
-                return new TrinityPower(SNOPower.X1_DemonHunter_EntanglingShot, RangedAttackRange, SentryCastSkillsCastArea.Position);
-            }
-
-            // Bola Shot
-            if (Hotbar.Contains(SNOPower.DemonHunter_Bolas))
-            {
-                float range = RangedAttackRange > 50f ? 50f : RangedAttackRange;
-                return new TrinityPower(SNOPower.DemonHunter_Bolas, range, SentryCastSkillsCastArea.Position);
-            }
-
-            // Grenades
-            if (Hotbar.Contains(SNOPower.DemonHunter_Grenades))
-            {
-                float range = RangedAttackRange > 30f ? 30f : RangedAttackRange;
-                return new TrinityPower(SNOPower.DemonHunter_Grenades, RangedAttackRange, SentryCastSkillsCastArea.Position);
-            }
-
-            var generator = SkillUtils.Active.FirstOrDefault(s => s.IsGenerator);
+            var generator = SkillUtils.Active.FirstOrDefault(s => s.IsAttackGenerator);
             return generator != null ? generator.ToPower(RangedAttackRange, Enemies.BestCluster.Position) : DefaultPower;
         }
 
@@ -271,9 +276,9 @@ namespace Trinity.Combat.Abilities
             // Preparation, restore Disc if needed
             float useDelay = Runes.DemonHunter.FocusedMind.IsActive ? 15000 : 500;
             if (CanCast(SNOPower.DemonHunter_Preparation, CanCastFlags.NoTimer) &&
-            Player.SecondaryResource <= V.F("DemonHunter.MinPreparationDiscipline") &&
-            !Runes.DemonHunter.Punishment.IsActive &&
-            TimeSincePowerUse(SNOPower.DemonHunter_Preparation) >= useDelay)
+                Player.SecondaryResource <= V.F("DemonHunter.MinPreparationDiscipline") &&
+                !Runes.DemonHunter.Punishment.IsActive &&
+                TimeSincePowerUse(SNOPower.DemonHunter_Preparation) >= useDelay)
             {
                 return new TrinityPower(SNOPower.DemonHunter_Preparation);
             }
@@ -442,53 +447,56 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.DemonHunter_SpikeTrap, 35f, vNewTarget, Trinity.Player.WorldDynamicID, -1, 1, 1);
             }
 
-            if (CurrentTarget.MonsterAffixes.HasFlag(MonsterAffixes.ReflectsDamage) &&
-                Sets.EmbodimentOfTheMarauder.IsFullyEquipped && IsSentryOnTarget())
+            if (AreaHasCastCriteria(RangedSkillsCastArea))
             {
-                SentryCastSkillsCastArea.Position = MathEx.CalculatePointFrom(SentryCastSkillsCastArea.Position, Player.Position, -30f);
-            }
-
-            // Cluster Arrow
-            if (CanCast(SNOPower.DemonHunter_ClusterArrow))
-            {
-                if (!Sets.NatalyasVengeance.IsFullyEquipped || CacheData.Buffs.HasBuff(SNOPower.P2_ItemPassive_Unique_Ring_053))
+                if (CurrentTarget.MonsterAffixes.HasFlag(MonsterAffixes.ReflectsDamage) &&
+                    Sets.EmbodimentOfTheMarauder.IsFullyEquipped && IsSentryOnTarget())
                 {
-                    return new TrinityPower(SNOPower.DemonHunter_ClusterArrow, RangedAttackRange, SentryCastSkillsCastArea.Position);
+                    RangedSkillsCastArea.Position = MathEx.CalculatePointFrom(RangedSkillsCastArea.Position, Player.Position, -30f);
                 }
-            }
 
-            // Elemental Arrow for non-kridershot
-            if (CanCast(SNOPower.DemonHunter_ElementalArrow))
-            {
-                return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, RangedAttackRange, SentryCastSkillsCastArea.Position);
-            }
+                // Cluster Arrow
+                if (CanCast(SNOPower.DemonHunter_ClusterArrow))
+                {
+                    if (!Sets.NatalyasVengeance.IsFullyEquipped || CacheData.Buffs.HasBuff(SNOPower.P2_ItemPassive_Unique_Ring_053))
+                    {
+                        return new TrinityPower(SNOPower.DemonHunter_ClusterArrow, RangedAttackRange, RangedSkillsCastArea.Position);
+                    }
+                }
 
-            // Multi Shot
-            if (CanCast(SNOPower.DemonHunter_Multishot))
-            {
-                return new TrinityPower(SNOPower.DemonHunter_Multishot, RangedAttackRange, SentryCastSkillsCastArea.Position);
-            }
+                // Elemental Arrow for non-kridershot
+                if (CanCast(SNOPower.DemonHunter_ElementalArrow))
+                {
+                    return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, RangedAttackRange, RangedSkillsCastArea.Position);
+                }
 
-            // Chakram normal attack
-            if (CanCast(SNOPower.DemonHunter_Chakram) && !Runes.DemonHunter.ShurikenCloud.IsActive)
-            {
-                if (DHSettings.RangedAttackRange > 0)
-                    DHSettings.RangedAttackRange = 50;
+                // Multi Shot
+                if (CanCast(SNOPower.DemonHunter_Multishot))
+                {
+                    return new TrinityPower(SNOPower.DemonHunter_Multishot, RangedAttackRange, RangedSkillsCastArea.Position);
+                }
 
-                return new TrinityPower(SNOPower.DemonHunter_Chakram, RangedAttackRange, SentryCastSkillsCastArea.Position);
-            }
+                // Chakram normal attack
+                if (CanCast(SNOPower.DemonHunter_Chakram) && !Runes.DemonHunter.ShurikenCloud.IsActive)
+                {
+                    if (DHSettings.RangedAttackRange > 0)
+                        DHSettings.RangedAttackRange = 50;
 
-            // Chakram:Shuriken Cloud
-            if (!Player.IsInTown && CanCast(SNOPower.DemonHunter_Chakram, CanCastFlags.NoTimer) &&
-                Runes.DemonHunter.ShurikenCloud.IsActive && TimeSincePowerUse(SNOPower.DemonHunter_Chakram) >= 110000)
-            {
-                return new TrinityPower(SNOPower.DemonHunter_Chakram);
-            }
+                    return new TrinityPower(SNOPower.DemonHunter_Chakram, RangedAttackRange, RangedSkillsCastArea.Position);
+                }
 
-            // Impale
-            if (CanCast(SNOPower.DemonHunter_Impale))
-            {
-                return new TrinityPower(SNOPower.DemonHunter_Impale, RangedAttackRange, SentryCastSkillsCastArea.Position);
+                // Chakram:Shuriken Cloud
+                if (!Player.IsInTown && CanCast(SNOPower.DemonHunter_Chakram, CanCastFlags.NoTimer) &&
+                    Runes.DemonHunter.ShurikenCloud.IsActive && TimeSincePowerUse(SNOPower.DemonHunter_Chakram) >= 110000)
+                {
+                    return new TrinityPower(SNOPower.DemonHunter_Chakram);
+                }
+
+                // Impale
+                if (CanCast(SNOPower.DemonHunter_Impale))
+                {
+                    return new TrinityPower(SNOPower.DemonHunter_Impale, RangedAttackRange, RangedSkillsCastArea.Position);
+                }
             }
 
             // Rapid Fire
@@ -596,19 +604,14 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         public static TrinityPower RunMarauderRoutine()
         {
+            if (CurrentTarget == null)
+                return null;
+
             // Fields
             TrinityPower power = null;
 
-            if (CurrentTarget != null)
-                power = GetCombatBuffPower();
-
-            if (!IsNull(power))
-            {
-                return power;
-            }
-
-            if (CurrentTarget == null)
-                return null;
+            power = GetCombatBuffPower();
+            if (!IsNull(power)) { return power; }
 
             // Sentry
             if (SentryCastArea != null && Skills.DemonHunter.Sentry.CanCast(CanCastFlags.NoTimer) && Trinity.PlayerOwnedDHSentryCount < MaxSentryCount)
@@ -642,72 +645,35 @@ namespace Trinity.Combat.Abilities
                     {
                         power = new TrinityPower(SNOPower.DemonHunter_Sentry, DHSettings.RangedAttackRange, SentryCastArea.Position);
                     }
-
-                    if (CurrentTarget == null || CurrentTarget.IsUnit)
-                        //MoveToSentryCastArea(SentryCastArea);
-
-                        if (!IsNull(power) && CurrentTarget == null)
-                        {
-                            Trinity.CurrentTarget = new TrinityCacheObject()
-                            {
-                                Position = SentryCastArea.Position,
-                                Type = GObjectType.Unit,
-                                Weight = 2d,
-                                Radius = 20f,
-                                InternalName = "SentryCastArea"
-                            };
-                        }
                 }
             }
 
             // SentryCastSkills
-            if (AreaHasCastCriteria(SentryCastSkillsCastArea))
+            if (AreaHasCastCriteria(RangedSkillsCastArea))
             {
-                if (Skills.DemonHunter.ClusterArrow.CanCast() && !Skills.DemonHunter.ClusterArrow.Cast(SentryCastSkillsCastArea.Position))
-                    power = new TrinityPower(SNOPower.DemonHunter_ClusterArrow, RangedAttackRange, SentryCastSkillsCastArea.Position);
-                else if (CanCast(SNOPower.DemonHunter_Multishot, CombatBase.CanCastFlags.NoTimer) && !Skills.DemonHunter.Multishot.Cast(SentryCastSkillsCastArea.Position))
-                    power = new TrinityPower(SNOPower.DemonHunter_Multishot, RangedAttackRange, SentryCastSkillsCastArea.Position);
-                else if (Skills.DemonHunter.Chakram.CanCast() && !Skills.DemonHunter.Chakram.Cast(SentryCastSkillsCastArea.Position))
-                    power = new TrinityPower(SNOPower.DemonHunter_Chakram, RangedAttackRange, SentryCastSkillsCastArea.Position);
-                else if (Skills.DemonHunter.Impale.CanCast() && !Skills.DemonHunter.Impale.Cast(SentryCastSkillsCastArea.Position))
-                    power = new TrinityPower(SNOPower.DemonHunter_Impale, RangedAttackRange, SentryCastSkillsCastArea.Position);
-                else if (Skills.DemonHunter.ElementalArrow.CanCast() && !Skills.DemonHunter.ElementalArrow.Cast(SentryCastSkillsCastArea.Position))
-                    power = new TrinityPower(SNOPower.DemonHunter_ElementalArrow, RangedAttackRange, SentryCastSkillsCastArea.Position);
+                if (Skills.DemonHunter.ClusterArrow.CanCast() && !Skills.DemonHunter.ClusterArrow.Cast(RangedSkillsCastArea.Position))
+                    power = new TrinityPower(SNOPower.DemonHunter_ClusterArrow, RangedAttackRange, RangedSkillsCastArea.Position);
+                else if (CanCast(SNOPower.DemonHunter_Multishot, CombatBase.CanCastFlags.NoTimer) && !Skills.DemonHunter.Multishot.Cast(RangedSkillsCastArea.Position))
+                    power = new TrinityPower(SNOPower.DemonHunter_Multishot, RangedAttackRange, RangedSkillsCastArea.Position);
+                else if (Skills.DemonHunter.Chakram.CanCast() && !Skills.DemonHunter.Chakram.Cast(RangedSkillsCastArea.Position))
+                    power = new TrinityPower(SNOPower.DemonHunter_Chakram, RangedAttackRange, RangedSkillsCastArea.Position);
+                else if (Skills.DemonHunter.Impale.CanCast() && !Skills.DemonHunter.Impale.Cast(RangedSkillsCastArea.Position))
+                    power = new TrinityPower(SNOPower.DemonHunter_Impale, RangedAttackRange, RangedSkillsCastArea.Position);
+                else if (Skills.DemonHunter.ElementalArrow.CanCast() && !Skills.DemonHunter.ElementalArrow.Cast(RangedSkillsCastArea.Position))
+                    power = new TrinityPower(SNOPower.DemonHunter_ElementalArrow, RangedAttackRange, RangedSkillsCastArea.Position);
             }
-            else if (IsNull(power) && SentryCastSkillsCastArea != null && SentryCastSkillsCastArea.Position != Vector3.Zero)
+            else if (IsNull(power) && RangedSkillsCastArea != null && RangedSkillsCastArea.Position != Vector3.Zero)
             {
                 if (Skills.DemonHunter.ClusterArrow.CanCast(CombatBase.CanCastFlags.NoTimer))
-                    power = new TrinityPower(SNOPower.DemonHunter_ClusterArrow, RangedAttackRange, SentryCastSkillsCastArea.Position);
+                    power = new TrinityPower(SNOPower.DemonHunter_ClusterArrow, RangedAttackRange, RangedSkillsCastArea.Position);
                 else if (CanCast(SNOPower.DemonHunter_Multishot, CombatBase.CanCastFlags.NoTimer))
-                    power = new TrinityPower(SNOPower.DemonHunter_Multishot, RangedAttackRange, SentryCastSkillsCastArea.Position);
+                    power = new TrinityPower(SNOPower.DemonHunter_Multishot, RangedAttackRange, RangedSkillsCastArea.Position);
                 else if (Skills.DemonHunter.Chakram.CanCast(CombatBase.CanCastFlags.NoTimer))
-                    power = new TrinityPower(SNOPower.DemonHunter_Chakram, RangedAttackRange, SentryCastSkillsCastArea.Position);
+                    power = new TrinityPower(SNOPower.DemonHunter_Chakram, RangedAttackRange, RangedSkillsCastArea.Position);
                 else if (Skills.DemonHunter.Impale.CanCast(CombatBase.CanCastFlags.NoTimer))
-                    power = new TrinityPower(SNOPower.DemonHunter_Impale, RangedAttackRange, SentryCastSkillsCastArea.Position);
+                    power = new TrinityPower(SNOPower.DemonHunter_Impale, RangedAttackRange, RangedSkillsCastArea.Position);
                 else if (Skills.DemonHunter.ElementalArrow.CanCast(CombatBase.CanCastFlags.NoTimer))
-                    power = new TrinityPower(SNOPower.DemonHunter_ElementalArrow, RangedAttackRange, SentryCastSkillsCastArea.Position);
-
-                if ((CurrentTarget == null || CurrentTarget.IsUnit) && RangedAttackRange > 1f)
-                {
-                    //MoveToSentryCastSkillsCastArea(SentryCastSkillsCastArea);
-                }
-
-                if (!IsNull(power) && CurrentTarget == null)
-                {
-                    Trinity.CurrentTarget = new TrinityCacheObject()
-                    {
-                        Position = SentryCastSkillsCastArea.Position,
-                        Type = GObjectType.Unit,
-                        Weight = 2d,
-                        Radius = 20f,
-                        InternalName = "SentryCastSkillsCastArea",
-                    };
-                }
-            }
-
-            if (!IsNull(power) && CurrentTarget == null)
-            {
-                Trinity.CurrentTarget = TargetUtil.GetClosestTarget(150f);
+                    power = new TrinityPower(SNOPower.DemonHunter_ElementalArrow, RangedAttackRange, RangedSkillsCastArea.Position);
             }
 
             return power;
@@ -716,47 +682,47 @@ namespace Trinity.Combat.Abilities
         #region Marauder routine helpers
         public static void ResetArea()
         {
-            _SentryCastArea = null;
-            _SentryCastSkillsCastArea = null;
-            _RangedAttackRange = -1f;
+            sentryCastArea = null;
+            rangedSkillsCastArea = null;
+            rangedAttackRange = -1f;
         }
 
-        private static TargetArea _SentryCastArea { get; set; }
+        private static TargetArea sentryCastArea { get; set; }
         private static TargetArea SentryCastArea
         {
             get
             {
-                if (_SentryCastArea != null)
-                    return _SentryCastArea;
+                if (sentryCastArea != null)
+                    return sentryCastArea;
 
                 TrinityCacheObject targetCacheObject = TargetUtil.GetClosestTarget(150f, Player.Position, false);
 
                 if (Runes.DemonHunter.PolarStation.IsActive && TargetUtil.ClusterExists(20f, 3))
-                    _SentryCastArea = Enemies.BestCluster;
+                    sentryCastArea = Enemies.BestCluster;
 
                 else if (TargetUtil.ClusterExists(20f, DHSettings.RangedAttackRange))
-                    _SentryCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, DHSettings.RangedAttackRange + 5f, _useWeights: false).Position);
+                    sentryCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, DHSettings.RangedAttackRange + 5f, _useWeights: false).Position);
 
                 else if (TargetUtil.ClusterExists(20f, 65f))
-                    _SentryCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, 65f + 5f, _useWeights: false).Position);
+                    sentryCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, 65f + 5f, _useWeights: false).Position);
 
                 else if (CurrentTarget != null && CurrentTarget.IsUnit)
-                    _SentryCastArea = new TargetArea(60f, CurrentTarget.Position);
+                    sentryCastArea = new TargetArea(60f, CurrentTarget.Position);
 
                 else if (targetCacheObject != null && targetCacheObject != default(TrinityCacheObject) && targetCacheObject.Position != Vector3.Zero)
-                    _SentryCastArea = new TargetArea(60f, targetCacheObject.Position);
+                    sentryCastArea = new TargetArea(60f, targetCacheObject.Position);
 
-                return _SentryCastArea;
+                return sentryCastArea;
             }
         }
 
-        private static TargetArea _SentryCastSkillsCastArea { get; set; }
-        private static TargetArea SentryCastSkillsCastArea
+        private static TargetArea rangedSkillsCastArea { get; set; }
+        private static TargetArea RangedSkillsCastArea
         {
             get
             {
-                if (_SentryCastSkillsCastArea != null)
-                    return _SentryCastSkillsCastArea;
+                if (rangedSkillsCastArea != null)
+                    return rangedSkillsCastArea;
 
                 TrinityCacheObject targetCacheObject = default(TrinityCacheObject);
                 if (Skills.DemonHunter.ElementalArrow.IsActive && Runes.DemonHunter.BallLightning.IsActive)
@@ -765,160 +731,40 @@ namespace Trinity.Combat.Abilities
                     targetCacheObject = TargetUtil.GetClosestTarget(150f, _useWeights: false);
 
                 if (Skills.DemonHunter.ClusterArrow.IsActive && TargetUtil.ClusterExists(20f, DHSettings.RangedAttackRange))
-                    _SentryCastSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, DHSettings.RangedAttackRange + 5f, _useWeights: false).Position);
+                    rangedSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, DHSettings.RangedAttackRange + 5f, _useWeights: false).Position);
 
                 else if (Skills.DemonHunter.Multishot.IsActive && TargetUtil.ClusterExists(40f, DHSettings.RangedAttackRange))
-                    _SentryCastSkillsCastArea = new TargetArea(40f, TargetUtil.GetBestClusterUnit(40f, DHSettings.RangedAttackRange + 5f, _useWeights: false).Position);
+                    rangedSkillsCastArea = new TargetArea(40f, TargetUtil.GetBestClusterUnit(40f, DHSettings.RangedAttackRange + 5f, _useWeights: false).Position);
 
                 else if (Skills.DemonHunter.Chakram.IsActive && TargetUtil.ClusterExists(20f, Math.Min(DHSettings.RangedAttackRange, 50f)))
-                    _SentryCastSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, Math.Min(DHSettings.RangedAttackRange + 5f, 50f), _useWeights: false).Position);
+                    rangedSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, Math.Min(DHSettings.RangedAttackRange + 5f, 50f), _useWeights: false).Position);
 
                 if (Skills.DemonHunter.ClusterArrow.IsActive && TargetUtil.ClusterExists(20f, 90f))
-                    _SentryCastSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, 65f, _useWeights: false).Position);
+                    rangedSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, 65f, _useWeights: false).Position);
 
                 else if (Skills.DemonHunter.Multishot.IsActive && TargetUtil.ClusterExists(40f, 90f))
-                    _SentryCastSkillsCastArea = new TargetArea(40f, TargetUtil.GetBestClusterUnit(40f, 65f, _useWeights: false).Position);
+                    rangedSkillsCastArea = new TargetArea(40f, TargetUtil.GetBestClusterUnit(40f, 65f, _useWeights: false).Position);
 
                 else if (Skills.DemonHunter.Chakram.IsActive && TargetUtil.ClusterExists(20f, 90f))
-                    _SentryCastSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, 65f, _useWeights: false).Position);
+                    rangedSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, 65f, _useWeights: false).Position);
 
                 else if (targetCacheObject != null && targetCacheObject != default(TrinityCacheObject) && targetCacheObject.Position != Vector3.Zero)
-                    _SentryCastSkillsCastArea = new TargetArea(20f, targetCacheObject.Position);
+                    rangedSkillsCastArea = new TargetArea(20f, targetCacheObject.Position);
 
                 else if (CurrentTarget != null && CurrentTarget.IsUnit)
-                    _SentryCastSkillsCastArea = new TargetArea(20f, CurrentTarget.Position);
-                return _SentryCastSkillsCastArea;
+                    rangedSkillsCastArea = new TargetArea(20f, CurrentTarget.Position);
+                return rangedSkillsCastArea;
             }
         }
 
         private static bool AreaHasCastCriteria(TargetArea area, bool rangeRequired = false)
         {
-            return !CombatBase.PlayerShouldNotFight &&
-                (area != null && area.Position != Vector3.Zero && area.UnitCount >= 1 &&
+            return (area != null && area.Position != Vector3.Zero && area.UnitCount >= 1 &&
                 (area.Position.Distance2D(Trinity.Player.Position) <= DHSettings.RangedAttackRange &&
                 area.Units.OrderByDescending(u => u.Distance).FirstOrDefault().IsInLineOfSight ||
                 RangedAttackRange <= 1f && !rangeRequired));
         }
 
-        private static void MoveToSentryCastArea(TargetArea area)
-        {
-            CombatBase.QueuedMovement.Queue(new QueuedMovement
-            {
-                Name = "Sentry Cast Position",
-                Destination = area.Position,
-                OnUpdate = m =>
-                {
-                    if (SentryCastArea != null)
-                    {
-                        m.Destination = SentryCastArea.Position;
-
-                        if (Skills.DemonHunter.Sentry.CanCast(CanCastFlags.NoTimer) && Trinity.PlayerOwnedDHSentryCount < MaxSentryCount && AreaHasCastCriteria(SentryCastArea, true))
-                        {
-                            Skills.DemonHunter.Sentry.Cast(SentryCastArea.Position);
-                        }
-                    }
-                    if (CurrentTarget != null && CurrentTarget.IsUnit)
-                    {
-                        Trinity.CurrentTarget = TargetUtil.GetClosestTarget(100f);
-                    }
-                },
-                OnFinished = m =>
-                {
-                    if (Skills.DemonHunter.Sentry.CanCast(CanCastFlags.NoTimer) && Trinity.PlayerOwnedDHSentryCount < MaxSentryCount && AreaHasCastCriteria(SentryCastArea, true))
-                    {
-                        Skills.DemonHunter.Sentry.Cast(SentryCastArea.Position);
-                    }
-                },
-                StopCondition = m =>
-                    AreaHasCastCriteria(SentryCastArea, true) ||
-                    SentryCastArea == null || CurrentTarget == null || !CurrentTarget.IsUnit || SentryCastArea.Position == Vector3.Zero ||
-                    CombatBase.PlayerShouldNotFight,
-                Options = new QueuedMovementOptions
-                {
-                    Logging = LogLevel.Info,
-                    Type = MoveType.SpecialCombat
-                }
-            });
-        }
-
-        private static void MoveToSentryCastSkillsCastArea(TargetArea area)
-        {
-            CombatBase.QueuedMovement.Queue(new QueuedMovement
-            {
-                Name = "Hatred Skills Cast Position",
-                Destination = area.Position,
-                OnUpdate = m =>
-                {
-                    if (SentryCastSkillsCastArea != null)
-                    {
-                        m.Destination = SentryCastSkillsCastArea.Position;
-
-                        if (AreaHasCastCriteria(SentryCastSkillsCastArea))
-                        {
-                            if (Skills.DemonHunter.ClusterArrow.CanCast())
-                                Skills.DemonHunter.ClusterArrow.Cast(SentryCastSkillsCastArea.Position);
-                            else if (CanCast(SNOPower.DemonHunter_Multishot, CombatBase.CanCastFlags.NoTimer))
-                                Skills.DemonHunter.Multishot.Cast(SentryCastSkillsCastArea.Position);
-                            else if (Skills.DemonHunter.Chakram.CanCast())
-                                Skills.DemonHunter.Chakram.Cast(SentryCastSkillsCastArea.Position);
-                            else if (Skills.DemonHunter.Impale.CanCast())
-                                Skills.DemonHunter.Impale.Cast(SentryCastSkillsCastArea.Position);
-                            else if (Skills.DemonHunter.ElementalArrow.CanCast())
-                                Skills.DemonHunter.ElementalArrow.Cast(SentryCastSkillsCastArea.Position);
-                            else if (Skills.DemonHunter.EvasiveFire.CanCast())
-                                Skills.DemonHunter.EvasiveFire.Cast(SentryCastSkillsCastArea.Position);
-                            else if (Skills.DemonHunter.HungeringArrow.CanCast())
-                                Skills.DemonHunter.HungeringArrow.Cast(SentryCastSkillsCastArea.Position);
-                            else if (Skills.DemonHunter.EntanglingShot.CanCast())
-                                Skills.DemonHunter.EntanglingShot.Cast(SentryCastSkillsCastArea.Position);
-                            else if (Skills.DemonHunter.Bolas.CanCast())
-                                Skills.DemonHunter.Bolas.Cast(SentryCastSkillsCastArea.Position);
-                            else if (Skills.DemonHunter.Grenade.CanCast())
-                                Skills.DemonHunter.Grenade.Cast(SentryCastSkillsCastArea.Position);
-                        }
-                        if (CurrentTarget != null && CurrentTarget.IsUnit)
-                        {
-                            Trinity.CurrentTarget = TargetUtil.GetClosestTarget(100f);
-                        }
-                    }
-                },
-                OnFinished = m =>
-                {
-                    if (AreaHasCastCriteria(SentryCastSkillsCastArea))
-                    {
-                        if (Skills.DemonHunter.ClusterArrow.CanCast())
-                            Skills.DemonHunter.ClusterArrow.Cast(SentryCastSkillsCastArea.Position);
-                        else if (CanCast(SNOPower.DemonHunter_Multishot, CombatBase.CanCastFlags.NoTimer))
-                            Skills.DemonHunter.Multishot.Cast(SentryCastSkillsCastArea.Position);
-                        else if (Skills.DemonHunter.Chakram.CanCast())
-                            Skills.DemonHunter.Chakram.Cast(SentryCastSkillsCastArea.Position);
-                        else if (Skills.DemonHunter.Impale.CanCast())
-                            Skills.DemonHunter.Impale.Cast(SentryCastSkillsCastArea.Position);
-                        else if (Skills.DemonHunter.ElementalArrow.CanCast())
-                            Skills.DemonHunter.ElementalArrow.Cast(SentryCastSkillsCastArea.Position);
-                        else if (Skills.DemonHunter.EvasiveFire.CanCast())
-                            Skills.DemonHunter.EvasiveFire.Cast(SentryCastSkillsCastArea.Position);
-                        else if (Skills.DemonHunter.HungeringArrow.CanCast())
-                            Skills.DemonHunter.HungeringArrow.Cast(SentryCastSkillsCastArea.Position);
-                        else if (Skills.DemonHunter.EntanglingShot.CanCast())
-                            Skills.DemonHunter.EntanglingShot.Cast(SentryCastSkillsCastArea.Position);
-                        else if (Skills.DemonHunter.Bolas.CanCast())
-                            Skills.DemonHunter.Bolas.Cast(SentryCastSkillsCastArea.Position);
-                        else if (Skills.DemonHunter.Grenade.CanCast())
-                            Skills.DemonHunter.Grenade.Cast(SentryCastSkillsCastArea.Position);
-                    }
-                },
-                StopCondition = m =>
-                    AreaHasCastCriteria(SentryCastSkillsCastArea) ||
-                    SentryCastSkillsCastArea == null || CurrentTarget == null || !CurrentTarget.IsUnit || SentryCastSkillsCastArea.Position == Vector3.Zero ||
-                    CombatBase.PlayerShouldNotFight,
-                Options = new QueuedMovementOptions
-                {
-                    Logging = LogLevel.Info,
-                    Type = MoveType.SpecialCombat
-                }
-            });
-        }
         #endregion
         #region Vault helpers
         public static bool CurrentlyUseVault

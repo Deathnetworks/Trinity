@@ -5869,7 +5869,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item NilfursBoast = new Item
         {
-            Id = 0,
+            Id = 415050,
             Name = "Nilfur's Boast",
             Quality = ItemQuality.Legendary,
             Slug = "nilfurs-boast",

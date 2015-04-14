@@ -56,7 +56,7 @@ namespace Trinity
         {
             using (new PerformanceLogger("RefreshDiaObjectCache.Kiting"))
             {
-                if (Trinity.Settings.Combat.Misc.KeepMovingInCombat && !Player.IsRanged)
+                if (Trinity.Settings.Combat.Misc.KeepMovingInCombat && Player.IsRanged)
                     return;
 
                 bool TryToKite = false;
@@ -121,6 +121,12 @@ namespace Trinity
                 if (!Trinity.Player.AvoidDeath && CombatBase.KiteDistance <= 0)
                     return;
 
+                if (CombatBase.QueuedMovement.IsBlacklisted((int)MoveType.Kite))
+                {
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Kite movement blacklisted");
+                    return;
+                }
+
                 // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
                 bool shouldKamikazeTreasureGoblins = (!AnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize);
 
@@ -130,7 +136,8 @@ namespace Trinity
                 double msCancelledKite = DateTime.UtcNow.Subtract(timeCancelledKiteMove).TotalMilliseconds;
                 bool shouldKite = msCancelledKite >= cancelledKiteMoveForMilliseconds && TryToKite;
 
-                if (shouldKamikazeTreasureGoblins && (shouldEmergencyMove || shouldKite) && !Combat.QueuedMovementManager.Stuck.IsStuck())
+                if (shouldKamikazeTreasureGoblins && (shouldEmergencyMove || shouldKite) &&
+                    GridMap.HasSafeSpots)
                 {
                     Vector3 vAnySafePoint = GridMap.GetBestMoveNode().Position;
 
@@ -180,7 +187,8 @@ namespace Trinity
                             Weight = 90000,
                             Radius = 2f,
                             InternalName = "KitePoint",
-                            IsKite = true
+                            IsKite = true,
+                            RActorGuid = (int)MoveType.Kite,
                         };
                     }
                 }

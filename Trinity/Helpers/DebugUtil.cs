@@ -186,7 +186,7 @@ namespace Trinity.Helpers
                         Logger.Log(level, LogCategory.UserInformation, "Skill: {0} Rune={1} Type={2}",
                             s.Name,
                             s.CurrentRune.Name,
-                            (s.IsSpender) ? "Spender" : (s.IsGenerator) ? "Generator" : "Other"
+                            (s.IsSpender) ? "Spender" : (s.IsAttackGenerator) ? "Generator" : "Other"
                             );
                     };
 

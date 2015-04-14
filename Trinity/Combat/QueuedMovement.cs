@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Trinity.Cache;
 using Trinity.DbProvider;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -22,6 +23,11 @@ namespace Trinity.Combat
     /// </summary>
     public class QueuedMovement
     {
+        /// <summary>
+        /// An id to identify this SpecialMovement
+        /// </summary>
+        public int Id { get; set; }
+
         /// <summary>
         /// A friendly name to identify this SpecialMovement
         /// </summary>
@@ -103,7 +109,7 @@ namespace Trinity.Combat
     {
         public QueuedMovementOptions()
         {
-            FailureBlacklistSeconds = 0.5;
+            FailureBlacklistSeconds = 1;
             SuccessBlacklistSeconds = 0;
             ChangeInDistanceLimit = 2f;
             TimeBeforeBlocked = 2500;
@@ -177,7 +183,7 @@ namespace Trinity.Combat
                 SuccessHandler("StopWhen");
             }
 
-            if (movement != null && movement.Destination != Vector3.Zero && IsHigherMoveTypePriority(movement) && !IsBlacklisted(movement))
+            if (movement != null && movement.Destination != Vector3.Zero && IsHigherMoveTypePriority(movement))
             {
                 if (CurrentMovement != null)
                     FinishedHandler();
@@ -312,12 +318,16 @@ namespace Trinity.Combat
         public void FailedHandler(string reason = "")
         {
             if (!_blacklist.Contains(CurrentMovement))
+            {
                 _blacklist.Add(CurrentMovement);
-
-            PlayerMover.UnstuckHandler();
+            }
+            else
+            {
+                PlayerMover.UnstuckHandler();
+            }
 
             var location = (!string.IsNullOrEmpty(reason) ? "(" + reason + ") " : reason);
-            LogLocation("Failed " + location + "moving to ", CurrentMovement, Stuck.LastLogMessage, TrinityLogLevel.Error);
+            LogLocation("Failed " + location + "moving to ", CurrentMovement, Stuck.LastLogMessage, TrinityLogLevel.Verbose);
 
             FinishedHandler();
         }
@@ -373,10 +383,26 @@ namespace Trinity.Combat
             get { return _internalQueue.Count > 0 || CurrentMovement != null; }
         }
 
+        public bool IsStuck
+        {
+            get { return Stuck.IsStuck(Options.ChangeInDistanceLimit, Options.TimeBeforeBlocked); }
+        }
+
         public bool IsBlacklisted(QueuedMovement movement)
         {
             _blacklist.RemoveAll(m => m != null && DateTime.UtcNow.Subtract(m.LastFinishedTime).TotalSeconds >= m.Options.FailureBlacklistSeconds);
-            return _blacklist.Any(m => m != null && m.Name == movement.Name);
+
+            var hash = HashGenerator.GenerateWorldObjectHash(movement.Id, movement.Destination, movement.Options.Type.ToString(), Trinity.CurrentWorldDynamicId);
+            if (GenericBlacklist.ContainsKey(hash))
+                return true;
+
+            return _blacklist.Any(m => m != null && m.Id == movement.Id);
+        }
+
+        public bool IsBlacklisted(int id)
+        {
+            _blacklist.RemoveAll(m => m != null && DateTime.UtcNow.Subtract(m.LastFinishedTime).TotalSeconds >= m.Options.FailureBlacklistSeconds);
+            return _blacklist.Any(m => m != null && m.Id == id);
         }
 
         public bool IsHigherMoveTypePriority(QueuedMovement movement)
