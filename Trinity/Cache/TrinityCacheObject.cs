@@ -374,6 +374,8 @@ namespace Trinity
                 {
                     if (MathUtil.GetDiff(rayCastResult.Item2, Distance) <= 5f)
                         isNavigable = rayCastResult.Item1;
+                    else
+                        isNavigable = Distance < 5f || (Distance < 95f && NavHelper.CanRayCast(Position, (Trinity.Player.IsRanged || (Distance <= 16f && Distance > 1f))));
 
                     CacheData.RayCastResultsFromObjects[RActorGuid] = new Tuple<bool, int>(isNavigable, (int)Distance);
                 }
@@ -442,6 +444,8 @@ namespace Trinity
                 {
                     if (MathUtil.GetDiff(rayCastResult.Item2, Distance) <= 5f)
                         isInLoS = rayCastResult.Item1;
+                    else
+                        isInLoS = Distance < 5f || (Distance < 95f && NavHelper.CanRayCast(Position, (Trinity.Player.IsRanged || (Distance <= 16f && Distance > 1f))));
 
                     CacheData.RayCastResultsFromObjects[RActorGuid] = new Tuple<bool, int>(isInLoS, (int)Distance);
                 }
@@ -480,8 +484,19 @@ namespace Trinity
             if (origin.Distance2D(Trinity.Player.Position) <= 6f)
                 return IsInLineOfSight;
 
+            var key = new Tuple<int, Vector3>(RActorGuid, MainGrid.VectorToGrid(origin));
+            bool isInLoS = false;
+
+            if (CacheData.RayCastResultsFromObjectsAt.TryGetValue(key, out isInLoS))
+                return isInLoS;
+
             // RayCast check
-            return NavHelper.CanRayCast(origin, target, (Trinity.Player.IsRanged || (Distance <= 16f && Distance > 1f)));
+            isInLoS = NavHelper.CanRayCast(origin, target, (Trinity.Player.IsRanged || (Distance <= 16f && Distance > 1f)));
+
+            if (CacheData.RayCastResultsFromObjectsAt.ContainsKey(key))
+                CacheData.RayCastResultsFromObjectsAt.Add(key, isInLoS);
+
+            return isInLoS;
         }
 
         [NoCopy]

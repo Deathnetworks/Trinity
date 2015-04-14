@@ -27,10 +27,6 @@ namespace Trinity.Combat.Abilities
                 }
             }
 
-            // Destructibles
-            if (UseDestructiblePower)
-                return DestroyObjectPower;
-            
             if (!UseOOCBuff && !IsCurrentlyAvoiding)
             {
                 /*
@@ -201,8 +197,8 @@ namespace Trinity.Combat.Abilities
                             bastionPower = new TrinityPower(SNOPower.X1_Crusader_Slash, 15f, closestTarget.ClusterPosition(10f));
 
                         // Punish
-                        if (IsNull(bastionPower) && CanCast(SNOPower.X1_Crusader_Punish) && closestTarget.RadiusDistance < 7f)
-                            bastionPower = new TrinityPower(SNOPower.X1_Crusader_Punish, 7f, closestTarget.Position);
+                        if (IsNull(bastionPower) && CanCast(SNOPower.X1_Crusader_Punish) && closestTarget.RadiusDistance < 15f)
+                            bastionPower = new TrinityPower(SNOPower.X1_Crusader_Punish, 10f, closestTarget.ACDGuid); 
                     }
 
                     if (!IsNull(bastionPower))
@@ -219,24 +215,10 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Shield Bash
-                if (Skills.Crusader.ShieldBash.IsActive)
+                if ((Skills.Crusader.ShieldBash.IsActive) && ((TargetUtil.EliteOrTrashInRange(45f) || TargetUtil.AnyMobsInRange(45f)) && Player.PrimaryResource >= 20))
                 {
-                    var target = TargetUtil.GetBestPierceTarget(40f);
-                    if (target.IsTrashPackOrBossEliteRareUnique || target.CountUnitsInFront > 1)
-                    {
-                        return new TrinityPower(SNOPower.X1_Crusader_ShieldBash2, 45f, target.ACDGuid);
-                    }
-
-                    var moveNode = TargetUtil.GetBestPierceMoveTarget(40f);
-                    if (moveNode != null)
-                    {
-                        target = TargetUtil.GetBestPierceTarget(40f, moveNode.Position);
-                        if (target.IsTrashPackOrBossEliteRareUnique || target.CountUnitsInFront > 1)
-                        {
-                            return new TrinityPower(SNOPower.X1_Crusader_ShieldBash2, 3f, moveNode.Position, target.ACDGuid);
-                        }
-                    }
-                }
+                    return new TrinityPower(SNOPower.X1_Crusader_ShieldBash2, 45f, CurrentTarget.ACDGuid);
+                } 
 
                 // Blessed Hammer, spin outwards 
                 // Limitless rune can spawn new hammers

@@ -96,6 +96,11 @@ namespace Trinity
         internal static Dictionary<int, Tuple<bool, int>> RayCastResultsFromObjects = new Dictionary<int, Tuple<bool, int>>();
 
         /// <summary>
+        /// If a unit, item, or other object has been raycastable before, this will contain true value and will be considered for targetting, otherwise we will continue to check at position
+        /// </summary>
+        internal static Dictionary<Tuple<int, Vector3>, bool> RayCastResultsFromObjectsAt = new Dictionary<Tuple<int, Vector3>, bool>();
+
+        /// <summary>
         /// Record of items that have been on the ground
         /// </summary>
         internal static HashSet<PickupItem> DroppedItems = new HashSet<PickupItem>();
@@ -251,8 +256,14 @@ namespace Trinity
             UnSafeZones.Clear();
             SentryTurret.Clear();
             Voodoo.Clear();
-            NearbyUnitsWithinDistanceRecorded.Clear();
-            UnitsWeightsWithinDistanceRecorded.Clear();
+
+            /* Every 2 ticks */
+            if (Tick % 2 == 0)
+            {
+                RayCastResultsFromObjectsAt.Clear();
+                NearbyUnitsWithinDistanceRecorded.Clear();
+                UnitsWeightsWithinDistanceRecorded.Clear();
+            }
 
             /* Every 10 ticks */
             if (Tick % 10 == 0)
