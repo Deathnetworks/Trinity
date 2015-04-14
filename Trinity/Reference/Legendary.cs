@@ -16,29 +16,6 @@ namespace Trinity.Reference
         /***************  START TEMP ITEMS FOR 2.20 Patch ****************/
 
         /// <summary>
-        /// Nilfur's Boast Increase the damage of Meteor by 100%. When your Meteor hits 3 or less enemies, the damage is increased by 150–200%.
-        /// </summary>
-        public static Item NilfursBoast = new Item
-        {
-            Id = 0,
-            Name = "Nilfur's Boast",
-            Quality = ItemQuality.Legendary,
-            Slug = "nilfurs-boast",
-            ItemType = ItemType.Boots,
-            GItemType = GItemType.Boots,
-            IsTwoHanded = false,
-            BaseType = ItemBaseType.Armor,
-            InternalName = "",
-            DataUrl = "https://us.battle.net/api/d3/data/item/nilfurs-boast",
-            Url = "http://us.battle.net/d3/en/item/nilfurs-boast",
-            IconUrl = "http://media.blizzard.com/d3/icons/items/large/p2_unique_boots_01_demonhunter_male.png",
-            RelativeUrl = "",
-            IsCrafted = false,
-            LegendaryAffix = "Increase the damage of Meteor by 100%. When your Meteor hits 3 or less enemies, the damage is increased by 150–200%.",
-            SetName = "",
-        };
-
-        /// <summary>
         /// Pandemonium Loop Enemies slain while Feared die in a bloody explosion and cause other nearby enemies to flee in Fear.
         /// </summary>
         public static Item PandemoniumLoop = new Item
