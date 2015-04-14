@@ -219,15 +219,15 @@ namespace Trinity.Combat
                     return RunStatus.Success;
                 }
 
-                if (Stuck.IsStuck(_options.ChangeInDistanceLimit, _options.TimeBeforeBlocked))
+                if (IsBlacklisted(CurrentMovement))
                 {
-                    FailedHandler("Blocked " + Stuck.LastLogMessage);
+                    FailedHandler("RecentlyFailed " + DateTime.UtcNow.Subtract(_blacklist.FirstOrDefault(m => m.Id == CurrentMovement.Id).LastFinishedTime).TotalMilliseconds + "/" + (_options.FailureBlacklistSeconds * 1000));
                     return RunStatus.Failure;
                 }
 
-                if (IsBlacklisted(CurrentMovement))
+                if (Stuck.IsStuck(_options.ChangeInDistanceLimit, _options.TimeBeforeBlocked))
                 {
-                    FailedHandler("RecentlyFailed");
+                    FailedHandler("Blocked " + Stuck.LastLogMessage);
                     return RunStatus.Failure;
                 }
 
@@ -299,7 +299,10 @@ namespace Trinity.Combat
             LogLocation("Arrived at " + location, CurrentMovement, Stuck.LastLogMessage, TrinityLogLevel.Verbose);
 
             if (_options.SuccessBlacklistSeconds > 0 && !_blacklist.Contains(CurrentMovement))
+            {
+                CurrentMovement.LastFinishedTime = DateTime.UtcNow;
                 _blacklist.Add(CurrentMovement);
+            }
 
             FinishedHandler();
         }
@@ -319,12 +322,12 @@ namespace Trinity.Combat
         {
             if (!_blacklist.Contains(CurrentMovement))
             {
+                CurrentMovement.LastFinishedTime = DateTime.UtcNow;
                 _blacklist.Add(CurrentMovement);
             }
-            else
-            {
+
+            if (Stuck.IsStuck(_options.ChangeInDistanceLimit, _options.TimeBeforeBlocked))
                 PlayerMover.UnstuckHandler();
-            }
 
             var location = (!string.IsNullOrEmpty(reason) ? "(" + reason + ") " : reason);
             LogLocation("Failed " + location + "moving to ", CurrentMovement, Stuck.LastLogMessage, TrinityLogLevel.Verbose);
@@ -337,7 +340,8 @@ namespace Trinity.Combat
         /// </summary>
         public void FinishedHandler()
         {
-            CurrentMovement.LastFinishedTime = DateTime.UtcNow;
+            if (!IsBlacklisted(CurrentMovement))
+                CurrentMovement.LastFinishedTime = DateTime.UtcNow;
 
             if (CurrentMovement.OnFinished != null)
                 CurrentMovement.OnFinished.Invoke(CurrentMovement);
@@ -353,18 +357,20 @@ namespace Trinity.Combat
         /// </summary>
         public void QueueingHandler(QueuedMovement movement)
         {
-            _internalQueue.Enqueue(movement);
+            if (!IsQueuedMovement || CurrentMovement.Id != movement.Id)
+            {
+                _internalQueue.Enqueue(movement);
 
-            if (movement.OnInitialize != null)
-                movement.OnInitialize.Invoke(CurrentMovement);
+                if (movement.OnInitialize != null)
+                    movement.OnInitialize.Invoke(CurrentMovement);
 
-            if (movement.Options.Logging >= LogLevel.Info)
-                LogLocation("Queueing", movement);
+                if (movement.Options.Logging >= LogLevel.Info)
+                    LogLocation("Queueing", movement);
 
-            CurrentMovement = _internalQueue.Dequeue();
-            CurrentMovement.StartPosition = Trinity.Player.Position;
-            CurrentMovement.LastStartedTime = DateTime.UtcNow;
-            Stuck.Reset();
+                CurrentMovement = _internalQueue.Dequeue();
+                CurrentMovement.StartPosition = Trinity.Player.Position;
+                CurrentMovement.LastStartedTime = DateTime.UtcNow;
+            }
         }
 
         public void LogLocation(string pre, QueuedMovement movement, string post = "", TrinityLogLevel level = TrinityLogLevel.Info)
