@@ -149,7 +149,7 @@ namespace Trinity.Combat.Abilities
             if (Sets.EmbodimentOfTheMarauder.IsMaxBonusActive && AreaHasCastCriteria(RangedSkillsCastArea))
             {
                 if (Skills.DemonHunter.EvasiveFire.IsActive && !Skills.DemonHunter.EvasiveFire.Cast(RangedSkillsCastArea.Position))
-                    return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, RangedAttackRange, RangedSkillsCastArea.Position); ;
+                    return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, RangedAttackRange, RangedSkillsCastArea.Position);
 
                 if (Skills.DemonHunter.HungeringArrow.IsActive && !Skills.DemonHunter.HungeringArrow.Cast(RangedSkillsCastArea.Position))
                     return new TrinityPower(SNOPower.DemonHunter_HungeringArrow, RangedAttackRange, RangedSkillsCastArea.Position);
@@ -607,6 +607,9 @@ namespace Trinity.Combat.Abilities
             if (CurrentTarget == null)
                 return null;
 
+            if (CurrentTarget.IsUnit)
+                SwitchToTarget(TargetUtil.GetClosestTarget(150f));
+
             // Fields
             TrinityPower power = null;
 
@@ -882,7 +885,9 @@ namespace Trinity.Combat.Abilities
         {
             return
                 /* Vault only at min dh settings health AND */
-                Player.CurrentHealthPct <= DHSettings.MinHealthVaultKite &&
+                Player.CurrentHealthPct <= DHSettings.MinHealthVaultKite && 
+                /* ha can fight at loc */
+                (CurrentTarget == null || (CurrentTarget.IsInLineOfSightOfPoint(loc) && loc.Distance2D(Trinity.Player.Position) < MainGrid.MinRangeToTarget)) &&
 
                 /* 1) A real kite movement OR */
                 ((!Trinity.Player.StandingInAvoidance && !Trinity.Player.AvoidDeath && Trinity.Player.NeedToKite) ||
