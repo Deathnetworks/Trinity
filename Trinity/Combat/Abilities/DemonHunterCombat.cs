@@ -187,7 +187,10 @@ namespace Trinity.Combat.Abilities
                 // Evasive Fire
                 if (Hotbar.Contains(SNOPower.X1_DemonHunter_EvasiveFire))
                 {
-                    float range = (Player.PrimaryResourceMissing > 5 || Sets.EmbodimentOfTheMarauder.IsMaxBonusActive) ? RangedAttackRange : 10f;
+                    float range = !IsBastionsPrimaryBuffWillExpired && (Player.PrimaryResourceMissing > 5 || Sets.EmbodimentOfTheMarauder.IsMaxBonusActive) 
+                        ? RangedAttackRange 
+                        : 10f;
+
                     return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, RangedAttackRange, RangedSkillsCastArea.Position);
                 }
 
@@ -214,11 +217,11 @@ namespace Trinity.Combat.Abilities
                 if (Hotbar.Contains(SNOPower.DemonHunter_Grenades))
                 {
                     float range = RangedAttackRange > 30f ? 30f : RangedAttackRange;
-                    return new TrinityPower(SNOPower.DemonHunter_Grenades, RangedAttackRange, RangedSkillsCastArea.Position);
+                    return new TrinityPower(SNOPower.DemonHunter_Grenades, range, RangedSkillsCastArea.Position);
                 }
             }
 
-            var generator = SkillUtils.Active.FirstOrDefault(s => s.IsGenerator);
+            var generator = SkillUtils.Active.FirstOrDefault(s => s.IsAttackGenerator);
             return generator != null ? generator.ToPower(RangedAttackRange, Enemies.BestCluster.Position) : DefaultPower;
         }
 

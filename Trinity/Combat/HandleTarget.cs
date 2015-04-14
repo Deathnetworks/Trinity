@@ -258,7 +258,7 @@ namespace Trinity
             if (CurrentTarget == null)
                 return false;
 
-            if (CurrentTarget.IsAvoidance || CurrentTarget.Type == GObjectType.OocAvoidance || Trinity.Player.StandingInAvoidance)
+            if (CurrentTarget.IsAvoidance)
             {
                 TrinityPower power = AbilitySelector(IsCurrentlyAvoiding: true);
                 if (!CombatBase.IsNull(power))

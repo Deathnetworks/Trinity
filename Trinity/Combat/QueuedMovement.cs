@@ -392,16 +392,6 @@ namespace Trinity.Combat
         {
             _blacklist.RemoveAll(m => m != null && DateTime.UtcNow.Subtract(m.LastFinishedTime).TotalSeconds >= m.Options.FailureBlacklistSeconds);
 
-            if (Trinity.Blacklist90Seconds.Contains(movement.Id) ||
-                Trinity.Blacklist60Seconds.Contains(movement.Id) ||
-                Trinity.Blacklist15Seconds.Contains(movement.Id) ||
-                Trinity.Blacklist3Seconds.Contains(movement.Id) ||
-                Trinity.Blacklist1Second.Contains(movement.Id) ||
-                DataDictionary.BlackListIds.Contains(movement.Id))
-            {
-                return true;
-            }
-
             var hash = HashGenerator.GenerateWorldObjectHash(movement.Id, movement.Destination, movement.Options.Type.ToString(), Trinity.CurrentWorldDynamicId);
             if (GenericBlacklist.ContainsKey(hash))
                 return true;
@@ -412,17 +402,6 @@ namespace Trinity.Combat
         public bool IsBlacklisted(int id)
         {
             _blacklist.RemoveAll(m => m != null && DateTime.UtcNow.Subtract(m.LastFinishedTime).TotalSeconds >= m.Options.FailureBlacklistSeconds);
-
-            if (Trinity.Blacklist90Seconds.Contains(id) ||
-                Trinity.Blacklist60Seconds.Contains(id) ||
-                Trinity.Blacklist15Seconds.Contains(id) ||
-                Trinity.Blacklist3Seconds.Contains(id) ||
-                Trinity.Blacklist1Second.Contains(id) ||
-                DataDictionary.BlackListIds.Contains(id))
-            {
-                return true;
-            }
-
             return _blacklist.Any(m => m != null && m.Id == id);
         }
 

@@ -121,6 +121,12 @@ namespace Trinity
                 if (!Trinity.Player.AvoidDeath && CombatBase.KiteDistance <= 0)
                     return;
 
+                if (CombatBase.QueuedMovement.IsBlacklisted((int)MoveType.Kite))
+                {
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Kite movement blacklisted");
+                    return;
+                }
+
                 // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
                 bool shouldKamikazeTreasureGoblins = (!AnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize);
 
@@ -131,7 +137,6 @@ namespace Trinity
                 bool shouldKite = msCancelledKite >= cancelledKiteMoveForMilliseconds && TryToKite;
 
                 if (shouldKamikazeTreasureGoblins && (shouldEmergencyMove || shouldKite) &&
-                    !CombatBase.QueuedMovement.IsStuck && !CombatBase.QueuedMovement.IsBlacklisted((int)MoveType.Kite) &&
                     GridMap.HasSafeSpots)
                 {
                     Vector3 vAnySafePoint = GridMap.GetBestMoveNode().Position;

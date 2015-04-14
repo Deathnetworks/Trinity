@@ -31,10 +31,12 @@ namespace Trinity
                 if (Settings.Combat.Misc.FleeInGhostMode && Player.IsGhosted)
                     Trinity.Player.StandingInAvoidance = true;
 
-                // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
-                if (Trinity.Player.StandingInAvoidance || Player.AvoidDeath && (!AnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
-                    !CombatBase.QueuedMovement.IsStuck && !CombatBase.QueuedMovement.IsBlacklisted((int)MoveType.Avoidance) &&
-                    GridMap.HasSafeSpots)
+                if (CombatBase.QueuedMovement.IsBlacklisted((int)MoveType.Avoidance))
+                {
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Avoidance movement blacklisted");
+                }
+                else if ((Trinity.Player.StandingInAvoidance || Player.AvoidDeath) && GridMap.HasSafeSpots &&
+                    (!AnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize))
                 {
                     var _safeNode = GridMap.GetBestMoveNode();
                     if (_safeNode != null)
@@ -54,13 +56,12 @@ namespace Trinity
                             InternalName = "AvoidancePoint",
                             RActorGuid = (int)MoveType.Avoidance,
                         };
+
+                        return;
                     }
                 }
             }
             #endregion
-
-            if (CurrentTarget != null && CurrentTarget.IsAvoidance && Trinity.Player.StandingInAvoidance)
-                return;
 
             #region RefreshDiaObjectCache.Weighting
             using (new PerformanceLogger("RefreshDiaObjectCache.Weighting"))

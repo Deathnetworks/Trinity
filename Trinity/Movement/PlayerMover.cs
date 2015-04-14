@@ -907,7 +907,7 @@ namespace Trinity.DbProvider
                             return true;
                     }
 
-                    if (CurrentTarget == null && CombatBase.TimeSincePowerUse(SNOPower.X1_Monk_DashingStrike) > 150 &&
+                    if (CurrentTarget == null && CombatBase.TimeSincePowerUse(SNOPower.X1_Monk_DashingStrike) > 400 &&
                         CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike, CombatBase.CanCastFlags.NoTimer) && Trinity.Settings.Combat.Monk.UseDashingStrikeOOC)
                     {
                         string direction = MathUtil.GetHeadingToPoint(Trinity.Player.Position, _gridNode.Position);
