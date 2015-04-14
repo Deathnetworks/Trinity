@@ -36,8 +36,6 @@ namespace Trinity
             }
         }
 
-        public static bool testHasBossMarker = false;
-
         /// <summary>
         /// This method will add and update necessary information about all available actors. Determines ObjectType, 
         /// sets ranges, updates blacklists, determines avoidance, kiting, target weighting
@@ -623,7 +621,6 @@ namespace Trinity
         {
             using (new PerformanceLogger("RefreshDiaObjectCache.CacheInit"))
             {
-                testHasBossMarker = ZetaDia.Minimap.Markers.CurrentWorldMarkers.Any(m => m.IsValid && (m.IsPointOfInterest || m.MinimapTexture == 81058) && !Blacklist60Seconds.Contains(m.NameHash));
                 LastRefreshedCache = DateTime.UtcNow;
 
                 // Blank current/last/next targets

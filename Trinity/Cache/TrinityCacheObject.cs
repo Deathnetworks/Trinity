@@ -135,12 +135,12 @@ namespace Trinity
         {
             get
             {
-                if (distance >= 0f)
-                    return distance;
-                distance = Trinity.Player.Position.Distance2D(Position);
+                if (_distance >= 0f)
+                    return _distance;
+                _distance = Trinity.Player.Position.Distance2D(Position);
                 return Distance;
             }
-            set { distance = value; }
+            set { _distance = value; }
         }
 
         [NoCopy]
@@ -334,15 +334,15 @@ namespace Trinity
         {
             get
             {
-                if (byteResult_IsNavigable >= 0)
-                    return byteResult_IsNavigable > 0 ? true : false;
+                if (_isNavigable != null)
+                    return (bool)_isNavigable;
 
-                bool isNavigable = false;
+                bool isNavigable;
                 Tuple<bool, int> rayCastResult;
 
                 if (ZDiff > 11f)
                 {
-                    byteResult_IsNavigable = 0;
+                    _isNavigable = false;
                     return false;
                 }
 
@@ -351,21 +351,21 @@ namespace Trinity
                     // Bounty Objectives should always be on the weight list
                     if (IsBountyObjective)
                     {
-                        byteResult_IsNavigable = 1;
+                        _isNavigable = true;
                         return true;
                     }
 
                     // Quest Monsters should get LoS white-listed
                     if (IsQuestMonster)
                     {
-                        byteResult_IsNavigable = 1;
+                        _isNavigable = true;
                         return true;
                     }
 
                     // Always LoS Units during events
                     if (IsUnit && Trinity.Player.InActiveEvent)
                     {
-                        byteResult_IsNavigable = 1;
+                        _isNavigable = true;
                         return true;
                     }
                 }
@@ -387,12 +387,12 @@ namespace Trinity
                         CacheData.RayCastResultsFromObjects.Add(RActorGuid, new Tuple<bool, int>(isNavigable, (int)Distance));
                 }
 
-                byteResult_IsNavigable = isNavigable ? 1 : 0;
+                _isNavigable = isNavigable;
                 return isNavigable;
             }
             set
             {
-                byteResult_IsNavigable = value ? 1 : 0;
+                _isNavigable = value;
             }
         }
 
@@ -404,15 +404,15 @@ namespace Trinity
                 if (!IsUnit)
                     return IsNavigable;
 
-                if (byteResult_IsInLineOfSight >= 0)
-                    return byteResult_IsInLineOfSight > 0 ? true : false;
+                if (_isInLineOfSight != null)
+                    return (bool)_isInLineOfSight;
 
-                bool isInLoS = false;
+                bool isInLoS;
                 Tuple<bool, int> rayCastResult;
 
                 if (ZDiff > 11f)
                 {
-                    byteResult_IsInLineOfSight = 0;
+                    _isInLineOfSight = false;
                     return false;
                 }
 
@@ -421,21 +421,21 @@ namespace Trinity
                     // Bounty Objectives should always be on the weight list
                     if (IsBountyObjective)
                     {
-                        byteResult_IsInLineOfSight = 1;
+                        _isInLineOfSight = true;
                         return true;
                     }
 
                     // Quest Monsters should get LoS white-listed
                     if (IsQuestMonster)
                     {
-                        byteResult_IsInLineOfSight = 1;
+                        _isInLineOfSight = true;
                         return true;
                     }
 
                     // Always LoS Units during events
                     if (Trinity.Player.InActiveEvent)
                     {
-                        byteResult_IsInLineOfSight = 1;
+                        _isInLineOfSight = true;
                         return true;
                     }
                 }
@@ -457,12 +457,12 @@ namespace Trinity
                         CacheData.RayCastResultsFromObjects.Add(RActorGuid, new Tuple<bool, int>(isInLoS, (int)Distance));
                 }
 
-                byteResult_IsInLineOfSight = isInLoS ? 1 : 0;
+                _isInLineOfSight = isInLoS;
                 return isInLoS;
             }
             set
             {
-                byteResult_IsInLineOfSight = value ? 1 : 0;
+                _isInLineOfSight = value;
             }
         }
 
@@ -471,7 +471,7 @@ namespace Trinity
         {
             Vector3 target = Position;
 
-            if (MathUtil.GetDiff((float)origin.Z, (float)target.Z) > 11f)
+            if (MathUtil.GetDiff(origin.Z, target.Z) > 11f)
                 return false;
 
             float dist = origin.Distance2D(target);
@@ -485,7 +485,7 @@ namespace Trinity
                 return IsInLineOfSight;
 
             var key = new Tuple<int, Vector3>(RActorGuid, MainGrid.VectorToGrid(origin));
-            bool isInLoS = false;
+            bool isInLoS;
 
             if (CacheData.RayCastResultsFromObjectsAt.TryGetValue(key, out isInLoS))
                 return isInLoS;
@@ -517,14 +517,14 @@ namespace Trinity
         [NoCopy]
         public bool IsPlayerFacing(float arc)
         {
-            return Trinity.Player.IsFacing(this.Position, arc);
+            return Trinity.Player.IsFacing(Position, arc);
         }
 
         [NoCopy]
-        public bool IsStandingInAvoidance { get { return CacheData.AvoidanceObstacles.Any(a => a.Position.Distance2D(this.Position) <= a.Radius); } }
+        public bool IsStandingInAvoidance { get { return CacheData.AvoidanceObstacles.Any(a => a.Position.Distance2D(Position) <= a.Radius); } }
 
         [NoCopy]
-        public AvoidanceType AvoidanceType { get { return AvoidanceManager.GetAvoidanceType(this.ActorSNO); } }
+        public AvoidanceType AvoidanceType { get { return AvoidanceManager.GetAvoidanceType(ActorSNO); } }
 
         [NoCopy]
         public Vector3 ClusterPosition(float range = 20f)
@@ -539,7 +539,7 @@ namespace Trinity
         [NoCopy]
         public double UnitsWeightsWithinDistance(float range = 5f)
         {
-            double weight = 0;
+            double weight;
             if (CacheData.UnitsWeightsWithinDistanceRecorded.TryGetValue(new Tuple<int, int>(RActorGuid, (int)range), out weight))
             {
                 return weight;
@@ -570,7 +570,7 @@ namespace Trinity
             if (range == 5f)
                 return NearbyUnits;
 
-            int count = 0;
+            int count;
             if (CacheData.NearbyUnitsWithinDistanceRecorded.TryGetValue(new Tuple<int, int>(RActorGuid, (int)range), out count))
             {
                 return count;
@@ -603,9 +603,9 @@ namespace Trinity
         {
             return
                 (from u in Trinity.ObjectCache
-                 where u.RActorGuid != this.RActorGuid &&
+                 where u.RActorGuid != RActorGuid &&
                  u.IsUnit &&
-                 MathUtil.IntersectsPath(this.Position, this.Radius, Trinity.Player.Position, u.Position)
+                 MathUtil.IntersectsPath(Position, Radius, Trinity.Player.Position, u.Position)
                  select u).Count();
         }
 
@@ -614,17 +614,17 @@ namespace Trinity
         {
             get
             {
-                if (countUnitsInFront >= 0)
-                    return countUnitsInFront;
+                if (_countUnitsInFront >= 0)
+                    return _countUnitsInFront;
 
-                countUnitsInFront =
+                _countUnitsInFront =
                     (from u in Trinity.ObjectCache
                      where u.RActorGuid != RActorGuid &&
                      u.IsUnit &&
                      MathUtil.IntersectsPath(u.Position, u.Radius, Trinity.Player.Position, Position)
                      select u).Count();
 
-                return countUnitsInFront;
+                return _countUnitsInFront;
             }
         }
         
@@ -633,44 +633,44 @@ namespace Trinity
         {
             get
             {
-                if (countFCObjectsInFront >= 0)
-                    return countFCObjectsInFront;
+                if (_countFcObjectsInFront >= 0)
+                    return _countFcObjectsInFront;
 
-                int _count = 0;
-                Vector3 _locAway = MathEx.CalculatePointFrom(Position, Trinity.Player.Position, 40f);
-                string _dir = MathUtil.GetHeadingToPoint(Position);
+                int count = 0;
+                Vector3 locAway = MathEx.CalculatePointFrom(Position, Trinity.Player.Position, 40f);
+                string dir = MathUtil.GetHeadingToPoint(Position);
 
-                foreach (var _o in Trinity.ObjectCache)
+                foreach (var o in Trinity.ObjectCache)
                 {
-                    if (_o.Type == GObjectType.Destructible || _o.IsUnit)
+                    if (o.Type == GObjectType.Destructible || o.IsUnit)
                     {
-                        if (_o.Position.Distance2D(Position) > 40f)
+                        if (o.Position.Distance2D(Position) > 40f)
                             continue;
 
-                        if (_o.IsUnit && (!_o.CommonDataIsValid || _o.HitPointsPct <= 0f))
+                        if (o.IsUnit && (!o.CommonDataIsValid || o.HitPointsPct <= 0f))
                             continue;
 
-                        if (!_dir.Equals(MathUtil.GetHeadingToPoint(_o.Position)))
+                        if (!dir.Equals(MathUtil.GetHeadingToPoint(o.Position)))
                             continue;
 
-                        float _radius = Math.Min(Math.Max(_o.Radius, 5f), 8f);
-                        if (NavHelper.CanRayCast(_o.Position, Trinity.Player.Position) && MathUtil.IntersectsPath(_o.Position, _radius, Trinity.Player.Position, _locAway))
+                        float radius = Math.Min(Math.Max(o.Radius, 5f), 8f);
+                        if (NavHelper.CanRayCast(o.Position, Trinity.Player.Position) && MathUtil.IntersectsPath(o.Position, radius, Trinity.Player.Position, locAway))
                         {
-                            if (_o.IsBoss || (_o.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze))
-                                _count += 3;
-                            else if (_o.Type == GObjectType.Destructible || _o.IsEliteRareUnique || (_o.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Prioritize))
-                                _count += 2;
+                            if (o.IsBoss || (o.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze))
+                                count += 3;
+                            else if (o.Type == GObjectType.Destructible || o.IsEliteRareUnique || (o.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Prioritize))
+                                count += 2;
                             else
-                                _count++;
+                                count++;
 
                             if (TownRun.IsTryingToTownPortal())
-                                _count++;
+                                count++;
                         }
                     }
                 }
 
-                countFCObjectsInFront = _count;
-                return countFCObjectsInFront;
+                _countFcObjectsInFront = count;
+                return _countFcObjectsInFront;
             }
         }
 
@@ -679,7 +679,7 @@ namespace Trinity
         {
             get
             {
-                return this.NearbyUnits <= Trinity.Settings.Combat.Misc.TrashPackSize;
+                return NearbyUnits <= Trinity.Settings.Combat.Misc.TrashPackSize;
             }
         }
 
@@ -688,7 +688,7 @@ namespace Trinity
         {
             get
             {
-                return this.IsBossOrEliteRareUnique || this.IsInTrashPackCluster;
+                return IsBossOrEliteRareUnique || IsInTrashPackCluster;
             }
         }
 
@@ -765,22 +765,17 @@ namespace Trinity
 
         /* private member */
 
-        [DataMember]
+        [NoCopy]
         private DiaObject _object;
 
-        [DataMember]
-        private int byteResult_IsNavigable = -1;
+        private bool? _isNavigable;
 
-        [DataMember]
-        private int byteResult_IsInLineOfSight = -1;
+        private bool? _isInLineOfSight;
 
-        [DataMember]
-        private float distance = -1;
+        private float _distance = -1;
 
-        [DataMember]
-        private int countUnitsInFront = -1;
+        private int _countUnitsInFront = -1;
 
-        [DataMember]
-        private int countFCObjectsInFront = -1;
+        private int _countFcObjectsInFront = -1;
     }
 }

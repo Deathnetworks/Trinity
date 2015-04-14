@@ -677,19 +677,17 @@ namespace Trinity
         /// <summary>
         /// Special handling for whether or not we want to cache an object that's not in LoS
         /// </summary>
-        /// <param name="c_diaObject"></param>
-        /// <param name="AddToCache"></param>
         /// <returns></returns>
         private static bool RefreshStepIgnoreLoS()
         {
             // Force navigable/los
-            if (c_diaObject.InLineOfSight)
+            if (NavHelper.CanRayCast(Player.Position, c_CacheObject.Position))
             {
                 c_CacheObject.IsNavigable = true;
                 c_CacheObject.IsInLineOfSight = true;
             }
 
-            // add everythings, new IsNavigable & IsInLineOfSight are use in weighting just when needed, reduce usage from memory
+            // add everything, new IsNavigable & IsInLineOfSight are use in weighting just when needed, reduce usage from memory
             return true;
         }
 

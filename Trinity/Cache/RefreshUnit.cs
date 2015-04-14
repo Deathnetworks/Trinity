@@ -216,15 +216,6 @@ namespace Trinity
                 RefreshAffixes();
                 if (c_MonsterAffixes.HasFlag(MonsterAffixes.Shielding))
                     c_unit_HasShieldAffix = true;
-
-                if (c_IsEliteRareUnique && ZetaDia.CurrentQuest.QuestSNO == 337492 && ZetaDia.CurrentQuest.StepId == 16)
-                {
-                    c_CacheObject.IsBoss = true;
-                }
-                else if (c_IsEliteRareUnique && testHasBossMarker)
-                {
-                    c_CacheObject.IsBoss = testHasBossMarker;
-                }
             }
 
             using (new MemorySpy("RefreshUnit().CheckMonsterSize"))
