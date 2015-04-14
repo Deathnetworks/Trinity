@@ -712,15 +712,32 @@ namespace Trinity.Combat.Abilities
 
         public static void SetSNOPowerUseDelay(SNOPower power, double delay)
         {
-            string key = "SpellDelay." + power.ToString();
-            TVar v = V.Data[key];
-
-            bool hasDefaultValue = v.Value == v.DefaultValue;
-
-            if (hasDefaultValue)
+            try
             {
-                // Create a new TVar (changes the default value)
-                V.Set(new TVar(v.Name, delay, v.Description));
+                string key = "SpellDelay." + power.ToString();
+                TVar v;
+                if (V.ContainsKey(key))
+                {
+                    v = V.Data[key];
+                }
+                else
+                {
+                    Logger.LogError("WARNING: TVar {0} is missing! Setting default to {1}", key, delay);
+                    V.Set(new TVar(key, delay, ""));
+                    return;
+                }
+
+                bool hasDefaultValue = v.Value == v.DefaultValue;
+
+                if (hasDefaultValue)
+                {
+                    // Create a new TVar (changes the default value)
+                    V.Set(new TVar(v.Name, delay, v.Description));
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error Getting SNOPower Use Delay for power {0}:{1}", power);
             }
         }
 
