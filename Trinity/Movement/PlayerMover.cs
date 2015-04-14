@@ -131,10 +131,18 @@ namespace Trinity.DbProvider
             // Update the last time we generated a path
             LastGeneratedStuckPosition = DateTime.UtcNow;
 
-            Trinity.CurrentTarget = TargetUtil.GetClosestTarget(25f);
+            Trinity.CurrentTarget = TargetUtil.GetClosestTarget(25f, _useWeights: false);
             if (CurrentTarget != null && CurrentTarget.IsUnit)
             {
                 CombatBase.Cast(Trinity.AbilitySelector());
+            }
+            else
+            {
+                Trinity.CurrentTarget = TargetUtil.GetClosestDestructible(25f, _useWeights: false);
+                if (CurrentTarget != null)
+                {
+                    CombatBase.Cast(Trinity.AbilitySelector(UseDestructiblePower: true));
+                }
             }
 
             // If we got stuck on a 2nd/3rd/4th "chained" anti-stuck route, then return the old move to target to keep movement of some kind going
@@ -789,6 +797,7 @@ namespace Trinity.DbProvider
         {
             CombatBase.QueuedMovement.Queue(new QueuedMovement
             {
+                Id = CurrentTarget.RActorGuid,
                 Name = CurrentTarget != null ? CurrentTarget.InternalName : post,
                 Infos = CurrentTarget != null ? CurrentTarget.Infos : "Avoidance/Kite movement",
                 Destination = CurrentTarget != null ? CurrentTarget.Position : GridMap.GetBestMoveNode().Position,
@@ -799,7 +808,8 @@ namespace Trinity.DbProvider
                 ,
                 Options = new QueuedMovementOptions
                 {
-                    FailureBlacklistSeconds = 0,
+                    FailureBlacklistSeconds = 1.5,
+                    TimeBeforeBlocked = 1500,
                     Logging = LogLevel.Info,
                     AcceptableDistance = 3f,
                     Type = CurrentTarget != null && CurrentTarget.IsKite ? MoveType.Kite : MoveType.Avoidance,

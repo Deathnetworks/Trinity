@@ -33,7 +33,8 @@ namespace Trinity
 
                 // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
                 if (Trinity.Player.StandingInAvoidance || Player.AvoidDeath && (!AnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
-                    !Combat.QueuedMovementManager.Stuck.IsStuck())
+                    !CombatBase.QueuedMovement.IsStuck && !CombatBase.QueuedMovement.IsBlacklisted((int)MoveType.Avoidance) &&
+                    GridMap.HasSafeSpots)
                 {
                     var _safeNode = GridMap.GetBestMoveNode();
                     if (_safeNode != null)
@@ -50,7 +51,8 @@ namespace Trinity
                             Type = GObjectType.Avoidance,
                             Weight = _safeNode.Weight,
                             Radius = 2f,
-                            InternalName = "AvoidancePoint"
+                            InternalName = "AvoidancePoint",
+                            RActorGuid = (int)MoveType.Avoidance,
                         };
                     }
                 }

@@ -168,7 +168,7 @@ namespace Trinity
                         "| =>   CurrentPower   : {0}", CombatBase.CurrentPower.SNOPower + " InRange:" + CurrentTargetIsInRange + " Dist:" + TargetCurrentDistance);
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting,
                         "| =>   MCD:{0} TCD{1} TCDi:{2} CPTP:{3} CPMP:{4} ACD:{5}",
-                        MoveCurrentDestination, TargetCurrentDestination, TargetCurrentDistance, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.MovePosition, CombatBase.CurrentPower.TargetACDGUID);
+                        CurrentMoveDestination, TargetCurrentDestination, TargetCurrentDistance, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.MovePosition, CombatBase.CurrentPower.TargetACDGUID);
                 }
 
                 if (CombatBase.QueuedMovement.IsQueuedMovement)
@@ -608,7 +608,7 @@ namespace Trinity
                     // So it won't blacklist a monster "on the edge of the screen" who isn't even being targetted
                     // Don't blacklist monsters on <= 50% health though, as they can't be in a stuck location... can they!? Maybe give them some extra time!
 
-                    bool isNavigable = NavHelper.CanRayCast(MoveCurrentDestination);
+                    bool isNavigable = NavHelper.CanRayCast(CurrentMoveDestination);
 
                     bool addTargetToBlacklist = true;
 
@@ -631,10 +631,10 @@ namespace Trinity
                     {
                         if (CurrentTarget.IsBoss)
                         {
-                            Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "Blacklisted Target, Returning Failure");
+                            Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "Blacklisted Boss, Returning Failure");
 
-                            Blacklist3Seconds.Add(CurrentTarget.RActorGuid);
-                            Blacklist3LastClear = DateTime.UtcNow;
+                            Blacklist15Seconds.Add(CurrentTarget.RActorGuid);
+                            Blacklist15LastClear = DateTime.UtcNow;
                             CurrentTarget = null;
                             return true;
                         }
@@ -667,8 +667,8 @@ namespace Trinity
 
                         Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Blacklisted Target, Returning Failure");
 
-                        Blacklist3Seconds.Add(CurrentTarget.RActorGuid);
-                        Blacklist3LastClear = DateTime.UtcNow;
+                        Blacklist60Seconds.Add(CurrentTarget.RActorGuid);
+                        Blacklist60LastClear = DateTime.UtcNow;
                         CurrentTarget = null;
                         return true;
                     }
@@ -803,10 +803,10 @@ namespace Trinity
                 }
                 if (bUseThisLoop)
                 {
-                    CombatBase.Cast(new TrinityPower(SNOPower.Barbarian_Whirlwind, 0f, MoveCurrentDestination));
+                    CombatBase.Cast(new TrinityPower(SNOPower.Barbarian_Whirlwind, 0f, CurrentMoveDestination));
                 }
                 // Store the current destination for comparison incase of changes next loop
-                LastMoveToTarget = MoveCurrentDestination;
+                LastMoveToTarget = CurrentMoveDestination;
                 // Reset total body-block count
                 if ((!_forceCloseRangeTarget || DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds > ForceCloseRangeForMilliseconds) &&
                     DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
@@ -826,7 +826,7 @@ namespace Trinity
                 CurrentTarget.Type == GObjectType.PowerGlobe ||
                 CurrentTarget.Type == GObjectType.ProgressionGlobe ||
                 Monk_SpecialMovement)
-                && NavHelper.CanRayCast(Player.Position, MoveCurrentDestination)
+                && NavHelper.CanRayCast(Player.Position, CurrentMoveDestination)
                 )
             {
                 bool attackableSpecialMovement = ((CurrentTarget.Type == GObjectType.Avoidance &&
@@ -836,34 +836,34 @@ namespace Trinity
                 // Leap movement for a barb
                 if (CombatBase.CanCast(SNOPower.Barbarian_Leap))
                 {
-                    return CombatBase.Cast(new TrinityPower(SNOPower.Barbarian_Leap, 0f, MoveCurrentDestination));
+                    return CombatBase.Cast(new TrinityPower(SNOPower.Barbarian_Leap, 0f, CurrentMoveDestination));
                 }
 
                 // Furious Charge movement for a barb
                 if (CombatBase.CanCast(SNOPower.Barbarian_FuriousCharge) && Settings.Combat.Barbarian.UseChargeOOC)
                 {
-                    return CombatBase.Cast(new TrinityPower(SNOPower.Barbarian_FuriousCharge, 0f, MoveCurrentDestination));
+                    return CombatBase.Cast(new TrinityPower(SNOPower.Barbarian_FuriousCharge, 0f, CurrentMoveDestination));
                 }
 
                 // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
                 if (CombatBase.CanCast(SNOPower.Wizard_Teleport))
                 {
-                    return CombatBase.Cast(new TrinityPower(SNOPower.Wizard_Teleport, 0f, MoveCurrentDestination));
+                    return CombatBase.Cast(new TrinityPower(SNOPower.Wizard_Teleport, 0f, CurrentMoveDestination));
                 }
 
                 // Archon Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
                 if (CombatBase.CanCast(SNOPower.Wizard_Archon_Teleport))
                 {
-                    return CombatBase.Cast(new TrinityPower(SNOPower.Wizard_Archon_Teleport, 0f, MoveCurrentDestination));
+                    return CombatBase.Cast(new TrinityPower(SNOPower.Wizard_Archon_Teleport, 0f, CurrentMoveDestination));
                 }
                 // Whirlwind for a barb
 
                 if (attackableSpecialMovement && !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker
                     && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource >= 10)
                 {
-                    if (CombatBase.Cast(new TrinityPower(SNOPower.Barbarian_Whirlwind, 0f, MoveCurrentDestination)))
+                    if (CombatBase.Cast(new TrinityPower(SNOPower.Barbarian_Whirlwind, 0f, CurrentMoveDestination)))
                     {
-                        LastMoveToTarget = MoveCurrentDestination;
+                        LastMoveToTarget = CurrentMoveDestination;
                         // Reset total body-block count, since we should have moved
                         if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                             _timesBlockedMoving = 0;
@@ -878,9 +878,9 @@ namespace Trinity
                     Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly &&
                     MonkCombat.IsTempestRushReady())
                 {
-                    if (CombatBase.Cast(new TrinityPower(SNOPower.Monk_TempestRush, 0f, MoveCurrentDestination)))
+                    if (CombatBase.Cast(new TrinityPower(SNOPower.Monk_TempestRush, 0f, CurrentMoveDestination)))
                     {
-                        LastMoveToTarget = MoveCurrentDestination;
+                        LastMoveToTarget = CurrentMoveDestination;
                         // Reset total body-block count, since we should have moved
                         if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                             _timesBlockedMoving = 0;
@@ -892,9 +892,9 @@ namespace Trinity
                 // Strafe for a Demon Hunter
                 if (attackableSpecialMovement && CombatBase.CanCast(SNOPower.DemonHunter_Strafe))
                 {
-                    if (CombatBase.Cast(new TrinityPower(SNOPower.DemonHunter_Strafe, 0f, MoveCurrentDestination)))
+                    if (CombatBase.Cast(new TrinityPower(SNOPower.DemonHunter_Strafe, 0f, CurrentMoveDestination)))
                     {
-                        LastMoveToTarget = MoveCurrentDestination;
+                        LastMoveToTarget = CurrentMoveDestination;
                         // Reset total body-block count, since we should have moved
                         if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                             _timesBlockedMoving = 0;
@@ -1043,6 +1043,7 @@ namespace Trinity
                 {
                     CombatBase.QueuedMovement.Queue(new QueuedMovement
                     {
+                        Id = CurrentTarget.RActorGuid,
                         Name = CurrentTarget.InternalName,
                         Infos = "(Keep moving) " + CurrentTarget.Infos,
                         Destination = GridMap.GetBestMoveNode().Position,
@@ -1072,6 +1073,7 @@ namespace Trinity
                 {
                     CombatBase.QueuedMovement.Queue(new QueuedMovement
                     {
+                        Id = CurrentTarget.RActorGuid,
                         Name = CurrentTarget.InternalName,
                         Infos = "(Walk) " + CurrentTarget.Infos,
                         Destination = CombatBase.CurrentPower.TargetPosition,
@@ -1119,16 +1121,17 @@ namespace Trinity
                     return;
                 }
 
-                if (DateTime.UtcNow.Subtract(lastSentMovePower).TotalMilliseconds >= 250 || Vector3.Distance(LastMoveToTarget, MoveCurrentDestination) >= 2f || bForceNewMovement)
+                if (DateTime.UtcNow.Subtract(lastSentMovePower).TotalMilliseconds >= 250 || Vector3.Distance(LastMoveToTarget, CurrentMoveDestination) >= 2f || bForceNewMovement)
                 {
                     if (!CurrentTarget.IsAvoidance && !(CurrentTarget.IsUnit && CurrentTargetIsInRange))
                     {
                         int rActorGuid = CurrentTarget.RActorGuid;
                         CombatBase.QueuedMovement.Queue(new QueuedMovement
                         {
+                            Id = CurrentTarget.RActorGuid,
                             Name = CurrentTarget.InternalName,
-                            Infos = MoveCurrentDestination != CurrentTarget.Position ? "(Required destination) " + CurrentTarget.Infos : CurrentTarget.Infos,
-                            Destination = MoveCurrentDestination,
+                            Infos = CurrentMoveDestination != CurrentTarget.Position ? "(Required destination) " + CurrentTarget.Infos : CurrentTarget.Infos,
+                            Destination = CurrentMoveDestination,
                             OnUpdate = m =>
                             {
                                 if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Player || CurrentTarget.Type == GObjectType.OocAvoidance)
@@ -1139,8 +1142,8 @@ namespace Trinity
                                 {
                                     SetTargetFields();
                                     m.Name = CurrentTarget.InternalName;
-                                    m.Infos = MoveCurrentDestination != CurrentTarget.Position ? "(Required destination) " + CurrentTarget.Infos : CurrentTarget.Infos;
-                                    m.Destination = MoveCurrentDestination;
+                                    m.Infos = CurrentMoveDestination != CurrentTarget.Position ? "(Required destination) " + CurrentTarget.Infos : CurrentTarget.Infos;
+                                    m.Destination = CurrentMoveDestination;
                                     m.Options.Type = CurrentTarget.IsUnit ? MoveType.BasicCombat : MoveType.TargetAttempt;
                                 }
                             },
@@ -1159,7 +1162,7 @@ namespace Trinity
                     if (CombatBase.QueuedMovement.IsQueuedMovement)
                     {
                         lastSentMovePower = DateTime.UtcNow;
-                        LastMoveToTarget = MoveCurrentDestination;
+                        LastMoveToTarget = CurrentMoveDestination;
                     }
                 }
             }
@@ -1178,7 +1181,7 @@ namespace Trinity
                 CurrentTargetIsInLoS = CurrentTarget.IsInLineOfSight;
 
                 TargetCurrentDestination = CurrentTarget.Position;
-                MoveCurrentDestination = CurrentTarget.Position;
+                CurrentMoveDestination = CurrentTarget.Position;
 
                 #region switch (CurrentTarget.Type)
                 switch (CurrentTarget.Type)
@@ -1239,7 +1242,7 @@ namespace Trinity
                         {
                             CurrentTarget.RequiredRange = Math.Max(Player.GoldPickupRadius - 5f, 5f);
                             TargetCurrentDistance = CurrentTarget.Distance;
-                            MoveCurrentDestination = MathEx.CalculatePointFrom(Player.Position, CurrentTarget.Position, -2f);
+                            CurrentMoveDestination = MathEx.CalculatePointFrom(Player.Position, CurrentTarget.Position, -2f);
                             break;
                         }
                     // * Globes - need to get within pickup radius only
@@ -1281,7 +1284,7 @@ namespace Trinity
                         {
                             if (CurrentTarget.IsQuestGiver)
                             {
-                                MoveCurrentDestination = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.Radius + 2f);
+                                CurrentMoveDestination = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.Radius + 2f);
                                 CurrentTarget.RequiredRange = 5f;
                             }
                             else

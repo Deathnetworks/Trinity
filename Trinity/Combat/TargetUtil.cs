@@ -1063,6 +1063,40 @@ namespace Trinity
         }
 
         // Revised
+        internal static TrinityCacheObject GetClosestDestructible(float _range, Vector3 _loc = new Vector3(), bool _useWeights = true)
+        {
+            if (_loc == new Vector3()) { _loc = Player.Position; }
+
+            var _list = ListObjectsInRangeOfPosition(_loc, _range, _useWeights);
+            if (_list == null)
+            {
+                if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
+                    return Trinity.CurrentTarget;
+
+                return default(TrinityCacheObject);
+            }
+
+            var _results = (
+                from u in _list
+                where
+                    u.Type == GObjectType.Barricade ||
+                    u.Type == GObjectType.Destructible ||
+                    u.Type == GObjectType.Door ||
+                    u.Type == GObjectType.Container
+                orderby
+                    u.Position.Distance2D(_loc) - u.Radius
+                select u).ToList();
+
+            if (_results.Any())
+                return _results.FirstOrDefault();
+
+            if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
+                return Trinity.CurrentTarget;
+
+            return default(TrinityCacheObject);
+        }
+
+        // Revised
         internal static TrinityCacheObject GetDashStrikeFarthestTarget(float _maxRange, float _minRange = 33f)
         {
             var _list = ListUnitsInRangeOfPosition(Player.Position, _maxRange);

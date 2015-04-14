@@ -316,7 +316,7 @@ namespace Trinity
         internal static DateTime lastShiftedPosition = DateTime.MinValue;
         internal static int ShiftPositionFor = 0;
         internal static Vector3 TargetCurrentDestination;
-        internal static Vector3 MoveCurrentDestination;
+        internal static Vector3 CurrentMoveDestination;
         internal static Vector3 CurrentDestination;
         public static int CurrentWorldDynamicId = -1;
         public static int CurrentWorldId = -1; // worldId from profiles, used in persistent stats
