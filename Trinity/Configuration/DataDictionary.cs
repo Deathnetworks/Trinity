@@ -2573,6 +2573,8 @@ namespace Trinity
             194682, 81699, 3340, 123325, 
             (int)SNOActor.a3_Battlefield_demonic_forge,
             (int)SNOActor.a3_crater_st_demonic_forge,
+            (int)SNOActor.a3dun_rmpt_RopeSwitch_A,
+            (int)SNOActor.a3dun_rmpt_RopeSwitch_A_MultiUse,
             158681, // A1 Blacksmith_Lore
             104596, // A1 trOut_FesteringWoods_Neph_Column_B
             104632, // A1 trOut_FesteringWoods_Neph_Column_B_Broken_Base
@@ -2604,6 +2606,9 @@ namespace Trinity
             {104827, 15}, // trOut_FesteringWoods_Neph_Column_C_Broken_Base 
             {355898, 12}, // x1_Bog_Family_Guard_Tower_Stump
             {376917, 10}, 
+            {(int)SNOActor.a3dun_rmpt_RopeSwitch_A, 15},
+            {(int)SNOActor.a3dun_rmpt_RopeSwitch_A_MultiUse, 15},
+
          };
 
         public static HashSet<int> ForceAtDoorType { get { return forceAtDoorType; } }

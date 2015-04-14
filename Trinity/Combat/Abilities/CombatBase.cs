@@ -513,7 +513,7 @@ namespace Trinity.Combat.Abilities
                     case GObjectType.Destructible:
                     case GObjectType.Barricade:
                         return true;
-                    default:
+                    default: 
                         return false;
                 }
             }

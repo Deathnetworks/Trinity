@@ -260,7 +260,7 @@ namespace Trinity
 
             if (CurrentTarget.IsAvoidance || CurrentTarget.Type == GObjectType.OocAvoidance || Trinity.Player.StandingInAvoidance)
             {
-                TrinityPower power = AbilitySelector(IsCurrentlyAvoiding: true);
+                TrinityPower power = AbilitySelector();
                 if (!CombatBase.IsNull(power))
                     CombatBase.Cast(power);
             }
@@ -634,7 +634,6 @@ namespace Trinity
                             Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "Blacklisted Target, Returning Failure");
 
                             Blacklist3Seconds.Add(CurrentTarget.RActorGuid);
-                            Blacklist3LastClear = DateTime.UtcNow;
                             CurrentTarget = null;
                             return true;
                         }
@@ -668,7 +667,6 @@ namespace Trinity
                         Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Blacklisted Target, Returning Failure");
 
                         Blacklist3Seconds.Add(CurrentTarget.RActorGuid);
-                        Blacklist3LastClear = DateTime.UtcNow;
                         CurrentTarget = null;
                         return true;
                     }
@@ -725,15 +723,15 @@ namespace Trinity
                         }
                     }
                     // Select an ability for destroying a destructible with in advance
-                    if (CurrentTarget.Type == GObjectType.Destructible || CurrentTarget.Type == GObjectType.Barricade || CurrentTarget.Type == GObjectType.Door)
-                        CombatBase.CurrentPower = AbilitySelector(UseDestructiblePower: true);
+                    if (CurrentTarget.Type == GObjectType.Destructible || CurrentTarget.Type == GObjectType.Barricade)
+                        CombatBase.CurrentPower = AbilitySelector();
 
                     // Return since we should have assigned a power
                     return;
                 }
                 if (!_isWaitingForPower && CombatBase.CurrentPower == null)
                 {
-                    CombatBase.CurrentPower = AbilitySelector(UseOOCBuff: true);
+                    CombatBase.CurrentPower = AbilitySelector();
                 }
             }
         }

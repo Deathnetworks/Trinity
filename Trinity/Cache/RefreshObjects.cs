@@ -9,6 +9,7 @@ using Trinity.DbProvider;
 using Trinity.Helpers;
 using Trinity.Items;
 using Trinity.Technicals;
+using Trinity.UI.UIComponents;
 using Zeta.Bot;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -112,7 +113,10 @@ namespace Trinity
                         /* Add Team HotSpots to the cache */
                         using (new MemorySpy("RefreshDiaObjects().HotSpots"))
                         {
-                            ObjectCache.AddRange(GroupHotSpots.GetCacheObjectHotSpots());
+                            foreach (var ghs in GroupHotSpots.GetCacheObjectHotSpots())
+                            {
+                                ObjectCache.Add(ghs);
+                            }
                         }
 
                         RefreshKiteValue();
@@ -181,6 +185,12 @@ namespace Trinity
                         {
                             Events.OnCacheUpdatedHandler.Invoke();
                         }
+                        CacheUI.DataModel.SourceCacheObjects.Clear();
+                        foreach (var co in ObjectCache)
+                        {
+                            CacheUI.DataModel.SourceCacheObjects.Add(co.Copy());
+                        }
+
                     }
                     /* Refresh at Tick impair */
                     else
@@ -711,8 +721,7 @@ namespace Trinity
                 IsAlreadyMoving = false;
 
                 // Here's the list we'll use to store each object
-                ObjectCache = new List<TrinityCacheObject>();
-
+                ObjectCache.Clear();
             }
         }
 

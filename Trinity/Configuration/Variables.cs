@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -351,7 +352,7 @@ namespace Trinity
         /// <summary>
         /// This contains the active cache of DiaObjects
         /// </summary>
-        internal static List<TrinityCacheObject> ObjectCache;
+        internal static List<TrinityCacheObject> ObjectCache = new List<TrinityCacheObject>();
 
         // From main RefreshDiaobjects
         /// <summary>

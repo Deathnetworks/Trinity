@@ -27,6 +27,10 @@ namespace Trinity.Combat.Abilities
                 }
             }
 
+            // Destructibles
+            if (UseDestructiblePower)
+                return DestroyObjectPower;
+            
             if (!UseOOCBuff && !IsCurrentlyAvoiding)
             {
                 /*

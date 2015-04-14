@@ -57,8 +57,5 @@ namespace Trinity.Configuration
             get { return _onCacheUpdatedHandler ?? (_onCacheUpdatedHandler += () => { }); }
             private set { _onCacheUpdatedHandler = value; }
         }
-
-
-
     }
 }

@@ -101,7 +101,7 @@ namespace Trinity
                             BarbarianCombat.AllowSprintOOC = true;
                             DisableOutofCombatSprint = false;
 
-                            PowerBuff = AbilitySelector(UseOOCBuff: true);
+                            PowerBuff = AbilitySelector();
                             if (CombatBase.Cast(PowerBuff))
                             {
                                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Using OOC Buff: {0}", PowerBuff.SNOPower.ToString());

@@ -57,17 +57,14 @@ namespace Trinity
         /// <summary>
         /// Returns an appropriately selected TrinityPower and related information
         /// </summary>
-        /// <param name="IsCurrentlyAvoiding">Are we currently avoiding?</param>
-        /// <param name="UseOOCBuff">Buff Out Of Combat</param>
-        /// <param name="UseDestructiblePower">Is this for breaking destructables?</param>
+        /// <param name="isCurrentlyAvoiding">Are we currently avoiding?</param>
+        /// <param name="useOocBuff">Buff Out Of Combat</param>
+        /// <param name="useDestructiblePower">Is this for breaking destructables?</param>
         /// <returns></returns>
-        internal static TrinityPower AbilitySelector(bool IsCurrentlyAvoiding = false, bool UseOOCBuff = false, bool UseDestructiblePower = false)
+        internal static TrinityPower AbilitySelector()
         {
             using (new PerformanceLogger("AbilitySelector"))
             {
-                if (!UseOOCBuff && CurrentTarget == null)
-                    return new TrinityPower();
-
                 // Switch based on the cached character class
                 TrinityPower power = CombatBase.CurrentPower;
 
