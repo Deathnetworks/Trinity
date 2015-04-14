@@ -365,7 +365,10 @@ namespace Trinity.Objects
         /// </summary>
         public bool Cast(Vector3 clickPosition, int targetAcdGuid)
         {
-            return CombatBase.Cast(new TrinityPower(SNOPower, 0f, clickPosition, targetAcdGuid));
+            if (targetAcdGuid != -1)
+                return CombatBase.Cast(new TrinityPower(SNOPower, 0f, targetAcdGuid));
+
+            return CombatBase.Cast(new TrinityPower(SNOPower, 0f, clickPosition));
         }
 
         private bool GameIsReady
