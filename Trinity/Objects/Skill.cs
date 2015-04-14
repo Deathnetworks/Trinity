@@ -83,7 +83,11 @@ namespace Trinity.Objects
         /// <summary>
         /// If this skill is a special primary skill (free to cast or generators)
         /// </summary>
-        public bool IsPrimary { get; set; }
+        public bool IsPrimary
+        {
+            get { return Category == SpellCategory.Primary; }
+            set { } // todo: find out why non-primary are being set as primary in JS Collector
+        }
 
         /// <summary>
         /// How much this spell costs to cast; uses rune value when applicable.
@@ -125,6 +129,12 @@ namespace Trinity.Objects
                     return true;
 
                 if (this == Skills.DemonHunter.ElementalArrow && Legendary.Kridershot.IsEquipped)
+                    return true;
+
+                if (this == Skills.DemonHunter.Preparation && Reference.Runes.DemonHunter.Punishment.IsActive)
+                    return true;
+
+                if (this == Skills.DemonHunter.Vengeance && Reference.Runes.DemonHunter.Seethe.IsActive)
                     return true;
 
                 return Category == SpellCategory.Primary;

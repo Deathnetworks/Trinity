@@ -368,6 +368,13 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         private static TrinityPower GetCombatPower()
         {
+            // Rain of Vengeance
+            if (Skills.DemonHunter.RainOfVengeance.CanCast() && !Player.IsIncapacitated &&
+                (TargetUtil.ClusterExists(45f, 5) || TargetUtil.EliteOrTrashInRange(45f) || Settings.Combat.DemonHunter.RainOfVengeanceOffCD || Sets.NatalyasVengeance.IsEquipped))
+            {
+                return new TrinityPower(SNOPower.DemonHunter_RainOfVengeance, 0f, Enemies.BestLargeCluster.Position);
+            }
+
             // Sentry Turret
             if (SentryCastArea != null && CanCast(SNOPower.DemonHunter_Sentry, CanCastFlags.NoTimer) && Trinity.PlayerOwnedDHSentryCount < MaxSentryCount)
             {
@@ -444,7 +451,10 @@ namespace Trinity.Combat.Abilities
             // Cluster Arrow
             if (CanCast(SNOPower.DemonHunter_ClusterArrow))
             {
-                return new TrinityPower(SNOPower.DemonHunter_ClusterArrow, RangedAttackRange, SentryCastSkillsCastArea.Position);
+                if (!Sets.NatalyasVengeance.IsFullyEquipped || CacheData.Buffs.HasBuff(SNOPower.P2_ItemPassive_Unique_Ring_053))
+                {
+                    return new TrinityPower(SNOPower.DemonHunter_ClusterArrow, RangedAttackRange, SentryCastSkillsCastArea.Position);
+                }
             }
 
             // Elemental Arrow for non-kridershot
@@ -492,16 +502,6 @@ namespace Trinity.Combat.Abilities
                 // Now return rapid fire, if not sending grenades instead
                 return new TrinityPower(SNOPower.DemonHunter_RapidFire, DHSettings.RangedAttackRange, CurrentTarget.Position);
             }
-
-            /*// Rain of Vengeance
-            if (CanCast(SNOPower.DemonHunter_RainOfVengeance) && !Player.IsIncapacitated &&
-               (TargetUtil.ClusterExists(45f, 3) || TargetUtil.EliteOrTrashInRange(45f)) ||
-               (TargetUtil.AnyMobsInRange(55f) && Settings.Combat.DemonHunter.RainOfVengeanceOffCD && !Runes.DemonHunter.DarkCloud.IsActive))
-            {
-                var bestClusterPoint = TargetUtil.GetBestClusterPoint(45f, 65f, false);
-
-                return new TrinityPower(SNOPower.DemonHunter_RainOfVengeance, 0f, bestClusterPoint);
-            }*/
 
             var spender = SkillUtils.Active.FirstOrDefault(s => s.IsSpender && s.CanCast());
             return spender != null ? spender.ToPower(RangedAttackRange, Enemies.BestCluster.Position) : null;

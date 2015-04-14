@@ -203,7 +203,8 @@ namespace Trinity.Reference
                 Legendary.NatalyasSight,
                 Legendary.NatalyasReflection,   
                 Legendary.NatalyasSlayer,
-                Legendary.NatalyasLeggings
+                Legendary.NatalyasLeggings,
+                Legendary.NatalyasTouch
             },
             FirstBonusItemCount = 2,
             SecondBonusItemCount = 4,

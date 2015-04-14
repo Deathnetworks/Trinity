@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Windows;
@@ -88,6 +89,15 @@ namespace Trinity.UI
                         Content = "Find New ActorIds"
                     };
 
+                    _btnDumpBuild = new Button
+                    {
+                        Width = 120,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        VerticalAlignment = VerticalAlignment.Top,
+                        Margin = new Thickness(3),
+                        Content = "Dump My Build"
+                    };
+
                     Window mainWindow = Application.Current.MainWindow;
 
                     _btnSortBackpack.Click += _btnSortBackpack_Click;
@@ -96,6 +106,7 @@ namespace Trinity.UI
                     _btnReloadItemRules.Click += _btnReloadItemRules_Click;
                     _btnDropLegendaries.Click += _btnDropLegendaries_Click;
                     _btnGetNewActorSNOs.Click += BtnGetNewActorSnOsOnClick;
+                    _btnDumpBuild.Click += BtnDumpBuildOnClick;
 
                     var uniformGrid = new UniformGrid
                     {
@@ -110,6 +121,7 @@ namespace Trinity.UI
                     uniformGrid.Children.Add(_btnReloadItemRules);
                     uniformGrid.Children.Add(_btnDropLegendaries);
                     uniformGrid.Children.Add(_btnGetNewActorSNOs);
+                    uniformGrid.Children.Add(_btnDumpBuild);
 
                     _tabItem = new TabItem
                     {
@@ -125,6 +137,11 @@ namespace Trinity.UI
                     tabs.Items.Add(_tabItem);
                 }
             );
+        }
+
+        private static void BtnDumpBuildOnClick(object sender, RoutedEventArgs routedEventArgs)
+        {
+            DebugUtil.LogBuildAndItems();            
         }
 
         private static void BtnGetNewActorSnOsOnClick(object sender, RoutedEventArgs routedEventArgs)
@@ -178,6 +195,7 @@ namespace Trinity.UI
 
 
         private static TabItem _tabItem;
+        private static Button _btnDumpBuild;
 
         internal static void RemoveTab()
         {
