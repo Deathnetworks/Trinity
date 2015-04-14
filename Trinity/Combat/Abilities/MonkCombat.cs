@@ -23,7 +23,7 @@ namespace Trinity.Combat.Abilities
             get
             {
                 return Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.X1_Monk_DashingStrike) &&
-                    CombatBase.TimeSincePowerUse(SNOPower.X1_Monk_DashingStrike) < 250;
+                    CombatBase.TimeSincePowerUse(SNOPower.X1_Monk_DashingStrike) < 350;
             }
         }
 
@@ -80,7 +80,9 @@ namespace Trinity.Combat.Abilities
             }
 
             // Dashing strike avoidance
-            if (IsCurrentlyAvoiding && CanCast(SNOPower.X1_Monk_DashingStrike, CanCastFlags.NoTimer) && GridMap.GetBestMoveNode().Distance >= 15f)
+            if (IsCurrentlyAvoiding && CanCast(SNOPower.X1_Monk_DashingStrike, CanCastFlags.NoTimer) && 
+                GridMap.GetBestMoveNode().Distance >= 15f &&
+                (!Sets.ThousandStorms.IsMaxBonusActive || Skills.Monk.DashingStrike.Charges > 1 || Player.PrimaryResource >= 80))
             {
                 return new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, GridMap.GetBestMoveNode().Position);
             }
@@ -120,8 +122,7 @@ namespace Trinity.Combat.Abilities
             if (CanCast(SNOPower.X1_Monk_InnerSanctuary))
             {
                 // InnerSanctuary ForbiddenPalace
-                if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
-                    Runes.Monk.ForbiddenPalace.IsActive)
+                if (Runes.Monk.ForbiddenPalace.IsActive && !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated)
                 {
                     bool adequateTarget = (CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.NearbyUnitsWithinDistance(8f) >= 5) &&
                         (!Skills.Monk.ExplodingPalm.IsActive || CurrentTarget.HasDebuff(SNOPower.Monk_ExplodingPalm) &&
@@ -131,7 +132,8 @@ namespace Trinity.Combat.Abilities
                     if (CurrentTarget.RadiusDistance <= 5f && adequateTarget)
                         return new TrinityPower(SNOPower.X1_Monk_InnerSanctuary);
 
-                    if (CanCastDashingStrike && CurrentTarget.IsInLineOfSight && adequateTarget)
+                    if (CanCastDashingStrike && 
+                        CurrentTarget.IsInLineOfSight && adequateTarget)
                     {
                         if (CombatBase.Cast(new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, CurrentTarget.ClusterPosition(5f))))
                             return new TrinityPower(SNOPower.X1_Monk_InnerSanctuary, 5f, CurrentTarget.Position);
@@ -141,7 +143,8 @@ namespace Trinity.Combat.Abilities
                         ? TargetUtil.GetDashStrikeThousandStormTarget(MaxDashingStrikeRange, 6f) :
                         TargetUtil.GetBestClusterUnit(MaxDashingStrikeRange, 8f);
 
-                    if (CanCastDashingStrike && (target.IsBossOrEliteRareUnique || target.NearbyUnitsWithinDistance(8f) >= 5) &&
+                    if (CanCastDashingStrike &&
+                        (target.IsBossOrEliteRareUnique || target.NearbyUnitsWithinDistance(8f) >= 5) &&
                         (!Skills.Monk.ExplodingPalm.IsActive || CurrentTarget.HasDebuff(SNOPower.Monk_ExplodingPalm) &&
                         (!Skills.Monk.WaveOfLight.IsActive || CanCast(SNOPower.Monk_WaveOfLight))) &&
                         (!Sets.ThousandStorms.IsSecondBonusActive || CurrentTarget.CountUnitsInFront > 3))
@@ -152,8 +155,8 @@ namespace Trinity.Combat.Abilities
                     }
                 }
                 // InnerSanctuary Intervene
-                else if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
-                    Runes.Monk.Intervene.IsActive && (!Skills.Monk.DashingStrike.IsActive || !CanCastDashingStrike) &&
+                else if (Runes.Monk.Intervene.IsActive && !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
+                    (!Skills.Monk.DashingStrike.IsActive || !CanCastDashingStrike) &&
                     (CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.NearbyUnits >= 3) && CurrentTarget.Distance >= 8f)
                 {
                     return new TrinityPower(SNOPower.X1_Monk_InnerSanctuary, 50f, CurrentTarget.ACDGuid);
@@ -165,7 +168,7 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // InnerSanctuary low health
-                if (CanCast(SNOPower.X1_Monk_InnerSanctuary) && Player.CurrentHealthPct <= 0.5)
+                if (Player.CurrentHealthPct <= 0.5)
                 {
                     return new TrinityPower(SNOPower.X1_Monk_InnerSanctuary);
                 }
@@ -194,7 +197,8 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.Monk_BlindingFlash);
                 }
 
-                if (swCheck && CanCastDashingStrike && CurrentTarget.IsInLineOfSight && adequateTarget)
+                if (swCheck && CanCastDashingStrike && 
+                    CurrentTarget.IsInLineOfSight && adequateTarget)
                 {
                     if (CombatBase.Cast(new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, CurrentTarget.ClusterPosition(5f))))
                         return new TrinityPower(SNOPower.Monk_BlindingFlash, 15f, CurrentTarget.Position);
@@ -204,7 +208,8 @@ namespace Trinity.Combat.Abilities
                     ? TargetUtil.GetDashStrikeThousandStormTarget(MaxDashingStrikeRange, 6f) :
                     TargetUtil.GetBestClusterUnit(MaxDashingStrikeRange, 20f);
 
-                if (CanCastDashingStrike && (target.IsBossOrEliteRareUnique || target.NearbyUnitsWithinDistance(18f) >= 3) &&
+                if (CanCastDashingStrike &&
+                    (target.IsBossOrEliteRareUnique || target.NearbyUnitsWithinDistance(18f) >= 3) &&
                     (!Sets.ThousandStorms.IsSecondBonusActive || CurrentTarget.CountUnitsInFront > 2))
                 {
                     SwitchToTarget(target);
@@ -285,7 +290,8 @@ namespace Trinity.Combat.Abilities
 
                 var target = TargetUtil.GetBestClusterUnit(MaxDashingStrikeRange, cycloneStrikeRange);
 
-                if (CanCastDashingStrike && (target.IsBossOrEliteRareUnique || target.NearbyUnitsWithinDistance(cycloneStrikeRange) > count + 1))
+                if (CanCastDashingStrike && 
+                    (target.IsBossOrEliteRareUnique || target.NearbyUnitsWithinDistance(cycloneStrikeRange) > count + 1))
                 {
                     SwitchToTarget(target);
                     if (CombatBase.Cast(new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, CurrentTarget.ClusterPosition(5f))))
@@ -315,7 +321,8 @@ namespace Trinity.Combat.Abilities
                     _target.RadiusDistance <= wolRange && _target.HasDebuff(SNOPower.Monk_ExplodingPalm))
                 {
                     SwitchToTarget(_target);
-                    if (CanCastDashingStrike && CurrentTarget.IsInLineOfSight && (CurrentTarget.RadiusDistance > 10f || 
+                    if (CanCastDashingStrike && 
+                        CurrentTarget.IsInLineOfSight && (CurrentTarget.RadiusDistance > 10f || 
                         CacheData.MonsterObstacles.Any(m => m.RActorGUID != CurrentTarget.RActorGuid && MathUtil.IntersectsPath(m.Position, 5f, CurrentTarget.Position, Player.Position))))
                     {
                         CombatBase.Cast(new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, CurrentTarget.ClusterPosition(5f)));
@@ -337,7 +344,8 @@ namespace Trinity.Combat.Abilities
                     _target.RadiusDistance <= 10f && _target.HasDebuff(SNOPower.Monk_ExplodingPalm))
                 {
                     SwitchToTarget(_target);
-                    if (CanCastDashingStrike && CurrentTarget.IsInLineOfSight && (CurrentTarget.RadiusDistance > 10f ||
+                    if (CanCastDashingStrike && 
+                        CurrentTarget.IsInLineOfSight && (CurrentTarget.RadiusDistance > 10f ||
                         CacheData.MonsterObstacles.Any(m => m.RActorGUID != CurrentTarget.RActorGuid && MathUtil.IntersectsPath(m.Position, 5f, CurrentTarget.Position, Player.Position))))
                     {
                         CombatBase.Cast(new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, CurrentTarget.ClusterPosition(5f)));
@@ -353,29 +361,25 @@ namespace Trinity.Combat.Abilities
                 ChangeTarget();
             }
 
-            if (CanCastDashingStrike)
+            // Jawbreaker
+            if (Legendary.Jawbreaker.IsEquipped &&
+                !UseOOCBuff && !Player.IsIncapacitated && !IsCurrentlyAvoiding &&
+                CanCast(SNOPower.X1_Monk_DashingStrike, CanCastFlags.NoTimer))
             {
-                if (Legendary.Jawbreaker.IsEquipped)
-                {
-                    return JawBreakerDashingStrike();
-                }
+                var target = TargetUtil.GetDashStrikeJawbreakerTarget(MaxDashingStrikeRange);
+                if (target != null)
+                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, target.Position);
+            }
 
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCastDashingStrike)
+            {
                 // Thousand storm spam
-                if (Sets.ThousandStorms.IsSecondBonusActive && Player.PrimaryResource >= 85 &&
-                    (CurrentTarget.IsTrashPackOrBossEliteRareUnique || TargetUtil.AnyMobsInRange(MaxDashingStrikeRange, 2)) &&
-                    (!Sets.ThousandStorms.IsMaxBonusActive || (TimeSincePrimaryUse >= 0 && TimeSincePrimaryUse < 5950 && Skills.Monk.DashingStrike.Charges > 0)))
+                if (Sets.ThousandStorms.IsSecondBonusActive && 
+                    (CurrentTarget.IsTrashPackOrBossEliteRareUnique || TargetUtil.AnyMobsInRange(MaxDashingStrikeRange, 2)))
                 {
                     var castNode = TargetUtil.GetBestPierceNode(MaxDashingStrikeRange);
                     if (castNode != null && castNode.SpecialCount > 0)
                         return new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, castNode.Position);
-
-                    /*if (Passives.Monk.Momentum.IsActive && !Passives.Monk.Momentum.IsBuffActive)
-                        CombatBase.SwitchToTarget(TargetUtil.GetDashStrikeThousandStormTarget(MaxDashingStrikeRange, 25f));
-                    else
-                        CombatBase.SwitchToTarget(TargetUtil.GetDashStrikeThousandStormTarget(MaxDashingStrikeRange, 5f));
-
-                    if (CurrentTarget.IsInLineOfSight)
-                        return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.ClusterPosition(5f));*/
                 }
 
                 // Other
@@ -390,7 +394,7 @@ namespace Trinity.Combat.Abilities
                     // Dash to active momentum
                     if (Passives.Monk.Momentum.IsActive && !Passives.Monk.Momentum.IsBuffActive && TargetUtil.AnyMobsInRange(30f, 3))
                     {
-                        CombatBase.SwitchToTarget(TargetUtil.GetDashStrikeFarthestTarget(MaxDashingStrikeRange, 25f));
+                        CombatBase.SwitchToTarget(TargetUtil.GetBestClusterUnit(MaxDashingStrikeRange, 25f));
                         return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.ClusterPosition(5f));
                     }
 
@@ -435,7 +439,7 @@ namespace Trinity.Combat.Abilities
             {
                 TrinityPower power = null;
 
-                var closestTarget = TargetUtil.GetClosestTarget(30f, _useWeights: false);
+                var closestTarget = TargetUtil.GetClosestTarget(30f, useWeights: false);
                 if (closestTarget != null)
                 {
                     if (IsNull(power) && CanCast(SNOPower.Monk_FistsofThunder) && closestTarget.RadiusDistance < 30f)
@@ -478,7 +482,8 @@ namespace Trinity.Combat.Abilities
                 if (!Skills.Monk.ExplodingPalm.IsActive || TargetUtil.NumMobsInRangeOfPosition(_target.Position, 12f) <= 1 || _target.HasDebuff(SNOPower.Monk_ExplodingPalm))
                 {
                     CombatBase.SwitchToTarget(_target);
-                    if (CanCastDashingStrike && CurrentTarget.IsInLineOfSight && (CurrentTarget.RadiusDistance > 10f ||
+                    if (CanCastDashingStrike && 
+                        CurrentTarget.IsInLineOfSight && (CurrentTarget.RadiusDistance > 10f ||
                         CacheData.MonsterObstacles.Any(m => m.RActorGUID != CurrentTarget.RActorGuid && MathUtil.IntersectsPath(m.Position, 5f, CurrentTarget.Position, Player.Position))))
                     {
                         CombatBase.Cast(new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, CurrentTarget.ClusterPosition(5f)));
@@ -500,7 +505,8 @@ namespace Trinity.Combat.Abilities
                 if (!Skills.Monk.ExplodingPalm.IsActive || TargetUtil.NumMobsInRangeOfPosition(_target.Position, 12f) <= 1 || _target.HasDebuff(SNOPower.Monk_ExplodingPalm))
                 {
                     CombatBase.SwitchToTarget(_target);
-                    if (CanCastDashingStrike && CurrentTarget.IsInLineOfSight && (CurrentTarget.RadiusDistance > 10f ||
+                    if (CanCastDashingStrike && 
+                        CurrentTarget.IsInLineOfSight && (CurrentTarget.RadiusDistance > 10f ||
                         CacheData.MonsterObstacles.Any(m => m.RActorGUID != CurrentTarget.RActorGuid && MathUtil.IntersectsPath(m.Position, 5f, CurrentTarget.Position, Player.Position))))
                     {
                         CombatBase.Cast(new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, CurrentTarget.ClusterPosition(5f)));
@@ -712,7 +718,8 @@ namespace Trinity.Combat.Abilities
                 if (CombatBase.SwitchToTarget(bestExplodingPalmTarget))
                     _lastTargetChange = DateTime.UtcNow;
 
-                if (CanCastDashingStrike && CurrentTarget.IsInLineOfSight && (CurrentTarget.RadiusDistance > 10f ||
+                if (CanCastDashingStrike && 
+                    CurrentTarget.IsInLineOfSight && (CurrentTarget.RadiusDistance > 10f ||
                     CacheData.MonsterObstacles.Any(m => m.RActorGUID != CurrentTarget.RActorGuid && MathUtil.IntersectsPath(m.Position, 5f, CurrentTarget.Position, Player.Position))))
                 {
                     CombatBase.Cast(new TrinityPower(SNOPower.X1_Monk_DashingStrike, 0f, CurrentTarget.ClusterPosition(5f)));
@@ -720,59 +727,14 @@ namespace Trinity.Combat.Abilities
             }
         }
 
-        private static bool CanCastDashingStrike
+        internal static bool CanCastDashingStrike
         {
-            get { return !UseOOCBuff && !Player.IsIncapacitated && CanCast(SNOPower.X1_Monk_DashingStrike, CanCastFlags.NoTimer) && !IsCurrentlyAvoiding; }
-        }
-
-        /// <summary>
-        /// blahblah999's Dashing Strike with JawBreaker Item
-        /// https://www.thebuddyforum.com/demonbuddy-forum/plugins/trinity/167966-monk-trinity-mod-dash-strike-spam-rots-set-bonus-jawbreaker.html
-        /// </summary>
-        internal static TrinityPower JawBreakerDashingStrike()
-        {
-            const float procDistance = 33f;
-            var farthestTarget = TargetUtil.GetDashStrikeFarthestTarget(49f);
-
-            // able to cast
-            if (TargetUtil.AnyMobsInRange(25f, 3) || TargetUtil.IsEliteTargetInRange(70f)) // surround by mobs or elite engaged.
+            get
             {
-                if (farthestTarget != null) // found a target within 33-49 yards.
-                {
-                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, farthestTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 2);
-                }
-                // no free target found, get a nearby cluster point instead.
-                var bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, procDistance);
-                return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, bestClusterPoint, Trinity.CurrentWorldDynamicId, -1, 2, 2);
+                return !Player.IsIncapacitated && !CurrentlyUseDashingStrike &&
+                    CanCast(SNOPower.X1_Monk_DashingStrike, CanCastFlags.NoTimer) &&
+                    (!Sets.ThousandStorms.IsSecondBonusActive || Skills.Monk.DashingStrike.Charges > 1 || Player.PrimaryResource >= 80);
             }
-
-            //usually this trigger after dash to the farthest target. dash a single mobs >30 yards, trying to dash back the cluster
-            if (TargetUtil.ClusterExists(20, 50, 3))
-            {
-                var dashStrikeBestClusterPoint = TargetUtil.GetBestClusterPoint(20f, 20f);
-                if (dashStrikeBestClusterPoint != Trinity.Player.Position)
-                {
-                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, dashStrikeBestClusterPoint, Trinity.CurrentWorldDynamicId, -1, 2, 2);
-                }
-            }
-
-            // dash to anything which is free.               
-            if (farthestTarget != null)
-            {
-                return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, farthestTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 2);
-            }
-
-            return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 2);
-        }
-
-        internal static void RefreshSweepingWind(bool spendsSpirit = false)
-        {
-            // Don't refresh timer if we have Taeguk Legendary Gem equipped and not spending spirit
-            //if (!spendsSpirit && IsTaegukEquipped)
-            //    return;
-
-            //if (GetHasBuff(SNOPower.Monk_SweepingWind))
-            //LastSweepingWindRefresh = DateTime.UtcNow;
         }
 
         internal static void GenerateMonkZigZag()
@@ -790,7 +752,7 @@ namespace Trinity.Combat.Abilities
         {
             if (IsTempestRushReady())
                 return new TrinityPower(SNOPower.Monk_TempestRush, 5f, Vector3.Zero, -1, -1, 0, 0);
-            if (CanCast(SNOPower.X1_Monk_DashingStrike))
+            if (CanCast(SNOPower.X1_Monk_DashingStrike) && (!Sets.ThousandStorms.IsSecondBonusActive || Skills.Monk.DashingStrike.Charges > 1 || Player.PrimaryResource > 80))
                 return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, Vector3.Zero, -1, -1, 0, 0);
             if (CanCast(SNOPower.Monk_FistsofThunder))
                 return new TrinityPower(SNOPower.Monk_FistsofThunder, 5f, Vector3.Zero, -1, -1, 0, 0);

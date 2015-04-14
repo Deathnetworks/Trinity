@@ -181,7 +181,7 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.DemonHunter_Grenades, RangedAttackRange, RangedSkillsCastArea.Position);
             }
 
-            var target = TargetUtil.GetClosestTarget(65f, _useWeights: false);
+            var target = TargetUtil.GetClosestTarget(65f, useWeights: false);
             if (target != default(TrinityCacheObject))
             {
                 // Evasive Fire
@@ -731,7 +731,7 @@ namespace Trinity.Combat.Abilities
                 if (Skills.DemonHunter.ElementalArrow.IsActive && Runes.DemonHunter.BallLightning.IsActive)
                     targetCacheObject = TargetUtil.GetBestPierceTarget(DHSettings.RangedAttackRange);
                 else
-                    targetCacheObject = TargetUtil.GetClosestTarget(150f, _useWeights: false);
+                    targetCacheObject = TargetUtil.GetClosestTarget(150f, useWeights: false);
 
                 if (Skills.DemonHunter.ClusterArrow.IsActive && TargetUtil.ClusterExists(20f, DHSettings.RangedAttackRange))
                     rangedSkillsCastArea = new TargetArea(20f, TargetUtil.GetBestClusterUnit(20f, DHSettings.RangedAttackRange + 5f, _useWeights: false).Position);

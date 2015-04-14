@@ -46,14 +46,14 @@ namespace Trinity
                     if (Player.IsDead)
                         return GetRunStatus("HeroIsDead", RunStatus.Failure);
 
-                    if (DemonHunterCombat.CurrentlyUseVault) // Wait a little
+                    /*if (DemonHunterCombat.CurrentlyUseVault) // Wait a little
                         return GetRunStatus("HeroVault", RunStatus.Running);
 
                     if (MonkCombat.CurrentlyUseDashingStrike) // Wait a little
                         return GetRunStatus("HeroDash", RunStatus.Running);
 
                     if (BarbarianCombat.CurrentlyUseFuriousCharge) // Wait a little
-                        return GetRunStatus("HeroCharge", RunStatus.Running);
+                        return GetRunStatus("HeroCharge", RunStatus.Running);*/
 
                     if (UsePotionIfNeededTask()) // Pop a potion when necessary
                         return GetRunStatus("UsePotion", RunStatus.Running);
@@ -693,7 +693,7 @@ namespace Trinity
                     _shouldPickNewAbilities = true;
 
                 // force to execute special combat routine like wd soulharverster
-                if (DateTime.UtcNow.Subtract(lastPickNewAbilitiesForced).TotalMilliseconds >= 100)
+                if (DateTime.UtcNow.Subtract(lastPickNewAbilitiesForced).TotalMilliseconds >= 350)
                 {
                     _shouldPickNewAbilities = true;
                     lastPickNewAbilitiesForced = DateTime.UtcNow;
@@ -703,6 +703,8 @@ namespace Trinity
                 if (_shouldPickNewAbilities && !_isWaitingForPower && !_isWaitingForPotion)
                 {
                     _shouldPickNewAbilities = false;
+                    lastPickNewAbilitiesForced = DateTime.UtcNow;
+
                     if (CurrentTarget.IsUnit)
                     {
                         // Pick a suitable ability

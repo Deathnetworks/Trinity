@@ -899,16 +899,21 @@ namespace Trinity
                     ).Sum();
         }
 
-        // revised
-        internal static TrinityCacheObject LowestHealthTarget(float _range, Vector3 _loc = new Vector3())
+        /// <summary>
+        /// search the unit in range of loc with the lowest health
+        /// </summary>
+        /// <param name="range">list only object in range of</param>
+        /// <param name="loc">search center location</param>
+        /// <returns></returns>
+        internal static TrinityCacheObject LowestHealthTarget(float range, Vector3 loc = new Vector3())
         {
-            var _results = (
-                from u in ListUnitsInRangeOfPosition(_loc, _range)
+            var results = (
+                from u in ListUnitsInRangeOfPosition(loc, range)
                 orderby u.HitPoints ascending
                 select u).ToList();
 
-            if (_results.Any())
-                return _results.FirstOrDefault();
+            if (results.Any())
+                return results.FirstOrDefault();
 
             if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
                 return Trinity.CurrentTarget;
@@ -916,11 +921,19 @@ namespace Trinity
             return default(TrinityCacheObject);
         }
 
-        // revised
-        internal static TrinityCacheObject BestExploadingPalmTarget(float _range, Vector3 _loc = new Vector3())
+        /// <summary>
+        /// search the closest unit in range of loc with the less unit in front and the highest weight
+        /// </summary>
+        /// <param name="range">list only object in range of</param>
+        /// <param name="loc">search center location</param>
+        /// <param name="useWeights">list only units with a positive weight</param>
+        /// <returns></returns>
+        internal static TrinityCacheObject GetBestMeleeTarget(float range, Vector3 loc = new Vector3(), bool useWeights = true)
         {
-            var _list = ListUnitsInRangeOfPosition(_loc, _range);
-            if (_list == null)
+            if (loc == new Vector3()) { loc = Player.Position; }
+
+            var list = ListUnitsInRangeOfPosition(loc, range, useWeights);
+            if (list == null)
             {
                 if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
                     return Trinity.CurrentTarget;
@@ -928,8 +941,119 @@ namespace Trinity
                 return default(TrinityCacheObject);
             }
 
-            var _results = (
-                from u in _list
+            var results = (
+                from u in list
+                where
+                    u.IsInLineOfSight
+                orderby
+                    u.CountUnitsInFront,
+                    (range - u.Position.Distance2D(loc) - u.Radius) * u.Weight descending
+                select u).ToList();
+
+            if (results.Any())
+                return results.FirstOrDefault();
+
+            if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
+                return Trinity.CurrentTarget;
+
+            return default(TrinityCacheObject);
+        }
+
+        /// <summary>
+        /// search the closest unit in range of loc
+        /// </summary>
+        /// <param name="range">list only object in range of</param>
+        /// <param name="loc">search center location</param>
+        /// <param name="useWeights">list only units with a positive weight</param>
+        /// <returns></returns>
+        internal static TrinityCacheObject GetClosestTarget(float range, Vector3 loc = new Vector3(), bool useWeights = true)
+        {
+            if (loc == new Vector3()) { loc = Player.Position; }
+
+            var list = ListUnitsInRangeOfPosition(loc, range, useWeights);
+            if (list == null)
+            {
+                if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
+                    return Trinity.CurrentTarget;
+
+                return default(TrinityCacheObject);
+            }
+
+            var results = (
+                from u in list
+                where
+                    u.IsInLineOfSight
+                orderby
+                    u.Position.Distance2D(loc) - u.Radius
+                select u).ToList();
+
+            if (results.Any())
+                return results.FirstOrDefault();
+
+            if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
+                return Trinity.CurrentTarget;
+
+            return default(TrinityCacheObject);
+        }
+
+        /// <summary>
+        /// search for closest destructible/barricade/door/container in range of loc
+        /// </summary>
+        /// <param name="range">list only object in range of</param>
+        /// <param name="loc">search center location</param>
+        /// <returns></returns>
+        internal static TrinityCacheObject GetClosestDestructible(float range, Vector3 loc = new Vector3())
+        {
+            if (loc == new Vector3()) { loc = Player.Position; }
+
+            var list = ListObjectsInRangeOfPosition(loc, range, false);
+            if (list == null)
+            {
+                if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
+                    return Trinity.CurrentTarget;
+
+                return default(TrinityCacheObject);
+            }
+
+            var results = (
+                from u in list
+                where
+                    u.Type == GObjectType.Barricade ||
+                    u.Type == GObjectType.Destructible ||
+                    u.Type == GObjectType.Door ||
+                    u.Type == GObjectType.Container
+                orderby
+                    u.Position.Distance2D(loc) - u.Radius
+                select u).ToList();
+
+            if (results.Any())
+                return results.FirstOrDefault();
+
+            if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
+                return Trinity.CurrentTarget;
+
+            return default(TrinityCacheObject);
+        }
+
+        /// <summary>
+        /// search the best unit in range of loc whithout Exploding palm debuff
+        /// </summary>
+        /// <param name="range">list only object in range of</param>
+        /// <param name="loc">search center location</param>
+        /// <returns></returns>
+        internal static TrinityCacheObject BestExploadingPalmTarget(float range, Vector3 loc = new Vector3())
+        {
+            var list = ListUnitsInRangeOfPosition(loc, range);
+            if (list == null)
+            {
+                if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
+                    return Trinity.CurrentTarget;
+
+                return default(TrinityCacheObject);
+            }
+
+            var results = (
+                from u in list
                 where
                     u.CommonDataIsValid &&
                     !u.HasDebuff(SNOPower.Monk_ExplodingPalm) &&
@@ -937,10 +1061,10 @@ namespace Trinity
                     u.IsTrashPackOrBossEliteRareUnique
                 select u).ToList();
 
-            if (_range <= 15f)
+            if (range <= 15f)
             {
-                _results = (
-                    from u in _results
+                results = (
+                    from u in results
                     orderby
                         u.HitPoints,
                         u.UnitsWeightsWithinDistance(16f) descending,
@@ -949,16 +1073,16 @@ namespace Trinity
             }
             else
             {
-                _results = (
-                   from u in _results
+                results = (
+                   from u in results
                    orderby
                        u.HitPoints,
                        u.UnitsWeightsWithinDistance(16f) descending
                    select u).ToList();
             }
 
-            if (_results.Any())
-                return _results.FirstOrDefault();
+            if (results.Any())
+                return results.FirstOrDefault();
 
             if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
                 return Trinity.CurrentTarget;
@@ -966,11 +1090,16 @@ namespace Trinity
             return default(TrinityCacheObject);
         }
 
-        // revised
-        internal static TrinityCacheObject BestExploadingPalmDebuffedTarget(float _range, Vector3 _loc = new Vector3())
+        /// <summary>
+        /// search the best unit in range of loc whith Exploding palm debuff
+        /// </summary>
+        /// <param name="range">list only object in range of</param>
+        /// <param name="loc">search center location</param>
+        /// <returns></returns>
+        internal static TrinityCacheObject BestExploadingPalmDebuffedTarget(float range, Vector3 loc = new Vector3())
         {
-            var _list = ListUnitsInRangeOfPosition(_loc, _range);
-            if (_list == null)
+            var list = ListUnitsInRangeOfPosition(loc, range);
+            if (list == null)
             {
                 if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
                     return Trinity.CurrentTarget;
@@ -978,8 +1107,8 @@ namespace Trinity
                 return default(TrinityCacheObject);
             }
 
-            var _results = (
-                from u in _list
+            var results = (
+                from u in list
                 where
                     u.CommonDataIsValid &&
                     u.HasDebuff(SNOPower.Monk_ExplodingPalm) &&
@@ -991,8 +1120,8 @@ namespace Trinity
                     MobsWithDebuff(u.Position, SNOPower.Monk_ExplodingPalm, 12f) descending
                 select u).ToList();
 
-            if (_results.Any())
-                return _results.FirstOrDefault();
+            if (results.Any())
+                return results.FirstOrDefault();
 
             if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
                 return Trinity.CurrentTarget;
@@ -1000,13 +1129,19 @@ namespace Trinity
             return default(TrinityCacheObject);
         }
 
-        // revised
-        internal static TrinityCacheObject BestTargetWithoutDebuffs(float _range, IEnumerable<SNOPower> _debuffs, Vector3 _loc = new Vector3())
+        /// <summary>
+        /// search the best unit in range of loc whithout any debuffs
+        /// </summary>
+        /// <param name="range">list only object in range of</param>
+        /// <param name="debuffs">enumerable of all debuff to check</param>
+        /// <param name="loc">search center location</param>
+        /// <returns></returns>
+        internal static TrinityCacheObject BestTargetWithoutDebuffs(float range, IEnumerable<SNOPower> debuffs, Vector3 loc = new Vector3())
         {
-            if (_loc == new Vector3()) { _loc = Player.Position; }
+            if (loc == new Vector3()) { loc = Player.Position; }
 
-            var _list = ListUnitsInRangeOfPosition(_loc, _range);
-            if (_list == null)
+            var list = ListUnitsInRangeOfPosition(loc, range);
+            if (list == null)
             {
                 if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
                     return Trinity.CurrentTarget;
@@ -1014,19 +1149,19 @@ namespace Trinity
                 return default(TrinityCacheObject);
             }
 
-            var _results = (
-                from u in _list
+            var results = (
+                from u in list
                 where
                     u.CommonDataIsValid &&
-                    !_debuffs.All(u.HasDebuff) &&
+                    !debuffs.All(u.HasDebuff) &&
                     u.IsInLineOfSight
                 orderby
                     u.Weight descending,
-                    u.Position.Distance2D(_loc)
+                    u.Position.Distance2D(loc)
                 select u).ToList();
 
-            if (_results.Any())
-                return _results.FirstOrDefault();
+            if (results.Any())
+                return results.FirstOrDefault();
 
             if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
                 return Trinity.CurrentTarget;
@@ -1034,13 +1169,16 @@ namespace Trinity
             return default(TrinityCacheObject);
         }
 
-        // Revised
-        internal static TrinityCacheObject GetClosestTarget(float _range, Vector3 _loc = new Vector3(), bool _useWeights = true)
+        /// <summary>
+        /// search for unit with best damage result
+        /// </summary>
+        /// <param name="maxRange">list only object in range of</param>
+        /// <param name="minRange">list only object out of range of</param>
+        /// <returns></returns>
+        internal static TrinityCacheObject GetDashStrikeThousandStormTarget(float maxRange, float minRange = 5f)
         {
-            if (_loc == new Vector3()) { _loc = Player.Position; }
-
-            var _list = ListUnitsInRangeOfPosition(_loc, _range, _useWeights);
-            if (_list == null)
+            var list = ListUnitsInRangeOfPosition(Player.Position, maxRange);
+            if (list == null)
             {
                 if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
                     return Trinity.CurrentTarget;
@@ -1048,103 +1186,10 @@ namespace Trinity
                 return default(TrinityCacheObject);
             }
 
-            var _results = (
-                from u in _list
-                orderby
-                    u.Position.Distance2D(_loc) - u.Radius
-                select u).ToList();
-
-            if (_results.Any())
-                return _results.FirstOrDefault();
-
-            if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
-                return Trinity.CurrentTarget;
-
-            return default(TrinityCacheObject);
-        }
-
-        // Revised
-        internal static TrinityCacheObject GetClosestDestructible(float _range, Vector3 _loc = new Vector3(), bool _useWeights = true)
-        {
-            if (_loc == new Vector3()) { _loc = Player.Position; }
-
-            var _list = ListObjectsInRangeOfPosition(_loc, _range, _useWeights);
-            if (_list == null)
-            {
-                if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
-                    return Trinity.CurrentTarget;
-
-                return default(TrinityCacheObject);
-            }
-
-            var _results = (
-                from u in _list
+            var results = (
+                from u in list
                 where
-                    u.Type == GObjectType.Barricade ||
-                    u.Type == GObjectType.Destructible ||
-                    u.Type == GObjectType.Door ||
-                    u.Type == GObjectType.Container
-                orderby
-                    u.Position.Distance2D(_loc) - u.Radius
-                select u).ToList();
-
-            if (_results.Any())
-                return _results.FirstOrDefault();
-
-            if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
-                return Trinity.CurrentTarget;
-
-            return default(TrinityCacheObject);
-        }
-
-        // Revised
-        internal static TrinityCacheObject GetDashStrikeFarthestTarget(float _maxRange, float _minRange = 33f)
-        {
-            var _list = ListUnitsInRangeOfPosition(Player.Position, _maxRange);
-            if (_list == null)
-            {
-                if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
-                    return Trinity.CurrentTarget;
-
-                return default(TrinityCacheObject);
-            }
-
-            var _results = (
-                from u in _list
-                where
-                    u.Distance >= _minRange &&
-                    u.Weight > 0 &&
-                    u.IsInLineOfSight &&
-                    u.IsTrashPackOrBossEliteRareUnique
-                orderby
-                    u.UnitsWeightsWithinDistance(16f) descending
-                select u).ToList();
-
-            if (_results.Any())
-                return _results.FirstOrDefault();
-
-            if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
-                return Trinity.CurrentTarget;
-
-            return default(TrinityCacheObject);
-        }
-
-        // Revised
-        internal static TrinityCacheObject GetDashStrikeThousandStormTarget(float _maxRange, float _minRange = 33f)
-        {
-            var _list = ListUnitsInRangeOfPosition(Player.Position, _maxRange);
-            if (_list == null)
-            {
-                if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
-                    return Trinity.CurrentTarget;
-
-                return default(TrinityCacheObject);
-            }
-
-            var _results = (
-                from u in _list
-                where
-                    u.Distance >= _minRange &&
+                    u.Distance >= minRange &&
                     u.IsInLineOfSight &&
                     u.IsTrashPackOrBossEliteRareUnique
                 orderby
@@ -1152,10 +1197,10 @@ namespace Trinity
                     u.UnitsWeightsWithinDistance(16f) descending
                 select u).ToList();
 
-            if (!_results.Any())
+            if (!results.Any())
             {
-                _results = (
-                    from u in _list
+                results = (
+                    from u in list
                     where
                         u.IsInLineOfSight &&
                         u.IsTrashPackOrBossEliteRareUnique
@@ -1165,8 +1210,8 @@ namespace Trinity
                     select u).ToList();
             }
 
-            if (_results.Any())
-                return _results.FirstOrDefault();
+            if (results.Any())
+                return results.FirstOrDefault();
 
             if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
                 return Trinity.CurrentTarget;
@@ -1174,194 +1219,257 @@ namespace Trinity
             return default(TrinityCacheObject);
         }
 
-        // new 03 2015
-        internal static List<GridNode> GetNodesCircleAroudPosition(Vector3 _loc = new Vector3(), float _radius = 80f, float _arcDegree = 18f)
+        /// <summary>
+        /// search for unit at more than 33f to reset charge
+        /// </summary>
+        /// <param name="maxRange">list only object in range of</param>
+        /// <param name="minRange">list only object out of range of</param>
+        /// <returns></returns>
+        internal static TrinityCacheObject GetDashStrikeJawbreakerTarget(float maxRange, float minRange = 33f)
         {
-            using (new MemorySpy("TargetUtil.GetNodesCircleAroudPosition()"))
+            var list = ListUnitsInRangeOfPosition(Player.Position, maxRange);
+            if (list == null)
             {
-                if (_loc == new Vector3()) _loc = Player.Position;
-                bool _atPlayer = _loc.Distance2D(Player.Position) <= 3f;
-
-                List<GridNode> _result = new List<GridNode>();
-                for (float _alpha = 0f; _alpha <= 360f; _alpha = _alpha + _arcDegree)
-                {
-                    Vector3 _projPoint = MathEx.GetPointAt(_loc, _radius, (float)MathUtil.DegreeToRadian(_alpha));
-                    _result.Add(new GridNode(_projPoint));
-                }
-
-                if (_result.Any())
-                    return _result;
+                if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit)
+                    return Trinity.CurrentTarget;
 
                 return null;
             }
+
+            var results = (
+                from u in list
+                where
+                    u.Distance >= minRange &&
+                    u.IsInLineOfSight
+                select u).ToList();
+
+            if (Sets.ThousandStorms.IsSecondBonusActive)
+            {
+                results = (
+                from u in results
+                orderby
+                    u.CountUnitsInFront descending,
+                    u.UnitsWeightsWithinDistance(16f) descending
+                select u).ToList();
+            }
+            else
+            {
+                results = (
+                from u in results
+                orderby
+                    u.UnitsWeightsWithinDistance(16f) descending
+                select u).ToList();
+            }
+
+            if (results.Any() && results.Count() > 1)
+                return results.First();
+
+            if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsUnit &&
+                Trinity.CurrentTarget.IsInLineOfSight && Trinity.CurrentTarget.Distance >= minRange)
+            {
+                return Trinity.CurrentTarget;
+            }
+
+            return null;
         }
 
-        // new 03 2015
-        internal static GridNode GetBestPierceNode(float _range, Vector3 _loc = new Vector3())
+        /// <summary>
+        /// create a node list as circle around loc elapsed by an arc value
+        /// </summary>
+        /// <param name="loc">center position</param>
+        /// <param name="radius">create points at radius of loc</param>
+        /// <param name="arcDegree">arc degree between two points</param>
+        /// <returns></returns>
+        internal static List<GridNode> GetNodesCircleAroudPosition(Vector3 loc = new Vector3(), float radius = 80f, float arcDegree = 18f)
         {
-            using (new MemorySpy("TargetUtil.GetBestPierceChargeNode()"))
+            if (loc == new Vector3()) loc = Player.Position;
+            bool _atPlayer = loc.Distance2D(Player.Position) <= 3f;
+
+            List<GridNode> result = new List<GridNode>();
+            for (float alpha = 0f; alpha <= 360f; alpha = alpha + arcDegree)
             {
-                if (_loc == new Vector3()) _loc = Player.Position;
-                bool _atPlayer = _loc.Distance2D(Player.Position) <= 2f;
+                Vector3 _projPoint = MathEx.GetPointAt(loc, radius, (float)MathUtil.DegreeToRadian(alpha));
+                result.Add(new GridNode(_projPoint));
+            }
 
-                var _list = ListObjectsInRangeOfPosition(_range: _range + 10f, _useWeights: false);
-                if (_list == null)
-                    return null;
+            if (result.Any())
+                return result;
 
-                List<GridNode> _nodes = GetNodesCircleAroudPosition(_loc, _range);
-                if (_nodes != null)
+            return null;
+        }
+
+        /// <summary>
+        /// search the node within range of loc wtih the best pierce weight
+        /// </summary>
+        /// <param name="range">list only object in range of</param>
+        /// <param name="loc">search center location</param>
+        /// <returns></returns>
+        internal static GridNode GetBestPierceNode(float range, Vector3 loc = new Vector3())
+        {
+            if (loc == new Vector3()) loc = Player.Position;
+            bool _atPlayer = loc.Distance2D(Player.Position) <= 2f;
+
+            var list = ListObjectsInRangeOfPosition(_range: range + 10f, _useWeights: false);
+            if (list == null)
+                return null;
+
+            List<GridNode> nodes = GetNodesCircleAroudPosition(loc, range);
+            if (nodes != null)
+            {
+                foreach (var node in nodes)
                 {
-                    foreach (var _n in _nodes)
+                    string direction = MathUtil.GetHeadingToPoint(loc, node.Position);
+
+                    bool mobInPath = false;
+                    bool isLastUnit = true;
+
+                    float farDistance = 0f;
+                    Vector3 nodePosition = node.Position;
+
+                    foreach (var obj in list.OrderByDescending(o => o.Distance))
                     {
-                        string _dir = MathUtil.GetHeadingToPoint(_loc, _n.Position);
-                        bool _hasMob = false;
-                        float farDistance = 0f;
-                        Vector3 nodePosition = _n.Position;
-                        bool isLastUnit = true;
-
-                        foreach (var _o in _list.OrderByDescending(o => o.Distance))
+                        if ((Skills.Barbarian.FuriousCharge.IsActive && obj.Type == GObjectType.Destructible) || obj.IsUnit)
                         {
-                            if ((Skills.Barbarian.FuriousCharge.IsActive && _o.Type == GObjectType.Destructible) || _o.IsUnit)
+                            if (obj.IsUnit && (!obj.CommonDataIsValid || obj.HitPointsPct <= 0f))
+                                continue;
+
+                            if (!direction.Equals(MathUtil.GetHeadingToPoint(loc, obj.Position)))
+                                continue;
+
+                            float _radius = Math.Min(Math.Max(obj.Radius, 5f), 8f);
+                            if (obj.IsInLineOfSight)
                             {
-                                if (_o.IsUnit && (!_o.CommonDataIsValid || _o.HitPointsPct <= 0f))
-                                    continue;
-
-                                if (!_dir.Equals(MathUtil.GetHeadingToPoint(_loc, _o.Position)))
-                                    continue;
-
-                                float _radius = Math.Min(Math.Max(_o.Radius, 5f), 8f);
-                                if (_o.IsInLineOfSight)
+                                if (MathUtil.IntersectsPath(obj.Position, _radius, loc, nodePosition))
                                 {
-                                    if (MathUtil.IntersectsPath(_o.Position, _radius, _loc, nodePosition))
+                                    if (obj.IsUnit) mobInPath = true;
+
+                                    float dist = obj.Position.Distance2D(loc);
+                                    if (dist > farDistance)
                                     {
-                                        if (_o.IsUnit) _hasMob = true;
-
-                                        float dist = _o.Position.Distance2D(_loc);
-                                        if (dist > farDistance)
-                                        {
-                                            farDistance = dist;
-                                            _n.Position = MathEx.CalculatePointFrom(_loc, _o.Position, -5f);
-                                        }
-
-                                        Vector3 _lineProj = MathEx.CalculatePointFrom(nodePosition, _loc, dist);
-                                        _n.SpecialWeight += (_radius - _lineProj.Distance2D(_o.Position)) * Math.Max(_o.Weight, 1000f);
-
-                                        if (_o.IsBoss || (_o.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze))
-                                            _n.SpecialCount += 3;
-                                        else if (_o.IsEliteRareUnique || _o.Type == GObjectType.Destructible || (_o.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Prioritize))
-                                            _n.SpecialCount += 2;
-                                        else
-                                            _n.SpecialCount++;
-
-                                        if (TownRun.IsTryingToTownPortal() || Trinity.Player.StandingInAvoidance)
-                                            _n.SpecialCount++;
-
-                                        if (Skills.Monk.InnerSanctuary.IsActive && _o.HasDebuff(SNOPower.X1_Monk_InnerSanctuary))
-                                            _n.SpecialCount++;
-
-                                        if (CombatBase.IsBaneOfTrappedEquipped && Skills.Monk.BlindingFlash.IsActive && _o.HasDebuff(SNOPower.Monk_BlindingFlash))
-                                            _n.SpecialCount++;
-
-                                        if (isLastUnit && _o.IsUnit)
-                                        {
-                                            isLastUnit = false;
-                                            if ((!Trinity.KillMonstersInAoE || Trinity.Settings.Combat.Misc.AvoidAOE) && _o.IsStandingInAvoidance)
-                                            {
-                                                _n.SpecialCount--;
-                                            }
-                                        }
-
-                                        if (!_atPlayer && dist <= 10)
-                                        {
-                                            if (_o.IsBoss)
-                                                _n.SpecialCount -= 3;
-                                            else if (_o.IsEliteRareUnique)
-                                                _n.SpecialCount -= 2;
-                                        }  
+                                        farDistance = dist;
+                                        node.Position = MathEx.CalculatePointFrom(loc, obj.Position, -5f);
                                     }
+
+                                    Vector3 _lineProj = MathEx.CalculatePointFrom(nodePosition, loc, dist);
+                                    node.SpecialWeight += (_radius - _lineProj.Distance2D(obj.Position)) * Math.Max(obj.Weight, 1000f);
+
+                                    if (obj.IsBoss || (obj.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze))
+                                        node.SpecialCount += 3;
+                                    else if (obj.IsEliteRareUnique || obj.Type == GObjectType.Destructible || (obj.IsTreasureGoblin && Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Prioritize))
+                                        node.SpecialCount += 2;
+                                    else
+                                        node.SpecialCount++;
+
+                                    if (TownRun.IsTryingToTownPortal() || Trinity.Player.StandingInAvoidance)
+                                        node.SpecialCount++;
+
+                                    if (Skills.Monk.InnerSanctuary.IsActive && obj.HasDebuff(SNOPower.X1_Monk_InnerSanctuary))
+                                        node.SpecialCount++;
+
+                                    if (CombatBase.IsBaneOfTrappedEquipped && Skills.Monk.BlindingFlash.IsActive && obj.HasDebuff(SNOPower.Monk_BlindingFlash))
+                                        node.SpecialCount++;
+
+                                    if (isLastUnit && obj.IsUnit)
+                                    {
+                                        isLastUnit = false;
+                                        if ((!Trinity.KillMonstersInAoE || Trinity.Settings.Combat.Misc.AvoidAOE) && obj.IsStandingInAvoidance)
+                                        {
+                                            node.SpecialCount--;
+                                        }
+                                    }
+
+                                    if (!_atPlayer && dist <= 10)
+                                    {
+                                        if (obj.IsBoss)
+                                            node.SpecialCount -= 3;
+                                        else if (obj.IsEliteRareUnique)
+                                            node.SpecialCount -= 2;
+                                    }  
                                 }
                             }
-
-                            if (Skills.Barbarian.FuriousCharge.Charges > 1)
-                                _n.SpecialCount++;
-
-                            _n.SpecialWeight *= _n.SpecialCount;
-                            if (!_hasMob) { _n.SpecialWeight = 0; }
                         }
-                    }
 
-                    if (_nodes.Any(n => n.SpecialWeight > 0))
-                        return _nodes.OrderByDescending(n => n.SpecialWeight).FirstOrDefault();
+                        if (Skills.Barbarian.FuriousCharge.Charges > 1)
+                            node.SpecialCount++;
+
+                        node.SpecialWeight *= node.SpecialCount;
+                        if (!mobInPath) { node.SpecialWeight = 0; }
+                    }
                 }
 
-                return null;
+                if (nodes.Any(n => n.SpecialWeight > 0))
+                    return nodes.OrderByDescending(n => n.SpecialWeight).FirstOrDefault();
             }
+
+            return null;
         }
 
-        // new 03 2015
-        internal static GridNode GetBestPierceMoveNode(float _range, Vector3 _loc = new Vector3())
+        /// <summary>
+        /// search the node within range of loc with the best pre pierce weight
+        /// </summary>
+        /// <param name="range">list only object in range of</param>
+        /// <param name="loc">search center location</param>
+        /// <returns></returns>
+        internal static GridNode GetBestPrePierceMoveNode(float range, Vector3 loc = new Vector3())
         {
-            using (new MemorySpy("TargetUtil.GetBestFuriousChargeMoveNode()"))
-            {
-                if (!MainGrid.Map.Any())
-                    return null;
-
-                if (_loc == new Vector3()) _loc = Player.Position;
-                bool _atPlayer = _loc.Distance2D(Player.Position) <= 3f;
-
-                HashSet<GridNode> _listResult = new HashSet<GridNode>();
-                var _rnd = new Random();
-
-                var _gridResult = (
-                    from _o in MainGrid.Map
-                    where
-                        _o.Distance > 3f &&
-                        _o.MonsterWeight >= 0 &&
-                        _o.Weight >= 0 &&
-                        !_o.HasMonsterRelated &&
-                        !_o.HasAvoidanceRelated &&
-                        _o.NearbyGridPointsCount > 0 &&
-                        (_atPlayer && _o.Distance <= 30f ||
-                        !_atPlayer && _o.Position.Distance2D(_loc) <= 30f)
-                    orderby
-                        _rnd.Next()
-                    select _o).ToList();
-
-                foreach (var _g in _gridResult)
-                {
-                    if (_listResult.Count() > 35) { break; }
-                    _listResult.Add(_g);
-                }
-
-                if (_listResult.Any())
-                {
-                    foreach (var _n in _gridResult)
-                    {
-                        var _node = GetBestPierceNode(_range, _n.Position);
-                        if (_node != null)
-                        {
-                            _n.SpecialWeight = _node.SpecialWeight;
-                            _n.SpecialCount = _node.SpecialCount;
-                        }
-                    }
-
-                    if (_gridResult.Any(o => o.SpecialWeight > 0))
-                    {
-                        _gridResult = (
-                            from _o in _gridResult
-                            orderby
-                                _o.SpecialWeight descending
-                            select _o).ToList();
-
-                        return _gridResult.FirstOrDefault();
-                    }
-                }
-
-                if (CurrentTarget != null)
-                    return new GridNode(CurrentTarget.Position);
-
+            if (!MainGrid.Map.Any())
                 return null;
+
+            if (loc == new Vector3()) loc = Player.Position;
+            bool atPlayer = loc.Distance2D(Player.Position) <= 3f;
+
+            HashSet<GridNode> keepedNodes = new HashSet<GridNode>();
+            var random = new Random();
+
+            var nodes = (
+                from n in MainGrid.Map
+                where
+                    n.Distance > 3f &&
+                    n.MonsterWeight >= 0 &&
+                    n.Weight >= 0 &&
+                    !n.HasMonsterRelated &&
+                    !n.HasAvoidanceRelated &&
+                    n.NearbyGridPointsCount > 0 &&
+                    (atPlayer && n.Distance <= 30f ||
+                    !atPlayer && n.Position.Distance2D(loc) <= 30f)
+                orderby
+                    random.Next()
+                select n).ToList();
+
+            foreach (var node in nodes)
+            {
+                if (keepedNodes.Count() > 35) { break; }
+                keepedNodes.Add(node);
             }
+
+            if (keepedNodes.Any())
+            {
+                foreach (var node in nodes)
+                {
+                    var pierceNode = GetBestPierceNode(range, node.Position);
+                    if (pierceNode != null)
+                    {
+                        node.SpecialWeight = pierceNode.SpecialWeight;
+                        node.SpecialCount = pierceNode.SpecialCount;
+                    }
+                }
+
+                if (nodes.Any(o => o.SpecialWeight > 0))
+                {
+                    nodes = (
+                        from _o in nodes
+                        orderby
+                            _o.SpecialWeight descending
+                        select _o).ToList();
+
+                    return nodes.FirstOrDefault();
+                }
+            }
+
+            if (CurrentTarget != null)
+                return new GridNode(CurrentTarget.Position);
+
+            return null;
         }
     }
 }

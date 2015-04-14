@@ -53,7 +53,7 @@ namespace Trinity.Combat.Abilities
                 // Bastion Of Will require primary usage
                 if (IsNull(power) && IsBastionsPrimaryBuffWillExpired)
                 {
-                    var closestTarget = TargetUtil.GetClosestTarget(40f, _useWeights: false);
+                    var closestTarget = TargetUtil.GetClosestTarget(40f, useWeights: false);
 
                     if (closestTarget != null)
                     {
@@ -538,7 +538,7 @@ namespace Trinity.Combat.Abilities
             {
                 if (CombatBase.IsCombatAllowed && CanCast(SNOPower.Barbarian_FuriousCharge))
                 {
-                    var _moveNode = TargetUtil.GetBestPierceMoveNode(maxFuriousChargeDistance);
+                    var _moveNode = TargetUtil.GetBestPrePierceMoveNode(maxFuriousChargeDistance);
                     var _castNode = TargetUtil.GetBestPierceNode(maxFuriousChargeDistance);
 
                     bool isValideMove = _moveNode != null && _moveNode.SpecialCount > 2 && _moveNode.SpecialWeight > 0;
@@ -560,7 +560,7 @@ namespace Trinity.Combat.Abilities
                     }
 
                     var _closestTarget = TargetUtil.GetClosestTarget(maxFuriousChargeDistance);
-                    _moveNode = _closestTarget != default(TrinityCacheObject) ? TargetUtil.GetBestPierceMoveNode(maxFuriousChargeDistance, _closestTarget.Position) : null;
+                    _moveNode = _closestTarget != default(TrinityCacheObject) ? TargetUtil.GetBestPrePierceMoveNode(maxFuriousChargeDistance, _closestTarget.Position) : null;
                     _castNode = _moveNode != null ? TargetUtil.GetBestPierceNode(maxFuriousChargeDistance, _moveNode.Position) : null;
 
                     isValideMove = _moveNode != null && _moveNode.SpecialWeight > 0;
@@ -953,7 +953,7 @@ namespace Trinity.Combat.Abilities
 
                 TrinityPower power = null;
 
-                var closestTarget = TargetUtil.GetClosestTarget(25f, _useWeights: false);
+                var closestTarget = TargetUtil.GetClosestTarget(25f, useWeights: false);
                 if (closestTarget != null)
                 { 
                     // haven't bashed, ever
