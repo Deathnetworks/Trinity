@@ -131,13 +131,13 @@
     public enum Element
     {
         Unknown = 0,
-        Physical,
+        Arcane,
         Cold,
         Fire,
-        Lightning,
-        Poison,
-        Arcane,
         Holy,
+        Lightning,
+        Physical,
+        Poison,
         GroundEffect,
     }
 
@@ -246,4 +246,21 @@
         Cluster,
         Monster
     }
+
+    public enum ResourceEffectType
+    {
+        None = 0,
+        Generator,
+        Spender
+    }
+
+    public enum SkillType
+    {
+        Unknown = 0,
+        Buff,
+        Attack,
+        Movement,
+        Minion
+    }
+
 }

@@ -27,6 +27,7 @@ namespace Trinity.Objects
         public bool IsCancellable { get; set; }
         public int StackCount { get; set; }
         public int Id { get; set; }
+        public int VariantId { get; set; } 
 
         public void Cancel()
         {
@@ -48,5 +49,7 @@ namespace Trinity.Objects
         {
             return ReferenceEquals(this, obj);
         }
+
+        public string VariantName { get; set; }
     }
 }

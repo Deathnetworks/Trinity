@@ -11542,6 +11542,7 @@ namespace Trinity.Reference
                 TypeId = "b",
                 RuneIndex = 1,
                 SkillIndex = 22,
+                ModifiedElement = Element.Fire,
                 Class = ActorClass.Wizard
             };
 

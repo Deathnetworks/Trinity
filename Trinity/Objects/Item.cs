@@ -114,6 +114,23 @@ namespace Trinity.Objects
             }
         }
 
+        public SNOPower BuffPower
+        {
+            get
+            {
+                SNOPower power;
+                return DataDictionary.PowerByItem.TryGetValue(this, out power) ? power : SNOPower.None;
+            }
+        }
+
+        public CachedBuff Buff
+        {
+            get
+            {
+                return CacheData.Buffs.GetBuff(BuffPower);
+            }
+        }
+
         public ActorClass ClassRestriction
         {
             get { return GetClassRestriction(GItemType); }

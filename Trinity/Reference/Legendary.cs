@@ -61,17 +61,17 @@ namespace Trinity.Reference
             SetName = "",
         };
 
-        public static Item ConventionOfTheElements = new Item
-        {
-            Id = 0,
-            Name = "Convention of the Elements",
-            Quality = ItemQuality.Legendary,
-            ItemType = ItemType.Ring,
-            BaseType = ItemBaseType.Jewelry,
-            GItemType = GItemType.Ring,
-            LegendaryAffix = "Gain 150-200% increased damage to a single element for 4 seconds",
-            SetName = "",
-        };
+        //public static Item ConventionOfTheElements = new Item
+        //{
+        //    Id = 0,
+        //    Name = "Convention of the Elements",
+        //    Quality = ItemQuality.Legendary,
+        //    ItemType = ItemType.Ring,
+        //    BaseType = ItemBaseType.Jewelry,
+        //    GItemType = GItemType.Ring,
+        //    LegendaryAffix = "Gain 150-200% increased damage to a single element for 4 seconds",
+        //    SetName = "",
+        //};
 
         //public static Item EunJangDo = new Item
         //{
