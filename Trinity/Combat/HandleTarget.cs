@@ -1142,7 +1142,7 @@ namespace Trinity
                 }
                 if (DateTime.UtcNow.Subtract(lastSentMovePower).TotalMilliseconds >= 250 || Vector3.Distance(LastMoveToTarget, CurrentMoveDestination) >= 2f || bForceNewMovement)
                 {
-                    if (!CurrentTarget.IsAvoidance && !CurrentTarget.IsUnit && !CurrentTargetIsInRange)
+                    if (!CurrentTarget.IsAvoidance && !(CurrentTarget.IsUnit && CurrentTargetIsInRange))
                     {
                         CombatBase.QueuedMovement.Queue(new QueuedMovement
                         {
@@ -1170,7 +1170,7 @@ namespace Trinity
                             ,
                             Options = new QueuedMovementOptions
                             {
-                                Logging = LogLevel.Debug,
+                                Logging = LogLevel.Info,
                                 AcceptableDistance = CurrentTarget.RequiredRange,
                                 Type = CurrentTarget.IsUnit ? MoveType.BasicCombat : MoveType.TargetAttempt
                             }
