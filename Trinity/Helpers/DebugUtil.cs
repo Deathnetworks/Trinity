@@ -100,10 +100,18 @@ namespace Trinity.Helpers
         {
             if (CacheData.Buffs != null && CacheData.Buffs.ActiveBuffs != null)
             {
+                _lastBuffs.ForEach(b =>
+                {
+                    if (CacheData.Buffs.ActiveBuffs.Any(o => o.Id + o.VariantId == b.Key))
+                        return;
+
+                    Logger.Log(LogCategory.ActiveBuffs, "Buff lost '{0}' ({1}) Stacks={2} VariantId={3} VariantName={4}", b.Value.InternalName, b.Value.Id, b.Value.StackCount, b.Value.VariantId, b.Value.VariantName);
+                });
+
                 CacheData.Buffs.ActiveBuffs.ForEach(b =>
                 {
                     CachedBuff lastBuff;
-                    if (_lastBuffs.TryGetValue(b.Id, out lastBuff))
+                    if (_lastBuffs.TryGetValue(b.Id + b.VariantId, out lastBuff))
                     {
                         if (b.StackCount != lastBuff.StackCount)
                         {
@@ -112,19 +120,11 @@ namespace Trinity.Helpers
                     }
                     else
                     {
-                        Logger.Log(LogCategory.ActiveBuffs, "Buff Gained '{0}' ({1}) Stacks={2}", b.InternalName, b.Id, b.StackCount);
+                        Logger.Log(LogCategory.ActiveBuffs, "Buff Gained '{0}' ({1}) Stacks={2} VariantId={3} VariantName={4}", b.InternalName, b.Id, b.StackCount, b.VariantId, b.VariantName);
                     }
                 });
 
-                _lastBuffs.ForEach(b =>
-                {
-                    if (CacheData.Buffs.ActiveBuffs.Any(o => o.Id == b.Key))
-                        return;
-
-                    Logger.Log(LogCategory.ActiveBuffs, "Buff lost '{0}' ({1}) Stacks={2}", b.Value.InternalName, b.Value.Id, b.Value.StackCount);
-                });
-
-                _lastBuffs = CacheData.Buffs.ActiveBuffs.ToDictionary(k => k.Id, v => v);
+                _lastBuffs = CacheData.Buffs.ActiveBuffs.DistinctBy(k => k.Id + k.VariantId).ToDictionary(k => k.Id + k.VariantId, v => v);
             }            
         }
 
@@ -150,15 +150,6 @@ namespace Trinity.Helpers
                         Logger.Log("Error: No equipped items detected");
                         return;
                     }
-
-                    //var actualEquipped = ZetaDia.Me.Inventory.Equipped.Where(i => i.ItemQualityLevel == ItemQuality.Legendary).ToList();
-                    //var referenceEquipped = Legendary.Equipped.Where(i => i.IsEquipped).ToList();
-                    //if (actualEquipped.Count != referenceEquipped.Count)
-                    //{
-                    //    var missingItems = actualEquipped.Where(i => referenceEquipped.All(item => item.Id != i.ActorSNO));
-                    //    Logger.Log(">> Warning - One or more of your equipped items is recorded incorrectly in Trinity; please report:");
-                    //    missingItems.ForEach(i => Logger.Log(">> {0} {1} ActorSNO={2} BaseType={3} ItemType={4}", i.InternalName, i.Name, i.ActorSNO, i.ItemBaseType, i.ItemType));
-                    //}
 
                     LogNewItems();
 

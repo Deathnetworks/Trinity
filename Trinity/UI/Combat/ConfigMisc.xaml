@@ -181,6 +181,7 @@
                             <CheckBox IsChecked="{Binding Path=Misc.HiPriorityHG}">Give higher priority to health globes</CheckBox>
                             <CheckBox IsChecked="{Binding Path=Misc.FleeInGhostMode}">Flee In Ghost Mode</CheckBox>
                             <CheckBox IsChecked="{Binding Path=Misc.KeepMovingInCombat}">Keep moving in combat</CheckBox>
+                            <CheckBox IsChecked="{Binding Path=Misc.UseConventionElementOnly}" ToolTip="Restrict casting of spells to match the element rotation on the ring Convention of Elements">Use Convention Element Only</CheckBox>
                         </UniformGrid>
                     </StackPanel>
                 </GroupBox>

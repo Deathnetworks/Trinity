@@ -361,13 +361,10 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                if (!Sets.BastionsOfWill.IsFullyEquipped)
+                if (!Sets.BastionsOfWill.IsFullyEquipped || CacheData.Buffs.HasBastiansWillGeneratorBuff)
                     return false;
 
-                var stacks = Legendary.Restraint.BuffStacks;
-                var timeSinceGenerator = DateTime.UtcNow.Subtract(LastGeneratorUseTime).TotalMilliseconds;
-
-                return stacks == 0 || timeSinceGenerator >= 4500;
+                return DateTime.UtcNow.Subtract(LastGeneratorUseTime).TotalMilliseconds >= 4000;
             }
         }
 
@@ -378,13 +375,10 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                if (!Sets.BastionsOfWill.IsFullyEquipped)
+                if (!Sets.BastionsOfWill.IsFullyEquipped || CacheData.Buffs.HasBastiansWillSpenderBuff)
                     return false;
 
-                var stacks = Legendary.Restraint.BuffStacks;
-                var timeSinceSpender = DateTime.UtcNow.Subtract(LastSpenderUseTime).TotalMilliseconds;
-
-                return stacks == 0 || timeSinceSpender >= 4500;
+                return DateTime.UtcNow.Subtract(LastSpenderUseTime).TotalMilliseconds >= 4000;
             }
         }
 
@@ -801,6 +795,14 @@ namespace Trinity.Combat.Abilities
         public static bool IsNull(TrinityPower power)
         {
             return power == null || power.SNOPower == SNOPower.None;
+        }
+
+        /// <summary>
+        /// Checks for Convention of Elements ring
+        /// </summary>
+        internal static bool CheckConventionElement(Skill skill)
+        {
+            return !Settings.Combat.Misc.UseConventionElementOnly  || !Legendary.ConventionOfElements.IsEquipped || CacheData.Buffs.ConventionElement == skill.Element;
         }
     }
 }
