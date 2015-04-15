@@ -19,7 +19,7 @@ namespace Trinity
 
             c_diaGizmo = c_diaObject as DiaGizmo;
 
-            if (!Settings.WorldObject.AllowPlayerResurection && c_CacheObject.ActorSNO == DataDictionary.PLAYER_HEADSTONE_SNO)
+            if (!Settings.WorldObject.AllowPlayerResurection && CurrentCacheObject.ActorSNO == DataDictionary.PLAYER_HEADSTONE_SNO)
             {
                 c_InfosSubStep += "IgnoreHeadstones";
                 AddToCache = false;
@@ -28,11 +28,11 @@ namespace Trinity
             // start as true, then set as false as we go. If nothing matches below, it will return true.
             AddToCache = true;
 
-            bool openResplendentChest = c_CacheObject.InternalName.ToLower().Contains("chest_rare");
+            bool openResplendentChest = CurrentCacheObject.InternalName.ToLower().Contains("chest_rare");
 
             // Ignore it if it's not in range yet, except shrines, pools of reflection and resplendent chests if we're opening chests
-            if ((c_CacheObject.RadiusDistance > CurrentBotLootRange || c_CacheObject.RadiusDistance > 50) && c_CacheObject.Type != GObjectType.HealthWell &&
-                c_CacheObject.Type != GObjectType.Shrine && c_CacheObject.RActorGuid != LastTargetRactorGUID)
+            if ((CurrentCacheObject.RadiusDistance > CurrentBotLootRange || CurrentCacheObject.RadiusDistance > 50) && CurrentCacheObject.Type != GObjectType.HealthWell &&
+                CurrentCacheObject.Type != GObjectType.Shrine && CurrentCacheObject.RActorGuid != LastTargetRactorGUID)
             {
                 AddToCache = false;
                 c_InfosSubStep += "NotInRange";
@@ -52,7 +52,7 @@ namespace Trinity
 
             if (c_diaGizmo != null)
             {
-                c_CacheObject.GizmoType = c_diaGizmo.ActorInfo.GizmoType;
+                CurrentCacheObject.GizmoType = c_diaGizmo.ActorInfo.GizmoType;
             }
 
             // Anything that's been disabled by a script
@@ -70,7 +70,7 @@ namespace Trinity
                 AddObjectToNavigationObstacleCache();
 
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
-                    "Safely handled exception getting Gizmo-Disabled-By-Script attribute for object {0} [{1}]", c_CacheObject.InternalName, c_CacheObject.ActorSNO);
+                    "Safely handled exception getting Gizmo-Disabled-By-Script attribute for object {0} [{1}]", CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
                 c_InfosSubStep += "isGizmoDisabledByScriptException";
                 AddToCache = false;
             }
@@ -129,21 +129,21 @@ namespace Trinity
                 AddObjectToNavigationObstacleCache();
 
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
-                    "Safely handled exception getting NoDamage attribute for object {0} [{1}]", c_CacheObject.InternalName, c_CacheObject.ActorSNO);
+                    "Safely handled exception getting NoDamage attribute for object {0} [{1}]", CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
                 c_InfosSubStep += "NoDamage";
                 AddToCache = false;
             }
 
             double minDistance;
             bool gizmoUsed = false;
-            switch (c_CacheObject.Type)
+            switch (CurrentCacheObject.Type)
             {
                 case GObjectType.Door:
                     {
                         AddToCache = true;
 
                         // add methode & Dictionary check
-                        AddObjectToNavigationObstacleCache();
+                        //AddObjectToNavigationObstacleCache();
 
                         var gizmoDoor = c_diaObject as GizmoDoor;
                         if (gizmoDoor != null && gizmoDoor.IsLocked)
@@ -172,7 +172,7 @@ namespace Trinity
                         catch { }
                         if (gizmoUsed)
                         {
-                            Blacklist3Seconds.Add(c_CacheObject.RActorGuid);
+                            Blacklist3Seconds.Add(CurrentCacheObject.RActorGuid);
                             c_InfosSubStep += "Door is Open or Opening";
                             return false;
                         }
@@ -216,7 +216,7 @@ namespace Trinity
                                         // add methode & Dictionary check
                                         AddObjectToNavigationObstacleCache();
 
-                                        Blacklist3Seconds.Add(c_CacheObject.RActorGuid);
+                                        Blacklist3Seconds.Add(CurrentCacheObject.RActorGuid);
                                         c_InfosSubStep += "DoorDisabledbyScript";
                                         return false;
                                     }
@@ -251,7 +251,7 @@ namespace Trinity
 
 
                         int endAnimation;
-                        if (DataDictionary.InteractEndAnimations.TryGetValue(c_CacheObject.ActorSNO, out endAnimation))
+                        if (DataDictionary.InteractEndAnimations.TryGetValue(CurrentCacheObject.ActorSNO, out endAnimation))
                         {
                             if (endAnimation == (int)c_diaGizmo.CommonData.CurrentAnimation)
                             {
@@ -272,7 +272,7 @@ namespace Trinity
                             return false;
                         }
 
-                        c_CacheObject.Radius = c_diaObject.CollisionSphere.Radius;
+                        CurrentCacheObject.Radius = c_diaObject.CollisionSphere.Radius;
                     }
                     break;
                 case GObjectType.HealthWell:
@@ -284,7 +284,7 @@ namespace Trinity
                         }
                         catch
                         {
-                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", c_CacheObject.InternalName, c_CacheObject.ActorSNO);
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
                             AddToCache = true;
                             //return bWantThis;
                         }
@@ -364,12 +364,12 @@ namespace Trinity
 
 
                         // Determine what shrine type it is, and blacklist if the user has disabled it
-                        switch (c_CacheObject.ActorSNO)
+                        switch (CurrentCacheObject.ActorSNO)
                         {
                             case (int)SNOActor.Shrine_Global_Frenzied:  //Frenzy Shrine
                                 if (!Settings.WorldObject.UseFrenzyShrine)
                                 {
-                                    Blacklist60Seconds.Add(c_CacheObject.RActorGuid);
+                                    Blacklist60Seconds.Add(CurrentCacheObject.RActorGuid);
                                     c_InfosSubStep += "IgnoreShrineOption";
                                     AddToCache = false;
                                 }
@@ -473,7 +473,7 @@ namespace Trinity
                         }  //end switch
 
                         // Bag it!
-                        c_CacheObject.Radius = 4f;
+                        CurrentCacheObject.Radius = 4f;
                         break;
                     }
                 case GObjectType.Barricade:
@@ -519,9 +519,9 @@ namespace Trinity
 
                         float maxRadiusDistance;
 
-                        if (DataDictionary.DestructableObjectRadius.TryGetValue(c_CacheObject.ActorSNO, out maxRadiusDistance))
+                        if (DataDictionary.DestructableObjectRadius.TryGetValue(CurrentCacheObject.ActorSNO, out maxRadiusDistance))
                         {
-                            if (c_CacheObject.RadiusDistance < maxRadiusDistance)
+                            if (CurrentCacheObject.RadiusDistance < maxRadiusDistance)
                             {
                                 AddToCache = true;
                                 c_InfosSubStep = "";
@@ -536,12 +536,12 @@ namespace Trinity
                         }
 
                         // Set min distance to user-defined setting
-                        minDistance = Settings.WorldObject.DestructibleRange + c_CacheObject.Radius;
+                        minDistance = Settings.WorldObject.DestructibleRange + CurrentCacheObject.Radius;
                         if (_forceCloseRangeTarget)
                             minDistance += 6f;
 
                         // This object isn't yet in our destructible desire range
-                        if (minDistance <= 0 || c_CacheObject.RadiusDistance > minDistance)
+                        if (minDistance <= 0 || CurrentCacheObject.RadiusDistance > minDistance)
                         {
                             c_InfosSubStep += "NotInBarricadeRange";
                             AddToCache = false;
@@ -609,14 +609,14 @@ namespace Trinity
                             break;
                         }
 
-                        if (c_CacheObject.IsQuestMonster || c_CacheObject.IsMinimapActive)
+                        if (CurrentCacheObject.IsQuestMonster || CurrentCacheObject.IsMinimapActive)
                         {
                             AddToCache = true;
                             c_InfosSubStep = "";
                             break;
                         }
 
-                        if (!DataDictionary.ForceDestructibles.Contains(c_CacheObject.ActorSNO) && Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.ForceIgnore)
+                        if (!DataDictionary.ForceDestructibles.Contains(CurrentCacheObject.ActorSNO) && Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.ForceIgnore)
                         {
                             AddToCache = false;
                             c_InfosSubStep += "ForceIgnoreDestructibles";
@@ -645,16 +645,16 @@ namespace Trinity
 
                         float maxRadiusDistance;
 
-                        if (DataDictionary.DestructableObjectRadius.TryGetValue(c_CacheObject.ActorSNO, out maxRadiusDistance))
+                        if (DataDictionary.DestructableObjectRadius.TryGetValue(CurrentCacheObject.ActorSNO, out maxRadiusDistance))
                         {
-                            if (c_CacheObject.RadiusDistance < maxRadiusDistance)
+                            if (CurrentCacheObject.RadiusDistance < maxRadiusDistance)
                             {
                                 AddToCache = true;
                                 c_InfosSubStep = "";
                             }
                         }
                         // Always add large destructibles within ultra close range
-                        if (!AddToCache && c_CacheObject.Radius >= 10f && c_CacheObject.RadiusDistance <= 5.9f)
+                        if (!AddToCache && CurrentCacheObject.Radius >= 10f && CurrentCacheObject.RadiusDistance <= 5.9f)
                         {
                             AddToCache = true;
                             c_InfosSubStep = "";
@@ -662,25 +662,25 @@ namespace Trinity
                         }
 
                         // This object isn't yet in our destructible desire range
-                        if (AddToCache && (minDistance <= 1 || c_CacheObject.RadiusDistance > minDistance) && PlayerMover.GetMovementSpeed() >= 1)
+                        if (AddToCache && (minDistance <= 1 || CurrentCacheObject.RadiusDistance > minDistance) && PlayerMover.GetMovementSpeed() >= 1)
                         {
                             AddToCache = false;
                             c_InfosSubStep += "NotInDestructableRange";
                         }
-                        if (AddToCache && c_CacheObject.RadiusDistance <= 2f && DateTime.UtcNow.Subtract(PlayerMover.LastGeneratedStuckPosition).TotalMilliseconds > 500)
+                        if (AddToCache && CurrentCacheObject.RadiusDistance <= 2f && DateTime.UtcNow.Subtract(PlayerMover.LastGeneratedStuckPosition).TotalMilliseconds > 500)
                         {
                             AddToCache = false;
                             c_InfosSubStep += "NotStuck2";
                         }
 
                         // Add if we're standing still and bumping into it
-                        if (c_CacheObject.RadiusDistance <= 2f && PlayerMover.GetMovementSpeed() <= 0)
+                        if (CurrentCacheObject.RadiusDistance <= 2f && PlayerMover.GetMovementSpeed() <= 0)
                         {
                             AddToCache = true;
                             c_InfosSubStep = "";
                         }
 
-                        if (c_CacheObject.RActorGuid == LastTargetRactorGUID)
+                        if (CurrentCacheObject.RActorGuid == LastTargetRactorGUID)
                         {
                             AddToCache = true;
                             c_InfosSubStep = "";
@@ -693,12 +693,12 @@ namespace Trinity
                     {
                         AddToCache = false;
 
-                        bool isRareChest = c_CacheObject.InternalName.ToLower().Contains("chest_rare") || DataDictionary.ResplendentChestIds.Contains(c_CacheObject.ActorSNO);
-                        bool isChest = (!isRareChest && c_CacheObject.InternalName.ToLower().Contains("chest")) ||
-                            DataDictionary.ContainerWhiteListIds.Contains(c_CacheObject.ActorSNO); // We know it's a container but this is not a known rare chest
-                        bool isCorpse = c_CacheObject.InternalName.ToLower().Contains("corpse");
-                        bool isWeaponRack = c_CacheObject.InternalName.ToLower().Contains("rack");
-                        bool isGroundClicky = c_CacheObject.InternalName.ToLower().Contains("ground_clicky");
+                        bool isRareChest = CurrentCacheObject.InternalName.ToLower().Contains("chest_rare") || DataDictionary.ResplendentChestIds.Contains(CurrentCacheObject.ActorSNO);
+                        bool isChest = (!isRareChest && CurrentCacheObject.InternalName.ToLower().Contains("chest")) ||
+                            DataDictionary.ContainerWhiteListIds.Contains(CurrentCacheObject.ActorSNO); // We know it's a container but this is not a known rare chest
+                        bool isCorpse = CurrentCacheObject.InternalName.ToLower().Contains("corpse");
+                        bool isWeaponRack = CurrentCacheObject.InternalName.ToLower().Contains("rack");
+                        bool isGroundClicky = CurrentCacheObject.InternalName.ToLower().Contains("ground_clicky");
 
                         // We want to do some vendoring, so don't open anything new yet
                         if (ForceVendorRunASAP)
@@ -715,7 +715,7 @@ namespace Trinity
                         }
                         catch
                         {
-                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting container-been-opened attribute for object {0} [{1}]", c_CacheObject.InternalName, c_CacheObject.ActorSNO);
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting container-been-opened attribute for object {0} [{1}]", CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
                             c_InfosSubStep += "ChestOpenException";
                             AddToCache = false;
                             return AddToCache;
@@ -748,7 +748,7 @@ namespace Trinity
                         }
 
                         // Regular container, check range
-                        if (c_CacheObject.RadiusDistance <= Settings.WorldObject.ContainerOpenRange)
+                        if (CurrentCacheObject.RadiusDistance <= Settings.WorldObject.ContainerOpenRange)
                         {
                             if (isChest && Settings.WorldObject.OpenContainers)
                                 return true;
@@ -763,7 +763,7 @@ namespace Trinity
                                 return true;
                         }
 
-                        if (c_CacheObject.IsQuestMonster)
+                        if (CurrentCacheObject.IsQuestMonster)
                         {
                             AddToCache = true;
                             return AddToCache;

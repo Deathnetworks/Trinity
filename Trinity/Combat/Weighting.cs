@@ -393,7 +393,7 @@ namespace Trinity
                                         {
                                             // Give extra weight to ranged enemies
                                             if ((Player.ActorClass == ActorClass.Barbarian || Player.ActorClass == ActorClass.Monk) &&
-                                                (cacheObject.MonsterSize == MonsterSize.Ranged || DataDictionary.RangedMonsterIds.Contains(c_CacheObject.ActorSNO)))
+                                                (cacheObject.MonsterSize == MonsterSize.Ranged || DataDictionary.RangedMonsterIds.Contains(CurrentCacheObject.ActorSNO)))
                                             {
                                                 objWeightInfo += "Ranged ";
                                                 cacheObject.Weight += 1100d;

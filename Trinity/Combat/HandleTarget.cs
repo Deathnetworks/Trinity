@@ -117,7 +117,7 @@ namespace Trinity
                     // Target is not in range, update status
                     UpdateStatusTextTarget(false);
 
-                    // Check if incapacited or rooted
+                    // Check if IsIncapacitated or rooted
                     if (Player.IsIncapacitated || Player.IsRooted)
                         return GetRunStatus("HeroRooted", RunStatus.Running);
 
@@ -283,7 +283,7 @@ namespace Trinity
                 case GObjectType.CursedShrine:
                 case GObjectType.Destructible:
                 case GObjectType.Barricade:
-                    if (!ZetaDia.Me.Movement.IsMoving)
+                    if (!ZetaDia.Me.Movement.IsMoving && CurrentTarget.RadiusDistance <= 5f)
                         stuckOnTarget = true;
                     break;
             }

@@ -39,8 +39,8 @@ namespace Trinity
                 ((DiaItem)c_diaObject).CommonData.GetAttribute<int>(ActorAttributeType.ItemQualityLevelIdentified);
                 c_ItemDisplayName = diaItem.CommonData.Name;
 
-                c_CacheObject.DynamicID = c_diaObject.CommonData.DynamicId;
-                c_CacheObject.GameBalanceID = c_diaObject.CommonData.GameBalanceId;
+                CurrentCacheObject.DynamicID = c_diaObject.CommonData.DynamicId;
+                CurrentCacheObject.GameBalanceID = c_diaObject.CommonData.GameBalanceId;
 
                 c_ItemLevel = diaItem.CommonData.Level;
                 c_DBItemBaseType = diaItem.CommonData.ItemBaseType;
@@ -49,25 +49,25 @@ namespace Trinity
                 c_IsTwoHandedItem = diaItem.CommonData.IsTwoHand;
                 c_item_tFollowerType = diaItem.CommonData.FollowerSpecialType;
                 // Calculate item type
-                c_item_GItemType = TrinityItemManager.DetermineItemType(c_CacheObject.InternalName, c_DBItemType, c_item_tFollowerType);
+                c_item_GItemType = TrinityItemManager.DetermineItemType(CurrentCacheObject.InternalName, c_DBItemType, c_item_tFollowerType);
 
                 // And temporarily store the base type
                 GItemBaseType itemBaseType = TrinityItemManager.DetermineBaseType(c_item_GItemType);
 
                 // Compute item quality from item link 
-                if (!CacheData.ItemLinkQuality.TryGetValue(c_CacheObject.ACDGuid, out c_ItemQuality))
+                if (!CacheData.ItemLinkQuality.TryGetValue(CurrentCacheObject.ACDGuid, out c_ItemQuality))
                 {
                     c_ItemQuality = diaItem.CommonData.ItemLinkColorQuality();
-                    CacheData.ItemLinkQuality.Add(c_CacheObject.ACDGuid, c_ItemQuality);
+                    CacheData.ItemLinkQuality.Add(CurrentCacheObject.ACDGuid, c_ItemQuality);
                 }
 
                 if (itemBaseType == GItemBaseType.Gem)
                     c_ItemLevel = (int)diaItem.CommonData.GemQuality;
 
-                c_CacheObject.ObjectHash = HashGenerator.GenerateItemHash(
-                    c_CacheObject.Position,
-                    c_CacheObject.ActorSNO,
-                    c_CacheObject.InternalName,
+                CurrentCacheObject.ObjectHash = HashGenerator.GenerateItemHash(
+                    CurrentCacheObject.Position,
+                    CurrentCacheObject.ActorSNO,
+                    CurrentCacheObject.InternalName,
                     Player.WorldID,
                     c_ItemQuality,
                     c_ItemLevel);
@@ -89,7 +89,7 @@ namespace Trinity
                     if (_keepLootRadiusExtendedForSeconds > 0)
                         range += 90f;
 
-                    if (c_CacheObject.Distance > (CurrentBotLootRange + range))
+                    if (CurrentCacheObject.Distance > (CurrentBotLootRange + range))
                     {
                         c_InfosSubStep += "OutOfRange";
                         // return here to save CPU on reading unncessary attributes for out of range items;
@@ -100,10 +100,10 @@ namespace Trinity
                 var pickupItem = new PickupItem
                 {
                     Name = c_ItemDisplayName,
-                    InternalName = c_CacheObject.InternalName,
+                    InternalName = CurrentCacheObject.InternalName,
                     Level = c_ItemLevel,
                     Quality = c_ItemQuality,
-                    BalanceID = c_CacheObject.GameBalanceID,
+                    BalanceID = CurrentCacheObject.GameBalanceID,
                     DBBaseType = c_DBItemBaseType,
                     DBItemType = c_DBItemType,
                     TBaseType = itemBaseType,
@@ -111,11 +111,11 @@ namespace Trinity
                     IsOneHand = c_IsOneHandedItem,
                     IsTwoHand = c_IsTwoHandedItem,
                     ItemFollowerType = c_item_tFollowerType,
-                    DynamicID = c_CacheObject.DynamicID,
-                    Position = c_CacheObject.Position,
-                    ActorSNO = c_CacheObject.ActorSNO,
-                    ACDGuid = c_CacheObject.ACDGuid,
-                    RActorGUID = c_CacheObject.RActorGuid,
+                    DynamicID = CurrentCacheObject.DynamicID,
+                    Position = CurrentCacheObject.Position,
+                    ActorSNO = CurrentCacheObject.ActorSNO,
+                    ACDGuid = CurrentCacheObject.ACDGuid,
+                    RActorGUID = CurrentCacheObject.RActorGuid,
                 };
 
                 // Blood Shards == HoradricRelic
@@ -127,21 +127,21 @@ namespace Trinity
                 // Treat all globes as a yes
                 if (c_item_GItemType == GItemType.HealthGlobe)
                 {
-                    c_CacheObject.Type = GObjectType.HealthGlobe;
+                    CurrentCacheObject.Type = GObjectType.HealthGlobe;
                     return true;
                 }
 
                 // Treat all globes as a yes
                 if (c_item_GItemType == GItemType.PowerGlobe)
                 {
-                    c_CacheObject.Type = GObjectType.PowerGlobe;
+                    CurrentCacheObject.Type = GObjectType.PowerGlobe;
                     return true;
                 }
 
                 // Treat all globes as a yes
                 if (c_item_GItemType == GItemType.ProgressionGlobe)
                 {
-                    c_CacheObject.Type = GObjectType.ProgressionGlobe;
+                    CurrentCacheObject.Type = GObjectType.ProgressionGlobe;
                     return true;
                 }
 
@@ -149,7 +149,7 @@ namespace Trinity
                 logNewItem = RefreshItemStats(itemBaseType);
 
                 // Get whether or not we want this item, cached if possible
-                if (!CacheData.PickupItem.TryGetValue(c_CacheObject.RActorGuid, out AddToCache))
+                if (!CacheData.PickupItem.TryGetValue(CurrentCacheObject.RActorGuid, out AddToCache))
                 {
                     if (pickupItem.IsTwoHand && Settings.Loot.Pickup.IgnoreTwoHandedWeapons && c_ItemQuality < ItemQuality.Legendary)
                     {
@@ -190,7 +190,7 @@ namespace Trinity
                             
                     }
 
-                    CacheData.PickupItem.Add(c_CacheObject.RActorGuid, AddToCache);
+                    CacheData.PickupItem.Add(CurrentCacheObject.RActorGuid, AddToCache);
                 }
 
                 if (AddToCache && ForceVendorRunASAP)
@@ -224,7 +224,7 @@ namespace Trinity
             }
 
             // Get the gold amount of this pile, cached if possible
-            if (!CacheData.GoldStack.TryGetValue(c_CacheObject.RActorGuid, out c_GoldStackSize))
+            if (!CacheData.GoldStack.TryGetValue(CurrentCacheObject.RActorGuid, out c_GoldStackSize))
             {
                 try
                 {
@@ -232,11 +232,11 @@ namespace Trinity
                 }
                 catch
                 {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting gold pile amount for item {0} [{1}]", c_CacheObject.InternalName, c_CacheObject.ActorSNO);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting gold pile amount for item {0} [{1}]", CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
                     c_InfosSubStep += "GetAttributeException";
                     return false;
                 }
-                CacheData.GoldStack.Add(c_CacheObject.RActorGuid, c_GoldStackSize);
+                CacheData.GoldStack.Add(CurrentCacheObject.RActorGuid, c_GoldStackSize);
             }
 
             if (c_GoldStackSize < Settings.Loot.Pickup.MinimumGoldStack)
@@ -251,7 +251,7 @@ namespace Trinity
         {
             bool isNewLogItem = false;
 
-            c_ItemMd5Hash = HashGenerator.GenerateItemHash(c_CacheObject.Position, c_CacheObject.ActorSNO, c_CacheObject.InternalName, CurrentWorldDynamicId, c_ItemQuality, c_ItemLevel);
+            c_ItemMd5Hash = HashGenerator.GenerateItemHash(CurrentCacheObject.Position, CurrentCacheObject.ActorSNO, CurrentCacheObject.InternalName, CurrentWorldDynamicId, c_ItemQuality, c_ItemLevel);
 
             if (!GenericCache.ContainsKey(c_ItemMd5Hash))
             {
@@ -354,14 +354,14 @@ namespace Trinity
                 {
                     LogWriter.WriteLine("ActorSNO,RActorGUID,DyanmicID,ACDGuid,Name,GoldStackSize,IgnoreItemSubStep,Distance");
                 }
-                LogWriter.Write(FormatCSVField(c_CacheObject.ActorSNO));
-                LogWriter.Write(FormatCSVField(c_CacheObject.RActorGuid));
-                LogWriter.Write(FormatCSVField(c_CacheObject.DynamicID));
-                LogWriter.Write(FormatCSVField(c_CacheObject.ACDGuid));
-                LogWriter.Write(FormatCSVField(c_CacheObject.InternalName));
+                LogWriter.Write(FormatCSVField(CurrentCacheObject.ActorSNO));
+                LogWriter.Write(FormatCSVField(CurrentCacheObject.RActorGuid));
+                LogWriter.Write(FormatCSVField(CurrentCacheObject.DynamicID));
+                LogWriter.Write(FormatCSVField(CurrentCacheObject.ACDGuid));
+                LogWriter.Write(FormatCSVField(CurrentCacheObject.InternalName));
                 LogWriter.Write(FormatCSVField(c_GoldStackSize));
                 LogWriter.Write(FormatCSVField(c_InfosSubStep));
-                LogWriter.Write(FormatCSVField(c_CacheObject.Distance));
+                LogWriter.Write(FormatCSVField(CurrentCacheObject.Distance));
                 LogWriter.Write("\n");
             }
         }

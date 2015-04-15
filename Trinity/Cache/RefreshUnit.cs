@@ -38,22 +38,22 @@ namespace Trinity
                 return false;
 
             // Always set this, otherwise we divide by zero later
-            c_CacheObject.KillRange = CurrentBotKillRange;
+            CurrentCacheObject.KillRange = CurrentBotKillRange;
 
 
             // See if this is a boss
             using (new MemorySpy("RefreshUnit().CheckIsBoss"))
             {
-                c_CacheObject.IsBoss = (DataDictionary.BossIds.Contains(c_CacheObject.ActorSNO) || c_diaUnit.Name.Contains("Boss"));
-                if (c_CacheObject.IsBoss)
-                    c_CacheObject.KillRange = c_CacheObject.RadiusDistance + 10f;
+                CurrentCacheObject.IsBoss = (DataDictionary.BossIds.Contains(CurrentCacheObject.ActorSNO) || c_diaUnit.Name.Contains("Boss"));
+                if (CurrentCacheObject.IsBoss)
+                    CurrentCacheObject.KillRange = CurrentCacheObject.RadiusDistance + 10f;
             }
 
 
             // hax for Diablo_shadowClone
             using (new MemorySpy("RefreshUnit().CheckIsAttackable"))
             {
-                c_unit_IsAttackable = c_CacheObject.InternalName.StartsWith("Diablo_shadowClone");
+                c_unit_IsAttackable = CurrentCacheObject.InternalName.StartsWith("Diablo_shadowClone");
             }
 
             /*
@@ -62,9 +62,9 @@ namespace Trinity
             int teamId;
             using (new MemorySpy("RefreshUnit().CheckIsTeamId"))
             {
-                string teamIdHash = HashGenerator.GetGenericHash("teamId.RActorGuid=" + c_CacheObject.RActorGuid + ".ActorSNO=" + c_CacheObject.ActorSNO + ".WorldId=" + Player.WorldID);
+                string teamIdHash = HashGenerator.GetGenericHash("teamId.RActorGuid=" + CurrentCacheObject.RActorGuid + ".ActorSNO=" + CurrentCacheObject.ActorSNO + ".WorldId=" + Player.WorldID);
 
-                if (!c_CacheObject.IsBoss && GenericCache.ContainsKey(teamIdHash))
+                if (!CurrentCacheObject.IsBoss && GenericCache.ContainsKey(teamIdHash))
                 {
                     teamId = (int)GenericCache.GetObject(teamIdHash).Value;
                 }
@@ -90,7 +90,7 @@ namespace Trinity
             {
                 try
                 {
-                    c_CacheObject.IsNPC = c_diaUnit.IsNPC;
+                    CurrentCacheObject.IsNPC = c_diaUnit.IsNPC;
                 }
                 catch (Exception)
                 {
@@ -112,14 +112,14 @@ namespace Trinity
             {
                 try
                 {
-                    c_CacheObject.IsQuestMonster = c_diaUnit.IsQuestMonster;
-                    if (c_CacheObject.IsQuestMonster)
-                        c_CacheObject.KillRange = c_CacheObject.RadiusDistance + 10f;
+                    CurrentCacheObject.IsQuestMonster = c_diaUnit.IsQuestMonster;
+                    if (CurrentCacheObject.IsQuestMonster)
+                        CurrentCacheObject.KillRange = CurrentCacheObject.RadiusDistance + 10f;
                 }
                 catch (Exception ex)
                 {
                     Logger.LogDebug(LogCategory.CacheManagement, "Error reading IsQuestMonster for Unit sno:{0} raGuid:{1} name:{2} ex:{3}",
-                        c_CacheObject.ActorSNO, c_CacheObject.RActorGuid, c_CacheObject.InternalName, ex.Message);
+                        CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
                 }
             }
 
@@ -127,14 +127,14 @@ namespace Trinity
             {
                 try
                 {
-                    c_CacheObject.IsQuestGiver = c_diaUnit.IsQuestGiver;
+                    CurrentCacheObject.IsQuestGiver = c_diaUnit.IsQuestGiver;
 
                     // Interact with quest givers, except when doing town-runs
-                    if (ZetaDia.CurrentAct == Act.OpenWorld && c_CacheObject.IsQuestGiver && !(WantToTownRun || ForceVendorRunASAP || BrainBehavior.IsVendoring))
+                    if (ZetaDia.CurrentAct == Act.OpenWorld && CurrentCacheObject.IsQuestGiver && !(WantToTownRun || ForceVendorRunASAP || BrainBehavior.IsVendoring))
                     {
-                        c_CacheObject.Type = GObjectType.Interactable;
-                        c_CacheObject.Type = GObjectType.Interactable;
-                        c_CacheObject.Radius = c_diaObject.CollisionSphere.Radius;
+                        CurrentCacheObject.Type = GObjectType.Interactable;
+                        CurrentCacheObject.Type = GObjectType.Interactable;
+                        CurrentCacheObject.Radius = c_diaObject.CollisionSphere.Radius;
                         return true;
                     }
                 }
@@ -154,7 +154,7 @@ namespace Trinity
             using (new MemorySpy("RefreshUnit().CheckMonsterType"))
             {
                 /* Always refresh monster type */
-                if (c_CacheObject.Type != GObjectType.Player && !c_CacheObject.IsBoss)
+                if (CurrentCacheObject.Type != GObjectType.Player && !CurrentCacheObject.IsBoss)
                 {
                     if (c_unit_MonsterInfo == null)
                         c_unit_MonsterInfo = c_diaUnit.MonsterInfo;
@@ -168,7 +168,7 @@ namespace Trinity
                             case MonsterType.Helper:
                             case MonsterType.Team:
                                 {
-                                    c_CacheObject.IsAlly = true;
+                                    CurrentCacheObject.IsAlly = true;
 
                                     addToCache = false;
                                     c_InfosSubStep += "AllySceneryHelperTeam";
@@ -181,9 +181,9 @@ namespace Trinity
 
             using (new MemorySpy("RefreshUnit().CheckFollower"))
             {
-                if (DataDictionary.FollowerIds.Contains(c_CacheObject.ActorSNO))
+                if (DataDictionary.FollowerIds.Contains(CurrentCacheObject.ActorSNO))
                 {
-                    c_CacheObject.IsAlly = true;
+                    CurrentCacheObject.IsAlly = true;
 
                     addToCache = false;
                     c_InfosSubStep += "FollowerIds";
@@ -196,7 +196,7 @@ namespace Trinity
                 // Only set treasure goblins to true *IF* they haven't disabled goblins! Then check the SNO in the goblin hash list!
                 c_unit_IsTreasureGoblin = false;
                 // Flag this as a treasure goblin *OR* ignore this object altogether if treasure goblins are set to ignore
-                if (DataDictionary.GoblinIds.Contains(c_CacheObject.ActorSNO) || c_CacheObject.InternalName.ToLower().StartsWith("treasuregoblin"))
+                if (DataDictionary.GoblinIds.Contains(CurrentCacheObject.ActorSNO) || CurrentCacheObject.InternalName.ToLower().StartsWith("treasuregoblin"))
                 {
                     if (Settings.Combat.Misc.GoblinPriority != 0)
                     {
@@ -229,10 +229,10 @@ namespace Trinity
             {
                 RefreshMonsterHealth();
 
-                //DebugUtil.LogAnimation(c_CacheObject);
+                //DebugUtil.LogAnimation(CurrentCacheObject);
 
                 // Unit is already dead
-                if (c_HitPoints <= 0d && !c_CacheObject.IsBoss)
+                if (c_HitPoints <= 0d && !CurrentCacheObject.IsBoss)
                 {
                     addToCache = false;
                     c_InfosSubStep += "0HitPoints";
@@ -247,7 +247,7 @@ namespace Trinity
                 }
             }
 
-            if (c_CacheObject.IsQuestMonster || c_CacheObject.IsBountyObjective)
+            if (CurrentCacheObject.IsQuestMonster || CurrentCacheObject.IsBountyObjective)
                 return true;
 
             using (new MemorySpy("RefreshUnit().CheckAttributes"))
@@ -261,10 +261,10 @@ namespace Trinity
             // Set Kill range
             using (new MemorySpy("RefreshUnit().CheckKillRange"))
             {
-                c_CacheObject.KillRange = SetKillRange();
+                CurrentCacheObject.KillRange = SetKillRange();
             }
 
-            if (c_CacheObject.RadiusDistance <= c_CacheObject.KillRange)
+            if (CurrentCacheObject.RadiusDistance <= CurrentCacheObject.KillRange)
                 AnyMobsInRange = true;
 
             return addToCache;
@@ -274,7 +274,7 @@ namespace Trinity
         {
             try
             {
-                c_CacheObject.NPCIsOperable = (c_CommonData.GetAttribute<int>(ActorAttributeType.NPCIsOperatable) > 0);
+                CurrentCacheObject.NPCIsOperable = (c_CommonData.GetAttribute<int>(ActorAttributeType.NPCIsOperatable) > 0);
             }
             catch (Exception)
             {
@@ -289,13 +289,13 @@ namespace Trinity
 
         private static void RefreshMonsterSize()
         {
-            if (!CacheData.MonsterSizes.TryGetValue(c_CacheObject.RActorGuid, out c_unit_MonsterSize))
+            if (!CacheData.MonsterSizes.TryGetValue(CurrentCacheObject.RActorGuid, out c_unit_MonsterSize))
             {
                 if (c_unit_MonsterInfo == null)
                     c_unit_MonsterInfo = c_diaUnit.MonsterInfo;
 
                 c_unit_MonsterSize = c_unit_MonsterInfo != null ? c_unit_MonsterInfo.MonsterSize : MonsterSize.Unknown;
-                CacheData.MonsterSizes.Add(c_CacheObject.RActorGuid, c_unit_MonsterSize);
+                CacheData.MonsterSizes.Add(CurrentCacheObject.RActorGuid, c_unit_MonsterSize);
             }
         }
 
@@ -307,10 +307,10 @@ namespace Trinity
             // health calculations
             double maxHealth;
             // Get the max health of this unit, a cached version if available, if not cache it
-            if (!CacheData.UnitMaxHealth.TryGetValue(c_CacheObject.RActorGuid, out maxHealth))
+            if (!CacheData.UnitMaxHealth.TryGetValue(CurrentCacheObject.RActorGuid, out maxHealth))
             {
                 maxHealth = c_diaUnit.HitpointsMax;
-                CacheData.UnitMaxHealth.Add(c_CacheObject.RActorGuid, maxHealth);
+                CacheData.UnitMaxHealth.Add(CurrentCacheObject.RActorGuid, maxHealth);
             }
 
             // Health calculations            
@@ -322,7 +322,7 @@ namespace Trinity
 
         private static bool RefreshUnitAttributes(bool AddToCache = true, DiaUnit unit = null)
         {
-            if (!DataDictionary.IgnoreUntargettableAttribute.Contains(c_CacheObject.ActorSNO) && unit.IsUntargetable)
+            if (!DataDictionary.IgnoreUntargettableAttribute.Contains(CurrentCacheObject.ActorSNO) && unit.IsUntargetable)
             {
                 AddToCache = false;
                 c_InfosSubStep += "IsUntargetable";
@@ -338,10 +338,10 @@ namespace Trinity
             }
 
             bool isBurrowed = false;
-            if (!CacheData.UnitIsBurrowed.TryGetValue(c_CacheObject.RActorGuid, out isBurrowed))
+            if (!CacheData.UnitIsBurrowed.TryGetValue(CurrentCacheObject.RActorGuid, out isBurrowed))
             {
                 isBurrowed = unit.IsBurrowed;
-                CacheData.UnitIsBurrowed.Add(c_CacheObject.RActorGuid, isBurrowed);
+                CacheData.UnitIsBurrowed.Add(CurrentCacheObject.RActorGuid, isBurrowed);
             }
 
             if (isBurrowed)
@@ -376,15 +376,15 @@ namespace Trinity
         private static double SetKillRange()
         {
             // Always within kill range if in the NoCheckKillRange list!
-            if (DataDictionary.NoCheckKillRange.Contains(c_CacheObject.ActorSNO))
-                return c_CacheObject.RadiusDistance + 100f;
+            if (DataDictionary.NoCheckKillRange.Contains(CurrentCacheObject.ActorSNO))
+                return CurrentCacheObject.RadiusDistance + 100f;
 
             double killRange;
 
             // Bosses, always kill
-            if (c_CacheObject.IsBoss)
+            if (CurrentCacheObject.IsBoss)
             {
-                return c_CacheObject.RadiusDistance + 100f;
+                return CurrentCacheObject.RadiusDistance + 100f;
             }
 
             // Elitey type mobs and things
@@ -410,19 +410,19 @@ namespace Trinity
             MonsterAffixes affixFlags;
             using (new MemorySpy("RefreshUnit().RefreshAffixes().Check"))
             {
-                if (!CacheData.UnitMonsterAffix.TryGetValue(c_CacheObject.RActorGuid, out affixFlags))
+                if (!CacheData.UnitMonsterAffix.TryGetValue(CurrentCacheObject.RActorGuid, out affixFlags))
                 {
                     try
                     {
                         using (new MemorySpy("RefreshUnit().RefreshAffixes().Get"))
                         { affixFlags = c_CommonData.MonsterAffixes; }
 
-                        CacheData.UnitMonsterAffix.Add(c_CacheObject.RActorGuid, affixFlags);
+                        CacheData.UnitMonsterAffix.Add(CurrentCacheObject.RActorGuid, affixFlags);
                     }
                     catch (Exception ex)
                     {
                         affixFlags = MonsterAffixes.None;
-                        Logger.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Handled Exception getting affixes for Monster SNO={0} Name={1} RAGuid={2}", c_CacheObject.ActorSNO, c_CacheObject.InternalName, c_CacheObject.RActorGuid);
+                        Logger.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Handled Exception getting affixes for Monster SNO={0} Name={1} RAGuid={2}", CurrentCacheObject.ActorSNO, CurrentCacheObject.InternalName, CurrentCacheObject.RActorGuid);
                         Logger.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, ex.ToString());
                     }
                 }
@@ -436,7 +436,7 @@ namespace Trinity
                 c_unit_IsMinion = affixFlags.HasFlag(MonsterAffixes.Minion);
 
                 // All-in-one flag for quicker if checks throughout
-                c_IsEliteRareUnique = (c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique || c_unit_IsMinion || DataDictionary.EliteRareUniqueIds.Contains(c_CacheObject.ActorSNO));
+                c_IsEliteRareUnique = (c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique || c_unit_IsMinion || DataDictionary.EliteRareUniqueIds.Contains(CurrentCacheObject.ActorSNO));
                 c_MonsterAffixes = affixFlags;
             }
         }
@@ -446,42 +446,42 @@ namespace Trinity
             if (c_diaUnit.IsFullyValid())
             {
                 int i_SummonedByACDId;
-                if (!CacheData.SummonedByACDId.TryGetValue(c_CacheObject.RActorGuid, out i_SummonedByACDId))
+                if (!CacheData.SummonedByACDId.TryGetValue(CurrentCacheObject.RActorGuid, out i_SummonedByACDId))
                 {
                     try
                     {
                         i_SummonedByACDId = c_diaUnit.SummonedByACDId;
-                        CacheData.SummonedByACDId.Add(c_CacheObject.RActorGuid, i_SummonedByACDId);
+                        CacheData.SummonedByACDId.Add(CurrentCacheObject.RActorGuid, i_SummonedByACDId);
                     }
                     catch {/* Continue */}
                 }
 
                 bool b_IsSummoner;
-                if (!CacheData.IsSummoner.TryGetValue(c_CacheObject.RActorGuid, out b_IsSummoner))
+                if (!CacheData.IsSummoner.TryGetValue(CurrentCacheObject.RActorGuid, out b_IsSummoner))
                 {
                     try
                     {
                         b_IsSummoner = c_diaUnit.SummonerId > 0;
-                        CacheData.IsSummoner.Add(c_CacheObject.RActorGuid, b_IsSummoner);
+                        CacheData.IsSummoner.Add(CurrentCacheObject.RActorGuid, b_IsSummoner);
                     }
                     catch {/* Continue */}
                 }
 
-                c_CacheObject.SummonedByACDId = i_SummonedByACDId;
-                c_CacheObject.IsSummoner = b_IsSummoner;
+                CurrentCacheObject.SummonedByACDId = i_SummonedByACDId;
+                CurrentCacheObject.IsSummoner = b_IsSummoner;
 
                 // SummonedByACDId is not ACDGuid, it's DynamicID
-                if (c_CacheObject.SummonedByACDId == Player.MyDynamicID)
+                if (CurrentCacheObject.SummonedByACDId == Player.MyDynamicID)
                 {
-                    c_CacheObject.IsSummonedByPlayer = true;
+                    CurrentCacheObject.IsSummonedByPlayer = true;
                 }
 
-                if (c_CacheObject.IsSummonedByPlayer)
+                if (CurrentCacheObject.IsSummonedByPlayer)
                 {
                     // Count up Mystic Allys, gargantuans, and zombies - if the player has those skills
                     if (Player.ActorClass == ActorClass.Monk)
                     {
-                        if (DataDictionary.MysticAllyIds.Contains(c_CacheObject.ActorSNO))
+                        if (DataDictionary.MysticAllyIds.Contains(CurrentCacheObject.ActorSNO))
                         {
                             PlayerOwnedMysticAllyCount++;
                             c_InfosSubStep += "IsPlayerSummoned";
@@ -491,25 +491,25 @@ namespace Trinity
                     // Count up Demon Hunter sentries
                     if (Player.ActorClass == ActorClass.DemonHunter)
                     {
-                        if (DataDictionary.DemonHunterSentryIds.Contains(c_CacheObject.ActorSNO))
+                        if (DataDictionary.DemonHunterSentryIds.Contains(CurrentCacheObject.ActorSNO))
                         {
-                            if (c_CacheObject.Distance < 75f)
+                            if (CurrentCacheObject.Distance < 75f)
                             {
                                 PlayerOwnedDHSentryCount++;
                             }
 
                             CacheData.SentryTurret.Add(new CacheObstacleObject()
                             {
-                                ActorSNO = c_CacheObject.ActorSNO,
-                                RActorGUID = c_CacheObject.RActorGuid,
-                                Position = c_CacheObject.Position,
-                                Radius = c_CacheObject.Radius,
+                                ActorSNO = CurrentCacheObject.ActorSNO,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
+                                Position = CurrentCacheObject.Position,
+                                Radius = CurrentCacheObject.Radius,
                             });
 
                             c_InfosSubStep += "IsPlayerSummoned";
                             return false;
                         }
-                        if (DataDictionary.DemonHunterPetIds.Contains(c_CacheObject.ActorSNO))
+                        if (DataDictionary.DemonHunterPetIds.Contains(CurrentCacheObject.ActorSNO))
                         {
                             PlayerOwnedDHPetsCount++;
                             c_InfosSubStep += "IsPlayerSummoned";
@@ -519,7 +519,7 @@ namespace Trinity
                     // Count up Wiz hydras
                     if (Player.ActorClass == ActorClass.Wizard)
                     {
-                        if (DataDictionary.WizardHydraIds.Contains(c_CacheObject.ActorSNO))
+                        if (DataDictionary.WizardHydraIds.Contains(CurrentCacheObject.ActorSNO))
                         {
                             PlayerOwnedHydraCount++;
                             c_InfosSubStep += "IsPlayerSummoned";
@@ -529,32 +529,32 @@ namespace Trinity
                     // Count up zombie dogs and gargantuans next
                     if (Player.ActorClass == ActorClass.Witchdoctor)
                     {
-                        if (DataDictionary.BigBadVoodooIds.Contains(c_CacheObject.ActorSNO))
+                        if (DataDictionary.BigBadVoodooIds.Contains(CurrentCacheObject.ActorSNO))
                         {
                             CacheData.Voodoo.Add(new CacheObstacleObject()
                             {
-                                ActorSNO = c_CacheObject.ActorSNO,
-                                RActorGUID = c_CacheObject.RActorGuid,
-                                Position = c_CacheObject.Position,
-                                Radius = c_CacheObject.Radius,
+                                ActorSNO = CurrentCacheObject.ActorSNO,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
+                                Position = CurrentCacheObject.Position,
+                                Radius = CurrentCacheObject.Radius,
                             });
 
                             c_InfosSubStep += "IsPlayerSummoned";
                             return false;
                         }
-                        if (DataDictionary.ZombieDogIds.Contains(c_CacheObject.ActorSNO))
+                        if (DataDictionary.ZombieDogIds.Contains(CurrentCacheObject.ActorSNO))
                         {
                             PlayerOwnedZombieDogCount++;
                             c_InfosSubStep += "IsPlayerSummoned";
                             return false;
                         }
-                        if (DataDictionary.GargantuanIds.Contains(c_CacheObject.ActorSNO))
+                        if (DataDictionary.GargantuanIds.Contains(CurrentCacheObject.ActorSNO))
                         {
                             PlayerOwnedGargantuanCount++;
                             c_InfosSubStep += "IsPlayerSummoned";
                             return false;
                         }
-                        if (DataDictionary.FetishArmyIds.Contains(c_CacheObject.ActorSNO))
+                        if (DataDictionary.FetishArmyIds.Contains(CurrentCacheObject.ActorSNO))
                         {
                             Trinity.PlayerOwnedFetishCount++;
                             c_InfosSubStep += "IsPlayerSummoned";

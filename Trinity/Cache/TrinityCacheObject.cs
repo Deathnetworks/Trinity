@@ -328,72 +328,7 @@ namespace Trinity
         [NoCopy]
         public bool IsEventObject { get { return IsCursedChest || IsCursedShrine; } }
 
-        [NoCopy]
-        public bool IsInLineOfSight
-        {
-            get
-            {
-                if (_isInLineOfSight != null)
-                    return (bool)_isInLineOfSight;
-
-                bool isInLoS;
-                Tuple<bool, int> rayCastResult;
-
-                if (ZDiff > 11f)
-                {
-                    _isInLineOfSight = false;
-                    return false;
-                }
-
-                if (!DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
-                {
-                    // Bounty Objectives should always be on the weight list
-                    if (IsBountyObjective)
-                    {
-                        _isInLineOfSight = true;
-                        return true;
-                    }
-
-                    // Quest Monsters should get LoS white-listed
-                    if (IsQuestMonster)
-                    {
-                        _isInLineOfSight = true;
-                        return true;
-                    }
-
-                    // Always LoS Units during events
-                    if (Trinity.Player.InActiveEvent)
-                    {
-                        _isInLineOfSight = true;
-                        return true;
-                    }
-                }
-
-                if (CacheData.RayCastResultsFromObjects.TryGetValue(RActorGuid, out rayCastResult))
-                {
-                    if (MathUtil.GetDiff(rayCastResult.Item2, Distance) <= 5f)
-                        isInLoS = rayCastResult.Item1;
-                    else
-                        isInLoS = Distance < 5f || (Distance < 95f && NavHelper.CanRayCast(Position, (Trinity.Player.IsRanged || (Distance <= 16f && Distance > 1f))));
-
-                    CacheData.RayCastResultsFromObjects[RActorGuid] = new Tuple<bool, int>(isInLoS, (int)Distance);
-                }
-                else
-                {
-                    isInLoS = Distance < 5f || (Distance < 95f && NavHelper.CanRayCast(Position, (Trinity.Player.IsRanged || (Distance <= 16f && Distance > 1f))));
-
-                    if (!CacheData.RayCastResultsFromObjects.ContainsKey(RActorGuid))
-                        CacheData.RayCastResultsFromObjects.Add(RActorGuid, new Tuple<bool, int>(isInLoS, (int)Distance));
-                }
-
-                _isInLineOfSight = isInLoS;
-                return isInLoS;
-            }
-            set
-            {
-                _isInLineOfSight = value;
-            }
-        }
+        public bool IsInLineOfSight { get; set; }
 
         [NoCopy]
         public bool IsInLineOfSightOfPoint(Vector3 origin)
@@ -413,17 +348,16 @@ namespace Trinity
             if (origin.Distance2D(Trinity.Player.Position) <= 6f)
                 return IsInLineOfSight;
 
-            var key = new Tuple<int, Vector3>(RActorGuid, MainGrid.VectorToGrid(origin));
             bool isInLoS;
 
-            if (CacheData.RayCastResultsFromObjectsAt.TryGetValue(key, out isInLoS))
+            if (CacheData.HasBeenInLoS.TryGetValue(RActorGuid, out isInLoS))
                 return isInLoS;
 
             // RayCast check
             isInLoS = NavHelper.CanRayCast(origin, target, (Trinity.Player.IsRanged || (Distance <= 16f && Distance > 1f)));
 
-            if (CacheData.RayCastResultsFromObjectsAt.ContainsKey(key))
-                CacheData.RayCastResultsFromObjectsAt.Add(key, isInLoS);
+            if (!CacheData.HasBeenInLoS.ContainsKey(RActorGuid))
+                CacheData.HasBeenInLoS.Add(RActorGuid, isInLoS);
 
             return isInLoS;
         }

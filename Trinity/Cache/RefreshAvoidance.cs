@@ -34,11 +34,11 @@ namespace Trinity
                     default: break;
                 }
 
-                _aAvoidance.Radius = (float)GetAvoidanceRadius(_aAvoidance.Id, (float)(c_CacheObject.Radius * 1.5));
+                _aAvoidance.Radius = (float)GetAvoidanceRadius(_aAvoidance.Id, (float)(CurrentCacheObject.Radius * 1.5));
 
                 bool isStandingInAvoidance = false;
-                bool isFacingPlayer = c_IsFacingPlayer || c_CacheObject.IsFacing(Player.Position, 15f);
-                double minAvoidanceHealth = GetAvoidanceHealth(c_CacheObject.ActorSNO);
+                bool isFacingPlayer = c_IsFacingPlayer || CurrentCacheObject.IsFacing(Player.Position, 15f);
+                double minAvoidanceHealth = GetAvoidanceHealth(CurrentCacheObject.ActorSNO);
                 bool isBelowHealthThreshold = Player.CurrentHealthPct <= minAvoidanceHealth;
 
                 /* Set avoidance */
@@ -78,7 +78,7 @@ namespace Trinity
                                     return GetReturn("Anim targetACDPosition isn't player", _aAvoidance);
 
                                 isStandingInAvoidance = (isFacingPlayer || c_TargetACDGuid == Player.ACDGuid || c_TargetACDPosition.Distance2D(Player.Position) <= _aAvoidance.Radius) &&
-                                    c_CacheObject.Distance <= _aAvoidance.Radius; 
+                                    CurrentCacheObject.Distance <= _aAvoidance.Radius; 
                             }
 
                         } break;
@@ -95,20 +95,20 @@ namespace Trinity
                                     return GetReturn("Anim targetACDPosition isn't player", _aAvoidance);
 
                                 isStandingInAvoidance = (isFacingPlayer || c_TargetACDGuid == Player.ACDGuid || c_TargetACDPosition.Distance2D(Player.Position) <= _aAvoidance.Radius) &&
-                                    c_CacheObject.Distance <= _aAvoidance.Radius; 
+                                    CurrentCacheObject.Distance <= _aAvoidance.Radius; 
                             }
 
                             Vector3 _targetPoint = c_TargetACDPosition != new Vector3() ? 
-                                c_TargetACDPosition : MathEx.GetPointAt(c_CacheObject.Position, 40f, c_CacheObject.Rotation);
+                                c_TargetACDPosition : MathEx.GetPointAt(CurrentCacheObject.Position, 40f, CurrentCacheObject.Rotation);
 
-                            for (float i = 0; i <= c_CacheObject.Position.Distance2D(_targetPoint); i += 5f)
+                            for (float i = 0; i <= CurrentCacheObject.Position.Distance2D(_targetPoint); i += 5f)
                             {
-                                Vector3 pathSpot = MathEx.CalculatePointFrom(c_CacheObject.Position, _targetPoint, i);
+                                Vector3 pathSpot = MathEx.CalculatePointFrom(CurrentCacheObject.Position, _targetPoint, i);
 
-                                CacheData.AvoidanceObstacles.Add(new CacheObstacleObject(pathSpot, _aAvoidance.Radius, c_CacheObject.ActorSNO, c_CurrentAnimation.ToString())
+                                CacheData.AvoidanceObstacles.Add(new CacheObstacleObject(pathSpot, _aAvoidance.Radius, CurrentCacheObject.ActorSNO, c_CurrentAnimation.ToString())
                                 {
                                     ObjectType = GObjectType.Avoidance,
-                                    Rotation = c_CacheObject.Rotation,
+                                    Rotation = CurrentCacheObject.Rotation,
                                     Animation = c_CurrentAnimation,
                                     AvoidType = _aAvoidance.Type,
                                     IsAvoidanceAnimations = true,
@@ -125,7 +125,7 @@ namespace Trinity
                     case AvoidType.RotateRight:
                     default:
                         {
-                            isStandingInAvoidance = isBelowHealthThreshold && c_CacheObject.Distance <= _aAvoidance.Radius;
+                            isStandingInAvoidance = isBelowHealthThreshold && CurrentCacheObject.Distance <= _aAvoidance.Radius;
                         }
                         break;
                 }
@@ -142,10 +142,10 @@ namespace Trinity
                     //    Trinity.KillMonstersInAoE = false;
                 }
 
-                CacheData.AvoidanceObstacles.Add(new CacheObstacleObject(c_CacheObject.Position, c_CacheObject.Radius, c_CacheObject.ActorSNO, c_CurrentAnimation.ToString())
+                CacheData.AvoidanceObstacles.Add(new CacheObstacleObject(CurrentCacheObject.Position, CurrentCacheObject.Radius, CurrentCacheObject.ActorSNO, c_CurrentAnimation.ToString())
                 {
                     ObjectType = GObjectType.Avoidance,
-                    Rotation = c_CacheObject.Rotation,
+                    Rotation = CurrentCacheObject.Rotation,
                     Animation = c_CurrentAnimation,
                     AvoidType = _aAvoidance.Type,
                     IsAvoidanceAnimations = true,
@@ -172,35 +172,35 @@ namespace Trinity
 
         private static bool RefreshAvoidance()
         {
-            double minAvoidanceHealth = GetAvoidanceHealth(c_CacheObject.ActorSNO);
+            double minAvoidanceHealth = GetAvoidanceHealth(CurrentCacheObject.ActorSNO);
 
             float customRadius;
-            if (DataDictionary.DefaultAvoidanceCustomRadius.TryGetValue(c_CacheObject.ActorSNO, out customRadius))
+            if (DataDictionary.DefaultAvoidanceCustomRadius.TryGetValue(CurrentCacheObject.ActorSNO, out customRadius))
             {
-                c_CacheObject.Radius = customRadius;
+                CurrentCacheObject.Radius = customRadius;
             }
             else
             {
-                c_CacheObject.Radius = (float)GetAvoidanceRadius(c_CacheObject.ActorSNO, (float)(c_CacheObject.Radius * 1.5));
+                CurrentCacheObject.Radius = (float)GetAvoidanceRadius(CurrentCacheObject.ActorSNO, (float)(CurrentCacheObject.Radius * 1.5));
             }
 
             // Add Navigation cell weights to path around avoidance
-            MainGridProvider.AddCellWeightingObstacle(c_CacheObject.ActorSNO, (float)c_CacheObject.Radius);
+            MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, (float)CurrentCacheObject.Radius);
 
-            AvoidanceType avoidanceType = AvoidanceManager.GetAvoidanceType(c_CacheObject.ActorSNO);
+            AvoidanceType avoidanceType = AvoidanceManager.GetAvoidanceType(CurrentCacheObject.ActorSNO);
 
-            if (c_CacheObject.InternalName.Contains("wall"))
+            if (CurrentCacheObject.InternalName.Contains("wall"))
             {
                 AddObjectToNavigationObstacleCache();
                 //return true;
             }
 
-            if (DataDictionary.AvoidancesAtPlayer.Contains(c_CacheObject.ActorSNO) && !CacheData.ObsoleteAvoidancesAtPlayer.Contains(c_CacheObject.ActorSNO))
+            if (DataDictionary.AvoidancesAtPlayer.Contains(CurrentCacheObject.ActorSNO) && !CacheData.ObsoleteAvoidancesAtPlayer.Contains(CurrentCacheObject.ActorSNO))
             {
-                c_CacheObject.Position = Trinity.Player.Position;
-                c_CacheObject.Distance = 0f;
+                CurrentCacheObject.Position = Trinity.Player.Position;
+                CurrentCacheObject.Distance = 0f;
 
-                CacheData.ObsoleteAvoidancesAtPlayer.Add(c_CacheObject.ActorSNO);
+                CacheData.ObsoleteAvoidancesAtPlayer.Add(CurrentCacheObject.ActorSNO);
             }
 
             // Monks with Serenity up ignore all AOE's
@@ -353,48 +353,48 @@ namespace Trinity
             if (minAvoidanceHealth == 0)
             {
                 Logger.Log(TrinityLogLevel.Info, LogCategory.Avoidance, "Ignoring Avoidance! Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
-                       c_CacheObject.InternalName, c_CacheObject.ActorSNO, c_CacheObject.Radius, minAvoidanceHealth, c_CacheObject.Distance);
+                       CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius, minAvoidanceHealth, CurrentCacheObject.Distance);
                 return false;
             }
 
             TimeSpan aoeExpiration = TimeSpan.FromMilliseconds(500);
-            DataDictionary.AvoidanceSpawnerDuration.TryGetValue(c_CacheObject.ActorSNO, out aoeExpiration);
+            DataDictionary.AvoidanceSpawnerDuration.TryGetValue(CurrentCacheObject.ActorSNO, out aoeExpiration);
 
-            CacheData.AvoidanceObstacles.Add(new CacheObstacleObject(c_CacheObject.Position, c_CacheObject.Radius, c_CacheObject.ActorSNO, c_CacheObject.InternalName)
+            CacheData.AvoidanceObstacles.Add(new CacheObstacleObject(CurrentCacheObject.Position, CurrentCacheObject.Radius, CurrentCacheObject.ActorSNO, CurrentCacheObject.InternalName)
             {
                 Expires = DateTime.UtcNow.Add(aoeExpiration),
                 ObjectType = GObjectType.Avoidance,
-                Rotation = c_CacheObject.Rotation,
+                Rotation = CurrentCacheObject.Rotation,
                 AvoidType = AvoidType.GroundCircle,
             });
 
             if (c_Avoidance != null && c_Avoidance.Type == AvoidType.Projectile)
             {
-                if (Player.Position.Distance2D(c_CacheObject.Position) > c_CacheObject.Radius)
+                if (Player.Position.Distance2D(CurrentCacheObject.Position) > CurrentCacheObject.Radius)
                 {
                     Vector3 _targetPoint = c_TargetACDPosition != new Vector3() ?
-                        c_TargetACDPosition : MathEx.GetPointAt(c_CacheObject.Position, 40f, c_CacheObject.Rotation);
+                        c_TargetACDPosition : MathEx.GetPointAt(CurrentCacheObject.Position, 40f, CurrentCacheObject.Rotation);
 
-                    for (float i = 0; i <= c_CacheObject.Position.Distance2D(_targetPoint); i += 5f)
+                    for (float i = 0; i <= CurrentCacheObject.Position.Distance2D(_targetPoint); i += 5f)
                     {
-                        Vector3 _pathSpot = MathEx.CalculatePointFrom(c_CacheObject.Position, _targetPoint, i);
+                        Vector3 _pathSpot = MathEx.CalculatePointFrom(CurrentCacheObject.Position, _targetPoint, i);
 
-                        CacheData.AvoidanceObstacles.Add(new CacheObstacleObject(c_CacheObject.Position, c_CacheObject.Radius, c_CacheObject.ActorSNO, c_CacheObject.InternalName)
+                        CacheData.AvoidanceObstacles.Add(new CacheObstacleObject(CurrentCacheObject.Position, CurrentCacheObject.Radius, CurrentCacheObject.ActorSNO, CurrentCacheObject.InternalName)
                         {
                             Expires = DateTime.UtcNow.Add(aoeExpiration),
                             ObjectType = GObjectType.Avoidance,
-                            Rotation = c_CacheObject.Rotation,
+                            Rotation = CurrentCacheObject.Rotation,
                             AvoidType = AvoidType.Projectile,
                         });
 
                         /* Player standing in avoidance ? */
-                        Trinity.Player.StandingInAvoidance = Player.Position.Distance2D(_pathSpot) <= c_CacheObject.Radius;
+                        Trinity.Player.StandingInAvoidance = Player.Position.Distance2D(_pathSpot) <= CurrentCacheObject.Radius;
                     }
                 }
                 else
                 {
                     Logger.Log(TrinityLogLevel.Info, LogCategory.Avoidance, "Is standing in avoidance of projectile impact Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
-                        c_CacheObject.InternalName, c_CacheObject.ActorSNO, c_CacheObject.Radius, minAvoidanceHealth, c_CacheObject.Distance);
+                        CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius, minAvoidanceHealth, CurrentCacheObject.Distance);
 
                     Trinity.Player.StandingInAvoidance = minAvoidanceHealth >= Player.CurrentHealthPct;
                 }
@@ -404,12 +404,12 @@ namespace Trinity
             else
             {
                 // Is this one under our feet? If so flag it up so we can find an avoidance spot
-                if (c_CacheObject.Distance <= c_CacheObject.Radius)
+                if (CurrentCacheObject.Distance <= CurrentCacheObject.Radius)
                 {
                     Trinity.Player.StandingInAvoidance = minAvoidanceHealth >= Player.CurrentHealthPct;
 
                     Logger.Log(TrinityLogLevel.Info, LogCategory.Avoidance, "Is standing in avoidance Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
-                        c_CacheObject.InternalName, c_CacheObject.ActorSNO, c_CacheObject.Radius, minAvoidanceHealth, c_CacheObject.Distance);
+                        CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius, minAvoidanceHealth, CurrentCacheObject.Distance);
                 } 
             }
 
@@ -420,12 +420,12 @@ namespace Trinity
         {
             // snag our SNO from cache variable if not provided
             if (actorSNO == -1)
-                actorSNO = c_CacheObject.ActorSNO;
+                actorSNO = CurrentCacheObject.ActorSNO;
             float hlthDefault = Player.IsRanged ? 0.98f : 0.75f;
             try
             {
                 if (actorSNO != -1)
-                    return AvoidanceManager.GetAvoidanceHealthBySNO(c_CacheObject.ActorSNO, hlthDefault);
+                    return AvoidanceManager.GetAvoidanceHealthBySNO(CurrentCacheObject.ActorSNO, hlthDefault);
                 return AvoidanceManager.GetAvoidanceHealthBySNO(actorSNO, hlthDefault);
             }
             catch (Exception ex)
@@ -439,7 +439,7 @@ namespace Trinity
         public static double GetAvoidanceRadius(int actorSNO = -1, float radius = -1f)
         {
             if (actorSNO == -1)
-                actorSNO = c_CacheObject.ActorSNO;
+                actorSNO = CurrentCacheObject.ActorSNO;
 
             if (radius == -1f)
                 radius = 20f;

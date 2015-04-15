@@ -2695,7 +2695,8 @@ namespace Trinity
             368515, // A5 Nephalem Switch -  Passage to Corvus 
             347276, // x1_Fortress_Soul_Grinder_A
             326937, // x1_Pand_BatteringRam_Hook_B
-            291368, // x1_Urzael_Boss
+            (int)SNOActor.x1_Urzael_Boss,
+            (int)SNOActor.a4dun_Garden_Corruption_Monster,
         };
 
         /// <summary>

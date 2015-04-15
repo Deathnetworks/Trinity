@@ -543,7 +543,7 @@ namespace Trinity
 
                             string extraData = "";
 
-                            switch (c_CacheObject.Type)
+                            switch (CurrentCacheObject.Type)
                             {
                                 case GObjectType.Unit:
                                     {
@@ -556,7 +556,7 @@ namespace Trinity
                                         if (c_HasDotDPS)
                                             extraData += " HasDotDPS";
 
-                                        if (c_CacheObject.IsInLineOfSight)
+                                        if (CurrentCacheObject.IsInLineOfSight)
                                             extraData += " HasBeenInLoS";
 
                                         extraData += " HP=" + c_HitPoints.ToString("0") + " (" + c_HitPointsPct.ToString("0.00") + ")";
@@ -574,18 +574,18 @@ namespace Trinity
                                     duration,
                                     (addToCache ? "Added " : "Ignored"),
                                     (!addToCache ? ("By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_InfosSubStep) : ""),
-                                    c_CacheObject.ActorType,
-                                    c_CacheObject.GizmoType != GizmoType.None ? c_CacheObject.GizmoType.ToString() : "",
-                                    c_CacheObject.Type,
-                                    c_CacheObject.InternalName,
-                                    c_CacheObject.ActorSNO,
-                                    (c_CacheObject.IsBoss ? " IsBoss" : ""),
+                                    CurrentCacheObject.ActorType,
+                                    CurrentCacheObject.GizmoType != GizmoType.None ? CurrentCacheObject.GizmoType.ToString() : "",
+                                    CurrentCacheObject.Type,
+                                    CurrentCacheObject.InternalName,
+                                    CurrentCacheObject.ActorSNO,
+                                    (CurrentCacheObject.IsBoss ? " IsBoss" : ""),
                                     (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""),
-                                    c_CacheObject.Distance,
-                                    c_CacheObject.RadiusDistance,
+                                    CurrentCacheObject.Distance,
+                                    CurrentCacheObject.RadiusDistance,
                                     c_ZDiff,
-                                    c_CacheObject.Radius,
-                                    c_CacheObject.RActorGuid,
+                                    CurrentCacheObject.Radius,
+                                    CurrentCacheObject.RActorGuid,
                                     extraData);
                         }
                     }
