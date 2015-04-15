@@ -324,6 +324,9 @@ namespace Trinity
 
         private static void AddObjectToNavigationObstacleCache()
         {
+            if (DataDictionary.ObstacleCustomRadius.ContainsKey(c_CacheObject.ActorSNO))
+                c_CacheObject.Radius = DataDictionary.ObstacleCustomRadius[c_CacheObject.ActorSNO];
+
             MainGridProvider.AddCellWeightingObstacle(c_CacheObject.ActorSNO, c_CacheObject.Radius);
 
             CacheData.AddToNavigationObstacles(new CacheObstacleObject()

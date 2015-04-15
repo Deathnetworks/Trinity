@@ -2600,10 +2600,10 @@ namespace Trinity
         public static Dictionary<int, float> ObstacleCustomRadius { get { return obstacleCustomRadius; } }
         private static readonly Dictionary<int, float> obstacleCustomRadius = new Dictionary<int, float> {
             {174900, 25}, {194682, 20}, {81699, 20}, {3340, 12}, {123325, 25}, {185391, 25},
-            {104596, 15}, // trOut_FesteringWoods_Neph_Column_B
-            {104632, 15}, // trOut_FesteringWoods_Neph_Column_B_Broken_Base
-            {105303, 15}, // trOut_FesteringWoods_Neph_Column_C_Broken_Base_Bottom
-            {104827, 15}, // trOut_FesteringWoods_Neph_Column_C_Broken_Base 
+            {104596, 20}, // trOut_FesteringWoods_Neph_Column_B
+            {104632, 20}, // trOut_FesteringWoods_Neph_Column_B_Broken_Base
+            {105303, 20}, // trOut_FesteringWoods_Neph_Column_C_Broken_Base_Bottom
+            {104827, 20}, // trOut_FesteringWoods_Neph_Column_C_Broken_Base 
             {355898, 12}, // x1_Bog_Family_Guard_Tower_Stump
             {376917, 10}, 
             {(int)SNOActor.a3dun_rmpt_RopeSwitch_A, 15},

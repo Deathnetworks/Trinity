@@ -271,13 +271,22 @@ namespace Trinity
                     CombatBase.Cast(power);
             }
 
-            bool stuckOnTarget =
-                ((CurrentTarget.Type == GObjectType.Barricade ||
-                CurrentTarget.Type == GObjectType.Interactable ||
-                CurrentTarget.Type == GObjectType.CursedChest ||
-                CurrentTarget.Type == GObjectType.CursedShrine ||
-                CurrentTarget.Type == GObjectType.Destructible) &&
-                !ZetaDia.Me.Movement.IsMoving && DateTime.UtcNow.Subtract(PlayerMover.TimeLastUsedPlayerMover).TotalMilliseconds < 750);
+            bool stuckOnTarget = false;
+            switch (CurrentTarget.Type)
+            {
+                case GObjectType.Door:
+                case GObjectType.HealthWell:
+                case GObjectType.Shrine:
+                case GObjectType.Container:
+                case GObjectType.Interactable:
+                case GObjectType.CursedChest:
+                case GObjectType.CursedShrine:
+                case GObjectType.Destructible:
+                case GObjectType.Barricade:
+                    if (!ZetaDia.Me.Movement.IsMoving)
+                        stuckOnTarget = true;
+                    break;
+            }
 
             bool npcInRange = CurrentTarget.IsQuestGiver && CurrentTarget.RadiusDistance <= 3f;
 
