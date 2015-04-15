@@ -21,8 +21,8 @@ namespace Trinity
         public long TotalXp;
         public long LastXp;
         public long NextLvXp;
-        public int TotalGold;
-        public int LastGold;
+        public long TotalGold;
+        public long LastGold;
         public int Level;
         public int ParagonLevel;
         public ItemDropStats ItemsDropped;

@@ -9,7 +9,7 @@ namespace Trinity.Helpers
 {
     public class GoldInactivity
     {
-        private int _lastGoldAmount;
+        private long _lastGoldAmount;
         private DateTime _lastCheckBag = DateTime.MinValue;
         private DateTime _lastFoundGold = DateTime.MinValue;
 
