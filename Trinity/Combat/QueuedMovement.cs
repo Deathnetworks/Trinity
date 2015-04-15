@@ -373,7 +373,7 @@ namespace Trinity.Combat
             }
         }
 
-        public void LogLocation(string pre, QueuedMovement movement, string post = "", TrinityLogLevel level = TrinityLogLevel.Info)
+        public void LogLocation(string pre, QueuedMovement movement, string post = "", TrinityLogLevel level = TrinityLogLevel.Debug)
         {
             Logger.Log(level, LogCategory.Movement, pre + " {0} Distance={4:0.#} (x={1:0.#},y={2:0.#},z={3:0.#}) {5}",
                 movement.Infos,

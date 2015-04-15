@@ -1131,8 +1131,7 @@ namespace Trinity
                     Navigator.PlayerMover.MoveStop();
                     return;
                 }
-                //DateTime.UtcNow.Subtract(lastSentMovePower).TotalMilliseconds >= 250 || 
-                if (Vector3.Distance(LastMoveToTarget, CurrentMoveDestination) >= 2f || bForceNewMovement)
+                if (DateTime.UtcNow.Subtract(lastSentMovePower).TotalMilliseconds >= 250 || Vector3.Distance(LastMoveToTarget, CurrentMoveDestination) >= 2f || bForceNewMovement)
                 {
                     if (!CurrentTarget.IsAvoidance && !CurrentTarget.IsUnit && !CurrentTargetIsInRange)
                     {
@@ -1162,7 +1161,7 @@ namespace Trinity
                             ,
                             Options = new QueuedMovementOptions
                             {
-                                Logging = LogLevel.Info,
+                                Logging = LogLevel.Debug,
                                 AcceptableDistance = CurrentTarget.RequiredRange,
                                 Type = CurrentTarget.IsUnit ? MoveType.BasicCombat : MoveType.TargetAttempt
                             }
@@ -1171,7 +1170,7 @@ namespace Trinity
 
                     if (CombatBase.QueuedMovement.IsQueuedMovement)
                     {
-                        //lastSentMovePower = DateTime.UtcNow;
+                        lastSentMovePower = DateTime.UtcNow;
                         LastMoveToTarget = CurrentMoveDestination;
                     }
                 }
