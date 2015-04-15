@@ -72,7 +72,6 @@ namespace Trinity
             }
         }
 
-
         [NoCopy]
         public ACD CommonData
         {
@@ -557,7 +556,7 @@ namespace Trinity
                 return _countUnitsInFront;
             }
         }
-        
+
         [NoCopy]
         public int CountFCObjectsInFront
         {
@@ -650,7 +649,7 @@ namespace Trinity
         {
             get
             {
-                return 
+                return
                     GenericBlacklist.ContainsKey(ObjectHash) ||
                     Trinity.Blacklist90Seconds.Contains(RActorGuid) ||
                     Trinity.Blacklist60Seconds.Contains(RActorGuid) ||
@@ -692,6 +691,9 @@ namespace Trinity
                     Weight);
             }
         }
+
+        [NoCopy]
+        public bool IsDestroyable { get { return Type == GObjectType.Barricade || Type == GObjectType.Destructible; } }
 
         /* private member */
 

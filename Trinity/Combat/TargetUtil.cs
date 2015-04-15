@@ -1018,10 +1018,7 @@ namespace Trinity
             var results = (
                 from u in list
                 where
-                    u.Type == GObjectType.Barricade ||
-                    u.Type == GObjectType.Destructible ||
-                    u.Type == GObjectType.Door ||
-                    u.Type == GObjectType.Container
+                    u.IsDestroyable
                 orderby
                     u.Position.Distance2D(loc) - u.Radius
                 select u).ToList();

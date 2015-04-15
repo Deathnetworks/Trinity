@@ -1,31 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Input;
+using System.ComponentModel;
+using Trinity.Helpers;
 using Trinity.Technicals;
-using Trinity.UIComponents;
 
 namespace Trinity.UI.UIComponents
 {
-    public class CacheUIDataModel
+    public class CacheUIDataModel : INotifyPropertyChanged
     {
-        internal ObservableCollection<TrinityCacheObject> ObservableCache = new ObservableCollection<TrinityCacheObject>();
-        internal List<TrinityCacheObject> SourceCacheObjects = new List<TrinityCacheObject>(); 
+        internal List<TrinityCacheObject> SourceCacheObjects = new List<TrinityCacheObject>();
 
-        public CacheUIDataModel()
+        private ObservableCollection<TrinityCacheObject> _observableCache = new ObservableCollection<TrinityCacheObject>();
+        internal ObservableCollection<TrinityCacheObject> ObservableCache
         {
-            try
-            {
+            get { return _observableCache; }
+            set { SetField(ref _observableCache, value, "ObservableCache"); }
+        }
 
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex.ToString());
-            }
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
+        }
+        protected bool SetField<T>(ref T field, T value, string propertyName)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+            field = value;
+            OnPropertyChanged(propertyName);
+            return true;
         }
     }
 }

@@ -1455,7 +1455,7 @@ namespace Trinity
                     objWeightInfo += cacheObject.IsNPC ? " IsNPC" : "";
                     objWeightInfo += cacheObject.NPCIsOperable ? " IsOperable" : "";
 
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Weight,
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight,
                         "Weight={0:0} name={1} sno={2} type={3} R-Dist={4:0} IsElite={5} RAGuid={6} {7}",
                             cacheObject.Weight, cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Type, cacheObject.RadiusDistance, cacheObject.IsEliteRareUnique,
                             cacheObject.RActorGuid, objWeightInfo);

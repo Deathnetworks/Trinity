@@ -77,13 +77,19 @@ namespace Trinity
                     RefreshDiaObjects(); // Refresh cache
 
                     using (new MemorySpy("HandleTarget().HandleAssignAbilityTask"))
-                    { HandleAssignAbilityTask(); }
+                    {
+                        HandleAssignAbilityTask();
+                    }
 
                     using (new MemorySpy("HandleTarget().SetTargetFields"))
-                    { SetTargetFields(); }
+                    {
+                        SetTargetFields();
+                    }
 
                     using (new MemorySpy("HandleTarget().SetQueuedSpecialMovement"))
-                    { SetQueuedSpecialMovement(); }
+                    {
+                        SetQueuedSpecialMovement();
+                    }
 
                     if (HandlePowerWaitTask()) // Waiting for/after power            
                         return GetRunStatus("WaitForPower", RunStatus.Running);
@@ -254,6 +260,7 @@ namespace Trinity
 
         private static bool HandleObjectInRange()
         {
+            Logger.LogDebug(LogCategory.Behavior, "Entering Handle Object in Range");
             if (CurrentTarget == null)
                 return false;
 
@@ -270,7 +277,7 @@ namespace Trinity
                 CurrentTarget.Type == GObjectType.CursedChest ||
                 CurrentTarget.Type == GObjectType.CursedShrine ||
                 CurrentTarget.Type == GObjectType.Destructible) &&
-                !ZetaDia.Me.Movement.IsMoving && DateTime.UtcNow.Subtract(PlayerMover.TimeLastUsedPlayerMover).TotalMilliseconds < 250);
+                !ZetaDia.Me.Movement.IsMoving && DateTime.UtcNow.Subtract(PlayerMover.TimeLastUsedPlayerMover).TotalMilliseconds < 750);
 
             bool npcInRange = CurrentTarget.IsQuestGiver && CurrentTarget.RadiusDistance <= 3f;
 
@@ -733,10 +740,10 @@ namespace Trinity
                     // Return since we should have assigned a power
                     return;
                 }
-                if (!_isWaitingForPower && CombatBase.CurrentPower == null)
-                {
-                    CombatBase.CurrentPower = AbilitySelector();
-                }
+                //if (!_isWaitingForPower && CombatBase.CurrentPower == null)
+                //{
+                //    CombatBase.CurrentPower = AbilitySelector();
+                //}
             }
         }
         /// <summary>
@@ -1124,10 +1131,10 @@ namespace Trinity
                     Navigator.PlayerMover.MoveStop();
                     return;
                 }
-
-                if (DateTime.UtcNow.Subtract(lastSentMovePower).TotalMilliseconds >= 250 || Vector3.Distance(LastMoveToTarget, CurrentMoveDestination) >= 2f || bForceNewMovement)
+                //DateTime.UtcNow.Subtract(lastSentMovePower).TotalMilliseconds >= 250 || 
+                if (Vector3.Distance(LastMoveToTarget, CurrentMoveDestination) >= 2f || bForceNewMovement)
                 {
-                    if (!CurrentTarget.IsAvoidance && !(CurrentTarget.IsUnit && CurrentTargetIsInRange) && CurrentTarget.RequiredRange > TargetCurrentDistance)
+                    if (!CurrentTarget.IsAvoidance && !CurrentTarget.IsUnit && !CurrentTargetIsInRange)
                     {
                         CombatBase.QueuedMovement.Queue(new QueuedMovement
                         {
@@ -1164,7 +1171,7 @@ namespace Trinity
 
                     if (CombatBase.QueuedMovement.IsQueuedMovement)
                     {
-                        lastSentMovePower = DateTime.UtcNow;
+                        //lastSentMovePower = DateTime.UtcNow;
                         LastMoveToTarget = CurrentMoveDestination;
                     }
                 }
@@ -1329,7 +1336,7 @@ namespace Trinity
                             break;
                         }
                     case GObjectType.Door:
-                        CurrentTarget.RequiredRange = 2f;
+                        CurrentTarget.RequiredRange = 5f;
                         TargetCurrentDistance = CurrentTarget.Distance;
                         break;
                     default:

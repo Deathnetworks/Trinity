@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
@@ -21,45 +22,48 @@ namespace Trinity.UI.UIComponents
 
         private const int updateDelay = 1000;
 
-        private static Thread _workerThread;
-
         public static Window CreateWindow()
         {
             try
             {
-                var filename = Path.Combine(FileManager.PluginPath, "UI", "CacheUI.xaml");
-
-                if (_window == null)
+                _window = new Window
                 {
-                    _window = new Window();
-                }
-
-                if (_userControl == null)
-                    _userControl = UILoader.LoadAndTransformXamlFile<UserControl>(filename);
-
-                //_window.Content = _userControl;
-                _window.Height = 150;
-                _window.Width = 600;
-                _window.MinHeight = MinimumHeight;
-                _window.MinWidth = MininumWidth;
-                _window.Title = "Trinity Cache";
-
-
-                var dgMainCache = new DataGrid { ItemsSource = DataModel.ObservableCache };
-                //foreach (var column in TrinityCacheObjectColumns())
-                //{
-                //    dgMainCache.Columns.Add(column);
-                //}
-
-                _window.Content = new TabControl
-                {
-                    Items = {
-                        new TabItem
+                    Height = 150,
+                    Width = 600,
+                    MinHeight = MinimumHeight,
+                    MinWidth = MininumWidth,
+                    Title = "Trinity Cache",
+                    Content = new TabControl
+                    {
+                        Items =
                         {
-                            Header = "Main Cache",
-                            Content = new ScrollViewer {
-                                HorizontalScrollBarVisibility = ScrollBarVisibility.Visible,
-                                Content = dgMainCache
+                            new TabItem
+                            {
+                                Header = "Main Cache",
+                                Content = new ScrollViewer
+                                {
+                                    HorizontalScrollBarVisibility = ScrollBarVisibility.Visible,
+                                    Content = new DataGrid
+                                    {
+                                        AutoGenerateColumns = false,
+                                        ItemsSource = DataModel.ObservableCache,
+                                        DataContext = DataModel.ObservableCache,
+                                        Columns =
+                                        {
+                                            new DataGridTextColumn {Header = "Name", IsReadOnly = true, Binding = new Binding("InternalName")},
+                                            new DataGridTextColumn {Header = "Type", IsReadOnly = true, Binding = new Binding("Type")},
+                                            new DataGridTextColumn {Header = "Weight", IsReadOnly = true, Binding = new Binding("Weight")},
+                                            new DataGridTextColumn {Header = "WeightInfo", IsReadOnly = true, Binding = new Binding("WeightInfo")},
+                                            new DataGridTextColumn {Header = "IsBossOrEliteRareUnique", IsReadOnly = true, Binding = new Binding("IsBossOrEliteRareUnique")},
+                                            new DataGridTextColumn {Header = "Distance", IsReadOnly = true, Binding = new Binding("Distance")},
+                                            new DataGridTextColumn {Header = "Radius", IsReadOnly = true, Binding = new Binding("Radius")},
+                                            //new DataGridTextColumn{Header = "", IsReadOnly = true, Binding = new Binding("") },
+                                            //new DataGridTextColumn{Header = "", IsReadOnly = true, Binding = new Binding("") },
+                                            //new DataGridTextColumn{Header = "", IsReadOnly = true, Binding = new Binding("") },
+                                            //new DataGridTextColumn{Header = "", IsReadOnly = true, Binding = new Binding("") },
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -69,13 +73,9 @@ namespace Trinity.UI.UIComponents
                     DataModel = new CacheUIDataModel();
                 _userControl.DataContext = DataModel;
 
-                _workerThread = new Thread(RunWorker)
-                {
-                    IsBackground = true
-                };
-                _workerThread.Start();
-
                 _window.Closed += Window_Closed;
+                Configuration.Events.OnCacheUpdated += Update;
+                Update();
 
             }
             catch (Exception ex)
@@ -85,8 +85,6 @@ namespace Trinity.UI.UIComponents
 
             return _window;
         }
-
-
 
         private static List<DataGridColumn> TrinityCacheObjectColumns()
         {
@@ -114,27 +112,33 @@ namespace Trinity.UI.UIComponents
         }
 
 
-        private static void RunWorker()
+        private static void Update()
         {
-            while (true)
+            try
             {
-                try
+                Trinity.Invoke(() =>
                 {
-                    Trinity.Invoke(() =>
+                    foreach (var o in DataModel.SourceCacheObjects)
                     {
-                        DataModel.ObservableCache.Clear();
-                        foreach (var o in DataModel.SourceCacheObjects)
+                        var existing = DataModel.ObservableCache.FirstOrDefault(oc => oc.RActorGuid == o.RActorGuid);
+                        if (existing != null)
                         {
+                            DataModel.ObservableCache.Remove(existing);
                             DataModel.ObservableCache.Add(o);
                         }
-                    });
-                    Thread.Sleep(updateDelay);
-                }
-                catch (ThreadAbortException) { Logger.Log("CacheUI Worker shutting down"); }
-                catch (Exception ex)
-                {
-                    Logger.LogError("Error in CacheUI Worker: " + ex);
-                }
+                        else
+                            DataModel.ObservableCache.Add(o);
+                    }
+                    foreach (var o in DataModel.ObservableCache.ToList())
+                    {
+                        if (DataModel.SourceCacheObjects.All(so => so.RActorGuid != o.RActorGuid))
+                            DataModel.ObservableCache.Remove(o);
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error in CacheUI Worker: " + ex);
             }
         }
 
@@ -142,8 +146,7 @@ namespace Trinity.UI.UIComponents
         {
             try
             {
-                if (_workerThread.IsAlive)
-                    _workerThread.Abort();
+                Configuration.Events.OnCacheUpdated -= Update;
                 _window = null;
             }
             catch (Exception ex)

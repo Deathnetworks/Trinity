@@ -138,7 +138,7 @@ namespace Trinity.DbProvider
             else
             {
                 Trinity.CurrentTarget = TargetUtil.GetClosestDestructible(25f);
-                if (CurrentTarget != null)
+                if (CurrentTarget != null && CurrentTarget.IsDestroyable)
                 {
                     CombatBase.Cast(Trinity.AbilitySelector());
                 }
@@ -382,6 +382,8 @@ namespace Trinity.DbProvider
 
         public void MoveTowards(Vector3 vMoveToTarget)
         {
+            Logger.LogDebug(LogCategory.Movement,"PlayerMover.MoveTowards={0}", NavHelper.PrettyPrintVector3(vMoveToTarget));
+
             if (Trinity.Settings.Advanced.DisableAllMovement)
                 return;
 
