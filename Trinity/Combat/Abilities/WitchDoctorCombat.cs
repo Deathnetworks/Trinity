@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Trinity.DbProvider;
 using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
@@ -11,18 +10,7 @@ namespace Trinity.Combat.Abilities
 {
     public class WitchDoctorCombat : CombatBase
     {
-        private static int MaxFetishArmyCount
-        {
-            get
-            {
-                if (Runes.WitchDoctor.LegionOfDaggers.IsActive)
-                    return 8;
-                if (Runes.WitchDoctor.TikiTorchers.IsActive || Runes.WitchDoctor.HeadHunters.IsActive)
-                    return 7;
 
-                return 5;
-            }
-        }
         private static readonly HashSet<SNOPower> HarvesterDebuffs = new HashSet<SNOPower>
         {
             SNOPower.Witchdoctor_Haunt,
@@ -30,11 +18,13 @@ namespace Trinity.Combat.Abilities
             SNOPower.Witchdoctor_Piranhas,
             SNOPower.Witchdoctor_AcidCloud
         };
+
         private static readonly HashSet<SNOPower> HarvesterCoreDebuffs = new HashSet<SNOPower>
         {
             SNOPower.Witchdoctor_Haunt,
             SNOPower.Witchdoctor_Locust_Swarm,
         };
+
         public static System.Diagnostics.Stopwatch VisionQuestRefreshTimer = new System.Diagnostics.Stopwatch();
         public static long GetTimeSinceLastVisionQuestRefresh()
         {
@@ -47,396 +37,467 @@ namespace Trinity.Combat.Abilities
         public static TrinityPower GetPower()
         {
             TrinityPower power = null;
-
-            // Spirit walk
-            power = GetSpiritWalkPower();
-            if (!IsNull(power)) { return power; }
-
-            // Skills off CD
-            power = GetSpamPower();
-            if (!IsNull(power)) { return power; }
-
-            // Avoidance
-            if (IsCurrentlyAvoiding || Trinity.Player.StandingInAvoidance)
-            {
-                power = GetAvoidancePower();
-                if (!IsNull(power)) { return power; }
-            }
-
-            // Destruclible
-            if (UseDestructiblePower)
-            {
-                return DestroyObjectPower;
-            }
-
-            // Bastions of will
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && IsBastionsPrimaryBuffWillExpired)
-            {
-                power = GetPrimaryPower();
-                if (!IsNull(power)) { return power; }
-            }
-
-            // Jade Harvester special logic
-            if (Player.IsInCombat && Sets.RaimentOfTheJadeHarvester.IsMaxBonusActive)
-            {
-                power = RunJadeHarvesterRoutine();
-                if (!IsNull(power)) { return power; }
-            }
-
-            if (Player.IsInCombat && Legendary.TiklandianVisage.IsEquipped)
-            {
-                power = RunTiklandianRoutine();
-                if (!IsNull(power)) { return power; }
-            }
-
-            // Combat
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && CurrentTarget != null)
-            {
-                power = GetCombatPower();
-                if (!IsNull(power)) { return power; }
-
-                power = GetPrimaryPower();
-                if (!IsNull(power)) { return power; }
-            }
-
-            // Buffs
-            if (UseOOCBuff)
-            {
-                power = GetOOCPower();
-                if (!IsNull(power)) { return power; }
-            }
-
-            // Default Attacks
-            if (IsNull(power)) { return DefaultPower; }
-
-            return power;
-        }
-
-        private static TrinityPower GetSpiritWalkPower()
-        {
-            if (!Skills.WitchDoctor.SpiritWalk.CanCast(CanCastFlags.NoTimer))
-                return null;
-
-            // Spirit walk OOC Movement
-            if (!Player.IsInCombat && Settings.Combat.Misc.AllowOOCMovement && PlayerMover.GetMovementSpeed() > 1)
-                return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
-
-            // Spirit walk Avoidance
-            if (Trinity.Player.StandingInAvoidance || IsCurrentlyAvoiding)
-                return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
-
-            // Spirit walk Incapacited or Rooted
-            if (Player.IsIncapacitated || Player.IsRooted)
-                return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
-
-            // Spirit walk Mana purchase
-            if (Runes.WitchDoctor.HonoredGuest.IsActive && Player.PrimaryResourcePct <= 0.5)
-                return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
-
-            // Spirit walk Life purchase
-            if (Runes.WitchDoctor.HealingJourney.IsActive && Player.CurrentHealthPct <= 0.65)
-                return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
-
-            // Avoid death
-            if (Player.CurrentHealthPct <= 0.5)
-                return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
-
-            // Spirit walk Goblin track
-            if (!Settings.Combat.WitchDoctor.UseSpiritWalkOnlyAvoidance && CurrentTarget != null &&
-                CurrentTarget.IsTreasureGoblin && CurrentTarget.HitPointsPct < 0.90 && CurrentTarget.RadiusDistance <= 40f)
+		
+            // Spirit Walk, always!
+            if (CanCast(SNOPower.Witchdoctor_SpiritWalk))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
             }
 
-            // Spam in combat
-            if (Player.IsInCombat && !Settings.Combat.WitchDoctor.UseSpiritWalkOnlyAvoidance)
+            // Combat Avoidance Spells
+            if (!UseOOCBuff && IsCurrentlyAvoiding)
             {
-                return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
-            }
-
-            return null;
-        }
-
-        private static TrinityPower GetAvoidancePower()
-        {
-            // Spirit walk
-            TrinityPower spiritWalkPower = GetSpiritWalkPower();
-            if (!IsNull(spiritWalkPower)) { return spiritWalkPower; }
-
-            // Horrify
-            if (Skills.WitchDoctor.Horrify.CanCast())
-            {
-                TrinityPower horrifyPower = GetHorrifyPower();
-                if (!IsNull(horrifyPower)) { return horrifyPower; }
-            }
-
-            return null;
-        }
-
-        private static TrinityPower GetSpamPower()
-        {
-            // Horrify Off CD
-            if (Settings.Combat.WitchDoctor.SpamHorrify && CanCast(SNOPower.Witchdoctor_Horrify, CanCastFlags.NoTimer))
-            {
-                TrinityPower power = GetHorrifyPower();
-                if (!IsNull(power)) { return power; }
-            }
-
-            if (TargetUtil.AnyMobsInRange(40f))
-            {
-                // Fetish Army off CD
-                if (Settings.Combat.WitchDoctor.UseFetishArmyOffCooldown && CanCast(SNOPower.Witchdoctor_FetishArmy, CanCastFlags.NoTimer) && Trinity.PlayerOwnedFetishCount <= MaxFetishArmyCount * 0.6)
-                    return new TrinityPower(SNOPower.Witchdoctor_FetishArmy);
-
-                // BigBadVoodoo off CD at Player
-                if (Settings.Combat.WitchDoctor.UseBigBadVoodooOffCooldown && CanCast(SNOPower.Witchdoctor_BigBadVoodoo, CanCastFlags.NoTimer) && !CacheData.Voodoo.Any(bbv => bbv.Position.Distance2D(Player.Position) <= 27f))
-                    return new TrinityPower(SNOPower.Witchdoctor_BigBadVoodoo);
-
-                // BigBadVoodoo off CD close to AoE
-                if (Settings.Combat.WitchDoctor.UseBigBadVoodooOffCooldown && CanCast(SNOPower.Witchdoctor_BigBadVoodoo, CanCastFlags.NoTimer) && CacheData.Voodoo.Any(bbv => bbv.Position.Distance2D(Player.Position) <= 27f) &&
-                    CurrentTarget != null && CurrentTarget.IsTrashPackOrBossEliteRareUnique)
+                // Spirit Walk out of AoE
+                if (CanCast(SNOPower.Witchdoctor_SpiritWalk))
                 {
-                    return new TrinityPower(SNOPower.Witchdoctor_BigBadVoodoo, 8f, TargetUtil.GetBestClusterPoint(30f, RangedAttackRange));
+                    return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
+                }
+
+                // Soul harvest at current location while avoiding
+                if (Sets.RaimentOfTheJadeHarvester.IsMaxBonusActive && MinimumSoulHarvestCriteria(Enemies.BestCluster))
+                {
+                    Skills.WitchDoctor.SoulHarvest.Cast();
                 }
             }
 
-            return null;
-        }
-
-        private static TrinityPower GetOOCPower()
-        {
-            // Horrify increase move speed by 20%
-            if (CanCast(SNOPower.Witchdoctor_Horrify) && Runes.WitchDoctor.Stalker.IsActive && PlayerMover.GetMovementSpeed() > 1)
-                return new TrinityPower(SNOPower.Witchdoctor_Horrify);
-
-            // Zombie Dogs non-sacrifice build
-            if (CanCast(SNOPower.Witchdoctor_SummonZombieDog) &&
-                ((Legendary.TheTallMansFinger.IsEquipped && Trinity.PlayerOwnedZombieDogCount < 1) ||
-                (!Legendary.TheTallMansFinger.IsEquipped && Trinity.PlayerOwnedZombieDogCount <= 2)))
+            // Incapacitated or Rooted
+            if (!UseOOCBuff && (Player.IsIncapacitated || Player.IsRooted))
             {
-                return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog);
+                // Spirit Walk
+                if (CanCast(SNOPower.Witchdoctor_SpiritWalk))
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
+                }
             }
 
-            // Gargantuan
-            if (CanCast(SNOPower.Witchdoctor_Gargantuan) && Trinity.PlayerOwnedGargantuanCount == 0 &&
-                !Runes.WitchDoctor.RestlessGiant.IsActive && !Runes.WitchDoctor.WrathfulProtector.IsActive)
+            // Combat Spells with a Target
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && CurrentTarget != null)
             {
-                return new TrinityPower(SNOPower.Witchdoctor_Gargantuan);
-            }
 
-            // Spirit Barrage Manitou
-            if (CanCast(SNOPower.Witchdoctor_SpiritBarrage) && Runes.WitchDoctor.Manitou.IsActive &&
-                TimeSincePowerUse(SNOPower.Witchdoctor_SpiritBarrage) > 18000)
-            {
-                return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage);
-            }
 
-            return null;
-        }
+                bool hasGraveInjustice = CacheData.Hotbar.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice);
 
-        private static TrinityPower GetCombatPower()
-        {
-            // Vision Quest Passive
-            if (Passives.WitchDoctor.VisionQuest.IsActive &&
-                (!GetHasBuff(SNOPower.Witchdoctor_Passive_VisionQuest) || GetTimeSinceLastVisionQuestRefresh() > 3800))
-            {
-                TrinityPower primaryPower = GetPrimaryPower();
-                if (!IsNull(primaryPower)) { return primaryPower; }
-            }
+                bool hasAngryChicken = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Hex && s.RuneIndex == 1);
+                bool isChicken = hasAngryChicken && Player.IsHidden;
 
-            // Sacrifice
-            if (CanCast(SNOPower.Witchdoctor_Sacrifice) && Trinity.PlayerOwnedZombieDogCount > 0)
-            {
-                if (TargetUtil.AnyElitesInRange(15f, 1) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f))
+                bool hasVisionQuest = CacheData.Hotbar.PassiveSkills.Any(s => s == SNOPower.Witchdoctor_Passive_VisionQuest);
+
+                // Set max ranged attack range, based on Grave Injustice, and current target NOT standing in avoidance, and health > 25%
+                float rangedAttackMaxRange = 30f;
+                if (hasGraveInjustice && !CurrentTarget.IsStandingInAvoidance && Player.CurrentHealthPct > 0.25)
+                    rangedAttackMaxRange = Math.Min(Player.GoldPickupRadius + 8f, 30f);
+
+                // Set basic attack range, depending on whether or not we have Bears and whether or not we are a tik tank
+                float basicAttackRange = 35f;
+                if (hasGraveInjustice)
+                    basicAttackRange = rangedAttackMaxRange;
+                else if (Hotbar.Contains(SNOPower.Witchdoctor_ZombieCharger) && Player.PrimaryResource >= 150)
+                    basicAttackRange = 30f;
+				else if (Legendary.TiklandianVisage.IsEquipped && !TikHorrifyCriteria(Enemies.BestLargeCluster))
+					basicAttackRange = 25f;	
+				else if (Legendary.TiklandianVisage.IsEquipped)
+					basicAttackRange = 1f;
+					
+					
+			
+
+                // Summon Pets  -----------------------------------------------------------------------
+
+                // Hex with angry chicken, is chicken, explode!
+                if (isChicken && (TargetUtil.AnyMobsInRange(12f, 1, false) || CurrentTarget.RadiusDistance <= 10f || UseDestructiblePower) &&
+                    CanCast(SNOPower.Witchdoctor_Hex_Explode))
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_Hex_Explode);
+                }
+
+                bool hasJaunt = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritWalk && s.RuneIndex == 1);
+                bool hasHonoredGuest = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritWalk && s.RuneIndex == 3);
+                bool hasUmbralShock = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritWalk && s.RuneIndex == 2);
+                bool hasSeverance = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritWalk && s.RuneIndex == 0);
+                bool hasHealingJourney = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritWalk && s.RuneIndex == 4);
+
+                // Spirit Walk for Goblins chasing
+                if (CanCast(SNOPower.Witchdoctor_SpiritWalk) &&
+                    CurrentTarget.IsTreasureGoblin && CurrentTarget.HitPointsPct < 0.90 && CurrentTarget.RadiusDistance <= 40f)
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
+                }
+
+                // Spirit Walk < 65% Health: Healing Journey
+                if (CanCast(SNOPower.Witchdoctor_SpiritWalk) && hasHealingJourney &&
+                    Player.CurrentHealthPct <= V.F("WitchDoctor.SpiritWalk.HealingJourneyHealth"))
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
+                }
+
+                // Spirit Walk < 50% Mana: Honored Guest
+                if (CanCast(SNOPower.Witchdoctor_SpiritWalk) && hasHonoredGuest &&
+                    Player.PrimaryResourcePct <= V.F("WitchDoctor.SpiritWalk.HonoredGuestMana"))
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
+                }
+
+                //bool shouldRefreshVisionQuest = GetTimeSinceLastVisionQuestRefresh() > 4000;
+                bool shouldRefreshVisionQuest = !GetHasBuff(SNOPower.Witchdoctor_Passive_VisionQuest) || GetTimeSinceLastVisionQuestRefresh() > 3800;
+
+                // Vision Quest Passive
+                if (hasVisionQuest && shouldRefreshVisionQuest)
+                {
+                    // Poison Darts 
+                    if (CanCast(SNOPower.Witchdoctor_PoisonDart))
+                    {
+                        VisionQuestRefreshTimer.Restart();
+                        return new TrinityPower(SNOPower.Witchdoctor_PoisonDart, basicAttackRange, CurrentTarget.ACDGuid);
+                    }
+                    // Corpse Spiders
+                    if (CanCast(SNOPower.Witchdoctor_CorpseSpider))
+                    {
+                        VisionQuestRefreshTimer.Restart();
+                        return new TrinityPower(SNOPower.Witchdoctor_CorpseSpider, basicAttackRange, CurrentTarget.ACDGuid);
+                    }
+                    // Plague Of Toads 
+                    if (CanCast(SNOPower.Witchdoctor_PlagueOfToads))
+                    {
+                        VisionQuestRefreshTimer.Restart();
+                        return new TrinityPower(SNOPower.Witchdoctor_PlagueOfToads, basicAttackRange, CurrentTarget.ACDGuid);
+                    }
+                    // Fire Bomb 
+                    if (CanCast(SNOPower.Witchdoctor_Firebomb))
+                    {
+                        VisionQuestRefreshTimer.Restart();
+                        return new TrinityPower(SNOPower.Witchdoctor_Firebomb, basicAttackRange, CurrentTarget.ACDGuid); ;
+                    }
+                }
+
+                bool hasVengefulSpirit = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_SoulHarvest && s.RuneIndex == 4);
+                bool hasSwallowYourSoul = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_SoulHarvest && s.RuneIndex == 3);
+				
+                // START Jade Harvester -----------------------------------------------------------------------
+
+                if (Sets.RaimentOfTheJadeHarvester.IsMaxBonusActive)
+                {
+                    //LogTargetArea("BestLargeCluster", Enemies.BestLargeCluster);
+                    //LogTargetArea("BestCluster", Enemies.BestCluster);
+                    //LogTargetArea("Nearby", Enemies.Nearby);
+                    //LogTargetArea("CloseNearby", Enemies.CloseNearby);
+
+                    // Piranhas
+                    if (CanCast(SNOPower.Witchdoctor_Piranhas) && Player.PrimaryResource >= 250 &&
+                        (TargetUtil.ClusterExists(15f, 45f) || TargetUtil.AnyElitesInRange(45f)) &&
+                        LastPowerUsed != SNOPower.Witchdoctor_Piranhas &&
+                        Player.PrimaryResource >= 250)
+                    {
+                        return new TrinityPower(SNOPower.Witchdoctor_Piranhas, 25f, Enemies.BestCluster.Position);
+                    }
+
+                    // Should we move to cluster for harvest
+                    if (IdealSoulHarvestCriteria(Enemies.BestLargeCluster))
+                    {
+                        //LogTargetArea("--- Found a good harvest location...", Enemies.BestLargeCluster);
+                        MoveToSoulHarvestPoint(Enemies.BestLargeCluster);
+                    }
+
+                    // Is there a slightly better position than right here
+                    if (MinimumSoulHarvestCriteria(Enemies.BestCluster) && (Enemies.BestCluster.EliteCount >= 2 || Enemies.BestCluster.UnitCount > 4))
+                    {
+                        //LogTargetArea("--- Found an average harvest location...", Enemies.BestCluster);
+                        MoveToSoulHarvestPoint(Enemies.BestCluster);
+                    }
+
+                    // Should we harvest right here?
+                    if (MinimumSoulHarvestCriteria(Enemies.CloseNearby))
+                    {
+                        //LogTargetArea("--- Harvesting (CurrentPosition)", Enemies.CloseNearby);
+                        return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest);
+                    }
+
+                    // Locust Swarm
+                    if (CanCast(SNOPower.Witchdoctor_Locust_Swarm) && Player.PrimaryResource >= 300 &&
+                        !CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Locust_Swarm))
+                    {
+                        return new TrinityPower(SNOPower.Witchdoctor_Locust_Swarm, 20f, CurrentTarget.ACDGuid);
+                    }
+
+                    // Haunt 
+                    if (Skills.WitchDoctor.Haunt.CanCast() && Player.PrimaryResource >= 50 &&
+                        !CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Haunt))
+                    {
+                        return new TrinityPower(SNOPower.Witchdoctor_Haunt, 45f, CurrentTarget.ACDGuid);
+                    }
+
+                    // Acid Cloud
+                    if (Skills.WitchDoctor.AcidCloud.CanCast() && Player.PrimaryResource >= 325 &&
+                        LastPowerUsed != SNOPower.Witchdoctor_AcidCloud)
+                    {
+                        Vector3 bestClusterPoint;
+                        if (Passives.WitchDoctor.GraveInjustice.IsActive)
+                            bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, Math.Min(Player.GoldPickupRadius + 8f, 30f));
+                        else
+                            bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, 30f);
+
+                        return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, rangedAttackMaxRange, bestClusterPoint);
+                    }
+
+                    // Spread the love around
+                    if (!CurrentTarget.IsTreasureGoblin && CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Locust_Swarm) &&
+                        CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Haunt) && Enemies.Nearby.UnitCount > 3 && 
+                        Enemies.Nearby.DebuffedPercent(HarvesterCoreDebuffs) < 0.5)
+                    {
+                        //var oldTarget = Trinity.CurrentTarget;
+                        Trinity.Blacklist3Seconds.Add(CurrentTarget.RActorGuid);
+                        Trinity.CurrentTarget = Enemies.BestCluster.GetTargetWithoutDebuffs(HarvesterCoreDebuffs);
+                        //Logger.LogNormal("{0} {1} is fully debuffed, switched to {2} {3}", oldTarget.InternalName, oldTarget.ACDGuid, CurrentTarget.InternalName, CurrentTarget.ACDGuid);
+                    }
+
+                    // Save mana for locust swarm || piranhas
+                    if (!CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Locust_Swarm) && Player.PrimaryResource < 300)
+                    {
+                        //Logger.LogNormal("Saving mana");
+                        return DefaultPower;
+                    }
+
+                }
+
+                // END Jade Harvester -----------------------------------------------------------------------
+
+                // Tiklandian Visage ----------------------------------------------------------------------
+                // Constantly casts Horrify and moves the middle of clusters
+
+                if (Legendary.TiklandianVisage.IsEquipped)
+                {
+                    // Piranhas
+                    if (CanCast(SNOPower.Witchdoctor_Piranhas) && Player.PrimaryResource >= 250 &&
+                        (TargetUtil.ClusterExists(15f, 45f) || TargetUtil.AnyElitesInRange(45f)) &&
+                        LastPowerUsed != SNOPower.Witchdoctor_Piranhas &&
+                        Player.PrimaryResource >= 250)
+                    {
+                        return new TrinityPower(SNOPower.Witchdoctor_Piranhas, 25f, Enemies.BestCluster.Position);
+                    }
+
+                    //Cast Horrify before we go into the fray
+                    if (CanCast(SNOPower.Witchdoctor_Horrify))
+                        return new TrinityPower(SNOPower.Witchdoctor_Horrify);
+
+                    // Should we move to a better position to fear people
+                    if (TikHorrifyCriteria(Enemies.BestLargeCluster))
+                        MoveToHorrifyPoint(Enemies.BestLargeCluster);
+                    
+
+                }
+
+                // END Tiklandian Visage ----------------------------------------------------------------------   
+
+                // Sacrifice
+                if (CanCast(SNOPower.Witchdoctor_Sacrifice) && Trinity.PlayerOwnedZombieDogCount > 0 &&
+                    (TargetUtil.AnyElitesInRange(15, 1) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 9f)))
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_Sacrifice);
                 }
 
                 // Sacrifice for Circle of Life
-                if (Passives.WitchDoctor.CircleOfLife.IsActive && TargetUtil.AnyMobsInRange(15f))
+                bool hasCircleofLife = CacheData.Hotbar.PassiveSkills.Any(s => s == SNOPower.Witchdoctor_Passive_CircleOfLife);
+                if (CanCast(SNOPower.Witchdoctor_Sacrifice) && Trinity.PlayerOwnedZombieDogCount > 0 && hasCircleofLife && TargetUtil.AnyMobsInRange(15f))
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_Sacrifice);
+                }
+
+                bool hasRestlessGiant = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Gargantuan && s.RuneIndex == 0);
+                bool hasWrathfulProtector = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Gargantuan && s.RuneIndex == 3);
+
+                if (CanCast(SNOPower.Witchdoctor_Gargantuan))
+                {
+                    // Gargantuan, Recast on Elites or Bosses to trigger Restless Giant
+                    if (hasRestlessGiant && (TargetUtil.IsEliteTargetInRange(30f) || Trinity.PlayerOwnedGargantuanCount == 0))
+                    {
+                        return new TrinityPower(SNOPower.Witchdoctor_Gargantuan);
+                    }
+
+                    // Gargantuan Wrathful Protector, 15 seconds of smash, use sparingly!
+                    if (hasWrathfulProtector && TargetUtil.IsEliteTargetInRange(30f))
+                    {
+                        return new TrinityPower(SNOPower.Witchdoctor_Gargantuan);
+                    }
+
+                    // Gargantuan regular
+                    if (!hasRestlessGiant && !hasWrathfulProtector && Trinity.PlayerOwnedGargantuanCount == 0)
+                    {
+                        return new TrinityPower(SNOPower.Witchdoctor_Gargantuan);
+                    }
+                }
+
+                bool hasSacrifice = Hotbar.Contains(SNOPower.Witchdoctor_Sacrifice);
+
+                // Zombie Dogs for Sacrifice
+                if (hasSacrifice && CanCast(SNOPower.Witchdoctor_SummonZombieDog) &&
+                    (LastPowerUsed == SNOPower.Witchdoctor_Sacrifice || Trinity.PlayerOwnedZombieDogCount <= 2) &&
+                    LastPowerUsed != SNOPower.Witchdoctor_SummonZombieDog)
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog);
+                }
+
+                // Hex with angry chicken, check if we want to shape shift and explode
+                if (CanCast(SNOPower.Witchdoctor_Hex) && (TargetUtil.AnyMobsInRange(12f, 1, false) || CurrentTarget.RadiusDistance <= 10f) &&
+                    hasAngryChicken)
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_Hex);
+                }
+
+                // Hex Spam Cast without angry chicken
+                if (CanCast(SNOPower.Witchdoctor_Hex) && !hasAngryChicken &&
+                   (TargetUtil.AnyElitesInRange(12) || TargetUtil.AnyMobsInRange(12, 2) || TargetUtil.IsEliteTargetInRange(18f)))
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_Hex);
+                }
+                // Mass Confuse, elites only or big mobs or to escape on low health
+                if (CanCast(SNOPower.Witchdoctor_MassConfusion) &&
+                    (TargetUtil.AnyElitesInRange(12, 1) || TargetUtil.AnyMobsInRange(12, 6) || Player.CurrentHealthPct <= 0.25 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 12f)) &&
+                    !CurrentTarget.IsTreasureGoblin)
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_MassConfusion, 0f, CurrentTarget.ACDGuid);
+                }
+
+                if (!Settings.Combat.WitchDoctor.UseBigBadVoodooOffCooldown)
+                {
+                    // Big Bad Voodoo, elites and bosses only
+                    if (CanCast(SNOPower.Witchdoctor_BigBadVoodoo) &&
+                        (TargetUtil.EliteOrTrashInRange(25f) || (CurrentTarget.IsBoss && CurrentTarget.Distance <= 30f)))
+                    {
+                        return new TrinityPower(SNOPower.Witchdoctor_BigBadVoodoo);
+                    }
+                }
+                else
+                {
+                    // Big Bad Voodo, cast whenever available
+                    if (!UseOOCBuff && !Player.IsIncapacitated && CanCast(SNOPower.Witchdoctor_BigBadVoodoo))
+                    {
+                        return new TrinityPower(SNOPower.Witchdoctor_BigBadVoodoo);
+                    }
+                }
+                // Grasp of the Dead
+                if (CanCast(SNOPower.Witchdoctor_GraspOfTheDead) &&
+                    (TargetUtil.AnyMobsInRange(30, 2) || TargetUtil.EliteOrTrashInRange(30f)) &&
+                    Player.PrimaryResource >= 150)
+                {
+                    var bestClusterPoint = TargetUtil.GetBestClusterPoint();
+
+                    return new TrinityPower(SNOPower.Witchdoctor_GraspOfTheDead, 25f, bestClusterPoint);
+                }
+
+                // Piranhas
+                if (CanCast(SNOPower.Witchdoctor_Piranhas) && Player.PrimaryResource >= 250 &&
+                    (TargetUtil.ClusterExists(15f, 45f) || TargetUtil.AnyElitesInRange(45f)) &&
+                    Player.PrimaryResource >= 250)
+                {
+                    var bestClusterPoint = TargetUtil.GetBestClusterPoint();
+
+                    return new TrinityPower(SNOPower.Witchdoctor_Piranhas, 25f, bestClusterPoint);
+                }
+
+                bool hasPhobia = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 2);
+                bool hasStalker = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 4);
+                bool hasFaceOfDeath = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 1);
+                bool hasFrighteningAspect = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 0);
+                bool hasRuthlessTerror = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 3);
+
+                float horrifyRadius = hasFaceOfDeath ? 24f : 12f;
+
+                // Horrify when low on health
+                if (CanCast(SNOPower.Witchdoctor_Horrify) && Player.CurrentHealthPct <= CombatBase.EmergencyHealthPotionLimit && TargetUtil.AnyMobsInRange(horrifyRadius, 3))
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_Horrify);
+                }
+
+                // Horrify Buff at 35% health -- Freightening Aspect
+                if (CanCast(SNOPower.Witchdoctor_Horrify) && Player.CurrentHealthPct <= 0.35 && hasFrighteningAspect)
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_Horrify);
+                }
+
+                // Spam Horrify
+                if (CanCast(SNOPower.Witchdoctor_Horrify) && Settings.Combat.WitchDoctor.SpamHorrify)
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_Horrify);
+                }
+
+                // Fetish Army, elites only
+                if (CanCast(SNOPower.Witchdoctor_FetishArmy) &&
+                    (TargetUtil.EliteOrTrashInRange(30f) || TargetUtil.IsEliteTargetInRange(30f) || Settings.Combat.WitchDoctor.UseFetishArmyOffCooldown))
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_FetishArmy);
+                }
+
+                bool hasManitou = Runes.WitchDoctor.Manitou.IsActive;
+
+                // Spirit Barrage Manitou
+                if (CanCast(SNOPower.Witchdoctor_SpiritBarrage) && Player.PrimaryResource >= 100 &&
+                    TimeSincePowerUse(SNOPower.Witchdoctor_SpiritBarrage) > 18000 && hasManitou)
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage);
+                }
+
+                bool hasResentfulSpirit = Runes.WitchDoctor.ResentfulSpirits.IsActive;
+                // Haunt 
+                if (CanCast(SNOPower.Witchdoctor_Haunt) &&
+                    Player.PrimaryResource >= 50 &&
+                    !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.Witchdoctor_Haunt) &&
+                    LastPowerUsed != SNOPower.Witchdoctor_Haunt)
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_Haunt, 21f, CurrentTarget.ACDGuid);
+                }
+
+                //skillDict.Add("LocustSwarm", SNOPower.Witchdoctor_Locust_Swarm);
+
+                // Locust Swarm
+                if (CanCast(SNOPower.Witchdoctor_Locust_Swarm) && Player.PrimaryResource >= 300 &&
+                    !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.Witchdoctor_Locust_Swarm) && LastPowerUsed != SNOPower.Witchdoctor_Locust_Swarm)
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_Locust_Swarm, 12f, CurrentTarget.ACDGuid);
                 }
 
                 // Sacrifice for 0 Dogs
-                if (TargetUtil.AnyMobsInRange(25f) && (Settings.Combat.WitchDoctor.ZeroDogs || !WitchDoctorHasPrimaryAttack))
+                if (CanCast(SNOPower.Witchdoctor_Sacrifice) &&
+                    (Settings.Combat.WitchDoctor.ZeroDogs || !WitchDoctorHasPrimaryAttack))
                 {
-                    return new TrinityPower(SNOPower.Witchdoctor_Sacrifice);
-                }
-            }
-
-            // Gargantuan
-            if (CanCast(SNOPower.Witchdoctor_Gargantuan) && Trinity.PlayerOwnedGargantuanCount == 0)
-            {
-                // Gargantuan, Recast on Elites or Bosses to trigger Restless Giant
-                if (Runes.WitchDoctor.RestlessGiant.IsActive && (TargetUtil.IsEliteTargetInRange(30f) || Trinity.PlayerOwnedGargantuanCount == 0))
-                {
-                    return new TrinityPower(SNOPower.Witchdoctor_Gargantuan);
+                    return new TrinityPower(SNOPower.Witchdoctor_Sacrifice, 9f);
                 }
 
-                // Gargantuan Wrathful Protector, 15 seconds of smash, use sparingly!
-                if (Runes.WitchDoctor.WrathfulProtector.IsActive && TargetUtil.IsEliteTargetInRange(30f))
+                // Wall of Zombies
+                if (CanCast(SNOPower.Witchdoctor_WallOfZombies) &&
+                    (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 4) ||
+                    ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 25f)))
                 {
-                    return new TrinityPower(SNOPower.Witchdoctor_Gargantuan);
+                    return new TrinityPower(SNOPower.Witchdoctor_WallOfZombies, 25f, CurrentTarget.Position);
                 }
 
-                // Gargantuan regular
-                if (!Runes.WitchDoctor.RestlessGiant.IsActive && !Runes.WitchDoctor.WrathfulProtector.IsActive)
-                {
-                    return new TrinityPower(SNOPower.Witchdoctor_Gargantuan);
-                }
-            }
+                var zombieChargerRange = hasGraveInjustice ? Math.Min(Player.GoldPickupRadius + 8f, 11f) : 11f;
 
-            // Zombie Dogs
-            if (CanCast(SNOPower.Witchdoctor_SummonZombieDog))
-            {
-                // Zombie Dogs for Sacrifice
-                if (Skills.WitchDoctor.Sacrifice.IsActive &&
-                    (LastPowerUsed == SNOPower.Witchdoctor_Sacrifice || Trinity.PlayerOwnedZombieDogCount <= 2))
+                // Zombie Charger aka Zombie bears Spams Bears @ Everything from 11feet away
+                if (CanCast(SNOPower.Witchdoctor_ZombieCharger) && Player.PrimaryResource >= 150)
                 {
-                    return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog);
+                    return new TrinityPower(SNOPower.Witchdoctor_ZombieCharger, zombieChargerRange, CurrentTarget.Position);
                 }
 
-                // Zombie Dogs non-sacrifice build
-                if (!Skills.WitchDoctor.Sacrifice.IsActive &&
-                    ((Legendary.TheTallMansFinger.IsEquipped && Trinity.PlayerOwnedZombieDogCount < 1) ||
-                    (!Legendary.TheTallMansFinger.IsEquipped && Trinity.PlayerOwnedZombieDogCount <= 2)))
-                {
-                    return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog);
-                }
-            }
-
-            // Hex with angry chicken, is chicken, explode!
-            if (CanCast(SNOPower.Witchdoctor_Hex_Explode) && Skills.WitchDoctor.Hex.IsActive && Player.IsHidden &&
-                (TargetUtil.AnyMobsInRange(12f) || CurrentTarget.RadiusDistance <= 12f))
-            {
-                return new TrinityPower(SNOPower.Witchdoctor_Hex_Explode);
-            }
-
-            // Hex
-            if (CanCast(SNOPower.Witchdoctor_Hex) &&
-                (TargetUtil.ClusterExists(RangedAttackRange, 2) || TargetUtil.EliteOrTrashInRange(RangedAttackRange)))
-            {
-                return new TrinityPower(SNOPower.Witchdoctor_Hex);
-            }
-
-            // Mass Confuse, elites only or big mobs or to escape on low health
-            if (CanCast(SNOPower.Witchdoctor_MassConfusion))
-            {
-                if (TargetUtil.AnyElitesInRange(MeleeAttackRange) || TargetUtil.AnyMobsInRange(MeleeAttackRange, 5))
-                {
-                    return new TrinityPower(SNOPower.Witchdoctor_MassConfusion);
-                }
-
-                if (Player.CurrentHealthPct <= 0.25 && TargetUtil.AnyMobsInRange(MeleeAttackRange, 2))
-                {
-                    return new TrinityPower(SNOPower.Witchdoctor_MassConfusion);
-                }
-
-                if (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= MeleeAttackRange)
-                {
-                    return new TrinityPower(SNOPower.Witchdoctor_MassConfusion);
-                }
-            }
-
-            // Fetish Army
-            if (CanCast(SNOPower.Witchdoctor_FetishArmy) && Trinity.PlayerOwnedFetishCount <= MaxFetishArmyCount * 0.6 &&
-                (TargetUtil.EliteOrTrashInRange(RangedAttackRange) || (CurrentTarget.IsBoss && CurrentTarget.Distance <= RangedAttackRange)))
-            {
-                return new TrinityPower(SNOPower.Witchdoctor_FetishArmy);
-            }
-
-            // Big Bad Voodoo
-            if (CanCast(SNOPower.Witchdoctor_BigBadVoodoo))
-            {
-                // At player
-                if (!Trinity.Player.HasDebuff(SNOPower.Witchdoctor_BigBadVoodoo) && (TargetUtil.EliteOrTrashInRange(RangedAttackRange) || (CurrentTarget.IsBoss && CurrentTarget.Distance <= RangedAttackRange)))
-                {
-                    return new TrinityPower(SNOPower.Witchdoctor_BigBadVoodoo);
-                }
-
-                // Close to AoE
-                if (Trinity.Player.HasDebuff(SNOPower.Witchdoctor_BigBadVoodoo) && CurrentTarget.IsTrashPackOrBossEliteRareUnique)
-                {
-                    return new TrinityPower(SNOPower.Witchdoctor_BigBadVoodoo, 8f, TargetUtil.GetBestClusterPoint(30f, RangedAttackRange));
-                }
-            }
-
-            // Grasp of the Dead
-            if (CanCast(SNOPower.Witchdoctor_GraspOfTheDead) &&
-                (TargetUtil.ClusterExists(RangedAttackRange, 2) || TargetUtil.EliteOrTrashInRange(RangedAttackRange)))
-            {
-                return new TrinityPower(SNOPower.Witchdoctor_GraspOfTheDead, RangedAttackRange, TargetUtil.GetBestClusterPoint(15f, RangedAttackRange));
-            }
-
-            // Piranhas
-            if (Skills.WitchDoctor.Piranhas.CanCast() &&
-                (TargetUtil.ClusterExists(20f, 3) || TargetUtil.EliteOrTrashInRange(RangedAttackRange)))
-            {
-                return new TrinityPower(SNOPower.Witchdoctor_Piranhas, RangedAttackRange, TargetUtil.GetBestClusterPoint(20f));
-            }
-
-            // Wall of Zombies
-            if (CanCast(SNOPower.Witchdoctor_WallOfZombies) &&
-                (TargetUtil.AnyElitesInRange(RangedAttackRange, 1) || TargetUtil.AnyMobsInRange(RangedAttackRange, 4) ||
-                (CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss)))
-            {
-                return new TrinityPower(SNOPower.Witchdoctor_WallOfZombies, RangedAttackRange, CurrentTarget.Position);
-            }
-
-            // Horrify
-            if (CanCast(SNOPower.Witchdoctor_Horrify))
-            {
-                TrinityPower horrifyPower = GetHorrifyPower();
-                if (!IsNull(horrifyPower)) { return horrifyPower; }
-            }
-
-            // Haunt 
-            if (CanCast(SNOPower.Witchdoctor_Haunt) && LastPowerUsed != SNOPower.Witchdoctor_Haunt &&
-                !CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Haunt))
-            {
-                return new TrinityPower(SNOPower.Witchdoctor_Haunt, RangedAttackRange, CurrentTarget.Position);
-            }
-
-            // Locust Swarm
-            if (CanCast(SNOPower.Witchdoctor_Locust_Swarm) &&
-                !CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Locust_Swarm))
-            {
-                return new TrinityPower(SNOPower.Witchdoctor_Locust_Swarm, MeleeAttackRange, CurrentTarget.Position);
-            }
-
-            // Zombie Charger
-            if (CanCast(SNOPower.Witchdoctor_ZombieCharger))
-            {
-                return new TrinityPower(SNOPower.Witchdoctor_ZombieCharger, MeleeAttackRange, CurrentTarget.Position);
-            }
-
-            if (!Sets.RaimentOfTheJadeHarvester.IsMaxBonusActive && CanCast(SNOPower.Witchdoctor_SoulHarvest))
-            {
                 // Soul Harvest Any Elites or to increase buff stacks
-                if (TargetUtil.AnyMobsInRange(16f, GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) + 1, false) ||
-                    TargetUtil.IsEliteTargetInRange(16f))
+                if (!Sets.RaimentOfTheJadeHarvester.IsMaxBonusActive && CanCast(SNOPower.Witchdoctor_SoulHarvest) &&
+                    (TargetUtil.AnyMobsInRange(16f, GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) + 1, false) || (hasSwallowYourSoul && Player.PrimaryResourcePct <= 0.50) || TargetUtil.IsEliteTargetInRange(16f)))
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest);
                 }
 
                 // Soul Harvest with VengefulSpirit
-                if (Runes.WitchDoctor.VengefulSpirit.IsActive && TargetUtil.AnyMobsInRange(16, 3))
+                if (!Sets.RaimentOfTheJadeHarvester.IsMaxBonusActive && CanCast(SNOPower.Witchdoctor_SoulHarvest) && hasVengefulSpirit &&
+                    TargetUtil.AnyMobsInRange(16, 3))
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest);
                 }
 
-                // Soul Harvest with SwallowYourSoul
-                if (Runes.WitchDoctor.SwallowYourSoul.IsActive && Player.PrimaryResourcePct <= 0.50)
-                {
-                    return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest);
-                }
-            }
+                bool hasDireBats = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 0);
+                bool hasVampireBats = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 3);
+                bool hasPlagueBats = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 2);
+                bool hasHungryBats = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 1);
+                bool hasCloudOfBats = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 4);
 
-            // Firebats
-            if (CanCast(SNOPower.Witchdoctor_Firebats))
-            {
-                int fireBatsChannelCost = Runes.WitchDoctor.VampireBats.IsActive ? 0 : 75;
+                int fireBatsChannelCost = hasVampireBats ? 0 : 75;
                 int fireBatsMana = TimeSincePowerUse(SNOPower.Witchdoctor_Firebats) < 125 ? fireBatsChannelCost : 225;
 
                 bool firebatsMaintain =
@@ -446,294 +507,174 @@ namespace Trinity.Combat.Abilities
                       SpellHistory.TimeSinceUse(SNOPower.Witchdoctor_Firebats) <= TimeSpan.FromMilliseconds(250d));
 
                 // Fire Bats:Cloud of bats 
-                if (Player.PrimaryResource >= fireBatsMana &&
-                    Runes.WitchDoctor.CloudOfBats.IsActive && (TargetUtil.AnyMobsInRange(8f) || firebatsMaintain))
+                if (hasCloudOfBats && (TargetUtil.AnyMobsInRange(8f) || firebatsMaintain) &&
+                    CanCast(SNOPower.Witchdoctor_Firebats) && Player.PrimaryResource >= fireBatsMana)
                 {
                     var range = Settings.Combat.WitchDoctor.FirebatsRange > 12f ? 12f : Settings.Combat.WitchDoctor.FirebatsRange;
-                    return new TrinityPower(SNOPower.Witchdoctor_Firebats, range, CurrentTarget.Position);
+
+                    return new TrinityPower(SNOPower.Witchdoctor_Firebats, range, CurrentTarget.ACDGuid);
                 }
 
                 // Fire Bats fast-attack
-                if (Player.PrimaryResource >= fireBatsMana &&
-                     (TargetUtil.AnyMobsInRange(Settings.Combat.WitchDoctor.FirebatsRange) || firebatsMaintain) && !Runes.WitchDoctor.CloudOfBats.IsActive)
+                if (CanCast(SNOPower.Witchdoctor_Firebats) && Player.PrimaryResource >= fireBatsMana &&
+                     (TargetUtil.AnyMobsInRange(Settings.Combat.WitchDoctor.FirebatsRange) || firebatsMaintain) && !hasCloudOfBats)
                 {
                     return new TrinityPower(SNOPower.Witchdoctor_Firebats, Settings.Combat.WitchDoctor.FirebatsRange, CurrentTarget.Position);
                 }
-            }
 
-            // Acid Cloud
-            if (CanCast(SNOPower.Witchdoctor_AcidCloud))
-            {
-                Vector3 bestClusterPoint;
-                if (Passives.WitchDoctor.GraveInjustice.IsActive)
-                    bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, Math.Min(Player.GoldPickupRadius + 8f, 30f));
-                else
-                    bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, 30f);
-
-                return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, RangedAttackRange, bestClusterPoint);
-            }
-
-            if (CanCast(SNOPower.Witchdoctor_SpiritBarrage))
-            {
-                // Spirit Barrage + Rush of Essence
-                if (Passives.WitchDoctor.RushOfEssence.IsActive && !Runes.WitchDoctor.Manitou.IsActive)
+                // Acid Cloud
+                if (CanCast(SNOPower.Witchdoctor_AcidCloud) && Player.PrimaryResource >= 175)
                 {
-                    return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, MeleeAttackRange, CurrentTarget.Position);
+                    Vector3 bestClusterPoint;
+                    if (hasGraveInjustice)
+                        bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, Math.Min(Player.GoldPickupRadius + 8f, 30f));
+                    else
+                        bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, 30f);
+
+                    return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, rangedAttackMaxRange, bestClusterPoint);
                 }
 
-                // Spirit Barrage Manitou
-                if (Runes.WitchDoctor.Manitou.IsActive && TimeSincePowerUse(SNOPower.Witchdoctor_SpiritBarrage) > 18000)
+                bool hasWellOfSouls = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritBarrage && s.RuneIndex == 1);
+                bool hasRushOfEssence = CacheData.Hotbar.PassiveSkills.Any(s => s == SNOPower.Witchdoctor_Passive_RushOfEssence);
+
+                // Spirit Barrage + Rush of Essence
+                if (CanCast(SNOPower.Witchdoctor_SpiritBarrage) && Player.PrimaryResource >= 100 &&
+                    hasRushOfEssence && !hasManitou)
                 {
-                    return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage);
+                    if (hasWellOfSouls)
+                        return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 21f, CurrentTarget.ACDGuid);  
+
+                    return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 21f, CurrentTarget.ACDGuid);
+                }
+
+                // Zombie Charger backup
+                if (CanCast(SNOPower.Witchdoctor_ZombieCharger) && Player.PrimaryResource >= 150)
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_ZombieCharger, zombieChargerRange, CurrentTarget.Position);
                 }
 
                 // Regular spirit barage
-                if (!Runes.WitchDoctor.Manitou.IsActive)
+                if (CanCast(SNOPower.Witchdoctor_SpiritBarrage) && Player.PrimaryResource >= 100 && !hasManitou)
                 {
-                    return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, MeleeAttackRange, CurrentTarget.Position);
+                    return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, basicAttackRange, CurrentTarget.ACDGuid);
+                }
+
+                // Poison Darts fast-attack Spams Darts when mana is too low (to cast bears) @12yds or @10yds if Bears avialable
+                if (CanCast(SNOPower.Witchdoctor_PoisonDart))
+                {
+                    VisionQuestRefreshTimer.Restart();
+                    return new TrinityPower(SNOPower.Witchdoctor_PoisonDart, basicAttackRange, CurrentTarget.ACDGuid);
+                }
+                // Corpse Spiders fast-attacks Spams Spiders when mana is too low (to cast bears) @12yds or @10yds if Bears avialable
+                if (CanCast(SNOPower.Witchdoctor_CorpseSpider))
+                {
+                    VisionQuestRefreshTimer.Restart();
+                    return new TrinityPower(SNOPower.Witchdoctor_CorpseSpider, basicAttackRange, CurrentTarget.ACDGuid);
+                }
+                // Toads fast-attacks Spams Toads when mana is too low (to cast bears) @12yds or @10yds if Bears avialable
+                if (CanCast(SNOPower.Witchdoctor_PlagueOfToads))
+                {
+                    VisionQuestRefreshTimer.Restart();
+                    return new TrinityPower(SNOPower.Witchdoctor_PlagueOfToads, basicAttackRange, CurrentTarget.ACDGuid);
+                }
+                // Fire Bomb fast-attacks Spams Bomb when mana is too low (to cast bears) @12yds or @10yds if Bears avialable
+                if (CanCast(SNOPower.Witchdoctor_Firebomb))
+                {
+                    VisionQuestRefreshTimer.Restart();
+                    return new TrinityPower(SNOPower.Witchdoctor_Firebomb, basicAttackRange, CurrentTarget.ACDGuid);
+                }
+				
+				//Hexing Pants Mod
+                if (Legendary.HexingPantsOfMrYan.IsEquipped && CurrentTarget.IsUnit && 
+				//!CanCast(SNOPower.Witchdoctor_Piranhas) && 
+				CurrentTarget.RadiusDistance > 10f)			
+				{
+					return new TrinityPower(SNOPower.Walk, 10f, CurrentTarget.Position);
+				}
+
+                if (Legendary.HexingPantsOfMrYan.IsEquipped && CurrentTarget.IsUnit && 
+				//!CanCast(SNOPower.Witchdoctor_Piranhas) && 
+				CurrentTarget.RadiusDistance < 10f)			
+				{
+					Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, -10f);
+					return new TrinityPower(SNOPower.Walk, 10f, vNewTarget);
+				}	
+
+            }
+
+            // Buffs
+            if (UseOOCBuff)
+            {
+                // Spirit Walk OOC 
+                if (CanCast(SNOPower.Witchdoctor_SpiritWalk) && Settings.Combat.Misc.AllowOOCMovement)
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk);
+                }
+				
+				
+				//Spam fear at all times if Tiklandian Visage is ewquipped and fear spam is selected to keep fear buff active
+				if (CanCast(SNOPower.Witchdoctor_Horrify) && Settings.Combat.WitchDoctor.SpamHorrify && Legendary.TiklandianVisage.IsEquipped)
+                {
+					return new TrinityPower(SNOPower.Witchdoctor_Horrify);
+                }
+
+                bool hasStalker = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 4);
+                // Horrify Buff When not in combat for movement speed -- Stalker
+                if (CanCast(SNOPower.Witchdoctor_Horrify) && hasStalker)
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_Horrify);
+                }
+
+                // Zombie Dogs non-sacrifice build
+                if (CanCast(SNOPower.Witchdoctor_SummonZombieDog) &&
+                ((Legendary.TheTallMansFinger.IsEquipped && Trinity.PlayerOwnedZombieDogCount < 1) ||
+                (!Legendary.TheTallMansFinger.IsEquipped && Trinity.PlayerOwnedZombieDogCount <= 2)))
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog);
+                }
+
+                bool hasRestlessGiant = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Gargantuan && s.RuneIndex == 0);
+                bool hasWrathfulProtector = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Witchdoctor_Gargantuan && s.RuneIndex == 3);
+
+                if (CanCast(SNOPower.Witchdoctor_Gargantuan) && !hasRestlessGiant && !hasWrathfulProtector && Trinity.PlayerOwnedGargantuanCount == 0)
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_Gargantuan);
                 }
             }
 
+            // Default Attacks
+            if (IsNull(power))
+                power = DefaultPower;
 
-
-            return null;
+            return power;
         }
-
-        public static TrinityPower GetHorrifyPower()
-        {
-            // Horrify FrighteningAspect
-            if (!CombatBase.PlayerIsImmune && Runes.WitchDoctor.FrighteningAspect.IsActive &&
-                (Player.CurrentHealthPct <= 0.25 ||
-                (Player.CurrentHealthPct <= 0.5 && TargetUtil.AnyMobsInRange(18f, 1)) ||
-                (Player.CurrentHealthPct <= 0.75 && TargetUtil.AnyMobsInRange(18f, 2))))
-            {
-                return new TrinityPower(SNOPower.Witchdoctor_Horrify);
-            }
-
-            // Horrify increase move speed by 20%
-            if (Runes.WitchDoctor.Stalker.IsActive && PlayerMover.GetMovementSpeed() > 1)
-                return new TrinityPower(SNOPower.Witchdoctor_Horrify);
-
-            // Horrify 24 yards
-            if (!Runes.WitchDoctor.Stalker.IsActive && Runes.WitchDoctor.FaceOfDeath.IsActive &&
-                TargetUtil.AnyMobsInRange(24f))
-            {
-                return new TrinityPower(SNOPower.Witchdoctor_Horrify);
-            }
-
-            // Horrify 18 yards
-            if (!Runes.WitchDoctor.Stalker.IsActive && !Runes.WitchDoctor.FaceOfDeath.IsActive &&
-                TargetUtil.AnyMobsInRange(18f))
-            {
-                return new TrinityPower(SNOPower.Witchdoctor_Horrify);
-            }
-
-            return null;
-        }
-
-        public static TrinityPower GetPrimaryPower()
-        {
-            // Poison Darts
-            if (CanCast(SNOPower.Witchdoctor_PoisonDart))
-            {
-                VisionQuestRefreshTimer.Restart();
-                return new TrinityPower(SNOPower.Witchdoctor_PoisonDart, RangedAttackRange, CurrentTarget.Position);
-            }
-            // Corpse Spiders
-            if (CanCast(SNOPower.Witchdoctor_CorpseSpider))
-            {
-                VisionQuestRefreshTimer.Restart();
-                return new TrinityPower(SNOPower.Witchdoctor_CorpseSpider, RangedAttackRange, CurrentTarget.Position);
-            }
-            // Plague Of Toads
-            if (CanCast(SNOPower.Witchdoctor_PlagueOfToads))
-            {
-                VisionQuestRefreshTimer.Restart();
-                return new TrinityPower(SNOPower.Witchdoctor_PlagueOfToads, RangedAttackRange, CurrentTarget.Position);
-            }
-            // Fire Bomb
-            if (CanCast(SNOPower.Witchdoctor_Firebomb))
-            {
-                VisionQuestRefreshTimer.Restart();
-                return new TrinityPower(SNOPower.Witchdoctor_Firebomb, RangedAttackRange, CurrentTarget.Position);
-            }
-
-            return null;
-        }
-
-        public static TrinityPower RunTiklandianRoutine()
-        {
-            // Piranhas
-            if (Skills.WitchDoctor.Piranhas.CanCast() &&
-                (TargetUtil.ClusterExists(20f, 3) || TargetUtil.EliteOrTrashInRange(RangedAttackRange)))
-            {
-                return new TrinityPower(SNOPower.Witchdoctor_Piranhas, RangedAttackRange, TargetUtil.GetBestClusterPoint(20f));
-            }
-
-            float horrifyMinRange = Runes.WitchDoctor.FaceOfDeath.IsActive ? 24f : 18f;
-
-            //Cast Horrify before we go into the fray
-            if (Skills.WitchDoctor.Horrify.CanCast() && TikHorrifyCriteria(new TargetArea(horrifyMinRange)))
-            {
-                Skills.WitchDoctor.Horrify.Cast();
-            }
-
-            // Should we move to a better position to fear people
-            if (TikHorrifyCriteria(new TargetCluster(horrifyMinRange)))
-            {
-                MoveToHorrifyPoint(new TargetCluster(horrifyMinRange));
-            }
-
-            return null;
-        }
-
-        private static TargetCluster SoulHarvestBestCluster = null;
-        private static TargetCluster GetSoulHarvestBestCluster
-        {
-            get
-            {
-                if (Enemies.BestLargeCluster.Exists && IdealSoulHarvestCriteria(Enemies.BestLargeCluster))
-                    return Enemies.BestLargeCluster;
-
-                if (Enemies.BestCluster.Exists && IdealSoulHarvestCriteria(Enemies.BestCluster))
-                    return Enemies.BestCluster;
-
-                if (Enemies.BestLargeCluster.Exists && MinimumSoulHarvestCriteria(Enemies.BestLargeCluster))
-                    return Enemies.BestLargeCluster;
-
-                if (Enemies.BestCluster.Exists && MinimumSoulHarvestCriteria(Enemies.BestCluster))
-                    return Enemies.BestCluster;
-
-                if (Enemies.BestLargeCluster.Exists)
-                    return Enemies.BestLargeCluster;
-
-                if (Enemies.BestCluster.Exists)
-                    return Enemies.BestCluster;
-
-                return null;
-            }
-        }
-
-        public static TrinityPower RunJadeHarvesterRoutine()
-        {
-            // Piranhas
-            if (Skills.WitchDoctor.Piranhas.CanCast() &&
-                (TargetUtil.ClusterExists(20f, 3) || TargetUtil.EliteOrTrashInRange(RangedAttackRange)))
-            {
-                return new TrinityPower(SNOPower.Witchdoctor_Piranhas, RangedAttackRange, TargetUtil.GetBestClusterPoint(20f));
-            }
-
-            SoulHarvestBestCluster = GetSoulHarvestBestCluster;
-            // Should we move to cluster for harvest
-            if (SoulHarvestBestCluster != null)
-            {
-                MoveToSoulHarvestPoint(SoulHarvestBestCluster);
-                if (CurrentTarget == null)
-                {
-                    CombatBase.SwitchToTarget(TargetUtil.GetClosestTarget(150f));
-                    Trinity.CurrentTarget.Position = SoulHarvestBestCluster.Position;
-                }
-            }
-
-
-            // Should we harvest right here?
-            if (Skills.WitchDoctor.SoulHarvest.CanCast() &&
-                (IdealSoulHarvestCriteria(Enemies.CloseNearby) || MinimumSoulHarvestCriteria(Enemies.CloseNearby)))
-            {
-                Skills.WitchDoctor.SoulHarvest.Cast();
-            }
-
-            if (CurrentTarget != null && CurrentTarget.IsUnit)
-            {
-                TrinityCacheObject getTargetWithoutDebuffs = Enemies.BestCluster.GetTargetWithoutDebuffs(HarvesterCoreDebuffs);
-                if (getTargetWithoutDebuffs != null && getTargetWithoutDebuffs != default(TrinityCacheObject))
-                {
-                    CombatBase.SwitchToTarget(getTargetWithoutDebuffs);
-                }
-
-                // Locust Swarm
-                if (CanCast(SNOPower.Witchdoctor_Locust_Swarm) &&
-                    !CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Locust_Swarm))
-                {
-                    return new TrinityPower(SNOPower.Witchdoctor_Locust_Swarm, MeleeAttackRange, CurrentTarget.ClusterPosition(MeleeAttackRange), CurrentTarget.ACDGuid);
-                }
-
-                // Haunt 
-                if (CanCast(SNOPower.Witchdoctor_Haunt) &&
-                    !CurrentTarget.HasDebuff(SNOPower.Witchdoctor_Haunt))
-                {
-                    return new TrinityPower(SNOPower.Witchdoctor_Haunt, MeleeAttackRange, CurrentTarget.ClusterPosition(MeleeAttackRange), CurrentTarget.ACDGuid);
-                }
-
-                // Acid Cloud
-                if (Skills.WitchDoctor.AcidCloud.CanCast() && Player.PrimaryResource >= 325 &&
-                    LastPowerUsed != SNOPower.Witchdoctor_AcidCloud)
-                {
-                    return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, MeleeAttackRange, CurrentTarget.ClusterPosition(MeleeAttackRange));
-                }
-            }
-
-            return null;
-        }
-
-        private static float RangedAttackRange
-        {
-            get
-            {
-                float range = 30f;
-                if (CombatBase.KiteDistance >= 20f)
-                    range = CombatBase.KiteDistance + 8f;
-
-                if (Passives.WitchDoctor.GraveInjustice.IsActive)
-                    return Math.Min(Player.GoldPickupRadius + 20f, range);
-
-                return range;
-            }
-        }
-        private static float MeleeAttackRange
-        {
-            get
-            {
-                if (CanCast(SNOPower.Witchdoctor_ZombieCharger))
-                    return 30f;
-
-                if (Legendary.TiklandianVisage.IsEquipped && !TikHorrifyCriteria(Enemies.BestLargeCluster))
-                    return 25f;
-
-                if (Legendary.TiklandianVisage.IsEquipped)
-                    return 1f;
-
-                return 16f;
-            }
-        }
-
-        private static readonly Func<TargetArea, bool> MinimumSoulHarvestCriteria = area =>
+        
+        private static readonly Func<TargetArea,bool> MinimumSoulHarvestCriteria = area =>
 
             //Harvest is off cooldown AND at least 2 debuffs exists && at least 40% of the units have a havestable debuff
-            //area.TotalDebuffCount(HarvesterCoreDebuffs) >= 2 && 
-            area.DebuffedCount(HarvesterCoreDebuffs) >= area.UnitCount * 0.6 &&
+            Skills.WitchDoctor.SoulHarvest.CanCast() && area.TotalDebuffCount(HarvesterCoreDebuffs) >= 2 && 
+            area.DebuffedCount(HarvesterCoreDebuffs) >= area.UnitCount * 0.4 &&
 
             // AND there's an elite, boss or more than 3 units or greater 35% of the units within sight are within this cluster
-            (area.EliteCount > 0 || area.BossCount > 0 || area.UnitCount >= 2);// || area.UnitCount >= (float)Enemies.Nearby.UnitCount * 0.35);
+            (area.EliteCount > 0 || area.BossCount > 0 || area.UnitCount >= 3 || area.UnitCount >= (float)Enemies.Nearby.UnitCount * 0.35);
 
 
         private static readonly Func<TargetArea, bool> IdealSoulHarvestCriteria = area =>
 
             // Harvest is off cooldown AND at least 7 debuffs are present (can be more than 1 per unit)
-            //area.TotalDebuffCount(HarvesterDebuffs) > 7 && 
-            area.DebuffedCount(HarvesterCoreDebuffs) >= area.UnitCount * 0.8 &&
-
+            Skills.WitchDoctor.SoulHarvest.CanCast() && area.TotalDebuffCount(HarvesterDebuffs) > 7 && 
+            
             // AND average health accross units in area is more than 30%
             area.AverageHealthPct > 0.3f &&
 
             // AND at least 2 Elites, a boss or more than 5 units or 80% of the nearby units are within this area
-            (area.EliteCount >= 1 || area.BossCount > 0 || area.UnitCount >= 5 || area.UnitCount >= (float)Enemies.Nearby.UnitCount * 0.80);
+            (area.EliteCount >= 2 || area.BossCount > 0 || area.UnitCount >= 5 || area.UnitCount >= (float)Enemies.Nearby.UnitCount * 0.80);
+			
+		private static readonly Func<TargetArea, bool> TikHorrifyCriteria = area =>
 
-        private static readonly Func<TargetArea, bool> TikHorrifyCriteria = area =>
-
-            //at least 2 Elites, a boss or more than 5 units or 80% of the nearby units are within this area
-            (area.EliteCount >= 2 || area.UnitCount >= 5);// || area.UnitCount >= (float)Enemies.Nearby.UnitCount * 0.80);
-
+			//at least 2 Elites, a boss or more than 5 units or 80% of the nearby units are within this area
+            (area.EliteCount >= 2 || area.UnitCount >= 5 || area.UnitCount >= (float)Enemies.Nearby.UnitCount * 0.80);
+		
 
 
         private static readonly Action<string, TargetArea> LogTargetArea = (message, area) =>
@@ -748,47 +689,37 @@ namespace Trinity.Combat.Abilities
 
         private static void MoveToSoulHarvestPoint(TargetArea area)
         {
-            QueuedMovement.Queue(new QueuedMovement
+            CombatMovement.Queue(new CombatMovement
             {
                 Name = "Jade Harvest Position",
                 Destination = area.Position,
                 OnUpdate = m =>
                 {
-                    TargetCluster bestCluster = SoulHarvestBestCluster;
-                    if (bestCluster != null)
-                    {
-                        m.Destination = bestCluster.Position;
-                    }
-
-                    if (Skills.WitchDoctor.SoulHarvest.CanCast() && IdealSoulHarvestCriteria(Enemies.CloseNearby))
-                    {
-                        Skills.WitchDoctor.SoulHarvest.Cast();
-                    }
+                    // Only change destination if the new target is way better
+                    if (IdealSoulHarvestCriteria(Enemies.BestLargeCluster) &&
+                        Enemies.BestLargeCluster.Position.Distance(m.Destination) > 10f)
+                        m.Destination = Enemies.BestLargeCluster.Position;
                 },
                 OnFinished = m =>
                 {
-                    if (Skills.WitchDoctor.SoulHarvest.CanCast() && MinimumSoulHarvestCriteria(Enemies.CloseNearby))
+                    if (MinimumSoulHarvestCriteria(Enemies.CloseNearby))
                     {
-                        Skills.WitchDoctor.SoulHarvest.Cast();
+                        //LogTargetArea("--- Harvesting (CombatMovement)", area);
+                        Skills.WitchDoctor.SoulHarvest.Cast();                        
                     }
                 },
-                StopCondition = m =>
-                    SoulHarvestBestCluster == null || CurrentTarget == null || !CurrentTarget.IsUnit
-                ,
-                Options = new QueuedMovementOptions
+                Options = new CombatMovementOptions
                 {
-                    Logging = LogLevel.Verbose,
-                    AcceptableDistance = 1f,
-                    Type = MoveType.SpecialCombat,
+                    Logging = LogLevel.Verbose,                    
                 }
             });
         }
-
-        private static void MoveToHorrifyPoint(TargetArea area)
+		
+		private static void MoveToHorrifyPoint(TargetArea area)
         {
-            QueuedMovement.Queue(new QueuedMovement
+            CombatMovement.Queue(new CombatMovement
             {
-                Name = "Horrify Position",
+                Name = "Horrify Position",                
                 Destination = area.Position,
                 OnUpdate = m =>
                 {
@@ -797,7 +728,7 @@ namespace Trinity.Combat.Abilities
                         Enemies.BestLargeCluster.Position.Distance(m.Destination) > 15f)
                         m.Destination = Enemies.BestLargeCluster.Position;
                 },
-                Options = new QueuedMovementOptions
+                Options = new CombatMovementOptions
                 {
                     AcceptableDistance = 12f,
                     Logging = LogLevel.Verbose,
@@ -806,7 +737,7 @@ namespace Trinity.Combat.Abilities
                     FailureBlacklistSeconds = 7,
                     TimeBeforeBlocked = 500
                 }
-
+	
             });
         }
 
@@ -826,29 +757,31 @@ namespace Trinity.Combat.Abilities
             }
         }
 
+
         private static TrinityPower DestroyObjectPower
         {
             get
             {
+
                 if (Hotbar.Contains(SNOPower.Witchdoctor_Firebomb))
                     return new TrinityPower(SNOPower.Witchdoctor_Firebomb, 12f, CurrentTarget.Position);
                 if (Hotbar.Contains(SNOPower.Witchdoctor_PoisonDart))
                     return new TrinityPower(SNOPower.Witchdoctor_PoisonDart, 15f, CurrentTarget.Position);
-                if (CanCast(SNOPower.Witchdoctor_ZombieCharger))
+                if (Hotbar.Contains(SNOPower.Witchdoctor_ZombieCharger) && Player.PrimaryResource >= 150)
                     return new TrinityPower(SNOPower.Witchdoctor_ZombieCharger, 12f, CurrentTarget.Position);
                 if (Hotbar.Contains(SNOPower.Witchdoctor_CorpseSpider))
                     return new TrinityPower(SNOPower.Witchdoctor_CorpseSpider, 12f, CurrentTarget.Position);
                 if (Hotbar.Contains(SNOPower.Witchdoctor_PlagueOfToads))
                     return new TrinityPower(SNOPower.Witchdoctor_PlagueOfToads, 12f, CurrentTarget.Position);
-                if (CanCast(SNOPower.Witchdoctor_AcidCloud))
+                if (Hotbar.Contains(SNOPower.Witchdoctor_AcidCloud) && Player.PrimaryResource >= 175)
                     return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, 12f, CurrentTarget.Position);
 
                 if (Hotbar.Contains(SNOPower.Witchdoctor_Sacrifice) && Hotbar.Contains(SNOPower.Witchdoctor_SummonZombieDog) &&
                     Trinity.PlayerOwnedZombieDogCount > 0 && Settings.Combat.WitchDoctor.ZeroDogs)
                     return new TrinityPower(SNOPower.Witchdoctor_Sacrifice, 12f, CurrentTarget.Position);
 
-                if (CanCast(SNOPower.Witchdoctor_SpiritBarrage))
-                    return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 12f, CurrentTarget.Position);
+                if (Hotbar.Contains(SNOPower.Witchdoctor_SpiritBarrage) && Player.PrimaryResource > 100)
+                    return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 12f, CurrentTarget.ACDGuid);
 
                 return DefaultPower;
             }

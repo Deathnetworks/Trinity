@@ -17,7 +17,7 @@ namespace Trinity.Helpers
         {
             _frameLockRelease = ZetaDia.Memory.ReleaseFrame(true);
 
-            if (ZetaDia.IsInGame)
+            if (ZetaDia.Service.IsInGame)
             {
                 ZetaDia.Actors.Update();
                 _externalReadCache = ZetaDia.Memory.SaveCacheState();
@@ -48,7 +48,7 @@ namespace Trinity.Helpers
                     if (_frameLockRelease != null)
                         _frameLockRelease.Dispose();
                 }
-                catch
+                catch (Exception ex)
                 {
                     Logger.LogDebug("Exception disposing of MemoryHelper._frameLockRelease");
                 }
@@ -58,7 +58,7 @@ namespace Trinity.Helpers
                     if (_externalReadCache != null)
                         _externalReadCache.Dispose();
                 }
-                catch
+                catch (Exception ex)
                 {
                     Logger.LogDebug("Exception disposing of MemoryHelper._externalReadCache");
                 }

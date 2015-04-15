@@ -50,13 +50,13 @@ namespace Trinity.Helpers
             }
             try
             {
-                if (!Trinity.Player.IsInGame)
+                if (!ZetaDia.IsInGame)
                 {
                     Logger.Log("Not in game, gold inactivity reset", 0);
                     ResetCheckGold(); //If not in game, reset the timer
                     return false;
                 }
-                if (Trinity.Player.IsLoadingWorld)
+                if (ZetaDia.IsLoadingWorld)
                 {
                     Logger.Log("Loading world, gold inactivity reset");
                     return false;

@@ -91,7 +91,7 @@ namespace Trinity
 
                     if (CurrentCacheObject.Distance > (CurrentBotLootRange + range))
                     {
-                        c_InfosSubStep += "OutOfRange";
+                        c_IgnoreSubStep = "OutOfRange";
                         // return here to save CPU on reading unncessary attributes for out of range items;
                         return false;
                     }
@@ -194,11 +194,11 @@ namespace Trinity
                 }
 
                 if (AddToCache && ForceVendorRunASAP)
-                    c_InfosSubStep += "ForcedVendoring";
+                    c_IgnoreSubStep = "ForcedVendoring";
 
                 // Didn't pass pickup rules, so ignore it
-                if (!AddToCache && c_InfosSubStep == String.Empty)
-                    c_InfosSubStep += "NoMatchingRule";
+                if (!AddToCache && c_IgnoreSubStep == String.Empty)
+                    c_IgnoreSubStep = "NoMatchingRule";
 
                 if (Settings.Advanced.LogDroppedItems && logNewItem && c_item_GItemType != GItemType.HealthGlobe && c_item_GItemType != GItemType.HealthPotion && c_item_GItemType != GItemType.PowerGlobe && c_item_GItemType != GItemType.ProgressionGlobe)
                     //LogDroppedItem();
@@ -212,14 +212,14 @@ namespace Trinity
         {
             if (!Settings.Loot.Pickup.PickupGold)
             {
-                c_InfosSubStep += "PickupDisabled";
+                c_IgnoreSubStep = "PickupDisabled";
                 return false;
             }
 
             if (Player.ActorClass == ActorClass.Barbarian && Settings.Combat.Barbarian.IgnoreGoldInWOTB && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) &&
                 GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
             {
-                c_InfosSubStep += "IgnoreGoldInWOTB";
+                c_IgnoreSubStep = "IgnoreGoldInWOTB";
                 return false;
             }
 
@@ -233,7 +233,7 @@ namespace Trinity
                 catch
                 {
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting gold pile amount for item {0} [{1}]", CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
-                    c_InfosSubStep += "GetAttributeException";
+                    c_IgnoreSubStep = "GetAttributeException";
                     return false;
                 }
                 CacheData.GoldStack.Add(CurrentCacheObject.RActorGuid, c_GoldStackSize);
@@ -241,7 +241,7 @@ namespace Trinity
 
             if (c_GoldStackSize < Settings.Loot.Pickup.MinimumGoldStack)
             {
-                c_InfosSubStep += "NotEnoughGold";
+                c_IgnoreSubStep = "NotEnoughGold";
                 return false;
             }
 
@@ -360,7 +360,7 @@ namespace Trinity
                 LogWriter.Write(FormatCSVField(CurrentCacheObject.ACDGuid));
                 LogWriter.Write(FormatCSVField(CurrentCacheObject.InternalName));
                 LogWriter.Write(FormatCSVField(c_GoldStackSize));
-                LogWriter.Write(FormatCSVField(c_InfosSubStep));
+                LogWriter.Write(FormatCSVField(c_IgnoreSubStep));
                 LogWriter.Write(FormatCSVField(CurrentCacheObject.Distance));
                 LogWriter.Write("\n");
             }

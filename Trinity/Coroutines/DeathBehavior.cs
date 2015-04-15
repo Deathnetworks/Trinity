@@ -17,13 +17,13 @@ namespace Trinity.Coroutines
 
         private static async Task<bool> OnDeathRoutine()
         {
-            if (!Trinity.Player.IsInGame)
+            if (!ZetaDia.IsInGame)
                 return false;
 
-            if (Trinity.Player.IsLoadingWorld)
+            if (ZetaDia.IsLoadingWorld)
                 return false;
 
-            if (Trinity.Player.IsDead && ZetaDia.Service.Party.NumPartyMembers > 1)
+            if (ZetaDia.Me.IsDead && ZetaDia.Service.Party.NumPartyMembers > 1)
             {
                 // Dead in Party, wat for rez
                 await Coroutine.Sleep(10000);

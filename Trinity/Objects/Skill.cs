@@ -83,11 +83,7 @@ namespace Trinity.Objects
         /// <summary>
         /// If this skill is a special primary skill (free to cast or generators)
         /// </summary>
-        public bool IsPrimary
-        {
-            get { return Category == SpellCategory.Primary; }
-            set { } // todo: find out why non-primary are being set as primary in JS Collector
-        }
+        public bool IsPrimary { get; set; }
 
         /// <summary>
         /// How much this spell costs to cast; uses rune value when applicable.
@@ -96,51 +92,6 @@ namespace Trinity.Objects
         {
             get { return CurrentRune.ModifiedCost.HasValue ? CurrentRune.ModifiedCost.Value : _cost; }
             set { _cost = value; }
-        }
-
-        /// <summary>
-        /// Check if skill spend primary ressource
-        /// </summary>
-        public bool IsSpender
-        {
-            get
-            {
-                if (SNOPower == 0 || Resource == Resource.Discipline || Resource == Resource.Unknown)
-                    return false;
-
-                if (this == Skills.DemonHunter.Chakram && Legendary.SpinesOfSeethingHatred.IsEquipped)
-                    return false;
-
-                if (this == Skills.DemonHunter.ElementalArrow && Legendary.Kridershot.IsEquipped)
-                    return false;
-
-                return Cost > 0;
-            }
-        }
-
-        /// <summary>
-        /// Check if skill generates resource and can hit
-        /// </summary>
-        public bool IsAttackGenerator
-        {
-            get
-            {
-                if (this == Skills.DemonHunter.Chakram && Legendary.SpinesOfSeethingHatred.IsEquipped)
-                    return true;
-
-                if (this == Skills.DemonHunter.ElementalArrow && Legendary.Kridershot.IsEquipped)
-                    return true;
-
-                return Category == SpellCategory.Primary;
-            }
-        }
-
-        /// <summary>
-        /// Signature spells are free to cast (not classified generators)
-        /// </summary>
-        public bool IsSignature
-        {
-            get { return Category == SpellCategory.Primary && (Class == ActorClass.Witchdoctor || Class == ActorClass.Wizard); }           
         }
 
         /// <summary>
@@ -214,14 +165,6 @@ namespace Trinity.Objects
         public int BuffStacks
         {
             get { return CombatBase.GetBuffStacks(SNOPower); }
-        }
-
-        /// <summary>
-        /// Gets the current skill charge count
-        /// </summary>
-        public int Charges
-        {
-            get { return CombatBase.GetSkillCharges(SNOPower); }
         }
 
         /// <summary>
@@ -301,68 +244,58 @@ namespace Trinity.Objects
         /// <summary>
         /// This skill as TrinityPower
         /// </summary>
-        public TrinityPower ToPower(float minimumRange, Vector3 targetPosition)
+        public TrinityPower ToPower
         {
-            return new TrinityPower(SNOPower, minimumRange, targetPosition);
-        }
-
-        /// <summary>
-        /// This skill as TrinityPower
-        /// </summary>
-        public TrinityPower ToPower(float minimumRange)
-        {
-            return new TrinityPower(SNOPower, minimumRange);
-        }
-
-        /// <summary>
-        /// This skill as TrinityPower
-        /// </summary>
-        public TrinityPower ToPower()
-        {
-            return new TrinityPower(SNOPower);
+            get { return new TrinityPower(SNOPower); }
         }
 
         /// <summary>
         /// Cast this skill at the current position
         /// </summary>
-        public bool Cast()
+        public void Cast()
         {
-            return Cast(Trinity.Player.Position, -1);
+            Cast(Trinity.Player.Position, -1);
         }
 
         /// <summary>
         /// Cast this skill at the specified position
         /// </summary>
-        public bool Cast(Vector3 position)
+        public void Cast(Vector3 position)
         {
-            return Cast(position, -1);
+            Cast(position, -1);
         }
 
         /// <summary>
         /// Cast this skill at the specified target
         /// </summary>
-        public bool Cast (TrinityCacheObject target)
+        public void Cast (TrinityCacheObject target)
         {
-            return Cast(target.Position, target.ACDGuid);
+            Cast(target.Position, target.ACDGuid);
         }
 
         /// <summary>
         /// Cast this speed using TrinityPower
         /// </summary>
-        public bool Cast(TrinityPower power)
+        public void Cast(TrinityPower power)
         {
-            return Cast(power.TargetPosition, power.TargetACDGUID);
+            Cast(power.TargetPosition, power.TargetACDGUID);
         }
 
         /// <summary>
         /// Cast this skill
         /// </summary>
-        public bool Cast(Vector3 clickPosition, int targetAcdGuid)
+        public void Cast(Vector3 clickPosition, int targetAcdGuid)
         {
-            if (targetAcdGuid != -1)
-                return CombatBase.Cast(new TrinityPower(SNOPower, 0f, targetAcdGuid));
-
-            return CombatBase.Cast(new TrinityPower(SNOPower, 0f, clickPosition));
+            if (SNOPower != SNOPower.None && clickPosition != Vector3.Zero && IsActive && GameIsReady)
+            {
+                if (ZetaDia.Me.UsePower(SNOPower, clickPosition, Trinity.CurrentWorldDynamicId, targetAcdGuid))
+                {
+                    Trinity.LastPowerUsed = SNOPower;
+                    CacheData.AbilityLastUsed[SNOPower] = DateTime.UtcNow;
+                    SpellTracker.TrackSpellOnUnit(CombatBase.CurrentTarget.ACDGuid, SNOPower);
+                    SpellHistory.RecordSpell(SNOPower);
+                }
+            }
         }
 
         private bool GameIsReady

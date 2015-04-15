@@ -47,6 +47,7 @@ namespace Trinity
             return new Vector2((float)Math.Cos(rotation), (float)Math.Sin(rotation));
         }
 
+
         #region Angle Finding
         /// <summary>
         /// Find the angle between two vectors. This will not only give the angle difference, but the direction.
@@ -121,22 +122,15 @@ namespace Trinity
         }
         #endregion
 
-        public static bool IntersectsPath(Vector3 obstacle, float radius, Vector3 origin, Vector3 destination, bool outOfLocation = false, bool twoDim = true)
+
+        public static bool IntersectsPath(Vector3 obstacle, float radius, Vector3 start, Vector3 destination)
         {
-            if (twoDim)
-            {
-                origin.Z = 0;
-                obstacle.Z = 0;
-                destination.Z = 0;
-            }
+            // fake-it to 2D
+            obstacle.Z = 0;
+            start.Z = 0;
+            destination.Z = 0;
 
-            if (origin.Distance2D(obstacle) <= radius)
-                return !outOfLocation;
-
-            if (destination.Distance2D(obstacle) <= radius)
-                return !outOfLocation;
-
-            return MathEx.IntersectsPath(obstacle, radius, origin, destination);
+            return MathEx.IntersectsPath(obstacle, radius, start, destination);
         }
 
         #region Angular Measure Unit Conversion
@@ -161,12 +155,9 @@ namespace Trinity
         }
         public static double RadianToDegree(double angle)
         {
-            return angle * (180 / Math.PI);
+            return angle * (180.0 / Math.PI);
         }
-        public static double DegreeToRadian(double angle)
-        {
-            return (angle / 180) * Math.PI;
-        }
+
 
         #endregion
         public static double GetRelativeAngularVariance(Vector3 origin, Vector3 destA, Vector3 destB)
@@ -184,10 +175,6 @@ namespace Trinity
         public static string GetHeadingToPoint(Vector3 TargetPoint)
         {
             return GetHeading(FindDirectionDegree(Trinity.Player.Position, TargetPoint));
-        }
-        public static string GetHeadingToPoint(Vector3 Origin, Vector3 TargetPoint)
-        {
-            return GetHeading(FindDirectionDegree(Origin, TargetPoint));
         }
         public static string GetHeading(float heading)
         {
@@ -239,16 +226,6 @@ namespace Trinity
             float z = min.Z + ((max.Z - min.Z) / 2);
 
             return new Vector3(x, y, z);
-        }
-
-        internal static float GetDiff(float item1, float item2)
-        {
-            return Math.Abs(Math.Max(item1, item2)) - Math.Abs(Math.Min(item1, item2));
-        }
-
-        internal static int GetHash(Vector3 v1, Vector3 v2)
-        {
-            return (int)(Math.Abs(v1.X) + Math.Abs(v1.Y) + Math.Abs(v2.X) + Math.Abs(v2.Y));
         }
     }
 }

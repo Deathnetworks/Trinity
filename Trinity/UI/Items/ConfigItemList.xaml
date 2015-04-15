@@ -5,7 +5,7 @@
              xmlns:ut="clr-namespace:Trinity.UIComponents"
              xmlns:themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero"             
              xmlns:mock="clr-namespace:Trinity.Settings.Mock"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"             
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" Foreground="{DynamicResource TextBrush}" Background="DarkGray"             
              d:DesignHeight="500" d:DesignWidth="420">
     <UserControl.Resources>
@@ -241,60 +241,12 @@
                     <DataTrigger Binding="{Binding Path=ItemProperty}" Value="SkillDamage">
                         <Setter Property="ContentTemplate" Value="{DynamicResource DropdownSliderFormTemplate}"/>
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="BaseMaxDamage">
+                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="BaseDamage">
                         <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=ItemProperty}" Value="AttackSpeed">
                         <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="PercentDamage">
-                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="DamageFromElites">
-                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="DamageAgainstElites">
-                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="Vitality">
-                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="Sockets">
-                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="ResistAll">
-                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="Cooldown">
-                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="ResourceCost">
-                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="ElementalDamage">
-                        <Setter Property="ContentTemplate" Value="{DynamicResource DropdownSliderFormTemplate}"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="FireSkills">
-                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="LightningSkills">
-                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="HolySkills">
-                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="ColdSkills">
-                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="PhysicalSkills">
-                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="ArcaneSkills">
-                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding Path=ItemProperty}" Value="PoisonSkills">
-                        <Setter Property="ContentTemplate" Value="{DynamicResource SliderFormTemplate}"/>
-                    </DataTrigger>                    
                 </Style.Triggers>
             </Style>
 
@@ -422,10 +374,10 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
+            
         </ResourceDictionary>
     </UserControl.Resources>
 
- 
     <ut:ModalContentPresenter x:Name="modalPresenter" IsModal="{Binding ItemList.IsModalVisible}" OpenCommand="{Binding ItemList.LoadModalCommand}">
 
         <DockPanel LastChildFill="True" VerticalAlignment="Stretch">
@@ -438,7 +390,6 @@
                 <ComboBox Tag="" SelectedValuePath="Tag" x:Name="GroupingDropdown" MaxHeight="25" SelectedValue="{Binding ItemList.Grouping}" Padding="0,0,15,0">
                     <ComboBoxItem Content="None" Tag="None" Foreground="White" Background="Black" />
                     <ComboBoxItem Content="ItemType" Tag="ItemType" Foreground="White" Background="Black" />
-                    <ComboBoxItem Content="IsCrafted" Tag="IsCrafted" Foreground="White" Background="Black" />
                     <ComboBoxItem Content="Sets" Tag="SetName" Foreground="White" Background="Black" />
                     <ComboBoxItem Content="IsValid" Tag="IsValid" Foreground="White" Background="Black" />
                 </ComboBox>
@@ -450,23 +401,16 @@
                 </Button>
             </StackPanel>
 
-            <!--<ScrollViewer 
-               x:Name="ListViewScrollViewer"
+            <ScrollViewer 
             HorizontalContentAlignment="Stretch" 
             VerticalContentAlignment="Stretch"             
             CanContentScroll="True"
-            Margin="0,0,0,0">-->
+            Margin="0,0,0,0">
                 <ListView x:Name="ListView1"                      
                 d:DataContext="{Binding Source={StaticResource DesignViewModel}}"
                 SelectionMode="Multiple"                          
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
-                ScrollViewer.VerticalScrollBarVisibility="Visible" 
-                VirtualizingPanel.IsVirtualizing="True"
-                VirtualizingPanel.VirtualizationMode="Standard"                          
-                VirtualizingPanel.IsVirtualizingWhenGrouping="False"
-                VirtualizingPanel.CacheLengthUnit="Page"
-                VirtualizingPanel.CacheLength="2"               
-                ScrollViewer.IsDeferredScrollingEnabled="False"
+                ScrollViewer.VerticalScrollBarVisibility="Disabled"                               
                 ItemContainerStyle="{DynamicResource ListViewItemStyle}"                         
                 Background="#FF474747"                          
                 ItemsSource="{Binding ItemList.Collection.View}"                      
@@ -476,9 +420,9 @@
                         <Style x:Key="ListViewStyle1" TargetType="{x:Type ListView}">
                             <Setter Property="BorderThickness" Value="0"/>
                             <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
-                            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Visible"/>
-                            <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
-                            <Setter Property="ScrollViewer.PanningMode" Value="VerticalOnly"/>
+                            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+                            <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
+                            <Setter Property="ScrollViewer.PanningMode" Value="Both"/>
                             <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
                             <Setter Property="VerticalContentAlignment" Value="Center"/>
                             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -492,12 +436,7 @@
                                         RenderMouseOver="{TemplateBinding IsMouseOver}" 
                                         RenderFocused="{TemplateBinding IsKeyboardFocusWithin}" 
                                         SnapsToDevicePixels="False">
-                                            
-                                            <ScrollViewer VerticalScrollBarVisibility="Visible" Padding="{TemplateBinding Padding}" Uid="ScrollViewer_11">
-                                                <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Uid="ItemsPresenter_6"/>
-                                            </ScrollViewer>
-                                             
-                                            <!--<ItemsPresenter SnapsToDevicePixels="False"/>-->
+                                            <ItemsPresenter SnapsToDevicePixels="False"/>
                                         </themes:ListBoxChrome>
                                         <ControlTemplate.Triggers>
                                             <MultiTrigger>
@@ -513,6 +452,11 @@
                             </Setter>
                         </Style>
                     </ListView.Resources>
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel/>
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
                     <ListView.GroupStyle>
                         <GroupStyle>
                             <GroupStyle.ContainerStyle>
@@ -538,7 +482,7 @@
                         </GroupStyle>
                     </ListView.GroupStyle>
                 </ListView>
-            <!--</ScrollViewer>-->
+            </ScrollViewer>
         </DockPanel>
 
         <!-- Import/Export Modal -->

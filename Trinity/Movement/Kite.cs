@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Trinity.Combat;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
-using Trinity.DbProvider;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Game;
@@ -26,38 +24,10 @@ namespace Trinity
         }
         internal static KitePosition LastKitePosition = null;
 
-        internal static void RefreshKiteValue()
-        {
-            if (Trinity.ObjectCache == null)
-                return;
-
-            foreach (var u in Trinity.ObjectCache.Where(u => u.IsUnit))
-            {
-                // Kite (can make it in navHelper, avoid to re loop twice)
-                if (u.RadiusDistance < CombatBase.KiteDistance * 0.75 && u.IsInLineOfSight)
-                {
-                    if (u.IsBoss && CombatBase.KiteMode != KiteMode.Never)
-                    {
-                        Trinity.Player.NeedToKite = true;
-                    }
-                    else if (u.IsBossOrEliteRareUnique && (CombatBase.KiteMode == KiteMode.Elites || CombatBase.KiteMode == KiteMode.Always))
-                    {
-                        Trinity.Player.NeedToKite = true;
-                    }
-                    else if (CombatBase.KiteMode == KiteMode.Always)
-                    {
-                        Trinity.Player.NeedToKite = true;
-                    }
-                }
-            }
-        }
-
-        private static void RefreshSetKiting(ref Vector3 vKitePointAvoid, bool needToKite)
+        private static void RefreshSetKiting(ref Vector3 vKitePointAvoid, bool NeedToKite)
         {
             using (new PerformanceLogger("RefreshDiaObjectCache.Kiting"))
             {
-                if (Trinity.Settings.Combat.Misc.KeepMovingInCombat && Player.IsRanged)
-                    return;
 
                 bool TryToKite = false;
 
@@ -110,36 +80,31 @@ namespace Trinity
                 }
 
                 // Avoid Death
-                if (Trinity.Player.AvoidDeath || needToKite)
+                if (Settings.Combat.Misc.AvoidDeath &&
+                    Player.CurrentHealthPct <= CombatBase.EmergencyHealthPotionLimit && // health is lower than potion limit
+                    !SNOPowerUseTimer(SNOPower.DrinkHealthPotion) && // we can't use a potion anymore
+                    TargetUtil.AnyMobsInRange(90f, false))
                 {
-                    Trinity.Player.NeedToKite = true;
+                    Logger.LogNormal("Attempting to avoid death!");
+                    NeedToKite = true;
+
                     kiteMonsterList = (from m in ObjectCache
                                        where m.IsUnit
                                        select m).ToList();
-                }
-
-                if (!Trinity.Player.AvoidDeath && CombatBase.KiteDistance <= 0)
-                    return;
-
-                if (CombatBase.QueuedMovement.IsBlacklisted((int)MoveType.Kite))
-                {
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Kite movement blacklisted");
-                    return;
                 }
 
                 // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
                 bool shouldKamikazeTreasureGoblins = (!AnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize);
 
                 double msCancelledEmergency = DateTime.UtcNow.Subtract(timeCancelledEmergencyMove).TotalMilliseconds;
-                bool shouldEmergencyMove = msCancelledEmergency >= cancelledEmergencyMoveForMilliseconds && Trinity.Player.NeedToKite;
+                bool shouldEmergencyMove = msCancelledEmergency >= cancelledEmergencyMoveForMilliseconds && NeedToKite;
 
                 double msCancelledKite = DateTime.UtcNow.Subtract(timeCancelledKiteMove).TotalMilliseconds;
                 bool shouldKite = msCancelledKite >= cancelledKiteMoveForMilliseconds && TryToKite;
 
-                if (shouldKamikazeTreasureGoblins && (shouldEmergencyMove || shouldKite) &&
-                    GridMap.HasSafeSpots)
+                if (shouldKamikazeTreasureGoblins && (shouldEmergencyMove || shouldKite))
                 {
-                    Vector3 vAnySafePoint = GridMap.GetBestMoveNode().Position;
+                    Vector3 vAnySafePoint = NavHelper.FindSafeZone(false, 1, vKitePointAvoid, true, kiteMonsterList, shouldEmergencyMove);
 
                     if (LastKitePosition == null)
                     {
@@ -153,7 +118,6 @@ namespace Trinity
 
                     if (vAnySafePoint != Vector3.Zero && vAnySafePoint.Distance(Player.Position) >= 1)
                     {
-                        PlayerMover.UsedSpecialMovement(vAnySafePoint);
 
                         if ((DateTime.UtcNow.Subtract(LastKitePosition.PositionFoundTime).TotalMilliseconds > 3000 && LastKitePosition.Position == vAnySafePoint) ||
                             (CurrentTarget != null && DateTime.UtcNow.Subtract(lastGlobalCooldownUse).TotalMilliseconds > 1500 && TryToKite))
@@ -175,24 +139,23 @@ namespace Trinity
 
                         if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         {
-                            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} Trinity.Player.NeedToKite: {6} TryToKite: {7}",
-                                vAnySafePoint, vAnySafePoint.Distance(Player.Position), MathUtil.GetHeading(MathUtil.FindDirectionDegree(Player.Position, vAnySafePoint)),
+                            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}",
+                                vAnySafePoint, vAnySafePoint.Distance(Player.Position), MathUtil.GetHeading(MathUtil.FindDirectionDegree(Me.Position, vAnySafePoint)),
                                 Player.CurrentHealthPct, CombatBase.KiteDistance, kiteMonsterList.Count(),
-                                Trinity.Player.NeedToKite, TryToKite);
+                                NeedToKite, TryToKite);
                         }
                         CurrentTarget = new TrinityCacheObject()
                         {
                             Position = vAnySafePoint,
                             Type = GObjectType.Avoidance,
                             Weight = 90000,
+                            Distance = Vector3.Distance(Player.Position, vAnySafePoint),
                             Radius = 2f,
-                            InternalName = "KitePoint",
-                            IsKite = true,
-                            RActorGuid = (int)MoveType.Kite,
+                            InternalName = "KitePoint"
                         };
                     }
                 }
-                else if (!shouldEmergencyMove && Trinity.Player.NeedToKite)
+                else if (!shouldEmergencyMove && NeedToKite)
                 {
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Emergency movement cancelled for {0:0}ms", DateTime.UtcNow.Subtract(timeCancelledEmergencyMove).TotalMilliseconds - cancelledKiteMoveForMilliseconds);
                 }

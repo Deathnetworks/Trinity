@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Linq;
-using Trinity.Objects;
 using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
-using Trinity.Technicals;
-using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.Combat.Abilities
 {
@@ -41,11 +38,7 @@ namespace Trinity.Combat.Abilities
             // In combat, Not Avoiding
             if (CurrentTarget != null)
             {
-                var p = GetCombatPower();
-                var skill = Skills.Wizard.ToList().FirstOrDefault(s => s.Id == (int) p.SNOPower);
-                if(skill != null)
-                    Logger.Log(LogCategory.Behavior, "GetCombatPower Selected Skill: {0} Element={1} Cost={2}", skill.Name, skill.Element, skill.Cost);
-                return p;
+                return GetCombatPower();
             }
             // Destructibles
             if (UseDestructiblePower)
@@ -64,7 +57,7 @@ namespace Trinity.Combat.Abilities
             // Defensive Teleport: SafePassage
             if (CanCast(SNOPower.Wizard_Teleport, CanCastFlags.NoTimer) && Runes.Wizard.SafePassage.IsActive && Player.CurrentHealthPct <= 0.75)
             {
-                var target = GridMap.GetBestMoveNode(35f).Position;
+                var target = NavHelper.FindSafeZone(false, 1, CurrentTarget.Position, true);
                 return new TrinityPower(SNOPower.Wizard_Teleport, 65f, target);
             }
 
@@ -117,13 +110,13 @@ namespace Trinity.Combat.Abilities
                 Player.CurrentHealthPct <= 0.50 &&
                 (CurrentTarget.IsBossOrEliteRareUnique || TargetUtil.IsEliteTargetInRange(75f)))
             {
-                var target = KiteDistance == 0 ? Player.Position : GridMap.GetBestMoveNode(KiteDistance).Position;
+                var target = KiteDistance == 0 ? ZetaDia.Me.Position : NavHelper.FindSafeZone(false, 1, CurrentTarget.Position, true);
                 return new TrinityPower(SNOPower.Wizard_Teleport, 65f, target);
             }
 
             // Wormhole / Black hole
             float blackholeRadius = Runes.Wizard.Supermassive.IsActive ? 20f : 15f;
-            if (CanCast(SNOPower.X1_Wizard_Wormhole, CanCastFlags.NoTimer) && CheckConventionElement(Skills.Wizard.BlackHole) &&
+            if (CanCast(SNOPower.X1_Wizard_Wormhole, CanCastFlags.NoTimer) &&
                 (TargetUtil.ClusterExists(blackholeRadius, 45f, Trinity.Settings.Combat.Wizard.BlackHoleAoECount) || CurrentTarget.IsBossOrEliteRareUnique))
             {
                 return new TrinityPower(SNOPower.X1_Wizard_Wormhole, 65f, TargetUtil.GetBestClusterUnit(blackholeRadius, 45f, 1, false).Position);
@@ -132,7 +125,7 @@ namespace Trinity.Combat.Abilities
             // Meteor: Arcane Dynamo
             bool arcaneDynamoPassiveReady =
              (Passives.Wizard.ArcaneDynamo.IsActive && GetBuffStacks(SNOPower.Wizard_Passive_ArcaneDynamo) == 5);
-            if (!Player.IsIncapacitated && !arcaneDynamoPassiveReady && CanCast(SNOPower.Wizard_Meteor, CanCastFlags.NoTimer) && CheckConventionElement(Skills.Wizard.Meteor) &&
+            if (!Player.IsIncapacitated && !arcaneDynamoPassiveReady && CanCast(SNOPower.Wizard_Meteor, CanCastFlags.NoTimer) &&
                 (TargetUtil.EliteOrTrashInRange(65) || TargetUtil.ClusterExists(15f, 65, 2)))
             {
                 var bestMeteorClusterUnit = TargetUtil.GetBestClusterUnit();
@@ -147,18 +140,19 @@ namespace Trinity.Combat.Abilities
             }
 
             // Slow Time for in combat
-            if (!Player.IsIncapacitated && Skills.Wizard.SlowTime.CanCast(CanCastFlags.NoTimer))
+            if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_SlowTime, CanCastFlags.NoTimer))
             {
-                if((Enemies.Nearby.UnitCount > 2 || Enemies.CloseNearby.Units.Any()) && Runes.Wizard.PointOfNoReturn.IsActive || Runes.Wizard.StretchTime.IsActive)
-                {
-                    return new TrinityPower(SNOPower.Wizard_SlowTime, 0f, Player.Position);
-                }
+                if (Legendary.GestureOfOrpheus.IsEquipped && SpellHistory.DistanceFromLastTarget(SNOPower.Wizard_SlowTime) > 10f)
+                    return new TrinityPower(SNOPower.Wizard_SlowTime);
 
-                if ((TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || CurrentTarget.IsBossOrEliteRareUnique))
+                if ((TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 40f)) &&
+                 SpellHistory.DistanceFromLastTarget(SNOPower.Wizard_SlowTime) > 30f)
                 {
-                    var targetPosition = TargetUtil.GetBestClusterUnit(20f, 50f).Position;
-                    var positionWithinMaxRange = targetPosition.Distance2D(Player.Position) <= 60f ? targetPosition : Player.Position;
-                    return new TrinityPower(SNOPower.Wizard_SlowTime, 0f, positionWithinMaxRange);
+                        return new TrinityPower(SNOPower.Wizard_SlowTime); // cast of Self
+                }
+                if (TargetUtil.AnyMobsInRange(55f) && Runes.Wizard.TimeAndSpace.IsActive)
+                {
+                    return new TrinityPower(SNOPower.Wizard_SlowTime, 55f, TargetUtil.GetBestClusterUnit(20f).Position);
                 }
             }
 
@@ -195,7 +189,7 @@ namespace Trinity.Combat.Abilities
 
                 bool twoAlredyCastIn5Sec = SpellHistory.SpellUseCountInTime(SNOPower.Wizard_Hydra, TimeSpan.FromSeconds(5)) >= 2;
 
-                if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_Hydra, CanCastFlags.NoTimer) && CheckConventionElement(Skills.Wizard.Hydra) &&
+                if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_Hydra, CanCastFlags.NoTimer) &&
                     (baseRecast || distanceRecast || serpentSparkerRecast1) && !twoAlredyCastIn5Sec &&
                     CurrentTarget.RadiusDistance <= castDistance && Player.PrimaryResource >= 15)
                 {
@@ -236,16 +230,16 @@ namespace Trinity.Combat.Abilities
 
             // Blizzard
             float blizzardRadius = Runes.Wizard.Apocalypse.IsActive ? 30f : 12f;
-            if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_Blizzard, CanCastFlags.NoTimer) && CheckConventionElement(Skills.Wizard.Blizzard) &&
-                (TargetUtil.ClusterExists(blizzardRadius, 90f, 2) || CurrentTarget.IsBossOrEliteRareUnique || !HasPrimarySkill) &&
+            if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_Blizzard, CanCastFlags.NoTimer) &&
+                (TargetUtil.ClusterExists(blizzardRadius, 90f, 2, false) || CurrentTarget.IsBossOrEliteRareUnique || !HasPrimarySkill) &&
                 (Player.PrimaryResource >= 40 || (Runes.Wizard.Snowbound.IsActive && Player.PrimaryResource >= 20)))
             {
-                var bestClusterPoint = TargetUtil.GetBestClusterPoint(blizzardRadius, 65f);
+                var bestClusterPoint = TargetUtil.GetBestClusterPoint(blizzardRadius, 65f, false);
                 return new TrinityPower(SNOPower.Wizard_Blizzard, 65f, bestClusterPoint);
             }
 
             // Meteor - no arcane dynamo
-            if (!Player.IsIncapacitated && !Passives.Wizard.ArcaneDynamo.IsActive && CanCast(SNOPower.Wizard_Meteor, CanCastFlags.NoTimer) && CheckConventionElement(Skills.Wizard.Meteor) &&
+            if (!Player.IsIncapacitated && !Passives.Wizard.ArcaneDynamo.IsActive && CanCast(SNOPower.Wizard_Meteor, CanCastFlags.NoTimer) &&
                 (TargetUtil.EliteOrTrashInRange(65) || TargetUtil.ClusterExists(15f, 65, 2)))
             {
                 return new TrinityPower(SNOPower.Wizard_Meteor, 65f, TargetUtil.GetBestClusterPoint());
@@ -292,20 +286,20 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.Wizard_Disintegrate, disintegrateRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0);
             }
             // Arcane Orb
-            if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_ArcaneOrb) && CheckConventionElement(Skills.Wizard.ArcaneOrb) &&
+            if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_ArcaneOrb) &&
                 ((Player.PrimaryResource >= 30 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 return new TrinityPower(SNOPower.Wizard_ArcaneOrb, 35f, CurrentTarget.ACDGuid);
             }
             // Arcane Torrent
-            if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_ArcaneTorrent) && CheckConventionElement(Skills.Wizard.ArcaneTorrent) &&
+            if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_ArcaneTorrent) &&
                 ((Player.PrimaryResource >= 16 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 return new TrinityPower(SNOPower.Wizard_ArcaneTorrent, 40f, CurrentTarget.ACDGuid);
             }
 
             // Ray of Frost
-            if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_RayOfFrost) && CheckConventionElement(Skills.Wizard.RayOfFrost) &&
+            if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_RayOfFrost) &&
                 (!IsWaitingForSpecial || (Player.PrimaryResource > MinEnergyReserve)))
             {
                 float range = 50f;
@@ -365,6 +359,10 @@ namespace Trinity.Combat.Abilities
             // Illusionist speed boost
             if (Passives.Wizard.Illusionist.IsActive)
             {
+                // Slow Time on self for speed boost
+                if (CanCast(SNOPower.Wizard_SlowTime))
+                    return new TrinityPower(SNOPower.Wizard_SlowTime);
+
                 // Mirror Image for speed boost
                 if (CanCast(SNOPower.Wizard_MirrorImage))
                     return new TrinityPower(SNOPower.Wizard_MirrorImage);
@@ -434,10 +432,11 @@ namespace Trinity.Combat.Abilities
         {
             // Archon form
             // Archon Slow Time for in combat
-            if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_Archon_SlowTime, CanCastFlags.NoTimer) &&
+            if (!Player.IsIncapacitated &&
+                CanCast(SNOPower.Wizard_Archon_SlowTime, CanCastFlags.NoTimer) &&
                 (TimeSpanSincePowerUse(SNOPower.Wizard_Archon_SlowTime) > TimeSpan.FromSeconds(30)))
             {
-                return new TrinityPower(SNOPower.Wizard_Archon_SlowTime, 0f, Player.Position);
+                return new TrinityPower(SNOPower.Wizard_Archon_SlowTime);
             }
 
             // Archon Teleport in combat for kiting
@@ -511,7 +510,7 @@ namespace Trinity.Combat.Abilities
 
             // Arcane Strike Rapid Spam at close-range only, and no AoE inbetween us and target
             if (!Player.IsIncapacitated && !Settings.Combat.Wizard.NoArcaneStrike && CanCast(strikePower, CanCastFlags.NoTimer) &&
-                !CacheData.AvoidanceObstacles.Any(aoe => MathUtil.IntersectsPath(aoe.Position, aoe.Radius, Player.Position, CurrentTarget.Position)))
+                !CacheData.TimeBoundAvoidance.Any(aoe => MathUtil.IntersectsPath(aoe.Position, aoe.Radius, Player.Position, CurrentTarget.Position)))
             {
                 return new TrinityPower(strikePower, 7f, CurrentTarget.ACDGuid);
             }
@@ -618,5 +617,6 @@ namespace Trinity.Combat.Abilities
                     Hotbar.Contains(SNOPower.Wizard_Electrocute);
             }
         }
+
     }
 }

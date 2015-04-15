@@ -18,7 +18,6 @@ namespace Trinity.Config.Combat
         private bool _AllowBacktracking;
         private int _DelayAfterKill;
         private bool _UseNavMeshTargeting;
-        private bool _UseConventionElementOnly;
         private bool _HiPriorityHG;
         private int _TrashPackSize;
         private float _TrashPackClusterRadius;
@@ -35,7 +34,6 @@ namespace Trinity.Config.Combat
         private bool _ProfileTagOverride;
         private bool _AvoidAoEOutOfCombat;
         private bool _FleeInGhostMode;
-        private bool _KeepMovingInCombat;
         #endregion Fields
 
         #region Events
@@ -104,24 +102,6 @@ namespace Trinity.Config.Combat
                 {
                     _UseNavMeshTargeting = value;
                     OnPropertyChanged("UseNavMeshTargeting");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool UseConventionElementOnly
-        {
-            get
-            {
-                return _UseConventionElementOnly;
-            }
-            set
-            {
-                if (_UseConventionElementOnly != value)
-                {
-                    _UseConventionElementOnly = value;
-                    OnPropertyChanged("UseConventionElementOnly");
                 }
             }
         }
@@ -567,24 +547,6 @@ namespace Trinity.Config.Combat
                 {
                     _FleeInGhostMode = value;
                     OnPropertyChanged("FleeInGhostMode");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool KeepMovingInCombat
-        {
-            get
-            {
-                return _KeepMovingInCombat;
-            }
-            set
-            {
-                if (_KeepMovingInCombat != value)
-                {
-                    _KeepMovingInCombat = value;
-                    OnPropertyChanged("KeepKiting");
                 }
             }
         }

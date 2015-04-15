@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
 using System.Text.RegularExpressions;
 using Trinity.Config;
 using Trinity.ItemRules;
-using Trinity.Technicals;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -77,7 +73,7 @@ namespace Trinity
         /// <summary>
         /// A special post power use pause, causes targetHandler to wait on any new decisions
         /// </summary>
-        internal static bool IsWaitingAfterPower;
+        private static bool _isWaitingAfterPower;
 
         /// <summary>
         /// If TargetHandle is waiting waiting before popping a potion - we won't refresh cache/change targets/unstuck/etc
@@ -134,7 +130,6 @@ namespace Trinity
         internal static int PlayerOwnedMysticAllyCount = 0;
         internal static int PlayerOwnedGargantuanCount = 0;
         internal static int PlayerOwnedZombieDogCount = 0;
-        internal static int PlayerOwnedFetishCount = 0;
         internal static int PlayerOwnedDHPetsCount = 0;
         internal static int PlayerOwnedDHSentryCount = 0;
         internal static int PlayerOwnedHydraCount = 0;
@@ -144,8 +139,6 @@ namespace Trinity
         // After so many, give the player a friendly warning to check their skill/build setup
         private static int NoAbilitiesAvailableInARow = 0;
         private static DateTime lastRemindedAboutAbilities = DateTime.MinValue;
-
-        private static DateTime lastPickNewAbilitiesForced = DateTime.MinValue;
 
         // Last had any mob in range, for loot-waiting
         internal static DateTime lastHadUnitInSights = DateTime.MinValue;
@@ -181,7 +174,7 @@ namespace Trinity
 
 
         // Caching of the current primary target's health, to detect if we AREN'T damaging it for a period of time
-        internal static double TargetLastHealth;
+        private static double _targetLastHealth;
 
         // This is used so we don't use certain skills until we "top up" our primary resource by enough
         internal static double MinEnergyReserve = 0d;
@@ -189,25 +182,21 @@ namespace Trinity
         /// <summary>
         /// Store the date-time when we *FIRST* picked this target, so we can blacklist after X period of time targeting
         /// </summary>
-        internal static DateTime LastPickedTargetTime = DateTime.MinValue;
+        private static DateTime _lastPickedTargetTime = DateTime.MinValue;
 
         // These values below are set on a per-class basis later on, so don't bother changing them here! These are the old default values
         public static double PlayerEmergencyHealthPotionLimit = 0.35;
+        private static double _playerEmergencyHealthGlobeLimit = 0.35;
+        private static double _playerHealthGlobeResource = 0.35;
 
         /*
          *  Blacklists
          */
         internal static bool NeedToClearBlacklist3 = false;
-        internal static DateTime Blacklist1LastClear = DateTime.MinValue;
         internal static DateTime Blacklist3LastClear = DateTime.MinValue;
         internal static DateTime Blacklist15LastClear = DateTime.MinValue;
         internal static DateTime Blacklist60LastClear = DateTime.MinValue;
         internal static DateTime Blacklist90LastClear = DateTime.MinValue;
-
-        /// <summary>
-        /// Use RActorGUID to blacklist an object/monster for 1 second
-        /// </summary>
-        internal static HashSet<int> Blacklist1Second = new HashSet<int>();
 
         /// <summary>
         /// Use RActorGUID to blacklist an object/monster for 3 seconds
@@ -241,6 +230,11 @@ namespace Trinity
         // Some avoidance related variables
 
         /// <summary>
+        /// Whether or not we need avoidance this target-search-loop
+        /// </summary>
+        private static bool _standingInAvoidance;
+
+        /// <summary>
         /// This lets us know if there is a target but it's in avoidance so we can just "stay put" until avoidance goes
         /// </summary>
         private static bool _shouldStayPutDuringAvoidance;
@@ -261,7 +255,7 @@ namespace Trinity
         private static bool wasRootedLastTick = false;
 
         // Variables used to actually hold powers the power-selector has picked to use, for buffing and main power use
-        private static TrinityPower PowerBuff;
+        private static TrinityPower powerBuff;
 
         private static SNOPower lastPowerUsed = SNOPower.None;
         public static SNOPower LastPowerUsed
@@ -316,8 +310,6 @@ namespace Trinity
         internal static Vector3 ShiftedPosition = Vector3.Zero;
         internal static DateTime lastShiftedPosition = DateTime.MinValue;
         internal static int ShiftPositionFor = 0;
-        internal static Vector3 TargetCurrentDestination;
-        internal static Vector3 CurrentMoveDestination;
         internal static Vector3 CurrentDestination;
         public static int CurrentWorldDynamicId = -1;
         public static int CurrentWorldId = -1; // worldId from profiles, used in persistent stats
@@ -352,7 +344,7 @@ namespace Trinity
         /// <summary>
         /// This contains the active cache of DiaObjects
         /// </summary>
-        internal static List<TrinityCacheObject> ObjectCache = new List<TrinityCacheObject>();
+        internal static List<TrinityCacheObject> ObjectCache;
 
         // From main RefreshDiaobjects
         /// <summary>
@@ -363,13 +355,15 @@ namespace Trinity
         /// <summary>
         /// The RActorGUID of the last CurrentTarget (PrimaryTarget)
         /// </summary>
-        internal static int LastTargetRactorGUID;
+        private static int LastTargetRactorGUID;
 
         internal static int LastTargetACDGuid;
         /// <summary>
         /// The number of monsters within melee range distance of the player
         /// </summary>
         private static double HighestWeightFound;
+
+        private static bool NeedToKite = false;
 
         /// <summary>
         /// Used for trimming off numbers from object names in RefreshDiaObject
@@ -441,11 +435,6 @@ namespace Trinity
         /// </summary>
         private static bool CurrentTargetIsInLoS;
 
-        /// <summary>
-        /// Los & Required range or no range required
-        /// </summary>
-        private static bool CurrentTargetIsInRange;
-
         // Darkfriend's Looting Rule
         public static Interpreter StashRule = null; // = new Interpreter();
 
@@ -474,20 +463,12 @@ namespace Trinity
         }
 
         private static DateTime eventStartTime = DateTime.MinValue;
+
         public static DateTime EventStartTime
         {
             get { return Trinity.eventStartTime; }
             set { Trinity.eventStartTime = value; }
         }
 
-        internal static bool KillMonstersInAoE { get; set; }
-        internal static bool LogHasFlagPerformance { get; set; }
-
-        // Refresh before anything else
-        internal static void ResetTickValues()
-        {
-            LogHasFlagPerformance = Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance);
-            KillMonstersInAoE = Settings.Combat.Misc.KillMonstersInAoE;
-        }
     }
 }

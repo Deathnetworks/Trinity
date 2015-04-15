@@ -3,7 +3,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
             xmlns:ut="clr-namespace:Trinity.UIComponents"
-             mc:Ignorable="d"  Foreground="{DynamicResource TextBrush}" d:DesignWidth="390" Height="780.224">
+             mc:Ignorable="d"  Foreground="{DynamicResource TextBrush}"
+             d:DesignHeight="350" d:DesignWidth="390">
     <UserControl.Resources>
         <ResourceDictionary>
             <!-- Don't format this line otherwise Db can't open config window -->
@@ -15,356 +16,147 @@
             <ut:EnumBooleanConverter x:Key="enumBooleanConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
-    <ScrollViewer>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <StackPanel>
-                <!--Emergency Health-->
-                <GroupBox>
-                    <GroupBox.Header>Emergency Health</GroupBox.Header>
-                    <StackPanel>
-                        <Grid Margin="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="2*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Potion %" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center"/>
-                            <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                                Interval="500" Maximum="99" Minimum="0" 
-                                SmallChange="1" LargeChange="5"
-                                TickPlacement="None" 
-                                Value="{Binding Path=DH.PotionLevel, Converter={StaticResource percentConverter}}" 
-                                HorizontalAlignment="Stretch" Margin="2"/>
-                        </Grid>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel>
+            <!--Emergency Health-->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Potion %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+                <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                    Interval="500" Maximum="99" Minimum="0" 
+                    SmallChange="1" LargeChange="5"
+                    TickPlacement="None" 
+                    Value="{Binding Path=DH.PotionLevel, Converter={StaticResource percentConverter}}" 
+                    HorizontalAlignment="Stretch" Margin="2"/>
+            </Grid>
 
-                        <Grid Margin="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Globe Health %" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center"/>
-                            <Slider Grid.Column="1" Template="{DynamicResource Slider}"
-                                    Interval="500" Maximum="99" Minimum="0"
-                                    SmallChange="1" LargeChange="5"
-                                    TickPlacement="None"
-                                    Value="{Binding Path=DH.HealthGlobeLevel, Converter={StaticResource percentConverter}}"
-                                    HorizontalAlignment="Stretch" Margin="2"/>
-                            <TextBlock Grid.Column="2" Text="Globe Resource %" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center"/>
-                            <Slider Grid.Column="3" Template="{DynamicResource Slider}"
-                                    Interval="500" Maximum="99" Minimum="0"
-                                    SmallChange="1" LargeChange="5"
-                                    TickPlacement="None"
-                                    Value="{Binding Path=DH.HealthGlobeLevelResource, Converter={StaticResource percentConverter}}"
-                                    HorizontalAlignment="Stretch" Margin="2"
-                                    ToolTip="Only applies when Reaper's Wraps are equipped"/>
-                        </Grid>
-                    </StackPanel>
-                </GroupBox>
-                <!--Kite-->
-                <GroupBox>
-                    <GroupBox.Header>Kite</GroupBox.Header>
-                    <StackPanel>
-                        <Grid Margin="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*"/>
-                                <ColumnDefinition Width="3*"/>
-                            </Grid.ColumnDefinitions>
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <TextBlock Text="Globe Health %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+              <Slider Grid.Column="1" Template="{DynamicResource Slider}"
+                      Interval="500" Maximum="100" Minimum="0"
+                      SmallChange="1" LargeChange="5"
+                      TickPlacement="None"
+                      Value="{Binding Path=DH.HealthGlobeLevel, Converter={StaticResource percentConverter}}"
+                      HorizontalAlignment="Stretch" Margin="2"/>
+              <TextBlock Grid.Column="2" Text="Globe Resource %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+              <Slider Grid.Column="3" Template="{DynamicResource Slider}"
+                      Interval="500" Maximum="100" Minimum="0"
+                      SmallChange="1" LargeChange="5"
+                      TickPlacement="None"
+                      Value="{Binding Path=DH.HealthGlobeLevelResource, Converter={StaticResource percentConverter}}"
+                      HorizontalAlignment="Stretch" Margin="2"
+                      ToolTip="Only applies when Reaper's Wraps are equipped"/>
+            </Grid>
+            <!--Kite-->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
 
-                            <TextBlock Text="Kite Trigger Range" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center"/>
-                            <Slider Grid.Column="1" Template="{DynamicResource Slider}"
-                              Interval="500" Maximum="40" Minimum="0"
-                              SmallChange="1" LargeChange="5"
-                              TickPlacement="BottomRight" TickFrequency="1"
-                              Value="{Binding Path=DH.KiteLimit}"
-                              HorizontalAlignment="Stretch" Margin="2"/>
-                        </Grid>
-                        <UniformGrid Columns="2" Margin="2" >
-                            <TextBlock Text="When to Kite/Flee" />
-                            <RadioButton Margin="2" GroupName="KiteMode" Content="Always in Combat" IsChecked="{Binding Path=DH.KiteMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Always}"  />
-                            <RadioButton Margin="2" GroupName="KiteMode" Content="Bosses Only" IsChecked="{Binding Path=DH.KiteMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Bosses}" />
-                            <RadioButton Margin="2" GroupName="KiteMode" Content="Elites Only" IsChecked="{Binding Path=DH.KiteMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Elites}" />
-                        </UniformGrid>
-                    </StackPanel>
-                </GroupBox>
-                <GroupBox>
-                    <GroupBox.Header>Combat</GroupBox.Header>
-                    <StackPanel>
-                        <Grid Margin="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*"/>
-                                <ColumnDefinition Width="3*"/>
-                            </Grid.ColumnDefinitions>
+                <TextBlock Text="Kite Trigger Range" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+                <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                    Interval="500" Maximum="40" Minimum="0"
+                    SmallChange="1" LargeChange="5" 
+                    TickPlacement="BottomRight" TickFrequency="1"
+                    Value="{Binding Path=DH.KiteLimit}" 
+                    HorizontalAlignment="Stretch" Margin="2"/>
+            </Grid>
+            <!--KiteMode-->
+            <GroupBox>
+                <GroupBox.Header>Kite Mode</GroupBox.Header>
+                <UniformGrid Columns="2">
+                    <TextBlock Text="When to Kite/Flee" />
+                    <RadioButton GroupName="KiteMode" Content="Always in Combat" IsChecked="{Binding Path=DH.KiteMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Always}"  />
+                    <RadioButton GroupName="KiteMode" Content="Bosses Only" IsChecked="{Binding Path=DH.KiteMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Bosses}" />
+                    <RadioButton GroupName="KiteMode" Content="Elites Only" IsChecked="{Binding Path=DH.KiteMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Elites}" />
+                </UniformGrid>
+            </GroupBox>
+            <!--Strafe-->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
 
-                            <TextBlock Text="Ranged Attack Range" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center"/>
-                            <Slider Grid.Column="1" Template="{DynamicResource Slider}"
-                              Interval="500" Maximum="65" Minimum="10"
-                              SmallChange="1" LargeChange="5"
-                              TickPlacement="BottomRight" TickFrequency="1"
-                              Value="{Binding Path=DH.RangedAttackRange}"
-                              HorizontalAlignment="Stretch" Margin="2"/>
-                        </Grid>
-                        <!--Strafe-->
-                        <Grid Margin="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*"/>
-                                <ColumnDefinition Width="3*"/>
-                            </Grid.ColumnDefinitions>
+                <TextBlock Text="Minimum Strafe Hatred" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+                <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                    Interval="500" Maximum="150" Minimum="12" 
+                    SmallChange="1" LargeChange="5" IsSnapToTickEnabled="True"
+                    TickPlacement="BottomRight" TickFrequency="12"
+                    Value="{Binding Path=DH.StrafeMinHatred}" 
+                    HorizontalAlignment="Stretch" Margin="2"/>
+            </Grid>
+            <!--RapidFire-->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
 
-                            <TextBlock Text="Minimum Strafe Hatred" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center"/>
-                            <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                                Interval="500" Maximum="150" Minimum="12" 
-                                SmallChange="1" LargeChange="5" IsSnapToTickEnabled="True"
-                                TickPlacement="BottomRight" TickFrequency="12"
-                                Value="{Binding Path=DH.StrafeMinHatred}" 
-                                HorizontalAlignment="Stretch" Margin="2"/>
-                        </Grid>
-                        <!--RapidFire-->
-                        <Grid Margin="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*"/>
-                                <ColumnDefinition Width="3*"/>
-                            </Grid.ColumnDefinitions>
+                <TextBlock Text="Minimum RapidFire Hatred" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+                <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                    Interval="500" Maximum="150" Minimum="30" 
+                    SmallChange="1" LargeChange="5" IsSnapToTickEnabled="True"
+                    TickPlacement="BottomRight" TickFrequency="10"
+                    Value="{Binding Path=DH.RapidFireMinHatred}" 
+                    HorizontalAlignment="Stretch" Margin="2"/>
+            </Grid>
+            <!--Vault-->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
 
-                            <TextBlock Text="Minimum RapidFire Hatred" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center"/>
-                            <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                                Interval="500" Maximum="150" Minimum="30" 
-                                SmallChange="1" LargeChange="5" IsSnapToTickEnabled="True"
-                                TickPlacement="BottomRight" TickFrequency="10"
-                                Value="{Binding Path=DH.RapidFireMinHatred}" 
-                                HorizontalAlignment="Stretch" Margin="2"/>
-                        </Grid>
-                        <Grid>
-                            <StackPanel>
-                                <UniformGrid Columns="2" Margin="2">
-                                    <CheckBox Margin="2" IsChecked="{Binding Path=DH.SpamSmokeScreen}" ToolTip="For use with Displacement rune">Spam Smoke Screen</CheckBox>
-                                    <CheckBox Margin="2" IsChecked="{Binding Path=DH.SpamShadowPower}" ToolTip="For use with Shadow Glide rune for Out of Combat Sprint">Spam Shadow Power</CheckBox>
-                                    <CheckBox Margin="2" IsChecked="{Binding Path=DH.VengeanceElitesOnly}">Vengeance Elites Only</CheckBox>
-                                    <CheckBox Margin="2" IsChecked="{Binding Path=DH.CompanionOffCooldown}">Companion Off CD</CheckBox>
-                                    <CheckBox Margin="2" IsChecked="{Binding Path=DH.RainOfVengeanceOffCD}">Rain of Vengeance Off CD</CheckBox>
-                                </UniformGrid>
-                            </StackPanel>
-                        </Grid>
-                    </StackPanel>
-                </GroupBox>
-                <GroupBox>
-                    <GroupBox.Header>Vault</GroupBox.Header>
-                    <StackPanel>
-                        <UniformGrid Columns="2" Margin="2">
+                <TextBlock Text="Vault movement delay" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+                <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                    Interval="500" Maximum="4000" Minimum="400" 
+                    SmallChange="10" LargeChange="5" 
+                    TickPlacement="BottomRight" TickFrequency="1"
+                    Value="{Binding Path=DH.VaultMovementDelay}" 
+                    HorizontalAlignment="Stretch" Margin="2"
+                    ToolTip="Vault for movement re-use delay"/>
+            </Grid>
+            <Grid>
+                <StackPanel>
+                    <UniformGrid Columns="2">
+                        <CheckBox Margin="2" IsChecked="{Binding Path=DH.SpamSmokeScreen}" ToolTip="For use with Displacement rune">Spam Smoke Screen</CheckBox>
+                        <CheckBox Margin="2" IsChecked="{Binding Path=DH.SpamShadowPower}" ToolTip="For use with Shadow Glide rune for Out of Combat Sprint">Spam Shadow Power</CheckBox>
+                        <CheckBox Margin="2" IsChecked="{Binding Path=DH.VengeanceElitesOnly}">Vengeance Elites Only</CheckBox>
+                        <CheckBox Margin="2" IsChecked="{Binding Path=DH.CompanionOffCooldown}">Companion Off CD</CheckBox>
+                        <CheckBox Margin="2" IsChecked="{Binding Path=DH.RainOfVengeanceOffCD}">Rain of Vengeance Off CD</CheckBox>
+                    </UniformGrid>
+                    <GroupBox>
+                        <GroupBox.Header>Vault</GroupBox.Header>
+                        <UniformGrid Columns="2">
                             <TextBlock Text="When to use Vault" />
-                            <RadioButton Margin="2" GroupName="VaultMode" Content="Anytime" IsChecked="{Binding Path=DH.VaultMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Always}"  />
-                            <RadioButton Margin="2" GroupName="VaultMode" Content="In Combat only" IsChecked="{Binding Path=DH.VaultMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=CombatOnly}" />
-                            <RadioButton Margin="2" GroupName="VaultMode" Content="Out of Combat Only" IsChecked="{Binding Path=DH.VaultMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=MovementOnly}" />
+                            <RadioButton GroupName="VaultMode" Content="Anytime" IsChecked="{Binding Path=DH.VaultMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Always}"  />
+                            <RadioButton GroupName="VaultMode" Content="In Combat only" IsChecked="{Binding Path=DH.VaultMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=CombatOnly}" />
+                            <RadioButton GroupName="VaultMode" Content="Out of Combat Only" IsChecked="{Binding Path=DH.VaultMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=MovementOnly}" />
                         </UniformGrid>
-                        <GroupBox>
-                            <GroupBox.Header>Vault Combat</GroupBox.Header>
-                            <StackPanel>
-                                <Grid Margin="2">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="2*"/>
-                                        <ColumnDefinition Width="3*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Vault combat delay" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center"/>
-                                    <Slider Grid.Column="1" Template="{DynamicResource Slider}"
-                                          Interval="500" Maximum="4000" Minimum="400"
-                                          SmallChange="25" LargeChange="50"
-                                          TickPlacement="BottomRight" TickFrequency="50"
-                                          Value="{Binding Path=DH.VaultCombatDelay}"
-                                          HorizontalAlignment="Stretch" Margin="2"
-                                          ToolTip="Vault for combat/avoidance re-use delay"/>
-                                </Grid>
-                                <GroupBox>
-                                    <GroupBox.Header>Minimum health % before use vault for</GroupBox.Header>
-                                    <StackPanel>
-                                        <Grid Margin="2">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="2*"/>
-                                                <ColumnDefinition Width="3*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Kite" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" Template="{DynamicResource Slider}"
-                                                Interval="500" Maximum="100" Minimum="0"
-                                                SmallChange="1" LargeChange="5"
-                                                TickPlacement="None"
-                                                Value="{Binding Path=DH.MinHealthVaultKite, Converter={StaticResource percentConverter}}"
-                                                HorizontalAlignment="Stretch" Margin="2"
-                                                ToolTip="Min health pct to use vault for kite movement"/>
-                                        </Grid>
-                                        <Grid Margin="2">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="2*"/>
-                                                <ColumnDefinition Width="3*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Avoid" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" Template="{DynamicResource Slider}"
-                                                Interval="500" Maximum="100" Minimum="0"
-                                                SmallChange="1" LargeChange="5"
-                                                TickPlacement="None"
-                                                Value="{Binding Path=DH.MinHealthVaultAvoidance, Converter={StaticResource percentConverter}}"
-                                                HorizontalAlignment="Stretch" Margin="2"
-                                                ToolTip="Min health pct to use vault for avoidance movement"/>
-                                        </Grid>
-                                    </StackPanel>
-                                </GroupBox>
-                                <GroupBox>
-                                    <GroupBox.Header>Minimum move distance before use vault - Avoidance</GroupBox.Header>
-                                    <StackPanel>
-                                        <Grid Margin="2">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="2*"/>
-                                                <ColumnDefinition Width="3*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Kite" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" Template="{DynamicResource Slider}"
-                                                  Interval="1" Maximum="35" Minimum="5"
-                                                  SmallChange="1" LargeChange="1"
-                                                  TickPlacement="BottomRight" TickFrequency="1"
-                                                  Value="{Binding Path=DH.MinDistVaultKite}"
-                                                  HorizontalAlignment="Stretch" Margin="2"
-                                                  ToolTip="Minimum distance to safe point to use vault"/>
-                                        </Grid>
-                                        <Grid Margin="2">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="2*"/>
-                                                <ColumnDefinition Width="3*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Avoidance" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" Template="{DynamicResource Slider}"
-                                                  Interval="1" Maximum="35" Minimum="5"
-                                                  SmallChange="1" LargeChange="1"
-                                                  TickPlacement="BottomRight" TickFrequency="1"
-                                                  Value="{Binding Path=DH.MinDistVaultAvoidance}"
-                                                  HorizontalAlignment="Stretch" Margin="2"
-                                                  ToolTip="Minimum distance to safe point to use vault"/>
-                                        </Grid>
-                                    </StackPanel>
-                                </GroupBox>
-                                <Grid Margin="2">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="2*"/>
-                                        <ColumnDefinition Width="3*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Save dicipline %" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center" />
-                                    <Slider Grid.Column="1" Template="{DynamicResource Slider}"
-                                        Interval="500" Maximum="100" Minimum="0"
-                                        SmallChange="1" LargeChange="5"
-                                        TickPlacement="BottomRight" TickFrequency="5"
-                                        Value="{Binding Path=DH.MinDiciplineCombatVaultPct, Converter={StaticResource percentConverter}}"
-                                        HorizontalAlignment="Stretch" Margin="2"
-                                        ToolTip="Save dicipline % before use vault for combat movement"/>
-                                </Grid>
-                                <GroupBox>
-                                    <GroupBox.Header>Minimum move distance before use vault - Target attempt</GroupBox.Header>
-                                    <StackPanel>
-                                        <Grid Margin="2">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="2*"/>
-                                                <ColumnDefinition Width="3*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Unit" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" Template="{DynamicResource Slider}"
-                                                  Interval="1" Maximum="35" Minimum="5"
-                                                  SmallChange="1" LargeChange="1"
-                                                  TickPlacement="BottomRight" TickFrequency="1"
-                                                  Value="{Binding Path=DH.MinDistVaultCombat}"
-                                                  HorizontalAlignment="Stretch" Margin="2"
-                                                  ToolTip="Minimum distance to safe point to use vault"/>
-                                        </Grid>
-                                        <Grid Margin="2">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="2*"/>
-                                                <ColumnDefinition Width="3*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Emergency health" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" Template="{DynamicResource Slider}"
-                                                  Interval="1" Maximum="35" Minimum="5"
-                                                  SmallChange="1" LargeChange="1"
-                                                  TickPlacement="BottomRight" TickFrequency="1"
-                                                  Value="{Binding Path=DH.MinDistVaultHealth}"
-                                                  HorizontalAlignment="Stretch" Margin="2"
-                                                  ToolTip="Minimum distance to safe point to use vault"/>
-                                        </Grid>
-                                        <Grid Margin="2">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="2*"/>
-                                                <ColumnDefinition Width="3*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Globe/Gold/Item" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" Template="{DynamicResource Slider}"
-                                                  Interval="1" Maximum="35" Minimum="5"
-                                                  SmallChange="1" LargeChange="1"
-                                                  TickPlacement="BottomRight" TickFrequency="1"
-                                                  Value="{Binding Path=DH.MinDistVaultGlobeItem}"
-                                                  HorizontalAlignment="Stretch" Margin="2"
-                                                  ToolTip="Minimum distance to safe point to use vault"/>
-                                        </Grid>
-                                        <Grid Margin="2">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="2*"/>
-                                                <ColumnDefinition Width="3*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Shrine/Container" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center"/>
-                                            <Slider Grid.Column="1" Template="{DynamicResource Slider}"
-                                                  Interval="1" Maximum="35" Minimum="5"
-                                                  SmallChange="1" LargeChange="1"
-                                                  TickPlacement="BottomRight" TickFrequency="1"
-                                                  Value="{Binding Path=DH.MinDistVaultShrineOther}"
-                                                  HorizontalAlignment="Stretch" Margin="2"
-                                                  ToolTip="Minimum distance to safe point to use vault"/>
-                                        </Grid>
-                                    </StackPanel>
-                                </GroupBox>
-                            </StackPanel>
-                        </GroupBox>
-                        <GroupBox>
-                            <GroupBox.Header>Vault OOC</GroupBox.Header>
-                            <StackPanel>
-                                <Grid Margin="2">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="2*"/>
-                                        <ColumnDefinition Width="3*"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <TextBlock Text="Vault movement delay" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center"/>
-                                    <Slider Grid.Column="1" Template="{DynamicResource Slider}"
-                                      Interval="500" Maximum="4000" Minimum="400"
-                                      SmallChange="25" LargeChange="50"
-                                      TickPlacement="BottomRight" TickFrequency="50"
-                                      Value="{Binding Path=DH.VaultMovementDelay}"
-                                      HorizontalAlignment="Stretch" Margin="2"
-                                      ToolTip="Vault for movement re-use delay"/>
-                                </Grid>
-                                <Grid Margin="2">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="2*"/>
-                                        <ColumnDefinition Width="3*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Save dicipline %" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center"/>
-                                    <Slider Grid.Column="1" Template="{DynamicResource Slider}"
-                                      Interval="500" Maximum="99" Minimum="0"
-                                      SmallChange="1" LargeChange="5"
-                                      TickPlacement="BottomRight" TickFrequency="5"
-                                      Value="{Binding Path=DH.MinDiciplineOOCVaultPct, Converter={StaticResource percentConverter}}"
-                                      HorizontalAlignment="Stretch" Margin="2"/>
-                                </Grid>
-                            </StackPanel>
-                        </GroupBox>
-                    </StackPanel>
-                </GroupBox>
-                <GroupBox>
-                    <GroupBox.Header>Avoidance</GroupBox.Header>
-                    <Grid Grid.Row="1" Margin="2">
-                        <Border Tag="Combat\Avoidance.xaml" DataContext="{Binding Path=DH}"/>
-                    </Grid>
-                </GroupBox>
-                <!--Reset Button-->
-                <Button Grid.Row="6" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetDemonHunterCommand}">Reset</Button>
-            </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+        <Grid Grid.Row="1" Margin="2">
+            <ScrollViewer Tag="Combat\Avoidance.xaml" DataContext="{Binding Path=DH}"/>
         </Grid>
-    </ScrollViewer>
+        <!--Reset Button-->
+        <Button Grid.Row="6" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetDemonHunterCommand}">Reset</Button>
+    </Grid>
 </UserControl>

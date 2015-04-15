@@ -16,14 +16,9 @@ namespace Trinity
         {
             if (ZetaDia.Me != null && ZetaDia.Me.IsValid)
             {
-                Vector3 playerLoc = MainGrid.VectorToGrid(Trinity.Player.Position);
-                if (!CacheData.VisitedZones.ContainsKey(playerLoc))
-                {
-                    CacheData.VisitedZones.Add(playerLoc, Trinity.Player.WorldID);
-                    Position = playerLoc;
-                    RecordedAt = DateTime.UtcNow;
-                    WorldId = Trinity.Player.WorldID;
-                }
+                Position = Trinity.Player.Position;
+                RecordedAt = DateTime.UtcNow;
+                WorldId = Trinity.Player.WorldID;
             }
         }
 
@@ -42,7 +37,6 @@ namespace Trinity
 
             foreach (PositionCache p in Cache.Where(p => p.Position.Distance2D(Trinity.Player.Position) < distance).ToList())
             {
-                CacheData.VisitedZones.Remove(p.Position);
                 Cache.Remove(p);
             }
             Cache.Add(new PositionCache());
@@ -53,17 +47,14 @@ namespace Trinity
         /// </summary>
         public static void MaintainCache()
         {
-            foreach (PositionCache p in Cache.ToList().Where(p => p.WorldId != Trinity.Player.WorldID))
-            {
-                CacheData.VisitedZones.Remove(p.Position);
-                Cache.Remove(p);
-            }
-
+            int worldId = ZetaDia.CurrentWorldId;
+            Cache.RemoveWhere(p => DateTime.UtcNow.Subtract(p.RecordedAt).TotalMilliseconds > 10000);
+            Cache.RemoveWhere(p => p.WorldId != worldId);
         }
 
         public bool Equals(PositionCache other)
         {
-            return Position == other.Position && WorldId == other.WorldId;
+            return this.Position == other.Position && this.WorldId == other.WorldId;
         }
     }
 }

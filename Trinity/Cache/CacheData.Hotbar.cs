@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using Trinity.Cache;
 using Trinity.Combat;
 using Trinity.Combat.Abilities;
@@ -52,12 +51,6 @@ namespace Trinity
                 public int RuneIndex { get; set; }
                 public bool HasRuneEquipped { get; set; }
                 public Rune Rune { get { return Skill.CurrentRune; } }
-                public int Charges { get; set; }
-
-                public override string ToString()
-                {
-                    return string.Format("Power: {0}, SRune: {1}, Charge:{2}, Slot:{3}", Power, Rune, Charges, Slot);
-                }
             }
 
             public HashSet<SNOPower> ActivePowers { get; private set; }
@@ -80,6 +73,8 @@ namespace Trinity
                     if (lastUpdateMs <= 5000 && CombatBase.TimeSincePowerUse(SNOPower.Wizard_Archon) > 20000)
 						return;
 
+				    Clear();
+
 					try
 					{
                         RefreshHotbar();
@@ -92,11 +87,9 @@ namespace Trinity
 			}
 
 			private void RefreshHotbar()
-			{
-                using (new PerformanceLogger("RefreshHotbar"))
-                {
-                    Clear();
-
+			{			   
+				using (new PerformanceLogger("RefreshHotbar"))
+				{
                     var cPlayer = ZetaDia.CPlayer;
 
                     LastUpdated = DateTime.UtcNow;
@@ -105,39 +98,40 @@ namespace Trinity
 
                     for (int i = 0; i <= 5; i++)
                     {
-                        var diaActiveSkill = cPlayer.GetActiveSkillByIndex(i, ZetaDia.Me.SkillOverrideActive);
+                        var diaActiveSkill = cPlayer.GetActiveSkillByIndex(i, ZetaDia.Me.SkillOverrideActive);                        
                         if (diaActiveSkill == null)
                             continue;
 
                         var power = diaActiveSkill.Power;
                         var runeIndex = diaActiveSkill.RuneIndex;
 
-                        HotbarSkill hotbarSkill = new HotbarSkill
+                        var hotbarskill = new HotbarSkill
                         {
                             Power = diaActiveSkill.Power,
                             Slot = (HotbarSlot) i,
                             RuneIndex = runeIndex,
                             HasRuneEquipped = diaActiveSkill.HasRuneEquipped,
-                            Skill = SkillUtils.ById(power),
-                            Charges = Player.CommonData.GetAttribute<int>(((int)diaActiveSkill.Power << 12) + ((int)ActorAttributeType.SkillCharges & 0xFFF)),
+                            Skill = SkillUtils.ById(power)
                         };
 
                         ActivePowers.Add(power);
-                        ActiveSkills.Add(hotbarSkill);
-                        _skillBySNOPower.Add(power, hotbarSkill);
-                        _skillBySlot.Add((HotbarSlot)i, hotbarSkill);
+                        ActiveSkills.Add(hotbarskill);
+                        _skillBySNOPower.Add(power, hotbarskill);
+                        _skillBySlot.Add((HotbarSlot)i, hotbarskill);
 
                         if (!DataDictionary.LastUseAbilityTimeDefaults.ContainsKey(power))
                             DataDictionary.LastUseAbilityTimeDefaults.Add(power, DateTime.MinValue);
 
                         if (!AbilityLastUsed.ContainsKey(power))
                             AbilityLastUsed.Add(power, DateTime.MinValue);
+
                     }
 
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                         "Refreshed Hotbar: ActiveSkills={0} PassiveSkills={1}",
                         ActiveSkills.Count,
                         PassiveSkills.Count);
+
 				}
 			}
 
@@ -151,16 +145,6 @@ namespace Trinity
             {
                 HotbarSkill skill;
                 return _skillBySlot.TryGetValue(slot, out skill) ? skill : new HotbarSkill();
-            }
-
-            public int GetSkillStacks(int id)
-            {
-                return GetSkill((SNOPower)id).Charges;
-            }
-
-            public int GetSkillCharges(SNOPower id)
-            {
-                return GetSkillStacks((int)id);
             }
 
 			public void Dump()

@@ -161,7 +161,16 @@ namespace Trinity
         {
             using (new PerformanceLogger("OutputReport"))
             {
-                if (!Trinity.Player.IsFullyValid)
+                if (!ZetaDia.Service.IsValid)
+                    return;
+
+                if (!ZetaDia.Service.Platform.IsConnected)
+                    return;
+
+                if (!ZetaDia.IsInGame)
+                    return;
+
+                if (ZetaDia.Me.IsFullyValid())
                     return;
 
                 if (!Trinity.Settings.Advanced.OutputReports)

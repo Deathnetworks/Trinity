@@ -36,16 +36,22 @@ namespace Trinity
             V.ValidateLoad();
 
             // Recording of all the XML's in use this run
-            string sThisProfile = GlobalSettings.Instance.LastProfile;
-            if (sThisProfile != CurrentProfile)
+            try
             {
-                ProfileHistory.Add(sThisProfile);
-                CurrentProfile = sThisProfile;
-                if (FirstProfile == string.Empty)
-                    FirstProfile = sThisProfile;
-            }
+                string sThisProfile = GlobalSettings.Instance.LastProfile;
+                if (sThisProfile != CurrentProfile)
+                {
+                    ProfileHistory.Add(sThisProfile);
+                    CurrentProfile = sThisProfile;
+                    if (FirstProfile == "")
+                        FirstProfile = sThisProfile;
+                }
 
-            DebugUtil.LogSystemInformation();
+                DebugUtil.LogSystemInformation();
+            }
+            catch
+            {
+            }
 
             if (!ItemDropStats.MaintainStatTracking)
             {
@@ -204,7 +210,7 @@ namespace Trinity
                 Blacklist60Seconds = new HashSet<int>();
                 Blacklist90Seconds = new HashSet<int>();
                 Blacklist15Seconds = new HashSet<int>();
-
+           
                 PlayerMover.TotalAntiStuckAttempts = 1;
                 PlayerMover.vSafeMovementLocation = Vector3.Zero;
                 PlayerMover.LastPosition = Vector3.Zero;
@@ -214,7 +220,7 @@ namespace Trinity
                 PlayerMover.TimesReachedMaxUnstucks = 0;
                 PlayerMover.CancelUnstuckerForSeconds = 0;
                 PlayerMover.LastCancelledUnstucker = DateTime.MinValue;
-                NavHelper.UsedStuckSpots = new List<GridNode>();
+                NavHelper.UsedStuckSpots = new List<GridPoint>();
 
                 CacheData.FullClear();
 

@@ -63,7 +63,7 @@ namespace Trinity.Helpers
         private static async Task<bool> MainCombatTask()
         {
             // If we aren't in the game or a world is loading, don't do anything yet
-            if (!Trinity.Player.IsInGame || Trinity.Player.IsLoadingWorld || !Trinity.Player.IsValid)
+            if (!ZetaDia.IsInGame || ZetaDia.IsLoadingWorld || !ZetaDia.Me.IsValid)
             {
                 Logger.LogDebug(LogCategory.GlobalHandler, "Not in game, IsLoadingWorld, or Me is Invalid");
                 return true;
@@ -80,15 +80,6 @@ namespace Trinity.Helpers
                 Logger.LogDebug(LogCategory.GlobalHandler, "Recently died, durability zero");
                 return true;
             }
-
-            // See if we should update the stats file
-            if (DateTime.UtcNow.Subtract(ItemDropStats.ItemStatsLastPostedReport).TotalSeconds > 10)
-            {
-                ItemDropStats.ItemStatsLastPostedReport = DateTime.UtcNow;
-                ItemDropStats.OutputReport();
-            }
-
-            Trinity.ResetTickValues();
             return await new Decorator(Trinity.TargetCheck, new Action(ret => Trinity.HandleTarget())).ExecuteCoroutine();
         }
 

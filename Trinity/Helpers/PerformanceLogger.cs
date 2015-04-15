@@ -28,15 +28,14 @@ namespace Trinity.Technicals
                 _Stopwatch.Stop();
                 if (_Stopwatch.Elapsed.TotalMilliseconds > 5)
                 {
-                    if (_Stopwatch.Elapsed.TotalMilliseconds > 1000 ||
-                        (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance) && _Stopwatch.Elapsed.TotalMilliseconds > 25))
-                    {
-                        Logging.InfoFormat("[Trinity][Performance] Execution of {0} took {1:00.00}ms.", _BlockName,
-                                            _Stopwatch.Elapsed.TotalMilliseconds);
-                    }
-                    else if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance))
+                    if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance))
                     {
                         Logging.DebugFormat("[Trinity][Performance] Execution of {0} took {1:00.00}ms.", _BlockName,
+                                            _Stopwatch.Elapsed.TotalMilliseconds);
+                    }
+                    else if (_Stopwatch.Elapsed.TotalMilliseconds > 1000)
+                    {
+                        Logging.ErrorFormat("[Trinity][Performance] Execution of {0} took {1:00.00}ms.", _BlockName,
                                             _Stopwatch.Elapsed.TotalMilliseconds);
                     }
                 }

@@ -220,14 +220,14 @@ namespace Trinity
             Set(new TVar("SpellDelay.Witchdoctor_FetishArmy", 90000, "Spell Use Delay/Interval, milliseconds"));
 
             // Demon Hunter skills
-            Set(new TVar("SpellDelay.DemonHunter_HungeringArrow", 150, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.DemonHunter_EntanglingShot", 150, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.DemonHunter_BolaShot", 150, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.DemonHunter_Grenades", 150, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.DemonHunter_Impale", 150, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.DemonHunter_RapidFire", 150, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.DemonHunter_Chakram", 150, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.DemonHunter_ElementalArrow", 150, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_HungeringArrow", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_EntanglingShot", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_BolaShot", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_Grenades", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_Impale", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_RapidFire", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_Chakram", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_ElementalArrow", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_Caltrops", 5500, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_SmokeScreen", 3000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_ShadowPower", 5000, "Spell Use Delay/Interval, milliseconds"));
@@ -239,16 +239,16 @@ namespace Trinity
             Set(new TVar("SpellDelay.DemonHunter_EvasiveFire", 300, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_FanOfKnives", 10000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_SpikeTrap", 1000, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.DemonHunter_Sentry", 150, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.DemonHunter_Strafe", 150, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.DemonHunter_Multishot", 150, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_Sentry", 8000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_Strafe", 1, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_Multishot", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_ClusterArrow", 150, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_RainOfVengeance", 10000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.X1_DemonHunter_Vengeance", 90000, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.X1_DemonHunter_EvasiveFire", 150, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.X1_DemonHunter_EvasiveFire", 5, "Spell Use Delay/Interval, milliseconds"));
 
             // Demon Hunter
-            Set(new TVar("DemonHunter.MinEnergyReserve", 20, "DemonHunter emergency hatred reserves"));
+            Set(new TVar("DemonHunter.MinEnergyReserve", 75, "DemonHunter emergency hatred reserves"));
             Set(new TVar("DemonHunter.PreperationTriggerRange", 40f, "Preperation monster trigger range"));
             Set(new TVar("DemonHunter.ClusterArrow.UseRange", 45f, "Cluster Arrow Maximum range"));
             Set(new TVar("DemonHunter.MinPreparationDiscipline", 15, "Minimum Preparation Discipline"));

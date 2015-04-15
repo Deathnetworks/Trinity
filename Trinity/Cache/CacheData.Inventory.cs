@@ -58,7 +58,7 @@ namespace Trinity
                     foreach (var item in ZetaDia.Actors.GetActorsOfType<ACDItem>())
                     {
                         if (!item.IsValid)
-                            continue;
+                            return;
 
                         switch (item.InventorySlot)
                         {
@@ -97,11 +97,6 @@ namespace Trinity
                                 break;
 
                             default:
-                                if ((int)item.InventorySlot == 19)
-                                {
-                                    Equipped.Add(item);
-                                    EquippedIds.Add(item.ActorSNO);
-                                }
                                     Other.Add(item);
                                 break;
 

@@ -39,8 +39,8 @@ namespace Trinity.Technicals
 
                 try
                 {
-                    if (args.Length > 0)
-                        msg = string.Format(msg, args);
+                if (args.Length > 0)
+                    msg = string.Format(msg, args);
                 }
                 catch
                 {
@@ -50,7 +50,7 @@ namespace Trinity.Technicals
 
                 if (!LastLogMessages.ContainsKey(key))
                     LastLogMessages.Add(key, "");
-
+                
                 string lastMessage;
                 if (LastLogMessages.TryGetValue(key, out lastMessage) && lastMessage != msg)
                 {

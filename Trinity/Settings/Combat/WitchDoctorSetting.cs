@@ -18,7 +18,6 @@ namespace Trinity.Config.Combat
         private float _HealthGlobeLevel;
         private float _HealthGlobeLevelResource;
         private int _KiteLimit;
-        private bool _UseSpiritWalkOnlyAvoidance;
         private float _AvoidArcaneHealth;
         private float _AvoidAzmoBodiesHealth;
         private float _AvoidAzmoFireBallHealth;
@@ -231,24 +230,6 @@ namespace Trinity.Config.Combat
                 {
                     _KiteLimit = value;
                     OnPropertyChanged("KiteLimit");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool UseSpiritWalkOnlyAvoidance
-        {
-            get
-            {
-                return _UseSpiritWalkOnlyAvoidance;
-            }
-            set
-            {
-                if (_UseSpiritWalkOnlyAvoidance != value)
-                {
-                    _UseSpiritWalkOnlyAvoidance = value;
-                    OnPropertyChanged("UseSpiritWalkOnlyAvoidance");
                 }
             }
         }

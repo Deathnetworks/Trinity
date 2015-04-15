@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Trinity.Config;
 using Trinity.Config.Combat;
-using Trinity.Objects;
 using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
-using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
@@ -20,8 +18,6 @@ namespace Trinity.Combat.Abilities
         static CombatBase()
 		{
             GameEvents.OnGameJoined += (sender, args) => LoadCombatSettings();
-            GameEvents.OnWorldChanged += (sender, args) => LoadCombatSettings();
-            Pulsator.OnPulse += (sender, args) => MonkCombat.RunOngoingPowers();
             LoadCombatSettings();
 		}
         
@@ -31,7 +27,7 @@ namespace Trinity.Combat.Abilities
         private static bool _isCombatAllowed = true;
         private static KiteMode _kiteMode = KiteMode.Never;
 
-        public static QueuedMovementManager QueuedMovement = new QueuedMovementManager();
+        public static CombatMovementManager CombatMovement = new CombatMovementManager();
         internal static DateTime LastChangedZigZag { get; set; }
         internal static Vector3 PositionLastZigZagCheck { get; set; }
         // Unique ID of mob last targetting when using whirlwind/strafe
@@ -43,68 +39,6 @@ namespace Trinity.Combat.Abilities
             NoTimer = 4,
             NoPowerManager = 8,
             Timer = 16
-        }
-
-        internal static bool Cast(TrinityPower power)
-        {
-            if (IsNull(power))
-                return false;
-
-            if (power.SNOPower == SNOPower.Walk && power.TargetPosition == Vector3.Zero)
-            {
-                Navigator.PlayerMover.MoveStop();
-                return true;
-            }
-
-            if (power.SNOPower == SNOPower.Walk)
-                return false;
-
-            if (ZetaDia.Me.UsePower(power.SNOPower, power.TargetPosition, power.TargetDynamicWorldId, power.TargetACDGUID))
-            {
-                SpellTracker.TrackSpellOnUnit(power.TargetACDGUID, power.SNOPower);
-                SpellHistory.RecordSpell(power);
-
-                Trinity.lastGlobalCooldownUse = DateTime.UtcNow;
-                Trinity.IsWaitingAfterPower = power.ShouldWaitAfterUse;
-
-                Vector3 target = power.TargetPosition != Vector3.Zero ? power.TargetPosition : CurrentTarget != null && power.TargetACDGUID != -1 ? CurrentTarget.Position : Vector3.Zero;
-                float distance = target != Vector3.Zero ? target.Distance2D(Player.Position) : 0f;
-
-                string info = CurrentTarget != null ? " TargetType=" + CurrentTarget.Type : "";
-                info += target != Vector3.Zero ? " at " + NavHelper.PrettyPrintVector3(target) : "";
-                info += power.TargetACDGUID != -1 ? " on " + power.TargetACDGUID : "";
-                info += (int)distance > 0 ? " Dist=" + (int)distance : "";
-                info += " Range=" + power.MinimumRange;
-
-                Skill skill = SkillUtils.ById(power.SNOPower);
-                if (skill != null)
-                {
-                    if (skill.IsSpender)
-                    {
-                        LastSpenderUseTime = DateTime.UtcNow;
-                        info += " Cost=" + skill.Cost;
-                    }
-
-                    else if (skill.IsAttackGenerator)
-                    {
-                        LastGeneratorUseTime = DateTime.UtcNow;
-                        info += " IsAttackGenerator";
-                    }
-
-                    if (skill.Charges > 0)
-                        info += " Charges=" + skill.Charges;
-                }
-
-                info += String.Format(" TimeSincePrimaryUse={0} TimeSinceSpendSkillUse={1}", 
-                    DateTime.UtcNow.Subtract(LastGeneratorUseTime).TotalMilliseconds, 
-                    DateTime.UtcNow.Subtract(LastSpenderUseTime).TotalMilliseconds);
-
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Used Power {0}" + info, power.SNOPower);
-
-                return true;
-            }
-
-            return false;
         }
 
         internal static void LoadCombatSettings()
@@ -122,7 +56,7 @@ namespace Trinity.Combat.Abilities
                 case ActorClass.Crusader:
                     EmergencyHealthPotionLimit = Settings.Combat.Crusader.PotionLevel;
                     EmergencyHealthGlobeLimit = Settings.Combat.Crusader.HealthGlobeLevel;
-                    HealthGlobeResource = Settings.Combat.Crusader.HealthGlobeLevelResource;
+                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
                     KiteDistance = 0;
                     KiteMode = KiteMode.Never;
                     break;
@@ -130,7 +64,7 @@ namespace Trinity.Combat.Abilities
                 case ActorClass.Monk:
                     EmergencyHealthPotionLimit = Settings.Combat.Monk.PotionLevel;
                     EmergencyHealthGlobeLimit = Settings.Combat.Monk.HealthGlobeLevel;
-                    HealthGlobeResource = Settings.Combat.Monk.HealthGlobeLevelResource;
+                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
                     KiteDistance = 0;
                     KiteMode = KiteMode.Never;
                     break;
@@ -138,7 +72,7 @@ namespace Trinity.Combat.Abilities
                 case ActorClass.Wizard:
                     EmergencyHealthPotionLimit = Settings.Combat.Wizard.PotionLevel;
                     EmergencyHealthGlobeLimit = Settings.Combat.Wizard.HealthGlobeLevel;
-                    HealthGlobeResource = Settings.Combat.Wizard.HealthGlobeLevelResource;
+                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
                     KiteDistance = Settings.Combat.Wizard.KiteLimit;
                     KiteMode = KiteMode.Always;
                     break;
@@ -146,7 +80,7 @@ namespace Trinity.Combat.Abilities
                 case ActorClass.Witchdoctor:
                     EmergencyHealthPotionLimit = Settings.Combat.WitchDoctor.PotionLevel;
                     EmergencyHealthGlobeLimit = Settings.Combat.WitchDoctor.HealthGlobeLevel;
-                    HealthGlobeResource = Settings.Combat.WitchDoctor.HealthGlobeLevelResource;
+                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
                     KiteDistance = Settings.Combat.WitchDoctor.KiteLimit;
                     KiteMode = KiteMode.Always;
                     break;
@@ -154,7 +88,7 @@ namespace Trinity.Combat.Abilities
                 case ActorClass.DemonHunter:
                     EmergencyHealthPotionLimit = Settings.Combat.DemonHunter.PotionLevel;
                     EmergencyHealthGlobeLimit = Settings.Combat.DemonHunter.HealthGlobeLevel;
-                    HealthGlobeResource = Settings.Combat.DemonHunter.HealthGlobeLevelResource;
+                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
                     KiteDistance = Settings.Combat.DemonHunter.KiteLimit;
                     KiteMode = Settings.Combat.DemonHunter.KiteMode;
                     break;
@@ -188,83 +122,6 @@ namespace Trinity.Combat.Abilities
             }
         }
 
-        internal static bool SwitchToTarget(TrinityCacheObject _target)
-        {
-            if (_target == null || _target == default(TrinityCacheObject))
-                return false;
-
-            // Change target
-            if (_target.RActorGuid != CurrentTarget.RActorGuid)
-                Trinity.CurrentTarget = _target;
-
-            if (CurrentTarget != null)
-            {
-                if (CurrentTarget.IsUnit)
-                    Trinity.lastHadUnitInSights = DateTime.UtcNow;
-
-                if (CurrentTarget.IsBossOrEliteRareUnique)
-                    Trinity.lastHadEliteUnitInSights = DateTime.UtcNow;
-
-                if (CurrentTarget.IsBoss || CurrentTarget.IsBountyObjective)
-                    Trinity.lastHadBossUnitInSights = DateTime.UtcNow;
-
-                if (CurrentTarget.Type == GObjectType.Container)
-                    Trinity.lastHadContainerInSights = DateTime.UtcNow;
-
-                // Record the last time our target changed
-                if (Trinity.LastTargetRactorGUID != CurrentTarget.RActorGuid)
-                {
-                    Trinity.RecordTargetHistory();
-
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.Weight,
-                        "Found New Target {0} dist={1:0} IsElite={2} Radius={3:0.0} Weight={4:0} ActorSNO={5} " +
-                        "Anim={6} TargetedCount={7} Type={8} ",
-                        CurrentTarget.InternalName,
-                        CurrentTarget.Distance,
-                        CurrentTarget.IsEliteRareUnique,
-                        CurrentTarget.Radius,
-                        CurrentTarget.Weight,
-                        CurrentTarget.ActorSNO,
-                        CurrentTarget.Animation,
-                        CurrentTarget.TimesBeenPrimaryTarget,
-                        CurrentTarget.Type
-                        );
-
-                    Trinity.LastPickedTargetTime = DateTime.UtcNow;
-                    Trinity.TargetLastHealth = 0f;
-                    Trinity.LastTargetRactorGUID = CurrentTarget.RActorGuid;
-
-                    return true;
-                }
-
-                // We're sticking to the same target, so update the target's health cache to check for stucks
-                if (CurrentTarget.IsUnit)
-                {
-                    // Check if the health has changed, if so update the target-pick time before we blacklist them again
-                    if (CurrentTarget.HitPointsPct != Trinity.TargetLastHealth)
-                    {
-                        Logger.Log(TrinityLogLevel.Info, LogCategory.Weight, "Keeping Target {0} - CurrentTarget.HitPoints: {1:0.00} TargetLastHealth: {2:0.00} ",
-                                        CurrentTarget.RActorGuid, CurrentTarget.HitPointsPct, Trinity.TargetLastHealth);
-                        Trinity.LastPickedTargetTime = DateTime.UtcNow;
-                    }
-                    // Now store the target's last-known health
-                    Trinity.TargetLastHealth = CurrentTarget.HitPointsPct;
-                }
-            }
-
-            return false;
-        }
-
-        internal static void RefreshValues()
-        {
-            TargetUtil.ResetTickValues();
-            DemonHunterCombat.ResetArea();
-
-            PlayerIsSurrounded = Trinity.ObjectCache != null && Trinity.ObjectCache.Count(o => o.IsUnit && o.Weight > 0 && o.RadiusDistance < 16f) > 4;
-            PlayerShouldNotFight = Player.StandingInAvoidance || Player.AvoidDeath || Player.NeedToKite;
-            PlayerIsImmune = false;// GetHasBuff(SNOPower.Witchdoctor_SpiritWalk) || GetHasBuff(SNOPower.DemonHunter_SmokeScreen);
-        }
-
         private static int _kiteDistance;
         /// <summary>
         /// Distance to kite, read settings (class independant)
@@ -282,15 +139,9 @@ namespace Trinity.Combat.Abilities
             set { _kiteDistance = value; }
         }
 
-        public static bool PlayerShouldNotFight { get; set; }
-        public static bool PlayerIsSurrounded { get; set; }
-        public static bool PlayerIsImmune { get; set; }
-
         public static float EmergencyHealthPotionLimit { get; set; }
         public static float EmergencyHealthGlobeLimit { get; set; }
         public static float HealthGlobeResource { get; set; }
-
-        public static float LastPowerRange = 0f;
 
         // When to Kite
         public static KiteMode KiteMode
@@ -318,69 +169,6 @@ namespace Trinity.Combat.Abilities
         }
 
         public static bool IsQuestingMode { get; set; }
-
-        public static DateTime LastSpenderUseTime = DateTime.MinValue;
-        public static DateTime LastGeneratorUseTime = DateTime.MinValue;
-
-        /// <summary>
-        /// Determines whether [is ZeisOfStone equipped].
-        /// </summary>
-        public static bool IsBaneOfTrappedEquipped
-        {
-            get { return CacheData.Inventory.EquippedIds.Contains(405781); }
-        }
-
-        /// <summary>
-        /// Determines whether [is ZeisOfStone equipped].
-        /// </summary>
-        public static bool IsZeisOfStoneEquipped
-        {
-            get { return CacheData.Inventory.EquippedIds.Contains(405801); }
-        }
-
-        /// <summary>
-        /// Determines whether [is taeguk equipped].
-        /// </summary>
-        public static bool IsTaegukEquipped
-        {
-            get { return CacheData.Inventory.EquippedIds.Contains(405804); }
-        }
-
-        /// <summary>
-        /// Retrun sets equipped and time sup 2500
-        /// </summary>
-        public static bool IsTaegukBuffWillExpire
-        {
-            get { return IsTaegukEquipped && DateTime.UtcNow.Subtract(LastSpenderUseTime).TotalMilliseconds >= 2250; }
-        }
-
-        /// <summary>
-        /// Retrun sets equipped and time sup 4500
-        /// </summary>
-        public static bool IsBastionsPrimaryBuffWillExpired
-        {
-            get
-            {
-                if (!Sets.BastionsOfWill.IsFullyEquipped || CacheData.Buffs.HasBastiansWillGeneratorBuff)
-                    return false;
-
-                return DateTime.UtcNow.Subtract(LastGeneratorUseTime).TotalMilliseconds >= 4000;
-            }
-        }
-
-        /// <summary>
-        /// Retrun sets equipped and time sup 4500
-        /// </summary>
-        public static bool IsBastionsSpendingBuffWillExpired
-        {
-            get
-            {
-                if (!Sets.BastionsOfWill.IsFullyEquipped || CacheData.Buffs.HasBastiansWillSpenderBuff)
-                    return false;
-
-                return DateTime.UtcNow.Subtract(LastSpenderUseTime).TotalMilliseconds >= 4000;
-            }
-        }
 
         /// <summary>
         /// The last "ZigZag" position, used with Barb Whirlwind, Monk Tempest Rush, etc.
@@ -510,7 +298,7 @@ namespace Trinity.Combat.Abilities
                     case GObjectType.Destructible:
                     case GObjectType.Barricade:
                         return true;
-                    default: 
+                    default:
                         return false;
                 }
             }
@@ -557,6 +345,11 @@ namespace Trinity.Combat.Abilities
                 // Default attacks
                 if (!UseOOCBuff && !IsCurrentlyAvoiding)
                 {
+                    if (Trinity.Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_SweepingWind))
+                    {
+                        MonkCombat.RefreshSweepingWind();
+                    }
+
                     return new TrinityPower
                     {
                         SNOPower = DefaultWeaponPower,
@@ -617,8 +410,6 @@ namespace Trinity.Combat.Abilities
                 {
                     case SNOPower.Weapon_Ranged_Instant:
                     case SNOPower.Weapon_Ranged_Projectile:
-                        if (Player.ActorClass == ActorClass.DemonHunter)
-                            return Trinity.Settings.Combat.DemonHunter.RangedAttackRange;
                         return 65f;
                     case SNOPower.Weapon_Ranged_Wand:
                         return 55f;
@@ -678,16 +469,6 @@ namespace Trinity.Combat.Abilities
         }
 
         /// <summary>
-        /// Returns how many stacks of a particular skill there are
-        /// </summary>
-        /// <param name="power"></param>
-        /// <returns></returns>
-        public static int GetSkillCharges(SNOPower power)
-        {
-            return CacheData.Hotbar.GetSkillCharges(power);
-        }
-
-        /// <summary>
         /// Check re-use timers on skills
         /// </summary>
         /// <param name="power">The power.</param>
@@ -706,32 +487,15 @@ namespace Trinity.Combat.Abilities
 
         public static void SetSNOPowerUseDelay(SNOPower power, double delay)
         {
-            try
-            {
-                string key = "SpellDelay." + power.ToString();
-                TVar v;
-                if (V.ContainsKey(key))
-                {
-                    v = V.Data[key];
-                }
-                else
-                {
-                    Logger.LogError("WARNING: TVar {0} is missing! Setting default to {1}", key, delay);
-                    V.Set(new TVar(key, delay, ""));
-                    return;
-                }
+            string key = "SpellDelay." + power.ToString();
+            TVar v = V.Data[key];
 
-                bool hasDefaultValue = v.Value == v.DefaultValue;
+            bool hasDefaultValue = v.Value == v.DefaultValue;
 
-                if (hasDefaultValue)
-                {
-                    // Create a new TVar (changes the default value)
-                    V.Set(new TVar(v.Name, delay, v.Description));
-                }
-            }
-            catch (Exception ex)
+            if (hasDefaultValue)
             {
-                Logger.LogError("Error Getting SNOPower Use Delay for power {0}:{1}", power);
+                // Create a new TVar (changes the default value)
+                V.Set(new TVar(v.Name, delay, v.Description));
             }
         }
 
@@ -757,11 +521,6 @@ namespace Trinity.Combat.Abilities
             return
                 (!CacheData.Hotbar.ActivePowers.Contains(snoPower) || (CacheData.Hotbar.ActivePowers.Contains(snoPower) && GetHasBuff(snoPower)));
 
-        }
-
-        internal static double TimeSincePrimaryUse
-        {
-            get { return DateTime.UtcNow.Subtract(LastGeneratorUseTime).TotalMilliseconds;  }
         }
 
         /// <summary>
@@ -792,17 +551,13 @@ namespace Trinity.Combat.Abilities
         /// Check if a power is null
         /// </summary>
         /// <param name="power"></param>
-        public static bool IsNull(TrinityPower power)
+        protected static bool IsNull(TrinityPower power)
         {
-            return power == null || power.SNOPower == SNOPower.None;
+            return power == null;
         }
 
-        /// <summary>
-        /// Checks for Convention of Elements ring
-        /// </summary>
-        internal static bool CheckConventionElement(Skill skill)
-        {
-            return !Settings.Combat.Misc.UseConventionElementOnly  || !Legendary.ConventionOfElements.IsEquipped || CacheData.Buffs.ConventionElement == skill.Element;
-        }
+
+
     }
+
 }

@@ -9,7 +9,6 @@ namespace Trinity
     internal class CacheObstacleObject
     {
         public Vector3 Position { get; set; }
-        public float Distance { get; set; }
         public float Radius { get; set; }
         public int ActorSNO { get; set; }
         public double Weight { get; set; }
@@ -25,9 +24,6 @@ namespace Trinity
         public float DirectionalAvoidanceDegrees { get; set; }
         public bool AvoidAtPlayerPosition { get; set; }
         public GObjectType ObjectType { get; set; }
-        public bool IsAvoidanceAnimations { get; set; }
-        public SNOAnim Animation { get; set; }
-        public AvoidType AvoidType { get; set; }
 
         public AvoidanceType AvoidanceType
         {

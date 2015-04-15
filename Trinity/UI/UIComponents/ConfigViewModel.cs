@@ -133,33 +133,7 @@ namespace Trinity.UI.UIComponents
                         }
                         catch (Exception ex)
                         {
-                            Logger.Log(LogCategory.UserInformation, "Exception in DumpSkillsAndItemsCommand: {0}", ex);
-                        }
-                    });
-                DumpItemReferenceCommand = new RelayCommand(
-                    parameter =>
-                    {
-                        try
-                        {
-                            UILoader.CloseWindow();
-                            DebugUtil.DumpReferenceItems(TrinityLogLevel.Info);
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Log(LogCategory.UserInformation, "Exception DumpItemReferenceCommand: {0}", ex);
-                        }
-                    });
-                DumpInvalidItemsCommand = new RelayCommand(
-                    parameter =>
-                    {
-                        try
-                        {
-                            UILoader.CloseWindow();
-                            DebugUtil.LogInvalidItems(TrinityLogLevel.Info);
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Log(LogCategory.UserInformation, "Exception DumpInvalidItemsCommand: {0}", ex);
+                            Logger.Log(LogCategory.UserInformation, "Exception Dumping Skill/Rune/Passive Items: {0}", ex);
                         }
                     });
                 DumpMerchantItemsCommand = new RelayCommand(
@@ -386,18 +360,6 @@ namespace Trinity.UI.UIComponents
         /// <value>The save command.</value>
         public ICommand DumpSkillsAndItemsCommand { get; private set; }
 
-        /// <summary>
-        ///     Gets the test score command.
-        /// </summary>
-        /// <value>The save command.</value>
-        public ICommand DumpItemReferenceCommand { get; private set; }
-
-        /// <summary>
-        ///     Gets the test score command.
-        /// </summary>
-        /// <value>The save command.</value>
-        public ICommand DumpInvalidItemsCommand { get; private set; }
-        
         /// <summary>
         ///     Gets the test score command.
         /// </summary>

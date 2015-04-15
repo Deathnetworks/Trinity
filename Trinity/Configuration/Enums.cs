@@ -100,7 +100,6 @@
     {
         Unknown,
         Avoidance,
-        OocAvoidance,
         Backtrack,
         Barricade,
         Checkpoint,
@@ -131,14 +130,13 @@
     public enum Element
     {
         Unknown = 0,
-        Arcane,
+        Physical,
         Cold,
         Fire,
-        Holy,
         Lightning,
-        Physical,
         Poison,
-        GroundEffect,
+        Arcane,
+        Holy
     }
 
     public enum SpellCategory
@@ -190,7 +188,6 @@
         Green,
         Other
     }
-
     public enum ItemQualityName
     {
         Inferior,
@@ -202,65 +199,5 @@
         Special
     }
 
-    public enum MoveType
-    {
-        Avoidance = 5,
-        Kite = 4,
-        SpecialCombat = 3,
-        BasicCombat = 2,
-        KeepMoving = 1,
-        TargetAttempt = 0
-    }
-
-    public enum AvoidType
-    {
-        Unknown = 0,
-        GenericCast,
-        MeleeAttack,
-        RangedAttack,
-        Attack,
-        AttackRight,
-        AttackLeft,
-        Teleport,
-        Leap,
-        Charge,
-        Strafe,
-        StrafeRight,
-        StrafeLeft,
-        Dash,
-        Grab,
-        GroundCircle,
-        KnockBack,
-        RotateLeft,
-        RotateRight,
-        Bomb,
-        Projectile,
-    }
-
-    public enum WeightType
-    {
-        Unknown = 0,
-        Unchangeable,
-        Dynamic,
-        Target,
-        Cluster,
-        Monster
-    }
-
-    public enum ResourceEffectType
-    {
-        None = 0,
-        Generator,
-        Spender
-    }
-
-    public enum SkillType
-    {
-        Unknown = 0,
-        Buff,
-        Attack,
-        Movement,
-        Minion
-    }
 
 }

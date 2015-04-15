@@ -84,7 +84,11 @@ namespace Trinity.Items
         private static bool _isFinished = false;
         public static async Task<bool> CleanTask()
         {
-            if (!Trinity.Player.IsFullyValid)
+            if (!ZetaDia.IsInGame)
+                return false;
+            if (ZetaDia.IsLoadingWorld)
+                return false;
+            if (!ZetaDia.Me.IsFullyValid())
                 return false;
 
             if (ZetaDia.Me.IsParticipatingInTieredLootRun)

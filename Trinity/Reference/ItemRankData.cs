@@ -83,30 +83,30 @@ new ItemRankData { Class = ActorClass.Crusader, SampleSize = 719, PercentUsed = 
 
 }
         };
-//        public static ItemRank SlaveBonds = new ItemRank
-//        {
-//            Item = Legendary.SlaveBonds,
+        public static ItemRank SlaveBonds = new ItemRank
+        {
+            Item = Legendary.SlaveBonds,
 
-//            HardcoreRank = new List<ItemRankData>
-//{
-//new ItemRankData { Class = ActorClass.Monk, SampleSize = 32, PercentUsed = 3.22, Rank = 4, }, 
-//new ItemRankData { Class = ActorClass.Barbarian, SampleSize = 36, PercentUsed = 3.65, Rank = 5, }, 
-//new ItemRankData { Class = ActorClass.DemonHunter, SampleSize = 115, PercentUsed = 11.59, Rank = 2, }, 
-//new ItemRankData { Class = ActorClass.Witchdoctor, SampleSize = 6, PercentUsed = 0.60, Rank = 9, }, 
-//new ItemRankData { Class = ActorClass.Wizard, SampleSize = 52, PercentUsed = 5.25, Rank = 4, }, 
-//new ItemRankData { Class = ActorClass.Crusader, SampleSize = 19, PercentUsed = 1.92, Rank = 6, }, 
+            HardcoreRank = new List<ItemRankData>
+{
+new ItemRankData { Class = ActorClass.Monk, SampleSize = 32, PercentUsed = 3.22, Rank = 4, }, 
+new ItemRankData { Class = ActorClass.Barbarian, SampleSize = 36, PercentUsed = 3.65, Rank = 5, }, 
+new ItemRankData { Class = ActorClass.DemonHunter, SampleSize = 115, PercentUsed = 11.59, Rank = 2, }, 
+new ItemRankData { Class = ActorClass.Witchdoctor, SampleSize = 6, PercentUsed = 0.60, Rank = 9, }, 
+new ItemRankData { Class = ActorClass.Wizard, SampleSize = 52, PercentUsed = 5.25, Rank = 4, }, 
+new ItemRankData { Class = ActorClass.Crusader, SampleSize = 19, PercentUsed = 1.92, Rank = 6, }, 
 
-//},
-//            SoftcoreRank = new List<ItemRankData>
-//{
-//new ItemRankData { Class = ActorClass.Monk, SampleSize = 13, PercentUsed = 1.30, Rank = 7, }, 
-//new ItemRankData { Class = ActorClass.Barbarian, SampleSize = 6, PercentUsed = 0.60, Rank = 10, }, 
-//new ItemRankData { Class = ActorClass.DemonHunter, SampleSize = 10, PercentUsed = 1.00, Rank = 7, }, 
-//new ItemRankData { Class = ActorClass.Witchdoctor, SampleSize = 8, PercentUsed = 0.80, Rank = 9, }, 
-//new ItemRankData { Class = ActorClass.Wizard, SampleSize = 25, PercentUsed = 2.50, Rank = 7, }, 
+},
+            SoftcoreRank = new List<ItemRankData>
+{
+new ItemRankData { Class = ActorClass.Monk, SampleSize = 13, PercentUsed = 1.30, Rank = 7, }, 
+new ItemRankData { Class = ActorClass.Barbarian, SampleSize = 6, PercentUsed = 0.60, Rank = 10, }, 
+new ItemRankData { Class = ActorClass.DemonHunter, SampleSize = 10, PercentUsed = 1.00, Rank = 7, }, 
+new ItemRankData { Class = ActorClass.Witchdoctor, SampleSize = 8, PercentUsed = 0.80, Rank = 9, }, 
+new ItemRankData { Class = ActorClass.Wizard, SampleSize = 25, PercentUsed = 2.50, Rank = 7, }, 
 
-//}
-//        };
+}
+        };
         public static ItemRank NemesisBracers = new ItemRank
         {
             Item = Legendary.NemesisBracers,

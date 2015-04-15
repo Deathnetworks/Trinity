@@ -53,6 +53,5 @@ namespace Trinity.Objects
 
             return result;
         }
-
     }
 }

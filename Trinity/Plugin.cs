@@ -30,7 +30,7 @@ namespace Trinity
         {
             get
             {
-                return new Version(2, 6, 7);
+                return new Version(2, 5, 2);
             }
         }
 
@@ -38,7 +38,7 @@ namespace Trinity
         {
             get
             {
-                return "rrrix, xzjv, jubisman, BuddyMe, and many more";
+                return "rrrix, xzjv, jubisman, and many more";
             }
         }
 
@@ -60,7 +60,7 @@ namespace Trinity
         /// </summary>
         public void OnPulse()
         {
-            using (new MemorySpy("OnPulse()"))
+            using (new PerformanceLogger("OnPulse"))
             {
                 try
                 {
@@ -84,10 +84,18 @@ namespace Trinity
                         }
                     }
 
+                    // See if we should update the stats file
+                    if (DateTime.UtcNow.Subtract(ItemDropStats.ItemStatsLastPostedReport).TotalSeconds > 10)
+                    {
+                        ItemDropStats.ItemStatsLastPostedReport = DateTime.UtcNow;
+                        ItemDropStats.OutputReport();
+                    }
+
                     // Recording of all the XML's in use this run
                     UsedProfileManager.RecordProfile();
 
                     DebugUtil.LogOnPulse();
+
                     MonkCombat.RunOngoingPowers();
                 }
                 catch (AccessViolationException)
@@ -99,7 +107,6 @@ namespace Trinity
                     Logger.Log(LogCategory.UserInformation, "Exception in Pulse: {0}", ex.ToString());
                 }
             }
-            Memory.LogSpy();
         }
 
         /// <summary>
@@ -350,10 +357,6 @@ namespace Trinity
         internal static void BeginInvoke(Action action)
         {
             Application.Current.Dispatcher.BeginInvoke(action);
-        }
-        internal static void Invoke(Action action)
-        {
-            Application.Current.Dispatcher.Invoke(action);
         }
 
     }

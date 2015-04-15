@@ -161,6 +161,10 @@ namespace Trinity.UI
                 filecontent = filecontent.Replace("xmlns:objects=\"clr-namespace:Trinity.Objects\"", "xmlns:objects=\"clr-namespace:Trinity.Objects;assembly=" + Assembly.GetExecutingAssembly().GetName().Name + "\"");
                 filecontent = filecontent.Replace("xmlns:mock=\"clr-namespace:Trinity.Settings.Mock\"", "xmlns:mock=\"clr-namespace:Trinity.Settings.Mock;assembly=" + Assembly.GetExecutingAssembly().GetName().Name + "\"");
 
+                // Remove Template designer reference
+                //filecontent = filecontent.Replace("<ResourceDictionary.MergedDictionaries><ResourceDictionary Source=\"..\\Template.xaml\"/></ResourceDictionary.MergedDictionaries>", string.Empty);
+                //filecontent = filecontent.Replace("<ResourceDictionary.MergedDictionaries><ResourceDictionary Source=\"Template.xaml\"/></ResourceDictionary.MergedDictionaries>", string.Empty);
+
                 filecontent = Regex.Replace(filecontent, "<ResourceDictionary.MergedDictionaries>.*</ResourceDictionary.MergedDictionaries>", string.Empty, RegexOptions.Singleline | RegexOptions.Compiled);
 
                 return (T)XamlReader.Load(new MemoryStream(Encoding.UTF8.GetBytes(filecontent)));

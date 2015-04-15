@@ -12,15 +12,12 @@ using Trinity.Reference;
 
 namespace Trinity.UIComponents
 {
-    /// <summary>
-    /// ListItem loot rule
-    /// </summary>
     [DataContract(Namespace = "")]
     public class LRule : INotifyPropertyChanged
     {
         public LRule()
         {
-            _value = GetDefaultValue(); 
+            //Value = 1;
         }
 
         private double _value;
@@ -42,9 +39,7 @@ namespace Trinity.UIComponents
         {
             get
             {
-                if (ItemStatRange != null)
-                    _value = CoerceValue(_value);
-                                 
+                _value = CoerceValue(_value);
                 return _value;
             }
             set
@@ -55,16 +50,6 @@ namespace Trinity.UIComponents
                     OnPropertyChanged();
                 }
             }
-        }
-
-        private double GetDefaultValue()
-        {
-            switch (ItemProperty)
-            {
-                case ItemProperty.Ancient:
-                    return 1;
-            }
-            return 0;
         }
 
         private double CoerceValue(double value)

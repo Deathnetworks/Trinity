@@ -102,35 +102,6 @@ namespace Trinity.Objects
             }
         }
 
-        public int BuffStacks
-        {
-            get
-            {
-                if (!IsEquipped) 
-                    return 0;
-
-                SNOPower power;
-                return DataDictionary.PowerByItem.TryGetValue(this, out power) ? CacheData.Buffs.GetBuffStacks(power) : 0;
-            }
-        }
-
-        public SNOPower BuffPower
-        {
-            get
-            {
-                SNOPower power;
-                return DataDictionary.PowerByItem.TryGetValue(this, out power) ? power : SNOPower.None;
-            }
-        }
-
-        public CachedBuff Buff
-        {
-            get
-            {
-                return CacheData.Buffs.GetBuff(BuffPower);
-            }
-        }
-
         public ActorClass ClassRestriction
         {
             get { return GetClassRestriction(GItemType); }

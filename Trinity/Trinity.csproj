@@ -90,8 +90,6 @@
     <Compile Include="Cache\CacheData.Hotbar.cs" />
     <Compile Include="Cache\CacheData.Inventory.cs" />
     <Compile Include="Cache\CacheData.Player.cs" />
-    <Compile Include="Helpers\EnumValue.cs" />
-    <Compile Include="Helpers\GetAttributeExtensions.cs" />
     <Compile Include="Cache\ItemStashSellAppender.cs" />
     <Compile Include="Cache\ItemDroppedAppender.cs" />
     <Compile Include="Cache\TrinityBountyInfo.cs" />
@@ -101,8 +99,6 @@
     <Compile Include="Cache\RefreshAvoidance.cs" />
     <Compile Include="Cache\RefreshGizmo.cs" />
     <Compile Include="Cache\SameWorldPortal.cs" />
-    <Compile Include="Cache\Avoidance.cs" />
-    <Compile Include="Cache\AvoidanceAnim.cs" />
     <Compile Include="Combat\Abilities\BarbarianCombat.cs" />
     <Compile Include="Combat\Abilities\CombatBase.cs" />
     <Compile Include="Combat\Abilities\CrusaderCombat.cs" />
@@ -115,7 +111,6 @@
     <Compile Include="Combat\AvoidanceManager.cs" />
     <Compile Include="Combat\AvoidanceType.cs" />
     <Compile Include="Combat\Enemies.cs" />
-    <Compile Include="Combat\QueuedMovement.cs" />
     <Compile Include="Combat\Routine\TrinityRoutine.cs" />
     <Compile Include="Combat\SpellTracker.cs" />
     <Compile Include="Configuration\Events.cs" />
@@ -127,7 +122,6 @@
     <Compile Include="DbProvider\SearchAreaProvider.cs" />
     <Compile Include="Helpers\Attributes\NoCopy.cs" />
     <Compile Include="Helpers\ExportHelper.cs" />
-    <Compile Include="Objects\CachedBuff.cs" />
     <Compile Include="Objects\IUnique.cs" />
     <Compile Include="Objects\ItemStatRange.cs" />
     <Compile Include="Resources\Battle.Net API\BNetDataObjects.cs" />
@@ -177,10 +171,6 @@
     <Compile Include="Helpers\GoldInactivity.cs" />
     <Compile Include="Cache\HashGenerator.cs" />
     <Compile Include="Helpers\MathUtil.cs" />
-    <Compile Include="Movement\Grid\GridMap.cs" />
-    <Compile Include="Movement\Grid\GridResults.cs" />
-    <Compile Include="Movement\Grid\GridPoint.cs" />
-    <Compile Include="Movement\Grid\MainGrid.cs" />
     <Compile Include="Movement\Kite.cs" />
     <Compile Include="Movement\NavHelper.cs" />
     <Compile Include="Movement\PositionCache.cs" />
@@ -206,6 +196,7 @@
     <Compile Include="Reference\Runes.cs" />
     <Compile Include="Reference\Sets.cs" />
     <Compile Include="Reference\Skills.cs" />
+    <Compile Include="Combat\CombatMovement.cs" />
     <Compile Include="Reference\SkillUtils.cs" />
     <Compile Include="Settings\Combat\CrusaderSetting.cs" />
     <Compile Include="Settings\Loot\ItemListSettings.cs" />
@@ -261,11 +252,8 @@
     <Compile Include="Settings\TrinitySetting.cs" />
     <Compile Include="Settings\WorldObjectSetting.cs" />
     <Compile Include="Helpers\PerformanceLogger.cs" />
-    <Compile Include="Helpers\MemorySpy.cs" />
-    <Compile Include="UI\UIComponents\CacheUI.cs" />
     <Compile Include="UI\TabUI.cs" />
     <Compile Include="UI\UIComponents\Behaviors\InputBindingBehavior.cs" />
-    <Compile Include="UI\UIComponents\CacheUIDataModel.cs" />
     <Compile Include="UI\UIComponents\Converters\BoolInverterConverter.cs" />
     <Compile Include="UI\UIComponents\Converters\BoolToTypeConverters.cs" />
     <Compile Include="UI\UIComponents\Converters\UrlToCachedImageConverter.cs" />

@@ -23,11 +23,7 @@
             <Button Content="Full Dump Stash items" Command="{Binding Path=DumpStashCommand}"/>
             <Button Content="Full Dump Merchant items" Command="{Binding Path=DumpMerchantItemsCommand}"/>
             <Button Content="Full Dump ALL items (SLOW!!)" Command="{Binding Path=DumpAllItemsCommand}"/>
-            <Button Content="Dump Build / Items" Command="{Binding Path=DumpSkillsAndItemsCommand}"/>
-            <Button Content="Dump Item Reference" Command="{Binding Path=DumpItemReferenceCommand}"/>
-            <Button Content="Dump Invalid Items" Command="{Binding Path=DumpInvalidItemsCommand}"/>            
-
-            
+            <Button Content="Dump Build / Items" Command="{Binding Path=DumpSkillsAndItemsCommand}"/>            
         </UniformGrid>
     </StackPanel>
 </UserControl>

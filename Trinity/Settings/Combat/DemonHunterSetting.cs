@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Reflection;
 using System.Runtime.Serialization;
 
 namespace Trinity.Config.Combat
@@ -12,17 +11,7 @@ namespace Trinity.Config.Combat
         private float _HealthGlobeLevel;
         private float _HealthGlobeLevelResource;
         private int _KiteLimit;
-        private int _RangedAttackRange;
         private int _VaultMovementDelay;
-        private int _VaultCombatDelay;
-        private float _MinHealthVaultKite;
-        private float _MinHealthVaultAvoidance;
-        private int _MinDistVaultKite;
-        private int _MinDistVaultAvoidance;
-        private int _MinDistVaultCombat;
-        private int _MinDistVaultHealth;
-        private int _MinDistVaultGlobeItem;
-        private int _MinDistVaultShrineOther;
         private bool _SpamSmokeScreen;
         private bool _SpamShadowPower;
         private bool _CompanionOffCooldown;
@@ -30,8 +19,6 @@ namespace Trinity.Config.Combat
         private int _StrafeMinHatred;
         private int _RapidFireMinHatred;
         private bool _VengeanceElitesOnly;
-        private float _MinDiciplineOOCVaultPct;
-        private float _MinDiciplineCombatVaultPct;
         private KiteMode _KiteMode;
         private DemonHunterVaultMode _VaultMode;
 
@@ -89,42 +76,6 @@ namespace Trinity.Config.Combat
 
         #region Properties
         [DataMember(IsRequired = false)]
-        [DefaultValue(0.5f)]
-        public float MinDiciplineOOCVaultPct
-        {
-            get
-            {
-                return _MinDiciplineOOCVaultPct;
-            }
-            set
-            {
-                if (_MinDiciplineOOCVaultPct != value)
-                {
-                    _MinDiciplineOOCVaultPct = value;
-                    OnPropertyChanged("PotionLevel");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(0.5f)]
-        public float MinDiciplineCombatVaultPct
-        {
-            get
-            {
-                return _MinDiciplineCombatVaultPct;
-            }
-            set
-            {
-                if (_MinDiciplineCombatVaultPct != value)
-                {
-                    _MinDiciplineCombatVaultPct = value;
-                    OnPropertyChanged("PotionLevel");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
         [DefaultValue(0.35f)]
         public float PotionLevel
         {
@@ -179,7 +130,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(15)]
+        [DefaultValue(0)]
         public int KiteLimit
         {
             get
@@ -192,24 +143,6 @@ namespace Trinity.Config.Combat
                 {
                     _KiteLimit = value;
                     OnPropertyChanged("KiteLimit");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(35)]
-        public int RangedAttackRange
-        {
-            get
-            {
-                return _RangedAttackRange;
-            }
-            set
-            {
-                if (_RangedAttackRange != value)
-                {
-                    _RangedAttackRange = value;
-                    OnPropertyChanged("RangedAttackRange");
                 }
             }
         }
@@ -374,188 +307,6 @@ namespace Trinity.Config.Combat
                 }
             }
         }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(1500)]
-        public int VaultMovementDelay
-        {
-            get
-            {
-                return _VaultMovementDelay;
-            }
-            set
-            {
-                if (_VaultMovementDelay != value)
-                {
-                    _VaultMovementDelay = value;
-                    OnPropertyChanged("VaultMovementDelay");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(400)]
-        public int VaultCombatDelay
-        {
-            get
-            {
-                return _VaultCombatDelay;
-            }
-            set
-            {
-                if (_VaultCombatDelay != value)
-                {
-                    _VaultCombatDelay = value;
-                    OnPropertyChanged("VaultCombatDelay");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(0.95f)]
-        public float MinHealthVaultKite
-        {
-            get
-            {
-                return _MinHealthVaultKite;
-            }
-            set
-            {
-                if (_MinHealthVaultKite != value)
-                {
-                    _MinHealthVaultKite = value;
-                    OnPropertyChanged("MinHealthVaultKite");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(1f)]
-        public float MinHealthVaultAvoidance
-        {
-            get
-            {
-                return _MinHealthVaultAvoidance;
-            }
-            set
-            {
-                if (_MinHealthVaultAvoidance != value)
-                {
-                    _MinHealthVaultAvoidance = value;
-                    OnPropertyChanged("MinHealthVaultAvoidance");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(20)]
-        public int MinDistVaultKite
-        {
-            get
-            {
-                return _MinDistVaultKite;
-            }
-            set
-            {
-                if (_MinDistVaultKite != value)
-                {
-                    _MinDistVaultKite = value;
-                    OnPropertyChanged("MinDistVaultKite");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(8)]
-        public int MinDistVaultAvoidance
-        {
-            get
-            {
-                return _MinDistVaultAvoidance;
-            }
-            set
-            {
-                if (_MinDistVaultAvoidance != value)
-                {
-                    _MinDistVaultAvoidance = value;
-                    OnPropertyChanged("MinDistVaultAvoidance");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(35)]
-        public int MinDistVaultCombat
-        {
-            get
-            {
-                return _MinDistVaultCombat;
-            }
-            set
-            {
-                if (_MinDistVaultCombat != value)
-                {
-                    _MinDistVaultCombat = value;
-                    OnPropertyChanged("MinDistVaultCombat");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(15)]
-        public int MinDistVaultHealth
-        {
-            get
-            {
-                return _MinDistVaultHealth;
-            }
-            set
-            {
-                if (_MinDistVaultHealth != value)
-                {
-                    _MinDistVaultHealth = value;
-                    OnPropertyChanged("MinDistVaultHealth");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(28)]
-        public int MinDistVaultGlobeItem
-        {
-            get
-            {
-                return _MinDistVaultGlobeItem;
-            }
-            set
-            {
-                if (_MinDistVaultGlobeItem != value)
-                {
-                    _MinDistVaultGlobeItem = value;
-                    OnPropertyChanged("MinDistVaultGlobeItem");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(30)]
-        public int MinDistVaultShrineOther
-        {
-            get
-            {
-                return _MinDistVaultShrineOther;
-            }
-            set
-            {
-                if (_MinDistVaultShrineOther != value)
-                {
-                    _MinDistVaultShrineOther = value;
-                    OnPropertyChanged("MinDistVaultShrineOther");
-                }
-            }
-        }
-
-        /* Avoidances */
 
         [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
@@ -1132,6 +883,24 @@ namespace Trinity.Config.Combat
                 }
             }
         }
+        
+        [DataMember(IsRequired = false)]
+        [DefaultValue(400)]
+        public int VaultMovementDelay
+        {
+            get
+            {
+                return _VaultMovementDelay;
+            }
+            set
+            {
+                if (_VaultMovementDelay != value)
+                {
+                    _VaultMovementDelay = value;
+                    OnPropertyChanged("VaultMovementDelay");
+                }
+            }
+        }
         #endregion Properties
 
         #region Methods
@@ -1165,24 +934,15 @@ namespace Trinity.Config.Combat
         /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
         /// </summary>
         /// <param name="context"></param>
-        [OnDeserializing]
+        [OnDeserializing()]
         internal void OnDeserializingMethod(StreamingContext context)
         {
-            AvoidGrotesqueHealth = 1;
-            AvoidOrbiterHealth = 1;
-            AvoidWormholeHealth = 0.50f;
-            StrafeMinHatred = 48;
-            VaultMode = DemonHunterVaultMode.Always;
+            this.AvoidGrotesqueHealth = 1;
+            this.AvoidOrbiterHealth = 1;
+            this.AvoidWormholeHealth = 0.50f;
+            this.StrafeMinHatred = 48;
+            this.VaultMode = DemonHunterVaultMode.Always;
         }
-
-        [OnDeserialized]
-        internal void OnDeserializedMethod(StreamingContext context)
-        {
-            // Fix for type default
-            if (RangedAttackRange < 10f)
-                RangedAttackRange = 65;
-        }
-
         #endregion Methods
     }
 }

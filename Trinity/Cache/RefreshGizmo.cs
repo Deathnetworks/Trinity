@@ -6,7 +6,6 @@ using Zeta.Common.Plugins;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.Actors.Gizmos;
-using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
@@ -21,7 +20,7 @@ namespace Trinity
 
             if (!Settings.WorldObject.AllowPlayerResurection && CurrentCacheObject.ActorSNO == DataDictionary.PLAYER_HEADSTONE_SNO)
             {
-                c_InfosSubStep += "IgnoreHeadstones";
+                c_IgnoreSubStep = "IgnoreHeadstones";
                 AddToCache = false;
                 return AddToCache;
             }
@@ -35,14 +34,14 @@ namespace Trinity
                 CurrentCacheObject.Type != GObjectType.Shrine && CurrentCacheObject.RActorGuid != LastTargetRactorGUID)
             {
                 AddToCache = false;
-                c_InfosSubStep += "NotInRange";
+                c_IgnoreSubStep = "NotInRange";
             }
 
             // re-add resplendent chests
             if (openResplendentChest)
             {
                 AddToCache = true;
-                c_InfosSubStep = "";
+                c_IgnoreSubStep = "";
             }
 
             CacheObjectIsBountyObjective();
@@ -66,21 +65,35 @@ namespace Trinity
             }
             catch
             {
-                // add methode & Dictionary check
-                AddObjectToNavigationObstacleCache();
+                CacheData.NavigationObstacles.Add(new CacheObstacleObject
+                {
+                    ActorSNO = CurrentCacheObject.ActorSNO,
+                    Radius = CurrentCacheObject.Radius,
+                    Position = CurrentCacheObject.Position,
+                    RActorGUID = CurrentCacheObject.RActorGuid,
+                    ObjectType = CurrentCacheObject.Type,
+                });
 
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                     "Safely handled exception getting Gizmo-Disabled-By-Script attribute for object {0} [{1}]", CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
-                c_InfosSubStep += "isGizmoDisabledByScriptException";
+                c_IgnoreSubStep = "isGizmoDisabledByScriptException";
                 AddToCache = false;
             }
             if (isGizmoDisabledByScript)
             {
-                // add methode & Dictionary check
-                AddObjectToNavigationObstacleCache();
+                MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
+
+                CacheData.NavigationObstacles.Add(new CacheObstacleObject
+                {
+                    ActorSNO = CurrentCacheObject.ActorSNO,
+                    Radius = CurrentCacheObject.Radius,
+                    Position = CurrentCacheObject.Position,
+                    RActorGUID = CurrentCacheObject.RActorGuid,
+                    ObjectType = CurrentCacheObject.Type,
+                });
 
                 AddToCache = false;
-                c_InfosSubStep += "GizmoDisabledByScript";
+                c_IgnoreSubStep = "GizmoDisabledByScript";
                 return AddToCache;
 
             }
@@ -125,12 +138,18 @@ namespace Trinity
             }
             catch
             {
-                // add methode & Dictionary check
-                AddObjectToNavigationObstacleCache();
+                CacheData.NavigationObstacles.Add(new CacheObstacleObject
+                {
+                    ActorSNO = CurrentCacheObject.ActorSNO,
+                    Radius = CurrentCacheObject.Radius,
+                    Position = CurrentCacheObject.Position,
+                    RActorGUID = CurrentCacheObject.RActorGuid,
+                    ObjectType = CurrentCacheObject.Type,
+                });
 
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                     "Safely handled exception getting NoDamage attribute for object {0} [{1}]", CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
-                c_InfosSubStep += "NoDamage";
+                c_IgnoreSubStep = "NoDamage";
                 AddToCache = false;
             }
 
@@ -142,19 +161,26 @@ namespace Trinity
                     {
                         AddToCache = true;
 
-                        // add methode & Dictionary check
-                        //AddObjectToNavigationObstacleCache();
-
                         var gizmoDoor = c_diaObject as GizmoDoor;
                         if (gizmoDoor != null && gizmoDoor.IsLocked)
                         {
-                            c_InfosSubStep += "IsLocked";
+                            MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
+                            CacheData.NavigationObstacles.Add(new CacheObstacleObject
+                            {
+                                ActorSNO = CurrentCacheObject.ActorSNO,
+                                Radius = CurrentCacheObject.Radius,
+                                Position = CurrentCacheObject.Position,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
+                                ObjectType = CurrentCacheObject.Type,
+                            });
+
+                            c_IgnoreSubStep = "IsLocked";
                             return false;
                         }
 
                         if (c_diaObject is DiaGizmo && ((DiaGizmo)c_diaObject).HasBeenOperated)
                         {
-                            c_InfosSubStep += "Door has been operated";
+                            c_IgnoreSubStep = "Door has been operated";
                             return false;
                         }
 
@@ -173,7 +199,7 @@ namespace Trinity
                         if (gizmoUsed)
                         {
                             Blacklist3Seconds.Add(CurrentCacheObject.RActorGuid);
-                            c_InfosSubStep += "Door is Open or Opening";
+                            c_IgnoreSubStep = "Door is Open or Opening";
                             return false;
                         }
 
@@ -182,22 +208,29 @@ namespace Trinity
                             int gizmoState = CacheObjectGizmoState();
                             if (gizmoState == 1)
                             {
-                                c_InfosSubStep += "GizmoState=1";
+                                c_IgnoreSubStep = "GizmoState=1";
                                 return false;
                             }
                         }
                         catch
                         {
-                            c_InfosSubStep += "GizmoStateException";
+                            c_IgnoreSubStep = "GizmoStateException";
                             return false;
                         }
 
                         if (untargetable)
                         {
-                            // add methode & Dictionary check
-                            AddObjectToNavigationObstacleCache();
+                            MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
+                            CacheData.NavigationObstacles.Add(new CacheObstacleObject
+                            {
+                                ActorSNO = CurrentCacheObject.ActorSNO,
+                                Radius = CurrentCacheObject.Radius,
+                                Position = CurrentCacheObject.Position,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
+                                ObjectType = CurrentCacheObject.Type,
+                            });
 
-                            c_InfosSubStep += "Untargetable";
+                            c_IgnoreSubStep = "Untargetable";
                             return false;
                         }
 
@@ -213,26 +246,28 @@ namespace Trinity
 
                                     if (door != null && door.IsGizmoDisabledByScript)
                                     {
-                                        // add methode & Dictionary check
-                                        AddObjectToNavigationObstacleCache();
+                                        CacheData.NavigationObstacles.Add(new CacheObstacleObject
+                                        {
+                                            ActorSNO = CurrentCacheObject.ActorSNO,
+                                            Radius = CurrentCacheObject.Radius,
+                                            Position = CurrentCacheObject.Position,
+                                            RActorGUID = CurrentCacheObject.RActorGuid,
+                                            ObjectType = CurrentCacheObject.Type,
+                                        });
 
                                         Blacklist3Seconds.Add(CurrentCacheObject.RActorGuid);
-                                        c_InfosSubStep += "DoorDisabledbyScript";
+                                        c_IgnoreSubStep = "DoorDisabledbyScript";
                                         return false;
                                     }
                                 }
                                 else
                                 {
-                                    c_InfosSubStep += "InvalidCastToDoor";
+                                    c_IgnoreSubStep = "InvalidCastToDoor";
                                     return false;
                                 }
                             }
 
-                            catch 
-                            {
-                                c_InfosSubStep += "InvalidDoor";
-                                return false;
-                            }
+                            catch { }
                         }
                     }
                     break;
@@ -242,10 +277,17 @@ namespace Trinity
 
                         if (untargetable)
                         {
-                            // add methode & Dictionary check
-                            AddObjectToNavigationObstacleCache();
+                            MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
+                            CacheData.NavigationObstacles.Add(new CacheObstacleObject()
+                            {
+                                ActorSNO = CurrentCacheObject.ActorSNO,
+                                Radius = CurrentCacheObject.Radius,
+                                Position = CurrentCacheObject.Position,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
+                                ObjectType = CurrentCacheObject.Type,
+                            });
 
-                            c_InfosSubStep += "Untargetable";
+                            c_IgnoreSubStep = "Untargetable";
                             return false;
                         }
 
@@ -255,20 +297,20 @@ namespace Trinity
                         {
                             if (endAnimation == (int)c_diaGizmo.CommonData.CurrentAnimation)
                             {
-                                c_InfosSubStep += "EndAnimation";
+                                c_IgnoreSubStep = "EndAnimation";
                                 return false;
                             }
                         }
 
                         if (c_diaGizmo.GizmoState == 1)
                         {
-                            c_InfosSubStep += "GizmoState1";
+                            c_IgnoreSubStep = "GizmoState1";
                             return false;
                         }
 
                         if (c_diaGizmo.HasBeenOperated)
                         {
-                            c_InfosSubStep += "GizmoHasBeenOperated";
+                            c_IgnoreSubStep = "GizmoHasBeenOperated";
                             return false;
                         }
 
@@ -294,29 +336,36 @@ namespace Trinity
                             if (gizmoState == 1)
                             {
                                 AddToCache = false;
-                                c_InfosSubStep += "GizmoState=1";
+                                c_IgnoreSubStep = "GizmoState=1";
                                 return AddToCache;
                             }
                         }
                         catch
                         {
                             AddToCache = false;
-                            c_InfosSubStep += "GizmoStateException";
+                            c_IgnoreSubStep = "GizmoStateException";
                             return AddToCache;
                         }
                         if (gizmoUsed)
                         {
-                            c_InfosSubStep += "GizmoCharges";
+                            c_IgnoreSubStep = "GizmoCharges";
                             AddToCache = false;
                             return AddToCache;
                         }
                         if (untargetable)
                         {
-                            // add methode & Dictionary check
-                            AddObjectToNavigationObstacleCache();
+                            MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
+                            CacheData.NavigationObstacles.Add(new CacheObstacleObject
+                            {
+                                ActorSNO = CurrentCacheObject.ActorSNO,
+                                Radius = CurrentCacheObject.Radius,
+                                Position = CurrentCacheObject.Position,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
+                                ObjectType = CurrentCacheObject.Type,
+                            });
 
                             AddToCache = false;
-                            c_InfosSubStep += "Untargetable";
+                            c_IgnoreSubStep = "Untargetable";
                             return AddToCache;
                         }
 
@@ -331,7 +380,7 @@ namespace Trinity
                         if (!Settings.WorldObject.UseShrine)
                         {
                             // We're ignoring all shrines, so blacklist this one
-                            c_InfosSubStep += "IgnoreAllShrinesSet";
+                            c_IgnoreSubStep = "IgnoreAllShrinesSet";
                             AddToCache = false;
                             return AddToCache;
                         }
@@ -342,23 +391,30 @@ namespace Trinity
                             if (gizmoState == 1)
                             {
                                 AddToCache = false;
-                                c_InfosSubStep += "GizmoState=1";
+                                c_IgnoreSubStep = "GizmoState=1";
                                 return AddToCache;
                             }
                         }
                         catch
                         {
                             AddToCache = false;
-                            c_InfosSubStep += "GizmoStateException";
+                            c_IgnoreSubStep = "GizmoStateException";
                             return AddToCache;
                         }
                         if (untargetable)
                         {
-                            // add methode & Dictionary check
-                            AddObjectToNavigationObstacleCache();
+                            MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
+                            CacheData.NavigationObstacles.Add(new CacheObstacleObject
+                            {
+                                ActorSNO = CurrentCacheObject.ActorSNO,
+                                Radius = CurrentCacheObject.Radius,
+                                Position = CurrentCacheObject.Position,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
+                                ObjectType = CurrentCacheObject.Type,
+                            });
 
                             AddToCache = false;
-                            c_InfosSubStep += "Untargetable";
+                            c_IgnoreSubStep = "Untargetable";
                             return AddToCache;
                         }
 
@@ -370,14 +426,14 @@ namespace Trinity
                                 if (!Settings.WorldObject.UseFrenzyShrine)
                                 {
                                     Blacklist60Seconds.Add(CurrentCacheObject.RActorGuid);
-                                    c_InfosSubStep += "IgnoreShrineOption";
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
                                     AddToCache = false;
                                 }
                                 if (Player.ActorClass == ActorClass.Monk && Settings.Combat.Monk.TROption.HasFlag(TempestRushOption.MovementOnly) && Hotbar.Contains(SNOPower.Monk_TempestRush))
                                 {
                                     // Frenzy shrines are a huge time sink for monks using Tempest Rush to move, we should ignore them.
                                     AddToCache = false;
-                                    c_InfosSubStep += "IgnoreShrineOption";
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
                                     return AddToCache;
                                 }
                                 break;
@@ -386,7 +442,7 @@ namespace Trinity
                                 if (!Settings.WorldObject.UseFortuneShrine)
                                 {
                                     AddToCache = false;
-                                    c_InfosSubStep += "IgnoreShrineOption";
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
                                     return AddToCache;
                                 }
                                 break;
@@ -395,7 +451,7 @@ namespace Trinity
                                 if (!Settings.WorldObject.UseProtectionShrine)
                                 {
                                     AddToCache = false;
-                                    c_InfosSubStep += "IgnoreShrineOption";
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
                                     return AddToCache;
                                 }
                                 break;
@@ -404,7 +460,7 @@ namespace Trinity
                                 if (!Settings.WorldObject.UseEmpoweredShrine)
                                 {
                                     AddToCache = false;
-                                    c_InfosSubStep += "IgnoreShrineOption";
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
                                     return AddToCache;
                                 }
                                 break;
@@ -413,7 +469,7 @@ namespace Trinity
                                 if (!Settings.WorldObject.UseEnlightenedShrine)
                                 {
                                     AddToCache = false;
-                                    c_InfosSubStep += "IgnoreShrineOption";
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
                                     return AddToCache;
                                 }
                                 break;
@@ -422,7 +478,7 @@ namespace Trinity
                                 if (!Settings.WorldObject.UseFleetingShrine)
                                 {
                                     AddToCache = false;
-                                    c_InfosSubStep += "IgnoreShrineOption";
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
                                     return AddToCache;
                                 }
                                 break;
@@ -431,7 +487,7 @@ namespace Trinity
                                 if (!Settings.WorldObject.UseChannelingPylon)
                                 {
                                     AddToCache = false;
-                                    c_InfosSubStep += "IgnoreShrineOption";
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
                                     return AddToCache;
                                 }
                                 break;
@@ -440,7 +496,7 @@ namespace Trinity
                                 if (!Settings.WorldObject.UseConduitPylon)
                                 {
                                     AddToCache = false;
-                                    c_InfosSubStep += "IgnoreShrineOption";
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
                                     return AddToCache;
                                 }
                                 break;
@@ -449,7 +505,7 @@ namespace Trinity
                                 if (!Settings.WorldObject.UseShieldPylon)
                                 {
                                     AddToCache = false;
-                                    c_InfosSubStep += "IgnoreShrineOption";
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
                                     return AddToCache;
                                 }
                                 break;
@@ -458,7 +514,7 @@ namespace Trinity
                                 if (!Settings.WorldObject.UseSpeedPylon)
                                 {
                                     AddToCache = false;
-                                    c_InfosSubStep += "IgnoreShrineOption";
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
                                     return AddToCache;
                                 }
                                 break;
@@ -466,7 +522,7 @@ namespace Trinity
                                 if (!Settings.WorldObject.UsePowerPylon)
                                 {
                                     AddToCache = false;
-                                    c_InfosSubStep += "IgnoreShrineOption";
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
                                     return AddToCache;
                                 }
                                 break;
@@ -483,37 +539,58 @@ namespace Trinity
                         var gizmoDestructible = c_diaObject as GizmoDestructible;
                         if (gizmoDestructible != null && gizmoDestructible.HitpointsCurrentPct <= 0)
                         {
-                            c_InfosSubStep += "HitPoints0";
+                            c_IgnoreSubStep = "HitPoints0";
                             return false;
                         }
 
                         if (noDamage)
                         {
-                            // add methode & Dictionary check
-                            AddObjectToNavigationObstacleCache();
+                            MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
+                            CacheData.NavigationObstacles.Add(new CacheObstacleObject
+                            {
+                                ActorSNO = CurrentCacheObject.ActorSNO,
+                                Radius = CurrentCacheObject.Radius,
+                                Position = CurrentCacheObject.Position,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
+                                ObjectType = CurrentCacheObject.Type,
+                            });
 
                             AddToCache = false;
-                            c_InfosSubStep += "NoDamage";
+                            c_IgnoreSubStep = "NoDamage";
                             return AddToCache;
                         }
                         if (untargetable)
                         {
-                            // add methode & Dictionary check
-                            AddObjectToNavigationObstacleCache();
+                            MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
+                            CacheData.NavigationObstacles.Add(new CacheObstacleObject
+                            {
+                                ActorSNO = CurrentCacheObject.ActorSNO,
+                                Radius = CurrentCacheObject.Radius,
+                                Position = CurrentCacheObject.Position,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
+                                ObjectType = CurrentCacheObject.Type,
+                            });
 
                             AddToCache = false;
-                            c_InfosSubStep += "Untargetable";
+                            c_IgnoreSubStep = "Untargetable";
                             return AddToCache;
                         }
 
 
                         if (invulnerable)
                         {
-                            // add methode & Dictionary check
-                            AddObjectToNavigationObstacleCache();
+                            MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
+                            CacheData.NavigationObstacles.Add(new CacheObstacleObject
+                            {
+                                ActorSNO = CurrentCacheObject.ActorSNO,
+                                Radius = CurrentCacheObject.Radius,
+                                Position = CurrentCacheObject.Position,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
+                                ObjectType = CurrentCacheObject.Type,
+                            });
 
                             AddToCache = false;
-                            c_InfosSubStep += "Invulnerable";
+                            c_IgnoreSubStep = "Invulnerable";
                             return AddToCache;
                         }
 
@@ -524,14 +601,14 @@ namespace Trinity
                             if (CurrentCacheObject.RadiusDistance < maxRadiusDistance)
                             {
                                 AddToCache = true;
-                                c_InfosSubStep = "";
+                                c_IgnoreSubStep = "";
                             }
                         }
 
                         if (DateTime.UtcNow.Subtract(PlayerMover.LastGeneratedStuckPosition).TotalSeconds <= 1)
                         {
                             AddToCache = true;
-                            c_InfosSubStep = "";
+                            c_IgnoreSubStep = "";
                             break;
                         }
 
@@ -543,7 +620,7 @@ namespace Trinity
                         // This object isn't yet in our destructible desire range
                         if (minDistance <= 0 || CurrentCacheObject.RadiusDistance > minDistance)
                         {
-                            c_InfosSubStep += "NotInBarricadeRange";
+                            c_IgnoreSubStep = "NotInBarricadeRange";
                             AddToCache = false;
                             return AddToCache;
                         }
@@ -555,42 +632,59 @@ namespace Trinity
                         AddToCache = true;
 
                         var gizmoDestructible = c_diaObject as GizmoDestructible;
-                        try
-                        {
                         if (gizmoDestructible != null && gizmoDestructible.HitpointsCurrentPct <= 0)
                         {
-                                c_InfosSubStep += "HitPoints0";
+                            c_IgnoreSubStep = "HitPoints0";
                             return false;
                         }
-                        }
-                        catch { }
 
                         if (noDamage)
                         {
-                            // add methode & Dictionary check
-                            AddObjectToNavigationObstacleCache();
+                            MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
+                            CacheData.NavigationObstacles.Add(new CacheObstacleObject
+                            {
+                                ActorSNO = CurrentCacheObject.ActorSNO,
+                                Radius = CurrentCacheObject.Radius,
+                                Position = CurrentCacheObject.Position,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
+                                ObjectType = CurrentCacheObject.Type,
+                            });
 
                             AddToCache = false;
-                            c_InfosSubStep += "NoDamage";
+                            c_IgnoreSubStep = "NoDamage";
                             return AddToCache;
                         }
 
                         if (invulnerable)
                         {
-                            // add methode & Dictionary check
-                            AddObjectToNavigationObstacleCache();
+                            MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
+                            CacheData.NavigationObstacles.Add(new CacheObstacleObject
+                            {
+                                ActorSNO = CurrentCacheObject.ActorSNO,
+                                Radius = CurrentCacheObject.Radius,
+                                Position = CurrentCacheObject.Position,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
+                                ObjectType = CurrentCacheObject.Type,
+                            });
 
                             AddToCache = false;
-                            c_InfosSubStep += "Invulnerable";
+                            c_IgnoreSubStep = "Invulnerable";
                             return AddToCache;
                         }
                         if (untargetable)
                         {
-                            // add methode & Dictionary check
-                            AddObjectToNavigationObstacleCache();
+                            MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
+                            CacheData.NavigationObstacles.Add(new CacheObstacleObject
+                            {
+                                ActorSNO = CurrentCacheObject.ActorSNO,
+                                Radius = CurrentCacheObject.Radius,
+                                Position = CurrentCacheObject.Position,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
+                                ObjectType = CurrentCacheObject.Type,
+                            });
 
                             AddToCache = false;
-                            c_InfosSubStep += "Untargetable";
+                            c_IgnoreSubStep = "Untargetable";
                             return AddToCache;
                         }
 
@@ -598,35 +692,35 @@ namespace Trinity
                         if (Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_TempestRush) && TimeSinceUse(SNOPower.Monk_TempestRush) <= 150)
                         {
                             AddToCache = false;
-                            c_InfosSubStep += "MonkTR";
+                            c_IgnoreSubStep = "MonkTR";
                             break;
                         }
 
                         if (Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_SweepingWind) && GetHasBuff(SNOPower.Monk_SweepingWind))
                         {
                             AddToCache = false;
-                            c_InfosSubStep += "MonkSW";
+                            c_IgnoreSubStep = "MonkSW";
                             break;
                         }
 
                         if (CurrentCacheObject.IsQuestMonster || CurrentCacheObject.IsMinimapActive)
                         {
                             AddToCache = true;
-                            c_InfosSubStep = "";
+                            c_IgnoreSubStep = "";
                             break;
                         }
 
                         if (!DataDictionary.ForceDestructibles.Contains(CurrentCacheObject.ActorSNO) && Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.ForceIgnore)
                         {
                             AddToCache = false;
-                            c_InfosSubStep += "ForceIgnoreDestructibles";
+                            c_IgnoreSubStep = "ForceIgnoreDestructibles";
                             break;
                         }
 
                         if (DateTime.UtcNow.Subtract(PlayerMover.LastGeneratedStuckPosition).TotalSeconds <= 1)
                         {
                             AddToCache = true;
-                            c_InfosSubStep = "";
+                            c_IgnoreSubStep = "";
                             break;
                         }
 
@@ -640,7 +734,7 @@ namespace Trinity
                         {
                             minDistance += 12f;
                             AddToCache = true;
-                            c_InfosSubStep = "";
+                            c_IgnoreSubStep = "";
                         }
 
                         float maxRadiusDistance;
@@ -650,14 +744,14 @@ namespace Trinity
                             if (CurrentCacheObject.RadiusDistance < maxRadiusDistance)
                             {
                                 AddToCache = true;
-                                c_InfosSubStep = "";
+                                c_IgnoreSubStep = "";
                             }
                         }
                         // Always add large destructibles within ultra close range
                         if (!AddToCache && CurrentCacheObject.Radius >= 10f && CurrentCacheObject.RadiusDistance <= 5.9f)
                         {
                             AddToCache = true;
-                            c_InfosSubStep = "";
+                            c_IgnoreSubStep = "";
                             break;
                         }
 
@@ -665,25 +759,25 @@ namespace Trinity
                         if (AddToCache && (minDistance <= 1 || CurrentCacheObject.RadiusDistance > minDistance) && PlayerMover.GetMovementSpeed() >= 1)
                         {
                             AddToCache = false;
-                            c_InfosSubStep += "NotInDestructableRange";
+                            c_IgnoreSubStep = "NotInDestructableRange";
                         }
                         if (AddToCache && CurrentCacheObject.RadiusDistance <= 2f && DateTime.UtcNow.Subtract(PlayerMover.LastGeneratedStuckPosition).TotalMilliseconds > 500)
                         {
                             AddToCache = false;
-                            c_InfosSubStep += "NotStuck2";
+                            c_IgnoreSubStep = "NotStuck2";
                         }
 
                         // Add if we're standing still and bumping into it
                         if (CurrentCacheObject.RadiusDistance <= 2f && PlayerMover.GetMovementSpeed() <= 0)
                         {
                             AddToCache = true;
-                            c_InfosSubStep = "";
+                            c_IgnoreSubStep = "";
                         }
 
                         if (CurrentCacheObject.RActorGuid == LastTargetRactorGUID)
                         {
                             AddToCache = true;
-                            c_InfosSubStep = "";
+                            c_IgnoreSubStep = "";
                         }
 
                         break;
@@ -704,7 +798,7 @@ namespace Trinity
                         if (ForceVendorRunASAP)
                         {
                             AddToCache = false;
-                            c_InfosSubStep += "ForceVendorRunASAP";
+                            c_IgnoreSubStep = "ForceVendorRunASAP";
                         }
 
                         // Already open, blacklist it and don't look at it again
@@ -716,7 +810,7 @@ namespace Trinity
                         catch
                         {
                             Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting container-been-opened attribute for object {0} [{1}]", CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
-                            c_InfosSubStep += "ChestOpenException";
+                            c_IgnoreSubStep = "ChestOpenException";
                             AddToCache = false;
                             return AddToCache;
                         }
@@ -726,17 +820,24 @@ namespace Trinity
                         {
                             // It's already open!
                             AddToCache = false;
-                            c_InfosSubStep += "AlreadyOpen";
+                            c_IgnoreSubStep = "AlreadyOpen";
                             return AddToCache;
                         }
 
                         if (untargetable)
                         {
-                            // add methode & Dictionary check
-                            AddObjectToNavigationObstacleCache();
+                            MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
+                            CacheData.NavigationObstacles.Add(new CacheObstacleObject
+                            {
+                                ActorSNO = CurrentCacheObject.ActorSNO,
+                                Radius = CurrentCacheObject.Radius,
+                                Position = CurrentCacheObject.Position,
+                                RActorGUID = CurrentCacheObject.RActorGuid,
+                                ObjectType = CurrentCacheObject.Type,
+                            });
 
                             AddToCache = false;
-                            c_InfosSubStep += "Untargetable";
+                            c_IgnoreSubStep = "Untargetable";
                             return AddToCache;
                         }
 
@@ -777,11 +878,11 @@ namespace Trinity
 
                         if (!isChest && !isCorpse && !isRareChest)
                         {
-                            c_InfosSubStep += "InvalidContainer";
+                            c_IgnoreSubStep = "InvalidContainer";
                         }
                         else
                         {
-                            c_InfosSubStep += "IgnoreContainer";
+                            c_IgnoreSubStep = "IgnoreContainer";
                         }
                         break;
                     }

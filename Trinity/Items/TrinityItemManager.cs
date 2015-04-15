@@ -828,7 +828,7 @@ namespace Trinity.Items
                         catch (IndexOutOfRangeException)
                         {
                             Logger.LogError("Error checking for next slot on item {0}, row={1} col={2} IsTwoSquare={3} ItemType={4}",
-                                item.Name, item.InventoryRow, item.InventoryColumn, item.IsTwoSquareItem, item.ItemType);
+                                item.Name, item.InventoryRow, item.InventoryColumn, item.ItemType);
                             continue;
                         }
 

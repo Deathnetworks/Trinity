@@ -9,10 +9,12 @@ namespace Trinity.Combat.Abilities
 {
     public class CrusaderCombat : CombatBase
     {
+
         public static Config.Combat.CrusaderSetting CrusaderSettings
         {
             get { return Trinity.Settings.Combat.Crusader; }
         }
+
 
         public static TrinityPower GetPower()
         {
@@ -27,11 +29,7 @@ namespace Trinity.Combat.Abilities
                 }
             }
 
-            // Destructibles
-            if (UseDestructiblePower)
-                return DestroyObjectPower;
-
-            if (!UseOOCBuff && !IsCurrentlyAvoiding)
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && CurrentTarget != null)
             {
                 /*
                  *  Laws for Active Buff
@@ -68,7 +66,9 @@ namespace Trinity.Combat.Abilities
                 // Shield Glare
                 if (CanCastShieldGlare())
                 {
-                    return new TrinityPower(SNOPower.X1_Crusader_ShieldGlare, 15f, TargetUtil.GetBestPiercePoint(15f));
+                    var arcTarget = TargetUtil.GetBestArcTarget(45f, 70f);
+                    if (arcTarget != null && arcTarget.Position != Vector3.Zero)
+                        return new TrinityPower(SNOPower.X1_Crusader_ShieldGlare, 15f, arcTarget.Position);
                 }
 
                 // Iron Skin
@@ -114,7 +114,7 @@ namespace Trinity.Combat.Abilities
                 // FallingSword
                 if (CanCastFallingSword())
                 {
-                    return new TrinityPower(SNOPower.X1_Crusader_FallingSword, 16f, TargetUtil.GetBestClusterPoint(15f, 65f));
+                    return new TrinityPower(SNOPower.X1_Crusader_FallingSword, 16f, TargetUtil.GetBestClusterPoint(15f, 65f, false));
                 }
 
                 // HeavensFury
@@ -144,9 +144,9 @@ namespace Trinity.Combat.Abilities
                 }
                 if (CanCastPhalanxStampede())
                 {
-                    var bestPierceTarget = TargetUtil.GetBestPierceTarget(35f);
+                    var bestPierceTarget = TargetUtil.GetBestPierceTarget(45f);
                     if (bestPierceTarget != null)
-                        return new TrinityPower(SNOPower.x1_Crusader_Phalanx3, 35f, bestPierceTarget.ACDGuid);
+                        return new TrinityPower(SNOPower.x1_Crusader_Phalanx3, 45f, bestPierceTarget.ACDGuid);
                 }
 
                 // Blessed Shield : Piercing Shield
@@ -180,38 +180,6 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.X1_Crusader_BlessedHammer, 20f, TargetUtil.GetBestClusterUnit(8f, 20f).Position);
                 }
 
-                // Bastion Of Will require primary usage
-                if (IsBastionsPrimaryBuffWillExpired)
-                {
-                    TrinityPower bastionPower = null;
-                    var closestTarget = TargetUtil.GetClosestTarget(40f, useWeights: false);
-
-                    if (closestTarget != null)
-                    {
-                        // Justice
-                        if (IsNull(bastionPower) && CanCast(SNOPower.X1_Crusader_Justice) && closestTarget.RadiusDistance < 7f)
-                            bastionPower = new TrinityPower(SNOPower.X1_Crusader_Justice, 7f, closestTarget.Position);
-
-                        // Smite
-                        if (IsNull(bastionPower) && CanCast(SNOPower.X1_Crusader_Smite) && closestTarget.RadiusDistance < 15f)
-                            bastionPower = new TrinityPower(SNOPower.X1_Crusader_Smite, 15f, closestTarget.ClusterPosition(10f));
-
-                        // Slash
-                        if (IsNull(bastionPower) && CanCast(SNOPower.X1_Crusader_Slash) && closestTarget.RadiusDistance < 15f)
-                            bastionPower = new TrinityPower(SNOPower.X1_Crusader_Slash, 15f, closestTarget.ClusterPosition(10f));
-
-                        // Punish
-                        if (IsNull(bastionPower) && CanCast(SNOPower.X1_Crusader_Punish) && closestTarget.RadiusDistance < 15f)
-                            bastionPower = new TrinityPower(SNOPower.X1_Crusader_Punish, 10f, closestTarget.ACDGuid); 
-                    }
-
-                    if (!IsNull(bastionPower))
-                    {
-                        SwitchToTarget(closestTarget);
-                        return bastionPower;
-                    }
-                }
-
                 // Provoke
                 if (CanCast(SNOPower.X1_Crusader_Provoke) && TargetUtil.AnyMobsInRange(15f, 4))
                 {
@@ -219,10 +187,12 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Shield Bash
-                if (Skills.Crusader.ShieldBash.IsActive && TargetUtil.AnyMobsInRange(45f) && Player.PrimaryResource >= 20)
+                if (CanCast(SNOPower.X1_Crusader_ShieldBash2))
                 {
-                    return new TrinityPower(SNOPower.X1_Crusader_ShieldBash2, 45f, CurrentTarget.ACDGuid);
-                } 
+                    var bestPierceTarget = TargetUtil.GetBestClusterUnit(15f, 65f, 1, false, false);
+                    if (bestPierceTarget != null)
+                        return new TrinityPower(SNOPower.X1_Crusader_ShieldBash2, 65f, bestPierceTarget.ACDGuid);
+                }
 
                 // Blessed Hammer, spin outwards 
                 // Limitless rune can spawn new hammers
@@ -276,7 +246,7 @@ namespace Trinity.Combat.Abilities
             // Buffs
             if (UseOOCBuff)
             {
-                if (CanCast(SNOPower.X1_Crusader_SteedCharge) && CrusaderSettings.SteedChargeOOC && Player.IsMoving)
+                if (CanCast(SNOPower.X1_Crusader_SteedCharge) && CrusaderSettings.SteedChargeOOC && ZetaDia.Me.Movement.SpeedXY > 0)
                 {
                     return new TrinityPower(SNOPower.X1_Crusader_SteedCharge);
                 }
@@ -346,7 +316,7 @@ namespace Trinity.Combat.Abilities
 
         private static bool CanCastPhalanxStampede()
         {
-            return (Legendary.UnrelentingPhalanx.IsEquipped && CanCast(SNOPower.x1_Crusader_Phalanx3) && TargetUtil.AnyMobsInRange(35f, 1) && Runes.Crusader.Stampede.IsActive);
+            return (Legendary.UnrelentingPhalanx.IsEquipped && CanCast(SNOPower.x1_Crusader_Phalanx3) && TargetUtil.AnyMobsInRange(45f, 1) && Runes.Crusader.Stampede.IsActive);
         }
 
         private static bool CanCastSteedChargeOutOfCombat()
