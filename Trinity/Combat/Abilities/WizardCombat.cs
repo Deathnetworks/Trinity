@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
 using Trinity.Reference;
+using Trinity.Technicals;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.Combat.Abilities
 {
@@ -38,7 +40,11 @@ namespace Trinity.Combat.Abilities
             // In combat, Not Avoiding
             if (CurrentTarget != null)
             {
-                return GetCombatPower();
+                var p = GetCombatPower();
+                var skill = Skills.Wizard.ToList().FirstOrDefault(s => s.Id == (int)p.SNOPower);
+                if (skill != null)
+                    Logger.Log(LogCategory.Behavior, "GetCombatPower Selected Skill: {0} Element={1} Cost={2}", skill.Name, skill.Element, skill.Cost);
+                return p;
             }
             // Destructibles
             if (UseDestructiblePower)
@@ -140,19 +146,18 @@ namespace Trinity.Combat.Abilities
             }
 
             // Slow Time for in combat
-            if (!Player.IsIncapacitated && CanCast(SNOPower.Wizard_SlowTime, CanCastFlags.NoTimer))
+            if (!Player.IsIncapacitated && Skills.Wizard.SlowTime.CanCast(CanCastFlags.NoTimer))
             {
-                if (Legendary.GestureOfOrpheus.IsEquipped && SpellHistory.DistanceFromLastTarget(SNOPower.Wizard_SlowTime) > 10f)
-                    return new TrinityPower(SNOPower.Wizard_SlowTime);
-
-                if ((TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 40f)) &&
-                 SpellHistory.DistanceFromLastTarget(SNOPower.Wizard_SlowTime) > 30f)
+                if ((Enemies.Nearby.UnitCount > 2 || Enemies.CloseNearby.Units.Any()) && Runes.Wizard.PointOfNoReturn.IsActive || Runes.Wizard.StretchTime.IsActive)
                 {
-                        return new TrinityPower(SNOPower.Wizard_SlowTime); // cast of Self
+                    return new TrinityPower(SNOPower.Wizard_SlowTime, 0f, Player.Position);
                 }
-                if (TargetUtil.AnyMobsInRange(55f) && Runes.Wizard.TimeAndSpace.IsActive)
+
+                if ((TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || CurrentTarget.IsBossOrEliteRareUnique))
                 {
-                    return new TrinityPower(SNOPower.Wizard_SlowTime, 55f, TargetUtil.GetBestClusterUnit(20f).Position);
+                    var targetPosition = TargetUtil.GetBestClusterUnit(20f, 50f).Position;
+                    var positionWithinMaxRange = targetPosition.Distance2D(Player.Position) <= 60f ? targetPosition : Player.Position;
+                    return new TrinityPower(SNOPower.Wizard_SlowTime, 0f, positionWithinMaxRange);
                 }
             }
 
@@ -361,7 +366,7 @@ namespace Trinity.Combat.Abilities
             {
                 // Slow Time on self for speed boost
                 if (CanCast(SNOPower.Wizard_SlowTime))
-                    return new TrinityPower(SNOPower.Wizard_SlowTime);
+                    return new TrinityPower(SNOPower.Wizard_SlowTime, 0f, Player.Position);
 
                 // Mirror Image for speed boost
                 if (CanCast(SNOPower.Wizard_MirrorImage))
@@ -436,7 +441,7 @@ namespace Trinity.Combat.Abilities
                 CanCast(SNOPower.Wizard_Archon_SlowTime, CanCastFlags.NoTimer) &&
                 (TimeSpanSincePowerUse(SNOPower.Wizard_Archon_SlowTime) > TimeSpan.FromSeconds(30)))
             {
-                return new TrinityPower(SNOPower.Wizard_Archon_SlowTime);
+                return new TrinityPower(SNOPower.Wizard_Archon_SlowTime, 0f, Player.Position);
             }
 
             // Archon Teleport in combat for kiting
