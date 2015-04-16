@@ -1199,8 +1199,6 @@ namespace Trinity.Items
             if (name.StartsWith("x1_")) name = name.Substring(3, name.Length - 3);
             if (name.StartsWith("p1_")) name = name.Substring(3, name.Length - 3);
             if (name.StartsWith("p2_")) name = name.Substring(3, name.Length - 3);
-
-            
             if (ItemExpansionRegex.IsMatch(name)) name = name.Substring(3, name.Length - 3);
 
             if (name.StartsWith("a1_")) return GItemType.SpecialItem;

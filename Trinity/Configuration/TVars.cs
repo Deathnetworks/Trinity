@@ -92,8 +92,8 @@ namespace Trinity
             Set(new TVar("Barbarian.Leap.MinExtraDistance", 4f, "Extra distance added to target for Leap direction"));
             Set(new TVar("Barbarian.HammerOfTheAncients.MinFury", 45, "Minimum Fury for Hammer of the Ancients"));
 
-            Set(new TVar("Barbarian.Rend.MinNonBleedMobCount", 1, "Cast rend when this many mobs surrounding are not bleeding"));
-            Set(new TVar("Barbarian.Rend.MinUseIntervalMillseconds", 0, "Minimum Delay between uses"));
+            Set(new TVar("Barbarian.Rend.MinNonBleedMobCount", 3, "Cast rend when this many mobs surrounding are not bleeding"));
+            Set(new TVar("Barbarian.Rend.MinUseIntervalMillseconds", 3500, "Minimum Delay between uses"));
             Set(new TVar("Barbarian.Rend.UseRange", 12f, "Power Use Range"));
             Set(new TVar("Barbarian.Rend.MaxRange", 12f, "Maximum Range for targets to be Rended"));
             Set(new TVar("Barbarian.Rend.MinFury", 30, "Minimum Fury"));

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Trinity.Config.Combat;
+using Trinity.Objects;
 using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
@@ -483,31 +484,20 @@ namespace Trinity.Combat.Abilities
         }
         public static bool CanUseRend
         {
-            //skillDict.Add("Rend", SNOPower.Barbarian_Rend);
-            //runeDict.Add("Ravage", 1);
-            //runeDict.Add("BloodLust", 3);
-            //runeDict.Add("Lacerate", 0);
-            //runeDict.Add("Mutilate", 2);
-            //runeDict.Add("Bloodbath", 4);
             get
             {
+                if (UseOOCBuff || IsCurrentlyAvoiding || Player.IsIncapacitated || !CanCast(SNOPower.Barbarian_Rend))
+                    return false;
+
                 bool hasReserveEnergy = (!IsWaitingForSpecial && Player.PrimaryResource >= V.I("Barbarian.Rend.MinFury")) || (IsWaitingForSpecial && Player.PrimaryResource > MinEnergyReserve);
 
-                return
-                    !UseOOCBuff &&
-                    !Player.IsIncapacitated &&
-                    hasReserveEnergy &&
-                    ((CanCast(SNOPower.Barbarian_Rend)) &&
-                        (Trinity.ObjectCache.Count(o => o.IsUnit &&
-                            !o.HasDotDPS && o.RadiusDistance <= V.F("Barbarian.Rend.MaxRange")) >= V.I("Barbarian.Rend.MinNonBleedMobCount"))
+                return Skills.Barbarian.Rend.TimeSinceUse > V.F("SpellDelay.Barbarian_Rend") && 
+                    hasReserveEnergy && (Trinity.ObjectCache.Count(o => o.IsUnit && !o.HasDotDPS && o.RadiusDistance <= V.F("Barbarian.Rend.MaxRange")) >= V.I("Barbarian.Rend.MinNonBleedMobCount"))
                      ||
                     // Spam with Bloodlust
-                    (CanCast(SNOPower.Barbarian_Rend) &&
+                    (CanCast(SNOPower.Barbarian_Rend) && Trinity.ObjectCache.Count(o => o.IsUnit && !o.HasDotDPS && o.RadiusDistance <= V.F("Barbarian.Rend.MaxRange")) >= V.I("Barbarian.Rend.MinNonBleedMobCount") && 
                      Player.CurrentHealthPct <= V.F("Barbarian.Rend.SpamBelowHealthPct") &&
-                     CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Barbarian_Rend && s.RuneIndex == 3) &&
-                     TargetUtil.AnyMobsInRange(V.F("Barbarian.Rend.MaxRange"), false)
-                    ))
-                    ;
+                     Runes.Barbarian.BloodLust.IsActive && TargetUtil.AnyMobsInRange(V.F("Barbarian.Rend.MaxRange"), false));
             }
         }
         public static bool CanUseOverPower
@@ -632,17 +622,14 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && !Player.IsIncapacitated && !Player.IsRooted && Player.PrimaryResource >= 10 &&
-                    (!IsWaitingForSpecial || (IsWaitingForSpecial && Player.PrimaryResource > MinEnergyReserve)) &&
-                    //(!IsWaitingForSpecial || (IsWaitingForSpecial && !(TargetUtil.AnyMobsInRange(3, 15) || ForceCloseRangeTarget))) && // make sure we're not surrounded if waiting for special
-                    // Only if within 25 yards of main target
-                    ((CurrentTarget.RadiusDistance <= 25f || TargetUtil.AnyMobsInRange(V.F("Barbarian.Whirlwind.TrashRange"), V.I("Barbarian.Whirlwind.TrashCount")))) &&
-                    (TargetUtil.AnyMobsInRange(50, 2) || CurrentTarget.HitPointsPct >= 0.30 || CurrentTarget.IsBossOrEliteRareUnique || Player.CurrentHealthPct <= 0.60) &&
+                if (UseOOCBuff || IsCurrentlyAvoiding || !CanCast(SNOPower.Barbarian_Whirlwind) || Player.IsIncapacitated || Player.IsRooted || Player.PrimaryResource < 10)
+                    return false;
+
+                return (CurrentTarget.RadiusDistance <= 25f || TargetUtil.AnyMobsInRange(V.F("Barbarian.Whirlwind.TrashRange"), V.I("Barbarian.Whirlwind.TrashCount"))) &&
                     // Check for energy reservation amounts
-                    //((playerStatus.dCurrentEnergy >= 20 && !playerStatus.bWaitingForReserveEnergy) || playerStatus.dCurrentEnergy >= iWaitingReservedAmount) &&
                     Player.PrimaryResource >= V.D("Barbarian.Whirlwind.MinFury") &&
-                    // If they have battle-rage, make sure it's up
-                    (!Hotbar.Contains(SNOPower.Barbarian_BattleRage) || (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage)));
+                    // If they have battle-rage, make sure it's up, except if we have no primary
+                    (!Hotbar.Contains(SNOPower.Barbarian_BattleRage) || (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage) && !BarbHasNoPrimary));
             }
         }
         // Dreadbomb build support
