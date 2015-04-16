@@ -628,10 +628,11 @@ namespace Trinity.Combat.Abilities
                 return (CurrentTarget.RadiusDistance <= 25f || TargetUtil.AnyMobsInRange(V.F("Barbarian.Whirlwind.TrashRange"), V.I("Barbarian.Whirlwind.TrashCount"))) &&
                     // Check for energy reservation amounts
                     Player.PrimaryResource >= V.D("Barbarian.Whirlwind.MinFury") &&
-                    // If they have battle-rage, make sure it's up, except if we have no primary
-                    (!Hotbar.Contains(SNOPower.Barbarian_BattleRage) || (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage) && !BarbHasNoPrimary));
+                    // If they have battle-rage, make sure it's up
+                    (!Hotbar.Contains(SNOPower.Barbarian_BattleRage) || (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage)));
             }
         }
+
         // Dreadbomb build support
         public static bool CanUseDreadbomb
         {

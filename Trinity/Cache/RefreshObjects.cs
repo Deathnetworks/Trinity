@@ -362,7 +362,6 @@ namespace Trinity
                     if (CurrentTarget.IsBoss || CurrentTarget.IsBountyObjective)
                         lastHadBossUnitInSights = DateTime.UtcNow;
 
-
                     if (CurrentTarget.Type == GObjectType.Container)
                         lastHadContainerInSights = DateTime.UtcNow;
 
