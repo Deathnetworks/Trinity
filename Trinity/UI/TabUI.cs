@@ -5,13 +5,16 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using Trinity.Helpers;
 using Trinity.Items;
-using Trinity.UI.UIComponents;
 using Zeta.Bot;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using Zeta.Common;
-
+using Application = System.Windows.Application;
+using Button = System.Windows.Controls.Button;
+using HorizontalAlignment = System.Windows.HorizontalAlignment;
 using Logger = Trinity.Technicals.Logger;
+using MessageBox = System.Windows.MessageBox;
+using TabControl = System.Windows.Controls.TabControl;
 
 namespace Trinity.UI
 {
@@ -43,6 +46,7 @@ namespace Trinity.UI
                     CreateButton("Find New ActorIds", GetNewActorSNOsEventHandler);
                     CreateButton("Dump My Build", DumpBuildEventHandler);
                     CreateButton("Show Cache", ShowCacheWindowEventHandler);
+                    CreateButton("Reset TVars", ResetTVarsEventHandler);
 
 
                     _tabItem = new TabItem
@@ -61,6 +65,7 @@ namespace Trinity.UI
             );
         }
 
+        #region TabMethods
         internal static void RemoveTab()
         {
             Application.Current.Dispatcher.Invoke(
@@ -88,7 +93,7 @@ namespace Trinity.UI
             button.Click += clickHandler;
             _tabGrid.Children.Add(button);
         }
-
+        #endregion
 
         /**************
          * 
@@ -100,6 +105,20 @@ namespace Trinity.UI
          *  
          *************/
 
+        private static void ResetTVarsEventHandler(object sender, RoutedEventArgs routedEventArgs)
+        {
+            try
+            {
+                var doReset = MessageBox.Show("This will reset all of the advanced Trinity Variables. Are you sure?", "Reset Trinity Variables",
+                    MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                if (doReset == MessageBoxResult.OK)
+                    V.ResetAll();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error Resetting TVar's:" + ex);
+            }
+        }
         private static void ShowCacheWindowEventHandler(object sender, RoutedEventArgs routedEventArgs)
         {
             try
