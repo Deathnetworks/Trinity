@@ -40,11 +40,7 @@ namespace Trinity.Combat.Abilities
             // In combat, Not Avoiding
             if (CurrentTarget != null)
             {
-                var p = GetCombatPower();
-                var skill = Skills.Wizard.ToList().FirstOrDefault(s => s.Id == (int)p.SNOPower);
-                if (skill != null)
-                    Logger.Log(LogCategory.Behavior, "GetCombatPower Selected Skill: {0} Element={1} Cost={2}", skill.Name, skill.Element, skill.Cost);
-                return p;
+                return GetCombatPower();
             }
             // Destructibles
             if (UseDestructiblePower)
@@ -182,7 +178,6 @@ namespace Trinity.Combat.Abilities
 
                     return new TrinityPower(SNOPower.Wizard_SlowTime, 0f, Player.Position);           
                 }
-
             }
 
             // Mirror Image  @ half health or 5+ monsters or rooted/incapacitated or last elite left @25% health

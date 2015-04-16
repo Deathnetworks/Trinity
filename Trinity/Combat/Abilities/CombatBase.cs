@@ -17,11 +17,11 @@ namespace Trinity.Combat.Abilities
     public class CombatBase
     {
         static CombatBase()
-        {
+		{
             GameEvents.OnGameJoined += (sender, args) => LoadCombatSettings();
             LoadCombatSettings();
-        }
-
+		}
+        
         private static TrinityPower _currentPower = new TrinityPower();
         private static Vector3 _lastZigZagLocation = Vector3.Zero;
         private static Vector3 _zigZagPosition = Vector3.Zero;
@@ -470,16 +470,6 @@ namespace Trinity.Combat.Abilities
         }
 
         /// <summary>
-        /// Returns how many stacks of a particular skill there are
-        /// </summary>
-        /// <param name="power"></param>
-        /// <returns></returns>
-        public static int GetSkillCharges(SNOPower power)
-        {
-            return CacheData.Hotbar.GetSkillCharges(power);
-        }
-
-        /// <summary>
         /// Check re-use timers on skills
         /// </summary>
         /// <param name="power">The power.</param>
@@ -531,7 +521,16 @@ namespace Trinity.Combat.Abilities
         {
             return
                 (!CacheData.Hotbar.ActivePowers.Contains(snoPower) || (CacheData.Hotbar.ActivePowers.Contains(snoPower) && GetHasBuff(snoPower)));
+        }
 
+        /// <summary>
+        /// Returns how many stacks of a particular skill there are
+        /// </summary>
+        /// <param name="power"></param>
+        /// <returns></returns>
+        public static int GetSkillCharges(SNOPower power)
+        {
+            return CacheData.Hotbar.GetSkillCharges(power);
         }
 
         /// <summary>
@@ -573,6 +572,59 @@ namespace Trinity.Combat.Abilities
         internal static bool CheckConventionElement(Skill skill)
         {
             return !Settings.Combat.Misc.UseConventionElementOnly || !Legendary.ConventionOfElements.IsEquipped || CacheData.Buffs.ConventionElement == skill.Element;
+        }
+
+        /// <summary>
+        /// If we should attack to aquire the Bastians generator buff
+        /// </summary>
+        internal static bool ShouldRefreshBastiansGeneratorBuff
+        {
+            get
+            {
+                if (Sets.BastionsOfWill.IsFullyEquipped && !CacheData.Buffs.HasBastiansWillGeneratorBuff)
+                    return true;
+
+                return SpellHistory.TimeSinceGeneratorCast >= 3500;
+            }
+        }
+
+        /// <summary>
+        /// If we should attack to aquire the Bastians spender buff
+        /// </summary>
+        internal static bool ShouldRefreshBastiansSpenderBuff
+        {
+            get
+            {
+                if (Sets.BastionsOfWill.IsFullyEquipped && !CacheData.Buffs.HasBastiansWillSpenderBuff)
+                    return true;
+
+                return  SpellHistory.TimeSinceSpenderCast >= 3500;
+            }
+        }
+
+        /// <summary>
+        /// Select an attacking skill that is primary or a generator
+        /// </summary>
+        /// <returns></returns>
+        internal static TrinityPower CastAttackGenerator()
+        {
+            var generator = SkillUtils.Active.FirstOrDefault(s => s.IsGeneratorOrPrimary);
+            if (generator == null)
+                return DefaultPower;
+
+            return generator.ToPower(50f, Enemies.BestCluster.Position);
+        }
+
+        /// <summary>
+        /// Select an attacking skill that spends resource
+        /// </summary>
+        internal static TrinityPower CastAttackSpender()
+        {
+            var spender = SkillUtils.Active.FirstOrDefault(s => s.IsAttackSpender);
+            if (spender == null)
+                return DefaultPower;
+
+            return spender.ToPower(80f, Enemies.BestCluster.Position);
         }
 
     }

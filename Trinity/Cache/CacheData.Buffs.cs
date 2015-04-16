@@ -59,7 +59,7 @@ namespace Trinity
 
                 using (new PerformanceLogger("UpdateCachedBuffsData"))
                 {
-                    if (DateTime.UtcNow.Subtract(LastUpdated).TotalMilliseconds < 500)
+                    if (DateTime.UtcNow.Subtract(LastUpdated).TotalMilliseconds < 250)
                         return;
 
                     Clear();
@@ -81,13 +81,6 @@ namespace Trinity
                         cachedBuff.VariantId = GetBuffVariantId((SNOPower)cachedBuff.Id);
                         cachedBuff.VariantName = GetBuffVariantName(cachedBuff);
 
-                        // Bastians of Will
-                        if (cachedBuff.Id == (int)SNOPower.ItemPassive_Unique_Ring_735_x1)
-                        {
-                            HasBastiansWillSpenderBuff = (ResourceEffectType)cachedBuff.VariantId == ResourceEffectType.Spender;   
-                            HasBastiansWillGeneratorBuff = (ResourceEffectType)cachedBuff.VariantId == ResourceEffectType.Generator;                 
-                        }
-
                         // Convention of Elements
                         if (cachedBuff.Id == (int) SNOPower.P2_ItemPassive_Unique_Ring_038)
                         {
@@ -108,6 +101,10 @@ namespace Trinity
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                         "Refreshed Inventory: ActiveBuffs={0}", ActiveBuffs.Count);
                 }
+
+                // Bastians of Will
+                HasBastiansWillSpenderBuff = HasBuff((int)SNOPower.ItemPassive_Unique_Ring_735_x1,2);
+                HasBastiansWillGeneratorBuff = HasBuff((int)SNOPower.ItemPassive_Unique_Ring_735_x1,1);
             }
 
             public List<CachedBuff> ActiveBuffs

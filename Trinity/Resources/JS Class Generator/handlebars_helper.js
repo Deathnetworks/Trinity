@@ -413,6 +413,80 @@ Handlebars.registerHelper('ICombatProperties', function (description, type) {
 
             //    break;
 
+        case "IsDamaging":
+           
+            var regex = /(deals)|(dealing)|(weapon damage)/gi;
+            var match = getMatches(description, regex, "last");
+            if (match) {
+                result = prefix + "IsDamaging = true,<br/>";
+            } else {
+                if (setDefault) {
+                    result = prefix + "IsDamaging = false,<br/>";
+                }
+            }
+            break;
+
+        case "AreaEffectRadius":
+           
+            var regex = /within ([\d|.]+) yards/gi;
+            var match = getMatches(description, regex, "last");
+            if (match) {
+                result = prefix + "AreaEffectRadius = " + match + "f,<br/>";
+            } else {
+
+                var regex = /large area/gi;
+                var match = getMatches(description, regex, "last");
+                if (match) {
+                    result = prefix + "AreaEffectRadius = 85f,<br/>";
+                } else {
+                    if (setDefault) {
+                        result = prefix + "AreaEffectRadius = 0f,<br/>";
+                    }
+                }
+            }
+            break;
+
+        case "ResourceEffect":            
+
+            var costRegex = /cost: ([\d|.]+)|cost to ([\d|.]\d+)|costs ([\d|.]+)|cost of \w+ to ([\d|.]+)|cost of *([a-zA-Z]+\s*){1,3} to ([\d|.]+)|add a ([\d|.]+) \w+ cost/gi;
+            var cost = getMatches(description, costRegex, "last");
+            if (cost) {
+                result = "ResourceEffect = ResourceEffectType.Spender,<br/>";
+                break;
+            }
+
+            var generateRegex = /(generate)/gi;
+            var match = getMatches(description, generateRegex, "last");
+            if (match) {
+                result = prefix + "ResourceEffect = ResourceEffectType.Generator,<br/>";
+                break;
+            }
+            
+                result = prefix + "ResourceEffect = ResourceEffectType.None,<br/>";
+            
+            break;
+
+        case "SkillType":
+
+            var costRegex = /cost: ([\d|.]+)|cost to ([\d|.]\d+)|costs ([\d|.]+)|cost of \w+ to ([\d|.]+)|cost of *([a-zA-Z]+\s*){1,3} to ([\d|.]+)|add a ([\d|.]+) \w+ cost/gi;
+            var cost = getMatches(description, costRegex, "last");
+            if (cost) {
+                result = prefix + "SkillType = SkillType.Spender,<br/>";
+                break;
+            }
+
+            var generateRegex = /(generate)/gi;
+            var match = getMatches(description, generateRegex, "last");
+            if (match) {
+                result = prefix + "SkillType = SkillType.Generator,<br/>";
+                break;
+            }
+
+            if (setDefault) {
+                result = prefix + "SkillType = SkillType.None,<br/>";
+            }
+            break;
+
         case "Resource":
 
             // not useful for runes - they wont mention resource type unless amount has changed.
@@ -425,11 +499,11 @@ Handlebars.registerHelper('ICombatProperties', function (description, type) {
             var resourceRegex = /(Arcane)|(Mana)|(Spirit)|(Fury)|(Wrath)|(Discipline)|(Hatred)/gi;
             var match = getMatches(description, resourceRegex, "last");
             if (match) {
-                result = "Resource = Resource." + ToTitleCase(match) + ",<br/>";
+                result = prefix + "Resource = Resource." + ToTitleCase(match) + ",<br/>";
             } else {
                 // allow a none resource type since you cant assume demonhunter skill is discipline or hatred
                 if (setDefault) {
-                    result = "Resource = Resource.None,<br/>";
+                    result = prefix + "Resource = Resource.None,<br/>";
                 }
 
             }
