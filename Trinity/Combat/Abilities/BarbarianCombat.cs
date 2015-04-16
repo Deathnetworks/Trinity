@@ -489,15 +489,15 @@ namespace Trinity.Combat.Abilities
                 if (UseOOCBuff || IsCurrentlyAvoiding || Player.IsIncapacitated || !CanCast(SNOPower.Barbarian_Rend))
                     return false;
 
-                bool hasReserveEnergy = (!IsWaitingForSpecial && Player.PrimaryResource >= V.I("Barbarian.Rend.MinFury")) || (IsWaitingForSpecial && Player.PrimaryResource > MinEnergyReserve);
+                bool hasReserveEnergy = (!IsWaitingForSpecial && Player.PrimaryResource >= 20) || (IsWaitingForSpecial && Player.PrimaryResource > MinEnergyReserve);
 
-                return Skills.Barbarian.Rend.TimeSinceUse > V.F("SpellDelay.Barbarian_Rend") && 
-                    hasReserveEnergy && (Trinity.ObjectCache.Count(o => o.IsUnit && !o.HasDotDPS && o.RadiusDistance <= V.F("Barbarian.Rend.MaxRange")) >= V.I("Barbarian.Rend.MinNonBleedMobCount"))
+                return Skills.Barbarian.Rend.TimeSinceUse > 3500 && 
+                    hasReserveEnergy && (Trinity.ObjectCache.Count(o => o.IsUnit && !o.HasDotDPS && o.RadiusDistance <= 12) >= 3)
                      ||
                     // Spam with Bloodlust
-                    (CanCast(SNOPower.Barbarian_Rend) && Trinity.ObjectCache.Count(o => o.IsUnit && !o.HasDotDPS && o.RadiusDistance <= V.F("Barbarian.Rend.MaxRange")) >= V.I("Barbarian.Rend.MinNonBleedMobCount") && 
-                     Player.CurrentHealthPct <= V.F("Barbarian.Rend.SpamBelowHealthPct") &&
-                     Runes.Barbarian.BloodLust.IsActive && TargetUtil.AnyMobsInRange(V.F("Barbarian.Rend.MaxRange"), false));
+                    (CanCast(SNOPower.Barbarian_Rend) && Trinity.ObjectCache.Count(o => o.IsUnit && !o.HasDotDPS && o.RadiusDistance <= 12) >= 3 && 
+                     Player.CurrentHealthPct <= .25 &&
+                     Runes.Barbarian.BloodLust.IsActive && TargetUtil.AnyMobsInRange(12, false));
             }
         }
         public static bool CanUseOverPower
