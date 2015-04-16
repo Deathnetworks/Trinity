@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -30,12 +31,16 @@ using Trinity.Helpers;
 
 namespace Trinity.Settings.Loot
 {
+    /// <summary>
+    /// Settings for ItemList looting
+    /// </summary>
     [DataContract(Namespace = "")]
     public class ItemListSettings : ITrinitySetting<ItemListSettings>, INotifyPropertyChanged
     {
         #region Fields
 
         private static List<LItem> _cachedItems;
+        private static Dictionary<int,LItem> _cachedItemsDictionary;
         private FullyObservableCollection<LItem> _displayItems = new FullyObservableCollection<LItem>();
         private List<LItem> _selectedItems = new List<LItem>();
         private GroupingType _grouping;
@@ -46,6 +51,7 @@ namespace Trinity.Settings.Loot
         private string _validationMessage;
         private ModalPage _selectedModalPage;
         private bool _isModalVisible;
+        private Dictionary<int, LItem> _viewPortal;
 
         #endregion
 
@@ -67,9 +73,18 @@ namespace Trinity.Settings.Loot
             BaseType,
             ItemType,
             SetName,
+            IsEquipped,
+            ActorClass,
             IsSetItem,
             IsCrafted,
             IsValid
+        }
+
+        public enum SortingType
+        {
+            None,
+            Name,
+            Id
         }
 
         public enum ModalPage
@@ -151,6 +166,7 @@ namespace Trinity.Settings.Loot
 
         /// <summary>
         /// Main collection for all items, underlies CollectionViewSource
+        /// This is only used for displaying the UI and user interaction.        
         /// </summary>
         [IgnoreDataMember]
         public FullyObservableCollection<LItem> DisplayItems
@@ -170,7 +186,9 @@ namespace Trinity.Settings.Loot
         }
 
         /// <summary>
-        /// The source of truth - currently selected items, this is persisted to the settings file.
+        /// Contains the currently selected items; this is persisted to the settings file.
+        /// Code elsewhere in trinity (such as loot engien) can check items against it at any time.
+        /// LItems here have a minimal set of data; only Ids of the items and rules are are saved.
         /// </summary>
         [DataMember(IsRequired = false)]
         public List<LItem> SelectedItems
@@ -183,11 +201,8 @@ namespace Trinity.Settings.Loot
             {
                 if (_selectedItems != value)
                 {
-                    //if (_selectedItems == null || value != null)
-                    //{
-                        _selectedItems = value;
-                        OnPropertyChanged("SelectedItems");
-                    //}
+                    _selectedItems = value;
+                    OnPropertyChanged("SelectedItems");
                 }
             }
         }
@@ -331,12 +346,18 @@ namespace Trinity.Settings.Loot
 
         #region Methods
 
+        /// <summary>
+        /// Generates an export code of the current state
+        /// </summary>        
         public string CreateExportCode()
         {
             var settingsXml = TrinitySetting.GetSettingsXml(this);
             return ExportHelper.Compress(settingsXml);
         }
 
+        /// <summary>
+        /// Decodes an export code and applies it to the current state.
+        /// </summary>
         public ItemListSettings ImportFromCode(string code)
         {
             if (string.IsNullOrEmpty(code) || string.IsNullOrWhiteSpace(code))
@@ -383,8 +404,8 @@ namespace Trinity.Settings.Loot
         /// </summary>
         private void SettingsWindowOpened()
         {
-            CreateView();            
-            UpdateSelectedItems();
+            CreateView();
+            UpdateSelectedItems();           
         }
 
         /// <summary>
@@ -395,8 +416,7 @@ namespace Trinity.Settings.Loot
             Collection = new CollectionViewSource();
             Collection.Source = DisplayItems;
             ChangeGrouping(Grouping);
-            Collection.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
-            Collection.View.Refresh();
+            ChangeSorting(SortingType.Name);
         }
 
         /// <summary>
@@ -405,7 +425,7 @@ namespace Trinity.Settings.Loot
         public static void CacheReferenceItems()
         {
             if (_cachedItems == null)
-                _cachedItems = Legendary.ToList().Select(i => new LItem(i)).ToList();
+                _cachedItems = Legendary.ToList().Where(i => !i.IsCrafted && i.Id != 0).Select(i => new LItem(i)).ToList();
         }
 
         /// <summary>
@@ -436,7 +456,7 @@ namespace Trinity.Settings.Loot
         }
 
         /// <summary>
-        /// Change the grouping order
+        /// Change the grouping property
         /// </summary>
         /// <param name="groupingType"></param>
         internal void ChangeGrouping(GroupingType groupingType)
@@ -450,6 +470,22 @@ namespace Trinity.Settings.Loot
                 Collection.GroupDescriptions.Clear();
                 if (groupingType != GroupingType.None)
                     Collection.GroupDescriptions.Add(new PropertyGroupDescription(groupingType.ToString()));
+            }
+        }
+
+        /// <summary>
+        /// Change the sorting order
+        /// </summary>
+        /// <param name="sortingType"></param>
+        internal void ChangeSorting(SortingType sortingType)
+        {
+            if (Collection == null)
+                return;
+
+            using (Collection.DeferRefresh())
+            {
+                Collection.SortDescriptions.Clear();
+                Collection.SortDescriptions.Add(new SortDescription(sortingType.ToString(), ListSortDirection.Ascending));
             }
         }
 
@@ -505,17 +541,23 @@ namespace Trinity.Settings.Loot
         /// <param name="args"></param>
         public void SyncSelectedItem(ChildElementPropertyChangedEventArgs args)
         {
-            if (IsUpdatingCollection)
-                return;
-
             var item = args.ChildElement as LItem;
             if (item != null && args.PropertyName.ToString() == "IsSelected")
             {
                 var match = _selectedItems.FirstOrDefault(i => i.Id == item.Id);
-                if (match != null && !item.IsSelected)
+                if (match != null)
                 {
-                    _selectedItems.Remove(match);
-                    Logger.LogVerbose("Removed {0} ({2}) from Selected Items, NewSelectedCount={1}", item.Name, _selectedItems.Count, item.Id);
+                    if (!item.IsSelected)
+                    {
+                        // Remove
+                        _selectedItems.Remove(match);
+                        Logger.LogVerbose("Removed {0} ({2}) from Selected Items, NewSelectedCount={1}", item.Name, _selectedItems.Count, item.Id);
+                    }
+                    else
+                    {
+                        // Update Data
+                    }
+
                 }
                 else if (match == null && item.IsSelected)
                 {
@@ -525,10 +567,8 @@ namespace Trinity.Settings.Loot
             }
         }
 
-        private bool IsUpdatingCollection { get; set; }
-
         /// <summary>
-        /// Updates the DisplayItems collection to match the Selected collection
+        /// Updates the DisplayItems collection to match the Selected collection.         
         /// </summary>
         public void UpdateSelectedItems()
         {
@@ -541,29 +581,34 @@ namespace Trinity.Settings.Loot
             // Prevent the collection from updating until outside of the using block.
             using (Collection.DeferRefresh())
             {
-                var selectedIdsRulesDict = _selectedItems.ToDictionary(k => k.Id, v => v.Rules);
+                var selectedDictionary = _selectedItems.DistinctBy(i => i.Id).ToDictionary(k => k.Id, v => v);
                 var castView = _collection.View.SourceCollection.Cast<LItem>();
 
                 castView.ForEach(item =>
                 {
-                    if (selectedIdsRulesDict.ContainsKey(item.Id))
+
+                    // After XML settings load _selectedItems will contain LItem husks that are lacking useful information, just what was saved.
+                    // We want to take the saved information and make an object that is fully populated and linked with the UI collection.
+
+                    LItem selectedItem;
+
+                    if (selectedDictionary.TryGetValue(item.Id, out selectedItem))
                     {
                         if(!item.IsSelected)
                             Logger.LogVerbose("Update: Selecting {0} ({1}) with {2} rules", item.Name, item.Id, item.Rules.Count);
-
-                        item.IsSelected = true;
-
-                        // Rules are not saved with min/max/step etc to save payload
-                        // So this needs to be populated based on the GItemType
-                        var rules = selectedIdsRulesDict[item.Id];
-                        rules.ForEach(r =>
+                      
+                        selectedItem.Rules.ForEach(r =>
                         {
                             r.GItemType = item.GItemType;
                             r.ItemStatRange = item.GetItemStatRange(r.ItemProperty);
                         });
+                        item.IsSelected = true;
+                        item.Rules = selectedItem.Rules;
+                        item.Ops = selectedItem.Ops;
 
-                        item.Rules = rules;
-                        
+                        // Replacing the reference to automatically receive changes from UI.
+                        _selectedItems.Remove(selectedItem);
+                        _selectedItems.Add(item);
                     }
                     else
                     {
@@ -576,6 +621,79 @@ namespace Trinity.Settings.Loot
                 });
             }
         }
+
+        
+        //public int SelectedTestIds { get; set; }
+        //public RuleType RuleType
+        //{
+        //    get { return (RuleType)TypeId; }
+        //    set { TypeId = (int)value; }
+        //}
+        //[DataMember]
+        //public List<LItem> SelectedTestObjects
+        //{
+        //    get
+        //    {
+        //        return CollectionViewSource == null ? null : CollectionViewSource.Where(r => r.IsSelected).ToList();
+        //    }
+        //    set
+        //    {
+        //        if (value == null)
+        //            return;
+
+        //        var selectedDictionary = value.ToDictionary(k => k.Id, v => v);
+        //        var newItems = new FullyObservableCollection<LItem>(_cachedItems, true); 
+        //        newItems.ForEach(i =>
+        //        {
+        //            LItem item;
+        //            if (selectedDictionary.TryGetValue(i.Id, out item))
+        //            {
+        //                i.IsSelected = true;
+        //                i.Rules = item.Rules;
+        //                i.OptionalCount = item.OptionalCount;
+        //            }
+        //        });
+
+        //        //var cachedItemIndex = 
+        //        //_cachedItems.ForEach(c =>
+        //        //{
+        //        //    if(c == value)
+        //        //});
+        //        //value.ForEach();
+                
+        //        //LoadedTestObjects = value;
+        //    }
+        //}
+
+        ////private List<LItem> LoadedTestObjects;
+
+        /////// <summary>
+        /////// Provides fast lookup of the view objects by id
+        /////// </summary>
+        ////public Dictionary<int, LItem> CollectionViewPortal
+        ////{
+        ////    get
+        ////    {
+        ////        if (CollectionViewSource == null)
+        ////            return null;
+
+        ////        return _viewPortal ?? (_viewPortal = CollectionViewSource.ToDictionary(k => k.Id, v => v));
+        ////    }
+        ////}
+
+        /////// <summary>
+        /////// Provides access to modify the view source collection
+        /////// </summary>
+        //public List<LItem> CollectionViewSource
+        //{
+        //    get
+        //    {
+        //        if (_collection == null || _collection.View == null || _collection.View.SourceCollection == null)
+        //            return null;
+
+        //        return _collection.View.SourceCollection.Cast<LItem>().ToList();
+        //    }
+        //}
 
         #endregion
 
