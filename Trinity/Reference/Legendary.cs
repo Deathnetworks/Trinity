@@ -6720,7 +6720,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item TalRashasStride = new Item
         {
-            Id = 0,
+            Id = 415049,
             Name = "Tal Rasha's Stride",
             Quality = ItemQuality.Legendary,
             Slug = "tal-rashas-stride",
