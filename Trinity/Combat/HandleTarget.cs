@@ -371,8 +371,8 @@ namespace Trinity
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("Error in HandleTarget: {0}", ex.Message);
-                    return GetRunStatus(RunStatus.Running);
+                    Logger.LogError("Error in HandleTarget: {0}", ex);
+                    return GetRunStatus(RunStatus.Failure);
                 }
 
                 HandleTargetBasicMovement(ForceNewMovement);

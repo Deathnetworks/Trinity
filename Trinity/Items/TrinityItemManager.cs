@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using Trinity.Cache;
 using Trinity.DbProvider;
 using Trinity.Helpers;
@@ -1183,6 +1184,8 @@ namespace Trinity.Items
             return DetermineItemType(item.InternalName, item.ItemType);
         }
 
+        private static readonly Regex ItemExpansionRegex = new Regex(@"^[xp]\d_", RegexOptions.Compiled);
+
         /// <summary>
         ///     DetermineItemType - Calculates what kind of item it is from D3 internalnames
         /// </summary>
@@ -1195,6 +1198,9 @@ namespace Trinity.Items
             name = name.ToLower();
             if (name.StartsWith("x1_")) name = name.Substring(3, name.Length - 3);
             if (name.StartsWith("p1_")) name = name.Substring(3, name.Length - 3);
+
+            
+            if (ItemExpansionRegex.IsMatch(name)) name = name.Substring(3, name.Length - 3);
 
             if (name.StartsWith("a1_")) return GItemType.SpecialItem;
             if (name.StartsWith("amethyst")) return GItemType.Amethyst;
