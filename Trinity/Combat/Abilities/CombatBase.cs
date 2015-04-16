@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Trinity.Config;
 using Trinity.Config.Combat;
+using Trinity.Objects;
 using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -556,7 +557,13 @@ namespace Trinity.Combat.Abilities
             return power == null;
         }
 
-
+        /// <summary>
+        /// Checks a skill against the convention of elements ring
+        /// </summary>
+        internal static bool CheckConventionElement(Skill skill)
+        {
+            return !Settings.Combat.Misc.UseConventionElementOnly || !Legendary.ConventionOfElements.IsEquipped || CacheData.Buffs.ConventionElement == skill.Element;
+        }
 
     }
 
