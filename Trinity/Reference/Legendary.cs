@@ -3592,7 +3592,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item TalRashasGrasp = new Item
         {
-            Id = 0,
+            Id = 415051,
             Name = "Tal Rasha's Grasp",
             Quality = ItemQuality.Legendary,
             Slug = "tal-rashas-grasp",
@@ -4351,7 +4351,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HarringtonWaistguard = new Item
         {
-            Id = 210432,
+            Id = 298129,//210432,
             Name = "Harrington Waistguard",
             Quality = ItemQuality.Legendary,
             Slug = "harrington-waistguard",
@@ -5938,7 +5938,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item InnasSandals = new Item
         {
-            Id = 0,
+            Id = 415264,
             Name = "Inna's Sandals",
             Quality = ItemQuality.Legendary,
             Slug = "innas-sandals",
@@ -6720,7 +6720,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item TalRashasStride = new Item
         {
-            Id = 0,
+            Id = 415049,
             Name = "Tal Rasha's Stride",
             Quality = ItemQuality.Legendary,
             Slug = "tal-rashas-stride",

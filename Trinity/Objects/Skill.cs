@@ -152,6 +152,43 @@ namespace Trinity.Objects
         }
 
         /// <summary>
+        /// Check if skill spend primary ressource
+        /// </summary>
+        public bool IsAttackSpender
+        {
+            get
+            {
+                if (SNOPower == 0 || Resource == Resource.Discipline || Resource == Resource.Unknown)
+                    return false;
+
+                if (this == Skills.DemonHunter.Chakram && Legendary.SpinesOfSeethingHatred.IsEquipped)
+                    return false;
+
+                if (this == Skills.DemonHunter.ElementalArrow && Legendary.Kridershot.IsEquipped)
+                    return false;
+
+                return Cost > 0;
+            }
+        }
+
+        /// <summary>
+        /// Check if skill generates resource and can hit
+        /// </summary>
+        public bool IsAttackGenerator
+        {
+            get
+            {
+                if (this == Skills.DemonHunter.Chakram && Legendary.SpinesOfSeethingHatred.IsEquipped)
+                    return true;
+
+                if (this == Skills.DemonHunter.ElementalArrow && Legendary.Kridershot.IsEquipped)
+                    return true;
+
+                return Category == SpellCategory.Primary;
+            }
+        }
+
+        /// <summary>
         /// If the skill's associated buff is currently active, ie, archon, warcry etc.
         /// </summary>
         public bool IsBuffActive

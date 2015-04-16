@@ -124,6 +124,7 @@
     <Compile Include="Helpers\EnumValue.cs" />
     <Compile Include="Helpers\ExportHelper.cs" />
     <Compile Include="Helpers\GetAttributeExtensions.cs" />
+    <Compile Include="Objects\CachedBuff.cs" />
     <Compile Include="Objects\IUnique.cs" />
     <Compile Include="Objects\ItemStatRange.cs" />
     <Compile Include="Resources\Battle.Net API\BNetDataObjects.cs" />

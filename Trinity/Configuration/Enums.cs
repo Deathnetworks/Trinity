@@ -130,13 +130,13 @@
     public enum Element
     {
         Unknown = 0,
-        Physical,
+        Arcane,
         Cold,
         Fire,
+        Holy,
         Lightning,
-        Poison,
-        Arcane,
-        Holy
+        Physical,
+        Poison
     }
 
     public enum SpellCategory
@@ -199,5 +199,11 @@
         Special
     }
 
+    public enum ResourceEffectType
+    {
+        None = 0,
+        Generator,
+        Spender
+    }
 
 }

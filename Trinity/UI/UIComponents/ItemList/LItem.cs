@@ -156,7 +156,7 @@ namespace Trinity.UI.UIComponents
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            Logger.Log("Property Changed {0}", propertyName);
+            //Logger.Log("Property Changed {0}", propertyName);
             var handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
