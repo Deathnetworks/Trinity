@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -14,7 +12,6 @@ namespace Trinity.UI.UIComponents
     public class CacheUI
     {
         private static Window _window;
-        private static UserControl _userControl;
         internal static CacheUIDataModel DataModel = new CacheUIDataModel();
 
         private const int MininumWidth = 25;
@@ -26,6 +23,9 @@ namespace Trinity.UI.UIComponents
         {
             try
             {
+                if (DataModel == null)
+                    DataModel = new CacheUIDataModel();
+
                 _window = new Window
                 {
                     Height = 150,
@@ -53,13 +53,10 @@ namespace Trinity.UI.UIComponents
                                             new DataGridTextColumn {Header = "Name", IsReadOnly = true, Binding = new Binding("InternalName")},
                                             new DataGridTextColumn {Header = "Type", IsReadOnly = true, Binding = new Binding("Type")},
                                             new DataGridTextColumn {Header = "Weight", IsReadOnly = true, Binding = new Binding("Weight")},
-                                            new DataGridTextColumn {Header = "WeightInfo", IsReadOnly = true, Binding = new Binding("WeightInfo")},
                                             new DataGridTextColumn {Header = "IsBossOrEliteRareUnique", IsReadOnly = true, Binding = new Binding("IsBossOrEliteRareUnique")},
                                             new DataGridTextColumn {Header = "Distance", IsReadOnly = true, Binding = new Binding("Distance")},
                                             new DataGridTextColumn {Header = "Radius", IsReadOnly = true, Binding = new Binding("Radius")},
-                                            //new DataGridTextColumn{Header = "", IsReadOnly = true, Binding = new Binding("") },
-                                            //new DataGridTextColumn{Header = "", IsReadOnly = true, Binding = new Binding("") },
-                                            //new DataGridTextColumn{Header = "", IsReadOnly = true, Binding = new Binding("") },
+                                            new DataGridTextColumn {Header = "WeightInfo", IsReadOnly = true, Binding = new Binding("WeightInfo")},
                                             //new DataGridTextColumn{Header = "", IsReadOnly = true, Binding = new Binding("") },
                                         }
                                     }
@@ -68,10 +65,6 @@ namespace Trinity.UI.UIComponents
                         }
                     }
                 };
-
-                if (DataModel == null)
-                    DataModel = new CacheUIDataModel();
-                _userControl.DataContext = DataModel;
 
                 _window.Closed += Window_Closed;
                 Configuration.Events.OnCacheUpdated += Update;
@@ -116,6 +109,10 @@ namespace Trinity.UI.UIComponents
         {
             try
             {
+                DataModel.SourceCacheObjects.Clear();
+                foreach (var o in Trinity.ObjectCache)
+                    DataModel.SourceCacheObjects.Add(o);
+
                 Trinity.Invoke(() =>
                 {
                     foreach (var o in DataModel.SourceCacheObjects)

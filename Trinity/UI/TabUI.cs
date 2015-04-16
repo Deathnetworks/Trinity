@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using Trinity.Helpers;
 using Trinity.Items;
+using Trinity.UI.UIComponents;
 using Zeta.Bot;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
@@ -123,7 +124,7 @@ namespace Trinity.UI
         {
             try
             {
-                //CacheUI.CreateWindow().Show();
+                CacheUI.CreateWindow().Show();
             }
             catch (Exception ex)
             {
