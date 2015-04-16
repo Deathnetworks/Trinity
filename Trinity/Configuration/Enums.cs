@@ -199,5 +199,11 @@
         Special
     }
 
+    public enum ResourceEffectType
+    {
+        None = 0,
+        Generator,
+        Spender
+    }
 
 }
