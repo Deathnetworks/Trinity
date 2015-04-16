@@ -153,12 +153,10 @@ namespace Trinity
                 }
             }
 
-    
-
             // Only set treasure goblins to true *IF* they haven't disabled goblins! Then check the SNO in the goblin hash list!
             c_unit_IsTreasureGoblin = false;
             // Flag this as a treasure goblin *OR* ignore this object altogether if treasure goblins are set to ignore
-            if (DataDictionary.GoblinIds.Contains(CurrentCacheObject.ActorSNO))
+            if (DataDictionary.GoblinIds.Contains(CurrentCacheObject.ActorSNO) || CurrentCacheObject.InternalName.ToLower().StartsWith("treasureGoblin"))
             {
                 if (Settings.Combat.Misc.GoblinPriority != 0)
                 {

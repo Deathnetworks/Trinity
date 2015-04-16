@@ -255,9 +255,11 @@
     <Compile Include="Settings\TrinitySetting.cs" />
     <Compile Include="Settings\WorldObjectSetting.cs" />
     <Compile Include="Helpers\PerformanceLogger.cs" />
+    <Compile Include="UI\CacheUI.cs" />
     <Compile Include="UI\TabUI.cs" />
     <Compile Include="UI\UIComponents\Behaviors\ComboAlwaysFireSelection.cs" />
     <Compile Include="UI\UIComponents\Behaviors\InputBindingBehavior.cs" />
+    <Compile Include="UI\UIComponents\CacheUIDataModel.cs" />
     <Compile Include="UI\UIComponents\Converters\BoolInverterConverter.cs" />
     <Compile Include="UI\UIComponents\Converters\BoolToTypeConverters.cs" />
     <Compile Include="UI\UIComponents\Converters\UrlToCachedImageConverter.cs" />

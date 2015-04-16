@@ -835,11 +835,11 @@ namespace Trinity
                         SpellHistory.RecordSpell(new TrinityPower(SNOPower.DrinkHealthPotion));
                         return true;
                     }
-                    if (regularPotions.Any())
+                    var potion = ZetaDia.Me.Inventory.BaseHealthPotion;
+                    if (potion != null)
                     {
                         Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Potion", 0);
-                        dynamicId = regularPotions.FirstOrDefault().DynamicId;
-                        ZetaDia.Me.Inventory.UseItem(dynamicId);
+                        ZetaDia.Me.Inventory.UseItem(potion.DynamicId);
                         SpellHistory.RecordSpell(new TrinityPower(SNOPower.DrinkHealthPotion));
                         return true;
                     }

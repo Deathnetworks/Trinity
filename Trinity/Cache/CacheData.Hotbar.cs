@@ -25,9 +25,9 @@ namespace Trinity
         public class HotbarCache
         {
             static HotbarCache()
-			{
-				Pulsator.OnPulse += (sender, args) => Instance.UpdateHotbarCache();
-			}
+            {
+                Pulsator.OnPulse += (sender, args) => Instance.UpdateHotbarCache();
+            }
 
             public HotbarCache()
             {
@@ -51,6 +51,11 @@ namespace Trinity
                 public int RuneIndex { get; set; }
                 public bool HasRuneEquipped { get; set; }
                 public Rune Rune { get { return Skill.CurrentRune; } }
+                public int Charges { get; set; }
+                public override string ToString()
+                {
+                    return string.Format("Power: {0}, SRune: {1}, Charge:{2}, Slot:{3}", Power, Rune, Charges, Slot);
+                }
             }
 
             public HashSet<SNOPower> ActivePowers { get; private set; }
@@ -58,38 +63,38 @@ namespace Trinity
             public HashSet<SNOPower> PassiveSkills { get; private set; }
             public DateTime LastUpdated = DateTime.MinValue;
 
-            private static Dictionary<SNOPower,HotbarSkill> _skillBySNOPower = new Dictionary<SNOPower, HotbarSkill>();
+            private static Dictionary<SNOPower, HotbarSkill> _skillBySNOPower = new Dictionary<SNOPower, HotbarSkill>();
             private static Dictionary<HotbarSlot, HotbarSkill> _skillBySlot = new Dictionary<HotbarSlot, HotbarSkill>();
-            
-            internal void UpdateHotbarCache()
-			{
-				using (new PerformanceLogger("UpdateCachedHotbarData"))
-				{
-				    var lastUpdateMs = DateTime.UtcNow.Subtract(LastUpdated).TotalMilliseconds;
 
-				    if (lastUpdateMs <= 250)
-				        return;
+            internal void UpdateHotbarCache()
+            {
+                using (new PerformanceLogger("UpdateCachedHotbarData"))
+                {
+                    var lastUpdateMs = DateTime.UtcNow.Subtract(LastUpdated).TotalMilliseconds;
+
+                    if (lastUpdateMs <= 250)
+                        return;
 
                     if (lastUpdateMs <= 5000 && CombatBase.TimeSincePowerUse(SNOPower.Wizard_Archon) > 20000)
-						return;
+                        return;
 
-				    Clear();
+                    Clear();
 
-					try
-					{
+                    try
+                    {
                         RefreshHotbar();
-					}
-					catch (Exception ex)
-					{
-						Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Exception grabbing Hotbar data.{0}{1}", Environment.NewLine, ex);
-					}
-				}
-			}
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Exception grabbing Hotbar data.{0}{1}", Environment.NewLine, ex);
+                    }
+                }
+            }
 
-			private void RefreshHotbar()
-			{			   
-				using (new PerformanceLogger("RefreshHotbar"))
-				{
+            private void RefreshHotbar()
+            {
+                using (new PerformanceLogger("RefreshHotbar"))
+                {
                     var cPlayer = ZetaDia.CPlayer;
 
                     LastUpdated = DateTime.UtcNow;
@@ -98,7 +103,7 @@ namespace Trinity
 
                     for (int i = 0; i <= 5; i++)
                     {
-                        var diaActiveSkill = cPlayer.GetActiveSkillByIndex(i, ZetaDia.Me.SkillOverrideActive);                        
+                        var diaActiveSkill = cPlayer.GetActiveSkillByIndex(i, ZetaDia.Me.SkillOverrideActive);
                         if (diaActiveSkill == null)
                             continue;
 
@@ -108,10 +113,11 @@ namespace Trinity
                         var hotbarskill = new HotbarSkill
                         {
                             Power = diaActiveSkill.Power,
-                            Slot = (HotbarSlot) i,
+                            Slot = (HotbarSlot)i,
                             RuneIndex = runeIndex,
                             HasRuneEquipped = diaActiveSkill.HasRuneEquipped,
-                            Skill = SkillUtils.ById(power)
+                            Skill = SkillUtils.ById(power),
+                            Charges = ZetaDia.Me.CommonData.GetAttribute<int>(((int)diaActiveSkill.Power << 12) + ((int)ActorAttributeType.SkillCharges & 0xFFF)),
                         };
 
                         ActivePowers.Add(power);
@@ -132,8 +138,8 @@ namespace Trinity
                         ActiveSkills.Count,
                         PassiveSkills.Count);
 
-				}
-			}
+                }
+            }
 
             internal HotbarSkill GetSkill(SNOPower power)
             {
@@ -147,23 +153,31 @@ namespace Trinity
                 return _skillBySlot.TryGetValue(slot, out skill) ? skill : new HotbarSkill();
             }
 
-			public void Dump()
-			{
-				using (new MemoryHelper())
-				{
-					foreach (var hotbarskill in ActiveSkills.ToList())
-					{
-						Logger.Log("Power={0} SkillName={1} Slot={2} DBRuneIndex={3} ProperRuneIndex={4} RuneName={5}",
+            public void Dump()
+            {
+                using (new MemoryHelper())
+                {
+                    foreach (var hotbarskill in ActiveSkills.ToList())
+                    {
+                        Logger.Log("Power={0} SkillName={1} Slot={2} DBRuneIndex={3} ProperRuneIndex={4} RuneName={5}",
                             hotbarskill.Power,
                             hotbarskill.Skill.Name,
                             hotbarskill.Slot,
                             hotbarskill.RuneIndex,
                             hotbarskill.Rune.Index,
                             hotbarskill.Rune.Name);
-					}
-				}
-			}
+                    }
+                }
+            }
+            public int GetSkillStacks(int id)
+            {
+                return GetSkill((SNOPower)id).Charges;
+            }
 
+            public int GetSkillCharges(SNOPower id)
+            {
+                return GetSkillStacks((int)id);
+            }
             public void Clear()
             {
                 LastUpdated = DateTime.MinValue;

@@ -28,7 +28,10 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.X1_Crusader_SteedCharge);
                 }
             }
-
+            // Destructibles
+            if (UseDestructiblePower)
+                return DestroyObjectPower;
+            
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CurrentTarget != null)
             {
                 /*

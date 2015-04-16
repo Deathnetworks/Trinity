@@ -621,7 +621,7 @@ namespace Trinity
                                 case GObjectType.Unit:
                                     {
                                         if (c_IsEliteRareUnique)
-                                            extraData += " IsElite " + c_MonsterAffixes.ToString();
+                                            extraData += " IsElite " + c_MonsterAffixes;
 
                                         if (c_unit_HasShieldAffix)
                                             extraData += " HasAffixShielded";

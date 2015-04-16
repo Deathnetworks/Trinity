@@ -17,11 +17,11 @@ namespace Trinity.Combat.Abilities
     public class CombatBase
     {
         static CombatBase()
-		{
+        {
             GameEvents.OnGameJoined += (sender, args) => LoadCombatSettings();
             LoadCombatSettings();
-		}
-        
+        }
+
         private static TrinityPower _currentPower = new TrinityPower();
         private static Vector3 _lastZigZagLocation = Vector3.Zero;
         private static Vector3 _zigZagPosition = Vector3.Zero;
@@ -467,6 +467,16 @@ namespace Trinity.Combat.Abilities
         public static int GetBuffStacks(SNOPower power)
         {
             return CacheData.Buffs.GetBuffStacks(power);
+        }
+
+        /// <summary>
+        /// Returns how many stacks of a particular skill there are
+        /// </summary>
+        /// <param name="power"></param>
+        /// <returns></returns>
+        public static int GetSkillCharges(SNOPower power)
+        {
+            return CacheData.Hotbar.GetSkillCharges(power);
         }
 
         /// <summary>

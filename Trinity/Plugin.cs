@@ -359,5 +359,10 @@ namespace Trinity
             Application.Current.Dispatcher.BeginInvoke(action);
         }
 
+        internal static void Invoke(Action action)
+        {
+            Application.Current.Dispatcher.Invoke(action);
+        }
+
     }
 }

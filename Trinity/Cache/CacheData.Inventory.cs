@@ -58,7 +58,7 @@ namespace Trinity
                     foreach (var item in ZetaDia.Actors.GetActorsOfType<ACDItem>())
                     {
                         if (!item.IsValid)
-                            return;
+                            continue;
 
                         switch (item.InventorySlot)
                         {
@@ -97,7 +97,12 @@ namespace Trinity
                                 break;
 
                             default:
-                                    Other.Add(item);
+                                if ((int)item.InventorySlot == 19)
+                                {
+                                    Equipped.Add(item);
+                                    EquippedIds.Add(item.ActorSNO);
+                                }
+                                Other.Add(item);
                                 break;
 
                         }
@@ -105,7 +110,7 @@ namespace Trinity
 
                     IsGroundItemOverload = (Ground.Count > 50);
 
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, 
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                         "Refreshed Inventory: Backpack={0} Stash={1} Equipped={2} Ground={3}",
                         Backpack.Count,
                         Stash.Count,
