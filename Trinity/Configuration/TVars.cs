@@ -119,7 +119,7 @@ namespace Trinity
             Set(new TVar("SpellDelay.Barbarian_Cleave", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_Frenzy", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_HammerOfTheAncients", 150, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.Barbarian_Rend", 600, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_Rend", 3500, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_SeismicSlam", 200, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_Whirlwind", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_GroundStomp", 12200, "Spell Use Delay/Interval, milliseconds"));
