@@ -16,6 +16,52 @@ namespace Trinity.Reference
         /***************  START TEMP ITEMS FOR 2.20 Patch ****************/
 
         /// <summary>
+        /// Envious Blade Gain 100% Critical Hit Chance against enemies at full health.
+        /// </summary>
+        public static Item EnviousBlade = new Item
+        {
+            Id = 271732,
+            Name = "Envious Blade",
+            Quality = ItemQuality.Legendary,
+            Slug = "envious-blade-3FoG39",
+            ItemType = ItemType.Dagger,
+            GItemType = GItemType.Dagger,
+            IsTwoHanded = false,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/envious-blade-3FoG39",
+            Url = "http://us.battle.net/d3/en/item/envious-blade-3FoG39",
+            IconUrl = "http://media.blizzard.com/d3/icons/items/large/unique_dagger_103_x1_demonhunter_male.png",
+            RelativeUrl = "",
+            IsCrafted = false,
+            LegendaryAffix = "Gain 100% Critical Hit Chance against enemies at full health.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Burst of Wrath Killing enemies and destroying objects has a chance to grant 20% of your maximum primary resource.
+        /// </summary>
+        public static Item BurstOfWrath = new Item
+        {
+            Id = 271601,
+            Name = "Burst of Wrath",
+            Quality = ItemQuality.Legendary,
+            Slug = "burst-of-wrath-322lv2",
+            ItemType = ItemType.Axe,
+            GItemType = GItemType.TwoHandAxe,
+            IsTwoHanded = true,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/burst-of-wrath-322lv2",
+            Url = "http://us.battle.net/d3/en/item/burst-of-wrath-322lv2",
+            IconUrl = "http://media.blizzard.com/d3/icons/items/large/unique_axe_2h_103_x1_demonhunter_male.png",
+            RelativeUrl = "",
+            IsCrafted = false,
+            LegendaryAffix = "Killing enemies and destroying objects has a chance to grant 20% of your maximum primary resource.",
+            SetName = "",
+        };
+
+        /// <summary>
         /// Pandemonium Loop Enemies slain while Feared die in a bloody explosion and cause other nearby enemies to flee in Fear.
         /// </summary>
         public static Item PandemoniumLoop = new Item
@@ -3546,7 +3592,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item InnasHold = new Item
         {
-            Id = 0,
+            Id = 415197,
             Name = "Inna's Hold",
             Quality = ItemQuality.Legendary,
             Slug = "innas-hold",
@@ -4282,7 +4328,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item BlessedOfHaull = new Item
         {
-            Id = 0,
+            Id = 423251,
             Name = "Blessed of Haull",
             Quality = ItemQuality.Legendary,
             Slug = "blessed-of-haull",
@@ -5386,7 +5432,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item DrakonsLesson = new Item
         {
-            Id = 0,
+            Id = 432833,
             Name = "Drakon's Lesson",
             Quality = ItemQuality.Legendary,
             Slug = "drakons-lesson",
@@ -6743,7 +6789,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item ZunimassasCloth = new Item
         {
-            Id = 0,
+            Id = 205647,
             Name = "Zunimassa's Cloth",
             Quality = ItemQuality.Legendary,
             Slug = "zunimassas-cloth",
@@ -6881,7 +6927,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item CaptainCrimsonsThrust = new Item
         {
-            Id = 0,
+            Id = 197214,
             Name = "Captain Crimson's Thrust",
             Quality = ItemQuality.Legendary,
             Slug = "captain-crimsons-thrust",
