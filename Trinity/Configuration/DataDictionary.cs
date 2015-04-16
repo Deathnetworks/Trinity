@@ -892,6 +892,8 @@ namespace Trinity
             321855, // x1_Pand_Ext_Ordnance_Mine
             355898, // x1_Bog_Family_Guard_Tower_Stump
             376917, // [1FA3B814] Type: ServerProp Name: x1_Westm_Hub_Stool_A-381422 ActorSNO: 376917, Distance: 2.337004
+            (int)SNOActor.px_Bounty_Camp_Hellportals_Frame, // A4 bounties
+            (int)SNOActor.px_Bounty_Camp_Pinger, // A4 bounties
         };
 
         /// <summary>

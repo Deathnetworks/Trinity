@@ -211,6 +211,13 @@ namespace Trinity.Combat.Abilities
                     return JawBreakerDashingStrike();
                 }
 
+                // Raiment set, dash costs 75 spirit and refunds a charge when it's used
+                if (Sets.ThousandStorms.IsSecondBonusActive && Player.PrimaryResource > 75)
+                {
+                    RefreshSweepingWind(true);
+                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.Position);
+                }
+
                 if (CurrentTarget.IsEliteRareUnique || TargetUtil.ClusterExists(15f, 3) &&
                     TargetUtil.IsUnitWithDebuffInRangeOfPosition(15f, TargetUtil.GetBestClusterPoint(), SNOPower.Monk_ExplodingPalm) ||
                     TargetUtil.AnyMobsInRangeOfPosition(CurrentTarget.Position, 20f, 3) && Skills.Monk.ExplodingPalm.IsTrackedOnUnit(CurrentTarget) ||
@@ -376,35 +383,35 @@ namespace Trinity.Combat.Abilities
                 SpellHistory.TimeSinceUse(SNOPower.Monk_CripplingWave) > TimeSpan.FromMilliseconds(cwInterval))
             {
                 RefreshSweepingWind();
-                return new TrinityPower(SNOPower.Monk_CripplingWave, 20f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 3);
+                return new TrinityPower(SNOPower.Monk_CripplingWave, 20f,CurrentTarget.ACDGuid);
             }
 
             // Fists of Thunder
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Monk_FistsofThunder))
             {
                 RefreshSweepingWind();
-                return new TrinityPower(SNOPower.Monk_FistsofThunder, 30f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 3);
+                return new TrinityPower(SNOPower.Monk_FistsofThunder, 45f, CurrentTarget.ACDGuid);
             }
 
             // Deadly Reach normal
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Monk_DeadlyReach))
             {
                 RefreshSweepingWind();
-                return new TrinityPower(SNOPower.Monk_DeadlyReach, 16f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 3);
+                return new TrinityPower(SNOPower.Monk_DeadlyReach, 16f, CurrentTarget.ACDGuid);
             }
 
             // Way of the Hundred Fists normal
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Monk_WayOfTheHundredFists))
             {
                 RefreshSweepingWind();
-                return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 16f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 3);
+                return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 16f, CurrentTarget.ACDGuid);
             }
 
             // Crippling Wave Normal
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Monk_CripplingWave))
             {
                 RefreshSweepingWind();
-                return new TrinityPower(SNOPower.Monk_CripplingWave, 30f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 3);
+                return new TrinityPower(SNOPower.Monk_CripplingWave, 30f, CurrentTarget.ACDGuid);
             }
 
             // Wave of light as primary 
