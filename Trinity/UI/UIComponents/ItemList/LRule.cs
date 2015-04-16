@@ -12,17 +12,22 @@ using Trinity.Reference;
 
 namespace Trinity.UIComponents
 {
+    /// <summary>
+    /// ListItem loot rule
+    /// </summary>
     [DataContract(Namespace = "")]
     public class LRule : INotifyPropertyChanged
     {
         public LRule()
         {
-            //Value = 1;
+            _value = GetDefaultValue(); 
         }
 
         private double _value;
         private int _variant;
         private List<object> _variants = new List<object>();
+        private RuleType _type;
+        private RuleType _ruleType;
 
         public string Name { get { return ItemProperty.ToString(); }}
 
@@ -39,7 +44,9 @@ namespace Trinity.UIComponents
         {
             get
             {
-                _value = CoerceValue(_value);
+                if (ItemStatRange != null)
+                    _value = CoerceValue(_value);
+                                 
                 return _value;
             }
             set
@@ -50,6 +57,16 @@ namespace Trinity.UIComponents
                     OnPropertyChanged();
                 }
             }
+        }
+
+        private double GetDefaultValue()
+        {
+            switch (ItemProperty)
+            {
+                case ItemProperty.Ancient:
+                    return 1;
+            }
+            return 0;
         }
 
         private double CoerceValue(double value)
@@ -103,6 +120,14 @@ namespace Trinity.UIComponents
             }
         }
 
+        [DataMember]
+        public int TypeId { get; set; }
+        public RuleType RuleType
+        {
+            get { return (RuleType)TypeId; }
+            set { TypeId = (int)value; }
+        }
+
         public double Min
         {
             get { return ItemStatRange.AbsMin; }
@@ -130,5 +155,15 @@ namespace Trinity.UIComponents
         public ItemStatRange ItemStatRange { get; set; }
 
         public GItemType GItemType { get; set; }
+
+        public override int GetHashCode()
+        {
+            return TypeId.GetHashCode() * 17 ^ Id * 13 ^ Variant * 31 ^ (int)Value;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return ReferenceEquals(this, obj);
+        }
     }
 }

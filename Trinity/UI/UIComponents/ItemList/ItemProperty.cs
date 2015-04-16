@@ -55,7 +55,7 @@ namespace Trinity.UIComponents
         ChanceToBleed = 44,
         HatredRegen = 45,
         Sockets = 46,
-        BaseDamage = 47,
+        BaseMaxDamage = 47,
         LifePerWrath = 48,
         DamageAgainstElites = 49,
         LifePerFury = 50,
@@ -82,5 +82,6 @@ namespace Trinity.UIComponents
         PercentDamage = 71,
         Ancient = 72,
         PrimaryStat = 73,
+        ElementalDamage = 74,
     }
 }

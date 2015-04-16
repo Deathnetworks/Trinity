@@ -33,7 +33,8 @@ namespace Trinity.Settings.Mock
                     {
                         new LRule
                         {
-                            Id = (int)ItemProperty.Ancient                            
+                            Id = (int)ItemProperty.Ancient, 
+                            RuleType = RuleType.Optional
                         },
                         new LRule
                         {
@@ -42,7 +43,13 @@ namespace Trinity.Settings.Mock
                         },
                         new LRule
                         {
-                            Id = (int)ItemProperty.SkillDamage                            
+                            Id = (int)ItemProperty.SkillDamage, 
+                            RuleType = RuleType.Optional
+                        },
+                        new LRule
+                        {
+                            Id = (int)ItemProperty.AttackSpeed, 
+                            RuleType = RuleType.Required
                         }
                     }
                 },

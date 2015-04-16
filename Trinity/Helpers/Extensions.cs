@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Trinity.Config.Combat;
 using Trinity.Reference;
@@ -43,6 +44,15 @@ namespace Trinity.Helpers
                     return TrinityItemQuality.Legendary;
 
             }
+        }
+
+        public static EnumValue<TEnum> ToEnumValue<TEnum>(this TEnum e) where TEnum : struct, IConvertible
+        {
+            if (!typeof(TEnum).IsEnum)
+            {
+                throw new ArgumentException("T must be an enumerated type");
+            }
+            return new EnumValue<TEnum>(e);
         }
 
         private static Regex ItemQualityRegex = new Regex("{c:[a-zA-Z0-9]{8}}", RegexOptions.Compiled);
@@ -173,6 +183,27 @@ namespace Trinity.Helpers
         {
             var seenKeys = new HashSet<TKey>();
             return source.Where(element => seenKeys.Add(keySelector(element)));
+        }
+
+        /// <summary>
+        /// Splits a StringLikeThisWithCapitalLetters into words with spaces between.
+        /// </summary>
+        public static string AddSpacesToSentence(this string text, bool preserveAcronyms = false)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return string.Empty;
+            StringBuilder newText = new StringBuilder(text.Length * 2);
+            newText.Append(text[0]);
+            for (int i = 1; i < text.Length; i++)
+            {
+                if (char.IsUpper(text[i]))
+                    if ((text[i - 1] != ' ' && !char.IsUpper(text[i - 1])) ||
+                        (preserveAcronyms && char.IsUpper(text[i - 1]) &&
+                         i < text.Length - 1 && !char.IsUpper(text[i + 1])))
+                        newText.Append(' ');
+                newText.Append(text[i]);
+            }
+            return newText.ToString();
         }
     }
 }
