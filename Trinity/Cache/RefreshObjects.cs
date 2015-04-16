@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows;
 using Trinity.Cache;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
@@ -477,12 +476,12 @@ namespace Trinity
 
                 if (legendaryItemMarkers.Any() && TrinityItemManager.FindValidBackpackLocation(true) != new Vector2(-1, -1))
                 {
-                    var legendaryItems = ZetaDia.Actors.GetActorsOfType<DiaItem>().Where(i => i.IsValid && i.IsACDBased && i.Position.Distance2D(ZetaDia.Me.Position) < 5f && 
+                    var legendaryItems = ZetaDia.Actors.GetActorsOfType<DiaItem>().Where(i => i.IsValid && i.IsACDBased && i.Position.Distance2D(ZetaDia.Me.Position) < 5f &&
                         legendaryItemMarkers.Any(im => i.Position.Distance2D(i.Position) < 2f));
 
                     foreach (var diaItem in legendaryItems)
                     {
-                        Logger.LogDebug(LogCategory.CacheManagement, "Adding Legendary Item from Marker {0} dist={1} ActorSNO={2} ACD={3} RActor={4}", 
+                        Logger.LogDebug(LogCategory.CacheManagement, "Adding Legendary Item from Marker {0} dist={1} ActorSNO={2} ACD={3} RActor={4}",
                             diaItem.Name, diaItem.Distance, diaItem.ActorSNO, diaItem.ACDGuid, diaItem.RActorGuid);
 
                         ObjectCache.Add(new TrinityCacheObject()
@@ -570,8 +569,6 @@ namespace Trinity
                 {
                     try
                     {
-                        bool addToCache;
-
                         // Objects deemed of low importance are stored from the last refresh
                         TrinityCacheObject cachedObject;
                         if (CacheData.LowPriorityObjectCache.TryGetValue(currentObject.RActorGuid, out cachedObject))
@@ -583,7 +580,7 @@ namespace Trinity
                             if (timeSinceRefresh < Settings.Advanced.CacheLowPriorityRefreshRate && cachedObject.Distance > 12f)
                             {
                                 cachedObject.Position = currentObject.Position;
-                                ObjectCache.Add(cachedObject);           
+                                ObjectCache.Add(cachedObject);
                                 continue;
                             }
                         }
@@ -604,7 +601,7 @@ namespace Trinity
                             /*
                              *  Main Cache Function
                              */
-                            addToCache = CacheDiaObject(currentObject);
+                            bool addToCache = CacheDiaObject(currentObject);
 
                             if (t1.IsRunning)
                                 t1.Stop();
@@ -613,6 +610,8 @@ namespace Trinity
 
                             // don't log stuff we never care about
                             if (duration <= 1 && c_IgnoreSubStep == "IgnoreNames")
+                                continue;
+                            if (CurrentCacheObject.Type == GObjectType.Player)
                                 continue;
 
                             string extraData = "";
@@ -633,7 +632,8 @@ namespace Trinity
                                         if (c_HasBeenInLoS)
                                             extraData += " HasBeenInLoS";
 
-                                        extraData += " HP=" + c_HitPoints.ToString("0") + " (" + c_HitPointsPct.ToString("0.00") + ")";
+                                        if (CurrentCacheObject.IsUnit)
+                                            extraData += " HP=" + c_HitPoints.ToString("0") + " (" + c_HitPointsPct.ToString("0.00") + ")";
                                     } break;
                                 case GObjectType.Avoidance:
                                     {
@@ -644,10 +644,10 @@ namespace Trinity
 
                             if (c_IgnoreReason != "InternalName")
                                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
-                                    "[{0:0000.00}ms] {1} {2} Type: {3} ({4}/{5}) Name={6} ({7}) {8} {9} Dist2Mid={10:0} Dist2Rad={11:0} ZDiff={12:0} Radius={13:0} RAGuid={14} {15}",
+                                    "[{0:0000.00}ms] {1} {2} Type={3}/{4}/{5} Name={6} ({7}) {8} {9} Dist2Mid={10:0} Dist2Rad={11:0} ZDiff={12:0} Radius={13:0} RAGuid={14} {15}",
                                     duration,
                                     (addToCache ? "Added " : "Ignored"),
-                                    (!addToCache ? ("By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
+                                    (!addToCache ? ((c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
                                     CurrentCacheObject.ActorType,
                                     CurrentCacheObject.GizmoType != GizmoType.None ? CurrentCacheObject.GizmoType.ToString() : "",
                                     CurrentCacheObject.Type,

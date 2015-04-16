@@ -158,7 +158,7 @@ namespace Trinity
                     ObjectType = CurrentCacheObject.Type,
                 });
 
-                ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
+                MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
 
                 c_IgnoreReason = "NavigationObstacle";
                 AddToCache = false;
@@ -327,7 +327,7 @@ namespace Trinity
             CurrentCacheObject = new TrinityCacheObject();
             // Start this object as off as unknown type
             CurrentCacheObject.Type = GObjectType.Unknown;
-
+            CurrentCacheObject.GizmoType = GizmoType.None;
             CurrentCacheObject.Distance = 0f;
             CurrentCacheObject.Radius = 0f;
             c_ZDiff = 0f;
@@ -403,7 +403,7 @@ namespace Trinity
             var currentInternalName = CurrentCacheObject.InternalName.ToLower();
             foreach (var ignoreName in ignoreNames)
             {
-                if (currentInternalName.StartsWith(ignoreName, StringComparison.Ordinal))
+                if (currentInternalName.StartsWith(ignoreName.ToLower(), StringComparison.InvariantCultureIgnoreCase))
                 {
                     AddToCache = false;
                     c_IgnoreSubStep = "IgnoreNames";
@@ -421,8 +421,20 @@ namespace Trinity
                 try
                 {
                     // Check if it's a unit with an animation we should avoid. We need to recheck this every time.
-                    if (c_diaObject is DiaUnit &&
-                        Settings.Combat.Misc.AvoidAOE && DataDictionary.AvoidanceAnimations.Contains(new DoubleInt(CurrentCacheObject.ActorSNO, (int)c_diaObject.CommonData.CurrentAnimation)))
+                    if (c_diaObject is DiaUnit && Settings.Combat.Misc.AvoidAOE && 
+                        DataDictionary.AvoidanceAnimations.Contains(new DoubleInt(CurrentCacheObject.ActorSNO, (int)c_diaObject.CommonData.CurrentAnimation)))
+                    {
+                        // The ActorSNO and Animation match a known pair, avoid this!
+                        // Example: "Grotesque" death animation
+                        AddToCache = true;
+                        CurrentCacheObject.Type = GObjectType.Avoidance;
+                        isAvoidanceSNO = true;
+                    }
+
+
+                    // Check if it's a unit with an animation we should avoid. We need to recheck this every time.
+                    if (c_diaObject is DiaUnit && Settings.Combat.Misc.AvoidAOE && c_diaObject.IsFacingPlayer &&
+                        DataDictionary.DirectionalAvoidanceAnimations.Contains(new DoubleInt(CurrentCacheObject.ActorSNO, (int)c_diaObject.CommonData.CurrentAnimation)))
                     {
                         // The ActorSNO and Animation match a known pair, avoid this!
                         // Example: "Grotesque" death animation

@@ -659,11 +659,10 @@ namespace Trinity
         /// <returns></returns>
         internal static Vector3 GetZigZagTarget(Vector3 origin, float ringDistance, bool randomizeDistance = false)
         {
-            var minDistance = 20f;
+            const float minDistance = 20f;
             Vector3 myPos = Player.Position;
-            float distanceToTarget = origin.Distance2D(myPos);
 
-            Vector3 zigZagPoint = origin;
+            Vector3 zigZagPoint;
 
             bool useTargetBasedZigZag = false;
             float maxDistance = 25f;
@@ -686,7 +685,7 @@ namespace Trinity
             if (useTargetBasedZigZag && shouldZigZagElites && !AnyTreasureGoblinsPresent && ObjectCache.Count(o => o.IsUnit) >= minTargets)
             {
                 bool attackInAoe = Trinity.Settings.Combat.Misc.KillMonstersInAoE;
-                var clusterPoint = TargetUtil.GetBestClusterPoint(ringDistance, ringDistance, false, attackInAoe);
+                var clusterPoint = GetBestClusterPoint(ringDistance, ringDistance, false, attackInAoe);
                 if (clusterPoint.Distance2D(Player.Position) >= minDistance)
                 {
                     Logger.Log(LogCategory.Movement, "Returning ZigZag: BestClusterPoint {0} r-dist={1} t-dist={2}", clusterPoint, ringDistance, clusterPoint.Distance2D(Player.Position));
@@ -694,7 +693,7 @@ namespace Trinity
                 }
 
 
-                var zigZagTargetList = new List<TrinityCacheObject>();
+                List<TrinityCacheObject> zigZagTargetList;
                 if (attackInAoe)
                 {
                     zigZagTargetList =
@@ -726,18 +725,15 @@ namespace Trinity
             Vector3 bestLocation = origin;
 
             // the unit circle always starts at 0 :)
-            double min = 0;
+            const double min = 0;
             // the maximum size of a unit circle
-            double max = 2 * Math.PI;
+            const double max = 2 * Math.PI;
             // the number of times we will iterate around the circle to find points
-            double piSlices = 16;
+            const double piSlices = 16;
 
             // We will do several "passes" to make sure we can get a point that we can least zig-zag to
             // The total number of points tested will be piSlices * distancePasses.Count
-            List<float> distancePasses = new List<float>();
-            distancePasses.Add(ringDistance * 1 / 2); // Do one loop at 1/2 distance
-            distancePasses.Add(ringDistance * 3 / 4); // Do one loop at 3/4 distance
-            distancePasses.Add(ringDistance);         // Do one loop at exact distance
+            List<float> distancePasses = new List<float> { ringDistance * 1 / 2, ringDistance * 3 / 4, ringDistance };
 
             foreach (float distance in distancePasses)
             {
@@ -777,7 +773,6 @@ namespace Trinity
                         continue;
 
                     float distanceToPoint = zigZagPoint.Distance2D(myPos);
-                    float distanceFromTargetToPoint = zigZagPoint.Distance2D(origin);
 
                     // Lots of weight for points further away from us (e.g. behind our CurrentTarget)
                     pointWeight *= distanceToPoint;

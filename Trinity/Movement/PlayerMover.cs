@@ -7,6 +7,7 @@ using System.Threading;
 using Trinity.Combat;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
+using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Dungeons;
@@ -759,12 +760,18 @@ namespace Trinity.DbProvider
                 }
 
                 LogCategory lc;
+                TrinityLogLevel ll;
                 if (t1.ElapsedMilliseconds > maxTime)
+                {
                     lc = LogCategory.UserInformation;
+                    ll = TrinityLogLevel.Info;
+                }
                 else
+                {
                     lc = LogCategory.Navigator;
-
-                Logger.Log(lc, "{0} in {1:0}ms {2} dist={3:0} {4}",
+                    ll = TrinityLogLevel.Debug;
+                }
+                Logger.Log(ll, lc, "{0} in {1:0}ms {2} dist={3:0} {4}",
                     result, t1.ElapsedMilliseconds, destinationName, destination.Distance2D(Trinity.Player.Position), pathCheck);
             }
             catch (OutOfMemoryException)

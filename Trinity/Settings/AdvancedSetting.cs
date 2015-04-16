@@ -376,7 +376,7 @@ namespace Trinity.Config
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
+        [DefaultValue(true)]
         public bool ShowHeroName
         {
             get
@@ -394,7 +394,7 @@ namespace Trinity.Config
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
+        [DefaultValue(true)]
         public bool ShowHeroClass
         {
             get

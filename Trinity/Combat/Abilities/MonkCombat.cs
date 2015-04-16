@@ -206,6 +206,8 @@ namespace Trinity.Combat.Abilities
             // Dashing Strike
             if (CanCastDashingStrike)
             {
+                int maxDashingStrikeCharges = Runes.Monk.Quicksilver.IsActive ? 3 : 2;
+
                 if (Legendary.Jawbreaker.IsEquipped)
                 {
                     return JawBreakerDashingStrike();
@@ -217,18 +219,24 @@ namespace Trinity.Combat.Abilities
                     RefreshSweepingWind(true);
                     return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.Position);
                 }
-
-                if (CurrentTarget.IsEliteRareUnique || TargetUtil.ClusterExists(15f, 3) &&
-                    TargetUtil.IsUnitWithDebuffInRangeOfPosition(15f, TargetUtil.GetBestClusterPoint(), SNOPower.Monk_ExplodingPalm) ||
-                    TargetUtil.AnyMobsInRangeOfPosition(CurrentTarget.Position, 20f, 3) && Skills.Monk.ExplodingPalm.IsTrackedOnUnit(CurrentTarget) ||
-                    _hasSwk && TargetUtil.AnyMobsInRange(50f))
+                
+                if (!Sets.ThousandStorms.IsSecondBonusActive)
                 {
-                    RefreshSweepingWind(true);
-                    if (TargetUtil.ClusterExists(15f, 3) && Sets.ThousandStorms.IsMaxBonusActive)
+                    // We get a charge every 8 seconds. If we have 2 charges, be dashing
+                    int fullRechargeDuration = maxDashingStrikeCharges * 8;
+                    if (SpellHistory.SpellUseCountInTime(SNOPower.X1_Monk_DashingStrike, TimeSpan.FromSeconds(fullRechargeDuration + 8)) < maxDashingStrikeCharges)
                     {
-                        return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, TargetUtil.GetBestClusterPoint(), Trinity.CurrentWorldDynamicId, -1, 2, 2);
+                        return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.Position);
                     }
-                    return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 2);
+
+                    if (CurrentTarget.IsEliteRareUnique || TargetUtil.ClusterExists(15f, 3) &&
+                        TargetUtil.IsUnitWithDebuffInRangeOfPosition(15f, TargetUtil.GetBestClusterPoint(), SNOPower.Monk_ExplodingPalm) ||
+                        TargetUtil.AnyMobsInRangeOfPosition(CurrentTarget.Position, 20f, 3) && Skills.Monk.ExplodingPalm.IsTrackedOnUnit(CurrentTarget) ||
+                        _hasSwk && TargetUtil.AnyMobsInRange(50f))
+                    {
+                        RefreshSweepingWind(true);
+                        return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 2);
+                    }
                 }
             }
 
@@ -237,10 +245,10 @@ namespace Trinity.Combat.Abilities
             {
                 ChangeTarget();
             }
-          
+
             // Exploding Palm
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
-                CanCast(SNOPower.Monk_ExplodingPalm, CanCastFlags.NoTimer) && 
+                CanCast(SNOPower.Monk_ExplodingPalm, CanCastFlags.NoTimer) &&
                 (Runes.Monk.EssenceBurn.IsActive ? !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.Monk_ExplodingPalm) : !Skills.Monk.ExplodingPalm.IsTrackedOnUnit(CurrentTarget)))
             {
                 return new TrinityPower(SNOPower.Monk_ExplodingPalm, 10f, CurrentTarget.ACDGuid);
@@ -383,7 +391,7 @@ namespace Trinity.Combat.Abilities
                 SpellHistory.TimeSinceUse(SNOPower.Monk_CripplingWave) > TimeSpan.FromMilliseconds(cwInterval))
             {
                 RefreshSweepingWind();
-                return new TrinityPower(SNOPower.Monk_CripplingWave, 20f,CurrentTarget.ACDGuid);
+                return new TrinityPower(SNOPower.Monk_CripplingWave, 20f, CurrentTarget.ACDGuid);
             }
 
             // Fists of Thunder

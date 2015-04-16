@@ -288,6 +288,34 @@ namespace Trinity
             new DoubleInt((int)SNOActor.Corpulent_C_OasisAmbush_Unique, (int)SNOAnim.Stitch_Suicide_Bomb),  
             new DoubleInt((int)SNOActor.Corpulent_D_Unique_Spec_01, (int)SNOAnim.Stitch_Suicide_Bomb), 
 
+            new DoubleInt(330824, (int)SNOAnim.x1_Urzael_attack_06), // Urzael flame 
+            new DoubleInt(330824, 348109), // Urzael Cannonball Aim
+            new DoubleInt(330824, 344952), // Urzael Flying
+
+            // Spinny AOE Attack
+            new DoubleInt((int)SNOActor.x1_LR_DeathMaiden_A, (int)SNOAnim.x1_deathMaiden_attack_special_360_01),
+
+            new DoubleInt((int)SNOActor.x1_portalGuardianMinion_Melee_A, (int)SNOAnim.x1_portalGuardianMinion_attack_charge_01), // x1_portalGuardianMinion_Melee_A (279052)
+            new DoubleInt((int)SNOActor.X1_BigRed_Chronodemon_Burned_A, (int)SNOAnim.X1_BigRed_attack_02), // X1_BigRed_Chronodemon_Burned_A (326670)
+            
+            // Big guys with blades on their arms who jump accross the screen and stun you
+            // x1_westmarchBrute_attack_02_out State=Attacking By: x1_westmarchBrute_A (258678)
+            new DoubleInt((int)SNOActor.x1_westmarchBrute_A, (int)SNOAnim.x1_westmarchBrute_attack_02_in), 
+            new DoubleInt((int)SNOActor.x1_westmarchBrute_A, (int)SNOAnim.x1_westmarchBrute_attack_02_mid), 
+            new DoubleInt((int)SNOActor.x1_westmarchBrute_A, (int)SNOAnim.x1_westmarchBrute_attack_02_out),   
+           
+            // snakeMan_melee_generic_cast_01 State=Transform By: X1_LR_Boss_Snakeman_Melee_Belial (360281)
+            new DoubleInt((int)SNOActor.X1_LR_Boss_Snakeman_Melee_Belial, (int)SNOAnim.snakeMan_melee_generic_cast_01),  
+ 
+            //x1_Squigglet_Generic_Cast State=Transform By: X1_LR_Boss_Squigglet (353535)
+            new DoubleInt((int)SNOActor.X1_LR_Boss_Squigglet, (int)SNOAnim.x1_Squigglet_Generic_Cast),
+       };
+
+        /// <summary>
+        /// This list is used for Units with specific Animations we want to treat as avoidance
+        /// </summary>
+        public static readonly HashSet<DoubleInt> DirectionalAvoidanceAnimations = new HashSet<DoubleInt>
+        {
             // Beast Charge
             new DoubleInt((int)SNOActor.Beast_A, (int)SNOAnim.Beast_start_charge_02),
             new DoubleInt((int)SNOActor.Beast_A, (int)SNOAnim.Beast_charge_02),
@@ -302,46 +330,19 @@ namespace Trinity
             new DoubleInt((int)SNOActor.Beast_D, (int)SNOAnim.Beast_charge_02),
             new DoubleInt((int)SNOActor.Beast_D, (int)SNOAnim.Beast_charge_04),
 
-            new DoubleInt(330824, (int)SNOAnim.x1_Urzael_attack_06), // Urzael flame 
-            new DoubleInt(330824, 348109), // Urzael Cannonball Aim
-            new DoubleInt(330824, 344952), // Urzael Flying
-
             // Nobody wants to get hit by a mallet demon
             new DoubleInt(343767, (int)SNOAnim.malletDemon_attack_01), // X1_LR_Boss_MalletDemon
             new DoubleInt(106709, (int)SNOAnim.malletDemon_attack_01), // MalletDemon_A
             new DoubleInt(219736, (int)SNOAnim.malletDemon_attack_01), // MalletDemon_A_Unique_01  
             new DoubleInt(219751, (int)SNOAnim.malletDemon_attack_01), // MalletDemon_A_Unique_02 
 
-            // These guys cast meteors Meteors
-            // morluSpellcaster_attack_AOE_01 State=Transform By: morluSpellcaster_A (4760)
-            //new DoubleInt((int)SNOActor.morluSpellcaster_A, (int)SNOAnim.morluSpellcaster_attack_AOE_01),             
-            //new DoubleInt((int)SNOActor.morluSpellcaster_B, (int)SNOAnim.morluSpellcaster_attack_AOE_01),          
-            //new DoubleInt((int)SNOActor.morluSpellcaster_D, (int)SNOAnim.morluSpellcaster_attack_AOE_01), 
-            //new DoubleInt((int)SNOActor.X1_LR_Boss_morluSpellcaster_Fire, (int)SNOAnim.morluSpellcaster_attack_AOE_01),
-
-            // Spinny AOE Attack
-            new DoubleInt((int)SNOActor.x1_LR_DeathMaiden_A, (int)SNOAnim.x1_deathMaiden_attack_special_360_01),
-
-            new DoubleInt((int)SNOActor.x1_portalGuardianMinion_Melee_A, (int)SNOAnim.x1_portalGuardianMinion_attack_charge_01), // x1_portalGuardianMinion_Melee_A (279052)
-            new DoubleInt((int)SNOActor.X1_BigRed_Chronodemon_Burned_A, (int)SNOAnim.X1_BigRed_attack_02), // X1_BigRed_Chronodemon_Burned_A (326670)
-            
+           
             // Angels with those big clubs with a dashing attack
             // Angel_Corrupt_attack_dash_in State=Transform By: Angel_Corrupt_A (106711)
             new DoubleInt((int)SNOActor.Angel_Corrupt_A, (int)SNOAnim.Angel_Corrupt_attack_dash_in), 
             new DoubleInt((int)SNOActor.Angel_Corrupt_A, (int)SNOAnim.Angel_Corrupt_attack_dash_middle), 
             new DoubleInt((int)SNOActor.Angel_Corrupt_A, (int)SNOAnim.Angel_Corrupt_attack_dash_out), 
-
-            // Big guys with blades on their arms who jump accross the screen and stun you
-            // x1_westmarchBrute_attack_02_out State=Attacking By: x1_westmarchBrute_A (258678)
-            new DoubleInt((int)SNOActor.x1_westmarchBrute_A, (int)SNOAnim.x1_westmarchBrute_attack_02_in), 
-            new DoubleInt((int)SNOActor.x1_westmarchBrute_A, (int)SNOAnim.x1_westmarchBrute_attack_02_mid), 
-            new DoubleInt((int)SNOActor.x1_westmarchBrute_A, (int)SNOAnim.x1_westmarchBrute_attack_02_out),   
            
-            // snakeMan_melee_generic_cast_01 State=Transform By: X1_LR_Boss_Snakeman_Melee_Belial (360281)
-            new DoubleInt((int)SNOActor.X1_LR_Boss_Snakeman_Melee_Belial, (int)SNOAnim.snakeMan_melee_generic_cast_01),  
- 
-            //x1_Squigglet_Generic_Cast State=Transform By: X1_LR_Boss_Squigglet (353535)
-            new DoubleInt((int)SNOActor.X1_LR_Boss_Squigglet, (int)SNOAnim.x1_Squigglet_Generic_Cast),
 
             //] Triune_Berserker_specialAttack_loop_01 State=TakingDamage By: Triune_Berserker_A (6052)
             new DoubleInt((int)SNOActor.Triune_Berserker_A, (int)SNOAnim.Triune_Berserker_specialAttack_01),
@@ -353,7 +354,6 @@ namespace Trinity
             new DoubleInt((int)SNOActor.Triune_Berserker_D, (int)SNOAnim.Triune_Berserker_specialAttack_01),
             new DoubleInt((int)SNOActor.Triune_Berserker_D, (int)SNOAnim.Triune_Berserker_specialAttack_loop_01),
        };
-
 
         /// <summary>
         /// This list is used for animations where the avoidance point should be the player's current location
