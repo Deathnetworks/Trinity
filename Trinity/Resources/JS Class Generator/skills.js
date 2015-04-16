@@ -46,7 +46,7 @@ var Skills = function() {
                 document.first("title").remove();
                 document.first("meta").remove();
 
-                var objectString = document.text()
+                var objectString = document.text();
 
                 // Line Breaks
                 objectString = objectString.replace(/(?:\r\n|\r|\n)/g, '');

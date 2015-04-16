@@ -95,5 +95,7 @@ namespace Trinity.Objects
         {
             get { return (int)SNOPower; }
         }
+
+        public string IconSlug { get; set; }
     }
 }

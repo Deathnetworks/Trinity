@@ -1285,7 +1285,8 @@ namespace Trinity
                 {
                     string powerResultInfo = CombatBase.CurrentPower.TargetPosition != Vector3.Zero ? "at " + NavHelper.PrettyPrintVector3(CombatBase.CurrentPower.TargetPosition) + " dist=" + (int)dist : "";
                     powerResultInfo += CombatBase.CurrentPower.TargetACDGUID != -1 ? " on " + CombatBase.CurrentPower.TargetACDGUID : "";
-                    Logger.LogDebug("Used Power {0} " + powerResultInfo, CombatBase.CurrentPower.SNOPower);
+                    
+                    Logger.Log(LogCategory.Behavior, "Used Power {0} " + powerResultInfo, CombatBase.CurrentPower.SNOPower);
 
                     // Monk Stuffs get special attention
                     {

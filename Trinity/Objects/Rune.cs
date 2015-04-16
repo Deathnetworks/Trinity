@@ -103,6 +103,10 @@ namespace Trinity.Objects
         /// </summary>
         public Element? ModifiedElement { get; set; }
 
+        public bool? ModifiedIsDamaging { get; set; }
+
+        public float? ModifiedAreaEffectRadius { get; set; }
+
         /// <summary>
         /// Unique Identifier so that dictionarys can compare this object properly.
         /// </summary>   

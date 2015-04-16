@@ -4,6 +4,8 @@ using Trinity.Config.Combat;
 using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
+using Trinity.Technicals;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.Combat.Abilities
 {
@@ -33,16 +35,21 @@ namespace Trinity.Combat.Abilities
             {
                 return GetCombatAvoidancePower();
             }
+
             // In combat, Not Avoiding
             if (CurrentTarget != null)
             {
+                if (ShouldRefreshBastiansGeneratorBuff)
+                {
+                    return CastAttackGenerator();
+                }
+
                 return GetCombatPower();
             }
 
             // Default attacks
             return DefaultPower;
         }
-
 
         /// <summary>
         /// Gets the best (non-movement related) avoidance power
@@ -81,6 +88,13 @@ namespace Trinity.Combat.Abilities
                 IsWaitingForSpecial = false;
             }
 
+            // Rain of Vengeance
+            if (CanCast(Skills.DemonHunter.RainOfVengeance.SNOPower) && !Player.IsIncapacitated &&
+                (TargetUtil.ClusterExists(45f, 4) || TargetUtil.EliteOrTrashInRange(75f) && (Settings.Combat.DemonHunter.RainOfVengeanceOffCD || Sets.NatalyasVengeance.IsEquipped)))
+            {
+                return new TrinityPower(SNOPower.DemonHunter_RainOfVengeance, 75f, Enemies.BestLargeCluster.Position);
+            }
+
             // NotSpam Shadow Power
             if (!Settings.Combat.DemonHunter.SpamShadowPower && CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
                 (!GetHasBuff(SNOPower.DemonHunter_ShadowPower) || Player.CurrentHealthPct <= EmergencyHealthPotionLimit) && // if we don't have the buff or our health is low
@@ -105,15 +119,6 @@ namespace Trinity.Combat.Abilities
                 {
                     return new TrinityPower(SNOPower.DemonHunter_Sentry, 75f, TargetUtil.GetBestClusterPoint(35f, 75f, false));
                 }
-            }
-
-            // Rain of Vengeance
-            if (CanCast(SNOPower.DemonHunter_RainOfVengeance) && !Player.IsIncapacitated && 
-                (TargetUtil.ClusterExists(45f, 3) || TargetUtil.EliteOrTrashInRange(45f)) && !Runes.DemonHunter.DarkCloud.IsActive)
-            {
-                var bestClusterPoint = TargetUtil.GetBestClusterPoint(45f, 65f, false);
-
-                return new TrinityPower(SNOPower.DemonHunter_RainOfVengeance, 0f, bestClusterPoint);
             }
 
             // Caltrops
@@ -194,20 +199,20 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.DemonHunter_Vault, 20f, vNewTarget);
             }
 
-            // Multi Shot
-            if (CanCast(SNOPower.DemonHunter_Multishot) && !Player.IsIncapacitated &&
-                ((Player.PrimaryResource >= 30 && !IsWaitingForSpecial) || Player.PrimaryResource > minEnergyReserve) &&
-                (TargetUtil.AnyMobsInRange(40, 2) || CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.IsTreasureGoblin))
-            {
-                return new TrinityPower(SNOPower.DemonHunter_Multishot, 30f, CurrentTarget.Position);
-            }
-
             // Fan of Knives
             if (CanCast(SNOPower.DemonHunter_FanOfKnives) && !Player.IsIncapacitated &&
                 (TargetUtil.EliteOrTrashInRange(15) || TargetUtil.AnyTrashInRange(15f, 5, false)))
             {
                 return new TrinityPower(SNOPower.DemonHunter_FanOfKnives);
             }
+
+            // Multi Shot
+            if (CanCast(SNOPower.DemonHunter_Multishot, CanCastFlags.NoPowerManager) && !Player.IsIncapacitated)
+            {
+                return new TrinityPower(SNOPower.DemonHunter_Multishot, 50f, CurrentTarget.Position);
+            }
+
+            Logger.Log("Went past multishot, CanCast={0} Incap={1}", CanCast(SNOPower.DemonHunter_Multishot, CanCastFlags.NoPowerManager), Player.IsIncapacitated);
 
             // Strafe spam - similar to barbarian whirlwind routine
             if (CanCast(SNOPower.DemonHunter_Strafe, CanCastFlags.NoTimer) &&
@@ -366,6 +371,7 @@ namespace Trinity.Combat.Abilities
             }
 
 
+
             return DefaultPower;
         }
         /// <summary>
@@ -392,7 +398,7 @@ namespace Trinity.Combat.Abilities
 
             // Spam Shadow Power
             if (Settings.Combat.DemonHunter.SpamShadowPower && CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
-                TimeSincePowerUse(SNOPower.DemonHunter_ShadowPower) > 250 && !GetHasBuff(SNOPower.DemonHunter_ShadowPower) &&
+                TimeSincePowerUse(SNOPower.DemonHunter_ShadowPower) > 250 && !GetHasBuff(SNOPower.DemonHunter_ShadowPower) && 
                 Player.SecondaryResource >= 14)
             {
                 return new TrinityPower(SNOPower.DemonHunter_ShadowPower);
@@ -417,7 +423,7 @@ namespace Trinity.Combat.Abilities
             float useDelay = Runes.DemonHunter.FocusedMind.IsActive ? 15000 : 500;
             if (CanCast(SNOPower.DemonHunter_Preparation, CanCastFlags.NoTimer) &&
             Player.SecondaryResource <= V.F("DemonHunter.MinPreparationDiscipline") &&
-            !Runes.DemonHunter.Punishment.IsActive &&
+            !Runes.DemonHunter.Punishment.IsActive && 
             TimeSincePowerUse(SNOPower.DemonHunter_Preparation) >= useDelay)
             {
                 return new TrinityPower(SNOPower.DemonHunter_Preparation);
@@ -434,8 +440,8 @@ namespace Trinity.Combat.Abilities
                !Player.IsIncapacitated && Runes.DemonHunter.DarkCloud.IsActive && Settings.Combat.DemonHunter.RainOfVengeanceOffCD)
             {
                 return new TrinityPower(SNOPower.DemonHunter_RainOfVengeance);
-            }
-
+            } 
+            
             return null;
         }
 

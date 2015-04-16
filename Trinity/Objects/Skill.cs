@@ -19,6 +19,8 @@ namespace Trinity.Objects
         private TimeSpan _duration;
         private TimeSpan _cooldown;
         private Element _element;
+        private bool _isDamaging;
+        private float _areaEffectRadius;
 
         public Skill()
         {
@@ -37,6 +39,8 @@ namespace Trinity.Objects
         public string Name { get; set; }
         public string Description { get; set; }
         public string Slug { get; set; }
+        public string IconSlug { get; set; }
+        public ResourceEffectType ResourceEffect { get; set; }
 
         /// <summary>
         /// The runes that may be selected for this skill
@@ -90,8 +94,17 @@ namespace Trinity.Objects
         /// </summary>
         public int Cost
         {
-            get { return CurrentRune.ModifiedCost.HasValue ? CurrentRune.ModifiedCost.Value : _cost; }
+            get { return CurrentRune.ModifiedCost ?? _cost; }
             set { _cost = value; }
+        }
+
+        /// <summary>
+        /// How much this spell costs to cast; uses rune value when applicable.
+        /// </summary>
+        public float AreaEffectRadius
+        {
+            get { return CurrentRune.ModifiedAreaEffectRadius ?? _areaEffectRadius; }
+            set { _areaEffectRadius = value; }
         }
 
         /// <summary>
@@ -99,8 +112,17 @@ namespace Trinity.Objects
         /// </summary>
         public TimeSpan Duration
         {
-            get { return CurrentRune.ModifiedDuration.HasValue ? CurrentRune.ModifiedDuration.Value : _duration; }
+            get { return CurrentRune.ModifiedDuration ?? _duration; }
             set { _duration = value; }
+        }
+
+        /// <summary>
+        /// If the spell causes direct damage to enemies
+        /// </summary>
+        public bool IsDamaging
+        {
+            get { return CurrentRune.ModifiedIsDamaging ?? _isDamaging; }
+            set { _isDamaging = value; }
         }
 
         /// <summary>
@@ -115,7 +137,7 @@ namespace Trinity.Objects
                 var finalCooldown = Trinity.Player.CooldownReductionPct > 0 ? TimeSpan.FromMilliseconds(newCooldownMilliseconds) : baseCooldown;
                 return finalCooldown;
             }
-            set { _cooldown = value; }
+            set { _cooldown = value;  }
         }
 
         /// <summary>
@@ -127,9 +149,9 @@ namespace Trinity.Objects
             {
                 if (TimeSinceUse > 9999999) return 0;
                 var castTime = DateTime.UtcNow.Subtract(TimeSpan.FromMilliseconds(TimeSinceUse));
-                var endTime = castTime.Add(Cooldown);
+                var endTime = castTime.Add(Cooldown);                
                 var remainingMilliseconds = DateTime.UtcNow.Subtract(endTime).TotalMilliseconds;
-                return remainingMilliseconds < 0 ? (int)remainingMilliseconds * -1 : 0; ;
+                return remainingMilliseconds < 0 ? (int)remainingMilliseconds * -1 : 0;;
             }
         }
 
@@ -167,14 +189,14 @@ namespace Trinity.Objects
                 if (this == Skills.DemonHunter.ElementalArrow && Legendary.Kridershot.IsEquipped)
                     return false;
 
-                return Cost > 0;
+                return Cost > 0 && IsDamaging;
             }
         }
 
         /// <summary>
         /// Check if skill generates resource and can hit
         /// </summary>
-        public bool IsAttackGenerator
+        public bool IsGeneratorOrPrimary
         {
             get
             {
@@ -205,20 +227,13 @@ namespace Trinity.Objects
         }
 
         /// <summary>
-        /// Gets the current skill charge count
-        /// </summary>
-        public int Charges
-        {
-            get { return CombatBase.GetSkillCharges(SNOPower); }
-        }
-        /// <summary>
         /// The currently selected rune for this skill.        
         /// </summary>
         public Rune CurrentRune
         {
             get
             {
-                var rune = Runes.FirstOrDefault(r => r.IsActive);
+                var rune =  Runes.FirstOrDefault(r => r.IsActive);
                 return rune ?? new Rune();
             }
         }
@@ -247,12 +262,12 @@ namespace Trinity.Objects
 
                 return false;
             }
-        }
+        }        
 
         /// <summary>
         /// Performs basic checks to see if we have and can cast a power (hotbar, power manager). Checks use timer for Wiz, DH, Monk
         /// </summary>
-        public bool CanCast(CombatBase.CanCastFlags flags = CombatBase.CanCastFlags.All)
+        public bool CanCast (CombatBase.CanCastFlags flags = CombatBase.CanCastFlags.All)
         {
             return CombatBase.CanCast(SNOPower, flags);
         }
@@ -270,7 +285,7 @@ namespace Trinity.Objects
         /// </summary>
         public double TimeSinceUse
         {
-            get { return DateTime.UtcNow.Subtract(LastUsed).TotalMilliseconds; }
+            get {  return DateTime.UtcNow.Subtract(LastUsed).TotalMilliseconds; }
         }
 
         /// <summary>
@@ -286,11 +301,35 @@ namespace Trinity.Objects
         }
 
         /// <summary>
+        /// Gets the current skill charge count
+        /// </summary>
+        public int Charges
+        {
+            get { return CombatBase.GetSkillCharges(SNOPower); }
+        }
+
+        /// <summary>
         /// This skill as TrinityPower
         /// </summary>
-        public TrinityPower ToPower
+        public TrinityPower ToPower(float minimumRange, Vector3 targetPosition)
         {
-            get { return new TrinityPower(SNOPower); }
+            return new TrinityPower(SNOPower, minimumRange, targetPosition);
+        }
+
+        /// <summary>
+        /// This skill as TrinityPower
+        /// </summary>
+        public TrinityPower ToPower(float minimumRange)
+        {
+            return new TrinityPower(SNOPower, minimumRange);
+        }
+
+        /// <summary>
+        /// This skill as TrinityPower
+        /// </summary>
+        public TrinityPower ToPower()
+        {
+            return new TrinityPower(SNOPower);
         }
 
         /// <summary>
@@ -312,7 +351,7 @@ namespace Trinity.Objects
         /// <summary>
         /// Cast this skill at the specified target
         /// </summary>
-        public void Cast(TrinityCacheObject target)
+        public void Cast (TrinityCacheObject target)
         {
             Cast(target.Position, target.ACDGuid);
         }
@@ -359,6 +398,7 @@ namespace Trinity.Objects
         {
             get { return (int)SNOPower; }
         }
+
     }
 }
 
