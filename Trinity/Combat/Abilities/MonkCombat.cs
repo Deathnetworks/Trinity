@@ -206,15 +206,13 @@ namespace Trinity.Combat.Abilities
             // Dashing Strike
             if (CanCastDashingStrike)
             {
-                int maxDashingStrikeCharges = Runes.Monk.Quicksilver.IsActive ? 3 : 2;
-
                 if (Legendary.Jawbreaker.IsEquipped)
                 {
                     return JawBreakerDashingStrike();
                 }
 
                 // Raiment set, dash costs 75 spirit and refunds a charge when it's used
-                if (Sets.ThousandStorms.IsSecondBonusActive && Player.PrimaryResource > 75)
+                if (Sets.ThousandStorms.IsSecondBonusActive && Player.PrimaryResource > 75 && Skills.Monk.DashingStrike.Charges > 1)
                 {
                     RefreshSweepingWind(true);
                     return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.Position);
@@ -223,8 +221,7 @@ namespace Trinity.Combat.Abilities
                 if (!Sets.ThousandStorms.IsSecondBonusActive)
                 {
                     // We get a charge every 8 seconds. If we have 2 charges, be dashing
-                    int fullRechargeDuration = maxDashingStrikeCharges * 8;
-                    if (SpellHistory.SpellUseCountInTime(SNOPower.X1_Monk_DashingStrike, TimeSpan.FromSeconds(fullRechargeDuration + 8)) < maxDashingStrikeCharges)
+                    if (Skills.Monk.DashingStrike.Charges > 1)
                     {
                         return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.Position);
                     }
