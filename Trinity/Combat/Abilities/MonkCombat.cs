@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using Trinity.Config.Combat;
 using Trinity.DbProvider;
-using Trinity.Objects;
 using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -68,60 +67,43 @@ namespace Trinity.Combat.Abilities
             }
 
             // Epiphany: spirit regen, dash to targets
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.X1_Monk_Epiphany, CanCastFlags.NoTimer) && (Settings.Combat.Monk.EpiphanyOffCD ||
-                (TargetUtil.EliteOrTrashInRange(15f) || TargetUtil.AnyMobsInRange(15f, 5)) &&
-                (Player.PrimaryResourcePct < 0.50 || ((Runes.Monk.DesertShroud.IsActive || Runes.Monk.SoothingMist.IsActive) && Player.CurrentHealthPct < 0.50)))
-                )
+            if (CanCastEpiphany())
             {
                 return new TrinityPower(SNOPower.X1_Monk_Epiphany);
             }
 
             // Serenity if health is low
-            if ((Player.CurrentHealthPct <= 0.50 || (Player.IsIncapacitated && Player.CurrentHealthPct <= 0.90)) && CanCast(SNOPower.Monk_Serenity))
+            if (CanCastSerenityOnLowHealth())
             {
                 return new TrinityPower(SNOPower.Monk_Serenity, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 1, 1);
             }
 
             // Mystic ally
-            if (CanCast(SNOPower.X1_Monk_MysticAlly_v2) && TargetUtil.EliteOrTrashInRange(30f) && !Runes.Monk.AirAlly.IsActive)
+            if (CanCastMysticAlly())
             {
                 return new TrinityPower(SNOPower.X1_Monk_MysticAlly_v2, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 2, 2);
             }
 
             // Air Ally
-            if (CanCast(SNOPower.X1_Monk_MysticAlly_v2) && Runes.Monk.AirAlly.IsActive && Player.PrimaryResource < 150)
+            if (CanCastMysticAirAlly())
             {
                 return new TrinityPower(SNOPower.X1_Monk_MysticAlly_v2);
             }
 
             // InnerSanctuary 
-            if (!UseOOCBuff && TargetUtil.EliteOrTrashInRange(16f) && CanCast(SNOPower.X1_Monk_InnerSanctuary))
+            if (CanCastInnerSanctuary())
             {
                 return new TrinityPower(SNOPower.X1_Monk_InnerSanctuary, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 1, 1);
             }
 
             // Blinding Flash
-            if (!UseOOCBuff && Player.PrimaryResource >= 20 && CanCast(SNOPower.Monk_BlindingFlash) &&
-                (
-                    TargetUtil.AnyElitesInRange(15, 1) ||
-                    Player.CurrentHealthPct <= 0.4 ||
-                    (TargetUtil.AnyMobsInRange(15, 3)) ||
-                    (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f) ||
-                // as pre-sweeping wind buff
-                    (TargetUtil.AnyMobsInRange(15, 1) && CanCast(SNOPower.Monk_SweepingWind) && !GetHasBuff(SNOPower.Monk_SweepingWind) && _hasInnaSet)
-                ) &&
-                // Check if either we don't have sweeping winds, or we do and it's ready to cast in a moment
-                (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) ||
-                 (!GetHasBuff(SNOPower.Monk_SweepingWind) &&
-                 (CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer))) ||
-                 Player.CurrentHealthPct <= 0.25))
+            if (CanCastBlindingFlash())
             {
                 return new TrinityPower(SNOPower.Monk_BlindingFlash, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 0, 1);
             }
 
             // Blinding Flash as a DEFENSE
-            if (!UseOOCBuff && Player.PrimaryResource >= 10 && CanCast(SNOPower.Monk_BlindingFlash) &&
-                Player.CurrentHealthPct <= 0.75 && TargetUtil.AnyMobsInRange(15, 1))
+            if (CanCastBlindingFlashDefensively())
             {
                 return new TrinityPower(SNOPower.Monk_BlindingFlash, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 0, 1);
             }
@@ -129,55 +111,40 @@ namespace Trinity.Combat.Abilities
             // Breath of Heaven Section
 
             // Breath of Heaven when needing healing or the buff
-            if (!UseOOCBuff && (Player.CurrentHealthPct <= 0.6 || !GetHasBuff(SNOPower.Monk_BreathOfHeaven)) && CanCast(SNOPower.Monk_BreathOfHeaven) &&
-                (Player.PrimaryResource >= 35 || (!CanCast(SNOPower.Monk_Serenity) && Player.PrimaryResource >= 25)))
+            if (CanCastBreathOfHeavenForHealing())
             {
                 return new TrinityPower(SNOPower.Monk_BreathOfHeaven, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 1, 1);
             }
 
             // Breath of Heaven for spirit - Infused with Light
-            if (!UseOOCBuff && !Player.IsIncapacitated && CanCast(SNOPower.Monk_BreathOfHeaven, CanCastFlags.NoTimer) &&
-                !GetHasBuff(SNOPower.Monk_BreathOfHeaven) && Runes.Monk.InfusedWithLight.IsActive &&
-                (TargetUtil.AnyMobsInRange(20) || TargetUtil.IsEliteTargetInRange(20) || Player.PrimaryResource < 75))
+            if (CanCastBreathOfHeavenInfusedWithLight())
             {
                 return new TrinityPower(SNOPower.Monk_BreathOfHeaven);
             }
 
             // Seven Sided Strike
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
-                (TargetUtil.AnyElitesInRange(15, 1) || Player.CurrentHealthPct <= 0.55 || Legendary.Madstone.IsEquipped) &&
-                CanCast(SNOPower.Monk_SevenSidedStrike, CanCastFlags.NoTimer) &&
-                ((Player.PrimaryResource >= 50 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
+            if (CanCastSevenSidedStrike())
             {
                 RefreshSweepingWind(true);
                 return new TrinityPower(SNOPower.Monk_SevenSidedStrike, 16f, CurrentTarget.Position, Trinity.CurrentWorldDynamicId, -1, 2, 3);
             }
 
             // Sweeping Winds Refresh
-            if (Player.PrimaryResource >= _minSweepingWindSpirit &&
-               CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) && (GetHasBuff(SNOPower.Monk_SweepingWind) || IsTaegukEquipped()) &&
-               TimeSinceLastSweepingWind >= _swMinTime &&
-                // First one is for Taeguk                       This one is for regular SW Stacks
-               (TimeSinceLastSweepingWind <= SwMaxTaegukTime || TimeSinceLastSweepingWind <= SwMaxTime))
+            if (ShouldRefreshSweepingWinds())
             {
                 // LastSweepingWindRefresh = DateTime.UtcNow; // Now set through HandleTarget primary spell usage
                 return new TrinityPower(SNOPower.Monk_SweepingWind);
             }
 
             // Start Sweeping Wind if not up 
-            if (CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.Timer) && !GetHasBuff(SNOPower.Monk_SweepingWind) &&
-               (TargetUtil.AnyMobsInRange(30, 1) || _hasInnaSet || IsTaegukEquipped()) && Player.PrimaryResource >= _minSweepingWindSpirit)
+            if (ShouldStartSweepingWinds())
             {
                 // LastSweepingWindRefresh = DateTime.UtcNow; // Now set through HandleTarget primary spell usage
                 return new TrinityPower(SNOPower.Monk_SweepingWind);
             }
 
             // Sweeping Wind for Transcendance Health Regen
-            if (CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) &&
-                Player.PrimaryResource >= _minSweepingWindSpirit &&
-                Passives.Monk.Transcendence.IsActive && Settings.Combat.Monk.SpamSweepingWindOnLowHP &&
-                Player.CurrentHealthPct <= V.F("Monk.SweepingWind.SpamOnLowHealthPct") &&
-                Trinity.TimeSinceUse(SNOPower.Monk_SweepingWind) > 500)
+            if (CanCastSweepingWindsForTranscendence())
             {
                 // LastSweepingWindRefresh = DateTime.UtcNow; // Now set through HandleTarget primary spell usage
                 return new TrinityPower(SNOPower.Monk_SweepingWind);
@@ -187,17 +154,7 @@ namespace Trinity.Combat.Abilities
             var cycloneStrikeSpirit = Runes.Monk.EyeOfTheStorm.IsActive ? 30 : 50;
 
             // Cyclone Strike
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_CycloneStrike) &&
-                (
-                 TargetUtil.AnyElitesInRange(cycloneStrikeRange, 1) ||
-                 TargetUtil.AnyMobsInRange(cycloneStrikeRange, Settings.Combat.Monk.MinCycloneTrashCount) ||
-                 (CurrentTarget.RadiusDistance >= 15f && CurrentTarget.RadiusDistance <= cycloneStrikeRange) // pull the current target into attack range
-                ) && TimeSincePowerUse(SNOPower.Monk_CycloneStrike) > 3000 &&
-
-                // Cyclone if more than 25% of monsters within cyclone range are at least 10f away
-                TargetUtil.IsPercentUnitsWithinBand(10f, cycloneStrikeRange, 0.25) &&
-
-                (Player.PrimaryResource >= (cycloneStrikeSpirit + MinEnergyReserve)))
+            if (CanCastCycloneStrike(cycloneStrikeRange, cycloneStrikeSpirit))
             {
                 RefreshSweepingWind(true);
                 return new TrinityPower(SNOPower.Monk_CycloneStrike, 0f, Vector3.Zero, Trinity.CurrentWorldDynamicId, -1, 2, 2);
@@ -217,7 +174,7 @@ namespace Trinity.Combat.Abilities
                     RefreshSweepingWind(true);
                     return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.Position);
                 }
-                
+
                 if (!Sets.ThousandStorms.IsSecondBonusActive)
                 {
                     // We get a charge every 8 seconds. If we have 2 charges, be dashing
@@ -244,9 +201,7 @@ namespace Trinity.Combat.Abilities
             }
 
             // Exploding Palm
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
-                CanCast(SNOPower.Monk_ExplodingPalm, CanCastFlags.NoTimer) &&
-                (Runes.Monk.EssenceBurn.IsActive ? !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.Monk_ExplodingPalm) : !Skills.Monk.ExplodingPalm.IsTrackedOnUnit(CurrentTarget)))
+            if (CanCastExplodingPalm())
             {
                 return new TrinityPower(SNOPower.Monk_ExplodingPalm, 10f, CurrentTarget.ACDGuid);
             }
@@ -254,20 +209,14 @@ namespace Trinity.Combat.Abilities
             var wolRange = Legendary.TzoKrinsGaze.IsEquipped ? 55f : 16f;
 
             // Wave of light
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight) && !MonkHasNoPrimary &&
-                (TargetUtil.AnyMobsInRange(wolRange, Settings.Combat.Monk.MinWoLTrashCount) || TargetUtil.IsEliteTargetInRange(wolRange)) &&
-                (Player.PrimaryResource >= 75 && !IsWaitingForSpecial || Player.PrimaryResource > MinEnergyReserve) &&
-                // optional check for SW stacks
-                (Settings.Combat.Monk.SWBeforeWoL && (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3) || !Settings.Combat.Monk.SWBeforeWoL) &&
-                HasMantraAbilityAndBuff())
+            if (CanCastWaveOfLight(wolRange))
             {
                 RefreshSweepingWind(true);
                 return new TrinityPower(SNOPower.Monk_WaveOfLight, wolRange, TargetUtil.GetBestClusterPoint());
             }
 
             // Lashing Tail Kick
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_LashingTailKick) &&
-                ((Player.PrimaryResource >= 50 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
+            if (CanCastLashingTailKick())
             {
                 RefreshSweepingWind(true);
                 return new TrinityPower(SNOPower.Monk_LashingTailKick, 10f, CurrentTarget.ACDGuid);
@@ -287,12 +236,7 @@ namespace Trinity.Combat.Abilities
             }
 
             // Tempest rush at elites or groups of mobs
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && !Player.IsRooted && CanCast(SNOPower.Monk_TempestRush) &&
-                ((Player.PrimaryResource >= Settings.Combat.Monk.TR_MinSpirit && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve) &&
-                (Settings.Combat.Monk.TROption == TempestRushOption.Always ||
-                Settings.Combat.Monk.TROption == TempestRushOption.CombatOnly ||
-                (Settings.Combat.Monk.TROption == TempestRushOption.ElitesGroupsOnly && (TargetUtil.AnyElitesInRange(25) || TargetUtil.AnyMobsInRange(25, 2))) ||
-                (Settings.Combat.Monk.TROption == TempestRushOption.TrashOnly && !TargetUtil.AnyElitesInRange(90f) && TargetUtil.AnyMobsInRange(40f))))
+            if (CanCastTempestRushAsAttack())
             {
                 GenerateMonkZigZag();
                 Trinity.MaintainTempestRush = true;
@@ -304,24 +248,20 @@ namespace Trinity.Combat.Abilities
             // 4 Mantra spam for the 4 second buff
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && !Settings.Combat.Monk.DisableMantraSpam)
             {
-                if (CanCast(SNOPower.X1_Monk_MantraOfConviction_v2) && TimeSincePowerUse(SNOPower.X1_Monk_MantraOfConviction_v2) > 1000 && (!GetHasBuff(SNOPower.X1_Monk_MantraOfConviction_v2) ||
-                    (_hasSwk && TargetUtil.AnyMobsInRange(10f))) && (Player.PrimaryResource >= 80))
+                if (CanCastMantraOfConviction())
                 {
                     return new TrinityPower(SNOPower.X1_Monk_MantraOfConviction_v2, 3);
                 }
 
-                if (CanCast(SNOPower.X1_Monk_MantraOfRetribution_v2) && TimeSincePowerUse(SNOPower.X1_Monk_MantraOfRetribution_v2) > 1000 && (!GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) ||
-                    (_hasSwk && TargetUtil.AnyMobsInRange(10f))) && (Player.PrimaryResource >= 80))
+                if (CanCastMantraOfRetribution())
                 {
                     return new TrinityPower(SNOPower.X1_Monk_MantraOfRetribution_v2, 3);
                 }
-                if (CanCast(SNOPower.X1_Monk_MantraOfHealing_v2) && TimeSincePowerUse(SNOPower.X1_Monk_MantraOfHealing_v2) > 1000 && (!GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) ||
-                    (_hasSwk && TargetUtil.AnyMobsInRange(10f))) && (Player.PrimaryResource >= 80))
+                if (CanCastMantraOfHealing())
                 {
                     return new TrinityPower(SNOPower.X1_Monk_MantraOfHealing_v2, 3);
                 }
-                if (CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && TimeSincePowerUse(SNOPower.X1_Monk_MantraOfEvasion_v2) > 1000 && (!GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) ||
-                    (_hasSwk && TargetUtil.AnyMobsInRange(10f))) && (Player.PrimaryResource >= 80))
+                if (CanCastMantraOfEvasion())
                 {
                     return new TrinityPower(SNOPower.X1_Monk_MantraOfEvasion_v2, 3);
                 }
@@ -428,6 +368,174 @@ namespace Trinity.Combat.Abilities
 
             // Default attacks
             return DefaultPower;
+        }
+
+        private static bool CanCastMantraOfEvasion()
+        {
+            return CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && TimeSincePowerUse(SNOPower.X1_Monk_MantraOfEvasion_v2) > 1000 && (!GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) ||
+                                                                                                                                     (_hasSwk && TargetUtil.AnyMobsInRange(10f))) && (Player.PrimaryResource >= 80);
+        }
+
+        private static bool CanCastMantraOfHealing()
+        {
+            return CanCast(SNOPower.X1_Monk_MantraOfHealing_v2) && TimeSincePowerUse(SNOPower.X1_Monk_MantraOfHealing_v2) > 1000 && (!GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) ||
+                                                                                                                                     (_hasSwk && TargetUtil.AnyMobsInRange(10f))) && (Player.PrimaryResource >= 80);
+        }
+
+        private static bool CanCastMantraOfRetribution()
+        {
+            return CanCast(SNOPower.X1_Monk_MantraOfRetribution_v2) && TimeSincePowerUse(SNOPower.X1_Monk_MantraOfRetribution_v2) > 1000 && (!GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) ||
+                                                                                                                                             (_hasSwk && TargetUtil.AnyMobsInRange(10f))) && (Player.PrimaryResource >= 80);
+        }
+
+        private static bool CanCastMantraOfConviction()
+        {
+            return CanCast(SNOPower.X1_Monk_MantraOfConviction_v2) && TimeSincePowerUse(SNOPower.X1_Monk_MantraOfConviction_v2) > 1000 && (!GetHasBuff(SNOPower.X1_Monk_MantraOfConviction_v2) ||
+                                                                                                                                           (_hasSwk && TargetUtil.AnyMobsInRange(10f))) && (Player.PrimaryResource >= 80);
+        }
+
+        private static bool CanCastTempestRushAsAttack()
+        {
+            return !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && !Player.IsRooted && CanCast(SNOPower.Monk_TempestRush) &&
+                   ((Player.PrimaryResource >= Settings.Combat.Monk.TR_MinSpirit && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve) &&
+                   (Settings.Combat.Monk.TROption == TempestRushOption.Always ||
+                    Settings.Combat.Monk.TROption == TempestRushOption.CombatOnly ||
+                    (Settings.Combat.Monk.TROption == TempestRushOption.ElitesGroupsOnly && (TargetUtil.AnyElitesInRange(25) || TargetUtil.AnyMobsInRange(25, 2))) ||
+                    (Settings.Combat.Monk.TROption == TempestRushOption.TrashOnly && !TargetUtil.AnyElitesInRange(90f) && TargetUtil.AnyMobsInRange(40f)));
+        }
+
+        private static bool CanCastLashingTailKick()
+        {
+            return !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_LashingTailKick) &&
+                   ((Player.PrimaryResource >= 50 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve);
+        }
+
+        private static bool CanCastWaveOfLight(float wolRange)
+        {
+            return !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight) && !MonkHasNoPrimary &&
+                   (TargetUtil.AnyMobsInRange(wolRange, Settings.Combat.Monk.MinWoLTrashCount) || TargetUtil.IsEliteTargetInRange(wolRange)) &&
+                   (Player.PrimaryResource >= 75 && !IsWaitingForSpecial || Player.PrimaryResource > MinEnergyReserve) &&
+                   // optional check for SW stacks
+                   (Settings.Combat.Monk.SWBeforeWoL && (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3) || !Settings.Combat.Monk.SWBeforeWoL) &&
+                   HasMantraAbilityAndBuff();
+        }
+
+        private static bool CanCastExplodingPalm()
+        {
+            return !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
+                   CanCast(SNOPower.Monk_ExplodingPalm, CanCastFlags.NoTimer) &&
+                   (Runes.Monk.EssenceBurn.IsActive ? !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.Monk_ExplodingPalm) : !Skills.Monk.ExplodingPalm.IsTrackedOnUnit(CurrentTarget));
+        }
+
+        private static bool CanCastCycloneStrike(float cycloneStrikeRange, int cycloneStrikeSpirit)
+        {
+            return !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_CycloneStrike) &&
+                   (
+                       TargetUtil.AnyElitesInRange(cycloneStrikeRange, 1) ||
+                       TargetUtil.AnyMobsInRange(cycloneStrikeRange, Settings.Combat.Monk.MinCycloneTrashCount) ||
+                       (CurrentTarget.RadiusDistance >= 15f && CurrentTarget.RadiusDistance <= cycloneStrikeRange) // pull the current target into attack range
+                       ) && TimeSincePowerUse(SNOPower.Monk_CycloneStrike) > 3000 &&
+
+                   // Cyclone if more than 25% of monsters within cyclone range are at least 10f away
+                   TargetUtil.IsPercentUnitsWithinBand(10f, cycloneStrikeRange, 0.25) &&
+
+                   (Player.PrimaryResource >= (cycloneStrikeSpirit + MinEnergyReserve));
+        }
+
+        private static bool CanCastSweepingWindsForTranscendence()
+        {
+            return CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) &&
+                   Player.PrimaryResource >= _minSweepingWindSpirit &&
+                   Passives.Monk.Transcendence.IsActive && Settings.Combat.Monk.SpamSweepingWindOnLowHP &&
+                   Player.CurrentHealthPct <= V.F("Monk.SweepingWind.SpamOnLowHealthPct") &&
+                   Trinity.TimeSinceUse(SNOPower.Monk_SweepingWind) > 500;
+        }
+
+        private static bool ShouldStartSweepingWinds()
+        {
+            return CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.Timer) && !GetHasBuff(SNOPower.Monk_SweepingWind) &&
+                   (TargetUtil.AnyMobsInRange(30, 1) || _hasInnaSet || IsTaegukEquipped()) && Player.PrimaryResource >= _minSweepingWindSpirit;
+        }
+
+        private static bool ShouldRefreshSweepingWinds()
+        {
+            return Player.PrimaryResource >= _minSweepingWindSpirit &&
+                   CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer) && (GetHasBuff(SNOPower.Monk_SweepingWind) || IsTaegukEquipped()) &&
+                   TimeSinceLastSweepingWind >= _swMinTime &&
+                   // First one is for Taeguk                       This one is for regular SW Stacks
+                   (TimeSinceLastSweepingWind <= SwMaxTaegukTime || TimeSinceLastSweepingWind <= SwMaxTime);
+        }
+
+        private static bool CanCastSevenSidedStrike()
+        {
+            return !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
+                   (TargetUtil.AnyElitesInRange(15, 1) || Player.CurrentHealthPct <= 0.55 || Legendary.Madstone.IsEquipped) &&
+                   CanCast(SNOPower.Monk_SevenSidedStrike, CanCastFlags.NoTimer) &&
+                   ((Player.PrimaryResource >= 50 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve);
+        }
+
+        private static bool CanCastBreathOfHeavenInfusedWithLight()
+        {
+            return !UseOOCBuff && !Player.IsIncapacitated && CanCast(SNOPower.Monk_BreathOfHeaven, CanCastFlags.NoTimer) &&
+                   !GetHasBuff(SNOPower.Monk_BreathOfHeaven) && Runes.Monk.InfusedWithLight.IsActive &&
+                   (TargetUtil.AnyMobsInRange(20) || TargetUtil.IsEliteTargetInRange(20) || Player.PrimaryResource < 75);
+        }
+
+        private static bool CanCastBreathOfHeavenForHealing()
+        {
+            return !UseOOCBuff && (Player.CurrentHealthPct <= 0.6 || !GetHasBuff(SNOPower.Monk_BreathOfHeaven)) && CanCast(SNOPower.Monk_BreathOfHeaven) &&
+                   (Player.PrimaryResource >= 35 || (!CanCast(SNOPower.Monk_Serenity) && Player.PrimaryResource >= 25));
+        }
+
+        private static bool CanCastBlindingFlashDefensively()
+        {
+            return !UseOOCBuff && Player.PrimaryResource >= 10 && CanCast(SNOPower.Monk_BlindingFlash) &&
+                   Player.CurrentHealthPct <= 0.75 && TargetUtil.AnyMobsInRange(15, 1);
+        }
+
+        private static bool CanCastBlindingFlash()
+        {
+            return !UseOOCBuff && Player.PrimaryResource >= 20 && CanCast(SNOPower.Monk_BlindingFlash) &&
+                   (
+                       TargetUtil.AnyElitesInRange(15, 1) ||
+                       Player.CurrentHealthPct <= 0.4 ||
+                       (TargetUtil.AnyMobsInRange(15, 3)) ||
+                       (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f) ||
+                       // as pre-sweeping wind buff
+                       (TargetUtil.AnyMobsInRange(15, 1) && CanCast(SNOPower.Monk_SweepingWind) && !GetHasBuff(SNOPower.Monk_SweepingWind) && _hasInnaSet)
+                       ) &&
+                   // Check if either we don't have sweeping winds, or we do and it's ready to cast in a moment
+                   (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) ||
+                    (!GetHasBuff(SNOPower.Monk_SweepingWind) &&
+                     (CanCast(SNOPower.Monk_SweepingWind, CanCastFlags.NoTimer))) ||
+                    Player.CurrentHealthPct <= 0.25);
+        }
+
+        private static bool CanCastInnerSanctuary()
+        {
+            return !UseOOCBuff && TargetUtil.EliteOrTrashInRange(16f) && CanCast(SNOPower.X1_Monk_InnerSanctuary);
+        }
+
+        private static bool CanCastMysticAirAlly()
+        {
+            return CanCast(SNOPower.X1_Monk_MysticAlly_v2) && Runes.Monk.AirAlly.IsActive && Player.PrimaryResource < 150;
+        }
+
+        private static bool CanCastMysticAlly()
+        {
+            return CanCast(SNOPower.X1_Monk_MysticAlly_v2) && TargetUtil.EliteOrTrashInRange(30f) && !Runes.Monk.AirAlly.IsActive;
+        }
+
+        private static bool CanCastSerenityOnLowHealth()
+        {
+            return (Player.CurrentHealthPct <= 0.50 || (Player.IsIncapacitated && Player.CurrentHealthPct <= 0.90)) && CanCast(SNOPower.Monk_Serenity);
+        }
+
+        private static bool CanCastEpiphany()
+        {
+            return !UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.X1_Monk_Epiphany, CanCastFlags.NoTimer) && (Settings.Combat.Monk.EpiphanyOffCD ||
+                            (TargetUtil.EliteOrTrashInRange(15f) || TargetUtil.AnyMobsInRange(15f, 5)) &&
+                            (Player.PrimaryResourcePct < 0.50 || ((Runes.Monk.DesertShroud.IsActive || Runes.Monk.SoothingMist.IsActive) && Player.CurrentHealthPct < 0.50)));
         }
 
 

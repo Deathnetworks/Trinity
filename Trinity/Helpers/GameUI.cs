@@ -37,6 +37,13 @@ namespace Trinity
         //[1DB5A7F0] Mouseover: 0x16C4B9DB83655800, Name: Root.NormalLayer.BattleNetWhatsNewPatches_main.LayoutRoot.OverlayContainer.Ok
         private const ulong patchOKButton = 0x16C4B9DB83655800;
 
+        // [1DD61C20] Mouseover: 0x981391BBDF64B009, Name: Root.TopLayer.credits_dialog_main_X1.creditsClose_button
+
+        public static UIElement CloseCreditsButton
+        {
+            get { return UIElement.FromHash(0x981391BBDF64B009); }
+        }
+
         public static UIElement PatchOKButton { get { return UIElement.FromHash(patchOKButton); } }
 
         public static UIElement RiftCompleteOkButton
@@ -236,6 +243,8 @@ namespace Trinity
 
             // These buttons should be clicked with no delay
 
+            if (SafeClickElement(CloseCreditsButton, "Close Credits Button"))
+                return;
             if (SafeClickElement(PatchOKButton, "Patch Update OK Button"))
                 return;
             if (Trinity.Player.IsInGame && SafeClickElement(BountyRewardDialog, "Bounty Reward Dialog"))
