@@ -137,7 +137,6 @@ namespace Trinity
                     }
                 }
 
-
                 /* Beast Charge Experimental Avoidance */
                 if (Settings.Combat.Misc.UseExperimentalSavageBeastAvoidance)
                 {
@@ -145,7 +144,6 @@ namespace Trinity
                     List<int> chargerSnoList = new List<int>();
                     foreach (var unit1 in ObjectCache.Where(u => objectIsCharging(u)))
                     {
-
                         Vector3 endPoint = MathEx.GetPointAt(unit1.Position, 90f, unit1.Unit.Movement.Rotation);
 
                         for (float i = 0; i <= unit1.Position.Distance2D(endPoint); i += (beastChargePathWidth / 4))
@@ -350,6 +348,7 @@ namespace Trinity
                     // Still no target, let's end it all!
                     if (CurrentTarget == null)
                     {
+                        Events.OnCacheUpdatedHandler.Invoke();
                         return true;
                     }
 

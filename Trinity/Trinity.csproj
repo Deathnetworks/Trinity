@@ -264,6 +264,7 @@
     <Compile Include="UI\UIComponents\Converters\BoolToTypeConverters.cs" />
     <Compile Include="UI\UIComponents\Converters\UrlToCachedImageConverter.cs" />
     <Compile Include="UI\UIComponents\Converters\UrlToImageConverter.cs" />
+    <Compile Include="UI\UIComponents\IntegerStringBinding.cs" />
     <Compile Include="UI\UIComponents\ItemList\ItemProperty.cs" />
     <Compile Include="UI\UIComponents\ItemList\LRule.cs" />
     <Compile Include="UI\UIComponents\Behaviors\CancelMouseBubbling.cs" />

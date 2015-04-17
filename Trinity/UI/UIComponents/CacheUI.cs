@@ -50,12 +50,12 @@ namespace Trinity.UI.UIComponents
                                         DataContext = DataModel.ObservableCache,
                                         Columns =
                                         {
+                                            new DataGridTextColumn {Header = "Distance", IsReadOnly = true, Binding = new IntegerStringBinding("Distance")},
                                             new DataGridTextColumn {Header = "Name", IsReadOnly = true, Binding = new Binding("InternalName")},
                                             new DataGridTextColumn {Header = "Type", IsReadOnly = true, Binding = new Binding("Type")},
-                                            new DataGridTextColumn {Header = "Weight", IsReadOnly = true, Binding = new Binding("Weight")},
+                                            new DataGridTextColumn {Header = "Weight", IsReadOnly = true, Binding = new IntegerStringBinding("Weight"),  },
                                             new DataGridTextColumn {Header = "IsBossOrEliteRareUnique", IsReadOnly = true, Binding = new Binding("IsBossOrEliteRareUnique")},
-                                            new DataGridTextColumn {Header = "Distance", IsReadOnly = true, Binding = new Binding("Distance")},
-                                            new DataGridTextColumn {Header = "Radius", IsReadOnly = true, Binding = new Binding("Radius")},
+                                            new DataGridTextColumn {Header = "Radius", IsReadOnly = true, Binding = new IntegerStringBinding("Radius")},
                                             new DataGridTextColumn {Header = "WeightInfo", IsReadOnly = true, Binding = new Binding("WeightInfo")},
                                             //new DataGridTextColumn{Header = "", IsReadOnly = true, Binding = new Binding("") },
                                         }
@@ -109,12 +109,12 @@ namespace Trinity.UI.UIComponents
         {
             try
             {
-                DataModel.SourceCacheObjects.Clear();
-                foreach (var o in Trinity.ObjectCache)
-                    DataModel.SourceCacheObjects.Add(o);
-
                 Trinity.Invoke(() =>
                 {
+                    DataModel.SourceCacheObjects.Clear();
+                    foreach (var o in Trinity.ObjectCache)
+                        DataModel.SourceCacheObjects.Add(o);
+
                     foreach (var o in DataModel.SourceCacheObjects)
                     {
                         var existing = DataModel.ObservableCache.FirstOrDefault(oc => oc.RActorGuid == o.RActorGuid);

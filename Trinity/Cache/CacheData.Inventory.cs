@@ -24,6 +24,7 @@ namespace Trinity
 
             public InventoryCache()
             {
+                Clear();
                 // Make sure data is immediately available 
                 // while bot is not running or before pulse starts
                 UpdateInventoryCache();
