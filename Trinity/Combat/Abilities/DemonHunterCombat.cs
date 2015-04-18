@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Trinity.Config.Combat;
+using Trinity.Helpers;
+using Trinity.Objects;
 using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
@@ -11,474 +14,555 @@ namespace Trinity.Combat.Abilities
 {
     public class DemonHunterCombat : CombatBase
     {
-        // ReSharper disable once InconsistentNaming
-        public static DemonHunterSetting DHSettings
+        private static int _minEnergyReserve;
+        private static int _specialEnergyReserve;
+
+        static DemonHunterCombat()
         {
-            get { return Trinity.Settings.Combat.DemonHunter; }
+            // Load Default Metadata for skills
+            SkillUtils.SetSkillMeta(SkillsDefaultMeta.DemonHunter.ToList());
+
+            // Load custom conditions for when skills should be used.
+            SetCombatConditions();
         }
 
+        /// <summary>
+        /// Main method for selecting a power
+        /// </summary>
         public static TrinityPower GetPower()
         {
-            if (UseDestructiblePower)
-                return GetDemonHunterDestroyPower();
+            TrinityPower power;
 
-            // Buffs
-            if ((Player.IsInCombat || UseOOCBuff) && !IsCurrentlyAvoiding)
+            GetCombatContext();
+
+            if (UseDestructiblePower && TryGetPower(GetDestructablesSkill(), out power))
             {
-                var power = GetBuffPower();
-                if (power != null && power.SNOPower != SNOPower.None)
-                    return power;
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "GetPower() Returning DestructablesSkill:  {0} Target={1}", power.SNOPower, (CurrentTarget == null) ? "Null" : CurrentTarget.InternalName);
+                return power;
             }
 
-            // In Combat, Avoiding
-            if (IsCurrentlyAvoiding)
+            if (IsCurrentlyAvoiding && TryGetPower(GetAvoidanceSkill(), out power))
             {
-                return GetCombatAvoidancePower();
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "GetPower() Returning AvoidanceSkill:  {0} Target={1}", power.SNOPower, (CurrentTarget == null) ? "Null" : CurrentTarget.InternalName);
+                return power;
             }
+                
 
-            // In combat, Not Avoiding
-            if (CurrentTarget != null)
+            if (CurrentTarget == null)
             {
-                if (ShouldRefreshBastiansGeneratorBuff)
+                if (!IsCurrentlyAvoiding && !Player.IsInTown && TryGetPower(GetBuffSkill(), out power))
                 {
-                    return CastAttackGenerator();
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "GetPower() Returning BuffSkill:  {0} Target={1}", power.SNOPower, (CurrentTarget == null) ? "Null" : CurrentTarget.InternalName);
+                    return power;  
                 }
-
-                return GetCombatPower();
-            }
-
-            // Default attacks
-            return DefaultPower;
-        }
-
-        /// <summary>
-        /// Gets the best (non-movement related) avoidance power
-        /// </summary>
-        /// <returns></returns>
-        private static TrinityPower GetCombatAvoidancePower()
-        {
-            // Smoke Screen
-            if (CanCast(SNOPower.DemonHunter_SmokeScreen, CanCastFlags.NoTimer))
-            {
-                return new TrinityPower(SNOPower.DemonHunter_SmokeScreen);
-            }
-
-            return null;
-        }
-
-        private static int _maxSentryCount = 2 + (Legendary.BombardiersRucksack.IsEquipped ? 2 : 0) + (Passives.DemonHunter.CustomEngineering.IsActive ? 1 : 0);
-
-        /// <summary>
-        /// Gets the best combat power for the current conditions
-        /// </summary>
-        /// <returns></returns>
-        private static TrinityPower GetCombatPower()
-        {
-            int minEnergyReserve = 25;
-
-            if (Sets.EmbodimentOfTheMarauder.IsFullyEquipped)
-                minEnergyReserve = 20;
-
-            if (Player.PrimaryResource < minEnergyReserve)
-            {
-                IsWaitingForSpecial = true;
             }
             else
             {
-                IsWaitingForSpecial = false;
-            }
-
-            // Rain of Vengeance
-            if (CanCast(Skills.DemonHunter.RainOfVengeance.SNOPower) && !Player.IsIncapacitated &&
-                (TargetUtil.ClusterExists(45f, 4) || TargetUtil.EliteOrTrashInRange(75f) && (Settings.Combat.DemonHunter.RainOfVengeanceOffCD || Sets.NatalyasVengeance.IsEquipped)))
-            {
-                return new TrinityPower(SNOPower.DemonHunter_RainOfVengeance, 75f, Enemies.BestLargeCluster.Position);
-            }
-
-            // NotSpam Shadow Power
-            if (!Settings.Combat.DemonHunter.SpamShadowPower && CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
-                (!GetHasBuff(SNOPower.DemonHunter_ShadowPower) || Player.CurrentHealthPct <= EmergencyHealthPotionLimit) && // if we don't have the buff or our health is low
-                (Player.CurrentHealthPct < 1f || Player.IsRooted || TargetUtil.AnyMobsInRange(15)))
-            {
-                return new TrinityPower(SNOPower.DemonHunter_ShadowPower);
-            }
-
-            // Smoke Screen
-            if (CanCast(SNOPower.DemonHunter_SmokeScreen, CanCastFlags.NoTimer) &&
-                !GetHasBuff(SNOPower.DemonHunter_ShadowPower) &&
-                (Player.CurrentHealthPct <= 0.50 || Player.IsRooted || TargetUtil.AnyMobsInRange(15) ||
-                (Legendary.MeticulousBolts.IsEquipped && TargetUtil.AnyMobsInRange(60)) || Player.IsIncapacitated))
-            {
-                return new TrinityPower(SNOPower.DemonHunter_SmokeScreen);
-            }
-
-            // Sentry Turret
-            if (!Player.IsIncapacitated && CanCast(SNOPower.DemonHunter_Sentry, CanCastFlags.NoTimer) && TargetUtil.AnyMobsInRange(65))
-            {
-                if (Trinity.PlayerOwnedDHSentryCount < _maxSentryCount)
+                if (ShouldRefreshBastiansGeneratorBuff && TryGetPower(GetAttackGenerator(), out power))
                 {
-                    return new TrinityPower(SNOPower.DemonHunter_Sentry, 75f, TargetUtil.GetBestClusterPoint(35f, 75f, false));
-                }
-            }
-
-            // Caltrops
-            if (!Player.IsIncapacitated && CanCast(SNOPower.DemonHunter_Caltrops) && TargetUtil.AnyMobsInRange(40) && !GetHasBuff(SNOPower.DemonHunter_Caltrops))
-            {
-                return new TrinityPower(SNOPower.DemonHunter_Caltrops);
-            }
-
-            // Companion
-            if (!Player.IsIncapacitated && Hotbar.Contains(SNOPower.X1_DemonHunter_Companion))
-            {
-                // Use Spider Slow on 4 or more trash mobs in an area or on Unique/Elite/Champion
-                if (Runes.DemonHunter.SpiderCompanion.IsActive && CanCast(SNOPower.X1_DemonHunter_Companion) && TargetUtil.ClusterExists(25f, 4) && TargetUtil.EliteOrTrashInRange(25f))
-                {
-                    return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "GetPower() Returning BastiansGenerator:  {0} Target={1}", power.SNOPower, (CurrentTarget == null) ? "Null" : CurrentTarget.InternalName);
+                    return power;
                 }
 
-                //Use Bat when Hatred is Needed
-                if (Runes.DemonHunter.BatCompanion.IsActive && CanCast(SNOPower.X1_DemonHunter_Companion) && Player.PrimaryResourceMissing >= 60)
+                if (TryGetPower(GetCombatPower(CombatSkillOrder), out power))
                 {
-                    return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "GetPower() Returning CombatPower:  {0} Target={1}", power.SNOPower, (CurrentTarget == null) ? "Null" : CurrentTarget.InternalName);
+                    return power;
                 }
 
-                // Use Boar Taunt on 3 or more trash mobs in an area or on Unique/Elite/Champion
-                if (Runes.DemonHunter.BoarCompanion.IsActive && CanCast(SNOPower.X1_DemonHunter_Companion) && ((TargetUtil.ClusterExists(20f, 4) && TargetUtil.EliteOrTrashInRange(20f)) ||
-                    (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.Distance <= 20f)))
+                if (TryGetPower(GetAttackGenerator(), out power))
                 {
-                    return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "GetPower() Returning AttackGenerator:  {0} Target={1}", power.SNOPower, (CurrentTarget == null) ? "Null" : CurrentTarget.InternalName);
+                    return power;  
                 }
-
-                // Ferrets used for picking up Health Globes when low on Health
-                if (Runes.DemonHunter.FerretCompanion.IsActive && Trinity.ObjectCache.Any(o => o.Type == GObjectType.HealthGlobe && o.Distance < 60f) && Player.CurrentHealthPct < EmergencyHealthPotionLimit)
-                {
-                    return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
-                }
-
-                // Use Wolf Howl on Unique/Elite/Champion - Would help for farming trash, but trash farming should not need this - Used on Elites to reduce Deaths per hour
-                if (Runes.DemonHunter.WolfCompanion.IsActive && CanCast(SNOPower.X1_DemonHunter_Companion, CanCastFlags.NoTimer) &&
-                    ((CurrentTarget.IsBossOrEliteRareUnique || TargetUtil.AnyMobsInRange(40, 10)) && CurrentTarget.RadiusDistance < 25f))
-                {
-                    return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
-                }
+                                  
             }
 
-            // Companion active attack on elite
-            if (CanCast(SNOPower.X1_DemonHunter_Companion) && CurrentTarget.IsEliteRareUnique )
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "GetPower() Returning DefaultPower {0} Target={1}", DefaultPower.SNOPower, (CurrentTarget == null) ? "Null" : CurrentTarget.InternalName);
+            return DefaultPower;
+        }
+
+        /// <summary>
+        /// Update general combat information, if we should be saving mana etc.
+        /// </summary>
+        private static void GetCombatContext()
+        {
+            _minEnergyReserve = 25;
+            _specialEnergyReserve = 50;
+
+            if (Sets.EmbodimentOfTheMarauder.IsFullyEquipped)
+                _minEnergyReserve = 20;
+
+            IsWaitingForSpecial = Player.PrimaryResource < _specialEnergyReserve;
+        }
+
+        /// <summary>
+        /// The combat skills and the order they should be evaluated in
+        /// </summary>
+        private static List<Skill> CombatSkillOrder
+        {
+            get
             {
-                return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
+                return new List<Skill>
+                {
+                    //Buffs
+                    Skills.DemonHunter.Vengeance,
+                    Skills.DemonHunter.ShadowPower,
+                    Skills.DemonHunter.SmokeScreen,
+                    Skills.DemonHunter.Preparation,
+                    Skills.DemonHunter.Companion,
+
+                    // Cooldown only
+                    Skills.DemonHunter.RainOfVengeance,
+
+                    // Spenders
+                    Skills.DemonHunter.Sentry,
+                    Skills.DemonHunter.Caltrops,
+                    Skills.DemonHunter.MarkedForDeath,
+                    Skills.DemonHunter.Vault,
+                    Skills.DemonHunter.FanOfKnives,
+                    Skills.DemonHunter.Multishot,
+                    Skills.DemonHunter.Strafe,
+                    Skills.DemonHunter.SpikeTrap,
+                    Skills.DemonHunter.ClusterArrow,
+                    Skills.DemonHunter.RapidFire,
+                    Skills.DemonHunter.Impale,
+                    Skills.DemonHunter.Chakram,
+                    Skills.DemonHunter.ElementalArrow,
+
+                    // Generators
+                    Skills.DemonHunter.EvasiveFire,
+                    Skills.DemonHunter.HungeringArrow,
+                    Skills.DemonHunter.EntanglingShot,
+                    Skills.DemonHunter.Bolas,
+                    Skills.DemonHunter.Grenade,
+                };
             }
+        }
+
+        /// <summary>
+        /// When skills should be cast, evaluated by CanCast() calls.
+        /// </summary>
+        public static void SetCombatConditions()
+        {
+            Skills.DemonHunter.Vengeance.Meta.CastCondition = VengeanceCondition;
+            Skills.DemonHunter.ShadowPower.Meta.CastCondition = ShadowPowerCondition;
+            Skills.DemonHunter.SmokeScreen.Meta.CastCondition = SmokeScreenCondition;
+            Skills.DemonHunter.Preparation.Meta.CastCondition = PreperationCondition;
+            Skills.DemonHunter.RainOfVengeance.Meta.CastCondition = RainOfVengeanceCondition;
+            Skills.DemonHunter.Sentry.Meta.CastCondition = SentryCondition;
+            Skills.DemonHunter.Caltrops.Meta.CastCondition = CaltropsCondition;
+            Skills.DemonHunter.Companion.Meta.CastCondition = CompanionCondition;
+            Skills.DemonHunter.MarkedForDeath.Meta.CastCondition = MarkedForDeathCondition;
+            Skills.DemonHunter.Vault.Meta.CastCondition = VaultCondition;
+            Skills.DemonHunter.FanOfKnives.Meta.CastCondition = FanOfKnivesCondition;
+            Skills.DemonHunter.Multishot.Meta.CastCondition = MultiShotCondition;
+            Skills.DemonHunter.Strafe.Meta.CastCondition = StrafeCondition;
+            Skills.DemonHunter.SpikeTrap.Meta.CastCondition = SpikeTrapCondition;
+            Skills.DemonHunter.ElementalArrow.Meta.CastCondition = ElementalArrowCondition;
+            Skills.DemonHunter.ClusterArrow.Meta.CastCondition = ClusterArrowCondition;
+            Skills.DemonHunter.Chakram.Meta.CastCondition = ChakramCondition;
+            Skills.DemonHunter.RapidFire.Meta.CastCondition = RapidFireCondition;
+            Skills.DemonHunter.Impale.Meta.CastCondition = ImpaleCondition;
+            Skills.DemonHunter.EvasiveFire.Meta.CastCondition = EvasiveFireCondition;
+            Skills.DemonHunter.HungeringArrow.Meta.CastCondition = HungeringArrowCondition;
+            Skills.DemonHunter.EntanglingShot.Meta.CastCondition = EntanglingShotCondition;
+            Skills.DemonHunter.Bolas.Meta.CastCondition = BolasCondition;
+            Skills.DemonHunter.Grenade.Meta.CastCondition = GrenadeCondition;
+        }
+
+        /// <summary>
+        /// When Grenade should be cast
+        /// </summary>
+        private static bool GrenadeCondition(SkillMeta meta)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// When Bolas should be cast
+        /// </summary>
+        private static bool BolasCondition(SkillMeta meta)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// When Entangling Shot should be cast
+        /// </summary>
+        private static bool EntanglingShotCondition(SkillMeta meta)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// When Hungering Arrow should be cast
+        /// </summary>
+        private static bool HungeringArrowCondition(SkillMeta meta)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// When Evasive fire should be cast
+        /// </summary>
+        /// <param name="meta"></param>
+        /// <returns></returns>
+        private static bool EvasiveFireCondition(SkillMeta meta)
+        {
+            meta.CastRange = HasNoPrimary ? 70f : 0f;
+            return TargetUtil.AnyMobsInRange(10f) || HasNoPrimary;
+        }
+
+        /// <summary>
+        /// When Impale should be cast
+        /// </summary>
+        private static bool ImpaleCondition(SkillMeta meta)
+        {
+            // Saving up for something more awesome
+            if (Player.PrimaryResource < _specialEnergyReserve && IsWaitingForSpecial)
+                return false;
+
+            // Not enough resource
+            if (Player.PrimaryResource <= _minEnergyReserve)
+                return false;
+
+            if (!TargetUtil.AnyMobsInRange(12, 4) && CurrentTarget.RadiusDistance <= 75f)
+                return true;
+            
+            return false;
+        }
+
+        /// <summary>
+        /// When Rapid Fire should be cast
+        /// </summary>
+        /// <param name="meta"></param>
+        /// <returns></returns>
+        private static bool RapidFireCondition(SkillMeta meta)
+        {
+            meta.CastFlags = CanCastFlags.NoTimer;
+
+            // Saving up for something more awesome
+            if (Player.PrimaryResource < _specialEnergyReserve && IsWaitingForSpecial)
+                return false;
+
+            // Stay above minimum resource level
+            if (Player.PrimaryResource < _minEnergyReserve || Player.PrimaryResource < Settings.Combat.DemonHunter.RapidFireMinHatred)
+                return false;
+
+            // Never use it twice in a row
+            if (LastPowerUsed == SNOPower.DemonHunter_RapidFire)
+                return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// When Chakram should be cast.
+        /// </summary>
+        private static bool ChakramCondition(SkillMeta meta)
+        {
+            // Spam it for Shuriken Cloud buff
+            if (Runes.DemonHunter.ShurikenCloud.IsActive && TimeSincePowerUse(SNOPower.DemonHunter_Chakram) >= 110000 &&
+                ((Player.PrimaryResource >= 10 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
+                return true;
+
+            // Always cast with Spines of Seething Hatred rune, grants 4 hatred
+            if (Legendary.SpinesOfSeethingHatred.IsEquipped)
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// When Cluster Arrow should be cast
+        /// </summary>
+        private static bool ClusterArrowCondition(SkillMeta meta)
+        {
+            // Saving up for something more awesome
+            if (Player.PrimaryResource < _specialEnergyReserve && IsWaitingForSpecial)
+                return false;
+
+            // Stay above minimum resource level
+            if (Player.PrimaryResource < _minEnergyReserve)
+                return false;
+
+            return false;
+        }
+
+        /// <summary>
+        /// When Elemental Arrow should be cast
+        /// </summary>
+        private static bool ElementalArrowCondition(SkillMeta meta)
+        {
+            // Lightning DH
+            if (Runes.DemonHunter.BallLightning.IsActive && Legendary.MeticulousBolts.IsEquipped && Player.PrimaryResource >= 10)
+            {
+                meta.CastRange = 10f;
+                return true;
+            }
+
+            // Kridershot
+            if (Legendary.Kridershot.IsEquipped)
+            {
+                meta.CastRange = 65f;
+                return true;
+            }
+
+            // Saving up for something more awesome
+            if (Player.PrimaryResource < _specialEnergyReserve && IsWaitingForSpecial)
+                return false;
+
+            // Stay above minimum resource level
+            if (Player.PrimaryResource < _minEnergyReserve)
+                return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// When spike trap should be cast
+        /// </summary>
+        private static bool SpikeTrapCondition(SkillMeta meta)
+        {
+            meta.TargetSelector = SpikeTrapTargetSelector;
+
+            if (LastPowerUsed != SNOPower.DemonHunter_SpikeTrap)
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Where Spike trap should be cast
+        /// </summary>
+        private static Vector3 SpikeTrapTargetSelector(SkillMeta skillMeta)
+        {
+            // For distant monsters, try to target a little bit in-front of them (as they run towards us), if it's not a treasure goblin
+            float reducedDistance = 0f;
+            if (CurrentTarget.Distance > 17f && !CurrentTarget.IsTreasureGoblin)
+            {
+                reducedDistance = CurrentTarget.Distance - 17f;
+                if (reducedDistance > 5f)
+                    reducedDistance = 5f;
+            }
+            return MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.Distance - reducedDistance);
+        }
+
+        /// <summary>
+        /// When Strafe should be cast
+        /// </summary>
+        private static bool StrafeCondition(SkillMeta meta)
+        {
+            meta.AfterUseDelay = TrinityPower.MillisecondsToTickDelay(250);
+            meta.TargetSelector = ret => TargetUtil.GetZigZagTarget(CurrentTarget.Position, V.F("Barbarian.Whirlwind.ZigZagDistance"));
+            meta.CastFlags = CanCastFlags.NoTimer;
+            meta.RequiredResource = Settings.Combat.DemonHunter.StrafeMinHatred;
+
+            if (!Player.IsRooted)
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// When Multishot should be cast
+        /// </summary>
+        private static bool MultiShotCondition(SkillMeta meta)
+        {
+            meta.CastFlags = CanCastFlags.NoPowerManager;
+
+            if (Sets.UnhallowedEssence.IsMaxBonusActive || TargetUtil.ClusterExists(45, 3))
+                return true;
+            
+            return true;
+        }
+
+        /// <summary>
+        /// When Fan of Knives should be cast
+        /// </summary>
+        private static bool FanOfKnivesCondition(SkillMeta meta)
+        {
+            if (TargetUtil.EliteOrTrashInRange(15) || TargetUtil.AnyTrashInRange(15f, 5, false))
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// When Vault should be cast
+        /// </summary>
+        private static bool VaultCondition(SkillMeta meta)
+        {
+            meta.TargetSelector = ret => NavHelper.MainFindSafeZone(Player.Position, true);
+            meta.IsCombatOnly = Settings.Combat.DemonHunter.VaultMode == DemonHunterVaultMode.CombatOnly;
+            meta.RequiredResource = Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) ? 22 : 16;
+            meta.AfterUseDelay = Settings.Combat.DemonHunter.VaultMovementDelay;
+
+            if (!Player.IsRooted && (TargetUtil.AnyMobsInRange(7f, 6) || Player.CurrentHealthPct <= 0.7))
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// When Marked for Death should be cast
+        /// </summary>
+        private static bool MarkedForDeathCondition(SkillMeta meta)
+        {
+            meta.CastFlags = CanCastFlags.NoTimer;
+
+            if (!CurrentTarget.HasDebuff(SNOPower.DemonHunter_MarkedForDeath) && !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.DemonHunter_MarkedForDeath))                
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// When Companion should be cast
+        /// </summary>
+        private static bool CompanionCondition(SkillMeta meta)
+        {
+            meta.CastFlags = CanCastFlags.NoTimer;
+
+            // Use Spider Slow on 4 or more trash mobs in an area or on Unique/Elite/Champion
+            if (Runes.DemonHunter.SpiderCompanion.IsActive && TargetUtil.ClusterExists(25f, 4) && TargetUtil.EliteOrTrashInRange(25f))
+                return true;
+
+            //Use Bat when Hatred is Needed
+            if (Runes.DemonHunter.BatCompanion.IsActive && Player.PrimaryResourceMissing >= 60)
+                return true;
+
+            // Use Boar Taunt on 3 or more trash mobs in an area or on Unique/Elite/Champion
+            if (Runes.DemonHunter.BoarCompanion.IsActive && ((TargetUtil.ClusterExists(20f, 4) && TargetUtil.EliteOrTrashInRange(20f)) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.Distance <= 20f)))
+                return true;
+
+            // Ferrets used for picking up Health Globes when low on Health
+            if (Runes.DemonHunter.FerretCompanion.IsActive && Trinity.ObjectCache.Any(o => o.Type == GObjectType.HealthGlobe && o.Distance < 60f) && Player.CurrentHealthPct < EmergencyHealthPotionLimit)
+                return true;
+
+            // Use Wolf Howl on Unique/Elite/Champion - Would help for farming trash, but trash farming should not need this - Used on Elites to reduce Deaths per hour
+            if (Runes.DemonHunter.WolfCompanion.IsActive && (TargetUtil.AnyElitesInRange(100f) || TargetUtil.AnyMobsInRange(40, 8)))            
+                return true;
 
             // Companion off CD
-            if (CanCast(SNOPower.X1_DemonHunter_Companion, CanCastFlags.NoTimer) && TargetUtil.AnyMobsInRange(60) && Settings.Combat.DemonHunter.CompanionOffCooldown)
-            {
-                return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
-            }
-
-            int mfdResource = Hotbar.Contains(SNOPower.DemonHunter_SmokeScreen) ? (Runes.DemonHunter.MortalEnemy.IsActive ? 3 : 17) : 17;
-            // Marked for Death
-            if (CanCast(SNOPower.DemonHunter_MarkedForDeath, CanCastFlags.NoTimer) &&
-                Player.SecondaryResource >= mfdResource &&
-                !CurrentTarget.HasDebuff(SNOPower.DemonHunter_MarkedForDeath) &&
-                !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.DemonHunter_MarkedForDeath))
-            {
-                return new TrinityPower(SNOPower.DemonHunter_MarkedForDeath, 40f, CurrentTarget.ACDGuid);
-            }
-
-            // Vault
-            if (CanCast(SNOPower.DemonHunter_Vault) && !Player.IsRooted && !Player.IsIncapacitated &&
-                Settings.Combat.DemonHunter.VaultMode == DemonHunterVaultMode.CombatOnly &&
-                (TargetUtil.AnyMobsInRange(7f, 6) || Player.CurrentHealthPct <= 0.7) &&
-                // if we have ShadowPower and Disicpline is >= 16
-                // or if we don't have ShadoWpower and Discipline is >= 22
-                (Player.SecondaryResource >= (Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) ? 22 : 16)) &&
-                    TimeSincePowerUse(SNOPower.DemonHunter_Vault) >= Settings.Combat.DemonHunter.VaultMovementDelay)
-            {
-                Vector3 vNewTarget = NavHelper.MainFindSafeZone(Player.Position, true);
-
-                return new TrinityPower(SNOPower.DemonHunter_Vault, 20f, vNewTarget);
-            }
-
-            // Fan of Knives
-            if (CanCast(SNOPower.DemonHunter_FanOfKnives) && !Player.IsIncapacitated &&
-                (TargetUtil.EliteOrTrashInRange(15) || TargetUtil.AnyTrashInRange(15f, 5, false)))
-            {
-                return new TrinityPower(SNOPower.DemonHunter_FanOfKnives);
-            }
-
-            // Multi Shot
-            if (CanCast(SNOPower.DemonHunter_Multishot, CanCastFlags.NoPowerManager) && !Player.IsIncapacitated)
-            {
-                return new TrinityPower(SNOPower.DemonHunter_Multishot, 50f, CurrentTarget.Position);
-            }
-
-            Logger.Log("Went past multishot, CanCast={0} Incap={1}", CanCast(SNOPower.DemonHunter_Multishot, CanCastFlags.NoPowerManager), Player.IsIncapacitated);
-
-            // Strafe spam - similar to barbarian whirlwind routine
-            if (CanCast(SNOPower.DemonHunter_Strafe, CanCastFlags.NoTimer) &&
-                !Player.IsIncapacitated && !Player.IsRooted && Player.PrimaryResource >= Settings.Combat.DemonHunter.StrafeMinHatred)
-            {
-                bool shouldGetNewZigZag =
-                    (DateTime.UtcNow.Subtract(LastChangedZigZag).TotalMilliseconds >= V.I("Barbarian.Whirlwind.ZigZagMaxTime") ||
-                    CurrentTarget.ACDGuid != LastZigZagUnitAcdGuid ||
-                    ZigZagPosition.Distance2D(Player.Position) <= 5f);
-
-                if (shouldGetNewZigZag)
-                {
-                    var wwdist = V.F("Barbarian.Whirlwind.ZigZagDistance");
-
-                    ZigZagPosition = TargetUtil.GetZigZagTarget(CurrentTarget.Position, wwdist);
-
-                    LastZigZagUnitAcdGuid = CurrentTarget.ACDGuid;
-                    LastChangedZigZag = DateTime.UtcNow;
-                }
-
-                int postCastTickDelay = TrinityPower.MillisecondsToTickDelay(250);
-
-                return new TrinityPower(SNOPower.DemonHunter_Strafe, 15f, ZigZagPosition, Trinity.Player.WorldDynamicID, -1, 0, postCastTickDelay);
-            }
-
-            // Spike Trap
-            if (!Player.IsIncapacitated && CanCast(SNOPower.DemonHunter_SpikeTrap) &&
-                LastPowerUsed != SNOPower.DemonHunter_SpikeTrap)
-            {
-                // For distant monsters, try to target a little bit in-front of them (as they run towards us), if it's not a treasure goblin
-                float reducedDistance = 0f;
-                if (CurrentTarget.Distance > 17f && !CurrentTarget.IsTreasureGoblin)
-                {
-                    reducedDistance = CurrentTarget.Distance - 17f;
-                    if (reducedDistance > 5f)
-                        reducedDistance = 5f;
-                }
-                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.Distance - reducedDistance);
-                return new TrinityPower(SNOPower.DemonHunter_SpikeTrap, 35f, vNewTarget, Trinity.Player.WorldDynamicID, -1, 1, 1);
-            }
-
-            // Elemental Arrow for non-kridershot
-            if (CanCast(SNOPower.DemonHunter_ElementalArrow) && !Player.IsIncapacitated && !Legendary.Kridershot.IsEquipped &&
-                ((Player.PrimaryResource >= 10 && !IsWaitingForSpecial) || Player.PrimaryResource >= minEnergyReserve))
-            {
-                return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 65f, CurrentTarget.ACDGuid);
-            }
-
-            // Elemental Arrow for Lightning DH
-            if (CanCast(SNOPower.DemonHunter_ElementalArrow) && !Player.IsIncapacitated && Runes.DemonHunter.BallLightning.IsActive &&
-                Passives.DemonHunter.NightStalker.IsActive && Legendary.MeticulousBolts.IsEquipped && Player.PrimaryResource >= 10)
-            {
-                var bestTarget = TargetUtil.GetBestPierceTarget(40f);
-
-                if (bestTarget != null)
-                    return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 10f, bestTarget.Position);
-                return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 10f, CurrentTarget.Position);
-            }
-
-            // Cluster Arrow
-            if (CanCast(SNOPower.DemonHunter_ClusterArrow) && !Player.IsIncapacitated &&
-                ((Player.PrimaryResource >= 40 && !IsWaitingForSpecial) || Player.PrimaryResource > minEnergyReserve))
-            {
-                return new TrinityPower(SNOPower.DemonHunter_ClusterArrow, V.F("DemonHunter.ClusterArrow.UseRange"), CurrentTarget.ACDGuid);
-            }
-
-            // Elemental Arrow for kridershot
-            if (CanCast(SNOPower.DemonHunter_ElementalArrow) && !Player.IsIncapacitated && Legendary.Kridershot.IsEquipped)
-            {
-                return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 65f, CurrentTarget.ACDGuid);
-            }
-
-
-            // Chakram normal attack
-            if (Hotbar.Contains(SNOPower.DemonHunter_Chakram) && !Player.IsIncapacitated &&
-                !Runes.DemonHunter.ShurikenCloud.IsActive &&
-                ((Player.PrimaryResource >= 10 && !IsWaitingForSpecial) || Player.PrimaryResource >= minEnergyReserve))
-            {
-                return new TrinityPower(SNOPower.DemonHunter_Chakram, 50f, CurrentTarget.ACDGuid);
-            }
-
-            // Rapid Fire
-            if (CanCast(SNOPower.DemonHunter_RapidFire, CanCastFlags.NoTimer) &&
-                !Player.IsIncapacitated && ((Player.PrimaryResource >= 16 && !IsWaitingForSpecial) || (Player.PrimaryResource > minEnergyReserve)) &&
-                (Player.PrimaryResource >= Settings.Combat.DemonHunter.RapidFireMinHatred || LastPowerUsed == SNOPower.DemonHunter_RapidFire))
-            {
-                // Players with grenades *AND* rapid fire should spam grenades at close-range instead
-                if (CanCast(SNOPower.DemonHunter_Grenades) && CurrentTarget.RadiusDistance <= 18f)
-                {
-                    return new TrinityPower(SNOPower.DemonHunter_Grenades, 18f, CurrentTarget.ACDGuid);
-                }
-                // Now return rapid fire, if not sending grenades instead
-                return new TrinityPower(SNOPower.DemonHunter_RapidFire, 40f, CurrentTarget.Position);
-            }
-
-            // Impale
-            if (CanCast(SNOPower.DemonHunter_Impale) && !TargetUtil.AnyMobsInRange(12, 4) &&
-                ((Player.PrimaryResource >= 25 && !IsWaitingForSpecial) || Player.PrimaryResource >= minEnergyReserve) &&
-                CurrentTarget.RadiusDistance <= 75f)
-            {
-                return new TrinityPower(SNOPower.DemonHunter_Impale, 75f, CurrentTarget.ACDGuid);
-            }
-
-            // Evasive Fire
-            if (CanCast(SNOPower.X1_DemonHunter_EvasiveFire) && !Player.IsIncapacitated &&
-                  (TargetUtil.AnyMobsInRange(10f) || DemonHunter_HasNoPrimary()))
-            {
-                float range = DemonHunter_HasNoPrimary() ? 70f : 0f;
-
-                return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, range, CurrentTarget.ACDGuid);
-            }
-
-            // Spines of Seething Hatred, grants 4 hatred
-            if (Legendary.SpinesOfSeethingHatred.IsEquipped && CanCast(SNOPower.DemonHunter_Chakram, CanCastFlags.NoTimer))
-            {
-                return new TrinityPower(SNOPower.DemonHunter_Chakram, 50f, CurrentTarget.ACDGuid);
-            }
-
-            // Hungering Arrow
-            if (Hotbar.Contains(SNOPower.DemonHunter_HungeringArrow) && !Player.IsIncapacitated)
-            {
-                return new TrinityPower(SNOPower.DemonHunter_HungeringArrow, 50f, CurrentTarget.ACDGuid);
-            }
-
-            // Entangling shot
-            if (Hotbar.Contains(SNOPower.X1_DemonHunter_EntanglingShot) && !Player.IsIncapacitated)
-            {
-                return new TrinityPower(SNOPower.X1_DemonHunter_EntanglingShot, 50f, CurrentTarget.ACDGuid);
-            }
-
-            // Bola Shot
-            if (Hotbar.Contains(SNOPower.DemonHunter_Bolas) && !Player.IsIncapacitated)
-            {
-                return new TrinityPower(SNOPower.DemonHunter_Bolas, 50f, CurrentTarget.ACDGuid);
-            }
-
-            // Grenades
-            if (Hotbar.Contains(SNOPower.DemonHunter_Grenades) && !Player.IsIncapacitated)
-            {
-                return new TrinityPower(SNOPower.DemonHunter_Grenades, 40f, CurrentTarget.ACDGuid);
-            }
-
-            //Hexing Pants Mod
-            if (CurrentTarget != null)
-            {
-                if (Legendary.HexingPantsOfMrYan.IsEquipped && CurrentTarget.IsUnit && CurrentTarget.RadiusDistance > 10f)
-                {
-                    return new TrinityPower(SNOPower.Walk, 10f, CurrentTarget.Position);
-                }
-
-                if (Legendary.HexingPantsOfMrYan.IsEquipped && CurrentTarget.IsUnit && CurrentTarget.RadiusDistance < 10f)
-                {
-                    Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, -10f);
-                    return new TrinityPower(SNOPower.Walk, 10f, vNewTarget);
-                }
-            }
-
-
-
-            return DefaultPower;
-        }
-        /// <summary>
-        /// Checks and casts buffs if needed
-        /// </summary>
-        /// <returns></returns>
-        private static TrinityPower GetBuffPower()
-        {
-            // Vengeance
-            if (CanCast(SNOPower.X1_DemonHunter_Vengeance, CanCastFlags.NoTimer) &&
-                ((!Settings.Combat.DemonHunter.VengeanceElitesOnly && TargetUtil.AnyMobsInRange(60, 6)) || TargetUtil.IsEliteTargetInRange(80f)))
-            {
-                return new TrinityPower(SNOPower.X1_DemonHunter_Vengeance);
-            }
-
-            // Shadow Power on low health (nospam)
-            if (CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
-                (TimeSincePowerUse(SNOPower.DemonHunter_ShadowPower) > 4500 || !GetHasBuff(SNOPower.DemonHunter_ShadowPower)) &&
-                Player.CurrentHealthPct <= Trinity.PlayerEmergencyHealthPotionLimit &&
-                Player.SecondaryResource >= 14) // When spamming Shadow Power, save some Discipline for emergencies
-            {
-                return new TrinityPower(SNOPower.DemonHunter_ShadowPower);
-            }
-
-            // Spam Shadow Power
-            if (Settings.Combat.DemonHunter.SpamShadowPower && CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
-                TimeSincePowerUse(SNOPower.DemonHunter_ShadowPower) > 250 && !GetHasBuff(SNOPower.DemonHunter_ShadowPower) && 
-                Player.SecondaryResource >= 14)
-            {
-                return new TrinityPower(SNOPower.DemonHunter_ShadowPower);
-            }
-
-            // Smoke Screen spam
-            if (Settings.Combat.DemonHunter.SpamSmokeScreen && CanCast(SNOPower.DemonHunter_SmokeScreen) &&
-                !GetHasBuff(SNOPower.DemonHunter_ShadowPower))
-            {
-                return new TrinityPower(SNOPower.DemonHunter_SmokeScreen);
-            }
-
-            // Chakram:Shuriken Cloud
-            if (!Player.IsInTown && CanCast(SNOPower.DemonHunter_Chakram, CanCastFlags.NoTimer) && !Player.IsIncapacitated &&
-                Runes.DemonHunter.ShurikenCloud.IsActive && TimeSincePowerUse(SNOPower.DemonHunter_Chakram) >= 110000 &&
-                ((Player.PrimaryResource >= 10 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
-            {
-                return new TrinityPower(SNOPower.DemonHunter_Chakram);
-            }
-
-            // Preparation, restore Disc if needed
-            float useDelay = Runes.DemonHunter.FocusedMind.IsActive ? 15000 : 500;
-            if (CanCast(SNOPower.DemonHunter_Preparation, CanCastFlags.NoTimer) &&
-            Player.SecondaryResource <= V.F("DemonHunter.MinPreparationDiscipline") &&
-            !Runes.DemonHunter.Punishment.IsActive && 
-            TimeSincePowerUse(SNOPower.DemonHunter_Preparation) >= useDelay)
-            {
-                return new TrinityPower(SNOPower.DemonHunter_Preparation);
-            }
-
-            // Preparation: Punishment
-            if (CanCast(SNOPower.DemonHunter_Preparation, CanCastFlags.NoTimer) && Runes.DemonHunter.Punishment.IsActive && Player.PrimaryResourceMissing >= 75)
-            {
-                return new TrinityPower(SNOPower.DemonHunter_Preparation);
-            }
-
-            // Rain of Vengeance OffCD with Dark Cloud
-            if (!Player.IsInTown && CanCast(SNOPower.DemonHunter_RainOfVengeance, CanCastFlags.NoTimer) &&
-               !Player.IsIncapacitated && Runes.DemonHunter.DarkCloud.IsActive && Settings.Combat.DemonHunter.RainOfVengeanceOffCD)
-            {
-                return new TrinityPower(SNOPower.DemonHunter_RainOfVengeance);
-            } 
+            if (Settings.Combat.DemonHunter.CompanionOffCooldown && TargetUtil.AnyMobsInRange(60))
+                return true;
             
-            return null;
+            return false;
         }
 
-        private static bool DemonHunter_HasNoPrimary()
+        /// <summary>
+        /// When Caltrops should be cast
+        /// </summary>
+        private static bool CaltropsCondition(SkillMeta meta)
+        {        
+            return TargetUtil.AnyMobsInRange(40) && !GetHasBuff(SNOPower.DemonHunter_Caltrops);
+        }
+
+        /// <summary>
+        /// When Sentry should be cast
+        /// </summary>
+        /// <param name="meta"></param>
+        /// <returns></returns>
+        private static bool SentryCondition(SkillMeta meta)
         {
-            return !(Hotbar.Contains(SNOPower.DemonHunter_Bolas) ||
-                                Hotbar.Contains(SNOPower.X1_DemonHunter_EntanglingShot) ||
-                                Hotbar.Contains(SNOPower.DemonHunter_Grenades) ||
-                                Hotbar.Contains(SNOPower.DemonHunter_HungeringArrow));
+            meta.CastFlags = CanCastFlags.NoTimer;
+            return TargetUtil.AnyMobsInRange(65) && Trinity.PlayerOwnedDHSentryCount < MaxSentryCount;
         }
-        private static TrinityPower GetDemonHunterDestroyPower()
+
+        /// <summary>
+        /// When Rain of Vengeance should be cast
+        /// </summary>
+        private static bool RainOfVengeanceCondition(SkillMeta meta)
         {
-            if (Hotbar.Contains(SNOPower.DemonHunter_HungeringArrow))
-                return new TrinityPower(SNOPower.DemonHunter_HungeringArrow, 10f, CurrentTarget.ACDGuid);
+            if (Settings.Combat.DemonHunter.RainOfVengeanceOffCD || Sets.NatalyasVengeance.IsEquipped)
+                return true;
 
-            if (Hotbar.Contains(SNOPower.X1_DemonHunter_EntanglingShot))
-                return new TrinityPower(SNOPower.X1_DemonHunter_EntanglingShot, 10f, CurrentTarget.ACDGuid);
+            if (TargetUtil.ClusterExists(45f, 4) || TargetUtil.AnyElitesInRange(90f))
+                return true;
 
-            if (Hotbar.Contains(SNOPower.DemonHunter_Bolas))
-                return new TrinityPower(SNOPower.DemonHunter_Bolas, 10f, CurrentTarget.ACDGuid);
-
-            if (Hotbar.Contains(SNOPower.DemonHunter_Grenades))
-                return new TrinityPower(SNOPower.DemonHunter_Grenades, 10f, CurrentTarget.ACDGuid);
-
-            if (Hotbar.Contains(SNOPower.DemonHunter_ElementalArrow) && Player.PrimaryResource >= 10)
-                return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 10f, CurrentTarget.ACDGuid);
-
-            if (Hotbar.Contains(SNOPower.X1_DemonHunter_EvasiveFire) && Player.PrimaryResource >= 10)
-                return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, 10f, CurrentTarget.ACDGuid);
-
-            if (Hotbar.Contains(SNOPower.DemonHunter_RapidFire) && Player.PrimaryResource >= 10)
-                return new TrinityPower(SNOPower.DemonHunter_RapidFire, 10f, CurrentTarget.Position);
-
-            if (Hotbar.Contains(SNOPower.DemonHunter_Chakram) && Player.PrimaryResource >= 20)
-                return new TrinityPower(SNOPower.DemonHunter_Chakram, 0f, CurrentTarget.ACDGuid);
-
-            return DefaultPower;
+            return false;
         }
+
+        /// <summary>
+        /// When Preperation should be cast
+        /// </summary>
+        private static bool PreperationCondition(SkillMeta meta)
+        {
+            meta.AfterUseDelay = Runes.DemonHunter.FocusedMind.IsActive ? 15000 : 500;
+            meta.CastFlags = CanCastFlags.NoTimer;
+            
+            if (!Runes.DemonHunter.Punishment.IsActive && Player.SecondaryResource <= V.F("DemonHunter.MinPreparationDiscipline"))
+                return true;
+
+            if (Runes.DemonHunter.Punishment.IsActive && Player.PrimaryResource <= 75 && (TargetUtil.AnyElitesInRange(50f) || Enemies.Nearby.UnitCount > 5))
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// When Smoke Screen should be cast
+        /// </summary>
+        private static bool SmokeScreenCondition(SkillMeta meta)
+        {
+            meta.CastFlags = CanCastFlags.NoTimer;
+
+            var normalCast = !GetHasBuff(SNOPower.DemonHunter_ShadowPower) &&
+                    (Player.CurrentHealthPct <= 0.50 || Player.IsRooted || TargetUtil.AnyMobsInRange(15) ||
+                    (Legendary.MeticulousBolts.IsEquipped && TargetUtil.AnyMobsInRange(60)) || Player.IsIncapacitated);
+
+            var spam = Settings.Combat.DemonHunter.SpamSmokeScreen && CanCast(SNOPower.DemonHunter_SmokeScreen) &&
+                        !GetHasBuff(SNOPower.DemonHunter_ShadowPower);
+
+            return normalCast || spam;
+        }
+
+        /// <summary>
+        /// When Shadow Power should be cast
+        /// </summary>
+        private static bool ShadowPowerCondition(SkillMeta meta)
+        {
+            var lowHealthCast = (TimeSincePowerUse(SNOPower.DemonHunter_ShadowPower) > 4500 || !GetHasBuff(SNOPower.DemonHunter_ShadowPower)) &&
+                                Player.CurrentHealthPct <= Trinity.PlayerEmergencyHealthPotionLimit &&
+                                Player.SecondaryResource >= 14;
+
+            var normalCast = !Settings.Combat.DemonHunter.SpamShadowPower && !Player.IsIncapacitated &&
+                                (!GetHasBuff(SNOPower.DemonHunter_ShadowPower) || Player.CurrentHealthPct <= EmergencyHealthPotionLimit) && 
+                                // if we don't have the buff or our health is low
+                                (Player.CurrentHealthPct < 1f || Player.IsRooted || TargetUtil.AnyMobsInRange(15));
+
+            var spam = Settings.Combat.DemonHunter.SpamShadowPower && CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
+                        TimeSincePowerUse(SNOPower.DemonHunter_ShadowPower) > 250 && !GetHasBuff(SNOPower.DemonHunter_ShadowPower) &&
+                        Player.SecondaryResource >= 14;
+
+            return lowHealthCast || normalCast || spam;
+        }
+
+        /// <summary>
+        /// When Vengeance should be cast
+        /// </summary>
+        private static bool VengeanceCondition(SkillMeta meta)
+        {
+            meta.CastFlags = CanCastFlags.NoTimer;
+
+            if (!Settings.Combat.DemonHunter.VengeanceElitesOnly && TargetUtil.AnyMobsInRange(60, 6))
+                return true;
+
+            if (TargetUtil.IsEliteTargetInRange(100f))
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Maximum number of sentries allowed from Equipped items and Passives
+        /// </summary>
+        public static int MaxSentryCount 
+        {
+            get { return 2 + (Legendary.BombardiersRucksack.IsEquipped ? 2 : 0) + (Passives.DemonHunter.CustomEngineering.IsActive ? 1 : 0); }
+        }
+
     }
 }

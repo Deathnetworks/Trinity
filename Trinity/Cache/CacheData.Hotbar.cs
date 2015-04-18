@@ -31,12 +31,10 @@ namespace Trinity
 
             public HotbarCache()
             {
-                // Make sure data is immediately available from
-                // calls while bot is not running or before pulse starts
                 UpdateHotbarCache();
             }
 
-            private static HotbarCache _instance = null;
+            private static HotbarCache _instance;
             public static HotbarCache Instance
             {
                 get { return _instance ?? (_instance = new HotbarCache()); }

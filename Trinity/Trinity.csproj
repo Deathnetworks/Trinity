@@ -127,6 +127,10 @@
     <Compile Include="Objects\CachedBuff.cs" />
     <Compile Include="Objects\IUnique.cs" />
     <Compile Include="Objects\ItemStatRange.cs" />
+    <Compile Include="Objects\SkillMeta.cs" />
+    <Compile Include="Reference\SkillsDefaultMeta.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Resources\Battle.Net API\BNetDataObjects.cs" />
     <Compile Include="Helpers\Bounties\BountyType.cs" />
     <Compile Include="Helpers\Bounties\Extensions.cs" />

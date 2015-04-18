@@ -606,25 +606,232 @@ namespace Trinity.Combat.Abilities
         /// Select an attacking skill that is primary or a generator
         /// </summary>
         /// <returns></returns>
-        internal static TrinityPower CastAttackGenerator()
+        internal static TrinityPower GetAttackGenerator()
         {
-            var generator = SkillUtils.Active.FirstOrDefault(s => s.IsGeneratorOrPrimary);
-            if (generator == null)
-                return DefaultPower;
-
-            return generator.ToPower(50f, Enemies.BestCluster.Position);
+            var generator = SkillUtils.Active.FirstOrDefault(s => s.IsGeneratorOrPrimary && s.CanCast());
+            return generator == null ? null : generator.ToPower(generator.Meta.CastRange, Enemies.BestCluster.Position);
         }
 
         /// <summary>
         /// Select an attacking skill that spends resource
         /// </summary>
-        internal static TrinityPower CastAttackSpender()
+        internal static TrinityPower GetAttackSpender()
         {
-            var spender = SkillUtils.Active.FirstOrDefault(s => s.IsAttackSpender);
-            if (spender == null)
-                return DefaultPower;
+            var spender = SkillUtils.Active.FirstOrDefault(s => s.IsAttackSpender && s.CanCast());
+            return spender == null ? null : spender.ToPower(spender.Meta.CastRange, Enemies.BestCluster.Position);
+        }
 
-            return spender.ToPower(80f, Enemies.BestCluster.Position);
+        /// <summary>
+        /// Select a skill for breaking urns and wooden carts etc.
+        /// </summary>
+        internal static TrinityPower GetDestructablesSkill()
+        {
+            var skill = SkillUtils.Active.FirstOrDefault(s => (s.Meta.IsDestructableSkill || s.IsGeneratorOrPrimary) && s.CanCast());
+            return skill == null ? null : skill.ToPower(skill.Meta.CastRange, Enemies.BestCluster.Position);
+        }
+
+        /// <summary>
+        /// Select a skill for noping the hell out of there.
+        /// </summary>
+        internal static TrinityPower GetAvoidanceSkill()
+        {
+            var skill = SkillUtils.Active.FirstOrDefault(s => s.Meta.IsAvoidanceSkill && s.CanCast());
+            return skill == null ? null : skill.ToPower(skill.Meta.CastRange, CurrentTarget.Position);
+        }
+
+        /// <summary>
+        /// Select a skill that is a buff
+        /// </summary>
+        internal static bool IsBuffSkill()
+        {
+            return SkillUtils.Active.Any(s => s.Meta.IsBuffingSkill && s.CanCast());
+        }
+
+        /// <summary>
+        /// Select a skill that is a buff
+        /// </summary>
+        internal static TrinityPower GetBuffSkill()
+        {
+            var skill = SkillUtils.Active.FirstOrDefault(s => s.Meta.IsBuffingSkill && s.CanCast());
+            return skill == null ? null : skill.ToPower();
+        }
+
+        /// <summary>
+        /// Finds a target location using skill metadata.
+        /// </summary>
+        /// <param name="skill">skill to be used</param>
+        /// <returns>target position</returns>
+        public static Vector3 GetBestAreaEffectTarget(Skill skill)
+        {
+            Vector3 targetLocation;
+            switch (skill.Meta.AreaEffectType)
+            {
+                case AreaEffectShape.Beam:
+                    targetLocation = TargetUtil.GetBestPierceTarget(skill.Meta.CastRange).Position;
+                    break;
+                case AreaEffectShape.Circle:
+                    targetLocation = TargetUtil.GetBestClusterPoint(skill.AreaEffectRadius, skill.Meta.CastRange);
+                    break;
+                case AreaEffectShape.Cone:
+                    targetLocation = TargetUtil.GetBestArcTarget(skill.Meta.CastRange, skill.AreaEffectRadius).Position;
+                    break;
+                default:
+                    targetLocation = Enemies.BestLargeCluster.Position;
+                    break;                    
+            }  
+
+            if(targetLocation == Vector3.Zero)
+                targetLocation = CurrentTarget.Position;
+
+            return targetLocation;            
+        }
+
+        /// <summary>
+        /// Checks if a skill can and should be cast.
+        /// Skill property must be assigned in action delegate
+        /// </summary>
+        /// <param name="changes">action to modify existing skill data</param>
+        public static bool CanCast(Action<SkillMeta> changes)
+        {
+            var obj = new SkillMeta();
+            changes(obj);
+            return CanCast(obj);                    
+        }
+
+        /// <summary>
+        /// Checks if a skill can and should be cast.
+        /// </summary>
+        /// <param name="setting">combat data to use</param>
+        public static bool CanCast(SkillMeta setting)
+        {
+            if (setting.Skill == null)
+                return false;
+
+            return CanCast(setting.Skill);
+        }
+
+        /// <summary>
+        /// Checks if a skill can and should be cast.
+        /// </summary>
+        /// <param name="skill">the Skill to check</param>
+        /// <param name="condition">function to test against</param>
+        public static bool CanCast(Skill skill, Func<SkillMeta, bool> condition)
+        {
+            return CanCast(skill, null, condition);
+        }
+
+        /// <summary>
+        /// Checks if a skill can and should be cast.
+        /// </summary>
+        /// <param name="skill">the Skill to check</param>
+        /// <param name="changes">action to modify existing skill data</param>
+        public static bool CanCast(Skill skill, Action<SkillMeta> changes)
+        {
+            return CanCast(skill, null, c =>
+            {
+                changes(c);
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Checks if a skill can and should be cast.
+        /// </summary>
+        /// <param name="skill">the Skill to check</param>
+        /// <param name="cd">Optional combat data to use</param>
+        /// <param name="adhocCondition">Optional function to test against</param>
+        public static bool CanCast(Skill skill, SkillMeta cd = null, Func<SkillMeta, bool> adhocCondition = null)
+        {
+            try
+            {
+                var meta = (cd != null) ? skill.Meta.Apply(cd) : skill.Meta;
+
+                if (!Hotbar.Contains(skill.SNOPower))
+                    return false;
+
+                if (Player.IsIncapacitated)
+                    return false;
+
+                if (!meta.CastFlags.HasFlag(CanCastFlags.NoTimer) && !SNOPowerUseTimer(skill.SNOPower))
+                    return false;
+
+                if (!meta.CastFlags.HasFlag(CanCastFlags.NoPowerManager) && !PowerManager.CanCast(skill.SNOPower))
+                    return false;
+
+                // Note: ZetaDia.Me.IsInCombat is unrealiable and only kicks in after an ability has hit a monster
+                if (meta.IsCombatOnly && CurrentTarget == null)
+                    return false;
+
+                //if (meta.IsEliteOnly && Enemies.Nearby.EliteCount == 0)
+                //    return false;
+
+                //if (meta.MaxTargetDistance > CurrentTarget.Distance)
+                //    return false;
+
+                var resourceCost = (meta.RequiredResource > 0) ? meta.RequiredResource : skill.Cost;
+                if (resourceCost > 0)
+                {
+                    if (skill.Resource == Resource.Discipline && Player.SecondaryResource < resourceCost || Player.PrimaryResource < resourceCost) 
+                        return false;
+                }
+                   
+                if (meta.IsEliteOnly && !CurrentTarget.IsBossOrEliteRareUnique)
+                    return false;
+
+                var adhocConditionResult = (adhocCondition == null) || adhocCondition(meta);
+                var metaConditionResult = (meta.CastCondition == null) || meta.CastCondition(meta);
+
+                return adhocConditionResult && metaConditionResult;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Exception in CanCast for {0}. {1} {2}", skill.Name, ex.Message, ex.InnerException);
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// If the players build currently has no primary/generator ability
+        /// </summary>
+        public static bool HasNoPrimary
+        {
+            get { return CacheData.Hotbar.ActiveSkills.All(s => s.Skill.IsGeneratorOrPrimary); }
+        }
+
+        /// <summary>
+        /// Some sugar for Null/Invalid checking on given power;
+        /// </summary>
+        public static bool TryGetPower(TrinityPower powerToCheck, out TrinityPower power)
+        {
+            power = powerToCheck;
+            return (power != null && power.SNOPower != SNOPower.None && power != DefaultPower);
+        }
+
+        /// <summary>
+        /// Gets the best power for combat
+        /// </summary>
+        /// <returns></returns>
+        public static TrinityPower GetCombatPower(List<Skill> skills)
+        {
+            foreach (var skill in skills.Where(skill => skill.CanCast()))
+            {
+                if (skill.Meta.IsCastOnSelf)
+                    return skill.ToPower();
+
+                if (skill.Meta.TargetSelector != null)
+                    return skill.ToPower(skill.Meta.CastRange, skill.Meta.TargetSelector(skill.Meta));
+
+                if (skill.Meta.IsAreaEffectSkill)
+                    return skill.ToPower(skill.Meta.CastRange, GetBestAreaEffectTarget(skill));
+
+                if (skill.Meta.IsOffensiveSkill)
+                    return skill.ToPower(skill.Meta.CastRange, CurrentTarget.Position);
+
+                return skill.ToPower();
+            }
+
+            return null;
         }
 
     }

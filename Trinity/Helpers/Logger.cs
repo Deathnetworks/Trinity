@@ -5,6 +5,7 @@ using log4net;
 using log4net.Appender;
 using log4net.Layout;
 using log4net.Repository.Hierarchy;
+using Trinity.Config;
 using Zeta.Common;
 
 namespace Trinity.Technicals
@@ -52,7 +53,7 @@ namespace Trinity.Technicals
                     LastLogMessages.Add(key, "");
                 
                 string lastMessage;
-                if (LastLogMessages.TryGetValue(key, out lastMessage) && lastMessage != msg)
+                if (LastLogMessages.TryGetValue(key, out lastMessage) && (Trinity.Settings.Advanced.AllowDuplicateMessages || lastMessage != msg))
                 {
                     LastLogMessages[key] = msg;
 

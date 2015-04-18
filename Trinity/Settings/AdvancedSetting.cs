@@ -29,6 +29,7 @@ namespace Trinity.Config
         private bool _ShowHeroName;
         private bool _ShowHeroClass;
         private bool _DisableAllMovement;
+        private bool _AllowDuplicateMessages;
         #endregion Fields
 
         #region Events
@@ -428,7 +429,28 @@ namespace Trinity.Config
                 }
             }
         }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool AllowDuplicateMessages
+        {
+            get
+            {
+                return _AllowDuplicateMessages;
+            }
+            set
+            {
+                if (_AllowDuplicateMessages != value)
+                {
+                    _AllowDuplicateMessages = value;
+                    OnPropertyChanged("AllowDuplicateMessages");
+                }
+            }
+        }
         #endregion Properties
+
+
+
 
         #region Methods
         public void Reset()

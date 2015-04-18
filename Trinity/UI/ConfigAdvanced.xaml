@@ -36,6 +36,7 @@
                         <CheckBox IsChecked="{Binding Advanced.ShowHeroClass}" Content="Show Hero Class in Title bar"/>
                         <CheckBox IsChecked="{Binding Advanced.LazyRaiderClickToPause}" Content="Lazy Raider Click to Pause"/>
                         <CheckBox IsChecked="{Binding Advanced.DisableAllMovement}" Content="Disable All Movement"/>
+                        <CheckBox IsChecked="{Binding Advanced.AllowDuplicateMessages}" Content="Allow Duplicate Messages"/>
                     </UniformGrid>
                 </GroupBox>
                 <GroupBox Header="Unstucker">

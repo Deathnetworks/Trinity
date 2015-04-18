@@ -29,12 +29,10 @@ namespace Trinity
 
             public PlayerCache()
             {
-                // Make sure data is immediately available 
-                // while bot is not running or before pulse starts
                 UpdatePlayerCache();                
             }
 
-            private static PlayerCache _instance = null;
+            private static PlayerCache _instance;
             public static PlayerCache Instance
             {
                 get { return _instance ?? (_instance = new PlayerCache()); }

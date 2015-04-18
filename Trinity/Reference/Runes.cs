@@ -10528,6 +10528,7 @@ namespace Trinity.Reference
                 SkillIndex = 4,
                 ModifiedElement = Element.Fire,
                 ModifiedIsDamaging = true,
+                ModifiedAreaEffectRadius = 8,
                 Class = ActorClass.DemonHunter
             };
             #endregion
