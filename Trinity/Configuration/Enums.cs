@@ -1,4 +1,6 @@
-﻿namespace Trinity
+﻿using System;
+
+namespace Trinity
 {
     /// <summary>
     /// Primary "lowest level" item type (eg EXACTLY what kind of item it is)
@@ -204,6 +206,30 @@
         None = 0,
         Generator,
         Spender
+    }
+
+    public enum AreaEffectShapeType
+    {
+        None = 0,
+        Cone,                
+        Circle,
+        Beam        
+    }
+
+    [Flags]
+    public enum EffectTypeFlags
+    {        
+        None            = 0,
+        Stun            = 1 << 0,
+        Knockback       = 1 << 1,
+        Immobilize      = 1 << 2,
+        Chill           = 1 << 3,
+        Blind           = 1 << 4,
+        Charm           = 1 << 5,
+        Slow            = 1 << 6,
+        Freeze          = 1 << 7, 
+
+        Any = Freeze | Stun | Knockback | Immobilize | Chill | Blind | Charm | Slow
     }
 
 }

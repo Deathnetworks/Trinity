@@ -18,5 +18,16 @@ namespace Trinity.Helpers
         {
             return Math.Round(acdItem.GetAttribute<float>(ActorAttributeType.DamageWeaponPercentAll) *100, MidpointRounding.AwayFromZero);
         }
+
+        public static double WeaponBaseMaxPhysicalDamage(this ACDItem acdItem)
+        {
+            return acdItem.GetAttribute<float>(ActorAttributeType.DamageMaxWeaponBonusPhysical) + acdItem.GetAttribute<float>(ActorAttributeType.DamageMinWeaponBonusPhysical);
+        }
+
+        public static double WeaponBaseMinPhysicalDamage(this ACDItem acdItem)
+        {
+            return acdItem.GetAttribute<float>(ActorAttributeType.DamageMaxWeaponBonusPhysical);
+        }
+
     }
 }

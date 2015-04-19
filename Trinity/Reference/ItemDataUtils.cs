@@ -33,13 +33,13 @@ namespace Trinity.Reference
         public static int GetMinBaseDamage(ACDItem item)
         {
             var min = Math.Min(item.Stats.MinDamageElemental, item.Stats.MaxDamageElemental);
-            return (min != 0) ? (int) min : (int) item.Stats.MinDamage;
+            return (min != 0) ? (int)min : (int)item.WeaponBaseMinPhysicalDamage();
         }
 
         public static int GetMaxBaseDamage(ACDItem item)
         {
             var max = Math.Max(item.Stats.MinDamageElemental, item.Stats.MaxDamageElemental);
-            return (max != 0) ? (int)max : (int)item.Stats.MaxDamage;
+            return (max != 0) ? (int)max : (int)item.WeaponBaseMaxPhysicalDamage();
         }
 
         public static double GetElementalDamage(ACDItem item, Element element)

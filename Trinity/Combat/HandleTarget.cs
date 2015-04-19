@@ -7,6 +7,7 @@ using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.DbProvider;
 using Trinity.Items;
+using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Navigation;
@@ -1283,11 +1284,9 @@ namespace Trinity
 
                 if (usePowerResult)
                 {
-                    string powerResultInfo = CombatBase.CurrentPower.TargetPosition != Vector3.Zero ? "at " + NavHelper.PrettyPrintVector3(CombatBase.CurrentPower.TargetPosition) + " dist=" + (int)dist : "";
-                    powerResultInfo += CombatBase.CurrentPower.TargetACDGUID != -1 ? " on " + CombatBase.CurrentPower.TargetACDGUID : "";
-                    
-                    Logger.Log(LogCategory.Behavior, "Used Power {0} " + powerResultInfo, CombatBase.CurrentPower.SNOPower);
-
+                    string target = CombatBase.CurrentPower.TargetPosition != Vector3.Zero ? "at " + NavHelper.PrettyPrintVector3(CombatBase.CurrentPower.TargetPosition) + " dist=" + (int)dist : "";
+                    target += CombatBase.CurrentPower.TargetACDGUID != -1 ? " on " + CombatBase.CurrentPower.TargetACDGUID : "";
+                                        
                     // Monk Stuffs get special attention
                     {
                         if (CombatBase.CurrentPower.SNOPower == SNOPower.Monk_TempestRush)
@@ -1296,6 +1295,24 @@ namespace Trinity
                             MonkCombat.LastSweepingWindRefresh = DateTime.UtcNow;
 
                         MonkCombat.RunOngoingPowers();
+                    }
+
+                    var skill = SkillUtils.ById(CombatBase.CurrentPower.SNOPower);
+                    if (skill != null && skill.Meta != null)
+                    {
+                        Logger.Log(LogCategory.Behavior, "Used Power {0} ({1}) {2} Range={3} ({4} {5}) Delay={6}",
+                            skill.Name,
+                            (int)skill.SNOPower,
+                            target,
+                            skill.Meta.CastRange,
+                            skill.Meta.DebugResourceEffect,
+                            skill.Meta.DebugType,
+                            skill.Meta.AfterUseDelay);                        
+                    }
+                    else
+                    {
+                        Logger.Log(LogCategory.Behavior, "Used Power {0} " + target, CombatBase.CurrentPower.SNOPower);
+
                     }
 
                     SpellTracker.TrackSpellOnUnit(CombatBase.CurrentPower.TargetACDGUID, CombatBase.CurrentPower.SNOPower);

@@ -85,7 +85,7 @@ namespace Trinity.Objects
         public Resource Resource { get; set; }
 
         /// <summary>
-        /// If this skill is a special primary skill (free to cast or generators)
+        /// Blizzards game guide classifies some skills with a primary flag
         /// </summary>
         public bool IsPrimary { get; set; }
 
@@ -100,6 +100,7 @@ namespace Trinity.Objects
 
         /// <summary>
         /// How much this spell costs to cast; uses rune value when applicable.
+        /// Corrisponds to: Beam=Width, Circle=Diameter
         /// </summary>
         public float AreaEffectRadius
         {
@@ -151,7 +152,7 @@ namespace Trinity.Objects
                 var castTime = DateTime.UtcNow.Subtract(TimeSpan.FromMilliseconds(TimeSinceUse));
                 var endTime = castTime.Add(Cooldown);                
                 var remainingMilliseconds = DateTime.UtcNow.Subtract(endTime).TotalMilliseconds;
-                return remainingMilliseconds < 0 ? (int)remainingMilliseconds * -1 : 0;;
+                return remainingMilliseconds < 0 ? (int)remainingMilliseconds * -1 : 0;
             }
         }
 
@@ -262,7 +263,15 @@ namespace Trinity.Objects
 
                 return false;
             }
-        }        
+        }
+
+        /// <summary>
+        /// Check if skill can and should be cast
+        /// </summary>
+        public bool CanCast()
+        {
+            return CombatBase.CanCast(this);
+        }
 
         /// <summary>
         /// Performs basic checks to see if we have and can cast a power (hotbar, power manager). Checks use timer for Wiz, DH, Monk
@@ -380,7 +389,10 @@ namespace Trinity.Objects
                 }
             }
         }
-
+        
+        /// <summary>
+        /// Game client is not doing anything weird.
+        /// </summary>
         private bool GameIsReady
         {
             get { return ZetaDia.IsInGame && ZetaDia.Me.IsValid && !ZetaDia.IsLoadingWorld && !ZetaDia.IsInTown && !ZetaDia.IsPlayingCutscene; }
@@ -394,9 +406,21 @@ namespace Trinity.Objects
             return Index.GetHashCode() ^ Name.GetHashCode();
         }
 
+        /// <summary>
+        /// A unique identifier for IUnique
+        /// </summary>
         public int Id
         {
             get { return (int)SNOPower; }
+        }
+
+        /// <summary>
+        /// Skill metadata
+        /// </summary>
+        public SkillMeta Meta
+        {
+            get { return SkillUtils.GetSkillMeta(this); }
+            set { SkillUtils.SetSkillMeta(value); }
         }
 
     }

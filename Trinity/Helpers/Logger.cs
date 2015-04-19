@@ -5,6 +5,7 @@ using log4net;
 using log4net.Appender;
 using log4net.Layout;
 using log4net.Repository.Hierarchy;
+using Trinity.Config;
 using Zeta.Common;
 
 namespace Trinity.Technicals
@@ -52,7 +53,7 @@ namespace Trinity.Technicals
                     LastLogMessages.Add(key, "");
                 
                 string lastMessage;
-                if (LastLogMessages.TryGetValue(key, out lastMessage) && lastMessage != msg)
+                if (LastLogMessages.TryGetValue(key, out lastMessage) && (Trinity.Settings.Advanced.AllowDuplicateMessages || lastMessage != msg))
                 {
                     LastLogMessages[key] = msg;
 
@@ -286,6 +287,45 @@ namespace Trinity.Technicals
             catch (Exception ex)
             {
                 _Logger.Error("Error in LogToTrinityDebug: " + ex.ToString());
+            }
+        }
+
+        internal static string CallingClassName
+        {
+            get
+            {
+                var result = string.Empty;
+                try
+                {
+                    var frame = new StackFrame(2);
+                    var method = frame.GetMethod();
+
+                    if (method.DeclaringType != null) 
+                        result = method.DeclaringType.Name;
+                }
+                catch (Exception ex)
+                {
+                    LogDebug("Exception in Logger.ClassTag method. {0} {1}", ex.Message, ex.InnerException);
+                }
+                return result;
+            }
+        }
+
+        internal static string CallingMethodName
+        {
+            get
+            {
+                var result = string.Empty;
+                try
+                {
+                    var frame = new StackFrame(2);
+                    result = frame.GetMethod().Name;
+                }
+                catch (Exception ex)
+                {
+                    LogDebug("Exception in Logger.ClassTag method. {0} {1}", ex.Message, ex.InnerException);
+                }
+                return result;
             }
         }
     }

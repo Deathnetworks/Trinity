@@ -3661,7 +3661,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item ZunimassasFingerWraps = new Item
         {
-            Id = 0,
+            Id = 205633,
             Name = "Zunimassa's Finger Wraps",
             Quality = ItemQuality.Legendary,
             Slug = "zunimassas-finger-wraps",
@@ -3799,7 +3799,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item FierceGauntlets = new Item
         {
-            Id = 0,
+            Id = 408873,
             Name = "Fierce Gauntlets",
             Quality = ItemQuality.Legendary,
             Slug = "fierce-gauntlets",
@@ -6421,7 +6421,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item StridersOfDestiny = new Item
         {
-            Id = 0,
+            Id = 408863,
             Name = "Striders of Destiny",
             Quality = ItemQuality.Legendary,
             Slug = "striders-of-destiny",
@@ -7180,7 +7180,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item TassetOfTheWastes = new Item
         {
-            Id = 0,
+            Id = 408862,
             Name = "Tasset of the Wastes",
             Quality = ItemQuality.Legendary,
             Slug = "tasset-of-the-wastes",
@@ -7479,7 +7479,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item AncestorsGrace = new Item
         {
-            Id = 0,
+            Id = 298049,
             Name = "Ancestors' Grace",
             Quality = ItemQuality.Legendary,
             Slug = "ancestors-grace",
@@ -8238,7 +8238,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item TheShortMansFinger = new Item
         {
-            Id = 0,
+            Id = 432666,
             Name = "The Short Man's Finger",
             Quality = ItemQuality.Legendary,
             Slug = "the-short-mans-finger",
@@ -9687,7 +9687,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item FleshTearer = new Item
         {
-            Id = 358801,
+            Id = 116388,//358801,
             Name = "Flesh Tearer",
             Quality = ItemQuality.Legendary,
             Slug = "flesh-tearer",

@@ -894,6 +894,10 @@ namespace Trinity
             376917, // [1FA3B814] Type: ServerProp Name: x1_Westm_Hub_Stool_A-381422 ActorSNO: 376917, Distance: 2.337004
             (int)SNOActor.px_Bounty_Camp_Hellportals_Frame, // A4 bounties
             (int)SNOActor.px_Bounty_Camp_Pinger, // A4 bounties
+
+            // DyingHymn A4 Bounties
+            433402, 
+            434971, 
         };
 
         /// <summary>
@@ -908,6 +912,10 @@ namespace Trinity
             {104827, 15}, // trOut_FesteringWoods_Neph_Column_C_Broken_Base 
             {355898, 12}, // x1_Bog_Family_Guard_Tower_Stump
             {376917, 10}, 
+
+            // DyingHymn A4 Bounties
+            {433402, 8},
+            {434971, 10},
             
          };
 
