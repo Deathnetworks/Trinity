@@ -1110,7 +1110,7 @@ namespace Trinity.Reference
                     meta.IsAreaEffectSkill = true;
                     meta.AreaEffectShape = AreaEffectShapeType.Cone;
                     meta.MaxTargetDistance = 90f;
-                    skill.AreaEffectRadius = 90f;
+                    skill.AreaEffectRadius = 50f;
                 }
             };
 

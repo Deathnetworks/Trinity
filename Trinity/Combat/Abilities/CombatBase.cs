@@ -758,7 +758,7 @@ namespace Trinity.Combat.Abilities
                     {
                         var actualResource = (skill.Resource == Resource.Discipline) ? Player.SecondaryResource : Player.PrimaryResource;
                         if (actualResource < resourceCost)
-                            return string.Format("NotEnoughResource({0}/{1})", actualResource, resourceCost);
+                            return string.Format("NotEnoughResource({0}/{1})", Math.Round(actualResource), resourceCost);
                     }
 
                     //if (meta.IsEliteOnly && !CurrentTarget.IsBossOrEliteRareUnique)

@@ -231,6 +231,24 @@ namespace Trinity
         }
 
         /// <summary>
+        /// Create a TrinityPower for use at a specific location
+        /// </summary>
+        /// <param name="snoPower"></param>
+        /// <param name="minimumRange"></param>
+        /// <param name="position"></param>
+        public TrinityPower(SNOPower snoPower, float minimumRange, Vector3 position, float waitTicksBeforeUse, float waitTicksAfterUse)
+        {
+            SNOPower = snoPower;
+            MinimumRange = minimumRange;
+            TargetPosition = position;
+            TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
+            TargetACDGUID = -1;
+            WaitTicksBeforeUse = waitTicksBeforeUse;
+            WaitTicksAfterUse = waitTicksAfterUse;
+            PowerAssignmentTime = DateTime.UtcNow;
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TrinityPower" /> class.
         /// </summary>
         /// <param name="snoPower">The SNOPower to be used</param>
