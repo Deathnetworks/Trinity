@@ -208,7 +208,7 @@ namespace Trinity
         Spender
     }
 
-    public enum AreaEffectShape
+    public enum AreaEffectShapeType
     {
         None = 0,
         Cone,                

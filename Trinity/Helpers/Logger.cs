@@ -289,5 +289,44 @@ namespace Trinity.Technicals
                 _Logger.Error("Error in LogToTrinityDebug: " + ex.ToString());
             }
         }
+
+        internal static string CallingClassName
+        {
+            get
+            {
+                var result = string.Empty;
+                try
+                {
+                    var frame = new StackFrame(2);
+                    var method = frame.GetMethod();
+
+                    if (method.DeclaringType != null) 
+                        result = method.DeclaringType.Name;
+                }
+                catch (Exception ex)
+                {
+                    LogDebug("Exception in Logger.ClassTag method. {0} {1}", ex.Message, ex.InnerException);
+                }
+                return result;
+            }
+        }
+
+        internal static string CallingMethodName
+        {
+            get
+            {
+                var result = string.Empty;
+                try
+                {
+                    var frame = new StackFrame(2);
+                    result = frame.GetMethod().Name;
+                }
+                catch (Exception ex)
+                {
+                    LogDebug("Exception in Logger.ClassTag method. {0} {1}", ex.Message, ex.InnerException);
+                }
+                return result;
+            }
+        }
     }
 }

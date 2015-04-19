@@ -608,8 +608,15 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         internal static TrinityPower GetAttackGenerator()
         {
-            var generator = SkillUtils.Active.FirstOrDefault(s => s.IsGeneratorOrPrimary && s.CanCast());
-            return generator == null ? null : generator.ToPower(generator.Meta.CastRange, Enemies.BestCluster.Position);
+            var skill = SkillUtils.Active.FirstOrDefault(s => s.IsGeneratorOrPrimary && s.CanCast());
+            if (skill == null)
+                return null;
+
+            var power = GetTrinityPower(skill);
+
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, Logger.CallingClassName + " Returning Generator Skill: {0} ({1}) Target={2}", power.SNOPower, (int)power.SNOPower, (CurrentTarget == null) ? "None" : CurrentTarget.InternalName);
+
+            return power;
         }
 
         /// <summary>
@@ -617,8 +624,16 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         internal static TrinityPower GetAttackSpender()
         {
-            var spender = SkillUtils.Active.FirstOrDefault(s => s.IsAttackSpender && s.CanCast());
-            return spender == null ? null : spender.ToPower(spender.Meta.CastRange, Enemies.BestCluster.Position);
+            var skill = SkillUtils.Active.FirstOrDefault(s => s.IsAttackSpender && s.CanCast());
+            if (skill == null)
+                return null;
+
+            var power = GetTrinityPower(skill);
+
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, Logger.CallingClassName + " Returning Spender Skill: {0} ({1}) Target={2}", 
+                power.SNOPower, (int)power.SNOPower, (CurrentTarget == null) ? "None" : CurrentTarget.InternalName);
+
+            return power;
         }
 
         /// <summary>
@@ -627,24 +642,49 @@ namespace Trinity.Combat.Abilities
         internal static TrinityPower GetDestructablesSkill()
         {
             var skill = SkillUtils.Active.FirstOrDefault(s => (s.Meta.IsDestructableSkill || s.IsGeneratorOrPrimary) && s.CanCast());
-            return skill == null ? null : skill.ToPower(skill.Meta.CastRange, Enemies.BestCluster.Position);
+            if (skill == null)
+                return null;
+
+            var power = GetTrinityPower(skill);
+
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, Logger.CallingClassName + " Returning Destructable Skill: {0} ({1}) Target={2}", 
+                power.SNOPower, (int)power.SNOPower, (CurrentTarget == null) ? "None" : CurrentTarget.InternalName);
+
+            return power;
         }
 
         /// <summary>
-        /// Select a skill for noping the hell out of there.
+        /// Select a skill for moving places fast
+        /// </summary>
+        internal static TrinityPower GetMovementSkill()
+        {
+            var skill = SkillUtils.Active.FirstOrDefault(s => (s.Meta.IsMovementSkill) && s.CanCast());
+            if (skill == null)
+                return null;
+
+            var power = GetTrinityPower(skill);
+
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, Logger.CallingClassName + " Returning Movement Skill: {0} ({1}) Target={2}", 
+                power.SNOPower, (int)power.SNOPower, (CurrentTarget == null) ? "None" : CurrentTarget.InternalName);
+
+            return power;
+        }
+
+        /// <summary>
+        /// Select a skill for noping the hell out of there, includes skills that provide immunity etc.
         /// </summary>
         internal static TrinityPower GetAvoidanceSkill()
         {
-            var skill = SkillUtils.Active.FirstOrDefault(s => s.Meta.IsAvoidanceSkill && s.CanCast());
-            return skill == null ? null : skill.ToPower(skill.Meta.CastRange, CurrentTarget.Position);
-        }
+            var skill = SkillUtils.Active.FirstOrDefault(s => (s.Meta.IsAvoidanceSkill || s.Meta.IsMovementSkill) && s.Meta.IsDefensiveSkill && s.CanCast());
+            if (skill == null)
+                return null;
 
-        /// <summary>
-        /// Select a skill that is a buff
-        /// </summary>
-        internal static bool IsBuffSkill()
-        {
-            return SkillUtils.Active.Any(s => s.Meta.IsBuffingSkill && s.CanCast());
+            var power = GetTrinityPower(skill);
+
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, Logger.CallingClassName + " Returning Avoidance Skill: {0} ({1}) Target={2}", 
+                power.SNOPower, (int)power.SNOPower, (CurrentTarget == null) ? "None" : CurrentTarget.InternalName);
+
+            return power;
         }
 
         /// <summary>
@@ -653,49 +693,33 @@ namespace Trinity.Combat.Abilities
         internal static TrinityPower GetBuffSkill()
         {
             var skill = SkillUtils.Active.FirstOrDefault(s => s.Meta.IsBuffingSkill && s.CanCast());
-            return skill == null ? null : skill.ToPower();
+            if (skill == null) 
+                return null;
+
+            var power = GetTrinityPower(skill);
+
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, Logger.CallingClassName + " Returning Buff Skill: {0} ({1}) Target={2}", 
+                power.SNOPower, (int)power.SNOPower, (CurrentTarget == null) ? "None" : CurrentTarget.InternalName);
+            
+            return power;
         }
 
         /// <summary>
-        /// Finds a target location using skill metadata.
+        /// Gets the best power for combat
         /// </summary>
-        /// <param name="skill">skill to be used</param>
-        /// <returns>target position</returns>
-        public static Vector3 GetBestAreaEffectTarget(Skill skill)
+        /// <returns></returns>
+        public static TrinityPower GetCombatPower(List<Skill> skills)
         {
-            Vector3 targetLocation;
-            switch (skill.Meta.AreaEffectType)
-            {
-                case AreaEffectShape.Beam:
-                    targetLocation = TargetUtil.GetBestPierceTarget(skill.Meta.CastRange).Position;
-                    break;
-                case AreaEffectShape.Circle:
-                    targetLocation = TargetUtil.GetBestClusterPoint(skill.AreaEffectRadius, skill.Meta.CastRange);
-                    break;
-                case AreaEffectShape.Cone:
-                    targetLocation = TargetUtil.GetBestArcTarget(skill.Meta.CastRange, skill.AreaEffectRadius).Position;
-                    break;
-                default:
-                    targetLocation = Enemies.BestLargeCluster.Position;
-                    break;                    
-            }  
+            var skill = skills.FirstOrDefault(s => s.CanCast());
+            if (skill == null)
+                return null;
 
-            if(targetLocation == Vector3.Zero)
-                targetLocation = CurrentTarget.Position;
+            var power = GetTrinityPower(skill);
 
-            return targetLocation;            
-        }
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, Logger.CallingClassName + " Returning Combat Skill: {0} ({1}) Target={2}",
+                power.SNOPower, (int)power.SNOPower, (CurrentTarget == null) ? "None" : CurrentTarget.InternalName);
 
-        /// <summary>
-        /// Checks if a skill can and should be cast.
-        /// Skill property must be assigned in action delegate
-        /// </summary>
-        /// <param name="changes">action to modify existing skill data</param>
-        public static bool CanCast(Action<SkillMeta> changes)
-        {
-            var obj = new SkillMeta();
-            changes(obj);
-            return CanCast(obj);                    
+            return power;
         }
 
         /// <summary>
@@ -809,31 +833,58 @@ namespace Trinity.Combat.Abilities
         }
 
         /// <summary>
-        /// Gets the best power for combat
+        /// Converts a skill into a TrinityPower for casting
         /// </summary>
         /// <returns></returns>
-        public static TrinityPower GetCombatPower(List<Skill> skills)
+        public static TrinityPower GetTrinityPower(Skill skill)
         {
-            foreach (var skill in skills.Where(skill => skill.CanCast()))
-            {
-                if (skill.Meta.IsCastOnSelf)
-                    return skill.ToPower();
-
-                if (skill.Meta.TargetSelector != null)
-                    return skill.ToPower(skill.Meta.CastRange, skill.Meta.TargetSelector(skill.Meta));
-
-                if (skill.Meta.IsAreaEffectSkill)
-                    return skill.ToPower(skill.Meta.CastRange, GetBestAreaEffectTarget(skill));
-
-                if (skill.Meta.IsOffensiveSkill)
-                    return skill.ToPower(skill.Meta.CastRange, CurrentTarget.Position);
-
+            if (skill.Meta.IsCastOnSelf)
                 return skill.ToPower();
-            }
 
-            return null;
+            var castRange = (skill.Meta.CastRange <= 0) ? (int)Math.Round(skill.Meta.MaxTargetDistance * 0.5) : skill.Meta.CastRange;
+
+            if (skill.Meta.TargetSelector != null)
+                return skill.ToPower(castRange, skill.Meta.TargetSelector(skill.Meta));
+
+            if (skill.Meta.IsAreaEffectSkill)
+                return skill.ToPower(castRange, GetBestAreaEffectTarget(skill));
+
+            if (skill.Meta.IsOffensiveSkill)
+                return skill.ToPower(castRange, CurrentTarget.Position);
+
+            return skill.ToPower();
         }
 
+        /// <summary>
+        /// Finds a target location using skill metadata.
+        /// </summary>
+        /// <param name="skill">skill to be used</param>
+        /// <returns>target position</returns>
+        public static Vector3 GetBestAreaEffectTarget(Skill skill)
+        {
+            Vector3 targetLocation;
+            switch (skill.Meta.AreaEffectShape)
+            {
+                case AreaEffectShapeType.Beam:
+                    targetLocation = TargetUtil.GetBestPierceTarget(skill.Meta.CastRange).Position;
+                    break;
+                case AreaEffectShapeType.Circle:
+                    targetLocation = TargetUtil.GetBestClusterPoint(skill.AreaEffectRadius, skill.Meta.CastRange);
+                    break;
+                case AreaEffectShapeType.Cone:
+                    targetLocation = TargetUtil.GetBestArcTarget(skill.Meta.CastRange, skill.AreaEffectRadius).Position;
+                    break;
+                default:
+                    targetLocation = Enemies.BestLargeCluster.Position;
+                    break;
+            }
+
+            if (targetLocation == Vector3.Zero)
+                targetLocation = CurrentTarget.Position;
+
+            return targetLocation;
+        }
+        
     }
 
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Trinity.Combat.Abilities;
+using Trinity.Technicals;
 using Zeta.Common;
 using Logger = Trinity.Technicals.Logger;
 
@@ -14,7 +15,7 @@ namespace Trinity.Objects
     {
         #region Constructors
 
-        public SkillMeta(Skill skill = null)
+        public SkillMeta(Skill skill)
         {
             Skill = skill;
         }
@@ -47,7 +48,7 @@ namespace Trinity.Objects
         }
 
         /// <summary>
-        /// Should only be used for elites
+        /// Should be cast at players' location
         /// </summary> 
         public bool IsCastOnSelf
         {
@@ -83,7 +84,7 @@ namespace Trinity.Objects
         }
 
         /// <summary>
-        /// Summon minions or pets when used
+        /// Has a knockback effect
         /// </summary>    
         public bool IsKnockbackSkill
         {
@@ -203,10 +204,10 @@ namespace Trinity.Objects
         /// <summary>
         /// Shape of area damage
         /// </summary>
-        public AreaEffectShape AreaEffectType
+        public AreaEffectShapeType AreaEffectShape
         {
-            get { return _areaEffectType.GetValueOrDefault(); }
-            set { _areaEffectType = value; }
+            get { return _areaEffectShape.GetValueOrDefault(); }
+            set { _areaEffectShape = value; }
         }
 
         /// <summary>
@@ -244,26 +245,28 @@ namespace Trinity.Objects
         }
 
         /// <summary>
-        /// Special Condition to be evaluated for Attacking
+        /// Special delegate for determining if the spell should be cast
         /// </summary>
         public Func<SkillMeta, bool> CastCondition;
 
         /// <summary>
-        /// Special Condition to be evaluated for Attacking
+        /// Special delegate for determining where to cast the spell
         /// </summary>
         public Func<SkillMeta, Vector3> TargetSelector;
 
         /// <summary>
-        /// Special action to apply rune based overrides
+        /// Special action to apply default overrides. 
+        /// This exposes a way to write code that wont fit in the collection initializer
+        /// E.g. Properties based on IF statements or set properties on the skill object.
         /// </summary>
-        public Action<Skill, SkillMeta> Overrides;
+        public Action<Skill, SkillMeta> Defaults;
 
         #endregion
 
         #region Fields
 
         private CombatBase.CanCastFlags? _castFlags;
-        private AreaEffectShape? _areaEffectType;
+        private AreaEffectShapeType? _areaEffectShape;
         private float? _requiredResource;
         private float? _requiredCluster;
         private float? _maxCastDistance;
@@ -298,6 +301,7 @@ namespace Trinity.Objects
 
         /// <summary>
         /// Change this instance using the set values of other instances
+        /// Properties that have not been set will not be applied.
         /// </summary>
         public SkillMeta Apply(params SkillMeta[] others)
         {
@@ -319,7 +323,7 @@ namespace Trinity.Objects
                 IsBuffingSkill = other._isBuffingSkill ?? IsBuffingSkill;
                 IsDebuffingSkill = other._isDebuffingSkill ?? IsDebuffingSkill;
                 IsAreaEffectSkill = other._isAreaEffectSkill ?? IsAreaEffectSkill;
-                AreaEffectType = other._areaEffectType ?? AreaEffectType;
+                AreaEffectShape = other._areaEffectShape ?? AreaEffectShape;
                 TargetEffectFlags = other._targetEffectFlags ?? TargetEffectFlags;
                 MaxTargetDistance = other._maxTargetDistance ?? MaxTargetDistance;
                 CastRange = other._maxCastDistance ?? CastRange;
@@ -335,6 +339,7 @@ namespace Trinity.Objects
 
         /// <summary>
         /// Copy the set values of this instance to another instance
+        /// Properties that have not been set will not be applied.
         /// </summary>
         /// <param name="other"></param>
         public void ApplyTo(SkillMeta other)
@@ -352,7 +357,7 @@ namespace Trinity.Objects
             other.IsBuffingSkill = _isBuffingSkill ?? other.IsBuffingSkill;
             other.IsDebuffingSkill = _isDebuffingSkill ?? other.IsDebuffingSkill;
             other.IsAreaEffectSkill = _isAreaEffectSkill ?? other.IsAreaEffectSkill;
-            other.AreaEffectType = _areaEffectType ?? other.AreaEffectType;
+            other.AreaEffectShape = _areaEffectShape ?? other.AreaEffectShape;
             other.TargetEffectFlags = _targetEffectFlags ?? other.TargetEffectFlags;
             other.MaxTargetDistance = _maxTargetDistance ?? other.MaxTargetDistance;
             other.CastRange = _maxCastDistance ?? other.CastRange;
@@ -367,7 +372,16 @@ namespace Trinity.Objects
             var clone = new SkillMeta(Skill);
             clone.Apply(this);
             return clone;
-        }       
+        }
+
+        public void ApplyDefaults()
+        {
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "Applying SkillMeta Defaults for {0} ({1})", 
+                Skill.Name, Logger.CallingClassName, Logger.CallingMethodName);  
+
+            if(Defaults!=null)
+                Defaults(Skill, this);
+        }  
 
         #endregion
 

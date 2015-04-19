@@ -19,7 +19,7 @@ namespace Trinity.Combat.Abilities
 
         static DemonHunterCombat()
         {
-            // Load Default Metadata for skills
+            // Load Default Metadata
             SkillUtils.SetSkillMeta(SkillsDefaultMeta.DemonHunter.ToList());
 
             // Load custom conditions for when skills should be used.
@@ -36,49 +36,35 @@ namespace Trinity.Combat.Abilities
             GetCombatContext();
 
             if (UseDestructiblePower && TryGetPower(GetDestructablesSkill(), out power))
-            {
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "GetPower() Returning DestructablesSkill:  {0} Target={1}", power.SNOPower, (CurrentTarget == null) ? "Null" : CurrentTarget.InternalName);
                 return power;
-            }
 
             if (IsCurrentlyAvoiding && TryGetPower(GetAvoidanceSkill(), out power))
-            {
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "GetPower() Returning AvoidanceSkill:  {0} Target={1}", power.SNOPower, (CurrentTarget == null) ? "Null" : CurrentTarget.InternalName);
                 return power;
-            }
-                
-
+   
             if (CurrentTarget == null)
             {
+                // Out of Combat Buffs
                 if (!IsCurrentlyAvoiding && !Player.IsInTown && TryGetPower(GetBuffSkill(), out power))
-                {
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "GetPower() Returning BuffSkill:  {0} Target={1}", power.SNOPower, (CurrentTarget == null) ? "Null" : CurrentTarget.InternalName);
                     return power;  
-                }
             }
             else
             {
+                // Use Generator for the Bastians Ring Set buff
                 if (ShouldRefreshBastiansGeneratorBuff && TryGetPower(GetAttackGenerator(), out power))
-                {
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "GetPower() Returning BastiansGenerator:  {0} Target={1}", power.SNOPower, (CurrentTarget == null) ? "Null" : CurrentTarget.InternalName);
                     return power;
-                }
 
+                // Main ability selection 
                 if (TryGetPower(GetCombatPower(CombatSkillOrder), out power))
-                {
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "GetPower() Returning CombatPower:  {0} Target={1}", power.SNOPower, (CurrentTarget == null) ? "Null" : CurrentTarget.InternalName);
                     return power;
-                }
 
+                // Backup use any Primary/Generator
                 if (TryGetPower(GetAttackGenerator(), out power))
-                {
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "GetPower() Returning AttackGenerator:  {0} Target={1}", power.SNOPower, (CurrentTarget == null) ? "Null" : CurrentTarget.InternalName);
-                    return power;  
-                }
-                                  
+                    return power;                  
             }
 
-            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "GetPower() Returning DefaultPower {0} Target={1}", DefaultPower.SNOPower, (CurrentTarget == null) ? "Null" : CurrentTarget.InternalName);
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "GetPower() Returning DefaultPower Target={0}", 
+                (CurrentTarget == null) ? "Null" : CurrentTarget.InternalName);
+
             return DefaultPower;
         }
 
@@ -176,6 +162,7 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         private static bool GrenadeCondition(SkillMeta meta)
         {
+            meta.CastRange = 40f;
             return true;
         }
 
@@ -184,6 +171,7 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         private static bool BolasCondition(SkillMeta meta)
         {
+            meta.CastRange = 50f;
             return true;
         }
 
@@ -192,6 +180,7 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         private static bool EntanglingShotCondition(SkillMeta meta)
         {
+            meta.CastRange = 50f;
             return true;
         }
 
@@ -200,6 +189,7 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         private static bool HungeringArrowCondition(SkillMeta meta)
         {
+            meta.CastRange = 50f;
             return true;
         }
 
@@ -210,8 +200,8 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         private static bool EvasiveFireCondition(SkillMeta meta)
         {
-            meta.CastRange = HasNoPrimary ? 70f : 0f;
-            return TargetUtil.AnyMobsInRange(10f) || HasNoPrimary;
+            meta.CastRange = 20f;
+            return TargetUtil.AnyMobsInRange(10f);
         }
 
         /// <summary>
@@ -219,6 +209,8 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         private static bool ImpaleCondition(SkillMeta meta)
         {
+            meta.CastRange = 80f;
+
             // Saving up for something more awesome
             if (Player.PrimaryResource < _specialEnergyReserve && IsWaitingForSpecial)
                 return false;
@@ -241,6 +233,7 @@ namespace Trinity.Combat.Abilities
         private static bool RapidFireCondition(SkillMeta meta)
         {
             meta.CastFlags = CanCastFlags.NoTimer;
+            meta.CastRange = 45f;
 
             // Saving up for something more awesome
             if (Player.PrimaryResource < _specialEnergyReserve && IsWaitingForSpecial)
@@ -262,6 +255,8 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         private static bool ChakramCondition(SkillMeta meta)
         {
+            meta.CastRange = 50f;
+
             // Spam it for Shuriken Cloud buff
             if (Runes.DemonHunter.ShurikenCloud.IsActive && TimeSincePowerUse(SNOPower.DemonHunter_Chakram) >= 110000 &&
                 ((Player.PrimaryResource >= 10 && !IsWaitingForSpecial) || Player.PrimaryResource >= MinEnergyReserve))
@@ -279,6 +274,8 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         private static bool ClusterArrowCondition(SkillMeta meta)
         {
+            meta.CastRange = 45f;
+
             // Saving up for something more awesome
             if (Player.PrimaryResource < _specialEnergyReserve && IsWaitingForSpecial)
                 return false;
@@ -295,19 +292,7 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         private static bool ElementalArrowCondition(SkillMeta meta)
         {
-            // Lightning DH
-            if (Runes.DemonHunter.BallLightning.IsActive && Legendary.MeticulousBolts.IsEquipped && Player.PrimaryResource >= 10)
-            {
-                meta.CastRange = 10f;
-                return true;
-            }
-
-            // Kridershot
-            if (Legendary.Kridershot.IsEquipped)
-            {
-                meta.CastRange = 65f;
-                return true;
-            }
+            meta.CastRange = 100f;
 
             // Saving up for something more awesome
             if (Player.PrimaryResource < _specialEnergyReserve && IsWaitingForSpecial)
@@ -316,6 +301,14 @@ namespace Trinity.Combat.Abilities
             // Stay above minimum resource level
             if (Player.PrimaryResource < _minEnergyReserve)
                 return false;
+
+            // Lightning DH
+            if (Runes.DemonHunter.BallLightning.IsActive && Legendary.MeticulousBolts.IsEquipped && Player.PrimaryResource >= 10)
+                meta.CastRange = 10f;
+
+            // Kridershot
+            if (Legendary.Kridershot.IsEquipped)
+                meta.CastRange = 65f;
 
             return true;
         }
@@ -354,6 +347,7 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         private static bool StrafeCondition(SkillMeta meta)
         {
+            meta.CastRange = 65f;
             meta.AfterUseDelay = TrinityPower.MillisecondsToTickDelay(250);
             meta.TargetSelector = ret => TargetUtil.GetZigZagTarget(CurrentTarget.Position, V.F("Barbarian.Whirlwind.ZigZagDistance"));
             meta.CastFlags = CanCastFlags.NoTimer;
@@ -383,6 +377,8 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         private static bool FanOfKnivesCondition(SkillMeta meta)
         {
+            meta.CastRange = 25f;
+
             if (TargetUtil.EliteOrTrashInRange(15) || TargetUtil.AnyTrashInRange(15f, 5, false))
                 return true;
 
@@ -394,6 +390,7 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         private static bool VaultCondition(SkillMeta meta)
         {
+            meta.CastRange = 20f;
             meta.TargetSelector = ret => NavHelper.MainFindSafeZone(Player.Position, true);
             meta.IsCombatOnly = Settings.Combat.DemonHunter.VaultMode == DemonHunterVaultMode.CombatOnly;
             meta.RequiredResource = Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) ? 22 : 16;
@@ -410,6 +407,7 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         private static bool MarkedForDeathCondition(SkillMeta meta)
         {
+            meta.CastRange = 100f;
             meta.CastFlags = CanCastFlags.NoTimer;
 
             if (!CurrentTarget.HasDebuff(SNOPower.DemonHunter_MarkedForDeath) && !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.DemonHunter_MarkedForDeath))                
@@ -467,8 +465,13 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         private static bool SentryCondition(SkillMeta meta)
         {
+            meta.CastRange = 80f;
             meta.CastFlags = CanCastFlags.NoTimer;
-            return TargetUtil.AnyMobsInRange(65) && Trinity.PlayerOwnedDHSentryCount < MaxSentryCount;
+
+            if (TargetUtil.AnyMobsInRange(65) && Trinity.PlayerOwnedDHSentryCount < MaxSentryCount)
+                return true;
+
+            return false;
         }
 
         /// <summary>
@@ -476,6 +479,8 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         private static bool RainOfVengeanceCondition(SkillMeta meta)
         {
+            meta.CastRange = 90f;            
+
             if (Settings.Combat.DemonHunter.RainOfVengeanceOffCD || Sets.NatalyasVengeance.IsEquipped)
                 return true;
 
@@ -509,14 +514,23 @@ namespace Trinity.Combat.Abilities
         {
             meta.CastFlags = CanCastFlags.NoTimer;
 
-            var normalCast = !GetHasBuff(SNOPower.DemonHunter_ShadowPower) &&
-                    (Player.CurrentHealthPct <= 0.50 || Player.IsRooted || TargetUtil.AnyMobsInRange(15) ||
-                    (Legendary.MeticulousBolts.IsEquipped && TargetUtil.AnyMobsInRange(60)) || Player.IsIncapacitated);
+            // Buff Already Active
+            if (GetHasBuff(SNOPower.DemonHunter_ShadowPower))
+                return false;
 
-            var spam = Settings.Combat.DemonHunter.SpamSmokeScreen && CanCast(SNOPower.DemonHunter_SmokeScreen) &&
-                        !GetHasBuff(SNOPower.DemonHunter_ShadowPower);
+            // Mobs in range
+            if (TargetUtil.AnyMobsInRange(15) || (Legendary.MeticulousBolts.IsEquipped && TargetUtil.AnyMobsInRange(60)))
+                return true;
 
-            return normalCast || spam;
+            // Defensive Cast
+            if((Player.CurrentHealthPct <= 0.50 || Player.IsRooted || Player.IsIncapacitated))
+                return true;
+
+            // Spam Setting
+            if (Settings.Combat.DemonHunter.SpamSmokeScreen)
+                return true;
+
+            return false;
         }
 
         /// <summary>
@@ -524,20 +538,31 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         private static bool ShadowPowerCondition(SkillMeta meta)
         {
-            var lowHealthCast = (TimeSincePowerUse(SNOPower.DemonHunter_ShadowPower) > 4500 || !GetHasBuff(SNOPower.DemonHunter_ShadowPower)) &&
-                                Player.CurrentHealthPct <= Trinity.PlayerEmergencyHealthPotionLimit &&
-                                Player.SecondaryResource >= 14;
+            // Buff Already Active
+            if(GetHasBuff(SNOPower.DemonHunter_ShadowPower))
+                return false;
 
-            var normalCast = !Settings.Combat.DemonHunter.SpamShadowPower && !Player.IsIncapacitated &&
-                                (!GetHasBuff(SNOPower.DemonHunter_ShadowPower) || Player.CurrentHealthPct <= EmergencyHealthPotionLimit) && 
-                                // if we don't have the buff or our health is low
-                                (Player.CurrentHealthPct < 1f || Player.IsRooted || TargetUtil.AnyMobsInRange(15));
+            // Not Enough Discipline
+            if (Player.SecondaryResource >= 14)
+                return false;
 
-            var spam = Settings.Combat.DemonHunter.SpamShadowPower && CanCast(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
-                        TimeSincePowerUse(SNOPower.DemonHunter_ShadowPower) > 250 && !GetHasBuff(SNOPower.DemonHunter_ShadowPower) &&
-                        Player.SecondaryResource >= 14;
+            // Used Recently
+            if (TimeSincePowerUse(SNOPower.DemonHunter_ShadowPower) < 4500)
+                return false;
 
-            return lowHealthCast || normalCast || spam;
+            // Low Health
+            if(Player.CurrentHealthPct <= Trinity.PlayerEmergencyHealthPotionLimit && Player.SecondaryResource >= 14)
+                return true;
+
+            // Defensive Cast
+            if(Player.IsRooted || TargetUtil.AnyMobsInRange(15))
+                return true;
+
+            // Spam Setting
+            if(Settings.Combat.DemonHunter.SpamShadowPower)
+                return true;
+
+            return false;
         }
 
         /// <summary>
@@ -547,7 +572,7 @@ namespace Trinity.Combat.Abilities
         {
             meta.CastFlags = CanCastFlags.NoTimer;
 
-            if (!Settings.Combat.DemonHunter.VengeanceElitesOnly && TargetUtil.AnyMobsInRange(60, 6))
+            if (!Settings.Combat.DemonHunter.VengeanceElitesOnly && TargetUtil.AnyMobsInRange(60f, 6))
                 return true;
 
             if (TargetUtil.IsEliteTargetInRange(100f))

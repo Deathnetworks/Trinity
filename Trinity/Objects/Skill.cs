@@ -100,6 +100,7 @@ namespace Trinity.Objects
 
         /// <summary>
         /// How much this spell costs to cast; uses rune value when applicable.
+        /// Corrisponds to: Beam=Width, Circle=Diameter
         /// </summary>
         public float AreaEffectRadius
         {

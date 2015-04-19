@@ -9687,7 +9687,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item FleshTearer = new Item
         {
-            Id = 358801,
+            Id = 116388,//358801,
             Name = "Flesh Tearer",
             Quality = ItemQuality.Legendary,
             Slug = "flesh-tearer",

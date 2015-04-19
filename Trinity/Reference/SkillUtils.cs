@@ -24,31 +24,31 @@ namespace Trinity.Reference
         /// <summary>
         /// Set skill to use an SkillMeta object
         /// </summary>
-        public static void SetSkillMeta(SkillMeta newSetting)
+        public static void SetSkillMeta(SkillMeta newMeta)
         {
-            if (newSetting.Skill == null)
+            if (newMeta.Skill == null)
             {
                 Logger.Log("SkillInfo set attempt without a reference to a skill");
                 return;
             }
 
-            SkillMeta oldSetting;
-            if (_skillMetas.TryGetValue(newSetting.Skill, out oldSetting))
+            SkillMeta oldMeta;
+            if (_skillMetas.TryGetValue(newMeta.Skill, out oldMeta))
             {
-                oldSetting.Apply(newSetting);
+                oldMeta.Apply(newMeta);
             }
             else
             {
-                _skillMetas.Add(newSetting.Skill, newSetting);
+                _skillMetas.Add(newMeta.Skill, newMeta);
             }
         }
 
         /// <summary>
         /// Set skills to use SkillMeta objects
         /// </summary>
-        public static void SetSkillMeta(List<SkillMeta> infos)
+        public static void SetSkillMeta(IEnumerable<SkillMeta> metas)
         {
-            infos.ForEach(SetSkillMeta);
+            metas.ForEach(SetSkillMeta);
         }
 
         /// <summary>
