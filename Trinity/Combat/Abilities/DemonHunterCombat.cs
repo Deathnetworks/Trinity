@@ -74,12 +74,13 @@ namespace Trinity.Combat.Abilities
         private static void GetCombatContext()
         {
             _minEnergyReserve = 25;
-            _specialEnergyReserve = 50;
+            _specialEnergyReserve = 40;
 
             if (Sets.EmbodimentOfTheMarauder.IsFullyEquipped)
                 _minEnergyReserve = 20;
 
             IsWaitingForSpecial = Player.PrimaryResource < _specialEnergyReserve;
+
         }
 
         /// <summary>
@@ -279,7 +280,8 @@ namespace Trinity.Combat.Abilities
         {
             meta.CastRange = 85f;
 
-            if (IsWaitingForSpecial)
+            // Natalyas - Wait for damage buff
+            if (Sets.NatalyasVengeance.IsFullyEquipped && Player.PrimaryResource < 100 && !CacheData.Buffs.HasBuff(SNOPower.P2_ItemPassive_Unique_Ring_053))
                 return false;
 
             // Stay above minimum resource level
@@ -366,6 +368,10 @@ namespace Trinity.Combat.Abilities
         private static bool MultiShotCondition(SkillMeta meta)
         {
             meta.CastFlags = CanCastFlags.NoPowerManager;
+
+            // Natalyas - Wait for damage buff
+            if (Sets.NatalyasVengeance.IsFullyEquipped && Player.PrimaryResource < 100 && !CacheData.Buffs.HasBuff(SNOPower.P2_ItemPassive_Unique_Ring_053))
+                return false;
 
             if (Sets.UnhallowedEssence.IsMaxBonusActive || TargetUtil.ClusterExists(45, 3))
                 return true;
