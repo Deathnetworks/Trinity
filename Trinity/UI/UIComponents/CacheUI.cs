@@ -1,11 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
+using Trinity.Cache;
+using Trinity.Helpers;
 using Trinity.Technicals;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 
 namespace Trinity.UI.UIComponents
 {
@@ -17,7 +21,7 @@ namespace Trinity.UI.UIComponents
         private const int MininumWidth = 25;
         private const int MinimumHeight = 25;
 
-        private const int updateDelay = 1000;
+        private const int UpdateDelay = 1000;
 
         public static Window CreateWindow()
         {
@@ -28,47 +32,19 @@ namespace Trinity.UI.UIComponents
 
                 _window = new Window
                 {
-                    Height = 150,
-                    Width = 600,
+                    Height = 300,
+                    Width = 1200,
                     MinHeight = MinimumHeight,
                     MinWidth = MininumWidth,
                     Title = "Trinity Cache",
-                    Content = new TabControl
-                    {
-                        Items =
-                        {
-                            new TabItem
-                            {
-                                Header = "Main Cache",
-                                Content = new ScrollViewer
-                                {
-                                    HorizontalScrollBarVisibility = ScrollBarVisibility.Visible,
-                                    Content = new DataGrid
-                                    {
-                                        AutoGenerateColumns = false,
-                                        ItemsSource = DataModel.ObservableCache,
-                                        DataContext = DataModel.ObservableCache,
-                                        Columns =
-                                        {
-                                            new DataGridTextColumn {Header = "Distance", IsReadOnly = true, Binding = new IntegerStringBinding("Distance")},
-                                            new DataGridTextColumn {Header = "Name", IsReadOnly = true, Binding = new Binding("InternalName")},
-                                            new DataGridTextColumn {Header = "Type", IsReadOnly = true, Binding = new Binding("Type")},
-                                            new DataGridTextColumn {Header = "Weight", IsReadOnly = true, Binding = new IntegerStringBinding("Weight"),  },
-                                            new DataGridTextColumn {Header = "IsBossOrEliteRareUnique", IsReadOnly = true, Binding = new Binding("IsBossOrEliteRareUnique")},
-                                            new DataGridTextColumn {Header = "Radius", IsReadOnly = true, Binding = new IntegerStringBinding("Radius")},
-                                            new DataGridTextColumn {Header = "WeightInfo", IsReadOnly = true, Binding = new Binding("WeightInfo")},
-                                            //new DataGridTextColumn{Header = "", IsReadOnly = true, Binding = new Binding("") },
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    Content = UILoader.LoadAndTransformXamlFile<UserControl>(Path.Combine(FileManager.PluginPath, "UI", "CacheUI.xaml")),
+                    DataContext = DataModel
                 };
 
+                _isWindowOpen = true;
                 _window.Closed += Window_Closed;
                 Configuration.Events.OnCacheUpdated += Update;
-                Update();
+                _window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
 
             }
             catch (Exception ex)
@@ -79,70 +55,52 @@ namespace Trinity.UI.UIComponents
             return _window;
         }
 
-        private static List<DataGridColumn> TrinityCacheObjectColumns()
-        {
-            var collection = new List<DataGridColumn>();
-            foreach (var pi in typeof(TrinityCacheObject).GetProperties(BindingFlags.Public | BindingFlags.Instance))
-            {
-                bool skip = false;
-                foreach (var ca in pi.CustomAttributes)
-                {
-                    if (ca.GetType() == typeof(NoCopy))
-                    {
-                        skip = true;
-                        break;
-                    }
-                }
-                if (skip)
-                    continue;
-
-                if (pi.PropertyType.IsPrimitive)
-                {
-                    collection.Add(new DataGridTextColumn { Header = pi.Name, IsReadOnly = true, Binding = new Binding(pi.Name) });
-                }
-            }
-            return collection;
-        }
-
-
+        private static bool _isUpdating;
+        private static readonly Stopwatch LastUpdatedStopwatch = new Stopwatch();
         private static void Update()
         {
             try
             {
-                Trinity.Invoke(() =>
-                {
-                    DataModel.SourceCacheObjects.Clear();
-                    foreach (var o in Trinity.ObjectCache)
-                        DataModel.SourceCacheObjects.Add(o);
+                if (!_isWindowOpen)
+                    return;
 
-                    foreach (var o in DataModel.SourceCacheObjects)
-                    {
-                        var existing = DataModel.ObservableCache.FirstOrDefault(oc => oc.RActorGuid == o.RActorGuid);
-                        if (existing != null)
-                        {
-                            DataModel.ObservableCache.Remove(existing);
-                            DataModel.ObservableCache.Add(o);
-                        }
-                        else
-                            DataModel.ObservableCache.Add(o);
-                    }
-                    foreach (var o in DataModel.ObservableCache.ToList())
-                    {
-                        if (DataModel.SourceCacheObjects.All(so => so.RActorGuid != o.RActorGuid))
-                            DataModel.ObservableCache.Remove(o);
-                    }
-                });
+                if (!LastUpdatedStopwatch.IsRunning)
+                    LastUpdatedStopwatch.Start();
+                else if (LastUpdatedStopwatch.ElapsedMilliseconds < 250)
+                    return;
+                else
+                    LastUpdatedStopwatch.Restart();
+
+                if (_isUpdating)
+                    return;
+                _isUpdating = true;
+
+                DataModel.Cache = new ObservableCollection<CacheUIObject>(GetCacheActorList());
+
+                _isUpdating = false;
             }
             catch (Exception ex)
             {
+                _isUpdating = false;
                 Logger.LogError("Error in CacheUI Worker: " + ex);
             }
         }
 
+        public static System.Collections.Generic.List<CacheUIObject> GetCacheActorList()
+        {
+            return ZetaDia.Actors.GetActorsOfType<DiaObject>(true)
+                                .Where(i => i.IsFullyValid())
+                                .Select(o => new CacheUIObject(o))
+                                .OrderByDescending(o => o.InCache)
+                                .ThenBy(o => o.Distance)
+                                .ToList();
+        }
+        private static bool _isWindowOpen;
         private static void Window_Closed(object sender, EventArgs e)
         {
             try
             {
+                _isWindowOpen = false;
                 Configuration.Events.OnCacheUpdated -= Update;
                 _window = null;
             }

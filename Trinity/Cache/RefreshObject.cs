@@ -229,6 +229,35 @@ namespace Trinity
                 AddToCache = RefreshStepIgnoreLoS(AddToCache);
                 if (!AddToCache) { c_IgnoreReason = "IgnoreLoS"; return AddToCache; }
             }
+            string extraData = "";
+
+            switch (CurrentCacheObject.Type)
+            {
+                case GObjectType.Unit:
+                    {
+                        if (c_IsEliteRareUnique)
+                            extraData += " IsElite " + c_MonsterAffixes;
+
+                        if (c_unit_HasShieldAffix)
+                            extraData += " HasAffixShielded";
+
+                        if (c_HasDotDPS)
+                            extraData += " HasDotDPS";
+
+                        if (c_HasBeenInLoS)
+                            extraData += " HasBeenInLoS";
+
+                        if (CurrentCacheObject.IsUnit)
+                            extraData += " HP=" + c_HitPoints.ToString("0") + " (" + c_HitPointsPct.ToString("0.00") + ")";
+                    } break;
+                case GObjectType.Avoidance:
+                    {
+                        extraData += _standingInAvoidance ? "InAoE " : "";
+                        break;
+                    }
+            }
+
+            CurrentCacheObject.ExtraInfo = extraData;
 
             // If it's a unit, add it to the monster cache
             AddUnitToMonsterObstacleCache();
@@ -275,7 +304,6 @@ namespace Trinity
             CurrentCacheObject.TwoHanded = c_IsTwoHandedItem;
             CurrentCacheObject.Type = CurrentCacheObject.Type;
             CurrentCacheObject.IsAncient = c_IsAncient;
-            ObjectCache.Add(CurrentCacheObject);
             return true;
         }
 
