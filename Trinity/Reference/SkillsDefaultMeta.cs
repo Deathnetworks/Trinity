@@ -10,13 +10,13 @@ namespace Trinity.Reference
 {
     /// <summary>
     /// This is a store for additional skill information.
-    /// Only set default values for things that won't change based or situational factors.
+    /// Only set default values for things that won't change based on situational factors.
     /// Anything that will change should go in the combat profile CastCondition instead.
     /// </summary>
     public class SkillsDefaultMeta
     {
         /// <summary>
-        /// Applies collection of default SkillMeta to their skills
+        /// Applies collection of default SkillMeta
         /// </summary>
         private static void ApplyDefaults(List<SkillMeta> metas)
         {

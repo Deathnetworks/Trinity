@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Ink;
 using Trinity.Helpers;
 using Trinity.Objects;
 using Trinity.Reference;
@@ -35,7 +36,7 @@ namespace Trinity.Items
             return false;
         }
 
-        internal static bool ShouldStashItem(Item referenceItem, CachedACDItem cItem)
+        internal static bool ShouldStashItem(Item referenceItem, CachedACDItem cItem, bool test = false)
         {
             Item item;
 
@@ -71,16 +72,20 @@ namespace Trinity.Items
 
                 Logger.LogDebug("  >>  {1}/{0} optional rules:", itemSetting.OptionalRules.Count, itemSetting.Ops);
 
-                // X optional rules must be true.
+                // X optional rules must be true. in test mode evaluate all rules
                 var trueOptionals = 0; 
                 foreach (var itemRule in itemSetting.OptionalRules)
                 {
                     if (EvaluateRule(itemRule, cItem))
                         trueOptionals++;
 
-                    if (trueOptionals >= itemSetting.Ops)
+                    if (trueOptionals >= itemSetting.Ops && !test)
                         return true;
-                }                   
+                }
+
+                if (trueOptionals >= itemSetting.Ops && test)
+                    return true;
+
                 return false;      
 
             }
@@ -123,7 +128,7 @@ namespace Trinity.Items
                     break;
 
                 case ItemProperty.AttackSpeed:
-                    itemValue = Math.Round(cItem.AttackSpeedPercent, MidpointRounding.AwayFromZero);
+                    itemValue = ItemDataUtils.GetAttackSpeed(cItem.AcdItem);
                     ruleValue = itemRule.Value;
                     result = itemValue >= ruleValue;
                     break;
@@ -254,7 +259,7 @@ namespace Trinity.Items
 
             }
 
-            Logger.LogDebug("  >>  Evaluated {0} -- {1} {5} Type={6} (Item: {2} -v- Rule: {3}) = {4}",
+            Logger.LogVerbose("  >>  Evaluated {0} -- {1} {5} Type={6} (Item: {2} -v- Rule: {3}) = {4}",
                 cItem.RealName,
                 itemRule.ItemProperty.ToString().AddSpacesToSentence(),
                 itemValue,
