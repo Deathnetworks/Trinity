@@ -27,5 +27,6 @@ namespace Trinity.Technicals
         Animation = 32768,
         UnknownObjects = 65536,
         ActiveBuffs = 131072,
+        SkillSelection = 262144
     }
 }

@@ -608,15 +608,7 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         internal static TrinityPower GetAttackGenerator()
         {
-            var skill = SkillUtils.Active.FirstOrDefault(s => s.IsGeneratorOrPrimary && s.CanCast());
-            if (skill == null)
-                return null;
-
-            var power = GetTrinityPower(skill);
-
-            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, Logger.CallingClassName + " Returning Generator Skill: {0} ({1}) Target={2}", power.SNOPower, (int)power.SNOPower, (CurrentTarget == null) ? "None" : CurrentTarget.InternalName);
-
-            return power;
+            return FindSkill("Generator", s => s.IsGeneratorOrPrimary && s.CanCast());
         }
 
         /// <summary>
@@ -624,16 +616,7 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         internal static TrinityPower GetAttackSpender()
         {
-            var skill = SkillUtils.Active.FirstOrDefault(s => s.IsAttackSpender && s.CanCast());
-            if (skill == null)
-                return null;
-
-            var power = GetTrinityPower(skill);
-
-            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, Logger.CallingClassName + " Returning Spender Skill: {0} ({1}) Target={2}", 
-                power.SNOPower, (int)power.SNOPower, (CurrentTarget == null) ? "None" : CurrentTarget.InternalName);
-
-            return power;
+            return FindSkill("Spender", s => s.IsAttackSpender && s.CanCast());
         }
 
         /// <summary>
@@ -641,16 +624,7 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         internal static TrinityPower GetDestructablesSkill()
         {
-            var skill = SkillUtils.Active.FirstOrDefault(s => (s.Meta.IsDestructableSkill || s.IsGeneratorOrPrimary) && s.CanCast());
-            if (skill == null)
-                return null;
-
-            var power = GetTrinityPower(skill);
-
-            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, Logger.CallingClassName + " Returning Destructable Skill: {0} ({1}) Target={2}", 
-                power.SNOPower, (int)power.SNOPower, (CurrentTarget == null) ? "None" : CurrentTarget.InternalName);
-
-            return power;
+            return FindSkill("Destructable", s => (s.Meta.IsDestructableSkill || s.IsGeneratorOrPrimary) && s.CanCast());
         }
 
         /// <summary>
@@ -658,16 +632,7 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         internal static TrinityPower GetMovementSkill()
         {
-            var skill = SkillUtils.Active.FirstOrDefault(s => (s.Meta.IsMovementSkill) && s.CanCast());
-            if (skill == null)
-                return null;
-
-            var power = GetTrinityPower(skill);
-
-            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, Logger.CallingClassName + " Returning Movement Skill: {0} ({1}) Target={2}", 
-                power.SNOPower, (int)power.SNOPower, (CurrentTarget == null) ? "None" : CurrentTarget.InternalName);
-
-            return power;
+            return FindSkill("Movement", s => (s.Meta.IsMovementSkill) && s.CanCast());
         }
 
         /// <summary>
@@ -675,16 +640,7 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         internal static TrinityPower GetAvoidanceSkill()
         {
-            var skill = SkillUtils.Active.FirstOrDefault(s => (s.Meta.IsAvoidanceSkill || s.Meta.IsMovementSkill) && s.Meta.IsDefensiveSkill && s.CanCast());
-            if (skill == null)
-                return null;
-
-            var power = GetTrinityPower(skill);
-
-            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, Logger.CallingClassName + " Returning Avoidance Skill: {0} ({1}) Target={2}", 
-                power.SNOPower, (int)power.SNOPower, (CurrentTarget == null) ? "None" : CurrentTarget.InternalName);
-
-            return power;
+            return FindSkill("Avoidance", s => (s.Meta.IsAvoidanceSkill || s.Meta.IsMovementSkill) && s.Meta.IsDefensiveSkill && s.CanCast());
         }
 
         /// <summary>
@@ -692,16 +648,7 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         internal static TrinityPower GetBuffSkill()
         {
-            var skill = SkillUtils.Active.FirstOrDefault(s => s.Meta.IsBuffingSkill && s.CanCast());
-            if (skill == null) 
-                return null;
-
-            var power = GetTrinityPower(skill);
-
-            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, Logger.CallingClassName + " Returning Buff Skill: {0} ({1}) Target={2}", 
-                power.SNOPower, (int)power.SNOPower, (CurrentTarget == null) ? "None" : CurrentTarget.InternalName);
-            
-            return power;
+            return FindSkill("Buff", s => s.Meta.IsBuffingSkill && s.CanCast());
         }
 
         /// <summary>
@@ -710,14 +657,33 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         public static TrinityPower GetCombatPower(List<Skill> skills)
         {
-            var skill = skills.FirstOrDefault(s => s.CanCast());
+            return FindSkill("Combat", s => s.CanCast(), skills);
+        }
+
+        /// <summary>
+        /// Searches for a skill matching some criteria
+        /// </summary>
+        /// <param name="typeName">name for the type of skill, used in logging</param>
+        /// <param name="condition">condition to be applied to skill list FirstOrDefault lamda</param>
+        /// <param name="skillCollection">colleciton of skills to search against, defaults to all Active skills</param>
+        /// <returns>a TrinityPower</returns>
+        internal static TrinityPower FindSkill(string typeName, Func<Skill,bool> condition, List<Skill> skillCollection = null)
+        {
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.SkillSelection, "Finding {0} Skill", typeName);
+
+            skillCollection = skillCollection ?? SkillUtils.Active;
+
+            if (condition == null)
+                return null;
+
+            var skill = skillCollection.FirstOrDefault(condition);
             if (skill == null)
                 return null;
 
             var power = GetTrinityPower(skill);
 
-            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, Logger.CallingClassName + " Returning Combat Skill: {0} ({1}) Target={2}",
-                power.SNOPower, (int)power.SNOPower, (CurrentTarget == null) ? "None" : CurrentTarget.InternalName);
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.SkillSelection, "   >>   Selected {0} Skill: {1} ({2}) Target={3}",
+                typeName, power.SNOPower, (int)power.SNOPower, (CurrentTarget == null) ? "None" : CurrentTarget.InternalName);
 
             return power;
         }
@@ -728,10 +694,7 @@ namespace Trinity.Combat.Abilities
         /// <param name="setting">combat data to use</param>
         public static bool CanCast(SkillMeta setting)
         {
-            if (setting.Skill == null)
-                return false;
-
-            return CanCast(setting.Skill);
+            return setting.Skill != null && CanCast(setting.Skill);
         }
 
         /// <summary>
@@ -751,11 +714,7 @@ namespace Trinity.Combat.Abilities
         /// <param name="changes">action to modify existing skill data</param>
         public static bool CanCast(Skill skill, Action<SkillMeta> changes)
         {
-            return CanCast(skill, null, c =>
-            {
-                changes(c);
-                return true;
-            });
+            return CanCast(skill, null, c => { changes(c); return true; });
         }
 
         /// <summary>
@@ -764,48 +723,67 @@ namespace Trinity.Combat.Abilities
         /// <param name="skill">the Skill to check</param>
         /// <param name="cd">Optional combat data to use</param>
         /// <param name="adhocCondition">Optional function to test against</param>
-        public static bool CanCast(Skill skill, SkillMeta cd = null, Func<SkillMeta, bool> adhocCondition = null)
+        public static bool CanCast(Skill skill, SkillMeta sm = null, Func<SkillMeta, bool> adhocCondition = null)
         {
             try
             {
-                var meta = (cd != null) ? skill.Meta.Apply(cd) : skill.Meta;
+                var meta = (sm != null) ? skill.Meta.Apply(sm) : skill.Meta;
 
-                if (!Hotbar.Contains(skill.SNOPower))
-                    return false;
-
-                if (Player.IsIncapacitated)
-                    return false;
-
-                if (!meta.CastFlags.HasFlag(CanCastFlags.NoTimer) && !SNOPowerUseTimer(skill.SNOPower))
-                    return false;
-
-                if (!meta.CastFlags.HasFlag(CanCastFlags.NoPowerManager) && !PowerManager.CanCast(skill.SNOPower))
-                    return false;
-
-                // Note: ZetaDia.Me.IsInCombat is unrealiable and only kicks in after an ability has hit a monster
-                if (meta.IsCombatOnly && CurrentTarget == null)
-                    return false;
-
-                //if (meta.IsEliteOnly && Enemies.Nearby.EliteCount == 0)
-                //    return false;
-
-                //if (meta.MaxTargetDistance > CurrentTarget.Distance)
-                //    return false;
-
-                var resourceCost = (meta.RequiredResource > 0) ? meta.RequiredResource : skill.Cost;
-                if (resourceCost > 0)
+                Func<string> check = () =>
                 {
-                    if (skill.Resource == Resource.Discipline && Player.SecondaryResource < resourceCost || Player.PrimaryResource < resourceCost) 
-                        return false;
-                }
-                   
-                if (meta.IsEliteOnly && !CurrentTarget.IsBossOrEliteRareUnique)
+                    if (!Hotbar.Contains(skill.SNOPower))
+                        return "NotOnHotbar";
+
+                    if (Player.IsIncapacitated)
+                        return "IsIncapacitated";
+
+                    if (!meta.CastFlags.HasFlag(CanCastFlags.NoTimer) && !SNOPowerUseTimer(skill.SNOPower))
+                        return "PowerUseTimer";
+
+                    if (!meta.CastFlags.HasFlag(CanCastFlags.NoPowerManager) && !PowerManager.CanCast(skill.SNOPower))
+                        return "PowerManager";
+
+                    // Note: ZetaDia.Me.IsInCombat is unrealiable and only kicks in after an ability has hit a monster
+                    if (meta.IsCombatOnly && CurrentTarget == null)
+                        return "IsInCombat";
+
+                    //if (meta.IsEliteOnly && Enemies.Nearby.EliteCount == 0)
+                    //    return false;
+
+                    //if (meta.MaxTargetDistance > CurrentTarget.Distance)
+                    //    return false;
+
+                    var resourceCost = (meta.RequiredResource > 0) ? meta.RequiredResource : skill.Cost;
+                    if (resourceCost > 0)
+                    {
+                        var actualResource = (skill.Resource == Resource.Discipline) ? Player.SecondaryResource : Player.PrimaryResource;
+                        if (actualResource < resourceCost)
+                            return string.Format("NotEnoughResource({0}/{1})", actualResource, resourceCost);
+                    }
+
+                    //if (meta.IsEliteOnly && !CurrentTarget.IsBossOrEliteRareUnique)
+                    //    return false;
+
+                    var adhocConditionResult = (adhocCondition == null) || adhocCondition(meta);
+                    var metaConditionResult = (meta.CastCondition == null) || meta.CastCondition(meta);
+
+                    if (!adhocConditionResult || !metaConditionResult)
+                        return "ConditionFailure";
+
+                    return string.Empty;
+                };
+
+                var failReason = check();
+
+                if (!string.IsNullOrEmpty(failReason))
+                {
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.SkillSelection, "   >>   CanCast Failed: {0} ({1}) Reason={2}",
+                        skill.Name, (int)skill.SNOPower, failReason);
+                    
                     return false;
+                }
 
-                var adhocConditionResult = (adhocCondition == null) || adhocCondition(meta);
-                var metaConditionResult = (meta.CastCondition == null) || meta.CastCondition(meta);
-
-                return adhocConditionResult && metaConditionResult;
+                return true;
             }
             catch (Exception ex)
             {

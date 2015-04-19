@@ -1300,15 +1300,14 @@ namespace Trinity
                     var skill = SkillUtils.ById(CombatBase.CurrentPower.SNOPower);
                     if (skill != null && skill.Meta != null)
                     {
-                        Logger.Log(LogCategory.Behavior, "Used Power {0} ({1}) {2} Range={3} ({4} {5}) Delay={6} CombatOnly={7}",
+                        Logger.Log(LogCategory.Behavior, "Used Power {0} ({1}) {2} Range={3} ({4} {5}) Delay={6}",
                             skill.Name,
                             (int)skill.SNOPower,
                             target,
                             skill.Meta.CastRange,
                             skill.Meta.DebugResourceEffect,
                             skill.Meta.DebugType,
-                            skill.Meta.AfterUseDelay,
-                            skill.Meta.IsCombatOnly);                        
+                            skill.Meta.AfterUseDelay);                        
                     }
                     else
                     {

@@ -62,7 +62,7 @@ namespace Trinity.Combat.Abilities
                     return power;                  
             }
 
-            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "GetPower() Returning DefaultPower Target={0}", 
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "DemonHunter GetPower() Returning DefaultPower Target={0}", 
                 (CurrentTarget == null) ? "Null" : CurrentTarget.InternalName);
 
             return DefaultPower;
@@ -200,8 +200,8 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         private static bool EvasiveFireCondition(SkillMeta meta)
         {
-            meta.CastRange = 20f;
-            return TargetUtil.AnyMobsInRange(10f);
+            meta.CastRange = 16f;
+            return TargetUtil.AnyMobsInRange(50f);
         }
 
         /// <summary>
@@ -235,8 +235,7 @@ namespace Trinity.Combat.Abilities
             meta.CastFlags = CanCastFlags.NoTimer;
             meta.CastRange = 45f;
 
-            // Saving up for something more awesome
-            if (Player.PrimaryResource < _specialEnergyReserve && IsWaitingForSpecial)
+            if (IsWaitingForSpecial)
                 return false;
 
             // Stay above minimum resource level
@@ -266,6 +265,10 @@ namespace Trinity.Combat.Abilities
             if (Legendary.SpinesOfSeethingHatred.IsEquipped)
                 return true;
 
+            // Monsters nearby
+            if (TargetUtil.ClusterExists(45f,4))
+                return true;       
+
             return false;
         }
 
@@ -274,17 +277,16 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         private static bool ClusterArrowCondition(SkillMeta meta)
         {
-            meta.CastRange = 45f;
+            meta.CastRange = 85f;
 
-            // Saving up for something more awesome
-            if (Player.PrimaryResource < _specialEnergyReserve && IsWaitingForSpecial)
+            if (IsWaitingForSpecial)
                 return false;
 
             // Stay above minimum resource level
             if (Player.PrimaryResource < _minEnergyReserve)
                 return false;
 
-            return false;
+            return true;
         }
 
         /// <summary>
@@ -294,8 +296,7 @@ namespace Trinity.Combat.Abilities
         {
             meta.CastRange = 100f;
 
-            // Saving up for something more awesome
-            if (Player.PrimaryResource < _specialEnergyReserve && IsWaitingForSpecial)
+            if (IsWaitingForSpecial)
                 return false;
 
             // Stay above minimum resource level

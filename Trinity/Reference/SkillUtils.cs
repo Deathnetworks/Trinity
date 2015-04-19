@@ -62,7 +62,7 @@ namespace Trinity.Reference
             if (_skillMetas.TryGetValue(skill, out s))
                 return s;
 
-            Logger.LogDebug("GetSkillInfo found no SkillMeta for {0}", skill.Name);
+            Logger.LogVerbose("GetSkillInfo found no SkillMeta for {0}", skill.Name);
             
             var newMeta = new SkillMeta(skill);
             SetSkillMeta(newMeta);

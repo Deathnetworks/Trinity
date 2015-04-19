@@ -1130,7 +1130,7 @@ namespace Trinity.Reference
                 {
                     meta.IsCombatOnly = true;
                     meta.IsOffensiveSkill = true;
-                    meta.MaxTargetDistance = 90f;
+                    meta.MaxTargetDistance = 100f;
                     meta.AreaEffectShape = AreaEffectShapeType.Circle;
                     skill.AreaEffectRadius = 25f;
 

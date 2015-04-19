@@ -3799,7 +3799,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item FierceGauntlets = new Item
         {
-            Id = 0,
+            Id = 408873,
             Name = "Fierce Gauntlets",
             Quality = ItemQuality.Legendary,
             Slug = "fierce-gauntlets",
@@ -6421,7 +6421,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item StridersOfDestiny = new Item
         {
-            Id = 0,
+            Id = 408863,
             Name = "Striders of Destiny",
             Quality = ItemQuality.Legendary,
             Slug = "striders-of-destiny",
