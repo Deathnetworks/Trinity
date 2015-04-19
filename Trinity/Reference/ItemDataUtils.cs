@@ -42,6 +42,11 @@ namespace Trinity.Reference
             return (max != 0) ? (int)max : (int)item.WeaponBaseMaxPhysicalDamage();
         }
 
+        internal static double GetAttackSpeed(ACDItem acdItem)
+        {
+            return Math.Round(Math.Max(acdItem.Stats.AttackSpeedPercent, acdItem.Stats.AttackSpeedPercentBonus), MidpointRounding.AwayFromZero);
+        }
+
         public static double GetElementalDamage(ACDItem item, Element element)
         {
             switch (element)
@@ -933,6 +938,8 @@ namespace Trinity.Reference
             {new KeyValuePair<GItemType, ActorClass>(GItemType.TwoHandDaibo, ActorClass.Monk), Skills.Monk.CycloneStrike},
 
         };
+
+
 
     }
 }
