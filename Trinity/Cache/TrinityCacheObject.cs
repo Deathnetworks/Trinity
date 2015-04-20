@@ -295,6 +295,12 @@ namespace Trinity
         [DataMember]
         public bool IsQuestGiver { get; set; }
 
+        [DataMember]
+        public string IgnoreReason { get; set; }
+
+        [DataMember]
+        public string ExtraInfo { get; set; }
+
         [NoCopy]
         public bool IsCursedChest { get { return Type == GObjectType.CursedChest; } }
 

@@ -144,6 +144,11 @@ namespace Trinity
         internal static HashSet<int> BlacklistedEvents = new HashSet<int>();
 
         /// <summary>
+        /// Contains the ignore rules/reasons why an object was not added to the cache
+        /// </summary>
+        internal static Dictionary<int, string> IgnoreReasons = new Dictionary<int, string>(); 
+
+        /// <summary>
         /// Cache for low weight/priority objects, so we dont have to refresh them every tick.
         /// </summary>
         internal static Dictionary<int, TrinityCacheObject> LowPriorityObjectCache = new Dictionary<int, TrinityCacheObject>();
@@ -185,6 +190,7 @@ namespace Trinity
             UnitMonsterAffix.Clear();
             TimeBoundAvoidance.RemoveWhere(aoe => aoe.Expires < DateTime.UtcNow);
             NavigationObstacles.RemoveWhere(o => o.Position.Distance2DSqr(Trinity.Player.Position) > 90f * 90f);
+            IgnoreReasons.Clear();
         }
 
         /// <summary>

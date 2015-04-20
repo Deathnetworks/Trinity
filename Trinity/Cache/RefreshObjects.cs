@@ -588,18 +588,26 @@ namespace Trinity
                             /*
                              *  Main Cache Function
                              */
-                            CacheDiaObject(currentObject);
+                            bool addToCache = CacheDiaObject(currentObject);
+                            CurrentCacheObject.IgnoreReason = (!addToCache ? ((c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : "");
+                            CacheData.IgnoreReasons.Add(CurrentCacheObject.RActorGuid, CurrentCacheObject.IgnoreReason);
+                            if (addToCache)
+                                ObjectCache.Add(CurrentCacheObject);
                         }
                         else
                         {
                             // We're debugging, slightly slower, calculate performance metrics and dump debugging to log 
-                            t1.Reset();
-                            t1.Start();
+                            t1.Restart();
 
                             /*
                              *  Main Cache Function
                              */
                             bool addToCache = CacheDiaObject(currentObject);
+
+                            CurrentCacheObject.IgnoreReason = (!addToCache ? ((c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : "");
+                            CacheData.IgnoreReasons.Add(CurrentCacheObject.RActorGuid, CurrentCacheObject.IgnoreReason);
+                            if (addToCache)
+                                ObjectCache.Add(CurrentCacheObject);
 
                             if (t1.IsRunning)
                                 t1.Stop();
@@ -612,40 +620,12 @@ namespace Trinity
                             if (CurrentCacheObject.Type == GObjectType.Player)
                                 continue;
 
-                            string extraData = "";
-
-                            switch (CurrentCacheObject.Type)
-                            {
-                                case GObjectType.Unit:
-                                    {
-                                        if (c_IsEliteRareUnique)
-                                            extraData += " IsElite " + c_MonsterAffixes;
-
-                                        if (c_unit_HasShieldAffix)
-                                            extraData += " HasAffixShielded";
-
-                                        if (c_HasDotDPS)
-                                            extraData += " HasDotDPS";
-
-                                        if (c_HasBeenInLoS)
-                                            extraData += " HasBeenInLoS";
-
-                                        if (CurrentCacheObject.IsUnit)
-                                            extraData += " HP=" + c_HitPoints.ToString("0") + " (" + c_HitPointsPct.ToString("0.00") + ")";
-                                    } break;
-                                case GObjectType.Avoidance:
-                                    {
-                                        extraData += _standingInAvoidance ? "InAoE " : "";
-                                        break;
-                                    }
-                            }
-
                             if (c_IgnoreReason != "InternalName")
                                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                                     "[{0:0000.00}ms] {1} {2} Type={3}/{4}/{5} Name={6} ({7}) {8} {9} Dist2Mid={10:0} Dist2Rad={11:0} ZDiff={12:0} Radius={13:0} RAGuid={14} {15}",
                                     duration,
                                     (addToCache ? "Added " : "Ignored"),
-                                    (!addToCache ? ((c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
+                                    CurrentCacheObject.IgnoreReason,
                                     CurrentCacheObject.ActorType,
                                     CurrentCacheObject.GizmoType != GizmoType.None ? CurrentCacheObject.GizmoType.ToString() : "",
                                     CurrentCacheObject.Type,
@@ -658,7 +638,7 @@ namespace Trinity
                                     c_ZDiff,
                                     CurrentCacheObject.Radius,
                                     CurrentCacheObject.RActorGuid,
-                                    extraData);
+                                    CurrentCacheObject.ExtraInfo);
                         }
                     }
                     catch (Exception ex)

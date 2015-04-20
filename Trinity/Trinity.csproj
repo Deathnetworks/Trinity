@@ -90,11 +90,13 @@
     <Compile Include="Cache\CacheData.Hotbar.cs" />
     <Compile Include="Cache\CacheData.Inventory.cs" />
     <Compile Include="Cache\CacheData.Player.cs" />
+    <Compile Include="Cache\CacheUIObject.cs" />
     <Compile Include="Cache\ItemStashSellAppender.cs" />
     <Compile Include="Cache\ItemDroppedAppender.cs" />
     <Compile Include="Cache\TrinityBountyInfo.cs" />
     <Compile Include="Cache\CacheData.cs" />
     <Compile Include="Cache\GroupHotSpot.cs" />
+    <Compile Include="Cache\TrinityCacheObjectUtils.cs" />
     <Compile Include="Cache\TrinityQuestInfo.cs" />
     <Compile Include="Cache\RefreshAvoidance.cs" />
     <Compile Include="Cache\RefreshGizmo.cs" />
@@ -290,7 +292,7 @@
     <Compile Include="UI\UIComponents\TVarsViewModel.cs" />
     <Compile Include="UI\UIComponents\TVarValidationRule.cs" />
     <Compile Include="UI\UILoader.cs" />
-    <Compile Include="Combat\Weighting.cs" />
+    <Compile Include="Cache\Weighting.cs" />
     <Compile Include="Combat\TargetCheck.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Configuration\Variables.cs" />
@@ -302,6 +304,10 @@
     <Compile Include="Cache\RefreshObjects.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="UI\CacheUI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\Combat\ConfigMisc.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
