@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Trinity.Combat.Abilities;
 using Trinity.Helpers;
 using Trinity.Objects;
 using Trinity.Technicals;
@@ -628,7 +630,17 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
+                    meta.IsCombatOnly = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.CastFlags = CombatBase.CanCastFlags.NoTimer;
+                    meta.CastRange = 6f;
+                    meta.IsDestructableSkill = true;
 
+                    if (skill.CurrentRune == Runes.Barbarian.Pulverize)
+                    {
+                        meta.IsAreaEffectSkill = true;
+                        meta.AreaEffectShape = AreaEffectShapeType.Beam;
+                    }
                 }
             };
 
@@ -636,7 +648,16 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
+                    meta.IsOffensiveSkill = true;
+                    meta.IsCombatOnly = true;
+                    meta.IsDestructableSkill = true;
+                    meta.CastRange = 9f;
 
+                    if (skill.CurrentRune == Runes.Barbarian.RollingThunder)
+                    {
+                        meta.IsAreaEffectSkill = true;
+                        meta.AreaEffectShape = AreaEffectShapeType.Beam;
+                    }
                 }
             };
 
@@ -644,20 +665,44 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsOffensiveSkill = true;
+                    meta.IsCombatOnly = true;
+                    meta.IsDestructableSkill = true;
+                    meta.CastRange = 9f;
+                    meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                    meta.IsAreaEffectSkill = true;
                 }
             };
 
             public static SkillMeta GroundStomp = new SkillMeta(Skills.Barbarian.GroundStomp)
             {
-
+                Defaults = (skill, meta) =>
+                {
+                    meta.IsCastOnSelf = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.IsCombatOnly = true;
+                    meta.CastRange = 14f;
+                    meta.MaxTargetDistance = 14f;
+                    meta.IsAreaEffectSkill = true;
+                    meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                }
             };
 
             public static SkillMeta Rend = new SkillMeta(Skills.Barbarian.Rend)
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsCastOnSelf = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.IsCombatOnly = true;
+                    meta.IsAreaEffectSkill = true;
+                    meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                    meta.MaxTargetDistance = 12f;
+                    if (skill.CurrentRune == Runes.Barbarian.Ravage)
+                    {
+                        meta.CastRange = 12f;
+                        meta.MaxTargetDistance = 18f;
+                    }
                 }
             };
 
@@ -665,7 +710,17 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsMovementSkill = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.CastRange = 35f;
+                    meta.MaxTargetDistance = 35f;
+                    meta.IsAreaEffectSkill = true;
+                    meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                    skill.AreaEffectRadius = 8f;
+                    if (skill.CurrentRune == Runes.Barbarian.CallOfArreat)
+                    {
+                        skill.AreaEffectRadius = 16f;
+                    }
                 }
             };
 
@@ -673,7 +728,13 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsCastOnSelf = true;
+                    meta.IsCombatOnly = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.IsAreaEffectSkill = true;
+                    meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                    skill.AreaEffectRadius = 9f;
+                    meta.CastRange = 9f;
                 }
             };
 
@@ -681,7 +742,9 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsCombatOnly = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.CastRange = 6f;
                 }
             };
 
@@ -689,7 +752,12 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.CastRange = 40f;
+                    meta.IsCombatOnly = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.IsAreaEffectSkill = true;
+                    meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                    skill.AreaEffectRadius = 45f;
                 }
             };
 
@@ -697,7 +765,12 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsCastOnSelf = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.IsCombatOnly = true;
+                    meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                    meta.CastRange = 9f;
+                    skill.AreaEffectRadius = 9f;
                 }
             };
 
@@ -705,7 +778,10 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsCastOnSelf = true;
+                    meta.IsBuffingSkill = true;
+                    meta.IsDefensiveSkill = true;
+                    meta.IsOffensiveSkill = true;
                 }
             };
 
@@ -713,7 +789,10 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsCastOnSelf = true;
+                    meta.IsBuffingSkill = true;
+                    meta.IsDefensiveSkill = true;
+                    meta.IsOffensiveSkill = true;
                 }
             };
 
@@ -721,7 +800,10 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsCombatOnly = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.CastRange = 65f;
+                    meta.IsDestructableSkill = true;
                 }
             };
 
@@ -729,7 +811,17 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsCombatOnly = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.CastRange = 18f;
+                    meta.IsDestructableSkill = true;
+                    meta.IsAreaEffectSkill = true;
+                    meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                    skill.AreaEffectRadius = 18f;
+                    if (skill.CurrentRune == Runes.Barbarian.Cavein)
+                    {
+                        skill.AreaEffectRadius = 24f;
+                    }
                 }
             };
 
@@ -737,20 +829,38 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsCombatOnly = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.CastRange = 9f;
+                    meta.IsDestructableSkill = true;
+                    meta.IsAreaEffectSkill = true;
+                    meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                    skill.AreaEffectRadius = 9f;
                 }
             };
 
             public static SkillMeta FuriousCharge = new SkillMeta(Skills.Barbarian.FuriousCharge)
             {
-
+                Defaults = (skill, meta) =>
+                {
+                    meta.IsCombatOnly = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.CastRange = 65f;
+                    meta.IsDestructableSkill = true;
+                    meta.IsAreaEffectSkill = true;
+                    meta.AreaEffectShape = AreaEffectShapeType.Beam;
+                    skill.AreaEffectRadius = 65f;
+                }
             };
 
             public static SkillMeta IgnorePain = new SkillMeta(Skills.Barbarian.IgnorePain)
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsCastOnSelf = true;
+                    meta.IsBuffingSkill = true;
+                    meta.IsDefensiveSkill = true;
+                    meta.IsOffensiveSkill = true;
                 }
             };
 
@@ -758,7 +868,10 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsCastOnSelf = true;
+                    meta.IsBuffingSkill = true;
+                    meta.IsDefensiveSkill = true;
+                    meta.IsOffensiveSkill = true;
                 }
             };
 
@@ -766,7 +879,9 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsCastOnSelf = true;
+                    meta.IsDefensiveSkill = true;
+                    meta.IsOffensiveSkill = true;
                 }
             };
 
@@ -774,7 +889,10 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsCombatOnly = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.CastRange = 45f;
+                    meta.IsDestructableSkill = true;
                 }
             };
 
@@ -782,7 +900,10 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsCastOnSelf = true;
+                    meta.IsBuffingSkill = true;
+                    meta.IsDefensiveSkill = true;
+                    meta.IsOffensiveSkill = true;
                 }
             };
 
@@ -790,7 +911,9 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsCastOnSelf = true;
+                    meta.IsDefensiveSkill = true;
+                    meta.IsOffensiveSkill = true;
                 }
             };
 
@@ -798,7 +921,11 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsCombatOnly = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.IsAreaEffectSkill = true;
+                    meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                    skill.AreaEffectRadius = 20f;
                 }
             };
 
