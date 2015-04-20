@@ -320,9 +320,33 @@ namespace Trinity.Objects
         /// <summary>
         /// This skill as TrinityPower
         /// </summary>
+        public TrinityPower ToPower(float minimumRange, int acdGuid)
+        {
+            return new TrinityPower(SNOPower, minimumRange, acdGuid);
+        }
+
+        /// <summary>
+        /// This skill as TrinityPower
+        /// </summary>
         public TrinityPower ToPower(float minimumRange, Vector3 targetPosition)
         {
             return new TrinityPower(SNOPower, minimumRange, targetPosition);
+        }
+
+        /// <summary>
+        /// This skill as TrinityPower
+        /// </summary>
+        public TrinityPower ToPower(float minimumRange, Vector3 targetPosition, float waitTicksBeforeUse, int waitTicksAfterUse)
+        {
+            return new TrinityPower(SNOPower, minimumRange, targetPosition, waitTicksBeforeUse, waitTicksAfterUse);
+        }
+
+        /// <summary>
+        /// This skill as TrinityPower
+        /// </summary>
+        public TrinityPower ToPower(float minimumRange, Vector3 targetPosition, int acdGuid, float waitTicksBeforeUse, int waitTicksAfterUse)
+        {
+            return new TrinityPower(SNOPower, minimumRange, targetPosition, Trinity.Player.WorldDynamicID, acdGuid, waitTicksBeforeUse, waitTicksAfterUse);
         }
 
         /// <summary>

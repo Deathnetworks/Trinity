@@ -62,7 +62,7 @@ namespace Trinity.Combat.Abilities
                     return power;                  
             }
 
-            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "DemonHunter GetPower() Returning DefaultPower Target={0}", 
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.SkillSelection, "DemonHunter GetPower() Returning DefaultPower Target={0}", 
                 (CurrentTarget == null) ? "Null" : CurrentTarget.InternalName);
 
             return DefaultPower;
