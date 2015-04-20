@@ -1315,7 +1315,24 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
+                    meta.IsDestructableSkill = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.IsAreaEffectSkill = false;
+                    meta.MaxTargetDistance = 100f;
 
+                    if (skill.CurrentRune == Runes.Wizard.GlacialSpike)
+                    {
+                        meta.IsAreaEffectSkill = true;
+                        meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                        skill.AreaEffectRadius = Runes.Wizard.GlacialSpike.ModifiedAreaEffectRadius.GetValueOrDefault();
+                    }
+
+                    if (skill.CurrentRune == Runes.Wizard.Conflagrate)
+                    {
+                        meta.IsAreaEffectSkill = true;
+                        meta.AreaEffectShape = AreaEffectShapeType.Cone;
+                        skill.AreaEffectRadius = 25f;
+                    }
                 }
             };
 
@@ -1323,7 +1340,24 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
+                    meta.IsCombatOnly = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.MaxTargetDistance = 100f;
 
+                    if (Legendary.LightOfGrace.IsEquipped)
+                    {
+                        meta.IsAreaEffectSkill = true;
+                        meta.AreaEffectShape = AreaEffectShapeType.Beam;
+                        skill.AreaEffectRadius = 8f;
+                    }
+
+                    if (skill.CurrentRune == Runes.Wizard.SleetStorm)
+                    {
+                        meta.IsCastOnSelf = true;
+                        meta.IsAreaEffectSkill = true;
+                        meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                        skill.AreaEffectRadius = 22f;
+                    }
                 }
             };
 
@@ -1331,7 +1365,24 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
+                    meta.IsDestructableSkill = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.MaxTargetDistance = 65f;
 
+                    if (skill.CurrentRune == Runes.Wizard.PiercingOrb)
+                    {
+                        meta.MaxTargetDistance = 85f;
+                        meta.IsAreaEffectSkill = true;
+                        meta.AreaEffectShape = AreaEffectShapeType.Beam;
+                        skill.AreaEffectRadius = 18f;
+                    }
+
+                    if (skill.CurrentRune == Runes.Wizard.LivingLightning)
+                    {
+                        meta.MaxTargetDistance = 45f;
+                        meta.AreaEffectShape = AreaEffectShapeType.Beam;
+                        skill.AreaEffectRadius = 12f;
+                    }
                 }
             };
 
@@ -1339,7 +1390,17 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
+                    meta.IsCombatOnly = true;
+                    meta.IsDefensiveSkill = true;
+                    meta.IsCastOnSelf = true;
+                    meta.IsAreaEffectSkill = true;
+                    skill.AreaEffectRadius = 20f;
 
+                    if (skill.CurrentRune == Runes.Wizard.BoneChill)
+                        skill.AreaEffectRadius = 28f;
+
+                    if (skill.CurrentRune == Runes.Wizard.FrozenMist)
+                        meta.IsDefensiveSkill = false;
                 }
             };
 
@@ -1347,6 +1408,29 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
+                    meta.IsCombatOnly = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.IsAreaEffectSkill = true;
+                    meta.AreaEffectShape = AreaEffectShapeType.Beam;
+                    meta.MaxTargetDistance = 95;
+
+                    if (skill.CurrentRune == Runes.Wizard.ArcaneOrbit)
+                    {
+                        skill.AreaEffectRadius = 8f;
+                        meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                        meta.IsCastOnSelf = true;
+                    }
+
+                    if (skill.CurrentRune == Runes.Wizard.Spark)
+                    {
+                        skill.AreaEffectRadius = 20f;
+                        meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                    }
+
+                    if (skill.CurrentRune == Runes.Wizard.FrozenOrb)
+                    {
+                        skill.AreaEffectRadius = 28f;
+                    }
 
                 }
             };
@@ -1355,6 +1439,14 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
+                    meta.IsCombatOnly = true;
+                    meta.IsCastOnSelf = true;
+                    meta.IsDefensiveSkill = true;
+
+                    if (skill.CurrentRune == Runes.Wizard.DiamondShards)
+                    {
+                        meta.IsOffensiveSkill = true;
+                    }
 
                 }
             };
@@ -1363,7 +1455,13 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsOffensiveSkill = true;
+                    meta.IsCastOnSelf = true;
+                    meta.IsCombatOnly = true;
+                    meta.IsAreaEffectSkill = true;
+                    meta.MaxTargetDistance = 26f;
+                    meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                    skill.AreaEffectRadius = 26f;
                 }
             };
 
@@ -1371,7 +1469,18 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
+                    meta.IsDestructableSkill = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.IsCombatOnly = true;
+                    meta.IsAreaEffectSkill = true;
+                    meta.MaxTargetDistance = 15f;
+                    meta.AreaEffectShape = AreaEffectShapeType.Cone;
+                    skill.AreaEffectRadius = 50f;
 
+                    if (skill.CurrentRune == Runes.Wizard.ThrownBlade)
+                    {
+                        meta.MaxTargetDistance = 20f;
+                    }
                 }
             };
 
@@ -1379,7 +1488,12 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsOffensiveSkill = true;
+                    meta.IsCombatOnly = true;
+                    meta.IsAreaEffectSkill = true;
+                    meta.MaxTargetDistance = 50f;
+                    meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                    skill.AreaEffectRadius = 12f;
                 }
             };
 
@@ -1387,7 +1501,18 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
+                    meta.IsOffensiveSkill = true;
+                    meta.IsCombatOnly = true;
+                    meta.IsAreaEffectSkill = true;
+                    meta.MaxTargetDistance = 80f;
+                    meta.AreaEffectShape = AreaEffectShapeType.Beam;
+                    skill.AreaEffectRadius = 20f;
 
+                    if (skill.CurrentRune == Runes.Wizard.WickedWind)
+                    {
+                        meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                        skill.AreaEffectRadius = 12f;
+                    }
                 }
             };
 
@@ -1395,7 +1520,18 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
+                    meta.IsBuffingSkill = true;
+                    meta.IsCastOnSelf = true;
+                    meta.IsDefensiveSkill = true;
 
+                    if (skill.CurrentRune == Runes.Wizard.FrozenStorm)
+                    {
+                        meta.IsOffensiveSkill = true;
+                        meta.IsAreaEffectSkill = true;
+                        meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                        skill.AreaEffectRadius = 18f;
+                        meta.MaxTargetDistance = 18f;
+                    }
                 }
             };
 
@@ -1403,7 +1539,17 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
+                    meta.IsDestructableSkill = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.MaxTargetDistance = 80f;
 
+                    if (skill.CurrentRune == Runes.Wizard.ArcLightning)
+                    {
+                        meta.IsAreaEffectSkill = true;
+                        meta.AreaEffectShape = AreaEffectShapeType.Cone;
+                        skill.AreaEffectRadius = 15f;
+                        meta.MaxTargetDistance = 15f;
+                    }
                 }
             };
 
@@ -1411,6 +1557,31 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
+                    meta.IsDefensiveSkill = true;
+                    meta.IsAreaEffectSkill = true;
+                    meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                    meta.IsDebuffingSkill = true;
+                    skill.AreaEffectRadius = 20f;
+                    meta.MaxTargetDistance = 60f;
+                    meta.IsCombatOnly = true;
+
+                    if (skill.CurrentRune == Runes.Wizard.StretchTime)
+                    {
+                        meta.IsDebuffingSkill = false;
+                        meta.IsCastOnSelf = true;
+                        meta.IsBuffingSkill = true;
+                    }
+
+                    if (Sets.DelseresMagnumOpus.IsFullyEquipped)
+                    {
+                        meta.IsOffensiveSkill = true;
+                    }
+
+                    if (Passives.Wizard.Illusionist.IsActive)
+                    {
+                        meta.IsBuffingSkill = true;
+                        meta.IsCombatOnly = false;
+                    }
 
                 }
             };
@@ -1419,7 +1590,9 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsBuffingSkill = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.IsCastOnSelf = true;
                 }
             };
 
@@ -1427,7 +1600,10 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsOffensiveSkill = true;
+                    meta.IsCombatOnly = true;
+                    meta.IsAreaEffectSkill = true;
+                    meta.AreaEffectShape = AreaEffectShapeType.Circle;
                 }
             };
 
@@ -1435,7 +1611,9 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsBuffingSkill = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.IsCastOnSelf = true;
                 }
             };
 
@@ -1443,7 +1621,11 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsOffensiveSkill = true;
+                    meta.IsSummoningSkill = true;
+                    meta.IsAreaEffectSkill = true;
+                    meta.IsCombatOnly = true;
+                    meta.MaxTargetDistance = 60f;
                 }
             };
 
@@ -1451,7 +1633,23 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
+                    meta.MaxTargetDistance = 55;
+                    meta.IsCombatOnly = true;
+                    meta.IsOffensiveSkill = true;
+                    skill.AreaEffectRadius = 6f;
+                    meta.AreaEffectShape = AreaEffectShapeType.Beam;
 
+                    if (skill.CurrentRune == Runes.Wizard.Convergence)
+                    {
+                        skill.AreaEffectRadius = 10f;
+                    }
+
+                    if (skill.CurrentRune == Runes.Wizard.Entropy)
+                    {
+                        meta.AreaEffectShape = AreaEffectShapeType.Cone;
+                        meta.MaxTargetDistance = 20f;
+                        skill.AreaEffectRadius = 100f;
+                    }
                 }
             };
 
@@ -1459,7 +1657,8 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsCastOnSelf = true;
+                    meta.IsBuffingSkill = true;
                 }
             };
 
@@ -1467,7 +1666,18 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
+                    meta.IsDefensiveSkill = true;
+                    meta.IsAvoidanceSkill = true;
+                    meta.IsMovementSkill = true;
+                    meta.MaxTargetDistance = 80f;
 
+                    if (skill.CurrentRune == Runes.Wizard.Calamity)
+                    {
+                        meta.IsOffensiveSkill = true;
+                        meta.IsAreaEffectSkill = true;
+                        meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                        skill.AreaEffectRadius = 16f;
+                    }
                 }
             };
 
@@ -1475,7 +1685,14 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
+                    meta.IsDefensiveSkill = true;
+                    meta.IsCombatOnly = true;
 
+                    if (Passives.Wizard.Illusionist.IsActive)
+                    {
+                        meta.IsBuffingSkill = true;
+                        meta.IsCombatOnly = false;
+                    }
                 }
             };
 
@@ -1483,6 +1700,23 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
+                    meta.MaxTargetDistance = 80f;
+                    meta.IsCombatOnly = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.IsAreaEffectSkill = true;
+                    meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                    skill.AreaEffectRadius = 14f;
+
+                    if (skill.CurrentRune == Runes.Wizard.MeteorShower)
+                    {
+                        skill.AreaEffectRadius = 28f;
+                    }
+
+                    if (skill.CurrentRune == Runes.Wizard.MoltenImpact)
+                    {
+                        skill.AreaEffectRadius = 22f;
+                    }
+
 
                 }
             };
@@ -1491,7 +1725,17 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
+                    meta.MaxTargetDistance = 75f;
+                    meta.IsCombatOnly = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.IsAreaEffectSkill = true;
+                    meta.AreaEffectShape = AreaEffectShapeType.Circle;
+                    skill.AreaEffectRadius = 14f;
 
+                    if (skill.CurrentRune == Runes.Wizard.MoltenImpact)
+                    {
+                        skill.AreaEffectRadius = 30f;
+                    }
                 }
             };
 
@@ -1499,7 +1743,8 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsDefensiveSkill = true;
+                    meta.IsBuffingSkill = true;
                 }
             };
 
@@ -1507,7 +1752,8 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.IsCombatOnly = true;
+                    meta.IsOffensiveSkill = true;
                 }
             };
 
@@ -1515,7 +1761,11 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-
+                    meta.MaxTargetDistance = 75f;
+                    meta.IsCombatOnly = true;
+                    meta.IsOffensiveSkill = true;
+                    meta.IsAreaEffectSkill = true;
+                    meta.AreaEffectShape = AreaEffectShapeType.Circle;
                 }
             };
 
