@@ -224,31 +224,31 @@ namespace Trinity.Items
                 if (evaluationType == ItemEvaluationType.Keep && craftMaterialType != CraftingMaterialType.Unknown)
                 {
                     var stackCount = GetItemStackCount(cItem, InventorySlot.SharedStash);
-                    if (craftMaterialType == CraftingMaterialType.ArcaneDust && stackCount > Trinity.Settings.Loot.TownRun.MaxStackArcaneDust)
+                    if (craftMaterialType == CraftingMaterialType.ArcaneDust && stackCount >= Trinity.Settings.Loot.TownRun.MaxStackArcaneDust)
                     {
                         Logger.Log("Already have {0} of {1}, max {2} (TRASH)", stackCount, craftMaterialType, Trinity.Settings.Loot.TownRun.MaxStackArcaneDust);
                         return false;
                     }
 
-                    if (craftMaterialType == CraftingMaterialType.DeathsBreath && stackCount > Trinity.Settings.Loot.TownRun.MaxStackDeathsBreath)
+                    if (craftMaterialType == CraftingMaterialType.DeathsBreath && stackCount >= Trinity.Settings.Loot.TownRun.MaxStackDeathsBreath)
                     {
                         Logger.Log("Already have {0} of {1}, max {2} (TRASH)", stackCount, craftMaterialType, Trinity.Settings.Loot.TownRun.MaxStackDeathsBreath);
                         return false;
                     }
 
-                    if (craftMaterialType == CraftingMaterialType.ForgottonSoul && stackCount > Trinity.Settings.Loot.TownRun.MaxStackForgottonSoul)
+                    if (craftMaterialType == CraftingMaterialType.ForgottonSoul && stackCount >= Trinity.Settings.Loot.TownRun.MaxStackForgottonSoul)
                     {
                         Logger.Log("Already have {0} of {1}, max {2} (TRASH)", stackCount, craftMaterialType, Trinity.Settings.Loot.TownRun.MaxStackForgottonSoul);
                         return false;
                     }
 
-                    if (craftMaterialType == CraftingMaterialType.ReusableParts && stackCount > Trinity.Settings.Loot.TownRun.MaxStackReusableParts)
+                    if (craftMaterialType == CraftingMaterialType.ReusableParts && stackCount >= Trinity.Settings.Loot.TownRun.MaxStackReusableParts)
                     {
                         Logger.Log("Already have {0} of {1}, max {2} (TRASH)", stackCount, craftMaterialType, Trinity.Settings.Loot.TownRun.MaxStackReusableParts);
                         return false;
                     }
 
-                    if (craftMaterialType == CraftingMaterialType.VeiledCrystal && stackCount > Trinity.Settings.Loot.TownRun.MaxStackVeiledCrystal)
+                    if (craftMaterialType == CraftingMaterialType.VeiledCrystal && stackCount >= Trinity.Settings.Loot.TownRun.MaxStackVeiledCrystal)
                     {
                         Logger.Log("Already have {0} of {1}, max {2} (TRASH)", stackCount, craftMaterialType, Trinity.Settings.Loot.TownRun.MaxStackVeiledCrystal);
                         return false;
