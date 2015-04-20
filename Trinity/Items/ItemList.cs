@@ -21,19 +21,24 @@ namespace Trinity.Items
         {
             if (cItem.AcdItem != null && cItem.AcdItem.IsValid)
             {
-                bool result = false;                
+                bool result = false;
 
                 var item = new Item(cItem.AcdItem);
 
                 var wrappedItem = new ItemWrapper(cItem.AcdItem);
 
-                result = ShouldStashItem(item, cItem);                
+                result = ShouldStashItem(item, cItem);
 
                 string action = result ? "KEEP" : "TRASH";
 
                 return result;
             }
             return false;
+        }
+
+        internal static bool ShouldSellItem(CachedACDItem cItem)
+        {
+            return TrinityItemManager.TrinitySell(cItem);
         }
 
         internal static bool ShouldStashItem(Item referenceItem, CachedACDItem cItem, bool test = false)
@@ -43,13 +48,13 @@ namespace Trinity.Items
             if (!Legendary.Items.TryGetValue(cItem.AcdItem.ActorSNO, out item))
             {
                 Logger.LogDebug("  >>  Unknown Item {0} {1} - Auto-keeping", cItem.RealName, cItem.AcdItem.ActorSNO);
-                return true;   
+                return true;
             }
 
             if (cItem.AcdItem.IsCrafted)
             {
                 Logger.LogDebug("  >>  Crafted Item {0} {1} - Auto-keeping", cItem.RealName, cItem.AcdItem.ActorSNO);
-                return true;                       
+                return true;
             }
 
             var itemSetting = Trinity.Settings.Loot.ItemList.SelectedItems.FirstOrDefault(i => referenceItem.Id == i.Id);
@@ -73,7 +78,7 @@ namespace Trinity.Items
                 Logger.LogDebug("  >>  {1}/{0} optional rules:", itemSetting.OptionalRules.Count, itemSetting.Ops);
 
                 // X optional rules must be true. in test mode evaluate all rules
-                var trueOptionals = 0; 
+                var trueOptionals = 0;
                 foreach (var itemRule in itemSetting.OptionalRules)
                 {
                     if (EvaluateRule(itemRule, cItem))
@@ -86,7 +91,7 @@ namespace Trinity.Items
                 if (trueOptionals >= itemSetting.Ops && test)
                     return true;
 
-                return false;      
+                return false;
 
             }
 
@@ -268,7 +273,7 @@ namespace Trinity.Items
                 friendlyVariant,
                 itemRule.RuleType);
 
-            return result; 
+            return result;
         }
 
     }

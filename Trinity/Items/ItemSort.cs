@@ -322,12 +322,12 @@ namespace Trinity.Items
         /// </summary>
         /// <returns>Composite.</returns>
         public static Composite CreateSortBehavior(InventorySlot inventorySlot)
-        {            
+        {
             return new ActionRunCoroutine(ret => SortTask(inventorySlot));
         }
 
         internal static async Task<bool> SortTask(InventorySlot inventorySlot)
-        {            
+        {
 
             IsSorting = true;
 
@@ -370,7 +370,7 @@ namespace Trinity.Items
             {
                 wrappedItems = ZetaDia.Me.Inventory.StashItems.Where(i => i.IsValid).Select(i => new ItemWrapper(i)).ToList();
 
-                int maxStashRow = ZetaDia.Me.Inventory.NumSharedStashSlots/7;
+                int maxStashRow = ZetaDia.Me.Inventory.NumSharedStashSlots / 7;
                 // 7 columns, 10 rows x 5 pages
                 _usedGrid = new bool[7, maxStashRow];
             }
@@ -445,7 +445,7 @@ namespace Trinity.Items
 
             RemoveBehavior();
             return true;
-         
+
         }
 
         public static async Task<bool> SortItems(InventorySlot inventorySlot)
@@ -592,7 +592,7 @@ namespace Trinity.Items
 
                     int desiredStashPage = await SetStashpage(currentRow);
 
-                    if (i.Item.MaxStackCount > 1 && ZetaDia.Me.Inventory.CanStackItemInStashPage(i.Item, desiredStashPage))
+                    if (i.Item.MaxStackCount > 1 && ZetaDia.Me.Inventory.CanStackItemInStashPage(i.Item, desiredStashPage) && GetNumberOfStacks(i.Item, inventorySlot) > 1)
                     {
                         ZetaDia.Me.Inventory.QuickWithdraw(i.Item);
                         await Coroutine.Sleep(50);
@@ -628,6 +628,23 @@ namespace Trinity.Items
                 RemoveBehavior();
             }
             return false;
+        }
+
+        private static int GetNumberOfStacks(ACDItem item, InventorySlot inventorySlot)
+        {
+            List<ACDItem> items;
+            switch (inventorySlot)
+            {
+                case InventorySlot.BackpackItems:
+                    items = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsValid && i.ActorSNO == item.ActorSNO && i.ItemType == item.ItemType).ToList();
+                    break;
+                case InventorySlot.SharedStash:
+                    items = ZetaDia.Me.Inventory.StashItems.Where(i => i.IsValid && i.ActorSNO == item.ActorSNO && i.ItemType == item.ItemType).ToList();
+                    break;
+                default: 
+                    return 0;
+            }
+            return items.Count();
         }
 
         private static async Task<int> SetStashpage(int currentRow)

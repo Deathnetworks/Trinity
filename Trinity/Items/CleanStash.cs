@@ -84,65 +84,85 @@ namespace Trinity.Items
         private static bool _isFinished = false;
         public static async Task<bool> CleanTask()
         {
-            if (!ZetaDia.IsInGame)
-                return false;
-            if (ZetaDia.IsLoadingWorld)
-                return false;
-            if (!ZetaDia.Me.IsFullyValid())
-                return false;
+            try
+            {
+                if (!ZetaDia.IsInGame)
+                    return false;
+                if (ZetaDia.IsLoadingWorld)
+                    return false;
+                if (!ZetaDia.Me.IsFullyValid())
+                    return false;
 
-            if (ZetaDia.Me.IsParticipatingInTieredLootRun)
-            {
-                Logger.LogNormal("Cannot clean stash while in trial/greater rift");
-                RemoveBehavior("Cannot clean stash while in trial/greater rift");
-                return false;
-            }
-
-            if (TrinityItemManager.FindValidBackpackLocation(true) == new Vector2(-1, -1))
-            {
-                Trinity.ForceVendorRunASAP = true;
-                return false;
-            }
-            if (!await TrinityCoroutines.ReturnToStashTask())
-            {
-                _isFinished = true;
-                return false;
-            }
-            if (GameUI.IsElementVisible(GameUI.StashDialogMainPage))
-            {
-                Logger.Log("Cleaning stash...");
-
-                foreach (var item in ZetaDia.Me.Inventory.StashItems.Where(i => i.ACDGuid != 0 && i.IsValid).ToList())
+                if (ZetaDia.Me.IsParticipatingInTieredLootRun)
                 {
-                    if (!ItemManager.Current.ShouldStashItem(item))
-                    {
-                        Logger.Log("Removing {0} from stash", item.Name);
-                        ZetaDia.Me.Inventory.QuickWithdraw(item);
-                        await Coroutine.Sleep(ItemMovementDelay);
-                        await Coroutine.Yield();
-
-                        if (TrinityItemManager.FindValidBackpackLocation(true) == new Vector2(-1, -1))
-                        {
-                            Trinity.ForceVendorRunASAP = true;
-                            return false;
-                        }
-                    }
+                    Logger.LogNormal("Cannot clean stash while in trial/greater rift");
+                    RemoveBehavior("Cannot clean stash while in trial/greater rift");
+                    return false;
                 }
 
-                Trinity.ForceVendorRunASAP = true;
-                _isFinished = true;
-                Logger.Log("Waiting 5 seconds...");
-                BotMain.StatusText = "Waiting 5 seconds...";
-                await Coroutine.Sleep(5000);
+                if (TrinityItemManager.FindValidBackpackLocation(true) == new Vector2(-1, -1))
+                {
+                    Trinity.ForceVendorRunASAP = true;
+                    return false;
+                }
+                if (!await TrinityCoroutines.ReturnToStashTask())
+                {
+                    _isFinished = true;
+                    return false;
+                }
+                if (GameUI.IsElementVisible(GameUI.StashDialogMainPage))
+                {
+                    Logger.Log("Cleaning stash...");
 
-                if (TrinityCoroutines.StartedOutOfTown && ZetaDia.IsInTown)
-                    await CommonBehaviors.TakeTownPortalBack().ExecuteCoroutine();
+                    foreach (var item in ZetaDia.Me.Inventory.StashItems.Where(i => i.ACDGuid != 0 && i.IsValid).ToList())
+                    {
+                        CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
+                        // Don't take potions from the stash
+                        if (cItem.TrinityItemType == GItemType.HealthPotion)
+                            continue;
+
+                        try
+                        {
+                            if (!ItemManager.Current.ShouldStashItem(item))
+                            {
+                                Logger.Log("Removing {0} from stash", item.Name);
+                                ZetaDia.Me.Inventory.QuickWithdraw(item);
+                                await Coroutine.Sleep(ItemMovementDelay);
+                                await Coroutine.Yield();
+
+                                if (TrinityItemManager.FindValidBackpackLocation(true) == new Vector2(-1, -1))
+                                {
+                                    Trinity.ForceVendorRunASAP = true;
+                                    return false;
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogError(ex.ToString());
+                        }
+                    }
+
+                    _isFinished = true;
+                    Trinity.ForceVendorRunASAP = true;
+                    Logger.Log("Waiting 5 seconds...");
+                    BotMain.StatusText = "Waiting 5 seconds...";
+                    await Coroutine.Sleep(5000);
+
+                    if (TrinityCoroutines.StartedOutOfTown && ZetaDia.IsInTown)
+                        await CommonBehaviors.TakeTownPortalBack().ExecuteCoroutine();
+                }
+                if (_isFinished)
+                    RemoveBehavior("finished!");
+                return true;
+
             }
-            if (_isFinished)
-                RemoveBehavior("finished!");
-            return true;
-
+            catch (Exception ex)
+            {
+                _isFinished = true;
+                Logger.LogError(ex.ToString());
+                return false;
+            }
         }
-
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web.Configuration;
 using Trinity.Cache;
 using Trinity.DbProvider;
 using Trinity.Helpers;
@@ -127,7 +128,7 @@ namespace Trinity.Items
             {
                 return ItemRulesSalvageSell(item, evaluationType);
             }
-            return TrinitySell(item);
+            return TrinitySell(cItem);
         }
 
         public override bool ShouldStashItem(ACDItem item)
@@ -219,6 +220,41 @@ namespace Trinity.Items
             }
             if (tItemType == GItemType.CraftingMaterial)
             {
+                var craftMaterialType = GetCraftingMaterialType(cItem);
+                if (evaluationType == ItemEvaluationType.Keep && craftMaterialType != CraftingMaterialType.Unknown)
+                {
+                    var stackCount = GetItemStackCount(cItem, InventorySlot.SharedStash);
+                    if (craftMaterialType == CraftingMaterialType.ArcaneDust && stackCount > Trinity.Settings.Loot.TownRun.MaxStackArcaneDust)
+                    {
+                        Logger.Log("Already have {0} of {1}, max {2} (TRASH)", stackCount, craftMaterialType, Trinity.Settings.Loot.TownRun.MaxStackArcaneDust);
+                        return false;
+                    }
+
+                    if (craftMaterialType == CraftingMaterialType.DeathsBreath && stackCount > Trinity.Settings.Loot.TownRun.MaxStackDeathsBreath)
+                    {
+                        Logger.Log("Already have {0} of {1}, max {2} (TRASH)", stackCount, craftMaterialType, Trinity.Settings.Loot.TownRun.MaxStackDeathsBreath);
+                        return false;
+                    }
+
+                    if (craftMaterialType == CraftingMaterialType.ForgottonSoul && stackCount > Trinity.Settings.Loot.TownRun.MaxStackForgottonSoul)
+                    {
+                        Logger.Log("Already have {0} of {1}, max {2} (TRASH)", stackCount, craftMaterialType, Trinity.Settings.Loot.TownRun.MaxStackForgottonSoul);
+                        return false;
+                    }
+
+                    if (craftMaterialType == CraftingMaterialType.ReusableParts && stackCount > Trinity.Settings.Loot.TownRun.MaxStackReusableParts)
+                    {
+                        Logger.Log("Already have {0} of {1}, max {2} (TRASH)", stackCount, craftMaterialType, Trinity.Settings.Loot.TownRun.MaxStackReusableParts);
+                        return false;
+                    }
+
+                    if (craftMaterialType == CraftingMaterialType.VeiledCrystal && stackCount > Trinity.Settings.Loot.TownRun.MaxStackVeiledCrystal)
+                    {
+                        Logger.Log("Already have {0} of {1}, max {2} (TRASH)", stackCount, craftMaterialType, Trinity.Settings.Loot.TownRun.MaxStackVeiledCrystal);
+                        return false;
+                    }
+                }
+
                 if (evaluationType == ItemEvaluationType.Keep)
                     Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep craft materials)", cItem.RealName, cItem.InternalName, tItemType);
                 return true;
@@ -413,7 +449,7 @@ namespace Trinity.Items
         {
             CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
 
-            if (cItem.AcdItem.IsVendorBought)
+            if (!cItem.IsSalvageable)
                 return false;
 
             // Vanity Items
@@ -431,8 +467,8 @@ namespace Trinity.Items
             if (Trinity.Settings.Loot.TownRun.StashBlues && cItem.Quality > ItemQuality.Superior && cItem.Quality < ItemQuality.Rare4)
                 return false;
 
-            GItemType trinityItemType = DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
-            GItemBaseType trinityItemBaseType = DetermineBaseType(trinityItemType);
+            GItemType trinityItemType = cItem.TrinityItemType;
+            GItemBaseType trinityItemBaseType = cItem.TrinityItemBaseType;
 
             // Take Salvage Option corresponding to ItemLevel
             SalvageOption salvageOption = GetSalvageOption(cItem.Quality);
@@ -466,29 +502,38 @@ namespace Trinity.Items
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        private static bool TrinitySell(ACDItem item)
+        internal static bool TrinitySell(ACDItem item)
         {
-            CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
+            return TrinitySell(CachedACDItem.GetCachedItem(item));
+        }
+
+        /// <summary>
+        /// Determines if we should Sell an Item
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        internal static bool TrinitySell(CachedACDItem item)
+        {
 
             // Vanity Items
             if (DataDictionary.VanityItems.Any(i => item.InternalName.StartsWith(i)))
                 return false;
 
-            if (item.ItemType == ItemType.KeystoneFragment && item.TieredLootRunKeyLevel >= 0)
+            if (item.DBItemType == ItemType.KeystoneFragment && item.AcdItem.TieredLootRunKeyLevel >= 0)
                 return false;
 
-            if (item.ItemType == ItemType.HoradricCache)
+            if (item.DBItemType == ItemType.HoradricCache)
                 return false;
 
             if (Trinity.Settings.Loot.TownRun.ApplyPickupValidationToStashing)
             {
-                var pItem = new PickupItem(item, cItem.TrinityItemBaseType, cItem.TrinityItemType);
+                var pItem = new PickupItem(item.AcdItem, item.TrinityItemBaseType, item.TrinityItemType);
                 var pickupCheck = PickupItemValidation(pItem);
                 if (!pickupCheck)
                     return true;
             }
 
-            switch (cItem.TrinityItemBaseType)
+            switch (item.TrinityItemBaseType)
             {
                 case GItemBaseType.WeaponRange:
                 case GItemBaseType.WeaponOneHand:
@@ -500,36 +545,9 @@ namespace Trinity.Items
                     return true;
                 case GItemBaseType.Gem:
                 case GItemBaseType.Misc:
-                    if (cItem.TrinityItemType == GItemType.HealthPotion && Trinity.Settings.Loot.TownRun.SellExtraPotions)
-                    {
-                        // Never sell our precious legendary potions!
-                        if (cItem.AcdItem.ItemQualityLevel >= ItemQuality.Legendary)
-                            return false;
-
-                        bool hasLegendaryPotion = ZetaDia.Me.Inventory.Backpack.Any(i => i.ItemType == ItemType.Potion && i.ItemQualityLevel >= ItemQuality.Legendary);
-
-                        // If we have a legendary potion, sell regular potions
-                        if (hasLegendaryPotion && cItem.AcdItem.ItemQualityLevel <= ItemQuality.Legendary)
-                            return true;
-
-                        // If we have more than 1 stack of potions
-                        // Keep the largest stack until we only have 1 stack
-                        int potionStacks = ZetaDia.Me.Inventory.Backpack.Count(i => i.ItemType == ItemType.Potion);
-                        if (potionStacks > 1)
-                        {
-                            // Keep only the highest stack
-                            ACDItem acdItem = ZetaDia.Me.Inventory.Backpack
-                                .Where(i => i.ItemType == ItemType.Potion && i.ItemQualityLevel == ItemQuality.Normal)
-                                .OrderBy(i => i.ItemStackQuantity)
-                                .FirstOrDefault();
-
-                            if (acdItem != null && cItem.AcdItem.ACDGuid == acdItem.ACDGuid)
-                            {
-                                return true;
-                            }
-                        }
-                    }
-                    if (cItem.TrinityItemType == GItemType.CraftingPlan)
+                    if (item.TrinityItemType == GItemType.CraftingPlan)
+                        return true;
+                    if (item.TrinityItemType == GItemType.CraftingMaterial)
                         return true;
                     return false;
                 case GItemBaseType.Unknown:
@@ -538,7 +556,6 @@ namespace Trinity.Items
 
             return false;
         }
-
         private static SalvageOption GetSalvageOption(ItemQuality quality)
         {
             if (quality >= ItemQuality.Inferior && quality <= ItemQuality.Superior)
@@ -759,12 +776,12 @@ namespace Trinity.Items
             {
                 try
                 {
-                    //if (_lastBackPackLocation != new Vector2(-2, -2) &&
-                    //    _lastBackPackCount == CacheData.Inventory.Backpack.Count &&
-                    //    _lastProtectedSlotsCount == CharacterSettings.Instance.ProtectedBagSlots.Count)
-                    //{
-                    //    return _lastBackPackLocation;
-                    //}
+                    if (_lastBackPackLocation != new Vector2(-2, -2) &&
+                        _lastBackPackCount == CacheData.Inventory.Backpack.Count &&
+                        _lastProtectedSlotsCount == CharacterSettings.Instance.ProtectedBagSlots.Count)
+                    {
+                        return _lastBackPackLocation;
+                    }
 
                     bool[,] backpackSlotBlocked = new bool[10, 6];
 
@@ -781,8 +798,6 @@ namespace Trinity.Items
                     }
 
                     var allItems = ZetaDia.Actors.GetActorsOfType<ACDItem>(true);
-                    var backpackItems = allItems.Where(i => i.InventorySlot == InventorySlot.BackpackItems);
-                    var blueItems = allItems.Where(i => i.ItemQualityLevel >= ItemQuality.Magic1 && i.ItemQualityLevel <= ItemQuality.Magic3);
 
                     // Map out all the items already in the backpack
                     foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
@@ -1463,7 +1478,7 @@ namespace Trinity.Items
         }
 
         internal static ItemType GItemTypeToItemType(GItemType itemType)
-        {           
+        {
             switch (itemType)
             {
                 case GItemType.Axe:
@@ -1567,7 +1582,7 @@ namespace Trinity.Items
             }
 
             ItemType newType;
-            if(Enum.TryParse(itemType.ToString(), true, out newType))
+            if (Enum.TryParse(itemType.ToString(), true, out newType))
                 return newType;
 
             return ItemType.Unknown;
@@ -1576,6 +1591,31 @@ namespace Trinity.Items
         internal static bool IsEquipment(CachedACDItem i)
         {
             return (i.DBBaseType == ItemBaseType.Armor || i.DBBaseType == ItemBaseType.Jewelry || i.DBBaseType == ItemBaseType.Weapon);
+        }
+
+        internal static CraftingMaterialType GetCraftingMaterialType(CachedACDItem item)
+        {
+            return (CraftingMaterialType)item.ActorSNO;
+        }
+
+        internal static Func<ACDItem, CachedACDItem, bool> StackItemMatchFunc = (item, cItem) => item.IsValid && item.ActorSNO == cItem.ActorSNO;
+        /// <summary>
+        /// Gets the number of items combined in all stacks
+        /// </summary>
+        /// <param name="cItem">The c item.</param>
+        /// <param name="inventorySlot">The inventory slot.</param>
+        /// <returns>System.Int32.</returns>
+        /// <exception cref="System.ArgumentException">InventorySlot  + inventorySlot +  is not supported for GetStackCount method</exception>
+        internal static int GetItemStackCount(CachedACDItem cItem, InventorySlot inventorySlot)
+        {
+            switch (inventorySlot)
+            {
+                case InventorySlot.BackpackItems:
+                    return ZetaDia.Me.Inventory.Backpack.Where(i => StackItemMatchFunc(i, cItem)).Sum(i => i.ItemStackQuantity);
+                case InventorySlot.SharedStash:
+                    return ZetaDia.Me.Inventory.StashItems.Where(i => StackItemMatchFunc(i, cItem)).Sum(i => i.ItemStackQuantity);
+            }
+            throw new ArgumentException("InventorySlot " + inventorySlot + " is not supported for GetStackCount method");
         }
     }
 }

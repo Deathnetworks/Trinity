@@ -232,4 +232,34 @@ namespace Trinity
         Any = Freeze | Stun | Knockback | Immobilize | Chill | Blind | Charm | Slow
     }
 
+    /// <summary>
+    /// Enum CraftingMaterialType - this is not finalized, i don't have all the items
+    /// </summary>
+    public enum CraftingMaterialType
+    {
+        Unknown = 0,
+        CommonDebris = 1,
+        ReusableParts = 361984,
+        ArcaneDust = 361985,
+        ExquisiteEssence = 3,
+        ShimmeringEssence = 4,
+        SubtleEssence = 5,
+        WishfulEssence = 6,
+        DeathsBreath = 361989,
+        DemonicEssence = 8,
+        EncrustedHoof = 9,
+        FallenTooth = 10,
+        IridescentTear = 11,
+        LizardEye = 12,
+        VeiledCrystal = 361986,
+        FieryBrimstone = 189863,
+        ForgottonSoul = 361988,
+        KeyOfBones = 364694,
+        KeyOfEvil = 364697,
+        KeyOfGluttony = 364695,
+        KeyOfWar = 364696,
+        KeyOfDestruction = 255880,
+        KeyOfHate = 255881,
+        KeyOfTerror = 255882,
+    }
 }
