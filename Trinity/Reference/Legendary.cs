@@ -149,7 +149,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item BootsOfDisregard = new Item
         {
-            Id = 0,
+            Id = 322905,
             Name = "Boots of Disregard",
             Quality = ItemQuality.Legendary,
             Slug = "boots-of-disregard-29WPmn",
@@ -5524,7 +5524,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item SpiritGuards = new Item
         {
-            Id = 0,
+            Id = 430290,
             Name = "Spirit Guards",
             Quality = ItemQuality.Legendary,
             Slug = "spirit-guards",
