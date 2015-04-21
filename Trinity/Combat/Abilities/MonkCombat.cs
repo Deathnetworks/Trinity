@@ -170,6 +170,13 @@ namespace Trinity.Combat.Abilities
 
                 // Raiment set, dash costs 75 spirit and refunds a charge when it's used
                 if (Sets.ThousandStorms.IsSecondBonusActive && Player.PrimaryResource > 75 && Skills.Monk.DashingStrike.Charges > 1)
+                if (Sets.ThousandStorms.IsSecondBonusActive && (Player.PrimaryResource > 75 || Skills.Monk.DashingStrike.Charges > 1) &&
+					(
+						SpellHistory.TimeSinceUse(SNOPower.Monk_FistsofThunder) < TimeSpan.FromMilliseconds(5000) ||
+						SpellHistory.TimeSinceUse(SNOPower.Monk_DeadlyReach) < TimeSpan.FromMilliseconds(5000) ||
+						SpellHistory.TimeSinceUse(SNOPower.Monk_WayOfTheHundredFists) < TimeSpan.FromMilliseconds(5000) ||
+						SpellHistory.TimeSinceUse(SNOPower.Monk_CripplingWave) < TimeSpan.FromMilliseconds(5000)
+					))
                 {
                     RefreshSweepingWind(true);
                     return new TrinityPower(SNOPower.X1_Monk_DashingStrike, MaxDashingStrikeRange, CurrentTarget.Position);
