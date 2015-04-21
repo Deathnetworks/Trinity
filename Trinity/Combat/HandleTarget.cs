@@ -316,6 +316,7 @@ namespace Trinity
                             CurrentTarget.Type == GObjectType.HealthGlobe ||
                             CurrentTarget.Type == GObjectType.PowerGlobe ||
                             CurrentTarget.Type == GObjectType.ProgressionGlobe ||
+                            CurrentTarget.Type == GObjectType.Shrine ||
                             Monk_SpecialMovement)
                             && NavHelper.CanRayCast(Player.Position, CurrentDestination)
                             )
@@ -799,15 +800,10 @@ namespace Trinity
                     var legendaryPotions = CacheData.Inventory.Backpack.Where(i => i.InternalName.ToLower()
                         .Contains("healthpotion_legendary_")).ToList();
 
-                    var regularPotions = CacheData.Inventory.Backpack.Where(i => i.InternalName.ToLower()
-                        .Contains("healthpotion_") && !i.InternalName.ToLower().Contains("legendary")).ToList();
-
-
-                    int dynamicId;
                     if (legendaryPotions.Any())
                     {
                         Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Legendary Potion", 0);
-                        dynamicId = legendaryPotions.FirstOrDefault().DynamicId;
+                        int dynamicId = legendaryPotions.FirstOrDefault().DynamicId;
                         ZetaDia.Me.Inventory.UseItem(dynamicId);
                         SpellHistory.RecordSpell(new TrinityPower(SNOPower.DrinkHealthPotion));
                         return true;
@@ -855,6 +851,19 @@ namespace Trinity
                     return true;
                 }
 
+                // Whirlwind for a barb
+                if (attackableSpecialMovement && !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker
+                    && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource >= 10)
+                {
+                    ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, CurrentDestination, CurrentWorldDynamicId, -1);
+                    // Store the current destination for comparison incase of changes next loop
+                    LastMoveToTarget = CurrentDestination;
+                    // Reset total body-block count, since we should have moved
+                    if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
+                        _timesBlockedMoving = 0;
+                    return true;
+                }
+
                 // Vault for a Demon Hunter
                 if (CombatBase.CanCast(SNOPower.DemonHunter_Vault) && Settings.Combat.DemonHunter.VaultMode != DemonHunterVaultMode.MovementOnly &&
                     (CombatBase.KiteDistance <= 0 || (!CacheData.MonsterObstacles.Any(a => a.Position.Distance(CurrentDestination) <= CombatBase.KiteDistance) &&
@@ -882,19 +891,6 @@ namespace Trinity
                     return true;
                 }
 
-                // Whirlwind for a barb
-                if (attackableSpecialMovement && !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker
-                    && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource >= 10)
-                {
-                    ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, CurrentDestination, CurrentWorldDynamicId, -1);
-                    // Store the current destination for comparison incase of changes next loop
-                    LastMoveToTarget = CurrentDestination;
-                    // Reset total body-block count, since we should have moved
-                    if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
-                        _timesBlockedMoving = 0;
-                    return true;
-                }
-
                 // Tempest rush for a monk
                 if (CombatBase.CanCast(SNOPower.Monk_TempestRush) && Player.PrimaryResource >= Settings.Combat.Monk.TR_MinSpirit &&
                     ((CurrentTarget.Type == GObjectType.Item && CurrentTarget.Distance > 20f) || CurrentTarget.Type != GObjectType.Item) &&
@@ -911,7 +907,6 @@ namespace Trinity
                     if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                         _timesBlockedMoving = 0;
                     return true;
-
                 }
 
                 // Strafe for a Demon Hunter

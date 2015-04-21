@@ -41,7 +41,7 @@ namespace Trinity
             c_CurrentAnimation = c_diaUnit.CommonData.CurrentAnimation;
 
             // See if this is a boss
-            CurrentCacheObject.IsBoss = DataDictionary.BossIds.Contains(CurrentCacheObject.ActorSNO);
+            CurrentCacheObject.IsBoss = DataDictionary.BossIds.Contains(CurrentCacheObject.ActorSNO) || CurrentCacheObject.InternalName.ToLower().Contains("boss");
             if (CurrentCacheObject.IsBoss)
                 CurrentCacheObject.KillRange = CurrentCacheObject.RadiusDistance + 10f;
 
@@ -60,6 +60,16 @@ namespace Trinity
             catch (Exception ex)
             {
                 Logger.LogDebug(LogCategory.CacheManagement, "Error while reading Rotation/Facing: {0}", ex.ToString());
+            }
+
+            // Invulnerable
+            try
+            {
+                CurrentCacheObject.IsInvulnerable = CurrentCacheObject.Unit.IsInvulnerable;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug(LogCategory.CacheManagement, "Error while reading IsInvulnerable: {0}", ex.ToString());
             }
 
             /*

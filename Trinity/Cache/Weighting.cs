@@ -238,7 +238,7 @@ namespace Trinity
                                 {
 
                                     // Not attackable, could be shielded, make super low priority
-                                    if (cacheObject.HasAffixShielded && cacheObject.Unit.IsInvulnerable)
+                                    if (cacheObject.HasAffixShielded && cacheObject.IsInvulnerable)
                                     {
                                         // Only 100 weight helps prevent it being prioritized over an unshielded
                                         cacheObject.Weight = 100;

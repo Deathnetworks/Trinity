@@ -77,6 +77,7 @@ namespace Trinity
             set { throw new NotImplementedException(); }
         }
 
+        [NoCopy]
         public bool CommonDataIsValid
         {
             get
@@ -93,8 +94,6 @@ namespace Trinity
 
         [DataMember]
         public int ActorSNO { get; set; }
-
-        // Generic stuff applicable to all objects
 
         [DataMember]
         public GObjectType Type { get; set; }
@@ -169,6 +168,9 @@ namespace Trinity
 
         [DataMember]
         public bool IsElite { get; set; }
+
+        [DataMember]
+        public bool IsInvulnerable { get; set; }
 
         [DataMember]
         public bool IsRare { get; set; }

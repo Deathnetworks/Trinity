@@ -1,15 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using Trinity.Cache;
 using Trinity.Helpers;
 using Trinity.Technicals;
+using Zeta.Common;
 using Zeta.Game;
+using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.UI.UIComponents
 {
@@ -64,6 +69,9 @@ namespace Trinity.UI.UIComponents
                 if (!_isWindowOpen)
                     return;
 
+                if (!DataModel.Enabled)
+                    return;
+
                 if (!LastUpdatedStopwatch.IsRunning)
                     LastUpdatedStopwatch.Start();
                 else if (LastUpdatedStopwatch.ElapsedMilliseconds < 250)
@@ -86,15 +94,17 @@ namespace Trinity.UI.UIComponents
             }
         }
 
-        public static System.Collections.Generic.List<CacheUIObject> GetCacheActorList()
+        public static List<CacheUIObject> GetCacheActorList()
         {
             return ZetaDia.Actors.GetActorsOfType<DiaObject>(true)
                                 .Where(i => i.IsFullyValid())
                                 .Select(o => new CacheUIObject(o))
                                 .OrderByDescending(o => o.InCache)
                                 .ThenByDescending(o => o.Weight)
+                                .ThenBy(o => o.Distance)
                                 .ToList();
         }
+
         private static bool _isWindowOpen;
         private static void Window_Closed(object sender, EventArgs e)
         {

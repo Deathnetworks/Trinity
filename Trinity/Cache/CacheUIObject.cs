@@ -18,11 +18,13 @@ namespace Trinity.Cache
         public string Type { get; set; }
         public string InCache { get; set; }
         public string IgnoreReason { get; set; }
-        public int Weight { get; set; }
+        public string Weight { get; set; }
         public string IsBoss { get; set; }
         public string IsElite { get; set; }
         public string IsQuestMonster { get; set; }
         public string IsMinimapActive { get; set; }
+        public string MarkerHash { get; set; }
+        public string MinimapTexture { get; set; }
         public string WeightInfo { get; set; }
         public int RActorGUID { get; set; }
         public int ActorSNO { get; set; }
@@ -37,6 +39,24 @@ namespace Trinity.Cache
                 Radius = (int)obj.CollisionSphere.Radius;
                 RadiusDistance = Distance - Radius;
                 Name = CleanName(obj.Name);
+
+                var marker = CacheData.CachedMarkers.FirstOrDefault(m => m.Position.Distance2D(obj.Position) < 1f);
+                if (marker != null)
+                {
+                    MarkerHash = IntToString(marker.NameHash);
+                    MinimapTexture = IntToString(marker.MinimapTexture);
+                }
+
+                try 
+                {
+                    if (obj is DiaUnit)
+                    {
+                        IsQuestMonster = BoolToString((obj as DiaUnit).IsQuestMonster);
+                        IsMinimapActive = BoolToString(obj.CommonData.GetAttribute<int>(ActorAttributeType.MinimapActive) > 0);
+                    }
+                }
+                catch {}
+
                 var cacheObject = Trinity.ObjectCache.FirstOrDefault(o => o.RActorGuid == RActorGUID);
                 if (cacheObject == null)
                 {
@@ -46,7 +66,7 @@ namespace Trinity.Cache
                 }
                 InCache = "True";
                 Type = cacheObject.Type.ToString();
-                Weight = (int)cacheObject.Weight;
+                Weight = IntToString((int)cacheObject.Weight);
                 IsBoss = BoolToString(cacheObject.IsBoss);
                 IsElite = BoolToString(cacheObject.IsEliteRareUnique);
                 WeightInfo = cacheObject.WeightInfo;
@@ -54,8 +74,7 @@ namespace Trinity.Cache
                 string ignoreReason = "";
                 CacheData.IgnoreReasons.TryGetValue(RActorGUID, out ignoreReason);
                 IgnoreReason = ignoreReason;
-                IsQuestMonster = BoolToString(cacheObject.IsQuestMonster);
-                IsMinimapActive = BoolToString(cacheObject.IsMinimapActive);
+
             }
             catch (Exception ex)
             {
@@ -67,6 +86,13 @@ namespace Trinity.Cache
         {
             if (val)
                 return "True";
+            return "";
+        }
+
+        private string IntToString(int val)
+        {
+            if (val != 0)
+                return val.ToString();
             return "";
         }
 

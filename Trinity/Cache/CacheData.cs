@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Trinity.Cache;
 using Zeta.Common;
+using Zeta.Game;
+using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 
@@ -171,6 +174,23 @@ namespace Trinity
         public static BuffsCache Buffs
         {
             get { return BuffsCache.Instance; }
+        }
+
+        public static CachedValue<List<MinimapMarker>> _cachedMarkers;
+        public static List<MinimapMarker> CachedMarkers
+        {
+            get
+            {
+                if (_cachedMarkers == null)
+                    _cachedMarkers = new CachedValue<List<MinimapMarker>>(GetMarkerList, TimeSpan.FromSeconds(1));
+                return _cachedMarkers.Value;
+            }
+        }
+
+        public static List<MinimapMarker> GetMarkerList()
+        {
+
+            return ZetaDia.Minimap.Markers.AllMarkers.ToList();
         }
 
         /// <summary>
