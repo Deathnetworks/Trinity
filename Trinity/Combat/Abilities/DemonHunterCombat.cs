@@ -528,7 +528,7 @@ namespace Trinity.Combat.Abilities
                 return false;
 
             // Not Enough Discipline
-            if (Player.SecondaryResource >= 14)
+            if (Player.SecondaryResource < 14)
                 return false;
 
             // Used Recently

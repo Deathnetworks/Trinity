@@ -138,7 +138,7 @@ namespace Trinity.Objects
                 var finalCooldown = Trinity.Player.CooldownReductionPct > 0 ? TimeSpan.FromMilliseconds(newCooldownMilliseconds) : baseCooldown;
                 return finalCooldown;
             }
-            set { _cooldown = value;  }
+            set { _cooldown = value; }
         }
 
         /// <summary>
@@ -150,7 +150,7 @@ namespace Trinity.Objects
             {
                 if (TimeSinceUse > 9999999) return 0;
                 var castTime = DateTime.UtcNow.Subtract(TimeSpan.FromMilliseconds(TimeSinceUse));
-                var endTime = castTime.Add(Cooldown);                
+                var endTime = castTime.Add(Cooldown);
                 var remainingMilliseconds = DateTime.UtcNow.Subtract(endTime).TotalMilliseconds;
                 return remainingMilliseconds < 0 ? (int)remainingMilliseconds * -1 : 0;
             }
@@ -234,7 +234,7 @@ namespace Trinity.Objects
         {
             get
             {
-                var rune =  Runes.FirstOrDefault(r => r.IsActive);
+                var rune = Runes.FirstOrDefault(r => r.IsActive);
                 return rune ?? new Rune();
             }
         }
@@ -276,7 +276,7 @@ namespace Trinity.Objects
         /// <summary>
         /// Performs basic checks to see if we have and can cast a power (hotbar, power manager). Checks use timer for Wiz, DH, Monk
         /// </summary>
-        public bool CanCast (CombatBase.CanCastFlags flags = CombatBase.CanCastFlags.All)
+        public bool CanCast(CombatBase.CanCastFlags flags = CombatBase.CanCastFlags.All)
         {
             return CombatBase.CanCast(SNOPower, flags);
         }
@@ -294,7 +294,7 @@ namespace Trinity.Objects
         /// </summary>
         public double TimeSinceUse
         {
-            get {  return DateTime.UtcNow.Subtract(LastUsed).TotalMilliseconds; }
+            get { return DateTime.UtcNow.Subtract(LastUsed).TotalMilliseconds; }
         }
 
         /// <summary>
@@ -393,7 +393,7 @@ namespace Trinity.Objects
         /// <summary>
         /// Cast this skill at the specified target
         /// </summary>
-        public void Cast (TrinityCacheObject target)
+        public void Cast(TrinityCacheObject target)
         {
             Cast(target.Position, target.ACDGuid);
         }
@@ -417,12 +417,13 @@ namespace Trinity.Objects
                 {
                     Trinity.LastPowerUsed = SNOPower;
                     CacheData.AbilityLastUsed[SNOPower] = DateTime.UtcNow;
-                    SpellTracker.TrackSpellOnUnit(CombatBase.CurrentTarget.ACDGuid, SNOPower);
+                    if (CombatBase.CurrentTarget != null)
+                        SpellTracker.TrackSpellOnUnit(CombatBase.CurrentTarget.ACDGuid, SNOPower);
                     SpellHistory.RecordSpell(SNOPower);
                 }
             }
         }
-        
+
         /// <summary>
         /// Game client is not doing anything weird.
         /// </summary>

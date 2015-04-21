@@ -285,12 +285,6 @@ namespace Trinity
 
                 using (new PerformanceLogger("RefreshDiaObjectCache.FinalChecks"))
                 {
-                    // force to stay put if we want to town run and there's no target
-                    if (CurrentTarget == null && ForceVendorRunASAP)
-                    {
-                        DontMoveMeIAmDoingShit = true;
-                    }
-
                     if (Settings.WorldObject.EnableBountyEvents)
                     {
                         bool eventObjectNear = ObjectCache.Any(o => o.Type == GObjectType.CursedChest || o.Type == GObjectType.CursedShrine);
@@ -589,8 +583,8 @@ namespace Trinity
                              *  Main Cache Function
                              */
                             bool addToCache = CacheDiaObject(currentObject);
-                            CurrentCacheObject.IgnoreReason = (!addToCache ? ((c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : "");
-                            CacheData.IgnoreReasons.Add(CurrentCacheObject.RActorGuid, CurrentCacheObject.IgnoreReason);
+                            CurrentCacheObject.IgnoreReason = c_IgnoreReason + "." + c_IgnoreSubStep; // (!addToCache ? ((c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : "");
+                            CacheData.IgnoreReasons.Add(currentObject.RActorGuid, CurrentCacheObject.IgnoreReason);
                             if (addToCache)
                                 ObjectCache.Add(CurrentCacheObject);
                         }
@@ -604,8 +598,8 @@ namespace Trinity
                              */
                             bool addToCache = CacheDiaObject(currentObject);
 
-                            CurrentCacheObject.IgnoreReason = (!addToCache ? ((c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : "");
-                            CacheData.IgnoreReasons.Add(CurrentCacheObject.RActorGuid, CurrentCacheObject.IgnoreReason);
+                            CurrentCacheObject.IgnoreReason = c_IgnoreReason + "." + c_IgnoreSubStep; // (!addToCache ? ((c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : "");
+                            CacheData.IgnoreReasons.Add(currentObject.RActorGuid, CurrentCacheObject.IgnoreReason);
                             if (addToCache)
                                 ObjectCache.Add(CurrentCacheObject);
 

@@ -145,7 +145,7 @@ namespace Trinity
 
         [DataMember]
         public bool OneHanded { get; set; }
-        
+
         [DataMember]
         public bool TwoHanded { get; set; }
 
@@ -227,7 +227,7 @@ namespace Trinity
         /// <summary>
         /// If Player is facing unit
         /// </summary>
-        [DataMember] 
+        [DataMember]
         public bool ForceLeapAgainst { get; set; }
 
         [DataMember]
@@ -256,7 +256,7 @@ namespace Trinity
         [DataMember]
         public bool HasBeenInLoS { get; set; }
 
-        [NoCopy]        
+        [NoCopy]
         public bool IsBossOrEliteRareUnique { get { return (this.IsUnit && (IsEliteRareUnique || IsBoss)); } }
 
         [NoCopy]
@@ -309,6 +309,27 @@ namespace Trinity
 
         [NoCopy]
         public bool IsEventObject { get { return IsCursedChest || IsCursedShrine; } }
+
+        [NoCopy]
+        public bool IsDestroyable { get { return Type == GObjectType.Barricade || Type == GObjectType.Destructible; } }
+
+        [NoCopy]
+        public bool IsInteractable
+        {
+            get
+            {
+                return Type == GObjectType.Item ||Type == GObjectType.Container || Type == GObjectType.CursedChest || Type == GObjectType.CursedChest || Type == GObjectType.CursedShrine ||
+                    Type == GObjectType.Door || Type == GObjectType.HealthWell || Type == GObjectType.Interactable ||  Type == GObjectType.Shrine;
+            }
+        }
+
+        public bool IsPickupNoClick
+        {
+            get
+            {
+                return Type == GObjectType.Gold || Type == GObjectType.PowerGlobe || Type == GObjectType.HealthGlobe || Type == GObjectType.ProgressionGlobe;
+            }
+        }
 
         [NoCopy]
         public bool IsFacing(Vector3 targetPosition, float arcDegrees = 70f)

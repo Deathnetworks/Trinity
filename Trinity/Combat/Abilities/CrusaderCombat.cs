@@ -1,5 +1,4 @@
-﻿
-using System.Linq;
+﻿using System.Linq;
 using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Game;
@@ -31,7 +30,7 @@ namespace Trinity.Combat.Abilities
             // Destructibles
             if (UseDestructiblePower)
                 return DestroyObjectPower;
-            
+
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CurrentTarget != null)
             {
                 /*
@@ -58,6 +57,13 @@ namespace Trinity.Combat.Abilities
                 if (CanCast(SNOPower.X1_Crusader_LawsOfValor2) && (TargetUtil.EliteOrTrashInRange(16f) || TargetUtil.AnyMobsInRange(15f, 5) || Settings.Combat.Crusader.SpamLawsOfValor))
                 {
                     return new TrinityPower(SNOPower.X1_Crusader_LawsOfValor2);
+                }
+
+                if (ShouldRefreshBastiansGeneratorBuff)
+                {
+                    power = GetPrimaryPower();
+                    if (power != null)
+                        return power;
                 }
 
                 // Judgement
@@ -221,29 +227,10 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.X1_Crusader_BlessedShield, 14f, CurrentTarget.ACDGuid);
                 }
 
-                // Justice
-                if (CanCast(SNOPower.X1_Crusader_Justice))
-                {
-                    return new TrinityPower(SNOPower.X1_Crusader_Justice, 7f, CurrentTarget.ACDGuid);
-                }
-
-                // Smite
-                if (CanCast(SNOPower.X1_Crusader_Smite))
-                {
-                    return new TrinityPower(SNOPower.X1_Crusader_Smite, 15f, TargetUtil.GetBestClusterUnit(15f, 15f).ACDGuid);
-                }
-
-                // Slash
-                if (CanCast(SNOPower.X1_Crusader_Slash))
-                {
-                    return new TrinityPower(SNOPower.X1_Crusader_Slash, 15f, TargetUtil.GetBestClusterUnit(5f, 8f).ACDGuid);
-                }
-
-                // Punish
-                if (CanCast(SNOPower.X1_Crusader_Punish))
-                {
-                    return new TrinityPower(SNOPower.X1_Crusader_Punish, 7f, CurrentTarget.ACDGuid);
-                }
+                // Primary generators
+                power = GetPrimaryPower();
+                if (power != null)
+                    return power;
             }
 
             // Buffs
@@ -283,6 +270,34 @@ namespace Trinity.Combat.Abilities
                 power = DefaultPower;
 
             return power;
+        }
+
+        public static TrinityPower GetPrimaryPower()
+        {
+            // Justice
+            if (CanCast(SNOPower.X1_Crusader_Justice))
+            {
+                return new TrinityPower(SNOPower.X1_Crusader_Justice, 7f, CurrentTarget.ACDGuid);
+            }
+
+            // Smite
+            if (CanCast(SNOPower.X1_Crusader_Smite))
+            {
+                return new TrinityPower(SNOPower.X1_Crusader_Smite, 15f, TargetUtil.GetBestClusterUnit(15f, 15f).ACDGuid);
+            }
+
+            // Slash
+            if (CanCast(SNOPower.X1_Crusader_Slash))
+            {
+                return new TrinityPower(SNOPower.X1_Crusader_Slash, 15f, TargetUtil.GetBestClusterUnit(5f, 8f).ACDGuid);
+            }
+
+            // Punish
+            if (CanCast(SNOPower.X1_Crusader_Punish))
+            {
+                return new TrinityPower(SNOPower.X1_Crusader_Punish, 7f, CurrentTarget.ACDGuid);
+            }
+            return null;
         }
 
         private static bool CanCastSweepAttack()
