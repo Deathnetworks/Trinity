@@ -1273,6 +1273,7 @@ namespace Trinity
                     dist = CurrentTarget.Position.Distance2D(Player.Position);
 
                 bool usePowerResult;
+
                 // For "no-attack" logic
                 if (CombatBase.CurrentPower.SNOPower == SNOPower.Walk && CombatBase.CurrentPower.TargetPosition == Vector3.Zero)
                 {
@@ -1280,13 +1281,16 @@ namespace Trinity
                     usePowerResult = true;
                 }
                 else
+                {
                     usePowerResult = ZetaDia.Me.UsePower(CombatBase.CurrentPower.SNOPower, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetDynamicWorldId, CombatBase.CurrentPower.TargetACDGUID);
+                }
+
+                var skill = SkillUtils.ById(CombatBase.CurrentPower.SNOPower);
+                string target = CombatBase.CurrentPower.TargetPosition != Vector3.Zero ? "at " + NavHelper.PrettyPrintVector3(CombatBase.CurrentPower.TargetPosition) + " dist=" + (int)dist : "";
+                target += CombatBase.CurrentPower.TargetACDGUID != -1 ? " on " + CombatBase.CurrentPower.TargetACDGUID : "";
 
                 if (usePowerResult)
                 {
-                    string target = CombatBase.CurrentPower.TargetPosition != Vector3.Zero ? "at " + NavHelper.PrettyPrintVector3(CombatBase.CurrentPower.TargetPosition) + " dist=" + (int)dist : "";
-                    target += CombatBase.CurrentPower.TargetACDGUID != -1 ? " on " + CombatBase.CurrentPower.TargetACDGUID : "";
-                                        
                     // Monk Stuffs get special attention
                     {
                         if (CombatBase.CurrentPower.SNOPower == SNOPower.Monk_TempestRush)
@@ -1297,17 +1301,24 @@ namespace Trinity
                         MonkCombat.RunOngoingPowers();
                     }
 
-                    var skill = SkillUtils.ById(CombatBase.CurrentPower.SNOPower);
+                    
                     if (skill != null && skill.Meta != null)
                     {
-                        Logger.Log(LogCategory.Behavior, "Used Power {0} ({1}) {2} Range={3} ({4} {5}) Delay={6}",
+                        Logger.Log(LogCategory.Behavior, "Used Power {0} ({1}) {2} Range={3} ({4} {5}) Delay={6}/{11} TargetDist={7} CurrentTarget={10}",
                             skill.Name,
-                            (int)skill.SNOPower,
+                            (int) skill.SNOPower,
                             target,
                             skill.Meta.CastRange,
                             skill.Meta.DebugResourceEffect,
                             skill.Meta.DebugType,
-                            skill.Meta.AfterUseDelay);                        
+                            skill.Meta.BeforeUseDelay,
+                            Player.Position.Distance(CombatBase.CurrentPower.TargetPosition),
+                            Player.IsFacing(CombatBase.CurrentPower.TargetPosition),
+                            CurrentTarget != null && Player.IsFacing(CurrentTarget.Position),
+                            CurrentTarget != null ? CurrentTarget.InternalName : "Null",
+                            skill.Meta.AfterUseDelay
+                            );
+
                     }
                     else
                     {
@@ -1325,6 +1336,24 @@ namespace Trinity
                     // See if we should force a long wait AFTERWARDS, too
                     // Force waiting AFTER power use for certain abilities
                     _isWaitingAfterPower = CombatBase.CurrentPower.ShouldWaitAfterUse;
+
+                }
+                else
+                {
+                    Logger.Log(LogCategory.Behavior, "Failed to use Power {0} ({1}) {2} Range={3} ({4} {5}) Delay={6}/{11} TargetDist={7} CurrentTarget={10}",
+                        skill.Name,
+                        (int)skill.SNOPower,
+                        target,
+                        skill.Meta.CastRange,
+                        skill.Meta.DebugResourceEffect,
+                        skill.Meta.DebugType,
+                        skill.Meta.BeforeUseDelay,
+                        Player.Position.Distance(CombatBase.CurrentPower.TargetPosition),
+                        Player.IsFacing(CombatBase.CurrentPower.TargetPosition),
+                        CurrentTarget != null && Player.IsFacing(CurrentTarget.Position),
+                        CurrentTarget != null ? CurrentTarget.InternalName : "Null",
+                        skill.Meta.AfterUseDelay
+                        );                    
                 }
 
                 _shouldPickNewAbilities = true;

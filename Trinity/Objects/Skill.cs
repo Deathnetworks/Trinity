@@ -100,7 +100,7 @@ namespace Trinity.Objects
 
         /// <summary>
         /// How much this spell costs to cast; uses rune value when applicable.
-        /// Corrisponds to: Beam=Width, Circle=Diameter
+        /// Corrisponds to: Beam=Width, Cone=ArcDegrees
         /// </summary>
         public float AreaEffectRadius
         {
@@ -325,6 +325,7 @@ namespace Trinity.Objects
             return new TrinityPower(SNOPower, minimumRange, acdGuid);
         }
 
+
         /// <summary>
         /// This skill as TrinityPower
         /// </summary>
@@ -336,7 +337,7 @@ namespace Trinity.Objects
         /// <summary>
         /// This skill as TrinityPower
         /// </summary>
-        public TrinityPower ToPower(float minimumRange, Vector3 targetPosition, float waitTicksBeforeUse, int waitTicksAfterUse)
+        public TrinityPower ToPower(float minimumRange, Vector3 targetPosition, int waitTicksBeforeUse, int waitTicksAfterUse)
         {
             return new TrinityPower(SNOPower, minimumRange, targetPosition, waitTicksBeforeUse, waitTicksAfterUse);
         }
@@ -344,9 +345,17 @@ namespace Trinity.Objects
         /// <summary>
         /// This skill as TrinityPower
         /// </summary>
-        public TrinityPower ToPower(float minimumRange, Vector3 targetPosition, int acdGuid, float waitTicksBeforeUse, int waitTicksAfterUse)
+        public TrinityPower ToPower(float minimumRange, Vector3 targetPosition, int acdGuid, int waitTicksBeforeUse, int waitTicksAfterUse)
         {
             return new TrinityPower(SNOPower, minimumRange, targetPosition, Trinity.Player.WorldDynamicID, acdGuid, waitTicksBeforeUse, waitTicksAfterUse);
+        }
+
+        /// <summary>
+        /// This skill as TrinityPower
+        /// </summary>
+        public TrinityPower ToPower(int waitTicksBeforeUse, int waitTicksAfterUse)
+        {
+            return new TrinityPower(SNOPower, waitTicksBeforeUse, waitTicksAfterUse);
         }
 
         /// <summary>

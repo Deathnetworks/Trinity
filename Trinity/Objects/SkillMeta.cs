@@ -1,7 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 using Trinity.Combat.Abilities;
+using Trinity.Helpers;
 using Trinity.Technicals;
 using Zeta.Common;
 using Logger = Trinity.Technicals.Logger;
@@ -147,12 +154,23 @@ namespace Trinity.Objects
         }
 
         /// <summary>
-        /// How long wait (in Milliseconds) after using, before using again.
+        /// How long to wait (in Milliseconds) after using skill.
         /// </summary>
+        [DefaultValue(100)]
         public float AfterUseDelay
         {
-            get { return _afterUseDelay.GetValueOrDefault(); }
+            get { return _afterUseDelay.GetValueOrDefaultAttribute(); }
             set { _afterUseDelay = value; }
+        }
+
+        /// <summary>
+        /// How long to wait (in Milliseconds) before using skill
+        /// </summary>
+        [DefaultValue(100)]
+        public float BeforeUseDelay
+        {
+            get { return _beforeUseDelay.GetValueOrDefaultAttribute(); }
+            set { _beforeUseDelay = value; }
         }
 
         /// <summary>
@@ -252,7 +270,12 @@ namespace Trinity.Objects
         /// <summary>
         /// Special delegate for determining where to cast the spell
         /// </summary>
-        public Func<SkillMeta, Vector3> TargetSelector;
+        public Func<SkillMeta, Vector3> TargetPositionSelector;
+
+        /// <summary>
+        /// Special delegate for determining which unit to cast the spell on
+        /// </summary>
+        public Func<SkillMeta, TrinityCacheObject> TargetUnitSelector;
 
         /// <summary>
         /// Special action to apply default overrides. 
@@ -272,6 +295,7 @@ namespace Trinity.Objects
         private float? _maxCastDistance;
         private float? _maxTargetDistance;
         private float? _afterUseDelay;
+        private float? _beforeUseDelay;
         private bool? _isDestructableSkill;
         private bool? _isDefensiveSkill;
         private bool? _isOffensiveSkill;
@@ -328,10 +352,12 @@ namespace Trinity.Objects
                 MaxTargetDistance = other._maxTargetDistance ?? MaxTargetDistance;
                 CastRange = other._maxCastDistance ?? CastRange;
                 AfterUseDelay = other._afterUseDelay ?? AfterUseDelay;
+                BeforeUseDelay = other._beforeUseDelay ?? BeforeUseDelay;
                 RequiredCluster = other._requiredCluster ?? RequiredCluster;
                 RequiredResource = other._requiredResource ?? RequiredResource;
                 CastCondition = other.CastCondition ?? CastCondition;
-                CastCondition = other.CastCondition ?? CastCondition;
+                TargetUnitSelector = other.TargetUnitSelector ?? TargetUnitSelector;
+                TargetPositionSelector = other.TargetPositionSelector ?? TargetPositionSelector;
             }
 
             return this;
@@ -362,9 +388,12 @@ namespace Trinity.Objects
             other.MaxTargetDistance = _maxTargetDistance ?? other.MaxTargetDistance;
             other.CastRange = _maxCastDistance ?? other.CastRange;
             other.AfterUseDelay = _afterUseDelay ?? other.AfterUseDelay;
+            other.BeforeUseDelay = _beforeUseDelay ?? other.BeforeUseDelay;
             other.RequiredCluster = _requiredCluster ?? other.RequiredCluster;
             other.RequiredResource = _requiredResource ?? other.RequiredResource;
             other.CastCondition = CastCondition ?? other.CastCondition;
+            other.TargetUnitSelector = TargetUnitSelector ?? other.TargetUnitSelector;
+            other.TargetPositionSelector = TargetPositionSelector ?? other.TargetPositionSelector;
         }
 
         public object Clone()
@@ -381,9 +410,11 @@ namespace Trinity.Objects
 
             if(Defaults!=null)
                 Defaults(Skill, this);
-        }  
+        }
 
         #endregion
 
     };
+
 }
+

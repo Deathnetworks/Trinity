@@ -136,6 +136,19 @@ namespace Trinity.UI.UIComponents
                             Logger.Log(LogCategory.UserInformation, "Exception Dumping Skill/Rune/Passive Items: {0}", ex);
                         }
                     });
+                DumpInvalidItemsCommand = new RelayCommand(
+                    parameter =>
+                    {
+                        try
+                        {
+                            UILoader.CloseWindow();
+                            DebugUtil.LogInvalidItems(TrinityLogLevel.Info);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log(LogCategory.UserInformation, "Exception Dumping Invalid Items: {0}", ex);
+                        }
+                    });                
                 DumpMerchantItemsCommand = new RelayCommand(
                     parameter =>
                     {
@@ -360,6 +373,12 @@ namespace Trinity.UI.UIComponents
         /// <value>The save command.</value>
         public ICommand DumpSkillsAndItemsCommand { get; private set; }
 
+        /// <summary>
+        ///     Gets the test score command.
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand DumpInvalidItemsCommand { get; private set; }
+        
         /// <summary>
         ///     Gets the test score command.
         /// </summary>

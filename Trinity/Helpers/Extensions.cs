@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows.Media;
 using Trinity.Config.Combat;
 using Trinity.Reference;
 using Trinity.Technicals;
+using Zeta.Bot;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 
@@ -13,6 +18,59 @@ namespace Trinity.Helpers
 {
     public static class Extensions
     {
+
+        /// <summary>
+        /// Allows a nullable backed property and use _field.GetValueOrDefaultAttribute() for [DefaultValue(1)] attribute
+        /// </summary>
+        public static T GetValueOrDefaultAttribute<T>(this T? obj, [CallerMemberName] string name = "", Type type = null) where T : struct, IComparable
+        {
+            if (obj.HasValue)
+                return obj.Value;
+
+            if (type == null)
+            {
+                var frame = new StackFrame(1);
+                var method = frame.GetMethod();
+                if (method.DeclaringType != null)
+                {
+                    type = method.DeclaringType;
+                }
+                else
+                {
+                    return default(T);
+                }
+            }
+
+            var attributes = TypeDescriptor.GetProperties(type)[name].Attributes;
+            var myAttribute = (DefaultValueAttribute)attributes[typeof(DefaultValueAttribute)];
+            return (T)Convert.ChangeType(myAttribute.Value, typeof(T));
+        }
+
+        /// <summary>
+        /// Gets a dictionary value or the default
+        /// </summary>
+        public static TValue GetValueOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key)
+        {
+            TValue value;
+            return dictionary.TryGetValue(key, out value) ? value : default(TValue);
+        }
+
+        /// <summary>
+        /// Get an attribute, exceptions get swallowed and default returned
+        /// </summary>
+        public static T GetAttribute<T>(this TrinityCacheObject actor, ActorAttributeType type) where T : struct
+        {
+            try
+            {
+                actor.CommonData.GetAttribute<T>(type);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug(LogCategory.CacheManagement, "Exception on {0} accessing {1} attribute: {2}", actor.InternalName, type, ex);
+            }
+            return default(T);
+        }
+
         public static TrinityItemQuality GetTrinityItemQuality(this ACDItem item)
         {
             if (item == null)
