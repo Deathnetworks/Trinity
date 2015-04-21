@@ -335,8 +335,10 @@ namespace Trinity
                         }
                     }
 
+                    bool wwToItem = (CurrentTarget.Type != GObjectType.Item || (CurrentTarget.Type == GObjectType.Item && CurrentTarget.Distance > 10f));
+
                     // Whirlwind against everything within range
-                    if (Player.PrimaryResource >= 10 && CombatBase.CanCast(SNOPower.Barbarian_Whirlwind) && 
+                    if (Player.PrimaryResource >= 10 && CombatBase.CanCast(SNOPower.Barbarian_Whirlwind) && wwToItem &&
                         (TargetUtil.AnyMobsInRange(20, false) || Sets.BulKathossOath.IsFullyEquipped) && !IsWaitingForSpecial)
                     {
                         Skills.Barbarian.Whirlwind.Cast(CurrentDestination);
@@ -879,8 +881,8 @@ namespace Trinity
                     SpellHistory.RecordSpell(SNOPower.Wizard_Archon_Teleport);
                     return true;
                 }
-                // Whirlwind for a barb
 
+                // Whirlwind for a barb
                 if (attackableSpecialMovement && !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker
                     && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource >= 10)
                 {

@@ -501,6 +501,13 @@ namespace Trinity
                                     break;
                                 }
 
+                                if (Player.ParticipatingInTieredLootRun && ObjectCache.Any(m => m.IsUnit && m.IsBoss))
+                                {
+                                    objWeightInfo += " LR Boss";
+                                    cacheObject.Weight = 0;
+                                    break;
+                                }
+
                                 // Default Weight
                                 cacheObject.Weight = Math.Max((175 - cacheObject.Distance) / 175 * MaxWeight, 100d);
 
@@ -629,6 +636,13 @@ namespace Trinity
                                 {
                                     cacheObject.Weight = 0;
                                     objWeightInfo += " DisableForQuest";
+                                    break;
+                                }
+
+                                if (ObjectCache.Any(m => m.IsUnit && m.IsBossOrEliteRareUnique))
+                                {
+                                    objWeightInfo += " BossOrElite";
+                                    cacheObject.Weight = 0;
                                     break;
                                 }
 
