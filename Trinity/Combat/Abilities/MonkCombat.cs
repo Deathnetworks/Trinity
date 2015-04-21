@@ -36,6 +36,8 @@ namespace Trinity.Combat.Abilities
 
         public static TrinityPower GetPower()
         {
+            TrinityPower power;
+            
             _hasInnaSet = Sets.Innas.IsThirdBonusActive;
             _hasSwk = Sets.MonkeyKingsGarb.IsSecondBonusActive;
             _minSweepingWindSpirit = _hasInnaSet ? 5f : 75f;
@@ -64,6 +66,13 @@ namespace Trinity.Combat.Abilities
                 }
 
                 return GetMonkDestroyPower();
+            }
+
+            if (ShouldRefreshBastiansGeneratorBuff)
+            {
+                power = GetPrimaryPower();
+                if (power != null)
+                    return power;
             }
 
             // Epiphany: spirit regen, dash to targets
@@ -333,6 +342,23 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.Monk_CripplingWave, 20f, CurrentTarget.ACDGuid);
             }
 
+            power = GetPrimaryPower();
+            if (power != null)
+                return power;
+
+            // Wave of light as primary 
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight))
+            {
+                RefreshSweepingWind(true);
+                return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, TargetUtil.GetBestClusterPoint());
+            }
+
+            // Default attacks
+            return DefaultPower;
+        }
+
+        private static TrinityPower GetPrimaryPower()
+        {
             // Fists of Thunder
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Monk_FistsofThunder))
             {
@@ -360,16 +386,7 @@ namespace Trinity.Combat.Abilities
                 RefreshSweepingWind();
                 return new TrinityPower(SNOPower.Monk_CripplingWave, 30f, CurrentTarget.ACDGuid);
             }
-
-            // Wave of light as primary 
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CanCast(SNOPower.Monk_WaveOfLight))
-            {
-                RefreshSweepingWind(true);
-                return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, TargetUtil.GetBestClusterPoint());
-            }
-
-            // Default attacks
-            return DefaultPower;
+            return null;
         }
 
         private static bool CanCastMantraOfEvasion()

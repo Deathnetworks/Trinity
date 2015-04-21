@@ -32,8 +32,8 @@ namespace Trinity.UI.UIComponents
 
                 _window = new Window
                 {
-                    Height = 300,
-                    Width = 1200,
+                    Height = 450,
+                    Width = 1900,
                     MinHeight = MinimumHeight,
                     MinWidth = MininumWidth,
                     Title = "Trinity Cache",
@@ -92,7 +92,7 @@ namespace Trinity.UI.UIComponents
                                 .Where(i => i.IsFullyValid())
                                 .Select(o => new CacheUIObject(o))
                                 .OrderByDescending(o => o.InCache)
-                                .ThenBy(o => o.Distance)
+                                .ThenByDescending(o => o.Weight)
                                 .ToList();
         }
         private static bool _isWindowOpen;

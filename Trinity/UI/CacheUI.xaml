@@ -17,19 +17,19 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Width="60" IsReadOnly="True" Binding="{Binding Path=Distance}" Header="Distance" />
                 <DataGridTextColumn Width="60" IsReadOnly="True" Binding="{Binding Path=Radius}" Header="Radius" />
-                <DataGridTextColumn Width="80" IsReadOnly="True" Binding="{Binding Path=RadiusDistance}" Header="RadiusDistance" />
+                <!--<DataGridTextColumn Width="80" IsReadOnly="True" Binding="{Binding Path=RadiusDistance}" Header="RadiusDistance" />-->
                 <DataGridTextColumn Width="170" IsReadOnly="True" Binding="{Binding Path=Name}" Header="Name" />
                 <DataGridTextColumn Width="80" IsReadOnly="True" Binding="{Binding Path=Type}" Header="Type" />
+                <DataGridTextColumn Width="80" IsReadOnly="True" Binding="{Binding Path=Weight}" Header="Weight" />
                 <DataGridTextColumn Width="60" IsReadOnly="True" Binding="{Binding Path=InCache}" Header="InCache" />
                 <DataGridTextColumn Width="120" IsReadOnly="True" Binding="{Binding Path=IgnoreReason}" Header="IgnoreReason" />
+                <DataGridTextColumn Width="650" IsReadOnly="True" Binding="{Binding Path=WeightInfo}" Header="WeightInfo" />
                 <DataGridTextColumn Width="60" IsReadOnly="True" Binding="{Binding Path=IsBoss}" Header="IsBoss" />
                 <DataGridTextColumn Width="60" IsReadOnly="True" Binding="{Binding Path=IsElite}" Header="IsElite" />
                 <DataGridTextColumn Width="100" IsReadOnly="True" Binding="{Binding Path=IsQuestMonster}" Header="IsQuestMonster" />
                 <DataGridTextColumn Width="100" IsReadOnly="True" Binding="{Binding Path=IsMinimapActive}" Header="IsMinimapActive" />
-                <DataGridTextColumn Width="80" IsReadOnly="True" Binding="{Binding Path=Weight}" Header="Weight" />
-                <DataGridTextColumn Width="80" IsReadOnly="True" Binding="{Binding Path=RActorGUID}" Header="RActorGUID" />
-                <DataGridTextColumn Width="70" IsReadOnly="True" Binding="{Binding Path=ActorSNO}" Header="ActorSNO" />
-                <DataGridTextColumn Width="450" IsReadOnly="True" Binding="{Binding Path=WeightInfo}" Header="WeightInfo" />
+                <!--<DataGridTextColumn Width="80" IsReadOnly="True" Binding="{Binding Path=RActorGUID}" Header="RActorGUID" />
+                <DataGridTextColumn Width="70" IsReadOnly="True" Binding="{Binding Path=ActorSNO}" Header="ActorSNO" />-->
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

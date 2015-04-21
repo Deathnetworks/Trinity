@@ -583,8 +583,8 @@ namespace Trinity
                              *  Main Cache Function
                              */
                             bool addToCache = CacheDiaObject(currentObject);
-                            CurrentCacheObject.IgnoreReason = (!addToCache ? ((c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : "");
-                            CacheData.IgnoreReasons.Add(CurrentCacheObject.RActorGuid, CurrentCacheObject.IgnoreReason);
+                            CurrentCacheObject.IgnoreReason = c_IgnoreReason + "." + c_IgnoreSubStep; // (!addToCache ? ((c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : "");
+                            CacheData.IgnoreReasons.Add(currentObject.RActorGuid, CurrentCacheObject.IgnoreReason);
                             if (addToCache)
                                 ObjectCache.Add(CurrentCacheObject);
                         }
@@ -598,8 +598,8 @@ namespace Trinity
                              */
                             bool addToCache = CacheDiaObject(currentObject);
 
-                            CurrentCacheObject.IgnoreReason = (!addToCache ? ((c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : "");
-                            CacheData.IgnoreReasons.Add(CurrentCacheObject.RActorGuid, CurrentCacheObject.IgnoreReason);
+                            CurrentCacheObject.IgnoreReason = c_IgnoreReason + "." + c_IgnoreSubStep; // (!addToCache ? ((c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : "");
+                            CacheData.IgnoreReasons.Add(currentObject.RActorGuid, CurrentCacheObject.IgnoreReason);
                             if (addToCache)
                                 ObjectCache.Add(CurrentCacheObject);
 

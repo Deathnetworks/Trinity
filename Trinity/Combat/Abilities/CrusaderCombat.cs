@@ -1,5 +1,4 @@
-﻿
-using System.Linq;
+﻿using System.Linq;
 using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Game;
