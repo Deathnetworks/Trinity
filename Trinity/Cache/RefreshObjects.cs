@@ -285,12 +285,6 @@ namespace Trinity
 
                 using (new PerformanceLogger("RefreshDiaObjectCache.FinalChecks"))
                 {
-                    // force to stay put if we want to town run and there's no target
-                    if (CurrentTarget == null && ForceVendorRunASAP)
-                    {
-                        DontMoveMeIAmDoingShit = true;
-                    }
-
                     if (Settings.WorldObject.EnableBountyEvents)
                     {
                         bool eventObjectNear = ObjectCache.Any(o => o.Type == GObjectType.CursedChest || o.Type == GObjectType.CursedShrine);

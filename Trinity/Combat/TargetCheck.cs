@@ -37,8 +37,6 @@ namespace Trinity
                     return TargetCheckResult(false, "Is Dead");
                 }
 
-                //CurrentTarget = null;
-                DontMoveMeIAmDoingShit = false;
                 _timesBlockedMoving = 0;
                 IsAlreadyMoving = false;
                 lastMovementCommand = DateTime.MinValue;
@@ -58,7 +56,6 @@ namespace Trinity
                 // We have a target, start the target handler!
                 if (CurrentTarget != null)
                 {
-                    DontMoveMeIAmDoingShit = true;
                     _shouldPickNewAbilities = true;
                     return TargetCheckResult(true, "Current Target is not null");
                 }

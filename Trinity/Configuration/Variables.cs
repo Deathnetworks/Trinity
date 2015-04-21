@@ -264,8 +264,6 @@ namespace Trinity
             set { Trinity.lastPowerUsed = value; }
         }
 
-        // Two variables to stop DB from attempting any navigator movement mid-combat/mid-backtrack
-        public static bool DontMoveMeIAmDoingShit = false;
         public static bool DisableOutofCombatSprint = false;
         public static bool OnlyTarget = false;
 

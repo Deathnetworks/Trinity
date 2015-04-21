@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.Reflection;
 using System.Runtime.Serialization;
 
 namespace Trinity.Config.Combat
@@ -28,6 +30,7 @@ namespace Trinity.Config.Combat
         private bool _UseLeapOOC;
         private bool _UseChargeOOC;
         private bool _WOTBEmergencyHealth;
+        private int _rendWaitDelay;
         private float _AvoidArcaneHealth;
         private float _AvoidAzmoBodiesHealth;
         private float _AvoidAzmoFireBallHealth;
@@ -748,6 +751,24 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
+        [DefaultValue(3500)]
+        public int RendWaitDelay
+        {
+            get
+            {
+                return _rendWaitDelay;
+            }
+            set
+            {
+                if (_rendWaitDelay != value)
+                {
+                    _rendWaitDelay = value;
+                    OnPropertyChanged("RendWaitDelay");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool WOTBEmergencyHealth
         {
@@ -1066,22 +1087,20 @@ namespace Trinity.Config.Combat
         /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
         /// </summary>
         /// <param name="context"></param>
-        [OnDeserializing()]
+        [OnDeserializing]
         internal void OnDeserializingMethod(StreamingContext context)
         {
-            this.TargetBasedZigZag = true;
-            this.MinThreatShoutMobCount = 1;
-            this.ThreatShoutOOC = true;
-            this.IgnoreAvoidanceInWOTB = true;
-            this.IgnoreGoldInWOTB = true;
-            this.MinHotaHealth = 0.40f;
-            this.WOTBMode = BarbarianWOTBMode.Normal;
-            this.UseLeapOOC = true;
-            this.UseChargeOOC = true;
-            this.AvoidGrotesqueHealth = 1;
-            this.AvoidOrbiterHealth = 1;
-            this.AvoidWormholeHealth = 0.50f;
-            this.SprintMode = BarbarianSprintMode.MovementOnly;
+            foreach (PropertyInfo p in GetType().GetProperties())
+            {
+                foreach (Attribute attr in p.GetCustomAttributes(true))
+                {
+                    if (attr is DefaultValueAttribute)
+                    {
+                        DefaultValueAttribute dv = (DefaultValueAttribute)attr;
+                        p.SetValue(this, dv.Value);
+                    }
+                }
+            }
         }
 
         /// <summary>

@@ -309,12 +309,10 @@ namespace Trinity
                     {
 
                         bool Monk_SpecialMovement = ((CurrentTarget.Type == GObjectType.Gold ||
-                            CurrentTarget.IsUnit ||
-                            CurrentTarget.Type == GObjectType.Barricade ||
-                            CurrentTarget.Type == GObjectType.Destructible) && MonkCombat.IsTempestRushReady());
+                            CurrentTarget.IsUnit || CurrentTarget.IsDestroyable) && MonkCombat.IsTempestRushReady());
 
                         // If we're doing avoidance, globes or backtracking, try to use special abilities to move quicker
-                        if ((CurrentTarget.Type == GObjectType.Avoidance ||
+                        if ((CurrentTarget.Type == GObjectType.Avoidance || 
                             CurrentTarget.Type == GObjectType.HealthGlobe ||
                             CurrentTarget.Type == GObjectType.PowerGlobe ||
                             CurrentTarget.Type == GObjectType.ProgressionGlobe ||
@@ -338,35 +336,11 @@ namespace Trinity
                     }
 
                     // Whirlwind against everything within range
-
-                    if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource >= 10 && TargetUtil.AnyMobsInRange(20) &&
-                        !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && TargetCurrentDistance <= 12f
-                        && CurrentTarget.Type != GObjectType.Container &&
-                        (!Hotbar.Contains(SNOPower.Barbarian_Sprint) || GetHasBuff(SNOPower.Barbarian_Sprint)) &&
-                        (CurrentTarget.Type != GObjectType.Item && CurrentTarget.Type != GObjectType.Gold && TargetCurrentDistance >= 6f) &&
-                        (CurrentTarget.Type != GObjectType.Unit ||
-                        (CurrentTarget.IsUnit && !CurrentTarget.IsTreasureGoblin)))
+                    if (Player.PrimaryResource >= 10 && CombatBase.CanCast(SNOPower.Barbarian_Whirlwind) && 
+                        (TargetUtil.AnyMobsInRange(20, false) || Sets.BulKathossOath.IsFullyEquipped) && !IsWaitingForSpecial)
                     {
-                        // Special code to prevent whirlwind double-spam, this helps save fury
-                        bool bUseThisLoop = SNOPower.Barbarian_Whirlwind != LastPowerUsed;
-                        if (!bUseThisLoop)
-                        {
-                            LastPowerUsed = SNOPower.None;
-                            if (TimeSinceUse(SNOPower.Barbarian_Whirlwind) >= 200)
-                                bUseThisLoop = true;
-                        }
-                        if (bUseThisLoop)
-                        {
-                            ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, CurrentDestination, CurrentWorldDynamicId, -1);
-                            LastPowerUsed = SNOPower.Barbarian_Whirlwind;
-                            CacheData.AbilityLastUsed[SNOPower.Barbarian_Whirlwind] = DateTime.UtcNow;
-                        }
-                        // Store the current destination for comparison incase of changes next loop
+                        Skills.Barbarian.Whirlwind.Cast(CurrentDestination);
                         LastMoveToTarget = CurrentDestination;
-                        // Reset total body-block count
-                        if ((!_forceCloseRangeTarget || DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds > ForceCloseRangeForMilliseconds) &&
-                            DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
-                            _timesBlockedMoving = 0;
                         return GetRunStatus(RunStatus.Running);
                     }
                 }
@@ -1301,12 +1275,12 @@ namespace Trinity
                         MonkCombat.RunOngoingPowers();
                     }
 
-                    
+
                     if (skill != null && skill.Meta != null)
                     {
                         Logger.Log(LogCategory.Behavior, "Used Power {0} ({1}) {2} Range={3} ({4} {5}) Delay={6}/{11} TargetDist={7} CurrentTarget={10}",
                             skill.Name,
-                            (int) skill.SNOPower,
+                            (int)skill.SNOPower,
                             target,
                             skill.Meta.CastRange,
                             skill.Meta.DebugResourceEffect,
@@ -1353,7 +1327,7 @@ namespace Trinity
                         CurrentTarget != null && Player.IsFacing(CurrentTarget.Position),
                         CurrentTarget != null ? CurrentTarget.InternalName : "Null",
                         skill.Meta.AfterUseDelay
-                        );                    
+                        );
                 }
 
                 _shouldPickNewAbilities = true;
