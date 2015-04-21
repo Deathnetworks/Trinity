@@ -796,9 +796,13 @@ namespace Trinity
         public static HashSet<int> WizardHydraIds { get { return wizardHydraIds; } }
         private static readonly HashSet<int> wizardHydraIds = new HashSet<int>
         { 
-            80745, // Wizard_HydraHead_Default_1
-            80757, // Wizard_HydraHead_Default_2
-            80758, // Wizard_HydraHead_Default_3
+            // Some hydras are 3 monsters, only use one of their heads.
+            82972, //Type: Monster Name: Wizard_HydraHead_Frost_1-1037 ActorSNO: 82972
+            83959, // Type: Monster Name: Wizard_HydraHead_Big-1168 ActorSNO: 83959
+            325807, // Type: Monster Name: Wizard_HydraHead_fire2_1-1250 ActorSNO: 325807
+            82109, // Type: Monster Name: Wizard_HydraHead_Lightning_1-1288 ActorSNO: 82109, 
+            81515, // Type: Monster Name: Wizard_HydraHead_Arcane_1-1338 ActorSNO: 81515, 
+            80745, // Type: Monster Name: Wizard_HydraHead_Default_1-1364 ActorSNO: 80745, 
         };
 
         /// <summary>

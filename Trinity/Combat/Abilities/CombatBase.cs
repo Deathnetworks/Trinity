@@ -10,6 +10,7 @@ using Zeta.Bot;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
+using Zeta.Game.Internals.SNO;
 using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.Combat.Abilities
@@ -41,6 +42,8 @@ namespace Trinity.Combat.Abilities
             NoPowerManager = 8,
             Timer = 16
         }
+
+        internal virtual void CombatSettings() { }
 
         internal static void LoadCombatSettings()
         {
@@ -84,14 +87,6 @@ namespace Trinity.Combat.Abilities
                     HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
                     KiteDistance = Settings.Combat.WitchDoctor.KiteLimit;
                     KiteMode = KiteMode.Always;
-                    break;
-
-                case ActorClass.DemonHunter:
-                    EmergencyHealthPotionLimit = Settings.Combat.DemonHunter.PotionLevel;
-                    EmergencyHealthGlobeLimit = Settings.Combat.DemonHunter.HealthGlobeLevel;
-                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
-                    KiteDistance = Settings.Combat.DemonHunter.KiteLimit;
-                    KiteMode = Settings.Combat.DemonHunter.KiteMode;
                     break;
             }
 
@@ -212,8 +207,9 @@ namespace Trinity.Combat.Abilities
         public static bool IsWaitingForSpecial { get; set; }
 
         /// <summary>
-        /// Minimum energy reserve for using "Big" spells/powers
-        /// </summary>
+        /// EnergReserve for using "Big" spells/powers        
+        /// </summary>        
+        [Obsolete("Use EnergyReserve, Set in Class's CombatSettings() override")]
         public static int MinEnergyReserve
         {
             get
@@ -235,6 +231,12 @@ namespace Trinity.Combat.Abilities
                 }
             }
         }
+
+        /// <summary>
+        /// Minimum energy reserve for using "Big" spells/powers     
+        /// </summary>
+        public static int EnergyReserve { get; set; }
+        
 
         /// <summary>
         /// Arcane, Frozen, Jailer, Molten, Electrified+Reflect Damage elites
@@ -569,9 +571,12 @@ namespace Trinity.Combat.Abilities
         /// <summary>
         /// Checks a skill against the convention of elements ring
         /// </summary>
-        internal static bool CheckConventionElement(Skill skill)
+        internal static bool ShouldWaitForConventionElement(Skill skill)
         {
-            return !Settings.Combat.Misc.UseConventionElementOnly || !Legendary.ConventionOfElements.IsEquipped || CacheData.Buffs.ConventionElement == skill.Element;
+            if (!Settings.Combat.Misc.UseConventionElementOnly)
+                return false;
+
+            return Legendary.ConventionOfElements.IsEquipped && CacheData.Buffs.ConventionElement != skill.Element;
         }
 
         /// <summary>
@@ -737,6 +742,9 @@ namespace Trinity.Combat.Abilities
                     if (Player.IsIncapacitated)
                         return "IsIncapacitated";
 
+                    var adhocConditionResult = (adhocCondition == null) || adhocCondition(meta);
+                    var metaConditionResult = (meta.CastCondition == null) || meta.CastCondition(meta);
+
                     if (!meta.CastFlags.HasFlag(CanCastFlags.NoTimer) && !SNOPowerUseTimer(skill.SNOPower))
                         return "PowerUseTimer";
 
@@ -754,7 +762,7 @@ namespace Trinity.Combat.Abilities
                     //    return false;
 
                     var resourceCost = (meta.RequiredResource > 0) ? meta.RequiredResource : skill.Cost;
-                    if (resourceCost > 0)
+                    if (resourceCost > 0 && !skill.IsGeneratorOrPrimary)
                     {
                         var actualResource = (skill.Resource == Resource.Discipline) ? Player.SecondaryResource : Player.PrimaryResource;
                         if (actualResource < resourceCost)
@@ -763,9 +771,6 @@ namespace Trinity.Combat.Abilities
 
                     //if (meta.IsEliteOnly && !CurrentTarget.IsBossOrEliteRareUnique)
                     //    return false;
-
-                    var adhocConditionResult = (adhocCondition == null) || adhocCondition(meta);
-                    var metaConditionResult = (meta.CastCondition == null) || meta.CastCondition(meta);
 
                     if (!adhocConditionResult || !metaConditionResult)
                         return "ConditionFailure";
@@ -816,21 +821,69 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         public static TrinityPower GetTrinityPower(Skill skill)
         {
+            var ticksBefore = skill.Meta.BeforeUseDelay == 0 ? 0 : (int)Math.Round(BotMain.TicksPerSecond * (skill.Meta.BeforeUseDelay / 1000));
+            var ticksAfter = skill.Meta.AfterUseDelay == 0 ? 0 : (int)Math.Round(BotMain.TicksPerSecond * (skill.Meta.AfterUseDelay / 1000));
+
             if (skill.Meta.IsCastOnSelf)
-                return skill.ToPower();
+            {
+                Logger.Log(LogCategory.Targetting, "Calculating TargetPosition for {0} as Self. CurrentTarget={1}", skill.Name, CurrentTarget.InternalName);
+                return skill.ToPower(ticksBefore, ticksAfter);
+            }
 
             var castRange = (skill.Meta.CastRange <= 0) ? (int)Math.Round(skill.Meta.MaxTargetDistance * 0.5) : skill.Meta.CastRange;
 
-            if (skill.Meta.TargetSelector != null)
-                return skill.ToPower(castRange, skill.Meta.TargetSelector(skill.Meta));
+            if (skill.Meta.TargetPositionSelector != null)
+            {                
+                var targetPosition = skill.Meta.TargetPositionSelector(skill.Meta);
+
+                Logger.Log(LogCategory.Targetting, "Calculating TargetPosition for {0} using TargetPositionSelector at {1} Dist={2} PlayerIsFacing(CastPosition={3} CurrentTarget={4}) CurrentTarget={5}", 
+                    skill.Name,
+                    targetPosition, 
+                    Player.Position.Distance(targetPosition), 
+                    Player.IsFacing(targetPosition),
+                    Player.IsFacing(CurrentTarget.Position),
+                    CurrentTarget.InternalName
+                    );
+
+                return skill.ToPower(castRange, targetPosition, ticksBefore, ticksAfter);
+            }
+
+            if (skill.Meta.TargetUnitSelector != null)
+            {
+                var targetUnit = skill.Meta.TargetUnitSelector(skill.Meta);
+
+                Logger.Log(LogCategory.Targetting, "Calculating TargetPosition for {0} using TargetUnitSelector at {1} Dist={2} PlayerIsFacing(CastPosition={3} CurrentTarget={4}) CurrentTarget={5}",
+                    skill.Name,
+                    targetUnit.Position,
+                    Player.Position.Distance(targetUnit.Position),
+                    Player.IsFacing(targetUnit.Position),
+                    Player.IsFacing(CurrentTarget.Position),
+                    CurrentTarget.InternalName
+                    );
+
+                return skill.ToPower(castRange, targetUnit.Position, targetUnit.ACDGuid, ticksBefore, ticksAfter);
+            }
+
 
             if (skill.Meta.IsAreaEffectSkill)
-                return skill.ToPower(castRange, GetBestAreaEffectTarget(skill));
+            {
+                var target = GetBestAreaEffectTarget(skill);
 
-            if (skill.Meta.IsOffensiveSkill)
-                return skill.ToPower(castRange, CurrentTarget.Position);
+                Logger.Log(LogCategory.Targetting, "Calculating TargetPosition for {0} using AreaEffectTargetting at {1} Dist={2} PlayerIsFacing(CastPosition={3} CurrentTarget={4}) CurrentTarget={5} AreaShape={6} AreaRadius={7} ",
+                    skill.Name,
+                    target,
+                    Player.Position.Distance(target.Position),
+                    Player.IsFacing(target.Position),
+                    Player.IsFacing(CurrentTarget.Position),
+                    CurrentTarget.InternalName,
+                    skill.Meta.AreaEffectShape,
+                    skill.AreaEffectRadius
+                    );
 
-            return skill.ToPower();
+                return skill.ToPower(castRange, target.Position, target.ACDGuid, ticksBefore, ticksAfter);
+            }
+
+            return skill.ToPower(castRange, CurrentTarget.Position);
         }
 
         /// <summary>
@@ -838,29 +891,31 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         /// <param name="skill">skill to be used</param>
         /// <returns>target position</returns>
-        public static Vector3 GetBestAreaEffectTarget(Skill skill)
+        public static TrinityCacheObject GetBestAreaEffectTarget(Skill skill)
         {
-            Vector3 targetLocation;
+            TrinityCacheObject target;
             switch (skill.Meta.AreaEffectShape)
             {
                 case AreaEffectShapeType.Beam:
-                    targetLocation = TargetUtil.GetBestPierceTarget(skill.Meta.CastRange).Position;
+                    target = TargetUtil.GetBestPierceTarget(skill.Meta.CastRange);
                     break;
                 case AreaEffectShapeType.Circle:
-                    targetLocation = TargetUtil.GetBestClusterPoint(skill.AreaEffectRadius, skill.Meta.CastRange);
+                    target = TargetUtil.GetBestClusterUnit(skill.AreaEffectRadius, skill.Meta.CastRange);
                     break;
                 case AreaEffectShapeType.Cone:
-                    targetLocation = TargetUtil.GetBestArcTarget(skill.Meta.CastRange, skill.AreaEffectRadius).Position;
+                    target = TargetUtil.GetBestArcTarget(skill.Meta.CastRange, skill.AreaEffectRadius);
                     break;
                 default:
-                    targetLocation = Enemies.BestLargeCluster.Position;
+                    target = TargetUtil.GetBestClusterUnit();
                     break;
             }
 
-            if (targetLocation == Vector3.Zero)
-                targetLocation = CurrentTarget.Position;
+            return target ?? CurrentTarget;
+        }
 
-            return targetLocation;
+        public static bool IsInCombat
+        {
+            get { return CurrentTarget != null && CurrentTarget.ActorType == ActorType.Monster || ZetaDia.Me.IsInCombat; }
         }
         
     }

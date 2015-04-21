@@ -51,9 +51,11 @@ namespace Trinity.Technicals
 
                 if (!LastLogMessages.ContainsKey(key))
                     LastLogMessages.Add(key, "");
-                
+
+                var allowDuplicates = Trinity.Settings != null && Trinity.Settings.Advanced != null && Trinity.Settings.Advanced.AllowDuplicateMessages;
+
                 string lastMessage;
-                if (LastLogMessages.TryGetValue(key, out lastMessage) && (Trinity.Settings.Advanced.AllowDuplicateMessages || lastMessage != msg))
+                if (LastLogMessages.TryGetValue(key, out lastMessage) && (allowDuplicates || lastMessage != msg))
                 {
                     LastLogMessages[key] = msg;
 

@@ -481,7 +481,7 @@ namespace Trinity.DbProvider
             bool cancelSpecialMovementAfterStuck = DateTime.UtcNow.Subtract(LastGeneratedStuckPosition).TotalMilliseconds > 10000;
 
             // See if we can use abilities like leap etc. for movement out of combat, but not in town
-            if (Trinity.Settings.Combat.Misc.AllowOOCMovement && !Trinity.Player.IsInTown && !Trinity.DontMoveMeIAmDoingShit && cancelSpecialMovementAfterStuck)
+            if (Trinity.Settings.Combat.Misc.AllowOOCMovement && !Trinity.Player.IsInTown && !Trinity.DontMoveMeIAmDoingShit && cancelSpecialMovementAfterStuck && !CombatBase.IsInCombat)
             {
                 // Whirlwind for a barb, special context only
                 if (Trinity.Settings.Combat.Barbarian.SprintMode != BarbarianSprintMode.CombatOnly &&

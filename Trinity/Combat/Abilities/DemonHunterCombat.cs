@@ -14,16 +14,20 @@ namespace Trinity.Combat.Abilities
 {
     public class DemonHunterCombat : CombatBase
     {
-        private static int _minEnergyReserve;
-        private static int _specialEnergyReserve;
-
         static DemonHunterCombat()
         {
-            // Load Default Metadata
             SkillUtils.SetSkillMeta(SkillsDefaultMeta.DemonHunter.ToList());
+            SetConditions();
+        }
 
-            // Load custom conditions for when skills should be used.
-            SetCombatConditions();
+        internal override void CombatSettings()
+        {
+            EmergencyHealthPotionLimit = Settings.Combat.DemonHunter.PotionLevel;
+            EmergencyHealthGlobeLimit = Settings.Combat.DemonHunter.HealthGlobeLevel;
+            HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
+            KiteDistance = Settings.Combat.DemonHunter.KiteLimit;
+            KiteMode = Settings.Combat.DemonHunter.KiteMode;
+            EnergyReserve = Sets.EmbodimentOfTheMarauder.IsFullyEquipped ? 20 : 25;
         }
 
         /// <summary>
@@ -32,8 +36,6 @@ namespace Trinity.Combat.Abilities
         public static TrinityPower GetPower()
         {
             TrinityPower power;
-
-            GetCombatContext();
 
             if (UseDestructiblePower && TryGetPower(GetDestructablesSkill(), out power))
                 return power;
@@ -55,32 +57,13 @@ namespace Trinity.Combat.Abilities
 
                 // Main ability selection 
                 if (TryGetPower(GetCombatPower(CombatSkillOrder), out power))
-                    return power;
-
-                // Backup use any Primary/Generator
-                if (TryGetPower(GetAttackGenerator(), out power))
-                    return power;                  
+                    return power;                
             }
 
             Logger.Log(TrinityLogLevel.Verbose, LogCategory.SkillSelection, "DemonHunter GetPower() Returning DefaultPower Target={0}", 
                 (CurrentTarget == null) ? "Null" : CurrentTarget.InternalName);
 
             return DefaultPower;
-        }
-
-        /// <summary>
-        /// Update general combat information, if we should be saving mana etc.
-        /// </summary>
-        private static void GetCombatContext()
-        {
-            _minEnergyReserve = 25;
-            _specialEnergyReserve = 40;
-
-            if (Sets.EmbodimentOfTheMarauder.IsFullyEquipped)
-                _minEnergyReserve = 20;
-
-            IsWaitingForSpecial = Player.PrimaryResource < _specialEnergyReserve;
-
         }
 
         /// <summary>
@@ -130,7 +113,7 @@ namespace Trinity.Combat.Abilities
         /// <summary>
         /// When skills should be cast, evaluated by CanCast() calls.
         /// </summary>
-        public static void SetCombatConditions()
+        public static void SetConditions()
         {
             Skills.DemonHunter.Vengeance.Meta.CastCondition = VengeanceCondition;
             Skills.DemonHunter.ShadowPower.Meta.CastCondition = ShadowPowerCondition;
@@ -212,12 +195,8 @@ namespace Trinity.Combat.Abilities
         {
             meta.CastRange = 80f;
 
-            // Saving up for something more awesome
-            if (Player.PrimaryResource < _specialEnergyReserve && IsWaitingForSpecial)
-                return false;
-
             // Not enough resource
-            if (Player.PrimaryResource <= _minEnergyReserve)
+            if (Player.PrimaryResource <= EnergyReserve)
                 return false;
 
             if (!TargetUtil.AnyMobsInRange(12, 4) && CurrentTarget.RadiusDistance <= 75f)
@@ -236,11 +215,8 @@ namespace Trinity.Combat.Abilities
             meta.CastFlags = CanCastFlags.NoTimer;
             meta.CastRange = 45f;
 
-            if (IsWaitingForSpecial)
-                return false;
-
             // Stay above minimum resource level
-            if (Player.PrimaryResource < _minEnergyReserve || Player.PrimaryResource < Settings.Combat.DemonHunter.RapidFireMinHatred)
+            if (Player.PrimaryResource < EnergyReserve || Player.PrimaryResource < Settings.Combat.DemonHunter.RapidFireMinHatred)
                 return false;
 
             // Never use it twice in a row
@@ -285,7 +261,7 @@ namespace Trinity.Combat.Abilities
                 return false;
 
             // Stay above minimum resource level
-            if (Player.PrimaryResource < _minEnergyReserve)
+            if (Player.PrimaryResource < EnergyReserve)
                 return false;
 
             return true;
@@ -298,16 +274,13 @@ namespace Trinity.Combat.Abilities
         {
             meta.CastRange = 100f;
 
-            if (IsWaitingForSpecial)
-                return false;
-
             // Stay above minimum resource level
-            if (Player.PrimaryResource < _minEnergyReserve)
+            if (Player.PrimaryResource < EnergyReserve && !Legendary.Kridershot.IsEquipped)
                 return false;
 
             // Lightning DH
-            if (Runes.DemonHunter.BallLightning.IsActive && Legendary.MeticulousBolts.IsEquipped && Player.PrimaryResource >= 10)
-                meta.CastRange = 10f;
+            if (Runes.DemonHunter.BallLightning.IsActive && Legendary.MeticulousBolts.IsEquipped)
+                meta.CastRange = 15f;
 
             // Kridershot
             if (Legendary.Kridershot.IsEquipped)
@@ -321,7 +294,7 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         private static bool SpikeTrapCondition(SkillMeta meta)
         {
-            meta.TargetSelector = SpikeTrapTargetSelector;
+            meta.TargetPositionSelector = SpikeTrapTargetSelector;
 
             if (LastPowerUsed != SNOPower.DemonHunter_SpikeTrap)
                 return true;
@@ -351,8 +324,8 @@ namespace Trinity.Combat.Abilities
         private static bool StrafeCondition(SkillMeta meta)
         {
             meta.CastRange = 65f;
-            meta.AfterUseDelay = TrinityPower.MillisecondsToTickDelay(250);
-            meta.TargetSelector = ret => TargetUtil.GetZigZagTarget(CurrentTarget.Position, V.F("Barbarian.Whirlwind.ZigZagDistance"));
+            meta.AfterUseDelay = 250;
+            meta.TargetPositionSelector = ret => TargetUtil.GetZigZagTarget(CurrentTarget.Position, V.F("Barbarian.Whirlwind.ZigZagDistance"));
             meta.CastFlags = CanCastFlags.NoTimer;
             meta.RequiredResource = Settings.Combat.DemonHunter.StrafeMinHatred;
 
@@ -398,10 +371,15 @@ namespace Trinity.Combat.Abilities
         private static bool VaultCondition(SkillMeta meta)
         {
             meta.CastRange = 20f;
-            meta.TargetSelector = ret => NavHelper.MainFindSafeZone(Player.Position, true);
-            meta.IsCombatOnly = Settings.Combat.DemonHunter.VaultMode == DemonHunterVaultMode.CombatOnly;
+            meta.TargetPositionSelector = ret => NavHelper.MainFindSafeZone(Player.Position, true);            
             meta.RequiredResource = Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) ? 22 : 16;
             meta.AfterUseDelay = Settings.Combat.DemonHunter.VaultMovementDelay;
+
+            if (Settings.Combat.DemonHunter.VaultMode == DemonHunterVaultMode.MovementOnly && IsInCombat)
+                return false;
+
+            if (Settings.Combat.DemonHunter.VaultMode == DemonHunterVaultMode.CombatOnly && !IsInCombat)
+                return false;
 
             if (!Player.IsRooted && (TargetUtil.AnyMobsInRange(7f, 6) || Player.CurrentHealthPct <= 0.7))
                 return true;

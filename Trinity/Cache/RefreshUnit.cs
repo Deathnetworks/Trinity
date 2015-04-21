@@ -492,7 +492,7 @@ namespace Trinity
                 {
                     if (DataDictionary.WizardHydraIds.Contains(CurrentCacheObject.ActorSNO))
                     {
-                        if (CurrentCacheObject.IsSummonedByPlayer)
+                        if (CurrentCacheObject.IsSummonedByPlayer && CurrentCacheObject.Distance < 60f)
                         {
                             PlayerOwnedHydraCount++;
                             c_IgnoreSubStep = "IsPlayerSummoned";
