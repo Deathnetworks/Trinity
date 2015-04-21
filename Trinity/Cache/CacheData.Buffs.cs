@@ -71,13 +71,6 @@ namespace Trinity
 
                         var cachedBuff = new CachedBuff(buff);
 
-                        // Shrines
-                        HasBlessedShrine = cachedBuff.Id == 30476; //Blessed (+25% defence)
-                        HasFrenzyShrine = cachedBuff.Id == 30479; //Frenzy  (+25% atk speed)
-                        HasInvulnerableShrine = cachedBuff.Id == (int)SNOPower.Pages_Buff_Invulnerable;
-                        HasCastingShrine = cachedBuff.Id == (int)SNOPower.Pages_Buff_Infinite_Casting;
-                        HasConduitShrine = cachedBuff.Id == (int)SNOPower.Pages_Buff_Electrified;
-
                         cachedBuff.VariantId = GetBuffVariantId((SNOPower)cachedBuff.Id);
                         cachedBuff.VariantName = GetBuffVariantName(cachedBuff);
 
@@ -103,8 +96,21 @@ namespace Trinity
                 }
 
                 // Bastians of Will
-                HasBastiansWillSpenderBuff = HasBuff((int)SNOPower.ItemPassive_Unique_Ring_735_x1,2);
-                HasBastiansWillGeneratorBuff = HasBuff((int)SNOPower.ItemPassive_Unique_Ring_735_x1,1);
+                HasBastiansWillSpenderBuff = HasBuff(SNOPower.ItemPassive_Unique_Ring_735_x1,2);
+                HasBastiansWillGeneratorBuff = HasBuff(SNOPower.ItemPassive_Unique_Ring_735_x1,1);
+
+                // Shrines
+                HasBlessedShrine = HasBuff(30476); //Blessed (+25% defence)
+                HasFrenzyShrine = HasBuff(30479); //Frenzy  (+25% atk speed)
+                HasInvulnerableShrine = HasBuff(SNOPower.Pages_Buff_Invulnerable);
+                HasCastingShrine = HasBuff(SNOPower.Pages_Buff_Infinite_Casting);
+                HasConduitShrine = HasBuff(SNOPower.Pages_Buff_Electrified);
+
+            }
+
+            private bool HasBuff(SNOPower power, int variantId)
+            {
+                return HasBuff((int) power, variantId);
             }
 
             public List<CachedBuff> ActiveBuffs

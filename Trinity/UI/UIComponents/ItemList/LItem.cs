@@ -312,7 +312,8 @@ namespace Trinity.UI.UIComponents
                     Id = (int)property,
                     ItemStatRange = statRange,
                     GItemType = GItemType,
-                    RuleType = ruleType
+                    RuleType = ruleType,
+                    Value = LRule.GetDefaultValue(property)
                 });
                 
                 OnPropertyChanged("Rules");

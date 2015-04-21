@@ -579,5 +579,17 @@
             </Style>
         </Style.BasedOn>
     </Style>
-    
+
+    <!-- Checkbox used as a label for its ability to be clicked -->
+    <Style x:Key="TextBlockCheckBox" TargetType="CheckBox">
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <ContentPresenter/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>
