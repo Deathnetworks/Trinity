@@ -351,8 +351,9 @@
                 <Border Background="#55999999" BorderBrush="#CC999999" CornerRadius="1" Padding="2" BorderThickness="1,1,0,0">
                     <Grid Width="Auto" HorizontalAlignment="Stretch">                        
                         <WrapPanel HorizontalAlignment="Stretch" Width="Auto">
-                            <CheckBox IsChecked="{Binding Path=Value}" Margin="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                            <Label Foreground="White" Style="{StaticResource UnselectedTitleLabelStyle}" Content="{Binding Name}"/>
+                            <CheckBox x:Name="CheckBoxFieldCheckbox" IsChecked="{Binding Path=Value}" Margin="0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <CheckBox Style="{DynamicResource TextBlockCheckBox}" FontWeight="Regular" IsChecked="{Binding IsChecked, ElementName=CheckBoxFieldCheckbox}" Content="{Binding Name}" Margin="0,0,0,0" />
+
                         </WrapPanel>
                         <Button HorizontalAlignment="Right" Content=" X " Height="21" Width="25" Margin="10,-1,0,0" Background="Transparent" 
                                 Command="{Binding Path=DataContext.RemoveRuleCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" 

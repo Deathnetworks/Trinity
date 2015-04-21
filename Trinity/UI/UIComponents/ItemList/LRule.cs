@@ -20,7 +20,13 @@ namespace Trinity.UIComponents
     {
         public LRule()
         {
-            _value = GetDefaultValue(); 
+
+        }
+
+        public LRule(ItemProperty prop)
+        {
+            Id = (int) prop;
+            Value = GetDefaultValue(prop);
         }
 
         private double _value;
@@ -59,9 +65,9 @@ namespace Trinity.UIComponents
             }
         }
 
-        private double GetDefaultValue()
+        public static double GetDefaultValue(ItemProperty prop)
         {
-            switch (ItemProperty)
+            switch (prop)
             {
                 case ItemProperty.Ancient:
                     return 1;
