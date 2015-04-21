@@ -826,7 +826,7 @@ namespace Trinity.Combat.Abilities
 
             if (skill.Meta.IsCastOnSelf)
             {
-                Logger.Log(LogCategory.Targetting, "Calculating TargetPosition for {0} as Self. CurrentTarget={1}", skill.Name, CurrentTarget.InternalName);
+                Logger.Log(LogCategory.Targetting, "Calculating TargetPosition for {0} as Self. CurrentTarget={1}", skill.Name, CurrentTarget != null ? CurrentTarget.InternalName : "");
                 return skill.ToPower(ticksBefore, ticksAfter);
             }
 
