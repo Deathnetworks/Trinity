@@ -49,7 +49,21 @@ namespace Trinity
                 public int RuneIndex { get; set; }
                 public bool HasRuneEquipped { get; set; }
                 public Rune Rune { get { return Skill.CurrentRune; } }
-                public int Charges { get; set; }
+                public int Charges
+                {
+                    get
+                    {
+                        try
+                        {
+                            return ZetaDia.Me.CommonData.GetAttribute<int>(((int)Power << 12) + ((int)ActorAttributeType.SkillCharges & 0xFFF));
+                        }
+                        catch
+                        {
+                            Logger.LogError("Exception getting Charges for Power {0}", Power);
+                            return 0;
+                        }
+                    }
+                }
                 public override string ToString()
                 {
                     return string.Format("Power: {0}, SRune: {1}, Charge:{2}, Slot:{3}", Power, Rune, Charges, Slot);
@@ -115,7 +129,7 @@ namespace Trinity
                             RuneIndex = runeIndex,
                             HasRuneEquipped = diaActiveSkill.HasRuneEquipped,
                             Skill = SkillUtils.ById(power),
-                            Charges = ZetaDia.Me.CommonData.GetAttribute<int>(((int)diaActiveSkill.Power << 12) + ((int)ActorAttributeType.SkillCharges & 0xFFF)),
+                            //Charges = ZetaDia.Me.CommonData.GetAttribute<int>(((int)diaActiveSkill.Power << 12) + ((int)ActorAttributeType.SkillCharges & 0xFFF)),
                         };
 
                         ActivePowers.Add(power);

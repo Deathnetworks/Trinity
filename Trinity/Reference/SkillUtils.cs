@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Trinity.Combat;
-using Trinity.Helpers;
 using Trinity.Objects;
-using Trinity.Technicals;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
@@ -82,6 +79,10 @@ namespace Trinity.Reference
 
             Skill skill;
             var result = _allSkillBySnoPower.TryGetValue(power, out skill);
+            if (!result)
+            {
+                Logger.LogDebug("Unable to find skill for power {0}", power);
+            }
             return result ? skill : new Skill();
         }
         private static Dictionary<SNOPower, Skill> _allSkillBySnoPower = new Dictionary<SNOPower, Skill>();
@@ -96,6 +97,10 @@ namespace Trinity.Reference
 
             Skill skill;
             var result = _allSkillByName.TryGetValue(name.ToLowerInvariant(), out skill);
+            if (!result)
+            {
+                Logger.LogDebug("Unable to find skill for power {0}", name);
+            }
             return result ? skill : new Skill();
         }
         private static Dictionary<string, Skill> _allSkillByName = new Dictionary<string, Skill>();

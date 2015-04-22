@@ -178,8 +178,7 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Raiment set, dash costs 75 spirit and refunds a charge when it's used
-                if (Sets.ThousandStorms.IsSecondBonusActive && 
-                    ((Player.PrimaryResource > 150 && Skills.Monk.DashingStrike.Charges > 0) || (Player.PrimaryResource > 75 && Skills.Monk.DashingStrike.Charges > 1)))
+                if (Sets.ThousandStorms.IsSecondBonusActive && ((Player.PrimaryResource >= 75 && Skills.Monk.DashingStrike.Charges >= 1) || CacheData.Buffs.HasCastingShrine))
                 {
                     RefreshSweepingWind(true);
                     if (CurrentTarget.IsBossOrEliteRareUnique)

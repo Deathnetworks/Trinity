@@ -25,9 +25,9 @@ namespace Trinity
     /// </summary>
     public class StuckHandler : IStuckHandler
     {
-        public bool IsStuck 
-        { 
-            get 
+        public bool IsStuck
+        {
+            get
             {
                 if (PlayerMover.UnstuckChecker())
                 {
@@ -40,12 +40,12 @@ namespace Trinity
                     return true;
                 }
                 return false;
-            } 
+            }
         }
 
-        public Vector3 GetUnstuckPos() 
-        { 
-            return PlayerMover.UnstuckHandler(); 
+        public Vector3 GetUnstuckPos()
+        {
+            return PlayerMover.UnstuckHandler();
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Trinity
             public static int Timeout { get; set; }
             public static bool IsRunning { get; private set; }
             public static int Attempts { get; private set; }
-            
+
             private static List<Vector3> _points = new List<Vector3>();
             private static DateTime _startTime = DateTime.MaxValue;
             private static DateTime _lastMoving = DateTime.MinValue;
@@ -71,19 +71,19 @@ namespace Trinity
             {
                 get
                 {
-                    if(DateTime.UtcNow.Subtract(_startTime).TotalSeconds > Timeout)
+                    if (DateTime.UtcNow.Subtract(_startTime).TotalSeconds > Timeout)
                         Stop();
 
                     return _isDone;
                 }
                 set
                 {
-                    if(value)
+                    if (value)
                         Stop();
 
                     _isDone = value;
                 }
-            }           
+            }
 
             public static void Start(List<Vector3> points = null)
             {
@@ -92,7 +92,7 @@ namespace Trinity
 
                 UpdateStuckAttempts();
                 Logger.Log("Bot is Stuck! Attempt #{0} to fix it", Attempts);
-                    
+
                 Timeout = Timeout <= 0 ? 15 : Timeout;
 
                 _startTime = DateTime.UtcNow;
@@ -116,7 +116,7 @@ namespace Trinity
 
             public static void Stop()
             {
-                _isDone = true;                
+                _isDone = true;
                 RemoveHook();
             }
 
@@ -124,7 +124,7 @@ namespace Trinity
             {
                 _hook = CreateUnstuckBehavior();
                 IsRunning = true;
-                TreeHooks.Instance.InsertHook("BotBehavior",0, _hook);                
+                TreeHooks.Instance.InsertHook("BotBehavior", 0, _hook);
             }
 
             private static void RemoveHook()
@@ -177,31 +177,41 @@ namespace Trinity
 
                     new Action(ret =>
                     {
-                        if (!_points.Any() || IsWithinRange(_points.First()))
+                        try
                         {
-                            Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Arrived at Destination {0} Distance={1}", _points.First().ToString(), _points.First());
+                            if (!_points.Any() || IsWithinRange(_points.First()))
+                            {
+                                Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Arrived at Destination {0} Distance={1}", _points.First().ToString(), _points.First());
+
+                                IsDone = true;
+                                return RunStatus.Failure;
+                            }
+
+                            if (ZetaDia.Me.Movement.IsMoving)
+                                _lastMoving = DateTime.UtcNow;
+
+                            // Ooooh bad bad bad - always use Navigator raycast!
+                            //var rayResult = ZetaDia.Physics.Raycast(ZetaDia.Me.Position, _points.First(), NavCellFlags.AllowWalk);
+                            var raycastHit = Navigator.Raycast(ZetaDia.Me.Position, _points.First());
+                            var stuckResult = DateTime.UtcNow.Subtract(_lastMoving).TotalMilliseconds > 250;
+
+                            if (stuckResult || raycastHit)
+                            {
+                                Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Discarded Location {0} Distance={1} RaycastResult={2} StuckResult={3} LocationsRemaining={4}", _points.First().ToString(), _points.First().Distance(ZetaDia.Me.Position), raycastHit, stuckResult, _points.Count - 1);
+                                _points.RemoveAt(0);
+                            }
+
+                            if (_points.Any() && _points.First() != Vector3.Zero && ZetaDia.Me.Movement.MoveActor(_points.First()) == 1)
+                                return RunStatus.Success;
 
                             IsDone = true;
                             return RunStatus.Failure;
                         }
-
-                        if (ZetaDia.Me.Movement.IsMoving)
-                            _lastMoving = DateTime.UtcNow;
-
-                        var rayResult = ZetaDia.Physics.Raycast(ZetaDia.Me.Position, _points.First(), NavCellFlags.AllowWalk);
-                        var stuckResult = DateTime.UtcNow.Subtract(_lastMoving).TotalMilliseconds > 250;
-
-                        if (stuckResult || !rayResult)
+                        catch (Exception ex)
                         {
-                            Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Discarded Location {0} Distance={1} RaycastResult={2} StuckResult={3} LocationsRemaining={4}", _points.First().ToString(), _points.First().Distance(ZetaDia.Me.Position), rayResult, stuckResult, _points.Count - 1);
-                            _points.RemoveAt(0);
+                            Logger.LogError("Exception in UnstuckBehavior: " + ex);
+                            return RunStatus.Failure;
                         }
-
-                        if (_points.Any() && _points.First() != Vector3.Zero && ZetaDia.Me.Movement.MoveActor(_points.First()) == 1)
-                            return RunStatus.Success;
-
-                        IsDone = true;
-                        return RunStatus.Failure;
                     })
                 );
             }

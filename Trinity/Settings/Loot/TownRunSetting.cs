@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Trinity.Settings.Loot;
@@ -38,7 +39,7 @@ namespace Trinity.Config.Loot
         private int _maxStackReusableParts;
         private int _maxStackDeathsBreath;
         private int _maxStackForgottonSoul;
-
+        private bool _alwaysStashAncients;
         #endregion Fields
 
         #region Events
@@ -59,6 +60,24 @@ namespace Trinity.Config.Loot
         #endregion Constructors
 
         #region Properties
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool AlwaysStashAncients
+        {
+            get
+            {
+                return _alwaysStashAncients;
+            }
+            set
+            {
+                if (_alwaysStashAncients != value)
+                {
+                    _alwaysStashAncients = value;
+                    OnPropertyChanged("AlwaysStashAncients");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(500000)]
@@ -563,13 +582,9 @@ namespace Trinity.Config.Loot
         {
             foreach (PropertyInfo p in GetType().GetProperties())
             {
-                foreach (Attribute attr in p.GetCustomAttributes(true))
+                foreach (DefaultValueAttribute dv in p.GetCustomAttributes(true).OfType<DefaultValueAttribute>())
                 {
-                    if (attr is DefaultValueAttribute)
-                    {
-                        DefaultValueAttribute dv = (DefaultValueAttribute)attr;
-                        p.SetValue(this, dv.Value);
-                    }
+                    p.SetValue(this, dv.Value);
                 }
             }
         }

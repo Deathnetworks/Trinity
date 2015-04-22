@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Trinity.Config.Combat;
-using Trinity.Objects;
 using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
@@ -29,7 +28,6 @@ namespace Trinity.Combat.Abilities
                 // Sprint OOC
                 if (IsNull(power) && CanUseSprintOOC)
                     power = PowerSprint;
-                // Threatening Shout OOC
             }
 
 

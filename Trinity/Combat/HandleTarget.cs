@@ -312,7 +312,7 @@ namespace Trinity
                             CurrentTarget.IsUnit || CurrentTarget.IsDestroyable) && MonkCombat.IsTempestRushReady());
 
                         // If we're doing avoidance, globes or backtracking, try to use special abilities to move quicker
-                        if ((CurrentTarget.Type == GObjectType.Avoidance || 
+                        if ((CurrentTarget.Type == GObjectType.Avoidance ||
                             CurrentTarget.Type == GObjectType.HealthGlobe ||
                             CurrentTarget.Type == GObjectType.PowerGlobe ||
                             CurrentTarget.Type == GObjectType.ProgressionGlobe ||
@@ -336,8 +336,15 @@ namespace Trinity
                         }
                     }
 
-                    bool wwToItem = (CurrentTarget.Type != GObjectType.Item || (CurrentTarget.Type == GObjectType.Item && CurrentTarget.Distance > 10f));
+                    if (Skills.Monk.DashingStrike.CanCast() && (Skills.Monk.DashingStrike.Charges > 1 || ZetaDia.Me.CurrentPrimaryResource > 75 || CacheData.Buffs.HasCastingShrine))
+					{
+                        Skills.Monk.DashingStrike.Cast(CurrentDestination);
+						
+						Logger.Log("Dash towards: {0}", GetTargetName());
+						return GetRunStatus(RunStatus.Running);
+					}
 
+                    bool wwToItem = (CurrentTarget.Type != GObjectType.Item || (CurrentTarget.Type == GObjectType.Item && CurrentTarget.Distance > 10f));
                     // Whirlwind against everything within range
                     if (Player.PrimaryResource >= 10 && CombatBase.CanCast(SNOPower.Barbarian_Whirlwind) && wwToItem &&
                         (TargetUtil.AnyMobsInRange(20, false) || Sets.BulKathossOath.IsFullyEquipped) && !IsWaitingForSpecial)
@@ -1237,12 +1244,6 @@ namespace Trinity
         {
             using (new PerformanceLogger("HandleTarget.HandleUnitInRange"))
             {
-                float dist = 0;
-                if (CombatBase.CurrentPower.TargetPosition != Vector3.Zero)
-                    dist = CombatBase.CurrentPower.TargetPosition.Distance2D(Player.Position);
-                else if (CurrentTarget != null)
-                    dist = CurrentTarget.Position.Distance2D(Player.Position);
-
                 bool usePowerResult;
 
                 // For "no-attack" logic
@@ -1257,8 +1258,7 @@ namespace Trinity
                 }
 
                 var skill = SkillUtils.ById(CombatBase.CurrentPower.SNOPower);
-                string target = CombatBase.CurrentPower.TargetPosition != Vector3.Zero ? "at " + NavHelper.PrettyPrintVector3(CombatBase.CurrentPower.TargetPosition) + " dist=" + (int)dist : "";
-                target += CombatBase.CurrentPower.TargetACDGUID != -1 ? " on " + CombatBase.CurrentPower.TargetACDGUID : "";
+                string target = GetTargetName();
 
                 if (usePowerResult)
                 {
@@ -1275,7 +1275,7 @@ namespace Trinity
 
                     if (skill != null && skill.Meta != null)
                     {
-                        Logger.Log(LogCategory.Behavior, "Used Power {0} ({1}) {2} Range={3} ({4} {5}) Delay={6}/{11} TargetDist={7} CurrentTarget={10}",
+                        Logger.LogVerbose("Used Power {0} ({1}) {2} Range={3} ({4} {5}) Delay={6}/{11} TargetDist={7} CurrentTarget={10}",
                             skill.Name,
                             (int)skill.SNOPower,
                             target,
@@ -1293,7 +1293,7 @@ namespace Trinity
                     }
                     else
                     {
-                        Logger.Log(LogCategory.Behavior, "Used Power {0} " + target, CombatBase.CurrentPower.SNOPower);
+                        Logger.LogVerbose("Used Power {0} " + target, CombatBase.CurrentPower.SNOPower);
 
                     }
 
@@ -1311,20 +1311,28 @@ namespace Trinity
                 }
                 else
                 {
-                    Logger.Log(LogCategory.Behavior, "Failed to use Power {0} ({1}) {2} Range={3} ({4} {5}) Delay={6}/{11} TargetDist={7} CurrentTarget={10}",
-                        skill.Name,
-                        (int)skill.SNOPower,
-                        target,
-                        skill.Meta.CastRange,
-                        skill.Meta.DebugResourceEffect,
-                        skill.Meta.DebugType,
-                        skill.Meta.BeforeUseDelay,
-                        Player.Position.Distance(CombatBase.CurrentPower.TargetPosition),
-                        Player.IsFacing(CombatBase.CurrentPower.TargetPosition),
-                        CurrentTarget != null && Player.IsFacing(CurrentTarget.Position),
-                        CurrentTarget != null ? CurrentTarget.InternalName : "Null",
-                        skill.Meta.AfterUseDelay
-                        );
+                    if (skill != null && skill.Meta != null)
+                    {
+                        Logger.Log(LogCategory.Behavior, "Failed to use Power {0} ({1}) {2} Range={3} ({4} {5}) Delay={6}/{11} TargetDist={7} CurrentTarget={10}",
+                                       skill.Name,
+                                       (int)skill.SNOPower,
+                                       target,
+                                       skill.Meta.CastRange,
+                                       skill.Meta.DebugResourceEffect,
+                                       skill.Meta.DebugType,
+                                       skill.Meta.BeforeUseDelay,
+                                       Player.Position.Distance(CombatBase.CurrentPower.TargetPosition),
+                                       Player.IsFacing(CombatBase.CurrentPower.TargetPosition),
+                                       CurrentTarget != null && Player.IsFacing(CurrentTarget.Position),
+                                       CurrentTarget != null ? CurrentTarget.InternalName : "Null",
+                                       skill.Meta.AfterUseDelay
+                                       );
+                    }
+                    else
+                    {
+                        Logger.Log(LogCategory.Behavior, "Failed to use power {0} " + target, CombatBase.CurrentPower.SNOPower);
+
+                    }
                 }
 
                 _shouldPickNewAbilities = true;
@@ -1349,6 +1357,19 @@ namespace Trinity
                 }
 
             }
+        }
+
+        private static string GetTargetName()
+        {
+            float dist = 0;
+            if (CombatBase.CurrentPower.TargetPosition != Vector3.Zero)
+                dist = CombatBase.CurrentPower.TargetPosition.Distance2D(Player.Position);
+            else if (CurrentTarget != null)
+                dist = CurrentTarget.Position.Distance2D(Player.Position);
+
+            string target = CombatBase.CurrentPower.TargetPosition != Vector3.Zero ? "at " + NavHelper.PrettyPrintVector3(CombatBase.CurrentPower.TargetPosition) + " dist=" + (int)dist : "";
+            target += CombatBase.CurrentPower.TargetACDGUID != -1 ? " on " + CombatBase.CurrentPower.TargetACDGUID : "";
+            return target;
         }
 
         private static int HandleItemInRange()

@@ -83,7 +83,6 @@ namespace Trinity
                     {
                         // Barbs
                         case ActorClass.Barbarian:
-                            //power = GetBarbarianPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
                             power = BarbarianCombat.GetPower();
                             break;
                         // Crusader

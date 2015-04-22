@@ -26,7 +26,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-
+            
 
             <GroupBox Grid.Row="0" Header="Misc Town Run Options">
                 <StackPanel HorizontalAlignment="Center">
@@ -40,6 +40,7 @@
                         <CheckBox ToolTip="Keep Legendaries Unidentified" IsChecked="{Binding Path=TownRun.KeepLegendaryUnid}" HorizontalAlignment="Left" Content="Keep Legendaries Unidentified" />
                         <CheckBox ToolTip="WARNING: Dropped items will not be picked up again" IsChecked="{Binding TownRun.DropLegendaryInTown}" HorizontalAlignment="Left" Content="Drop Legendaries in Town" />
                         <CheckBox ToolTip="Apply Pickup Validation to Stashing" IsChecked="{Binding TownRun.ApplyPickupValidationToStashing}" HorizontalAlignment="Left" Content="Apply Pickup Validation to Stashing" />
+                        <CheckBox ToolTip="Always Stash Ancients" IsChecked="{Binding TownRun.AlwaysStashAncients}" HorizontalAlignment="Left" Content="Always Stash Ancients" />
                     </UniformGrid>
                     <UniformGrid Columns="1" HorizontalAlignment="Center">
                         <CheckBox Content="Keep Rift Keys in Backpack" IsChecked="{Binding Path=TownRun.KeepRiftKeysInBackpack}" />

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web.Configuration;
 using Trinity.Cache;
 using Trinity.DbProvider;
 using Trinity.Helpers;
@@ -164,6 +163,10 @@ namespace Trinity.Items
             // Vanity Items
             if (DataDictionary.VanityItems.Any(i => item.InternalName.StartsWith(i)))
                 return Trinity.Settings.Loot.TownRun.StashVanityItems;
+
+            // Always stash ancients setting
+            if (Trinity.Settings.Loot.TownRun.AlwaysStashAncients && item.AncientRank > 0)
+                return true;
 
             CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
             // Now look for Misc items we might want to keep
@@ -467,16 +470,13 @@ namespace Trinity.Items
             if (Trinity.Settings.Loot.TownRun.StashBlues && cItem.Quality > ItemQuality.Superior && cItem.Quality < ItemQuality.Rare4)
                 return false;
 
-            GItemType trinityItemType = cItem.TrinityItemType;
-            GItemBaseType trinityItemBaseType = cItem.TrinityItemBaseType;
-
             // Take Salvage Option corresponding to ItemLevel
             SalvageOption salvageOption = GetSalvageOption(cItem.Quality);
 
             if (salvageOption == SalvageOption.Salvage)
                 return true;
 
-            switch (trinityItemBaseType)
+            switch (cItem.TrinityItemBaseType)
             {
                 case GItemBaseType.WeaponRange:
                 case GItemBaseType.WeaponOneHand:
@@ -796,8 +796,6 @@ namespace Trinity.Items
                         backpackSlotBlocked[square.Column, square.Row] = true;
                         freeBagSlots--;
                     }
-
-                    var allItems = ZetaDia.Actors.GetActorsOfType<ACDItem>(true);
 
                     // Map out all the items already in the backpack
                     foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)

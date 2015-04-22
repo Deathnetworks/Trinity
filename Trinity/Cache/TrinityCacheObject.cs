@@ -313,15 +313,21 @@ namespace Trinity
         public bool IsEventObject { get { return IsCursedChest || IsCursedShrine; } }
 
         [NoCopy]
-        public bool IsDestroyable { get { return Type == GObjectType.Barricade || Type == GObjectType.Destructible; } }
+        public bool IsDestroyable
+        {
+            get
+            {
+                return Type == GObjectType.Barricade || Type == GObjectType.Destructible;
+            }
+        }
 
         [NoCopy]
         public bool IsInteractable
         {
             get
             {
-                return Type == GObjectType.Item ||Type == GObjectType.Container || Type == GObjectType.CursedChest || Type == GObjectType.CursedChest || Type == GObjectType.CursedShrine ||
-                    Type == GObjectType.Door || Type == GObjectType.HealthWell || Type == GObjectType.Interactable ||  Type == GObjectType.Shrine;
+                return Type == GObjectType.Item || Type == GObjectType.Container || Type == GObjectType.CursedChest || Type == GObjectType.CursedChest || Type == GObjectType.CursedShrine ||
+                    Type == GObjectType.Door || Type == GObjectType.HealthWell || Type == GObjectType.Interactable || Type == GObjectType.Shrine;
             }
         }
 
