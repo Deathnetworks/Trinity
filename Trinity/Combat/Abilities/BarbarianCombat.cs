@@ -782,31 +782,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                bool shouldGetNewZigZag =
-                    (DateTime.UtcNow.Subtract(LastChangedZigZag).TotalMilliseconds >= V.I("Barbarian.Whirlwind.ZigZagMaxTime") ||
-                    CurrentTarget.ACDGuid != LastZigZagUnitAcdGuid ||
-                    ZigZagPosition.Distance2D(Player.Position) <= 5f);
-                bool hasRLTW = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Barbarian_Sprint && s.RuneIndex == 2);
-
-                if (shouldGetNewZigZag)
-                {
-                    if (hasRLTW)
-                    {
-                        var wwdist = V.F("Barbarian.Whirlwind.RLTWZigZag");
-                        ZigZagPosition = TargetUtil.GetZigZagTarget(CurrentTarget.Position, wwdist);
-                        return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), ZigZagPosition, Trinity.CurrentWorldDynamicId, -1, 0, 1);
-                    }
-                    if (!hasRLTW)
-                    {
-                        var wwdist = V.F("Barbarian.Whirlwind.ZigZagDistance");
-                        ZigZagPosition = TargetUtil.GetZigZagTarget(CurrentTarget.Position, wwdist);
-                        return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), ZigZagPosition, Trinity.CurrentWorldDynamicId, -1, 0, 1);
-                    }
-
-                    LastZigZagUnitAcdGuid = CurrentTarget.ACDGuid;
-                    LastChangedZigZag = DateTime.UtcNow;
-                }
-                return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), ZigZagPosition, Trinity.CurrentWorldDynamicId, -1, 0, 1);
+                return new TrinityPower(SNOPower.Barbarian_Whirlwind, 20f, TargetUtil.GetZigZagTarget(CurrentTarget.Position, 20), Trinity.CurrentWorldDynamicId, -1, 0, 1);
             }
         }
         public static TrinityPower PowerHammerOfTheAncients { get { return new TrinityPower(SNOPower.Barbarian_HammerOfTheAncients, V.F("Barbarian.HammerOfTheAncients.UseRange"), CurrentTarget.ACDGuid); } }

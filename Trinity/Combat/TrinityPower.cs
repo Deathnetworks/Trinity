@@ -1,5 +1,7 @@
 ﻿using System;
 using Trinity.Combat.Abilities;
+using Trinity.Objects;
+using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
 
@@ -283,7 +285,7 @@ namespace Trinity
         public override string ToString()
         {
             return
-            String.Format("power={0} pos={1} acdGuid={2} preWait={3} postWait={4} timeSinceAssigned={5} timeSinceUse={6} range={7}",
+            String.Format("power={0} pos={1} acdGuid={2} preWait={3} postWait={4} timeSinceAssigned={5} timeSinceUse={6} range={7} charges={8}",
                     SNOPower,
                     NavHelper.PrettyPrintVector3(TargetPosition),
                     TargetACDGUID,
@@ -291,7 +293,8 @@ namespace Trinity
                     WaitTicksAfterUse,
                     TimeSinceAssigned,
                     TimeSinceUse,
-                    MinimumRange);
+                    MinimumRange,
+                    GetSkill().Charges);
         }
 
         public static int MillisecondsToTickDelay(int milliseconds)
@@ -299,6 +302,11 @@ namespace Trinity
             const int totalTps = 1000 / TickTimeMs;
 
             return totalTps / (1000 / milliseconds);
+        }
+
+        public Skill GetSkill()
+        {
+            return SkillUtils.ById(SNOPower);
         }
     }
 }

@@ -30,10 +30,7 @@ namespace Trinity.Combat.Abilities
         private static KiteMode _kiteMode = KiteMode.Never;
 
         public static CombatMovementManager CombatMovement = new CombatMovementManager();
-        internal static DateTime LastChangedZigZag { get; set; }
         internal static Vector3 PositionLastZigZagCheck { get; set; }
-        // Unique ID of mob last targetting when using whirlwind/strafe
-        internal static int LastZigZagUnitAcdGuid { get; set; }
 
         public enum CanCastFlags
         {

@@ -659,13 +659,13 @@ namespace Trinity
         /// <returns></returns>
         internal static Vector3 GetZigZagTarget(Vector3 origin, float ringDistance, bool randomizeDistance = false)
         {
-            const float minDistance = 20f;
+            const float minDistance = 5f;
             Vector3 myPos = Player.Position;
 
             Vector3 zigZagPoint;
 
             bool useTargetBasedZigZag = false;
-            float maxDistance = 25f;
+            float maxDistance = 35f;
             int minTargets = 2;
 
             if (Trinity.Player.ActorClass == ActorClass.Monk)
@@ -679,10 +679,7 @@ namespace Trinity
                 useTargetBasedZigZag = Trinity.Settings.Combat.Barbarian.TargetBasedZigZag;
             }
 
-            int eliteCount = ObjectCache.Count(u => u.IsUnit && u.IsBossOrEliteRareUnique);
-            bool shouldZigZagElites = ((Trinity.CurrentTarget.IsBossOrEliteRareUnique && eliteCount > 1) || eliteCount == 0);
-
-            if (useTargetBasedZigZag && shouldZigZagElites && !AnyTreasureGoblinsPresent && ObjectCache.Count(o => o.IsUnit) >= minTargets)
+            if (useTargetBasedZigZag && ObjectCache.Count(o => o.IsUnit) >= minTargets)
             {
                 bool attackInAoe = Trinity.Settings.Combat.Misc.KillMonstersInAoE;
                 var clusterPoint = GetBestClusterPoint(ringDistance, ringDistance, false, attackInAoe);
@@ -720,7 +717,6 @@ namespace Trinity
                 }
             }
 
-            Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
             float highestWeightFound = float.NegativeInfinity;
             Vector3 bestLocation = origin;
 

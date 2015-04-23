@@ -7,6 +7,7 @@ using System.Threading;
 using Trinity.Combat;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
+using Trinity.Objects;
 using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -631,14 +632,21 @@ namespace Trinity.DbProvider
                 }
 
                 // Dashing Strike OOC
-                if (CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike) && Trinity.Settings.Combat.Monk.UseDashingStrikeOOC && destinationDistance > 15f)
+                if (Trinity.Player.ActorClass == ActorClass.Monk && CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike) && Trinity.Settings.Combat.Monk.UseDashingStrikeOOC && destinationDistance > 15f)
                 {
-                    ZetaDia.Me.UsePower(SNOPower.X1_Monk_DashingStrike, destination, Trinity.CurrentWorldDynamicId, -1);
-                    SpellHistory.RecordSpell(SNOPower.X1_Monk_DashingStrike);
+                    if (Sets.ThousandStorms.IsSecondBonusActive && ((Skills.Monk.DashingStrike.Charges > 1 && Trinity.Player.PrimaryResource >= 75) || CacheData.BuffsCache.Instance.HasCastingShrine))
+                    {
+                        if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Dashing Strike for OOC movement, distance={0} charges={1}", destinationDistance, Skills.Monk.DashingStrike.Charges);
+                        Skills.Monk.DashingStrike.Cast(destination);
+                        return;
+                    }
+                    
+                    Skills.Monk.DashingStrike.Cast(destination);
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Dashing Strike for OOC movement, distance={0}", destinationDistance);
+                    return;
                 }
-
 
                 bool hasCalamity = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Wizard_Teleport && s.RuneIndex == 0);
 
@@ -681,7 +689,7 @@ namespace Trinity.DbProvider
                 ZetaDia.Me.UsePower(SNOPower.Walk, destination, Trinity.CurrentWorldDynamicId, -1);
 
                 if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Moved to:{0} dir:{1} Speed:{2:0.00} Dist:{3:0} ZDiff:{4:0} CanStand:{5} Raycast:{6}",
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "PlayerMover Moved to:{0} dir:{1} Speed:{2:0.00} Dist:{3:0} ZDiff:{4:0} CanStand:{5} Raycast:{6}",
                         NavHelper.PrettyPrintVector3(destination), MathUtil.GetHeadingToPoint(destination), MovementSpeed, MyPosition.Distance2D(destination),
                         Math.Abs(MyPosition.Z - destination.Z),
                         Trinity.MainGridProvider.CanStandAt(Trinity.MainGridProvider.WorldToGrid(destination.ToVector2())),

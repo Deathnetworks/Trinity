@@ -336,22 +336,25 @@ namespace Trinity
                         }
                     }
 
-                    if (Skills.Monk.DashingStrike.CanCast() && (Skills.Monk.DashingStrike.Charges > 1 || ZetaDia.Me.CurrentPrimaryResource > 75 || CacheData.Buffs.HasCastingShrine))
+                    if (Player.ActorClass == ActorClass.Monk && CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike) && ((Skills.Monk.DashingStrike.Charges > 1 && ZetaDia.Me.CurrentPrimaryResource > 75) || CacheData.Buffs.HasCastingShrine))
 					{
+						Logger.Log("Dash towards: {0}, charges={1}", GetTargetName(), Skills.Monk.DashingStrike.Charges);
                         Skills.Monk.DashingStrike.Cast(CurrentDestination);
 						
-						Logger.Log("Dash towards: {0}", GetTargetName());
 						return GetRunStatus(RunStatus.Running);
 					}
 
-                    bool wwToItem = (CurrentTarget.Type != GObjectType.Item || (CurrentTarget.Type == GObjectType.Item && CurrentTarget.Distance > 10f));
-                    // Whirlwind against everything within range
-                    if (Player.PrimaryResource >= 10 && CombatBase.CanCast(SNOPower.Barbarian_Whirlwind) && wwToItem &&
-                        (TargetUtil.AnyMobsInRange(20, false) || Sets.BulKathossOath.IsFullyEquipped) && !IsWaitingForSpecial)
+                    if (Player.ActorClass == ActorClass.Barbarian)
                     {
-                        Skills.Barbarian.Whirlwind.Cast(CurrentDestination);
-                        LastMoveToTarget = CurrentDestination;
-                        return GetRunStatus(RunStatus.Running);
+                        bool wwToItem = (CurrentTarget.Type != GObjectType.Item || (CurrentTarget.Type == GObjectType.Item && CurrentTarget.Distance > 10f));
+                        // Whirlwind against everything within range
+                        if (Player.PrimaryResource >= 10 && CombatBase.CanCast(SNOPower.Barbarian_Whirlwind) && wwToItem &&
+                            (TargetUtil.AnyMobsInRange(20, false) || Sets.BulKathossOath.IsFullyEquipped) && !IsWaitingForSpecial)
+                        {
+                            Skills.Barbarian.Whirlwind.Cast(CurrentDestination);
+                            LastMoveToTarget = CurrentDestination;
+                            return GetRunStatus(RunStatus.Running);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -1275,7 +1278,7 @@ namespace Trinity
 
                     if (skill != null && skill.Meta != null)
                     {
-                        Logger.LogVerbose("Used Power {0} ({1}) {2} Range={3} ({4} {5}) Delay={6}/{11} TargetDist={7} CurrentTarget={10}",
+                        Logger.LogVerbose("Used Power {0} ({1}) {2} Range={3} ({4} {5}) Delay={6}/{7} TargetDist={8} CurrentTarget={9} charges={10}",
                             skill.Name,
                             (int)skill.SNOPower,
                             target,
@@ -1283,11 +1286,10 @@ namespace Trinity
                             skill.Meta.DebugResourceEffect,
                             skill.Meta.DebugType,
                             skill.Meta.BeforeUseDelay,
+                            skill.Meta.AfterUseDelay,
                             Player.Position.Distance(CombatBase.CurrentPower.TargetPosition),
-                            Player.IsFacing(CombatBase.CurrentPower.TargetPosition),
-                            CurrentTarget != null && Player.IsFacing(CurrentTarget.Position),
                             CurrentTarget != null ? CurrentTarget.InternalName : "Null",
-                            skill.Meta.AfterUseDelay
+                            skill.Charges
                             );
 
                     }
@@ -1313,7 +1315,7 @@ namespace Trinity
                 {
                     if (skill != null && skill.Meta != null)
                     {
-                        Logger.Log(LogCategory.Behavior, "Failed to use Power {0} ({1}) {2} Range={3} ({4} {5}) Delay={6}/{11} TargetDist={7} CurrentTarget={10}",
+                        Logger.LogVerbose(LogCategory.Behavior, "Failed to use Power {0} ({1}) {2} Range={3} ({4} {5}) Delay={6}/{11} TargetDist={7} CurrentTarget={10}",
                                        skill.Name,
                                        (int)skill.SNOPower,
                                        target,
@@ -1330,7 +1332,7 @@ namespace Trinity
                     }
                     else
                     {
-                        Logger.Log(LogCategory.Behavior, "Failed to use power {0} " + target, CombatBase.CurrentPower.SNOPower);
+                        Logger.LogVerbose(LogCategory.Behavior, "Failed to use power {0} " + target, CombatBase.CurrentPower.SNOPower);
 
                     }
                 }

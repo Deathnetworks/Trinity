@@ -686,8 +686,6 @@ namespace Trinity.Combat.Abilities
             double direction = MathUtil.FindDirectionRadian(Player.Position, ZigZagPosition);
             ZigZagPosition = MathEx.GetPointAt(Player.Position, 40f, (float)direction);
             Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Generated ZigZag {0} distance {1:0}", ZigZagPosition, ZigZagPosition.Distance2D(Player.Position));
-            LastZigZagUnitAcdGuid = CurrentTarget.ACDGuid;
-            LastChangedZigZag = DateTime.UtcNow;
         }
 
         internal static TrinityPower GetMonkDestroyPower()
