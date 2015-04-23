@@ -503,6 +503,7 @@ namespace Trinity.DbProvider
                     Skills.Barbarian.Whirlwind.Cast(destination);
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Whirlwind for OOC movement, distance={0:0}", destinationDistance);
+                    return;
                 }
 
                 // Leap movement for a barb
