@@ -435,35 +435,37 @@ namespace Trinity
             if (!WantToTownRun && !ForceVendorRunASAP)
             {
                 var legendaryItemMarkers = ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsValid &&
-                                    m.Position.Distance2D(Player.Position) >= 45f &&
+                                    m.Position.Distance2D(Player.Position) >= 45f && m.Position.Distance2D(Player.Position) < 300f &&
                                     (m.MinimapTexture == setItemMarkerTexture || m.MinimapTexture == legendaryItemMarkerTexture) && !Blacklist60Seconds.Contains(m.NameHash)).ToList();
 
                 foreach (var marker in legendaryItemMarkers)
                 {
                     var name = (marker.MinimapTexture == setItemMarkerTexture ? "Set Item" : "Legendary Item") + " Minimap Marker";
-                    var hash = marker.NameHash + marker.Position.ToString();
 
-                    if (GenericBlacklist.ContainsKey(hash))
+                    var cacheObject = new TrinityCacheObject
                     {
-                        Logger.LogDebug(LogCategory.CacheManagement, "Ignoring Marker because it's blacklisted {0} {1} at {2} distance {3}", name, marker.NameHash, marker.Position, marker.Position.Distance(Player.Position));
-                        continue;
-                    }
-
-                    Logger.LogDebug(LogCategory.CacheManagement, "Adding {0} {1} at {2} distance {3}", name, marker.NameHash, marker.Position, marker.Position.Distance(Player.Position));
-                    ObjectCache.Add(new TrinityCacheObject()
-                    {
-                        Position = marker.Position,
+                        Position = new Vector3((float)Math.Floor(marker.Position.X), (float)Math.Floor(marker.Position.Y), (float)Math.Floor(marker.Position.Z)),
                         InternalName = name,
-                        RActorGuid = marker.NameHash,
+                        ActorSNO = marker.NameHash,
+                        RActorGuid = marker.MinimapTexture,
                         Distance = marker.Position.Distance(Player.Position),
                         ActorType = ActorType.Item,
                         Type = GObjectType.Item,
                         ItemQuality = ItemQuality.Legendary,
-                        ObjectHash = hash,
                         Radius = 2f,
                         Weight = 50,
                         IsMarker = true
-                    });
+                    };
+                    cacheObject.ObjectHash = HashGenerator.GenerateItemHash(cacheObject);
+
+                    if (GenericBlacklist.ContainsKey(cacheObject.ObjectHash))
+                    {
+                        Logger.LogDebug(LogCategory.CacheManagement, "Ignoring Marker because it's blacklisted {0} {1} at {2} distance {3}", name, marker.MinimapTexture, marker.Position, marker.Position.Distance(Player.Position));
+                        continue;
+                    }
+
+                    Logger.LogDebug(LogCategory.CacheManagement, "Adding {0} {1} at {2} distance {3}", name, marker.MinimapTexture, marker.Position, marker.Position.Distance(Player.Position));
+                    ObjectCache.Add(cacheObject);
                 }
 
                 if (legendaryItemMarkers.Any() && TrinityItemManager.FindValidBackpackLocation(true) != new Vector2(-1, -1))

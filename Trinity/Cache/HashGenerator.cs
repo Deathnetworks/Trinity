@@ -10,8 +10,13 @@ namespace Trinity
     public static class HashGenerator
     {
         /*
-         * Reference implimentation: http://msdn.microsoft.com/en-us/library/s02tk69a.aspx
+         * Reference implementation: http://msdn.microsoft.com/en-us/library/s02tk69a.aspx
          */
+
+        public static string GenerateItemHash(TrinityCacheObject item)
+        {
+            return GenerateItemHash(item.Position, item.ActorSNO, item.InternalName, Trinity.Player.WorldID, item.ItemQuality, item.ItemLevel);
+        }
 
         /// <summary>
         /// Generates an MD5 Hash given the dropped item parameters
