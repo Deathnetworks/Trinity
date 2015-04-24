@@ -894,20 +894,23 @@ namespace Trinity.Combat.Abilities
         /// <returns>target position</returns>
         public static TrinityCacheObject GetBestAreaEffectTarget(Skill skill)
         {
+            // Avoid bot choosing a target that is too far away (and potentially running towards it) when there is danger close by.
+            var searchRange = (float)(skill.IsGeneratorOrPrimary && Enemies.CloseNearby.Units.Any() ? skill.Meta.CastRange * 0.5 : skill.Meta.CastRange);
+
             TrinityCacheObject target;
             switch (skill.Meta.AreaEffectShape)
             {
                 case AreaEffectShapeType.Beam:
-                    target = TargetUtil.GetBestPierceTarget(skill.Meta.CastRange);
+                    target = TargetUtil.GetBestPierceTarget(searchRange);
                     break;
                 case AreaEffectShapeType.Circle:
-                    target = TargetUtil.GetBestClusterUnit(skill.AreaEffectRadius, skill.Meta.CastRange);
+                    target = TargetUtil.GetBestClusterUnit(skill.AreaEffectRadius, searchRange);
                     break;
                 case AreaEffectShapeType.Cone:
-                    target = TargetUtil.GetBestArcTarget(skill.Meta.CastRange, skill.AreaEffectRadius);
+                    target = TargetUtil.GetBestArcTarget(searchRange, skill.AreaEffectRadius);
                     break;
                 default:
-                    target = TargetUtil.GetBestClusterUnit();
+                    target = TargetUtil.GetBestClusterUnit(skill.AreaEffectRadius, searchRange);
                     break;
             }
 

@@ -469,6 +469,7 @@ namespace Trinity.Combat.Abilities
         private static bool RainOfVengeanceCondition(SkillMeta meta)
         {
             meta.CastRange = 90f;            
+            meta.CastFlags = CanCastFlags.NoTimer;
 
             if (Settings.Combat.DemonHunter.RainOfVengeanceOffCD || Sets.NatalyasVengeance.IsEquipped)
                 return true;
