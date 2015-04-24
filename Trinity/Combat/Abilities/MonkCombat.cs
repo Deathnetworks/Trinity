@@ -830,14 +830,14 @@ namespace Trinity.Combat.Abilities
                 // maintain for everything except items, doors, interactables... stuff we have to "click" on
                 switch (CurrentTarget.Type)
                 {
-                    case GObjectType.Unit:
-                    case GObjectType.Gold:
-                    case GObjectType.Avoidance:
-                    case GObjectType.Barricade:
-                    case GObjectType.Destructible:
-                    case GObjectType.HealthGlobe:
-                    case GObjectType.PowerGlobe:
-                    case GObjectType.ProgressionGlobe:
+                    case TrinityObjectType.Unit:
+                    case TrinityObjectType.Gold:
+                    case TrinityObjectType.Avoidance:
+                    case TrinityObjectType.Barricade:
+                    case TrinityObjectType.Destructible:
+                    case TrinityObjectType.HealthGlobe:
+                    case TrinityObjectType.PowerGlobe:
+                    case TrinityObjectType.ProgressionGlobe:
                         {
                             if (Settings.Combat.Monk.TROption == TempestRushOption.TrashOnly &&
                                     (TargetUtil.AnyElitesInRange(40f) || CurrentTarget.IsBossOrEliteRareUnique))

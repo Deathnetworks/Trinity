@@ -87,7 +87,7 @@ namespace Trinity.Combat
             if (unit == null)
                 return false;
 
-            if (unit.Type != GObjectType.Unit)
+            if (unit.Type != TrinityObjectType.Unit)
                 return false;
             bool result = TrackedUnits.Any(t => t.ACDGuid == unit.ACDGuid && t.Power == power);
             //if (result)

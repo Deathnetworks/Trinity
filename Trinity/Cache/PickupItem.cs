@@ -12,8 +12,8 @@ namespace Trinity.Cache
         public int BalanceID { get; set; }
         public ItemBaseType DBBaseType { get; set; }
         public ItemType DBItemType { get; set; }
-        public GItemBaseType TBaseType { get; set; }
-        public GItemType TType { get; set; }
+        public TrinityItemBaseType TBaseType { get; set; }
+        public TinityItemType TType { get; set; }
         public bool IsOneHand { get; set; }
         public bool IsTwoHand { get; set; }
         public FollowerType ItemFollowerType { get; set; }
@@ -31,7 +31,7 @@ namespace Trinity.Cache
 
         public PickupItem() { }
 
-        public PickupItem(ACDItem item, GItemBaseType gItemBaseType, GItemType gItemType)
+        public PickupItem(ACDItem item, TrinityItemBaseType trinityItemBaseType, TinityItemType tinityItemType)
         {
             Name = item.Name;
             InternalName = Trinity.NameNumberTrimRegex.Replace(item.InternalName, ""); ;
@@ -40,8 +40,8 @@ namespace Trinity.Cache
             BalanceID = item.GameBalanceId;
             DBBaseType = item.ItemBaseType;
             DBItemType = item.ItemType;
-            TBaseType = gItemBaseType;
-            TType = gItemType;
+            TBaseType = trinityItemBaseType;
+            TType = tinityItemType;
             IsOneHand = item.IsOneHand;
             IsTwoHand = item.IsTwoHand;
             ItemFollowerType = item.FollowerSpecialType;

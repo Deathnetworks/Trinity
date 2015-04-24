@@ -35,9 +35,9 @@ namespace Trinity
                 double movementSpeed = PlayerMover.GetMovementSpeed();
 
                 int eliteCount = CombatBase.IgnoringElites ? 0 : ObjectCache.Count(u => u.IsUnit && u.IsBossOrEliteRareUnique);
-                int avoidanceCount = Settings.Combat.Misc.AvoidAOE ? 0 : ObjectCache.Count(o => o.Type == GObjectType.Avoidance && o.Distance <= 50f);
+                int avoidanceCount = Settings.Combat.Misc.AvoidAOE ? 0 : ObjectCache.Count(o => o.Type == TrinityObjectType.Avoidance && o.Distance <= 50f);
 
-                bool avoidanceNearby = Settings.Combat.Misc.AvoidAOE && ObjectCache.Any(o => o.Type == GObjectType.Avoidance && o.Distance <= 15f);
+                bool avoidanceNearby = Settings.Combat.Misc.AvoidAOE && ObjectCache.Any(o => o.Type == TrinityObjectType.Avoidance && o.Distance <= 15f);
 
                 bool prioritizeCloseRangeUnits = (avoidanceNearby || _forceCloseRangeTarget || Player.IsRooted || DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds < 1000 &&
                                                   ObjectCache.Count(u => u.IsUnit && u.RadiusDistance < 10f) >= 3);
@@ -45,13 +45,13 @@ namespace Trinity
                 bool hiPriorityHealthGlobes = Settings.Combat.Misc.HiPriorityHG;
 
                 bool healthGlobeEmergency = (Player.CurrentHealthPct <= CombatBase.EmergencyHealthGlobeLimit || Player.PrimaryResourcePct <= CombatBase.HealthGlobeResource) &&
-                                            ObjectCache.Any(g => g.Type == GObjectType.HealthGlobe) && hiPriorityHealthGlobes;
+                                            ObjectCache.Any(g => g.Type == TrinityObjectType.HealthGlobe) && hiPriorityHealthGlobes;
 
                 bool hiPriorityShrine = Settings.WorldObject.HiPriorityShrines;
 
-                bool getHiPriorityShrine = ObjectCache.Any(s => s.Type == GObjectType.Shrine) && hiPriorityShrine;
+                bool getHiPriorityShrine = ObjectCache.Any(s => s.Type == TrinityObjectType.Shrine) && hiPriorityShrine;
 
-                bool getHiPriorityContainer = Settings.WorldObject.HiPriorityContainers && ObjectCache.Any(c => c.Type == GObjectType.Container) &&
+                bool getHiPriorityContainer = Settings.WorldObject.HiPriorityContainers && ObjectCache.Any(c => c.Type == TrinityObjectType.Container) &&
                                               !(Legendary.HarringtonWaistguard.IsEquipped && Legendary.HarringtonWaistguard.IsBuffActive);
 
                 bool profileTagCheck = false;
@@ -123,7 +123,7 @@ namespace Trinity
                     switch (cacheObject.Type)
                     {
                         // Weight Units
-                        case GObjectType.Unit:
+                        case TrinityObjectType.Unit:
                             {
                                 bool goblinKamikaze = cacheObject.IsTreasureGoblin && Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze;
 
@@ -292,7 +292,7 @@ namespace Trinity
                                         if (cacheObject.Weight > 0)
                                         {
                                             var group = 0.0;
-                                            foreach (var player in ObjectCache.Where(p => p.Type == GObjectType.Player && p.ACDGuid != Player.ACDGuid))
+                                            foreach (var player in ObjectCache.Where(p => p.Type == TrinityObjectType.Player && p.ACDGuid != Player.ACDGuid))
                                             {
                                                 group += Math.Max(((55f - cacheObject.Position.Distance2D(player.Position)) / 55f * 500d), 2d);
                                             }
@@ -420,7 +420,7 @@ namespace Trinity
                                             objWeightInfo += "LowHPGoblin ";
                                             cacheObject.Weight += Math.Max(((1 - cacheObject.HitPointsPct) / 100) * 2000d, 100d);
                                         }
-                                        if (cacheObject.IsTreasureGoblin && !ObjectCache.Any(obj => (obj.Type == GObjectType.Door || obj.Type == GObjectType.Barricade) &&
+                                        if (cacheObject.IsTreasureGoblin && !ObjectCache.Any(obj => (obj.Type == TrinityObjectType.Door || obj.Type == TrinityObjectType.Barricade) &&
                                             !MathUtil.IntersectsPath(obj.Position, obj.Radius, Player.Position, cacheObject.Position)))
                                         {
                                             // Logging goblin sightings
@@ -468,7 +468,7 @@ namespace Trinity
                                 }
                                 break;
                             }
-                        case GObjectType.HotSpot:
+                        case TrinityObjectType.HotSpot:
                             {
                                 // If there's monsters in our face, ignore
                                 if (prioritizeCloseRangeUnits)
@@ -490,7 +490,7 @@ namespace Trinity
                                 }
                                 break;
                             }
-                        case GObjectType.Item:
+                        case TrinityObjectType.Item:
                             {
                                 // Campaign A5 Quest "Lost Treasure of the Nephalem" - have to interact with nephalem switches first... 
                                 // Quest: x1_Adria, Id: 257120, Step: 108 - disable all looting, pickup, and objects
@@ -628,7 +628,7 @@ namespace Trinity
 
                                 break;
                             }
-                        case GObjectType.Gold:
+                        case TrinityObjectType.Gold:
                             {
                                 // Campaign A5 Quest "Lost Treasure of the Nephalem" - have to interact with nephalem switches first... 
                                 // Quest: x1_Adria, Id: 257120, Step: 108 - disable all looting, pickup, and objects
@@ -702,7 +702,7 @@ namespace Trinity
 
                                 break;
                             }
-                        case GObjectType.PowerGlobe:
+                        case TrinityObjectType.PowerGlobe:
                             {
                                 if (!TownRun.IsTryingToTownPortal())
                                 {
@@ -729,7 +729,7 @@ namespace Trinity
 
                                 break;
                             }
-                        case GObjectType.ProgressionGlobe:
+                        case TrinityObjectType.ProgressionGlobe:
                             {
                                 if (!TownRun.IsTryingToTownPortal())
                                 {
@@ -756,7 +756,7 @@ namespace Trinity
 
                                 break;
                             }
-                        case GObjectType.HealthGlobe:
+                        case TrinityObjectType.HealthGlobe:
                             {
                                 // Weight Health Globes
                                 if (cacheObject.IsNavBlocking())
@@ -798,8 +798,8 @@ namespace Trinity
                                     double myHealth = Player.CurrentHealthPct;
 
                                     double minPartyHealth = 1d;
-                                    if (ObjectCache.Any(p => p.Type == GObjectType.Player && p.RActorGuid != Player.RActorGuid))
-                                        minPartyHealth = ObjectCache.Where(p => p.Type == GObjectType.Player && p.RActorGuid != Player.RActorGuid).Min(p => p.HitPointsPct);
+                                    if (ObjectCache.Any(p => p.Type == TrinityObjectType.Player && p.RActorGuid != Player.RActorGuid))
+                                        minPartyHealth = ObjectCache.Where(p => p.Type == TrinityObjectType.Player && p.RActorGuid != Player.RActorGuid).Min(p => p.HitPointsPct);
                                     // If we're giving high priority to health globes, give it higher weight and check for resource level
                                     if (hiPriorityHealthGlobes)
                                     {
@@ -895,7 +895,7 @@ namespace Trinity
 
                                 break;
                             }
-                        case GObjectType.HealthWell:
+                        case TrinityObjectType.HealthWell:
                             {
                                 if (!ObjectCache.Any(o => o.IsBoss))
                                 {
@@ -942,14 +942,14 @@ namespace Trinity
 
                                 break;
                             }
-                        case GObjectType.CursedShrine:
+                        case TrinityObjectType.CursedShrine:
                             {
 
                                 cacheObject.Weight += 5000d;
 
                                 break;
                             }
-                        case GObjectType.Shrine:
+                        case TrinityObjectType.Shrine:
                             {
                                 // Campaign A5 Quest "Lost Treasure of the Nephalem" - have to interact with nephalem switches first... 
                                 // Quest: x1_Adria, Id: 257120, Step: 108 - disable all looting, pickup, and objects
@@ -999,7 +999,7 @@ namespace Trinity
                                 }
                                 break;
                             }
-                        case GObjectType.Door:
+                        case TrinityObjectType.Door:
                             {
                                 // Ignore doors where units are blocking our LoS
                                 if (ObjectCache.Any(u => u.IsUnit && u.HitPointsPct > 0 && u.Distance < cacheObject.Distance &&
@@ -1033,7 +1033,7 @@ namespace Trinity
                                 }
                                 break;
                             }
-                        case GObjectType.Barricade:
+                        case TrinityObjectType.Barricade:
                             {
                                 // rrrix added this as a single "weight" source based on the DestructableRange.
                                 // Calculate the weight based on distance, where a distance = 1 is 5000, 90 = 0
@@ -1049,7 +1049,7 @@ namespace Trinity
                             }
                             break;
 
-                        case GObjectType.Destructible:
+                        case TrinityObjectType.Destructible:
                             {
                                 if (DataDictionary.ForceDestructibles.Contains(cacheObject.ActorSNO))
                                 {
@@ -1100,7 +1100,7 @@ namespace Trinity
                                     cacheObject.Weight = 100 + cacheObject.RadiusDistance;
                                 break;
                             }
-                        case GObjectType.Interactable:
+                        case TrinityObjectType.Interactable:
                             {
                                 // Campaign A5 Quest "Lost Treasure of the Nephalem" - have to interact with nephalem switches first... 
                                 // Quest: x1_Adria, Id: 257120, Step: 108 - disable all looting, pickup, and objects
@@ -1158,7 +1158,7 @@ namespace Trinity
 
                                 break;
                             }
-                        case GObjectType.Container:
+                        case TrinityObjectType.Container:
                             {
                                 // Need to Prioritize, forget it!
                                 if (prioritizeCloseRangeUnits)
@@ -1222,8 +1222,8 @@ namespace Trinity
 
                     // Force the character to stay where it is if there is nothing available that is out of avoidance stuff and we aren't already in avoidance stuff
                     if (cacheObject.Weight == 1 && !_standingInAvoidance &&
-                        (ObjectCache.Any(aoe => aoe.Type == GObjectType.Avoidance && cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius) ||
-                        ObjectCache.Any(aoe => aoe.Type == GObjectType.Avoidance && MathUtil.IntersectsPath(aoe.Position, aoe.Radius, Player.Position, cacheObject.Position))))
+                        (ObjectCache.Any(aoe => aoe.Type == TrinityObjectType.Avoidance && cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius) ||
+                        ObjectCache.Any(aoe => aoe.Type == TrinityObjectType.Avoidance && MathUtil.IntersectsPath(aoe.Position, aoe.Radius, Player.Position, cacheObject.Position))))
                     {
                         cacheObject.Weight = 0;
                         _shouldStayPutDuringAvoidance = true;
@@ -1320,7 +1320,7 @@ namespace Trinity
                 CurrentTarget.HasBeenPrimaryTarget = true;
 
                 bool isEliteLowHealth = CurrentTarget.HitPointsPct <= 0.75 && CurrentTarget.IsBossOrEliteRareUnique;
-                bool isLegendaryItem = CurrentTarget.Type == GObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary;
+                bool isLegendaryItem = CurrentTarget.Type == TrinityObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary;
 
                 bool isHoradricRelic = (CurrentTarget.InternalName.ToLower().StartsWith("horadricrelic") && CurrentTarget.TimesBeenPrimaryTarget > 5);
 

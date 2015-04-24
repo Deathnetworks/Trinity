@@ -177,7 +177,7 @@ namespace Trinity
                     using (new PerformanceLogger("HandleTarget.CheckAvoidanceBuffs"))
                     {
                         // See if we can use any special buffs etc. while in avoidance
-                        if (CurrentTarget.Type == GObjectType.Avoidance)
+                        if (CurrentTarget.Type == TrinityObjectType.Avoidance)
                         {
                             powerBuff = AbilitySelector(true);
                             if (powerBuff.SNOPower != SNOPower.None)
@@ -225,7 +225,7 @@ namespace Trinity
                         {
                             CurrentTargetIsInLoS = true;
                         }
-                        else if (Settings.Combat.Misc.UseNavMeshTargeting && CurrentTarget.Type != GObjectType.Barricade && CurrentTarget.Type != GObjectType.Destructible)
+                        else if (Settings.Combat.Misc.UseNavMeshTargeting && CurrentTarget.Type != TrinityObjectType.Barricade && CurrentTarget.Type != TrinityObjectType.Destructible)
                         {
                             CurrentTargetIsInLoS = (NavHelper.CanRayCast(Player.Position, CurrentDestination) || DataDictionary.LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
                         }
@@ -238,11 +238,11 @@ namespace Trinity
                     using (new PerformanceLogger("HandleTarget.InRange"))
                     {
                         bool stuckOnTarget =
-                            ((CurrentTarget.Type == GObjectType.Barricade ||
-                             CurrentTarget.Type == GObjectType.Interactable ||
-                             CurrentTarget.Type == GObjectType.CursedChest ||
-                             CurrentTarget.Type == GObjectType.CursedShrine ||
-                             CurrentTarget.Type == GObjectType.Destructible) &&
+                            ((CurrentTarget.Type == TrinityObjectType.Barricade ||
+                             CurrentTarget.Type == TrinityObjectType.Interactable ||
+                             CurrentTarget.Type == TrinityObjectType.CursedChest ||
+                             CurrentTarget.Type == TrinityObjectType.CursedShrine ||
+                             CurrentTarget.Type == TrinityObjectType.Destructible) &&
                              !ZetaDia.Me.Movement.IsMoving && DateTime.UtcNow.Subtract(PlayerMover.TimeLastUsedPlayerMover).TotalMilliseconds < 250);
 
                         bool npcInRange = CurrentTarget.IsQuestGiver && CurrentTarget.RadiusDistance <= 3f;
@@ -251,9 +251,9 @@ namespace Trinity
                         switch (CurrentTarget.Type)
                         {
                             // These always have TargetRangeRequired=1f, but, we need to run directly to their center until we stop moving, then destroy them
-                            case GObjectType.Door:
-                            case GObjectType.Barricade:
-                            case GObjectType.Destructible:
+                            case TrinityObjectType.Door:
+                            case TrinityObjectType.Barricade:
+                            case TrinityObjectType.Destructible:
                                 noRangeRequired = false;
                                 break;
                         }
@@ -308,15 +308,15 @@ namespace Trinity
                     using (new PerformanceLogger("HandleTarget.SpecialMovement"))
                     {
 
-                        bool Monk_SpecialMovement = ((CurrentTarget.Type == GObjectType.Gold ||
+                        bool Monk_SpecialMovement = ((CurrentTarget.Type == TrinityObjectType.Gold ||
                             CurrentTarget.IsUnit || CurrentTarget.IsDestroyable) && MonkCombat.IsTempestRushReady());
 
                         // If we're doing avoidance, globes or backtracking, try to use special abilities to move quicker
-                        if ((CurrentTarget.Type == GObjectType.Avoidance ||
-                            CurrentTarget.Type == GObjectType.HealthGlobe ||
-                            CurrentTarget.Type == GObjectType.PowerGlobe ||
-                            CurrentTarget.Type == GObjectType.ProgressionGlobe ||
-                            CurrentTarget.Type == GObjectType.Shrine ||
+                        if ((CurrentTarget.Type == TrinityObjectType.Avoidance ||
+                            CurrentTarget.Type == TrinityObjectType.HealthGlobe ||
+                            CurrentTarget.Type == TrinityObjectType.PowerGlobe ||
+                            CurrentTarget.Type == TrinityObjectType.ProgressionGlobe ||
+                            CurrentTarget.Type == TrinityObjectType.Shrine ||
                             Monk_SpecialMovement)
                             && NavHelper.CanRayCast(Player.Position, CurrentDestination)
                             )
@@ -346,7 +346,7 @@ namespace Trinity
 
                     if (Player.ActorClass == ActorClass.Barbarian)
                     {
-                        bool wwToItem = (CurrentTarget.Type != GObjectType.Item || (CurrentTarget.Type == GObjectType.Item && CurrentTarget.Distance > 10f));
+                        bool wwToItem = (CurrentTarget.Type != TrinityObjectType.Item || (CurrentTarget.Type == TrinityObjectType.Item && CurrentTarget.Distance > 10f));
                         // Whirlwind against everything within range
                         if (Player.PrimaryResource >= 10 && CombatBase.CanCast(SNOPower.Barbarian_Whirlwind) && wwToItem &&
                             (TargetUtil.AnyMobsInRange(20, false) || Sets.BulKathossOath.IsFullyEquipped) && !IsWaitingForSpecial)
@@ -373,14 +373,14 @@ namespace Trinity
         {
             switch (CurrentTarget.Type)
             {
-                case GObjectType.Avoidance:
+                case TrinityObjectType.Avoidance:
                     _forceTargetUpdate = true;
                     break;
-                case GObjectType.Player:
+                case TrinityObjectType.Player:
                     break;
 
                 // Unit, use our primary power to attack
-                case GObjectType.Unit:
+                case TrinityObjectType.Unit:
                     {
                         if (CombatBase.CurrentPower.SNOPower != SNOPower.None)
                         {
@@ -400,7 +400,7 @@ namespace Trinity
                         break;
                     }
                 // Item, interact with it and log item stats
-                case GObjectType.Item:
+                case TrinityObjectType.Item:
                     {
                         // Check if we actually have room for this item first
 
@@ -426,10 +426,10 @@ namespace Trinity
                         break;
                     }
                 // * Gold & Globe - need to get within pickup radius only
-                case GObjectType.Gold:
-                case GObjectType.HealthGlobe:
-                case GObjectType.PowerGlobe:
-                case GObjectType.ProgressionGlobe:
+                case TrinityObjectType.Gold:
+                case TrinityObjectType.HealthGlobe:
+                case TrinityObjectType.PowerGlobe:
+                case TrinityObjectType.ProgressionGlobe:
                     {
                         int interactAttempts;
                         // Count how many times we've tried interacting
@@ -456,13 +456,13 @@ namespace Trinity
                         break;
                     }
 
-                case GObjectType.Door:
-                case GObjectType.HealthWell:
-                case GObjectType.Shrine:
-                case GObjectType.Container:
-                case GObjectType.Interactable:
-                case GObjectType.CursedChest:
-                case GObjectType.CursedShrine:
+                case TrinityObjectType.Door:
+                case TrinityObjectType.HealthWell:
+                case TrinityObjectType.Shrine:
+                case TrinityObjectType.Container:
+                case TrinityObjectType.Interactable:
+                case TrinityObjectType.CursedChest:
+                case TrinityObjectType.CursedShrine:
                     {
                         _forceTargetUpdate = true;
 
@@ -509,7 +509,7 @@ namespace Trinity
                             }
 
                             // If we've tried interacting too many times, blacklist this for a while
-                            if (CacheData.InteractAttempts[CurrentTarget.RActorGuid] > 15 && CurrentTarget.Type != GObjectType.HealthWell)
+                            if (CacheData.InteractAttempts[CurrentTarget.RActorGuid] > 15 && CurrentTarget.Type != TrinityObjectType.HealthWell)
                             {
                                 Logger.LogVerbose("Blacklisting {0} ({1}) for 15 seconds after {2} interactions",
                                     CurrentTarget.InternalName, CurrentTarget.ActorSNO, attemptCount);
@@ -519,12 +519,12 @@ namespace Trinity
                         break;
                     }
                 // * Destructible - need to pick an ability and attack it
-                case GObjectType.Destructible:
-                case GObjectType.Barricade:
+                case TrinityObjectType.Destructible:
+                case TrinityObjectType.Barricade:
                     {
                         if (CombatBase.CurrentPower.SNOPower != SNOPower.None)
                         {
-                            if (CurrentTarget.Type == GObjectType.Barricade)
+                            if (CurrentTarget.Type == TrinityObjectType.Barricade)
                             {
                                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior,
                                     "Barricade: Name={0}. SNO={1}, Range={2}. Needed range={3}. Radius={4}. Type={5}. Using power={6}",
@@ -656,11 +656,11 @@ namespace Trinity
                 bool shouldTryBlacklist = false;
 
                 // don't timeout on avoidance
-                if (CurrentTarget.Type == GObjectType.Avoidance)
+                if (CurrentTarget.Type == TrinityObjectType.Avoidance)
                     return false;
 
                 // don't timeout on legendary items
-                if (CurrentTarget.Type == GObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary)
+                if (CurrentTarget.Type == TrinityObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary)
                     return false;
 
                 // don't timeout if we're actively moving
@@ -677,7 +677,7 @@ namespace Trinity
                 if ((CurrentTargetIsUnit() && !CurrentTarget.IsBoss && GetSecondsSinceTargetUpdate() > 10))
                     shouldTryBlacklist = true;
 
-                if (CurrentTarget.Type == GObjectType.HotSpot)
+                if (CurrentTarget.Type == TrinityObjectType.HotSpot)
                     shouldTryBlacklist = false;
 
                 if (shouldTryBlacklist)
@@ -699,7 +699,7 @@ namespace Trinity
                     int interactAttempts;
                     CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out interactAttempts);
 
-                    if ((CurrentTarget.Type == GObjectType.Door || CurrentTarget.Type == GObjectType.Interactable || CurrentTarget.Type == GObjectType.Container) &&
+                    if ((CurrentTarget.Type == TrinityObjectType.Door || CurrentTarget.Type == TrinityObjectType.Interactable || CurrentTarget.Type == TrinityObjectType.Container) &&
                         interactAttempts < 45 && DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalSeconds > 15)
                     {
                         addTargetToBlacklist = false;
@@ -714,7 +714,7 @@ namespace Trinity
                             CurrentTarget = null;
                             return true;
                         }
-                        if (CurrentTarget.Type == GObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary)
+                        if (CurrentTarget.Type == TrinityObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary)
                         {
                             return false;
                         }
@@ -784,7 +784,7 @@ namespace Trinity
                         }
                     }
                     // Select an ability for destroying a destructible with in advance
-                    if (CurrentTarget.Type == GObjectType.Destructible || CurrentTarget.Type == GObjectType.Barricade)
+                    if (CurrentTarget.Type == TrinityObjectType.Destructible || CurrentTarget.Type == TrinityObjectType.Barricade)
                         CombatBase.CurrentPower = AbilitySelector(UseDestructiblePower: true);
 
                     // Return since we should have assigned a power
@@ -839,8 +839,8 @@ namespace Trinity
         /// <returns></returns>
         private static bool UsedSpecialMovement()
         {
-            bool attackableSpecialMovement = ((CurrentTarget.Type == GObjectType.Avoidance &&
-            ObjectCache.Any(u => (u.IsUnit || u.Type == GObjectType.Destructible || u.Type == GObjectType.Barricade) &&
+            bool attackableSpecialMovement = ((CurrentTarget.Type == TrinityObjectType.Avoidance &&
+            ObjectCache.Any(u => (u.IsUnit || u.Type == TrinityObjectType.Destructible || u.Type == TrinityObjectType.Barricade) &&
                 MathUtil.IntersectsPath(u.Position, u.Radius, Player.Position, CurrentTarget.Position))));
 
             using (new PerformanceLogger("HandleTarget.UsedSpecialMovement"))
@@ -903,7 +903,7 @@ namespace Trinity
 
                 // Tempest rush for a monk
                 if (CombatBase.CanCast(SNOPower.Monk_TempestRush) && Player.PrimaryResource >= Settings.Combat.Monk.TR_MinSpirit &&
-                    ((CurrentTarget.Type == GObjectType.Item && CurrentTarget.Distance > 20f) || CurrentTarget.Type != GObjectType.Item) &&
+                    ((CurrentTarget.Type == TrinityObjectType.Item && CurrentTarget.Distance > 20f) || CurrentTarget.Type != TrinityObjectType.Item) &&
                     Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly &&
                     MonkCombat.IsTempestRushReady())
                 {
@@ -937,12 +937,12 @@ namespace Trinity
 
         private static bool CurrentTargetIsNotAvoidance()
         {
-            return CurrentTarget.Type != GObjectType.Avoidance;
+            return CurrentTarget.Type != TrinityObjectType.Avoidance;
         }
 
         private static bool CurrentTargetIsNonUnit()
         {
-            return CurrentTarget.Type != GObjectType.Unit;
+            return CurrentTarget.Type != TrinityObjectType.Unit;
         }
 
         private static bool CurrentTargetIsUnit()
@@ -974,31 +974,31 @@ namespace Trinity
             else
                 switch (CurrentTarget.Type)
                 {
-                    case GObjectType.Avoidance:
+                    case TrinityObjectType.Avoidance:
                         action = "Avoid ";
                         break;
-                    case GObjectType.Unit:
+                    case TrinityObjectType.Unit:
                         action = "Attack ";
                         break;
-                    case GObjectType.Item:
-                    case GObjectType.Gold:
-                    case GObjectType.PowerGlobe:
-                    case GObjectType.HealthGlobe:
-                    case GObjectType.ProgressionGlobe:
+                    case TrinityObjectType.Item:
+                    case TrinityObjectType.Gold:
+                    case TrinityObjectType.PowerGlobe:
+                    case TrinityObjectType.HealthGlobe:
+                    case TrinityObjectType.ProgressionGlobe:
                         action = "Pickup ";
                         break;
-                    case GObjectType.Interactable:
+                    case TrinityObjectType.Interactable:
                         action = "Interact ";
                         break;
-                    case GObjectType.Door:
-                    case GObjectType.Container:
+                    case TrinityObjectType.Door:
+                    case TrinityObjectType.Container:
                         action = "Open ";
                         break;
-                    case GObjectType.Destructible:
-                    case GObjectType.Barricade:
+                    case TrinityObjectType.Destructible:
+                    case TrinityObjectType.Barricade:
                         action = "Destroy ";
                         break;
-                    case GObjectType.Shrine:
+                    case TrinityObjectType.Shrine:
                         action = "Click ";
                         break;
                 }
@@ -1095,9 +1095,9 @@ namespace Trinity
 
                     bool inRange = TargetCurrentDistance <= TargetRangeRequired || CurrentTarget.Distance < 10f;
                     if (lastMoveResult == MoveResult.ReachedDestination && !inRange &&
-                        CurrentTarget.Type != GObjectType.Item &&
-                        CurrentTarget.Type != GObjectType.Destructible &&
-                        CurrentTarget.Type != GObjectType.Barricade)
+                        CurrentTarget.Type != TrinityObjectType.Item &&
+                        CurrentTarget.Type != TrinityObjectType.Destructible &&
+                        CurrentTarget.Type != TrinityObjectType.Barricade)
                     {
                         bool pathFindresult = ((DefaultNavigationProvider)Navigator.NavigationProvider).CanPathWithinDistance(CurrentTarget.Position, CurrentTarget.Radius);
                         if (!pathFindresult)
@@ -1132,21 +1132,21 @@ namespace Trinity
                 switch (CurrentTarget.Type)
                 {
                     // * Unit, we need to pick an ability to use and get within range
-                    case GObjectType.Unit:
+                    case TrinityObjectType.Unit:
                         {
                             // Pick a range to try to reach
                             TargetRangeRequired = CombatBase.CurrentPower.MinimumRange;
                             break;
                         }
                     // * Item - need to get within 6 feet and then interact with it
-                    case GObjectType.Item:
+                    case TrinityObjectType.Item:
                         {
                             TargetRangeRequired = 2f;
                             TargetCurrentDistance = CurrentTarget.Distance;
                             break;
                         }
                     // * Gold - need to get within pickup radius only
-                    case GObjectType.Gold:
+                    case TrinityObjectType.Gold:
                         {
                             TargetRangeRequired = 2f;
                             TargetCurrentDistance = CurrentTarget.Distance;
@@ -1154,16 +1154,16 @@ namespace Trinity
                             break;
                         }
                     // * Globes - need to get within pickup radius only
-                    case GObjectType.PowerGlobe:
-                    case GObjectType.HealthGlobe:
-                    case GObjectType.ProgressionGlobe:
+                    case TrinityObjectType.PowerGlobe:
+                    case TrinityObjectType.HealthGlobe:
+                    case TrinityObjectType.ProgressionGlobe:
                         {
                             TargetRangeRequired = 2f;
                             TargetCurrentDistance = CurrentTarget.Distance;
                             break;
                         }
                     // * Shrine & Container - need to get within 8 feet and interact
-                    case GObjectType.HealthWell:
+                    case TrinityObjectType.HealthWell:
                         {
                             TargetRangeRequired = 4f;
 
@@ -1174,8 +1174,8 @@ namespace Trinity
                             }
                             break;
                         }
-                    case GObjectType.Shrine:
-                    case GObjectType.Container:
+                    case TrinityObjectType.Shrine:
+                    case TrinityObjectType.Container:
                         {
                             TargetRangeRequired = 6f;
 
@@ -1186,7 +1186,7 @@ namespace Trinity
                             }
                             break;
                         }
-                    case GObjectType.Interactable:
+                    case TrinityObjectType.Interactable:
                         {
                             if (CurrentTarget.IsQuestGiver)
                             {
@@ -1210,7 +1210,7 @@ namespace Trinity
                             break;
                         }
                     // * Destructible - need to pick an ability and attack it
-                    case GObjectType.Destructible:
+                    case TrinityObjectType.Destructible:
                         {
                             // Pick a range to try to reach + (tmp_fThisRadius * 0.70);
                             //TargetRangeRequired = CombatBase.CurrentPower.SNOPower == SNOPower.None ? 9f : CombatBase.CurrentPower.MinimumRange;
@@ -1219,7 +1219,7 @@ namespace Trinity
                             TargetCurrentDistance = CurrentTarget.Distance;
                             break;
                         }
-                    case GObjectType.Barricade:
+                    case TrinityObjectType.Barricade:
                         {
                             // Pick a range to try to reach + (tmp_fThisRadius * 0.70);
                             TargetRangeRequired = CombatBase.CurrentPower.MinimumRange;
@@ -1228,12 +1228,12 @@ namespace Trinity
                             break;
                         }
                     // * Avoidance - need to pick an avoid location and move there
-                    case GObjectType.Avoidance:
+                    case TrinityObjectType.Avoidance:
                         {
                             TargetRangeRequired = 2f;
                             break;
                         }
-                    case GObjectType.Door:
+                    case TrinityObjectType.Door:
                         TargetRangeRequired = 2f;
                         break;
                     default:
@@ -1389,11 +1389,11 @@ namespace Trinity
                 if (!ItemDropStats._hashsetItemPicksLookedAt.Contains(itemSha1Hash))
                 {
                     ItemDropStats._hashsetItemPicksLookedAt.Add(itemSha1Hash);
-                    GItemType itemType = TrinityItemManager.DetermineItemType(CurrentTarget.InternalName, CurrentTarget.DBItemType, CurrentTarget.FollowerType);
-                    GItemBaseType itemBaseType = TrinityItemManager.DetermineBaseType(itemType);
-                    if (itemBaseType == GItemBaseType.Armor || itemBaseType == GItemBaseType.WeaponOneHand || itemBaseType == GItemBaseType.WeaponTwoHand ||
-                        itemBaseType == GItemBaseType.WeaponRange || itemBaseType == GItemBaseType.Jewelry || itemBaseType == GItemBaseType.FollowerItem ||
-                        itemBaseType == GItemBaseType.Offhand)
+                    TinityItemType itemType = TrinityItemManager.DetermineItemType(CurrentTarget.InternalName, CurrentTarget.DBItemType, CurrentTarget.FollowerType);
+                    TrinityItemBaseType itemBaseType = TrinityItemManager.DetermineBaseType(itemType);
+                    if (itemBaseType == TrinityItemBaseType.Armor || itemBaseType == TrinityItemBaseType.WeaponOneHand || itemBaseType == TrinityItemBaseType.WeaponTwoHand ||
+                        itemBaseType == TrinityItemBaseType.WeaponRange || itemBaseType == TrinityItemBaseType.Jewelry || itemBaseType == TrinityItemBaseType.FollowerItem ||
+                        itemBaseType == TrinityItemBaseType.Offhand)
                     {
                         int iQuality;
                         ItemDropStats.ItemsPickedStats.Total++;
@@ -1418,26 +1418,26 @@ namespace Trinity
                         ItemDropStats.ItemsPickedStats.TotalPerLevel[CurrentTarget.ItemLevel]++;
                         ItemDropStats.ItemsPickedStats.TotalPerQPerL[iQuality, CurrentTarget.ItemLevel]++;
                     }
-                    else if (itemBaseType == GItemBaseType.Gem)
+                    else if (itemBaseType == TrinityItemBaseType.Gem)
                     {
                         int iGemType = 0;
                         ItemDropStats.ItemsPickedStats.TotalGems++;
-                        if (itemType == GItemType.Topaz)
+                        if (itemType == TinityItemType.Topaz)
                             iGemType = ItemDropStats.GEMTOPAZ;
-                        if (itemType == GItemType.Ruby)
+                        if (itemType == TinityItemType.Ruby)
                             iGemType = ItemDropStats.GEMRUBY;
-                        if (itemType == GItemType.Emerald)
+                        if (itemType == TinityItemType.Emerald)
                             iGemType = ItemDropStats.GEMEMERALD;
-                        if (itemType == GItemType.Amethyst)
+                        if (itemType == TinityItemType.Amethyst)
                             iGemType = ItemDropStats.GEMAMETHYST;
-                        if (itemType == GItemType.Diamond)
+                        if (itemType == TinityItemType.Diamond)
                             iGemType = ItemDropStats.GEMDIAMOND;
 
                         ItemDropStats.ItemsPickedStats.GemsPerType[iGemType]++;
                         ItemDropStats.ItemsPickedStats.GemsPerLevel[CurrentTarget.ItemLevel]++;
                         ItemDropStats.ItemsPickedStats.GemsPerTPerL[iGemType, CurrentTarget.ItemLevel]++;
                     }
-                    else if (itemType == GItemType.HealthPotion)
+                    else if (itemType == TinityItemType.HealthPotion)
                     {
                         ItemDropStats.ItemsPickedStats.TotalPotions++;
                         if ((CurrentTarget.ItemLevel < 0) || (CurrentTarget.ItemLevel > 63))
@@ -1446,7 +1446,7 @@ namespace Trinity
                         }
                         ItemDropStats.ItemsPickedStats.PotionsPerLevel[CurrentTarget.ItemLevel]++;
                     }
-                    else if (c_item_GItemType == GItemType.InfernalKey)
+                    else if (_cItemTinityItemType == TinityItemType.InfernalKey)
                     {
                         ItemDropStats.ItemsPickedStats.TotalInfernalKeys++;
                     }

@@ -280,7 +280,7 @@ namespace Trinity.Combat.Abilities
                 if (CurrentTarget == null)
                     return false;
 
-                if (CurrentTarget.Type == GObjectType.Avoidance)
+                if (CurrentTarget.Type == TrinityObjectType.Avoidance)
                     return true;
                 return false;
             }
@@ -295,8 +295,8 @@ namespace Trinity.Combat.Abilities
 
                 switch (CurrentTarget.Type)
                 {
-                    case GObjectType.Destructible:
-                    case GObjectType.Barricade:
+                    case TrinityObjectType.Destructible:
+                    case TrinityObjectType.Barricade:
                         return true;
                     default:
                         return false;

@@ -29,8 +29,8 @@ namespace Trinity
         public DyeType DyeType { get; set; }
         public ItemType DBItemType { get; set; }
         public ItemBaseType DBBaseType { get; set; }
-        public GItemBaseType TrinityItemBaseType { get; set; }
-        public GItemType TrinityItemType { get; set; }
+        public TrinityItemBaseType TrinityItemBaseType { get; set; }
+        public TinityItemType TrinityItemType { get; set; }
         public FollowerType FollowerType { get; set; }
         public bool IsUnidentified { get; set; }
         public int ItemStackQuantity { get; set; }
@@ -206,7 +206,7 @@ namespace Trinity
                     IsAncient = item.GetAttribute<int>(ActorAttributeType.AncientRank) > 0,
 
                 };
-                GItemBaseType trinityItemBaseType = TrinityItemManager.DetermineBaseType(TrinityItemManager.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType));
+                TrinityItemBaseType trinityItemBaseType = TrinityItemManager.DetermineBaseType(TrinityItemManager.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType));
                 cItem.TrinityItemBaseType = trinityItemBaseType;
                 cItem.IsEquipment = GetIsEquipment(trinityItemBaseType);
                 cItem.IsSalvageable = GetIsSalvageable(cItem);
@@ -232,17 +232,17 @@ namespace Trinity
             return true;
         }
 
-        public static bool GetIsEquipment(GItemBaseType baseType)
+        public static bool GetIsEquipment(TrinityItemBaseType baseType)
         {
             switch (baseType)
             {
-                case GItemBaseType.Armor:
-                case GItemBaseType.Jewelry:
-                case GItemBaseType.Offhand:
-                case GItemBaseType.WeaponOneHand:
-                case GItemBaseType.WeaponRange:
-                case GItemBaseType.WeaponTwoHand:
-                case GItemBaseType.FollowerItem:
+                case TrinityItemBaseType.Armor:
+                case global::Trinity.TrinityItemBaseType.Jewelry:
+                case global::Trinity.TrinityItemBaseType.Offhand:
+                case global::Trinity.TrinityItemBaseType.WeaponOneHand:
+                case global::Trinity.TrinityItemBaseType.WeaponRange:
+                case global::Trinity.TrinityItemBaseType.WeaponTwoHand:
+                case global::Trinity.TrinityItemBaseType.FollowerItem:
                     return true;
                 default:
                     return false;

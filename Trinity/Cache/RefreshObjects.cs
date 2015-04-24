@@ -210,7 +210,7 @@ namespace Trinity
                             CurrentTarget = new TrinityCacheObject()
                                 {
                                     Position = safePosition,
-                                    Type = GObjectType.Avoidance,
+                                    Type = TrinityObjectType.Avoidance,
                                     Weight = 20000,
                                     Distance = Vector3.Distance(Player.Position, safePosition),
                                     Radius = 2f,
@@ -238,7 +238,7 @@ namespace Trinity
                     CurrentTarget = new TrinityCacheObject()
                                         {
                                             Position = Player.Position,
-                                            Type = GObjectType.Avoidance,
+                                            Type = TrinityObjectType.Avoidance,
                                             Weight = 20000,
                                             Distance = 2f,
                                             Radius = 2f,
@@ -273,7 +273,7 @@ namespace Trinity
                         CurrentTarget = new TrinityCacheObject()
                         {
                             Position = TownRun.PreTownRunPosition,
-                            Type = GObjectType.Avoidance,
+                            Type = TrinityObjectType.Avoidance,
                             Weight = 20000,
                             Distance = 2f,
                             Radius = 2f,
@@ -287,7 +287,7 @@ namespace Trinity
                 {
                     if (Settings.WorldObject.EnableBountyEvents)
                     {
-                        bool eventObjectNear = ObjectCache.Any(o => o.Type == GObjectType.CursedChest || o.Type == GObjectType.CursedShrine);
+                        bool eventObjectNear = ObjectCache.Any(o => o.Type == TrinityObjectType.CursedChest || o.Type == TrinityObjectType.CursedShrine);
 
                         if (!Player.InActiveEvent)
                         {
@@ -303,7 +303,7 @@ namespace Trinity
 
                         if (eventObjectNear)
                         {
-                            EventStartPosition = ObjectCache.FirstOrDefault(o => o.Type == GObjectType.CursedChest || o.Type == GObjectType.CursedShrine).Position;
+                            EventStartPosition = ObjectCache.FirstOrDefault(o => o.Type == TrinityObjectType.CursedChest || o.Type == TrinityObjectType.CursedShrine).Position;
                         }
 
                         var activeEvent = ZetaDia.ActInfo.ActiveQuests.FirstOrDefault(q => DataDictionary.EventQuests.Contains(q.QuestSNO));
@@ -321,7 +321,7 @@ namespace Trinity
                             CurrentTarget = new TrinityCacheObject()
                             {
                                 Position = EventStartPosition,
-                                Type = GObjectType.Avoidance,
+                                Type = TrinityObjectType.Avoidance,
                                 Weight = 20000,
                                 Distance = 2f,
                                 Radius = 2f,
@@ -355,7 +355,7 @@ namespace Trinity
                     if (CurrentTarget.IsBoss || CurrentTarget.IsBountyObjective)
                         lastHadBossUnitInSights = DateTime.UtcNow;
 
-                    if (CurrentTarget.Type == GObjectType.Container)
+                    if (CurrentTarget.Type == TrinityObjectType.Container)
                         lastHadContainerInSights = DateTime.UtcNow;
 
                     // Record the last time our target changed
@@ -405,7 +405,7 @@ namespace Trinity
                     var threshold = setting > 0 && CurrentTarget != null ? CurrentTarget.Weight * ((double)setting / 100) : 0;
 
                     var lowPriorityObjects = ObjectCache.DistinctBy(c => c.RActorGuid).Where(c =>
-                        c.Type != GObjectType.Avoidance && c.Type != GObjectType.Unit ||
+                        c.Type != TrinityObjectType.Avoidance && c.Type != TrinityObjectType.Unit ||
                         c.Weight < threshold && c.Distance > 12f && !c.IsElite
                         ).ToDictionary(x => x.RActorGuid, x => x);
 
@@ -450,7 +450,7 @@ namespace Trinity
                         RActorGuid = marker.MinimapTexture,
                         Distance = marker.Position.Distance(Player.Position),
                         ActorType = ActorType.Item,
-                        Type = GObjectType.Item,
+                        Type = TrinityObjectType.Item,
                         ItemQuality = ItemQuality.Legendary,
                         Radius = 2f,
                         Weight = 50,
@@ -489,7 +489,7 @@ namespace Trinity
                             HasBeenInLoS = true,
                             Distance = diaItem.Distance,
                             ActorType = ActorType.Item,
-                            Type = GObjectType.Item,
+                            Type = TrinityObjectType.Item,
                             Radius = 2f,
                             Weight = 50,
                             ItemQuality = ItemQuality.Legendary,
@@ -517,7 +517,7 @@ namespace Trinity
                         Distance = marker.Position.Distance(Player.Position),
                         RActorGuid = marker.NameHash,
                         ActorType = ActorType.Monster,
-                        Type = GObjectType.Unit,
+                        Type = TrinityObjectType.Unit,
                         Radius = 10f,
                         Weight = 5000,
                     });
@@ -535,7 +535,7 @@ namespace Trinity
                         Distance = marker.Position.Distance(Player.Position),
                         RActorGuid = marker.NameHash,
                         ActorType = ActorType.Monster,
-                        Type = GObjectType.Unit,
+                        Type = TrinityObjectType.Unit,
                         Radius = 10f,
                         Weight = 5000,
                     });
@@ -613,7 +613,7 @@ namespace Trinity
                             // don't log stuff we never care about
                             if (duration <= 1 && c_IgnoreSubStep == "IgnoreNames")
                                 continue;
-                            if (CurrentCacheObject.Type == GObjectType.Player)
+                            if (CurrentCacheObject.Type == TrinityObjectType.Player)
                                 continue;
 
                             if (c_IgnoreReason != "InternalName")
@@ -807,7 +807,7 @@ namespace Trinity
                 CurrentTarget = new TrinityCacheObject()
                                     {
                                         Position = Player.Position,
-                                        Type = GObjectType.Avoidance,
+                                        Type = TrinityObjectType.Avoidance,
                                         Weight = 20000,
                                         Distance = 2f,
                                         Radius = 2f,
@@ -828,7 +828,7 @@ namespace Trinity
                 CurrentTarget = new TrinityCacheObject()
                                     {
                                         Position = Player.Position,
-                                        Type = GObjectType.Avoidance,
+                                        Type = TrinityObjectType.Avoidance,
                                         Weight = 20000,
                                         Distance = 2f,
                                         Radius = 2f,
@@ -843,7 +843,7 @@ namespace Trinity
                 CurrentTarget = new TrinityCacheObject()
                                     {
                                         Position = Player.Position,
-                                        Type = GObjectType.Avoidance,
+                                        Type = TrinityObjectType.Avoidance,
                                         Weight = 20000,
                                         Distance = 2f,
                                         Radius = 2f,
@@ -858,7 +858,7 @@ namespace Trinity
                 CurrentTarget = new TrinityCacheObject()
                                     {
                                         Position = Player.Position,
-                                        Type = GObjectType.Avoidance,
+                                        Type = TrinityObjectType.Avoidance,
                                         Weight = 20000,
                                         Distance = 2f,
                                         Radius = 2f,

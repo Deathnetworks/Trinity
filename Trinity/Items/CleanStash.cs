@@ -118,7 +118,7 @@ namespace Trinity.Items
                     {
                         CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
                         // Don't take potions from the stash
-                        if (cItem.TrinityItemType == GItemType.HealthPotion)
+                        if (cItem.TrinityItemType == TinityItemType.HealthPotion)
                             continue;
 
                         try

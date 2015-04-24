@@ -106,7 +106,7 @@ namespace Trinity
                 {
                     Position = hotSpot.Location,
                     InternalName = "HotSpot",
-                    Type = GObjectType.HotSpot,
+                    Type = TrinityObjectType.HotSpot,
                     Distance = Trinity.Player.Position.Distance2D(hotSpot.Location),
                     Radius = HotSpot.MaxPositionDistance,
                 };

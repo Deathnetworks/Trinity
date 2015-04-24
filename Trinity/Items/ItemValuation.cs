@@ -15,7 +15,7 @@ namespace Trinity
         private static double[] ItemMaxPoints = new double[Constants.TOTALSTATS];
         private static bool IsInvalidItem = true;
         private static double TotalItemPoints = 0;
-        private static GItemBaseType baseItemType = GItemBaseType.Unknown;
+        private static TrinityItemBaseType baseItemType = TrinityItemBaseType.Unknown;
 
         /// <summary>
         /// This is a bonus applied at the end of valuation 
@@ -40,7 +40,7 @@ namespace Trinity
         /// <param name="item"></param>
         /// <param name="itemType"></param>
         /// <returns></returns>
-        internal static double ValueThisItem(CachedACDItem item, GItemType itemType)
+        internal static double ValueThisItem(CachedACDItem item, TinityItemType itemType)
         {
             // Reset static variables
             TotalItemPoints = 0;
@@ -167,7 +167,7 @@ namespace Trinity
                     }
 
                     // This *REMOVES* score from follower items for stats that followers don't care about
-                    if (baseItemType == GItemBaseType.FollowerItem && (i == Constants.CRITDAMAGE || i == Constants.LIFEONHIT || i == Constants.ALLRESIST))
+                    if (baseItemType == TrinityItemBaseType.FollowerItem && (i == Constants.CRITDAMAGE || i == Constants.LIFEONHIT || i == Constants.ALLRESIST))
                         FinalBonusGranted -= 0.9;
 
                     // Bonus 15% for being *at* the stat cap (ie - completely maxed out, or very very close to), but not for the socket stat (since sockets are usually 0 or 1!)
@@ -190,13 +190,13 @@ namespace Trinity
                     {
 
                         // Off-handers get less value from sockets
-                        if (baseItemType == GItemBaseType.Offhand)
+                        if (baseItemType == TrinityItemBaseType.Offhand)
                         {
                             FinalBonusGranted -= 0.35;
                         }
 
                         // Chest
-                        if (itemType == GItemType.Chest || itemType == GItemType.Cloak)
+                        if (itemType == TinityItemType.Chest || itemType == TinityItemType.Cloak)
                         {
                             if (TempStatistic >= 2)
                             {
@@ -207,7 +207,7 @@ namespace Trinity
                         }
 
                         // Pants
-                        if (itemType == GItemType.Legs)
+                        if (itemType == TinityItemType.Legs)
                         {
                             if (TempStatistic >= 2)
                             {
@@ -217,14 +217,14 @@ namespace Trinity
                         }
 
                         // Helmets can have a bonus for a socket since it gives amazing MF/GF
-                        if (TempStatistic >= 1 && (itemType == GItemType.Helm || itemType == GItemType.WizardHat || itemType == GItemType.VoodooMask ||
-                            itemType == GItemType.SpiritStone))
+                        if (TempStatistic >= 1 && (itemType == TinityItemType.Helm || itemType == TinityItemType.WizardHat || itemType == TinityItemType.VoodooMask ||
+                            itemType == TinityItemType.SpiritStone))
                         {
                             SocketsCanReplacePrimaries = true;
                         }
 
                         // And rings and amulets too
-                        if (TempStatistic >= 1 && (itemType == GItemType.Ring || itemType == GItemType.Amulet))
+                        if (TempStatistic >= 1 && (itemType == TinityItemType.Ring || itemType == TinityItemType.Amulet))
                         {
                             SocketsCanReplacePrimaries = true;
                         }
@@ -233,7 +233,7 @@ namespace Trinity
                     // Right, here's quite a long bit of code, but this is basically all about granting all sorts of bonuses based on primary stat values of all different ranges
 
                     // For all item types *EXCEPT* weapons
-                    if (baseItemType != GItemBaseType.WeaponRange && baseItemType != GItemBaseType.WeaponOneHand && baseItemType != GItemBaseType.WeaponTwoHand)
+                    if (baseItemType != TrinityItemBaseType.WeaponRange && baseItemType != TrinityItemBaseType.WeaponOneHand && baseItemType != TrinityItemBaseType.WeaponTwoHand)
                     {
                         double SpecialBonus = 0;
                         if (i > Constants.LIFEPERCENT)
@@ -258,13 +258,13 @@ namespace Trinity
                                     ((HadStat[Constants.STRENGTH] / ItemMaxStats[Constants.STRENGTH]) < (Constants.StatMinimumPrimary[i] + 0.1)) && ((HadStat[Constants.INTELLIGENCE] / ItemMaxStats[Constants.INTELLIGENCE]) < Constants.StatMinimumPrimary[i]) &&
                                     ((HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) < Constants.StatMinimumPrimary[i]) && (SafeLifePercentage < (Constants.StatMinimumPrimary[i] * 2.5)) && !SocketsCanReplacePrimaries)
                                 {
-                                    if (itemType != GItemType.Ring && itemType != GItemType.Amulet)
+                                    if (itemType != TinityItemType.Ring && itemType != TinityItemType.Amulet)
                                         FinalBonusGranted -= 0.4;
                                     else
                                         FinalBonusGranted -= 0.3;
 
                                     // And another 25% off for armor and all resist which are more useful with primaries, as long as not jewelry
-                                    if ((i == Constants.ARMOR || i == Constants.ALLRESIST || i == Constants.RANDOMRESIST) && itemType != GItemType.Ring && itemType != GItemType.Amulet && !SocketsCanReplacePrimaries)
+                                    if ((i == Constants.ARMOR || i == Constants.ALLRESIST || i == Constants.RANDOMRESIST) && itemType != TinityItemType.Ring && itemType != TinityItemType.Amulet && !SocketsCanReplacePrimaries)
                                         FinalBonusGranted -= 0.15;
                                 }
                             }
@@ -276,7 +276,7 @@ namespace Trinity
                                 {
 
                                     // So 35% off for all items except jewelry which is 20% off
-                                    if (itemType != GItemType.Ring && itemType != GItemType.Amulet)
+                                    if (itemType != TinityItemType.Ring && itemType != TinityItemType.Amulet)
                                     {
                                         FinalBonusGranted -= 0.35;
 
@@ -290,7 +290,7 @@ namespace Trinity
                                     }
                                 }
                             }
-                            if (baseItemType == GItemBaseType.Armor || baseItemType == GItemBaseType.Jewelry)
+                            if (baseItemType == TrinityItemBaseType.Armor || baseItemType == TrinityItemBaseType.Jewelry)
                             {
 
                                 // Grant a 50% bonus to stats if a primary is above 200 AND (vitality above 200 or life% within 90% max)
@@ -388,7 +388,7 @@ namespace Trinity
                                     if (0.03 > SpecialBonus) SpecialBonus = 0.03;
                                 }
                             }
-                            if (itemType == GItemType.Ring || itemType == GItemType.Amulet)
+                            if (itemType == TinityItemType.Ring || itemType == TinityItemType.Amulet)
                             {
                                 if ((HadStat[Constants.DEXTERITY] / ItemMaxStats[Constants.DEXTERITY]) > .4 || (HadStat[Constants.STRENGTH] / ItemMaxStats[Constants.STRENGTH]) > .4 || (HadStat[Constants.INTELLIGENCE] / ItemMaxStats[Constants.INTELLIGENCE]) > .4)
                                 {
@@ -435,7 +435,7 @@ namespace Trinity
                         // This stat is one after life percent stat
 
                         // Shields get less of a special bonus from high prime stats
-                        if (itemType == GItemType.Shield)
+                        if (itemType == TinityItemType.Shield)
                             SpecialBonus *= 0.7;
 
                         if (SpecialBonus > 0)
@@ -444,7 +444,7 @@ namespace Trinity
                         FinalBonusGranted += SpecialBonus;
                     }
 
-                    if (i == Constants.LIFESTEAL && itemType == GItemType.MightyBelt)
+                    if (i == Constants.LIFESTEAL && itemType == TinityItemType.MightyBelt)
                         FinalBonusGranted += 0.3;
 
                     if (i == Constants.TOTALDPS)
@@ -467,8 +467,8 @@ namespace Trinity
                         FinalBonusGranted += 0.2;
 
                     // Blue item point reduction for non-weapons
-                    if (item.Quality < ItemQuality.Rare4 && (baseItemType == GItemBaseType.Armor || baseItemType == GItemBaseType.Offhand ||
-                        baseItemType == GItemBaseType.Jewelry || baseItemType == GItemBaseType.FollowerItem) && ((TempStatistic / ItemMaxStats[i]) < 0.88))
+                    if (item.Quality < ItemQuality.Rare4 && (baseItemType == TrinityItemBaseType.Armor || baseItemType == TrinityItemBaseType.Offhand ||
+                        baseItemType == TrinityItemBaseType.Jewelry || baseItemType == TrinityItemBaseType.FollowerItem) && ((TempStatistic / ItemMaxStats[i]) < 0.88))
                         FinalBonusGranted -= 0.9;
 
                     // Special all-resist bonuses
@@ -476,7 +476,7 @@ namespace Trinity
                     {
 
                         // Shields with < 60% max all resist, lost some all resist score
-                        if (itemType == GItemType.Shield && (TempStatistic / ItemMaxStats[i]) <= 0.6)
+                        if (itemType == TinityItemType.Shield && (TempStatistic / ItemMaxStats[i]) <= 0.6)
                             FinalBonusGranted -= 0.30;
                         double iSpecialBonus = 0;
 
@@ -515,11 +515,11 @@ namespace Trinity
                     }
 
                     // All resist special bonuses
-                    if (itemType != GItemType.Ring && itemType != GItemType.Amulet)
+                    if (itemType != TinityItemType.Ring && itemType != TinityItemType.Amulet)
                     {
 
                         // Shields get 10% less on everything
-                        if (itemType == GItemType.Shield)
+                        if (itemType == TinityItemType.Shield)
                             FinalBonusGranted -= 0.10;
 
                         // Prime stat gets a 20% bonus if 50 from max possible
@@ -657,7 +657,7 @@ namespace Trinity
                     }
 
                     // And now for jewelry checks...
-                    if (itemType == GItemType.Ring || itemType == GItemType.Amulet)
+                    if (itemType == TinityItemType.Ring || itemType == TinityItemType.Amulet)
                     {
 
                         // Global bonus to everything if jewelry has an all resist above 50%
@@ -689,7 +689,7 @@ namespace Trinity
                             FinalBonusGranted += 0.2;
 
                         // Special stat handling stuff for jewelry
-                        if (itemType == GItemType.Ring)
+                        if (itemType == TinityItemType.Ring)
                         {
 
                             // Prime stat gets a 25% bonus if 30 from max possible
@@ -774,34 +774,34 @@ namespace Trinity
                     // All the "set to 0" checks now
 
                     // Disable specific primary stat scoring for certain class-specific item types
-                    if ((itemType == GItemType.VoodooMask || itemType == GItemType.WizardHat || itemType == GItemType.Wand ||
-                        itemType == GItemType.CeremonialKnife || itemType == GItemType.Mojo || itemType == GItemType.Orb)
+                    if ((itemType == TinityItemType.VoodooMask || itemType == TinityItemType.WizardHat || itemType == TinityItemType.Wand ||
+                        itemType == TinityItemType.CeremonialKnife || itemType == TinityItemType.Mojo || itemType == TinityItemType.Orb)
                         && (i == Constants.STRENGTH || i == Constants.DEXTERITY))
                         FinalBonusGranted = 0;
-                    if ((itemType == GItemType.Quiver || itemType == GItemType.HandCrossbow || itemType == GItemType.Cloak ||
-                        itemType == GItemType.SpiritStone || itemType == GItemType.TwoHandDaibo || itemType == GItemType.FistWeapon)
+                    if ((itemType == TinityItemType.Quiver || itemType == TinityItemType.HandCrossbow || itemType == TinityItemType.Cloak ||
+                        itemType == TinityItemType.SpiritStone || itemType == TinityItemType.TwoHandDaibo || itemType == TinityItemType.FistWeapon)
                         && (i == Constants.STRENGTH || i == Constants.INTELLIGENCE))
                         FinalBonusGranted = 0;
-                    if ((itemType == GItemType.MightyBelt || itemType == GItemType.MightyWeapon || itemType == GItemType.TwoHandMighty)
+                    if ((itemType == TinityItemType.MightyBelt || itemType == TinityItemType.MightyWeapon || itemType == TinityItemType.TwoHandMighty)
                         && (i == Constants.DEXTERITY || i == Constants.INTELLIGENCE))
                         FinalBonusGranted = 0;
 
                     // Remove unwanted follower stats for specific follower types
-                    if (itemType == GItemType.FollowerEnchantress && (i == Constants.STRENGTH || i == Constants.DEXTERITY))
+                    if (itemType == TinityItemType.FollowerEnchantress && (i == Constants.STRENGTH || i == Constants.DEXTERITY))
                         FinalBonusGranted = 0;
-                    if (itemType == GItemType.FollowerEnchantress && (i == Constants.INTELLIGENCE || i == Constants.VITALITY))
+                    if (itemType == TinityItemType.FollowerEnchantress && (i == Constants.INTELLIGENCE || i == Constants.VITALITY))
                         FinalBonusGranted -= 0.4;
-                    if (itemType == GItemType.FollowerScoundrel && (i == Constants.STRENGTH || i == Constants.INTELLIGENCE))
+                    if (itemType == TinityItemType.FollowerScoundrel && (i == Constants.STRENGTH || i == Constants.INTELLIGENCE))
                         FinalBonusGranted = 0;
-                    if (itemType == GItemType.FollowerScoundrel && (i == Constants.DEXTERITY || i == Constants.VITALITY))
+                    if (itemType == TinityItemType.FollowerScoundrel && (i == Constants.DEXTERITY || i == Constants.VITALITY))
                         FinalBonusGranted -= 0.4;
-                    if (itemType == GItemType.FollowerTemplar && (i == Constants.DEXTERITY || i == Constants.INTELLIGENCE))
+                    if (itemType == TinityItemType.FollowerTemplar && (i == Constants.DEXTERITY || i == Constants.INTELLIGENCE))
                         FinalBonusGranted = 0;
-                    if (itemType == GItemType.FollowerTemplar && (i == Constants.STRENGTH || i == Constants.VITALITY))
+                    if (itemType == TinityItemType.FollowerTemplar && (i == Constants.STRENGTH || i == Constants.VITALITY))
                         FinalBonusGranted -= 0.4;
 
                     // Attack speed is always on a quiver so forget it
-                    if ((itemType == GItemType.Quiver) && (i == Constants.ATTACKSPEED))
+                    if ((itemType == TinityItemType.Quiver) && (i == Constants.ATTACKSPEED))
                         FinalBonusGranted = 0;
 
                     // Single resists worth nothing without all-resist
@@ -869,14 +869,14 @@ namespace Trinity
             TotalItemPoints *= GlobalMultiplier;
 
             // 2 handed weapons and ranged weapons lose a large score for low DPS
-            if (baseItemType == GItemBaseType.WeaponRange || baseItemType == GItemBaseType.WeaponTwoHand)
+            if (baseItemType == TrinityItemBaseType.WeaponRange || baseItemType == TrinityItemBaseType.WeaponTwoHand)
             {
                 if ((HadStat[Constants.TOTALDPS] / ItemMaxStats[Constants.TOTALDPS]) <= 0.7)
                     TotalItemPoints *= 0.75;
             }
 
             // Weapons should get a nice 15% bonus score for having very high primaries
-            if (baseItemType == GItemBaseType.WeaponRange || baseItemType == GItemBaseType.WeaponOneHand || baseItemType == GItemBaseType.WeaponTwoHand)
+            if (baseItemType == TrinityItemBaseType.WeaponRange || baseItemType == TrinityItemBaseType.WeaponOneHand || baseItemType == TrinityItemBaseType.WeaponTwoHand)
             {
                 if (HighestScoringPrimary > 0 && (HighestScoringPrimary >= ItemMaxPoints[WhichPrimaryIsHighest] * 0.9))
                 {
@@ -897,7 +897,7 @@ namespace Trinity
             }
 
             // Shields 
-            if (itemType == GItemType.Shield)
+            if (itemType == TinityItemType.Shield)
             {
 
                 // Strength/Dex based shield calculations
@@ -922,7 +922,7 @@ namespace Trinity
             }
 
             // Quivers
-            if (itemType == GItemType.Quiver)
+            if (itemType == TinityItemType.Quiver)
             {
                 TotalRequirements = 0;
                 if (HadStat[Constants.DEXTERITY] >= 100)
@@ -964,7 +964,7 @@ namespace Trinity
             }
 
             // Mojos and Sources
-            if (itemType == GItemType.Orb || itemType == GItemType.Mojo)
+            if (itemType == TinityItemType.Orb || itemType == TinityItemType.Mojo)
             {
                 TotalRequirements = 0;
                 if (HadStat[Constants.INTELLIGENCE] >= 100)
@@ -1014,15 +1014,15 @@ namespace Trinity
             }
 
             // Chests/cloaks/pants without a socket lose 17% of total score
-            if ((itemType == GItemType.Chest || itemType == GItemType.Cloak || itemType == GItemType.Legs) && HadStat[Constants.SOCKETS] == 0)
+            if ((itemType == TinityItemType.Chest || itemType == TinityItemType.Cloak || itemType == TinityItemType.Legs) && HadStat[Constants.SOCKETS] == 0)
                 TotalItemPoints *= 0.83;
 
             // Boots with no movement speed get reduced score
-            if ((itemType == GItemType.Boots) && HadStat[Constants.MOVEMENTSPEED] <= 6)
+            if ((itemType == TinityItemType.Boots) && HadStat[Constants.MOVEMENTSPEED] <= 6)
                 TotalItemPoints *= 0.75;
 
             // Helmets
-            if (itemType == GItemType.Helm || itemType == GItemType.WizardHat || itemType == GItemType.VoodooMask || itemType == GItemType.SpiritStone)
+            if (itemType == TinityItemType.Helm || itemType == TinityItemType.WizardHat || itemType == TinityItemType.VoodooMask || itemType == TinityItemType.SpiritStone)
             {
                 // Helmets without a socket lose 20% of total score, and most of any MF/GF bonus
                 if (HadStat[Constants.SOCKETS] == 0)
@@ -1057,13 +1057,13 @@ namespace Trinity
             TownRun.JunkItemStatString = "";
         }
 
-        private static void CheckForInvalidItemType(GItemType itemType)
+        private static void CheckForInvalidItemType(TinityItemType itemType)
         {
             // One Handed Weapons 
-            if (itemType == GItemType.Axe || itemType == GItemType.CeremonialKnife || itemType == GItemType.Dagger ||
-                 itemType == GItemType.FistWeapon || itemType == GItemType.Mace || itemType == GItemType.MightyWeapon ||
-                 itemType == GItemType.Spear || itemType == GItemType.Sword || itemType == GItemType.Wand ||
-                 itemType == GItemType.HandCrossbow)
+            if (itemType == TinityItemType.Axe || itemType == TinityItemType.CeremonialKnife || itemType == TinityItemType.Dagger ||
+                 itemType == TinityItemType.FistWeapon || itemType == TinityItemType.Mace || itemType == TinityItemType.MightyWeapon ||
+                 itemType == TinityItemType.Spear || itemType == TinityItemType.Sword || itemType == TinityItemType.Wand ||
+                 itemType == TinityItemType.HandCrossbow)
             {
                 Array.Copy(Constants.MaxPointsWeaponOneHand, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.WeaponPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
@@ -1071,10 +1071,10 @@ namespace Trinity
             }
 
             // Two Handed Weapons
-            if (itemType == GItemType.TwoHandAxe || itemType == GItemType.TwoHandDaibo || itemType == GItemType.TwoHandMace ||
-                itemType == GItemType.TwoHandMighty || itemType == GItemType.TwoHandPolearm || itemType == GItemType.TwoHandStaff ||
-                itemType == GItemType.TwoHandSword ||
-                itemType == GItemType.TwoHandCrossbow || itemType == GItemType.TwoHandBow)
+            if (itemType == TinityItemType.TwoHandAxe || itemType == TinityItemType.TwoHandDaibo || itemType == TinityItemType.TwoHandMace ||
+                itemType == TinityItemType.TwoHandMighty || itemType == TinityItemType.TwoHandPolearm || itemType == TinityItemType.TwoHandStaff ||
+                itemType == TinityItemType.TwoHandSword ||
+                itemType == TinityItemType.TwoHandCrossbow || itemType == TinityItemType.TwoHandBow)
             {
                 Array.Copy(Constants.MaxPointsWeaponTwoHand, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.WeaponPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
@@ -1083,7 +1083,7 @@ namespace Trinity
             // Off-handed stuff
 
             // Mojo, Source, Quiver
-            if (itemType == GItemType.Mojo || itemType == GItemType.Orb || itemType == GItemType.Quiver)
+            if (itemType == TinityItemType.Mojo || itemType == TinityItemType.Orb || itemType == TinityItemType.Quiver)
             {
                 Array.Copy(Constants.MaxPointsOffHand, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
@@ -1091,7 +1091,7 @@ namespace Trinity
             }
 
             // Shields
-            if (itemType == GItemType.Shield)
+            if (itemType == TinityItemType.Shield)
             {
                 Array.Copy(Constants.MaxPointsShield, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
@@ -1101,7 +1101,7 @@ namespace Trinity
             // Jewelry
 
             // Ring
-            if (itemType == GItemType.Amulet)
+            if (itemType == TinityItemType.Amulet)
             {
                 Array.Copy(Constants.MaxPointsAmulet, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.JewelryPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
@@ -1109,7 +1109,7 @@ namespace Trinity
             }
 
             // Ring
-            if (itemType == GItemType.Ring)
+            if (itemType == TinityItemType.Ring)
             {
                 Array.Copy(Constants.MaxPointsRing, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.JewelryPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
@@ -1119,7 +1119,7 @@ namespace Trinity
             // Armor
 
             // Belt
-            if (itemType == GItemType.Belt)
+            if (itemType == TinityItemType.Belt)
             {
                 Array.Copy(Constants.MaxPointsBelt, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
@@ -1127,7 +1127,7 @@ namespace Trinity
             }
 
             // Boots
-            if (itemType == GItemType.Boots)
+            if (itemType == TinityItemType.Boots)
             {
                 Array.Copy(Constants.MaxPointsBoots, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
@@ -1135,7 +1135,7 @@ namespace Trinity
             }
 
             // Bracers
-            if (itemType == GItemType.Bracer)
+            if (itemType == TinityItemType.Bracer)
             {
                 Array.Copy(Constants.MaxPointsBracer, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
@@ -1143,13 +1143,13 @@ namespace Trinity
             }
 
             // Chest
-            if (itemType == GItemType.Chest)
+            if (itemType == TinityItemType.Chest)
             {
                 Array.Copy(Constants.MaxPointsChest, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
                 IsInvalidItem = false;
             }
-            if (itemType == GItemType.Cloak)
+            if (itemType == TinityItemType.Cloak)
             {
                 Array.Copy(Constants.MaxPointsCloak, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
@@ -1157,7 +1157,7 @@ namespace Trinity
             }
 
             // Gloves
-            if (itemType == GItemType.Gloves)
+            if (itemType == TinityItemType.Gloves)
             {
                 Array.Copy(Constants.MaxPointsGloves, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
@@ -1165,7 +1165,7 @@ namespace Trinity
             }
 
             // Helm
-            if (itemType == GItemType.Helm)
+            if (itemType == TinityItemType.Helm)
             {
                 Array.Copy(Constants.MaxPointsHelm, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
@@ -1173,13 +1173,13 @@ namespace Trinity
             }
 
             // Pants
-            if (itemType == GItemType.Legs)
+            if (itemType == TinityItemType.Legs)
             {
                 Array.Copy(Constants.MaxPointsPants, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
                 IsInvalidItem = false;
             }
-            if (itemType == GItemType.MightyBelt)
+            if (itemType == TinityItemType.MightyBelt)
             {
                 Array.Copy(Constants.MaxPointsMightyBelt, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
@@ -1187,19 +1187,19 @@ namespace Trinity
             }
 
             // Shoulders
-            if (itemType == GItemType.Shoulder)
+            if (itemType == TinityItemType.Shoulder)
             {
                 Array.Copy(Constants.MaxPointsShoulders, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
                 IsInvalidItem = false;
             }
-            if (itemType == GItemType.SpiritStone)
+            if (itemType == TinityItemType.SpiritStone)
             {
                 Array.Copy(Constants.MaxPointsSpiritStone, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
                 IsInvalidItem = false;
             }
-            if (itemType == GItemType.VoodooMask)
+            if (itemType == TinityItemType.VoodooMask)
             {
                 Array.Copy(Constants.MaxPointsVoodooMask, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
@@ -1207,7 +1207,7 @@ namespace Trinity
             }
 
             // Wizard Hat
-            if (itemType == GItemType.WizardHat)
+            if (itemType == TinityItemType.WizardHat)
             {
                 Array.Copy(Constants.MaxPointsWizardHat, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
@@ -1215,7 +1215,7 @@ namespace Trinity
             }
 
             // Follower Items
-            if (itemType == GItemType.FollowerEnchantress || itemType == GItemType.FollowerScoundrel || itemType == GItemType.FollowerTemplar)
+            if (itemType == TinityItemType.FollowerEnchantress || itemType == TinityItemType.FollowerScoundrel || itemType == TinityItemType.FollowerTemplar)
             {
                 Array.Copy(Constants.MaxPointsFollower, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.JewelryPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
@@ -1227,7 +1227,7 @@ namespace Trinity
         /// Define Special Reductions
         /// </summary>
         /// <param name="itemType"></param>
-        private static void GetBestFinalPoints(GItemType itemType)
+        private static void GetBestFinalPoints(TinityItemType itemType)
         {
             // Gold-find and pickup radius combined
             if ((HadStat[Constants.GOLDFIND] / ItemMaxStats[Constants.GOLDFIND] > 0.55) && (HadStat[Constants.PICKUPRADIUS] / ItemMaxStats[Constants.PICKUPRADIUS] > 0.5))
@@ -1240,7 +1240,7 @@ namespace Trinity
             // Special crit hit/crit chance/attack speed combos a.k.a Trifecta!
             if ((HadStat[Constants.CRITCHANCE] > (ItemMaxStats[Constants.CRITCHANCE] * 0.8)) && (HadStat[Constants.CRITDAMAGE] > (ItemMaxStats[Constants.CRITDAMAGE] * 0.8)) && (HadStat[Constants.ATTACKSPEED] > (ItemMaxStats[Constants.ATTACKSPEED] * 0.8)))
             {
-                if (BestFinalBonus < 3.2 && itemType != GItemType.Quiver)
+                if (BestFinalBonus < 3.2 && itemType != TinityItemType.Quiver)
                     BestFinalBonus = 3.2;
             }
 
@@ -1256,13 +1256,13 @@ namespace Trinity
             // 80% of crit chance, 80% of attack speed of max for item
             if ((HadStat[Constants.CRITCHANCE] > (ItemMaxStats[Constants.CRITCHANCE] * 0.8)) && (HadStat[Constants.ATTACKSPEED] > (ItemMaxStats[Constants.ATTACKSPEED] * 0.8)))
             {
-                if (BestFinalBonus < 2.1 && itemType != GItemType.Quiver)
+                if (BestFinalBonus < 2.1 && itemType != TinityItemType.Quiver)
                     BestFinalBonus = 2.1;
             }
             // 80% of crit damage, 80% of attack speed of max for item
             if ((HadStat[Constants.CRITDAMAGE] > (ItemMaxStats[Constants.CRITDAMAGE] * 0.8)) && (HadStat[Constants.ATTACKSPEED] > (ItemMaxStats[Constants.ATTACKSPEED] * 0.8)))
             {
-                if (BestFinalBonus < 1.8 && itemType != GItemType.Quiver)
+                if (BestFinalBonus < 1.8 && itemType != TinityItemType.Quiver)
                     BestFinalBonus = 1.8;
             }
             /*
@@ -1271,7 +1271,7 @@ namespace Trinity
             // 65% crit chance, 65% crit damage, 65% attack speed of max for item
             if ((HadStat[Constants.CRITCHANCE] > (ItemMaxStats[Constants.CRITCHANCE] * 0.65)) && (HadStat[Constants.CRITDAMAGE] > (ItemMaxStats[Constants.CRITDAMAGE] * 0.65)) && (HadStat[Constants.ATTACKSPEED] > (ItemMaxStats[Constants.ATTACKSPEED] * 0.65)))
             {
-                if (BestFinalBonus < 2.1 && itemType != GItemType.Quiver)
+                if (BestFinalBonus < 2.1 && itemType != TinityItemType.Quiver)
                     BestFinalBonus = 2.1;
             }
             // 65% crit chance, 65% crit damage
@@ -1282,13 +1282,13 @@ namespace Trinity
             // 65% crit chance, 65% attack speed of max for item
             if ((HadStat[Constants.CRITCHANCE] > (ItemMaxStats[Constants.CRITCHANCE] * 0.65)) && (HadStat[Constants.ATTACKSPEED] > (ItemMaxStats[Constants.ATTACKSPEED] * 0.65)))
             {
-                if (BestFinalBonus < 1.7 && itemType != GItemType.Quiver)
+                if (BestFinalBonus < 1.7 && itemType != TinityItemType.Quiver)
                     BestFinalBonus = 1.7;
             }
             // 65% crit damage, 65% attack speed of max for item
             if ((HadStat[Constants.CRITDAMAGE] > (ItemMaxStats[Constants.CRITDAMAGE] * 0.65)) && (HadStat[Constants.ATTACKSPEED] > (ItemMaxStats[Constants.ATTACKSPEED] * 0.65)))
             {
-                if (BestFinalBonus < 1.5 && itemType != GItemType.Quiver)
+                if (BestFinalBonus < 1.5 && itemType != TinityItemType.Quiver)
                     BestFinalBonus = 1.5;
             }
             /*
@@ -1297,7 +1297,7 @@ namespace Trinity
             // 45% crit chance, 45% crit damage, 45% attack speed of max for item
             if ((HadStat[Constants.CRITCHANCE] > (ItemMaxStats[Constants.CRITCHANCE] * 0.45)) && (HadStat[Constants.CRITDAMAGE] > (ItemMaxStats[Constants.CRITDAMAGE] * 0.45)) && (HadStat[Constants.ATTACKSPEED] > (ItemMaxStats[Constants.ATTACKSPEED] * 0.45)))
             {
-                if (BestFinalBonus < 1.7 && itemType != GItemType.Quiver)
+                if (BestFinalBonus < 1.7 && itemType != TinityItemType.Quiver)
                     BestFinalBonus = 1.7;
             }
             // 45% crit chance, 45% crit damage, 45% attack speed of max for item
@@ -1308,13 +1308,13 @@ namespace Trinity
             // 45% crit chance, 45% attack speed of max for item
             if ((HadStat[Constants.CRITCHANCE] > (ItemMaxStats[Constants.CRITCHANCE] * 0.45)) && (HadStat[Constants.ATTACKSPEED] > (ItemMaxStats[Constants.ATTACKSPEED] * 0.45)))
             {
-                if (BestFinalBonus < 1.3 && itemType != GItemType.Quiver)
+                if (BestFinalBonus < 1.3 && itemType != TinityItemType.Quiver)
                     BestFinalBonus = 1.3;
             }
             // 45% crit damage, 45% attack speed of max for item
             if ((HadStat[Constants.CRITDAMAGE] > (ItemMaxStats[Constants.CRITDAMAGE] * 0.45)) && (HadStat[Constants.ATTACKSPEED] > (ItemMaxStats[Constants.ATTACKSPEED] * 0.45)))
             {
-                if (BestFinalBonus < 1.1 && itemType != GItemType.Quiver)
+                if (BestFinalBonus < 1.1 && itemType != TinityItemType.Quiver)
                     BestFinalBonus = 1.1;
             }
         }
@@ -1389,18 +1389,18 @@ namespace Trinity
         /// <summary>
         ///     Checks if score of item is suffisant for throw notification.
         /// </summary>
-        public static bool CheckScoreForNotification(GItemBaseType itemBaseType, double itemValue)
+        public static bool CheckScoreForNotification(TrinityItemBaseType itemBaseType, double itemValue)
         {
             switch (itemBaseType)
             {
-                case GItemBaseType.WeaponOneHand:
-                case GItemBaseType.WeaponRange:
-                case GItemBaseType.WeaponTwoHand:
+                case TrinityItemBaseType.WeaponOneHand:
+                case TrinityItemBaseType.WeaponRange:
+                case TrinityItemBaseType.WeaponTwoHand:
                     return (itemValue >= Trinity.Settings.Notification.WeaponScore);
-                case GItemBaseType.Armor:
-                case GItemBaseType.Offhand:
+                case TrinityItemBaseType.Armor:
+                case TrinityItemBaseType.Offhand:
                     return (itemValue >= Trinity.Settings.Notification.ArmorScore);
-                case GItemBaseType.Jewelry:
+                case TrinityItemBaseType.Jewelry:
                     return (itemValue >= Trinity.Settings.Notification.JewelryScore);
             }
             return false;

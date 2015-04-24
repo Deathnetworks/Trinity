@@ -251,7 +251,7 @@ namespace Trinity
                      (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                      u.RadiusDistance <= maxRange &&
                      u.NearbyUnitsWithinDistance(aoe_radius) >= count
-                     orderby u.Type != GObjectType.HealthGlobe && u.Type != GObjectType.PowerGlobe,
+                     orderby u.Type != TrinityObjectType.HealthGlobe && u.Type != TrinityObjectType.PowerGlobe,
                      u.NearbyUnitsWithinDistance(aoe_radius),
                      u.Distance descending
                      select u).ToList();
@@ -285,7 +285,7 @@ namespace Trinity
             Vector3 bestClusterPoint;
             var clusterUnits =
                 (from u in ObjectCache
-                 where u.Type == GObjectType.HealthGlobe &&
+                 where u.Type == TrinityObjectType.HealthGlobe &&
                  (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                  u.RadiusDistance <= maxRange
                  orderby u.NearbyUnitsWithinDistance(radius),
@@ -319,7 +319,7 @@ namespace Trinity
             Vector3 bestClusterPoint;
             var clusterUnits =
                 (from u in ObjectCache
-                 where u.Type == GObjectType.PowerGlobe &&
+                 where u.Type == TrinityObjectType.PowerGlobe &&
                  (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                  u.RadiusDistance <= maxRange
                  orderby u.NearbyUnitsWithinDistance(radius),
@@ -342,7 +342,7 @@ namespace Trinity
         {
             var clusterCheck =
                 (from u in ObjectCache
-                 where u.Type == GObjectType.HealthGlobe && !UnitOrPathInAoE(u) &&
+                 where u.Type == TrinityObjectType.HealthGlobe && !UnitOrPathInAoE(u) &&
                  u.RadiusDistance <= radius
                  select u).Any();
 
@@ -358,7 +358,7 @@ namespace Trinity
         {
             var clusterCheck =
                 (from u in ObjectCache
-                 where u.Type == GObjectType.PowerGlobe && !UnitOrPathInAoE(u) &&
+                 where u.Type == TrinityObjectType.PowerGlobe && !UnitOrPathInAoE(u) &&
                  u.RadiusDistance <= radius
                  select u).Any();
 
@@ -426,18 +426,18 @@ namespace Trinity
                 case ActorClass.Barbarian:
                     includeHealthGlobes = CombatBase.Hotbar.Contains(SNOPower.Barbarian_Whirlwind) &&
                                           Trinity.Settings.Combat.Misc.CollectHealthGlobe &&
-                                          ObjectCache.Any(g => g.Type == GObjectType.HealthGlobe && g.Weight > 0);
+                                          ObjectCache.Any(g => g.Type == TrinityObjectType.HealthGlobe && g.Weight > 0);
                     break;
             }
 
             Vector3 bestClusterPoint;
             var clusterUnits =
                 (from u in ObjectCache
-                 where (u.IsUnit || (includeHealthGlobes && u.Type == GObjectType.HealthGlobe)) &&
+                 where (u.IsUnit || (includeHealthGlobes && u.Type == TrinityObjectType.HealthGlobe)) &&
                  ((useWeights && u.Weight > 0) || !useWeights) &&
                  (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                  u.RadiusDistance <= maxRange
-                 orderby u.Type != GObjectType.HealthGlobe, // if it's a globe this will be false and sorted at the top
+                 orderby u.Type != TrinityObjectType.HealthGlobe, // if it's a globe this will be false and sorted at the top
                  u.IsTrashMob,
                  u.NearbyUnitsWithinDistance(radius) descending,
                  u.Distance,
@@ -1074,18 +1074,18 @@ namespace Trinity
                 case ActorClass.Barbarian:
                     includeHealthGlobes = CombatBase.Hotbar.Contains(SNOPower.Barbarian_Whirlwind) &&
                                           Trinity.Settings.Combat.Misc.CollectHealthGlobe &&
-                                          ObjectCache.Any(g => g.Type == GObjectType.HealthGlobe && g.Weight > 0);
+                                          ObjectCache.Any(g => g.Type == TrinityObjectType.HealthGlobe && g.Weight > 0);
                     break;
             }
 
             Vector3 bestClusterPoint;
             var clusterUnits =
                 (from u in ObjectCache
-                 where (u.IsUnit || (includeHealthGlobes && u.Type == GObjectType.HealthGlobe)) &&
+                 where (u.IsUnit || (includeHealthGlobes && u.Type == TrinityObjectType.HealthGlobe)) &&
                  ((useWeights && u.Weight > 0) || !useWeights) &&
                  (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                  u.RadiusDistance <= maxRange && u.Distance >= procDistance
-                 orderby u.Type != GObjectType.HealthGlobe, // if it's a globe this will be false and sorted at the top
+                 orderby u.Type != TrinityObjectType.HealthGlobe, // if it's a globe this will be false and sorted at the top
                   !u.IsBossOrEliteRareUnique,
                   u.NearbyUnitsWithinDistance(radius) descending,
                   u.Distance,

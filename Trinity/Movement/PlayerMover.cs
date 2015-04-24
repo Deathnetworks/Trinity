@@ -498,7 +498,7 @@ namespace Trinity.DbProvider
 
                 // Whirlwind for Bul-Kathos Sword Set D3 2.2.0
                 if (CombatBase.CanCast(SNOPower.Barbarian_Whirlwind) && Trinity.Player.PrimaryResource > 10 && Sets.BulKathossOath.IsFullyEquipped
-                    && !(CurrentTarget != null && CurrentTarget.Type == GObjectType.Item && CurrentTarget.Distance < 10f))
+                    && !(CurrentTarget != null && CurrentTarget.Type == TrinityObjectType.Item && CurrentTarget.Distance < 10f))
                 {
                     Skills.Barbarian.Whirlwind.Cast(destination);
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))

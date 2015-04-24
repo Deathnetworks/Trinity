@@ -30,8 +30,8 @@ namespace Trinity
             bool openResplendentChest = CurrentCacheObject.InternalName.ToLower().Contains("chest_rare");
 
             // Ignore it if it's not in range yet, except shrines, pools of reflection and resplendent chests if we're opening chests
-            if ((CurrentCacheObject.RadiusDistance > CurrentBotLootRange || CurrentCacheObject.RadiusDistance > 50) && CurrentCacheObject.Type != GObjectType.HealthWell &&
-                CurrentCacheObject.Type != GObjectType.Shrine && CurrentCacheObject.RActorGuid != LastTargetRactorGUID)
+            if ((CurrentCacheObject.RadiusDistance > CurrentBotLootRange || CurrentCacheObject.RadiusDistance > 50) && CurrentCacheObject.Type != TrinityObjectType.HealthWell &&
+                CurrentCacheObject.Type != TrinityObjectType.Shrine && CurrentCacheObject.RActorGuid != LastTargetRactorGUID)
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "NotInRange";
@@ -157,7 +157,7 @@ namespace Trinity
             bool gizmoUsed = false;
             switch (CurrentCacheObject.Type)
             {
-                case GObjectType.Door:
+                case TrinityObjectType.Door:
                     {
                         AddToCache = true;
 
@@ -271,7 +271,7 @@ namespace Trinity
                         }
                     }
                     break;
-                case GObjectType.Interactable:
+                case TrinityObjectType.Interactable:
                     {
                         AddToCache = true;
 
@@ -317,7 +317,7 @@ namespace Trinity
                         CurrentCacheObject.Radius = c_diaObject.CollisionSphere.Radius;
                     }
                     break;
-                case GObjectType.HealthWell:
+                case TrinityObjectType.HealthWell:
                     {
                         AddToCache = true;
                         try
@@ -371,8 +371,8 @@ namespace Trinity
 
                     }
                     break;
-                case GObjectType.CursedShrine:
-                case GObjectType.Shrine:
+                case TrinityObjectType.CursedShrine:
+                case TrinityObjectType.Shrine:
                     {
                         AddToCache = true;
                         // Shrines
@@ -532,7 +532,7 @@ namespace Trinity
                         CurrentCacheObject.Radius = 4f;
                         break;
                     }
-                case GObjectType.Barricade:
+                case TrinityObjectType.Barricade:
                     {
                         AddToCache = true;
 
@@ -627,7 +627,7 @@ namespace Trinity
 
                         break;
                     }
-                case GObjectType.Destructible:
+                case TrinityObjectType.Destructible:
                     {
                         AddToCache = true;
 
@@ -782,8 +782,8 @@ namespace Trinity
 
                         break;
                     }
-                case GObjectType.CursedChest:
-                case GObjectType.Container:
+                case TrinityObjectType.CursedChest:
+                case TrinityObjectType.Container:
                     {
                         AddToCache = false;
 

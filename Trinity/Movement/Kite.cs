@@ -147,7 +147,7 @@ namespace Trinity
                         CurrentTarget = new TrinityCacheObject()
                         {
                             Position = vAnySafePoint,
-                            Type = GObjectType.Avoidance,
+                            Type = TrinityObjectType.Avoidance,
                             Weight = 90000,
                             Distance = Vector3.Distance(Player.Position, vAnySafePoint),
                             Radius = 2f,

@@ -170,15 +170,15 @@ namespace Trinity.Items
 
             CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
             // Now look for Misc items we might want to keep
-            GItemType tItemType = cItem.TrinityItemType; // DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
-            GItemBaseType tBaseType = cItem.TrinityItemBaseType; // DetermineBaseType(trinityItemType);
+            TinityItemType tItemType = cItem.TrinityItemType; // DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
+            TrinityItemBaseType tBaseType = cItem.TrinityItemBaseType; // DetermineBaseType(trinityItemType);
 
-            bool isEquipment = (tBaseType == GItemBaseType.Armor ||
-                tBaseType == GItemBaseType.Jewelry ||
-                tBaseType == GItemBaseType.Offhand ||
-                tBaseType == GItemBaseType.WeaponOneHand ||
-                tBaseType == GItemBaseType.WeaponRange ||
-                tBaseType == GItemBaseType.WeaponTwoHand);
+            bool isEquipment = (tBaseType == TrinityItemBaseType.Armor ||
+                tBaseType == TrinityItemBaseType.Jewelry ||
+                tBaseType == TrinityItemBaseType.Offhand ||
+                tBaseType == TrinityItemBaseType.WeaponOneHand ||
+                tBaseType == TrinityItemBaseType.WeaponRange ||
+                tBaseType == TrinityItemBaseType.WeaponTwoHand);
 
             if (Trinity.Settings.Loot.TownRun.ApplyPickupValidationToStashing)
             {
@@ -202,7 +202,7 @@ namespace Trinity.Items
                 return true;
             }
 
-            if (cItem.TrinityItemType == GItemType.HoradricCache && Trinity.Settings.Loot.TownRun.OpenHoradricCaches)
+            if (cItem.TrinityItemType == TinityItemType.HoradricCache && Trinity.Settings.Loot.TownRun.OpenHoradricCaches)
             {
                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] = (ignoring Horadric Cache)", cItem.RealName, cItem.InternalName);
                 return false;
@@ -215,13 +215,13 @@ namespace Trinity.Items
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] = (autokeep unidentified items)", cItem.RealName, cItem.InternalName);
                 return true;
             }
-            if (tItemType == GItemType.StaffOfHerding)
+            if (tItemType == TinityItemType.StaffOfHerding)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
                     Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep staff of herding)", cItem.RealName, cItem.InternalName, tItemType);
                 return true;
             }
-            if (tItemType == GItemType.CraftingMaterial)
+            if (tItemType == TinityItemType.CraftingMaterial)
             {
                 var craftMaterialType = GetCraftingMaterialType(cItem);
                 if (evaluationType == ItemEvaluationType.Keep && craftMaterialType != CraftingMaterialType.Unknown)
@@ -263,26 +263,26 @@ namespace Trinity.Items
                 return true;
             }
 
-            if (tItemType == GItemType.Emerald || tItemType == GItemType.Amethyst || tItemType == GItemType.Topaz || tItemType == GItemType.Ruby || tItemType == GItemType.Diamond)
+            if (tItemType == TinityItemType.Emerald || tItemType == TinityItemType.Amethyst || tItemType == TinityItemType.Topaz || tItemType == TinityItemType.Ruby || tItemType == TinityItemType.Diamond)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
                     Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, tItemType);
                 return true;
             }
-            if (tItemType == GItemType.CraftTome)
+            if (tItemType == TinityItemType.CraftTome)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
                     Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep tomes)", cItem.RealName, cItem.InternalName, tItemType);
                 return true;
             }
-            if (tItemType == GItemType.InfernalKey)
+            if (tItemType == TinityItemType.InfernalKey)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep infernal key)", cItem.RealName, cItem.InternalName, tItemType);
                 return true;
             }
 
-            if (tItemType == GItemType.HealthPotion && item.ItemQualityLevel >= ItemQuality.Legendary)
+            if (tItemType == TinityItemType.HealthPotion && item.ItemQualityLevel >= ItemQuality.Legendary)
             {
                 var shouldStash = Trinity.Settings.Loot.TownRun.StashLegendaryPotions;
                 if (evaluationType == ItemEvaluationType.Keep)
@@ -291,28 +291,28 @@ namespace Trinity.Items
                 return shouldStash;
             }
 
-            if (tItemType == GItemType.HealthPotion && item.ItemQualityLevel < ItemQuality.Legendary)
+            if (tItemType == TinityItemType.HealthPotion && item.ItemQualityLevel < ItemQuality.Legendary)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
                     Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (ignoring potions)", cItem.RealName, cItem.InternalName, tItemType);
                 return false;
             }
 
-            if (tItemType == GItemType.CraftingPlan && cItem.Quality >= ItemQuality.Legendary)
+            if (tItemType == TinityItemType.CraftingPlan && cItem.Quality >= ItemQuality.Legendary)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendary plans)", cItem.RealName, cItem.InternalName, tItemType);
                 return true;
             }
 
-            if (tItemType == GItemType.ConsumableAddSockets)
+            if (tItemType == TinityItemType.ConsumableAddSockets)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep Ramaladni's Gift)", cItem.RealName, cItem.InternalName, tItemType);
                 return true;
             }
 
-            if (tItemType == GItemType.TieredLootrunKey)
+            if (tItemType == TinityItemType.TieredLootrunKey)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (ignoring Tiered Rift Keys)", cItem.RealName, cItem.InternalName, tItemType);
@@ -337,7 +337,7 @@ namespace Trinity.Items
                 }
             }
 
-            if (tItemType == GItemType.CraftingPlan)
+            if (tItemType == TinityItemType.CraftingPlan)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep plans)", cItem.RealName, cItem.InternalName, tItemType);
@@ -351,7 +351,7 @@ namespace Trinity.Items
                 return true;
             }
             // Else auto-trash
-            if (cItem.Quality <= ItemQuality.Superior && (isEquipment || cItem.TrinityItemBaseType == GItemBaseType.FollowerItem))
+            if (cItem.Quality <= ItemQuality.Superior && (isEquipment || cItem.TrinityItemBaseType == TrinityItemBaseType.FollowerItem))
             {
                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (trash whites)", cItem.RealName, cItem.InternalName, tItemType);
                 return false;
@@ -364,14 +364,14 @@ namespace Trinity.Items
                 return true;
             }
             // Else auto trash
-            if (cItem.Quality >= ItemQuality.Magic1 && cItem.Quality <= ItemQuality.Magic3 && (isEquipment || cItem.TrinityItemBaseType == GItemBaseType.FollowerItem))
+            if (cItem.Quality >= ItemQuality.Magic1 && cItem.Quality <= ItemQuality.Magic3 && (isEquipment || cItem.TrinityItemBaseType == TrinityItemBaseType.FollowerItem))
             {
                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (trashing blues)", cItem.RealName, cItem.InternalName, tItemType);
                 return false;
             }
 
             // Force salvage Rares
-            if (Trinity.Settings.Loot.TownRun.ForceSalvageRares && cItem.Quality >= ItemQuality.Rare4 && cItem.Quality <= ItemQuality.Rare6 && (isEquipment || cItem.TrinityItemBaseType == GItemBaseType.FollowerItem))
+            if (Trinity.Settings.Loot.TownRun.ForceSalvageRares && cItem.Quality >= ItemQuality.Rare4 && cItem.Quality <= ItemQuality.Rare6 && (isEquipment || cItem.TrinityItemBaseType == TrinityItemBaseType.FollowerItem))
             {
                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (force salvage rare)", cItem.RealName, cItem.InternalName, tItemType);
                 return false;
@@ -478,19 +478,19 @@ namespace Trinity.Items
 
             switch (cItem.TrinityItemBaseType)
             {
-                case GItemBaseType.WeaponRange:
-                case GItemBaseType.WeaponOneHand:
-                case GItemBaseType.WeaponTwoHand:
-                case GItemBaseType.Armor:
-                case GItemBaseType.Offhand:
+                case TrinityItemBaseType.WeaponRange:
+                case TrinityItemBaseType.WeaponOneHand:
+                case TrinityItemBaseType.WeaponTwoHand:
+                case TrinityItemBaseType.Armor:
+                case TrinityItemBaseType.Offhand:
                     return salvageOption == SalvageOption.Salvage;
-                case GItemBaseType.Jewelry:
+                case TrinityItemBaseType.Jewelry:
                     return salvageOption == SalvageOption.Salvage;
-                case GItemBaseType.FollowerItem:
+                case TrinityItemBaseType.FollowerItem:
                     return salvageOption == SalvageOption.Salvage;
-                case GItemBaseType.Gem:
-                case GItemBaseType.Misc:
-                case GItemBaseType.Unknown:
+                case TrinityItemBaseType.Gem:
+                case TrinityItemBaseType.Misc:
+                case TrinityItemBaseType.Unknown:
                     return false;
                 default:
                     return false;
@@ -535,22 +535,22 @@ namespace Trinity.Items
 
             switch (item.TrinityItemBaseType)
             {
-                case GItemBaseType.WeaponRange:
-                case GItemBaseType.WeaponOneHand:
-                case GItemBaseType.WeaponTwoHand:
-                case GItemBaseType.Armor:
-                case GItemBaseType.Offhand:
-                case GItemBaseType.Jewelry:
-                case GItemBaseType.FollowerItem:
+                case TrinityItemBaseType.WeaponRange:
+                case TrinityItemBaseType.WeaponOneHand:
+                case TrinityItemBaseType.WeaponTwoHand:
+                case TrinityItemBaseType.Armor:
+                case TrinityItemBaseType.Offhand:
+                case TrinityItemBaseType.Jewelry:
+                case TrinityItemBaseType.FollowerItem:
                     return true;
-                case GItemBaseType.Gem:
-                case GItemBaseType.Misc:
-                    if (item.TrinityItemType == GItemType.CraftingPlan)
+                case TrinityItemBaseType.Gem:
+                case TrinityItemBaseType.Misc:
+                    if (item.TrinityItemType == TinityItemType.CraftingPlan)
                         return true;
-                    if (item.TrinityItemType == GItemType.CraftingMaterial)
+                    if (item.TrinityItemType == TinityItemType.CraftingMaterial)
                         return true;
                     return false;
-                case GItemBaseType.Unknown:
+                case TrinityItemBaseType.Unknown:
                     return false;
             }
 
@@ -940,45 +940,45 @@ namespace Trinity.Items
         internal static bool PickupItemValidation(PickupItem item)
         {
             // Calculate item types and base types etc.
-            GItemType itemType = DetermineItemType(item.InternalName, item.DBItemType, item.ItemFollowerType);
-            GItemBaseType baseType = DetermineBaseType(itemType);
+            TinityItemType itemType = DetermineItemType(item.InternalName, item.DBItemType, item.ItemFollowerType);
+            TrinityItemBaseType baseType = DetermineBaseType(itemType);
 
             // Pickup Ramaladni's Gift
-            if (itemType == GItemType.ConsumableAddSockets)
+            if (itemType == TinityItemType.ConsumableAddSockets)
             {
                 return Trinity.Settings.Loot.Pickup.RamadalinisGift;
             }
 
             // Tiered Rift Keys
-            if (itemType == GItemType.TieredLootrunKey)
+            if (itemType == TinityItemType.TieredLootrunKey)
             {
                 return Trinity.Settings.Loot.Pickup.LootRunKey;
             }
 
             // Pickup Legendary potions
-            if (itemType == GItemType.HealthPotion && item.Quality >= ItemQuality.Legendary)
+            if (itemType == TinityItemType.HealthPotion && item.Quality >= ItemQuality.Legendary)
             {
                 return Trinity.Settings.Loot.Pickup.LegendaryPotions;
             }
 
-            if (itemType == GItemType.InfernalKey)
+            if (itemType == TinityItemType.InfernalKey)
             {
                 return Trinity.Settings.Loot.Pickup.InfernalKeys;
             }
 
             // Rift Keystone Fragments == LootRunkey
-            if (itemType == GItemType.LootRunKey)
+            if (itemType == TinityItemType.LootRunKey)
             {
                 return Trinity.Settings.Loot.Pickup.LootRunKey;
             }
 
             // Blood Shards == HoradricRelic
-            if (itemType == GItemType.HoradricRelic && ZetaDia.CPlayer.BloodshardCount < 500)
+            if (itemType == TinityItemType.HoradricRelic && ZetaDia.CPlayer.BloodshardCount < 500)
             {
                 return Trinity.Settings.Loot.Pickup.BloodShards;
             }
 
-            if (itemType == GItemType.CraftingMaterial && (item.ACDItem.GetTrinityItemQuality() < Trinity.Settings.Loot.Pickup.MiscItemQuality || !Trinity.Settings.Loot.Pickup.CraftMaterials))
+            if (itemType == TinityItemType.CraftingMaterial && (item.ACDItem.GetTrinityItemQuality() < Trinity.Settings.Loot.Pickup.MiscItemQuality || !Trinity.Settings.Loot.Pickup.CraftMaterials))
             {
                 return false;
             }
@@ -995,7 +995,7 @@ namespace Trinity.Items
                 return false;
             }
 
-            if (itemType == GItemType.CraftingPlan && item.Quality >= ItemQuality.Legendary && Trinity.Settings.Loot.Pickup.LegendaryPlans)
+            if (itemType == TinityItemType.CraftingPlan && item.Quality >= ItemQuality.Legendary && Trinity.Settings.Loot.Pickup.LegendaryPlans)
             {
                 return true;
             }
@@ -1007,25 +1007,25 @@ namespace Trinity.Items
 
             switch (baseType)
             {
-                case GItemBaseType.WeaponTwoHand:
-                case GItemBaseType.WeaponOneHand:
-                case GItemBaseType.WeaponRange:
+                case TrinityItemBaseType.WeaponTwoHand:
+                case TrinityItemBaseType.WeaponOneHand:
+                case TrinityItemBaseType.WeaponRange:
                     if (item.Quality >= ItemQuality.Legendary)
                         return Trinity.Settings.Loot.Pickup.PickupLegendaries;
 
                     return CheckLevelRequirements(item.Level, item.Quality, Trinity.Settings.Loot.Pickup.PickupBlueWeapons, Trinity.Settings.Loot.Pickup.PickupYellowWeapons);
-                case GItemBaseType.Armor:
-                case GItemBaseType.Offhand:
+                case TrinityItemBaseType.Armor:
+                case TrinityItemBaseType.Offhand:
                     if (item.Quality >= ItemQuality.Legendary)
                         return Trinity.Settings.Loot.Pickup.PickupLegendaries;
 
                     return CheckLevelRequirements(item.Level, item.Quality, Trinity.Settings.Loot.Pickup.PickupBlueArmor, Trinity.Settings.Loot.Pickup.PickupYellowArmor);
-                case GItemBaseType.Jewelry:
+                case TrinityItemBaseType.Jewelry:
                     if (item.Quality >= ItemQuality.Legendary)
                         return Trinity.Settings.Loot.Pickup.PickupLegendaries;
 
                     return CheckLevelRequirements(item.Level, item.Quality, Trinity.Settings.Loot.Pickup.PickupBlueJewlery, Trinity.Settings.Loot.Pickup.PickupYellowJewlery);
-                case GItemBaseType.FollowerItem:
+                case TrinityItemBaseType.FollowerItem:
                     if (item.Quality >= ItemQuality.Legendary)
                         return Trinity.Settings.Loot.Pickup.PickupLegendaryFollowerItems;
 
@@ -1036,23 +1036,23 @@ namespace Trinity.Items
                         return Trinity.Settings.Loot.Pickup.PickupYellowFollowerItems;
                     // not matched above, ignore it
                     return false;
-                case GItemBaseType.Gem:
+                case TrinityItemBaseType.Gem:
                     if (item.Level < Trinity.Settings.Loot.Pickup.GemLevel ||
-                        (itemType == GItemType.Ruby && !Trinity.Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Ruby)) ||
-                        (itemType == GItemType.Emerald && !Trinity.Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Emerald)) ||
-                        (itemType == GItemType.Amethyst && !Trinity.Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Amethyst)) ||
-                        (itemType == GItemType.Topaz && !Trinity.Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Topaz)) ||
-                        (itemType == GItemType.Diamond && !Trinity.Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Diamond)))
+                        (itemType == TinityItemType.Ruby && !Trinity.Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Ruby)) ||
+                        (itemType == TinityItemType.Emerald && !Trinity.Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Emerald)) ||
+                        (itemType == TinityItemType.Amethyst && !Trinity.Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Amethyst)) ||
+                        (itemType == TinityItemType.Topaz && !Trinity.Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Topaz)) ||
+                        (itemType == TinityItemType.Diamond && !Trinity.Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Diamond)))
                     {
                         return false;
                     }
                     break;
-                case GItemBaseType.Misc:
+                case TrinityItemBaseType.Misc:
                     if (item.ACDItem.GetTrinityItemQuality() < Trinity.Settings.Loot.Pickup.MiscItemQuality)
                         return false;
 
                     // Potion filtering
-                    if (itemType == GItemType.HealthPotion && item.Quality < ItemQuality.Legendary)
+                    if (itemType == TinityItemType.HealthPotion && item.Quality < ItemQuality.Legendary)
                     {
                         int potionsInBackPack = ZetaDia.Me.Inventory.Backpack.Where(p => p.ItemType == ItemType.Potion).Sum(p => p.ItemStackQuantity);
 
@@ -1061,11 +1061,11 @@ namespace Trinity.Items
                         return true;
                     }
                     break;
-                case GItemBaseType.HealthGlobe:
+                case TrinityItemBaseType.HealthGlobe:
                     return true;
-                case GItemBaseType.ProgressionGlobe:
+                case TrinityItemBaseType.ProgressionGlobe:
                     return true;
-                case GItemBaseType.Unknown:
+                case TrinityItemBaseType.Unknown:
                     return false;
                 default:
                     return false;
@@ -1192,7 +1192,7 @@ namespace Trinity.Items
             return true;
         }
 
-        internal static GItemType DetermineItemType(ACDItem item)
+        internal static TinityItemType DetermineItemType(ACDItem item)
         {
             return DetermineItemType(item.InternalName, item.ItemType);
         }
@@ -1206,7 +1206,7 @@ namespace Trinity.Items
         /// <param name="dbItemType"></param>
         /// <param name="dbFollowerType"></param>
         /// <returns></returns>
-        internal static GItemType DetermineItemType(string name, ItemType dbItemType, FollowerType dbFollowerType = FollowerType.None)
+        internal static TinityItemType DetermineItemType(string name, ItemType dbItemType, FollowerType dbFollowerType = FollowerType.None)
         {
             name = name.ToLower();
             if (name.StartsWith("x1_")) name = name.Substring(3, name.Length - 3);
@@ -1214,126 +1214,126 @@ namespace Trinity.Items
             if (name.StartsWith("p2_")) name = name.Substring(3, name.Length - 3);
             if (ItemExpansionRegex.IsMatch(name)) name = name.Substring(3, name.Length - 3);
 
-            if (name.StartsWith("a1_")) return GItemType.SpecialItem;
-            if (name.StartsWith("amethyst")) return GItemType.Amethyst;
-            if (name.StartsWith("amulet_")) return GItemType.Amulet;
-            if (name.StartsWith("axe_")) return GItemType.Axe;
-            if (name.StartsWith("barbbelt_")) return GItemType.MightyBelt;
-            if (name.StartsWith("blacksmithstome")) return GItemType.CraftTome;
-            if (name.StartsWith("boots_")) return GItemType.Boots;
-            if (name.StartsWith("bow_")) return GItemType.TwoHandBow;
-            if (name.StartsWith("bracers_")) return GItemType.Bracer;
-            if (name.StartsWith("ceremonialdagger_")) return GItemType.CeremonialKnife;
-            if (name.StartsWith("cloak_")) return GItemType.Cloak;
-            if (name.StartsWith("combatstaff_")) return GItemType.TwoHandDaibo;
-            if (name.StartsWith("crafting_")) return GItemType.CraftingMaterial;
-            if (name.StartsWith("craftingmaterials_")) return GItemType.CraftingMaterial;
-            if (name.StartsWith("craftingplan_")) return GItemType.CraftingPlan;
-            if (name.StartsWith("craftingreagent_legendary_")) return GItemType.CraftingMaterial;
-            if (name.StartsWith("crushield_")) return GItemType.CrusaderShield;
-            if (name.StartsWith("dagger_")) return GItemType.Dagger;
-            if (name.StartsWith("diamond_")) return GItemType.Diamond;
-            if (name.StartsWith("dye_")) return GItemType.Dye;
-            if (name.StartsWith("emerald_")) return GItemType.Emerald;
-            if (name.StartsWith("fistweapon_")) return GItemType.FistWeapon;
-            if (name.StartsWith("flail1h_")) return GItemType.Flail;
-            if (name.StartsWith("flail2h_")) return GItemType.TwoHandFlail;
-            if (name.StartsWith("followeritem_enchantress_") || dbFollowerType == FollowerType.Enchantress) return GItemType.FollowerEnchantress;
-            if (name.StartsWith("followeritem_scoundrel_") || dbFollowerType == FollowerType.Scoundrel) return GItemType.FollowerScoundrel;
-            if (name.StartsWith("followeritem_templar_") || dbFollowerType == FollowerType.Templar) return GItemType.FollowerTemplar;
-            if (name.StartsWith("gloves_")) return GItemType.Gloves;
-            if (name.StartsWith("handxbow_")) return GItemType.HandCrossbow;
-            if (name.StartsWith("healthglobe")) return GItemType.HealthGlobe;
-            if (name.StartsWith("healthpotion")) return GItemType.HealthPotion;
-            if (name.StartsWith("horadriccache")) return GItemType.HoradricCache;
-            if (name.StartsWith("lore_book_")) return GItemType.CraftTome;
-            if (name.StartsWith("lootrunkey")) return GItemType.LootRunKey;
-            if (name.StartsWith("mace_")) return GItemType.Mace;
-            if (name.StartsWith("mightyweapon_1h_")) return GItemType.MightyWeapon;
-            if (name.StartsWith("mightyweapon_2h_")) return GItemType.TwoHandMighty;
-            if (name.StartsWith("mojo_")) return GItemType.Mojo;
-            if (name.StartsWith("orb_")) return GItemType.Orb;
-            if (name.StartsWith("page_of_")) return GItemType.CraftTome;
-            if (name.StartsWith("pants_")) return GItemType.Legs;
-            if (name.StartsWith("polearm_") || dbItemType == ItemType.Polearm) return GItemType.TwoHandPolearm;
-            if (name.StartsWith("quiver_")) return GItemType.Quiver;
-            if (name.StartsWith("ring_")) return GItemType.Ring;
-            if (name.StartsWith("ruby_")) return GItemType.Ruby;
-            if (name.StartsWith("shield_")) return GItemType.Shield;
-            if (name.StartsWith("shoulderpads_")) return GItemType.Shoulder;
-            if (name.StartsWith("spear_")) return GItemType.Spear;
-            if (name.StartsWith("spiritstone_")) return GItemType.SpiritStone;
-            if (name.StartsWith("staff_")) return GItemType.TwoHandStaff;
-            if (name.StartsWith("staffofcow")) return GItemType.StaffOfHerding;
-            if (name.StartsWith("sword_")) return GItemType.Sword;
-            if (name.StartsWith("topaz_")) return GItemType.Topaz;
-            if (name.StartsWith("twohandedaxe_")) return GItemType.TwoHandAxe;
-            if (name.StartsWith("twohandedmace_")) return GItemType.TwoHandMace;
-            if (name.StartsWith("twohandedsword_")) return GItemType.TwoHandSword;
-            if (name.StartsWith("voodoomask_")) return GItemType.VoodooMask;
-            if (name.StartsWith("wand_")) return GItemType.Wand;
-            if (name.StartsWith("wizardhat_")) return GItemType.WizardHat;
-            if (name.StartsWith("xbow_")) return GItemType.TwoHandCrossbow;
-            if (name.StartsWith("console_powerglobe")) return GItemType.PowerGlobe;
-            if (name.StartsWith("tiered_rifts_orb")) return GItemType.ProgressionGlobe;
-            if (name.StartsWith("consumable_add_sockets")) return GItemType.ConsumableAddSockets; // Ramaladni's Gift
-            if (name.StartsWith("tieredlootrunkey_")) return GItemType.TieredLootrunKey;
-            if (name.StartsWith("demonkey_") || name.StartsWith("demontrebuchetkey") || name.StartsWith("quest_")) return GItemType.InfernalKey;
-            if (name.StartsWith("offhand_")) return GItemType.Mojo;
-            if (name.StartsWith("horadricrelic")) return GItemType.HoradricRelic;
+            if (name.StartsWith("a1_")) return TinityItemType.SpecialItem;
+            if (name.StartsWith("amethyst")) return TinityItemType.Amethyst;
+            if (name.StartsWith("amulet_")) return TinityItemType.Amulet;
+            if (name.StartsWith("axe_")) return TinityItemType.Axe;
+            if (name.StartsWith("barbbelt_")) return TinityItemType.MightyBelt;
+            if (name.StartsWith("blacksmithstome")) return TinityItemType.CraftTome;
+            if (name.StartsWith("boots_")) return TinityItemType.Boots;
+            if (name.StartsWith("bow_")) return TinityItemType.TwoHandBow;
+            if (name.StartsWith("bracers_")) return TinityItemType.Bracer;
+            if (name.StartsWith("ceremonialdagger_")) return TinityItemType.CeremonialKnife;
+            if (name.StartsWith("cloak_")) return TinityItemType.Cloak;
+            if (name.StartsWith("combatstaff_")) return TinityItemType.TwoHandDaibo;
+            if (name.StartsWith("crafting_")) return TinityItemType.CraftingMaterial;
+            if (name.StartsWith("craftingmaterials_")) return TinityItemType.CraftingMaterial;
+            if (name.StartsWith("craftingplan_")) return TinityItemType.CraftingPlan;
+            if (name.StartsWith("craftingreagent_legendary_")) return TinityItemType.CraftingMaterial;
+            if (name.StartsWith("crushield_")) return TinityItemType.CrusaderShield;
+            if (name.StartsWith("dagger_")) return TinityItemType.Dagger;
+            if (name.StartsWith("diamond_")) return TinityItemType.Diamond;
+            if (name.StartsWith("dye_")) return TinityItemType.Dye;
+            if (name.StartsWith("emerald_")) return TinityItemType.Emerald;
+            if (name.StartsWith("fistweapon_")) return TinityItemType.FistWeapon;
+            if (name.StartsWith("flail1h_")) return TinityItemType.Flail;
+            if (name.StartsWith("flail2h_")) return TinityItemType.TwoHandFlail;
+            if (name.StartsWith("followeritem_enchantress_") || dbFollowerType == FollowerType.Enchantress) return TinityItemType.FollowerEnchantress;
+            if (name.StartsWith("followeritem_scoundrel_") || dbFollowerType == FollowerType.Scoundrel) return TinityItemType.FollowerScoundrel;
+            if (name.StartsWith("followeritem_templar_") || dbFollowerType == FollowerType.Templar) return TinityItemType.FollowerTemplar;
+            if (name.StartsWith("gloves_")) return TinityItemType.Gloves;
+            if (name.StartsWith("handxbow_")) return TinityItemType.HandCrossbow;
+            if (name.StartsWith("healthglobe")) return TinityItemType.HealthGlobe;
+            if (name.StartsWith("healthpotion")) return TinityItemType.HealthPotion;
+            if (name.StartsWith("horadriccache")) return TinityItemType.HoradricCache;
+            if (name.StartsWith("lore_book_")) return TinityItemType.CraftTome;
+            if (name.StartsWith("lootrunkey")) return TinityItemType.LootRunKey;
+            if (name.StartsWith("mace_")) return TinityItemType.Mace;
+            if (name.StartsWith("mightyweapon_1h_")) return TinityItemType.MightyWeapon;
+            if (name.StartsWith("mightyweapon_2h_")) return TinityItemType.TwoHandMighty;
+            if (name.StartsWith("mojo_")) return TinityItemType.Mojo;
+            if (name.StartsWith("orb_")) return TinityItemType.Orb;
+            if (name.StartsWith("page_of_")) return TinityItemType.CraftTome;
+            if (name.StartsWith("pants_")) return TinityItemType.Legs;
+            if (name.StartsWith("polearm_") || dbItemType == ItemType.Polearm) return TinityItemType.TwoHandPolearm;
+            if (name.StartsWith("quiver_")) return TinityItemType.Quiver;
+            if (name.StartsWith("ring_")) return TinityItemType.Ring;
+            if (name.StartsWith("ruby_")) return TinityItemType.Ruby;
+            if (name.StartsWith("shield_")) return TinityItemType.Shield;
+            if (name.StartsWith("shoulderpads_")) return TinityItemType.Shoulder;
+            if (name.StartsWith("spear_")) return TinityItemType.Spear;
+            if (name.StartsWith("spiritstone_")) return TinityItemType.SpiritStone;
+            if (name.StartsWith("staff_")) return TinityItemType.TwoHandStaff;
+            if (name.StartsWith("staffofcow")) return TinityItemType.StaffOfHerding;
+            if (name.StartsWith("sword_")) return TinityItemType.Sword;
+            if (name.StartsWith("topaz_")) return TinityItemType.Topaz;
+            if (name.StartsWith("twohandedaxe_")) return TinityItemType.TwoHandAxe;
+            if (name.StartsWith("twohandedmace_")) return TinityItemType.TwoHandMace;
+            if (name.StartsWith("twohandedsword_")) return TinityItemType.TwoHandSword;
+            if (name.StartsWith("voodoomask_")) return TinityItemType.VoodooMask;
+            if (name.StartsWith("wand_")) return TinityItemType.Wand;
+            if (name.StartsWith("wizardhat_")) return TinityItemType.WizardHat;
+            if (name.StartsWith("xbow_")) return TinityItemType.TwoHandCrossbow;
+            if (name.StartsWith("console_powerglobe")) return TinityItemType.PowerGlobe;
+            if (name.StartsWith("tiered_rifts_orb")) return TinityItemType.ProgressionGlobe;
+            if (name.StartsWith("consumable_add_sockets")) return TinityItemType.ConsumableAddSockets; // Ramaladni's Gift
+            if (name.StartsWith("tieredlootrunkey_")) return TinityItemType.TieredLootrunKey;
+            if (name.StartsWith("demonkey_") || name.StartsWith("demontrebuchetkey") || name.StartsWith("quest_")) return TinityItemType.InfernalKey;
+            if (name.StartsWith("offhand_")) return TinityItemType.Mojo;
+            if (name.StartsWith("horadricrelic")) return TinityItemType.HoradricRelic;
 
 
             // Follower item types
             if (name.StartsWith("jewelbox_") || dbItemType == ItemType.FollowerSpecial)
             {
                 if (dbFollowerType == FollowerType.Scoundrel)
-                    return GItemType.FollowerScoundrel;
+                    return TinityItemType.FollowerScoundrel;
                 if (dbFollowerType == FollowerType.Templar)
-                    return GItemType.FollowerTemplar;
+                    return TinityItemType.FollowerTemplar;
                 if (dbFollowerType == FollowerType.Enchantress)
-                    return GItemType.FollowerEnchantress;
+                    return TinityItemType.FollowerEnchantress;
             }
 
             // Fall back on some partial DB item type checking 
             if (name.StartsWith("crafting_"))
             {
                 if (dbItemType == ItemType.CraftingPage)
-                    return GItemType.CraftTome;
-                return GItemType.CraftingMaterial;
+                    return TinityItemType.CraftTome;
+                return TinityItemType.CraftingMaterial;
             }
             if (name.StartsWith("chestarmor_"))
             {
                 if (dbItemType == ItemType.Cloak)
-                    return GItemType.Cloak;
-                return GItemType.Chest;
+                    return TinityItemType.Cloak;
+                return TinityItemType.Chest;
             }
             if (name.StartsWith("helm_"))
             {
                 if (dbItemType == ItemType.SpiritStone)
-                    return GItemType.SpiritStone;
+                    return TinityItemType.SpiritStone;
                 if (dbItemType == ItemType.VoodooMask)
-                    return GItemType.VoodooMask;
+                    return TinityItemType.VoodooMask;
                 if (dbItemType == ItemType.WizardHat)
-                    return GItemType.WizardHat;
-                return GItemType.Helm;
+                    return TinityItemType.WizardHat;
+                return TinityItemType.Helm;
             }
             if (name.StartsWith("helmcloth_"))
             {
                 if (dbItemType == ItemType.SpiritStone)
-                    return GItemType.SpiritStone;
+                    return TinityItemType.SpiritStone;
                 if (dbItemType == ItemType.VoodooMask)
-                    return GItemType.VoodooMask;
+                    return TinityItemType.VoodooMask;
                 if (dbItemType == ItemType.WizardHat)
-                    return GItemType.WizardHat;
-                return GItemType.Helm;
+                    return TinityItemType.WizardHat;
+                return TinityItemType.Helm;
             }
             if (name.StartsWith("belt_"))
             {
                 if (dbItemType == ItemType.MightyBelt)
-                    return GItemType.MightyBelt;
-                return GItemType.Belt;
+                    return TinityItemType.MightyBelt;
+                return TinityItemType.Belt;
             }
-            return GItemType.Unknown;
+            return TinityItemType.Unknown;
         }
 
         /// <summary>
@@ -1341,241 +1341,241 @@ namespace Trinity.Items
         /// </summary>
         /// <param name="itemType"></param>
         /// <returns></returns>
-        internal static GItemBaseType DetermineBaseType(GItemType itemType)
+        internal static TrinityItemBaseType DetermineBaseType(TinityItemType itemType)
         {
-            var itemBaseType = GItemBaseType.Misc;
+            var itemBaseType = TrinityItemBaseType.Misc;
 
             // One Handed Weapons
             switch (itemType)
             {
-                case GItemType.Axe:
-                case GItemType.CeremonialKnife:
-                case GItemType.Dagger:
-                case GItemType.Flail:
-                case GItemType.FistWeapon:
-                case GItemType.Mace:
-                case GItemType.MightyWeapon:
-                case GItemType.Spear:
-                case GItemType.Sword:
-                case GItemType.Wand:
+                case TinityItemType.Axe:
+                case TinityItemType.CeremonialKnife:
+                case TinityItemType.Dagger:
+                case TinityItemType.Flail:
+                case TinityItemType.FistWeapon:
+                case TinityItemType.Mace:
+                case TinityItemType.MightyWeapon:
+                case TinityItemType.Spear:
+                case TinityItemType.Sword:
+                case TinityItemType.Wand:
                     {
 
-                        itemBaseType = GItemBaseType.WeaponOneHand;
+                        itemBaseType = TrinityItemBaseType.WeaponOneHand;
                         break;
                     }
                 // Two Handed Weapons
-                case GItemType.TwoHandDaibo:
-                case GItemType.TwoHandMace:
-                case GItemType.TwoHandFlail:
-                case GItemType.TwoHandMighty:
-                case GItemType.TwoHandPolearm:
-                case GItemType.TwoHandStaff:
-                case GItemType.TwoHandSword:
-                case GItemType.TwoHandAxe:
+                case TinityItemType.TwoHandDaibo:
+                case TinityItemType.TwoHandMace:
+                case TinityItemType.TwoHandFlail:
+                case TinityItemType.TwoHandMighty:
+                case TinityItemType.TwoHandPolearm:
+                case TinityItemType.TwoHandStaff:
+                case TinityItemType.TwoHandSword:
+                case TinityItemType.TwoHandAxe:
                     {
-                        itemBaseType = GItemBaseType.WeaponTwoHand;
+                        itemBaseType = TrinityItemBaseType.WeaponTwoHand;
                         break;
                     }
                 // Ranged Weapons
-                case GItemType.TwoHandCrossbow:
-                case GItemType.HandCrossbow:
-                case GItemType.TwoHandBow:
+                case TinityItemType.TwoHandCrossbow:
+                case TinityItemType.HandCrossbow:
+                case TinityItemType.TwoHandBow:
                     {
-                        itemBaseType = GItemBaseType.WeaponRange;
+                        itemBaseType = TrinityItemBaseType.WeaponRange;
                         break;
                     }
                 // Off-hands
-                case GItemType.Mojo:
-                case GItemType.Orb:
-                case GItemType.CrusaderShield:
-                case GItemType.Quiver:
-                case GItemType.Shield:
+                case TinityItemType.Mojo:
+                case TinityItemType.Orb:
+                case TinityItemType.CrusaderShield:
+                case TinityItemType.Quiver:
+                case TinityItemType.Shield:
                     {
-                        itemBaseType = GItemBaseType.Offhand;
+                        itemBaseType = TrinityItemBaseType.Offhand;
                         break;
                     }
                 // Armors
-                case GItemType.Boots:
-                case GItemType.Bracer:
-                case GItemType.Chest:
-                case GItemType.Cloak:
-                case GItemType.Gloves:
-                case GItemType.Helm:
-                case GItemType.Legs:
-                case GItemType.Shoulder:
-                case GItemType.SpiritStone:
-                case GItemType.VoodooMask:
-                case GItemType.WizardHat:
-                case GItemType.Belt:
-                case GItemType.MightyBelt:
+                case TinityItemType.Boots:
+                case TinityItemType.Bracer:
+                case TinityItemType.Chest:
+                case TinityItemType.Cloak:
+                case TinityItemType.Gloves:
+                case TinityItemType.Helm:
+                case TinityItemType.Legs:
+                case TinityItemType.Shoulder:
+                case TinityItemType.SpiritStone:
+                case TinityItemType.VoodooMask:
+                case TinityItemType.WizardHat:
+                case TinityItemType.Belt:
+                case TinityItemType.MightyBelt:
                     {
-                        itemBaseType = GItemBaseType.Armor;
+                        itemBaseType = TrinityItemBaseType.Armor;
                         break;
                     }
                 // Jewlery
-                case GItemType.Amulet:
-                case GItemType.Ring:
+                case TinityItemType.Amulet:
+                case TinityItemType.Ring:
                     {
-                        itemBaseType = GItemBaseType.Jewelry;
+                        itemBaseType = TrinityItemBaseType.Jewelry;
                         break;
                     }
                 // Follower Items
-                case GItemType.FollowerEnchantress:
-                case GItemType.FollowerScoundrel:
-                case GItemType.FollowerTemplar:
+                case TinityItemType.FollowerEnchantress:
+                case TinityItemType.FollowerScoundrel:
+                case TinityItemType.FollowerTemplar:
                     {
-                        itemBaseType = GItemBaseType.FollowerItem;
+                        itemBaseType = TrinityItemBaseType.FollowerItem;
                         break;
                     }
                 // Misc Items
-                case GItemType.CraftingMaterial:
-                case GItemType.CraftTome:
-                case GItemType.LootRunKey:
-                case GItemType.HoradricRelic:
-                case GItemType.SpecialItem:
-                case GItemType.CraftingPlan:
-                case GItemType.HealthPotion:
-                case GItemType.HoradricCache:
-                case GItemType.Dye:
-                case GItemType.StaffOfHerding:
-                case GItemType.InfernalKey:
-                case GItemType.ConsumableAddSockets:
-                case GItemType.TieredLootrunKey:
+                case TinityItemType.CraftingMaterial:
+                case TinityItemType.CraftTome:
+                case TinityItemType.LootRunKey:
+                case TinityItemType.HoradricRelic:
+                case TinityItemType.SpecialItem:
+                case TinityItemType.CraftingPlan:
+                case TinityItemType.HealthPotion:
+                case TinityItemType.HoradricCache:
+                case TinityItemType.Dye:
+                case TinityItemType.StaffOfHerding:
+                case TinityItemType.InfernalKey:
+                case TinityItemType.ConsumableAddSockets:
+                case TinityItemType.TieredLootrunKey:
                     {
-                        itemBaseType = GItemBaseType.Misc;
+                        itemBaseType = TrinityItemBaseType.Misc;
                         break;
                     }
                 // Gems
-                case GItemType.Ruby:
-                case GItemType.Emerald:
-                case GItemType.Topaz:
-                case GItemType.Amethyst:
-                case GItemType.Diamond:
+                case TinityItemType.Ruby:
+                case TinityItemType.Emerald:
+                case TinityItemType.Topaz:
+                case TinityItemType.Amethyst:
+                case TinityItemType.Diamond:
                     {
-                        itemBaseType = GItemBaseType.Gem;
+                        itemBaseType = TrinityItemBaseType.Gem;
                         break;
                     }
                 // Globes
-                case GItemType.HealthGlobe:
+                case TinityItemType.HealthGlobe:
                     {
-                        itemBaseType = GItemBaseType.HealthGlobe;
+                        itemBaseType = TrinityItemBaseType.HealthGlobe;
                         break;
                     }
-                case GItemType.PowerGlobe:
+                case TinityItemType.PowerGlobe:
                     {
-                        itemBaseType = GItemBaseType.PowerGlobe;
+                        itemBaseType = TrinityItemBaseType.PowerGlobe;
                         break;
                     }
-                case GItemType.ProgressionGlobe:
+                case TinityItemType.ProgressionGlobe:
                     {
-                        itemBaseType = GItemBaseType.ProgressionGlobe;
+                        itemBaseType = TrinityItemBaseType.ProgressionGlobe;
                         break;
                     }
             }
             return itemBaseType;
         }
 
-        internal static ItemType GItemTypeToItemType(GItemType itemType)
+        internal static ItemType GItemTypeToItemType(TinityItemType itemType)
         {
             switch (itemType)
             {
-                case GItemType.Axe:
+                case TinityItemType.Axe:
                     return ItemType.Axe;
 
-                case GItemType.Dagger:
+                case TinityItemType.Dagger:
                     return ItemType.Dagger;
 
-                case GItemType.Flail:
+                case TinityItemType.Flail:
                     return ItemType.Flail;
 
-                case GItemType.FistWeapon:
+                case TinityItemType.FistWeapon:
                     return ItemType.FistWeapon;
 
-                case GItemType.Mace:
+                case TinityItemType.Mace:
                     return ItemType.Mace;
 
-                case GItemType.MightyWeapon:
+                case TinityItemType.MightyWeapon:
                     return ItemType.MightyWeapon;
 
-                case GItemType.Spear:
+                case TinityItemType.Spear:
                     return ItemType.Spear;
 
-                case GItemType.Sword:
+                case TinityItemType.Sword:
                     return ItemType.Sword;
 
-                case GItemType.Wand:
+                case TinityItemType.Wand:
                     return ItemType.Wand;
 
-                case GItemType.HandCrossbow:
+                case TinityItemType.HandCrossbow:
                     return ItemType.HandCrossbow;
 
-                case GItemType.CeremonialKnife:
+                case TinityItemType.CeremonialKnife:
                     return ItemType.CeremonialDagger;
 
-                case GItemType.TwoHandDaibo:
+                case TinityItemType.TwoHandDaibo:
                     return ItemType.Daibo;
 
-                case GItemType.TwoHandMace:
+                case TinityItemType.TwoHandMace:
                     return ItemType.Mace;
 
-                case GItemType.TwoHandFlail:
+                case TinityItemType.TwoHandFlail:
                     return ItemType.Flail;
 
-                case GItemType.TwoHandMighty:
+                case TinityItemType.TwoHandMighty:
                     return ItemType.MightyWeapon;
 
-                case GItemType.TwoHandPolearm:
+                case TinityItemType.TwoHandPolearm:
                     return ItemType.Polearm;
 
-                case GItemType.TwoHandStaff:
+                case TinityItemType.TwoHandStaff:
                     return ItemType.Staff;
 
-                case GItemType.TwoHandSword:
+                case TinityItemType.TwoHandSword:
                     return ItemType.Sword;
 
-                case GItemType.TwoHandAxe:
+                case TinityItemType.TwoHandAxe:
                     return ItemType.Axe;
 
-                case GItemType.TwoHandCrossbow:
+                case TinityItemType.TwoHandCrossbow:
                     return ItemType.Crossbow;
 
-                case GItemType.TwoHandBow:
+                case TinityItemType.TwoHandBow:
                     return ItemType.Bow;
 
-                case GItemType.FollowerEnchantress:
-                case GItemType.FollowerScoundrel:
-                case GItemType.FollowerTemplar:
+                case TinityItemType.FollowerEnchantress:
+                case TinityItemType.FollowerScoundrel:
+                case TinityItemType.FollowerTemplar:
                     return ItemType.FollowerSpecial;
 
-                case GItemType.CraftingMaterial:
+                case TinityItemType.CraftingMaterial:
                     return ItemType.CraftingReagent;
 
-                case GItemType.CraftTome:
+                case TinityItemType.CraftTome:
                     return ItemType.CraftingPlan;
 
-                case GItemType.HealthPotion:
-                case GItemType.Dye:
-                case GItemType.ConsumableAddSockets:
-                case GItemType.ProgressionGlobe:
-                case GItemType.PowerGlobe:
-                case GItemType.HealthGlobe:
+                case TinityItemType.HealthPotion:
+                case TinityItemType.Dye:
+                case TinityItemType.ConsumableAddSockets:
+                case TinityItemType.ProgressionGlobe:
+                case TinityItemType.PowerGlobe:
+                case TinityItemType.HealthGlobe:
                     return ItemType.Consumable;
 
-                case GItemType.Ruby:
-                case GItemType.Emerald:
-                case GItemType.Topaz:
-                case GItemType.Amethyst:
-                case GItemType.Diamond:
+                case TinityItemType.Ruby:
+                case TinityItemType.Emerald:
+                case TinityItemType.Topaz:
+                case TinityItemType.Amethyst:
+                case TinityItemType.Diamond:
                     return ItemType.Gem;
 
-                case GItemType.LootRunKey:
-                case GItemType.HoradricRelic:
-                case GItemType.SpecialItem:
-                case GItemType.CraftingPlan:
-                case GItemType.HoradricCache:
-                case GItemType.StaffOfHerding:
-                case GItemType.InfernalKey:
-                case GItemType.TieredLootrunKey:
+                case TinityItemType.LootRunKey:
+                case TinityItemType.HoradricRelic:
+                case TinityItemType.SpecialItem:
+                case TinityItemType.CraftingPlan:
+                case TinityItemType.HoradricCache:
+                case TinityItemType.StaffOfHerding:
+                case TinityItemType.InfernalKey:
+                case TinityItemType.TieredLootrunKey:
                     return ItemType.Unknown;
             }
 

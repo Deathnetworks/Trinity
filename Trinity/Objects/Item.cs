@@ -104,41 +104,41 @@ namespace Trinity.Objects
 
         public ActorClass ClassRestriction
         {
-            get { return GetClassRestriction(GItemType); }
+            get { return GetClassRestriction(TinityItemType); }
         }
 
-        public static ActorClass GetClassRestriction(GItemType type)
+        public static ActorClass GetClassRestriction(TinityItemType type)
         {
             switch (type)
             {
-                case GItemType.Flail:
-                case GItemType.CrusaderShield:
-                case GItemType.TwoHandFlail:
+                case TinityItemType.Flail:
+                case TinityItemType.CrusaderShield:
+                case TinityItemType.TwoHandFlail:
                     return ActorClass.Crusader;
 
-                case GItemType.FistWeapon:
-                case GItemType.SpiritStone:
-                case GItemType.TwoHandDaibo:
+                case TinityItemType.FistWeapon:
+                case TinityItemType.SpiritStone:
+                case TinityItemType.TwoHandDaibo:
                     return ActorClass.Monk;
 
-                case GItemType.VoodooMask:
-                case GItemType.Mojo:
-                case GItemType.CeremonialKnife:
+                case TinityItemType.VoodooMask:
+                case TinityItemType.Mojo:
+                case TinityItemType.CeremonialKnife:
                     return ActorClass.Witchdoctor;
 
-                case GItemType.MightyBelt:
-                case GItemType.MightyWeapon:
+                case TinityItemType.MightyBelt:
+                case TinityItemType.MightyWeapon:
                     return ActorClass.Barbarian;
 
-                case GItemType.WizardHat:
-                case GItemType.Orb:
+                case TinityItemType.WizardHat:
+                case TinityItemType.Orb:
                     return ActorClass.Wizard;
 
-                case GItemType.HandCrossbow:
-                case GItemType.Cloak:
-                case GItemType.Quiver:
-                case GItemType.TwoHandBow:
-                case GItemType.TwoHandCrossbow:
+                case TinityItemType.HandCrossbow:
+                case TinityItemType.Cloak:
+                case TinityItemType.Quiver:
+                case TinityItemType.TwoHandBow:
+                case TinityItemType.TwoHandCrossbow:
                     return ActorClass.DemonHunter;   
             }
             
@@ -160,7 +160,7 @@ namespace Trinity.Objects
 
         public bool IsTwoHanded { get; set; }
 
-        public GItemType GItemType { get; set; }
+        public TinityItemType TinityItemType { get; set; }
 
         public string IconUrl { get; set; }
     }

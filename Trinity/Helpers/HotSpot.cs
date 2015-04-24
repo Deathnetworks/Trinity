@@ -107,7 +107,7 @@ namespace Trinity
                 {
                     if (Trinity.CurrentTarget == null)
                         return null;
-                    else if (Trinity.CurrentTarget.Type != GObjectType.Unit)
+                    else if (Trinity.CurrentTarget.Type != TrinityObjectType.Unit)
                         return null;
                     else
                     {

@@ -128,8 +128,8 @@ namespace Trinity
                 // Interact with quest givers, except when doing town-runs
                 if (ZetaDia.CurrentAct == Act.OpenWorld && CurrentCacheObject.IsQuestGiver && !(WantToTownRun || ForceVendorRunASAP || BrainBehavior.IsVendoring))
                 {
-                    CurrentCacheObject.Type = GObjectType.Interactable;
-                    CurrentCacheObject.Type = GObjectType.Interactable;
+                    CurrentCacheObject.Type = TrinityObjectType.Interactable;
+                    CurrentCacheObject.Type = TrinityObjectType.Interactable;
                     CurrentCacheObject.Radius = c_diaObject.CollisionSphere.Radius;
                     return true;
                 }
@@ -147,7 +147,7 @@ namespace Trinity
             }
 
             /* Always refresh monster type */
-            if (CurrentCacheObject.Type != GObjectType.Player && !CurrentCacheObject.IsBoss)
+            if (CurrentCacheObject.Type != TrinityObjectType.Player && !CurrentCacheObject.IsBoss)
             {
                 switch (c_diaObject.CommonData.MonsterInfo.MonsterType)
                 {

@@ -47,9 +47,9 @@ namespace Trinity
             using (MD5 md5 = MD5.Create())
             {
                 string objHashBase;
-                if (obj.Type == GObjectType.Unit)
+                if (obj.Type == TrinityObjectType.Unit)
                     objHashBase = obj.ActorSNO + obj.InternalName + obj.Position + obj.Type + Trinity.CurrentWorldDynamicId;
-                else if (obj.Type == GObjectType.Item)
+                else if (obj.Type == TrinityObjectType.Item)
                     return GenerateItemHash(obj.Position, obj.ActorSNO, obj.InternalName, Trinity.CurrentWorldId, obj.ItemQuality, obj.ItemLevel);
                 else
                     objHashBase = String.Format("{0}{1}{2}{3}", obj.ActorSNO, obj.Position, obj.Type, Trinity.CurrentWorldDynamicId);

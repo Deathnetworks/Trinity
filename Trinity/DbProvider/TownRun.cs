@@ -404,7 +404,7 @@ namespace Trinity.DbProvider
         /// <summary>
         ///     Log the nice items we found and stashed
         /// </summary>
-        internal static void LogGoodItems(CachedACDItem acdItem, GItemBaseType itemBaseType, GItemType itemType, double itemValue)
+        internal static void LogGoodItems(CachedACDItem acdItem, TrinityItemBaseType itemBaseType, TinityItemType itemType, double itemValue)
         {
             FileStream logStream = null;
             try
@@ -474,7 +474,7 @@ namespace Trinity.DbProvider
         /// <summary>
         ///     Log the rubbish junk items we salvaged or sold
         /// </summary>
-        internal static void LogJunkItems(CachedACDItem acdItem, GItemBaseType itemBaseType, GItemType itemType, double itemValue)
+        internal static void LogJunkItems(CachedACDItem acdItem, TrinityItemBaseType itemBaseType, TinityItemType itemType, double itemValue)
         {
             FileStream logStream = null;
             try

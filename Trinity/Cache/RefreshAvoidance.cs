@@ -202,7 +202,7 @@ namespace Trinity
                 CacheData.TimeBoundAvoidance.Add(new CacheObstacleObject(CurrentCacheObject.Position, avoidanceRadius, CurrentCacheObject.ActorSNO, CurrentCacheObject.InternalName)
                 {
                     Expires = DateTime.UtcNow.Add(aoeExpiration),
-                    ObjectType = GObjectType.Avoidance,
+                    ObjectType = TrinityObjectType.Avoidance,
                     Rotation = CurrentCacheObject.Rotation
                 });
 

@@ -96,7 +96,7 @@ namespace Trinity
         public int ActorSNO { get; set; }
 
         [DataMember]
-        public GObjectType Type { get; set; }
+        public TrinityObjectType Type { get; set; }
 
         [DataMember]
         public ActorType ActorType { get; set; }
@@ -161,7 +161,7 @@ namespace Trinity
         public FollowerType FollowerType { get; set; }
 
         [DataMember]
-        public GItemType TrinityItemType { get; set; }
+        public TinityItemType TrinityItemType { get; set; }
 
         [DataMember]
         public DateTime LastSeenTime { get; set; }
@@ -277,7 +277,7 @@ namespace Trinity
         public int SummonedByACDId { get; set; }
 
         [NoCopy]
-        public bool IsUnit { get { return this.Type == GObjectType.Unit; } }
+        public bool IsUnit { get { return this.Type == TrinityObjectType.Unit; } }
 
         [DataMember]
         public bool IsNPC { get; set; }
@@ -304,10 +304,10 @@ namespace Trinity
         public string ExtraInfo { get; set; }
 
         [NoCopy]
-        public bool IsCursedChest { get { return Type == GObjectType.CursedChest; } }
+        public bool IsCursedChest { get { return Type == TrinityObjectType.CursedChest; } }
 
         [NoCopy]
-        public bool IsCursedShrine { get { return Type == GObjectType.CursedShrine; } }
+        public bool IsCursedShrine { get { return Type == TrinityObjectType.CursedShrine; } }
 
         [NoCopy]
         public bool IsEventObject { get { return IsCursedChest || IsCursedShrine; } }
@@ -317,7 +317,7 @@ namespace Trinity
         {
             get
             {
-                return Type == GObjectType.Barricade || Type == GObjectType.Destructible;
+                return Type == TrinityObjectType.Barricade || Type == TrinityObjectType.Destructible;
             }
         }
 
@@ -326,8 +326,8 @@ namespace Trinity
         {
             get
             {
-                return Type == GObjectType.Item || Type == GObjectType.Container || Type == GObjectType.CursedChest || Type == GObjectType.CursedChest || Type == GObjectType.CursedShrine ||
-                    Type == GObjectType.Door || Type == GObjectType.HealthWell || Type == GObjectType.Interactable || Type == GObjectType.Shrine;
+                return Type == TrinityObjectType.Item || Type == TrinityObjectType.Container || Type == TrinityObjectType.CursedChest || Type == TrinityObjectType.CursedChest || Type == TrinityObjectType.CursedShrine ||
+                    Type == TrinityObjectType.Door || Type == TrinityObjectType.HealthWell || Type == TrinityObjectType.Interactable || Type == TrinityObjectType.Shrine;
             }
         }
 
@@ -335,7 +335,7 @@ namespace Trinity
         {
             get
             {
-                return Type == GObjectType.Gold || Type == GObjectType.PowerGlobe || Type == GObjectType.HealthGlobe || Type == GObjectType.ProgressionGlobe;
+                return Type == TrinityObjectType.Gold || Type == TrinityObjectType.PowerGlobe || Type == TrinityObjectType.HealthGlobe || Type == TrinityObjectType.ProgressionGlobe;
             }
         }
 
@@ -388,7 +388,7 @@ namespace Trinity
         {
             using (new Technicals.PerformanceLogger("CacheObject.UnitsNear"))
             {
-                if (this.Type != GObjectType.Unit)
+                if (this.Type != TrinityObjectType.Unit)
                     return 0;
 
                 return Trinity.ObjectCache
