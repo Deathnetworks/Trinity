@@ -1099,7 +1099,6 @@ namespace Trinity.Reference
             {
                 Defaults = (skill, meta) =>
                 {
-                    meta.IsCombatOnly = true;
                     meta.IsBuffingSkill = true;
                     meta.IsCastOnSelf = true;
                 }

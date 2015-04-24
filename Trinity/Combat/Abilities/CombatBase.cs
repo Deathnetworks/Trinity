@@ -752,6 +752,9 @@ namespace Trinity.Combat.Abilities
                     if (meta.IsCombatOnly && CurrentTarget == null)
                         return "IsInCombat";
 
+                    if (meta.ReUseDelay > 0 && TimeSincePowerUse(skill.SNOPower) < meta.ReUseDelay)
+                        return "ReUseDelay";
+
                     //if (meta.IsEliteOnly && Enemies.Nearby.EliteCount == 0)
                     //    return false;
 

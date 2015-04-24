@@ -324,7 +324,7 @@ namespace Trinity.Combat.Abilities
         private static bool StrafeCondition(SkillMeta meta)
         {
             meta.CastRange = 65f;
-            meta.AfterUseDelay = 250;
+            meta.ReUseDelay = 250;
             meta.TargetPositionSelector = ret => TargetUtil.GetZigZagTarget(CurrentTarget.Position, V.F("Barbarian.Whirlwind.ZigZagDistance"));
             meta.CastFlags = CanCastFlags.NoTimer;
             meta.RequiredResource = Settings.Combat.DemonHunter.StrafeMinHatred;
@@ -373,7 +373,7 @@ namespace Trinity.Combat.Abilities
             meta.CastRange = 20f;
             meta.TargetPositionSelector = ret => NavHelper.MainFindSafeZone(Player.Position, true);            
             meta.RequiredResource = Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) ? 22 : 16;
-            meta.AfterUseDelay = Settings.Combat.DemonHunter.VaultMovementDelay;
+            meta.ReUseDelay = Settings.Combat.DemonHunter.VaultMovementDelay;
 
             if (Settings.Combat.DemonHunter.VaultMode == DemonHunterVaultMode.MovementOnly && IsInCombat)
                 return false;
@@ -480,7 +480,7 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         private static bool PreperationCondition(SkillMeta meta)
         {
-            meta.AfterUseDelay = Runes.DemonHunter.FocusedMind.IsActive ? 15000 : 500;
+            meta.ReUseDelay = Runes.DemonHunter.FocusedMind.IsActive ? 15000 : 500;
             meta.CastFlags = CanCastFlags.NoTimer;
             
             if (!Runes.DemonHunter.Punishment.IsActive && Player.SecondaryResource <= V.F("DemonHunter.MinPreparationDiscipline"))
