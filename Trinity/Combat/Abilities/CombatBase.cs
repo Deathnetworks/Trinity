@@ -586,7 +586,8 @@ namespace Trinity.Combat.Abilities
                 if (Sets.BastionsOfWill.IsFullyEquipped && !CacheData.Buffs.HasBastiansWillGeneratorBuff)
                     return true;
 
-                return SpellHistory.TimeSinceGeneratorCast >= 3500;
+                // Some Generators take a while to actually hit something (chakram for example)
+                return SpellHistory.TimeSinceGeneratorCast >= 4000;
             }
         }
 
@@ -600,7 +601,7 @@ namespace Trinity.Combat.Abilities
                 if (Sets.BastionsOfWill.IsFullyEquipped && !CacheData.Buffs.HasBastiansWillSpenderBuff)
                     return true;
 
-                return  SpellHistory.TimeSinceSpenderCast >= 3500;
+                return  SpellHistory.TimeSinceSpenderCast >= 4750;
             }
         }
 
@@ -752,6 +753,9 @@ namespace Trinity.Combat.Abilities
                     if (meta.IsCombatOnly && CurrentTarget == null)
                         return "IsInCombat";
 
+                    if (meta.ReUseDelay > 0 && TimeSincePowerUse(skill.SNOPower) < meta.ReUseDelay)
+                        return "ReUseDelay";
+
                     //if (meta.IsEliteOnly && Enemies.Nearby.EliteCount == 0)
                     //    return false;
 
@@ -890,20 +894,23 @@ namespace Trinity.Combat.Abilities
         /// <returns>target position</returns>
         public static TrinityCacheObject GetBestAreaEffectTarget(Skill skill)
         {
+            // Avoid bot choosing a target that is too far away (and potentially running towards it) when there is danger close by.
+            var searchRange = (float)(skill.IsGeneratorOrPrimary && Enemies.CloseNearby.Units.Any() ? skill.Meta.CastRange * 0.5 : skill.Meta.CastRange);
+
             TrinityCacheObject target;
             switch (skill.Meta.AreaEffectShape)
             {
                 case AreaEffectShapeType.Beam:
-                    target = TargetUtil.GetBestPierceTarget(skill.Meta.CastRange);
+                    target = TargetUtil.GetBestPierceTarget(searchRange);
                     break;
                 case AreaEffectShapeType.Circle:
-                    target = TargetUtil.GetBestClusterUnit(skill.AreaEffectRadius, skill.Meta.CastRange);
+                    target = TargetUtil.GetBestClusterUnit(skill.AreaEffectRadius, searchRange);
                     break;
                 case AreaEffectShapeType.Cone:
-                    target = TargetUtil.GetBestArcTarget(skill.Meta.CastRange, skill.AreaEffectRadius);
+                    target = TargetUtil.GetBestArcTarget(searchRange, skill.AreaEffectRadius);
                     break;
                 default:
-                    target = TargetUtil.GetBestClusterUnit();
+                    target = TargetUtil.GetBestClusterUnit(skill.AreaEffectRadius, searchRange);
                     break;
             }
 

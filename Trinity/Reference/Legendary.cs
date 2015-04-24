@@ -4442,7 +4442,7 @@ namespace Trinity.Reference
         /// </summary>
         public static Item HwojWrap = new Item
         {
-            Id = 193670,
+            Id = 0,//193670,
             Name = "Hwoj Wrap",
             Quality = ItemQuality.Legendary,
             Slug = "hwoj-wrap",

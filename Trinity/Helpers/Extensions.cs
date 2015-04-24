@@ -41,9 +41,16 @@ namespace Trinity.Helpers
                 }
             }
 
-            var attributes = TypeDescriptor.GetProperties(type)[name].Attributes;
-            var myAttribute = (DefaultValueAttribute)attributes[typeof(DefaultValueAttribute)];
-            return (T)Convert.ChangeType(myAttribute.Value, typeof(T));
+            var properties = TypeDescriptor.GetProperties(type)[name];
+            if (properties != null)
+            {
+                var myAttribute = properties.Attributes.OfType<DefaultValueAttribute>().FirstOrDefault();
+                if (myAttribute != null)
+                {
+                    return (T)Convert.ChangeType(myAttribute.Value, typeof(T));
+                }
+            }
+            return default(T);
         }
 
         /// <summary>
@@ -58,7 +65,7 @@ namespace Trinity.Helpers
         /// <summary>
         /// Get an attribute, exceptions get swallowed and default returned
         /// </summary>
-        public static T GetAttribute<T>(this TrinityCacheObject actor, ActorAttributeType type) where T : struct
+        public static T GetAttributeOrDefault<T>(this TrinityCacheObject actor, ActorAttributeType type) where T : struct
         {
             try
             {
@@ -67,6 +74,22 @@ namespace Trinity.Helpers
             catch (Exception ex)
             {
                 Logger.LogDebug(LogCategory.CacheManagement, "Exception on {0} accessing {1} attribute: {2}", actor.InternalName, type, ex);
+            }
+            return default(T);
+        }
+
+        /// <summary>
+        /// Get an attribute, exceptions get swallowed and default returned
+        /// </summary>
+        public static T GetAttributeOrDefault<T>(this ACD actorACD, ActorAttributeType type) where T : struct
+        {
+            try
+            {
+                actorACD.GetAttribute<T>(type);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug(LogCategory.CacheManagement, "Exception on {0} accessing {1} attribute: {2}", actorACD.Name, type, ex);
             }
             return default(T);
         }

@@ -55,6 +55,10 @@ namespace Trinity.Combat.Abilities
                 if (ShouldRefreshBastiansGeneratorBuff && TryGetPower(GetAttackGenerator(), out power))
                     return power;
 
+                // Use Spender for the Bastians Ring Set buff
+                if (ShouldRefreshBastiansSpenderBuff && TryGetPower(GetAttackSpender(), out power))
+                    return power;
+
                 // Main ability selection 
                 if (TryGetPower(GetCombatPower(CombatSkillOrder), out power))
                     return power;                
@@ -115,11 +119,11 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         public static void SetConditions()
         {
+            Skills.DemonHunter.RainOfVengeance.Meta.CastCondition = RainOfVengeanceCondition;
             Skills.DemonHunter.Vengeance.Meta.CastCondition = VengeanceCondition;
             Skills.DemonHunter.ShadowPower.Meta.CastCondition = ShadowPowerCondition;
             Skills.DemonHunter.SmokeScreen.Meta.CastCondition = SmokeScreenCondition;
             Skills.DemonHunter.Preparation.Meta.CastCondition = PreperationCondition;
-            Skills.DemonHunter.RainOfVengeance.Meta.CastCondition = RainOfVengeanceCondition;
             Skills.DemonHunter.Sentry.Meta.CastCondition = SentryCondition;
             Skills.DemonHunter.Caltrops.Meta.CastCondition = CaltropsCondition;
             Skills.DemonHunter.Companion.Meta.CastCondition = CompanionCondition;
@@ -324,7 +328,7 @@ namespace Trinity.Combat.Abilities
         private static bool StrafeCondition(SkillMeta meta)
         {
             meta.CastRange = 65f;
-            meta.AfterUseDelay = 250;
+            meta.ReUseDelay = 250;
             meta.TargetPositionSelector = ret => TargetUtil.GetZigZagTarget(CurrentTarget.Position, V.F("Barbarian.Whirlwind.ZigZagDistance"));
             meta.CastFlags = CanCastFlags.NoTimer;
             meta.RequiredResource = Settings.Combat.DemonHunter.StrafeMinHatred;
@@ -373,7 +377,7 @@ namespace Trinity.Combat.Abilities
             meta.CastRange = 20f;
             meta.TargetPositionSelector = ret => NavHelper.MainFindSafeZone(Player.Position, true);            
             meta.RequiredResource = Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) ? 22 : 16;
-            meta.AfterUseDelay = Settings.Combat.DemonHunter.VaultMovementDelay;
+            meta.ReUseDelay = Settings.Combat.DemonHunter.VaultMovementDelay;
 
             if (Settings.Combat.DemonHunter.VaultMode == DemonHunterVaultMode.MovementOnly && IsInCombat)
                 return false;
@@ -465,6 +469,7 @@ namespace Trinity.Combat.Abilities
         private static bool RainOfVengeanceCondition(SkillMeta meta)
         {
             meta.CastRange = 90f;            
+            meta.CastFlags = CanCastFlags.NoTimer;
 
             if (Settings.Combat.DemonHunter.RainOfVengeanceOffCD || Sets.NatalyasVengeance.IsEquipped)
                 return true;
@@ -480,7 +485,7 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         private static bool PreperationCondition(SkillMeta meta)
         {
-            meta.AfterUseDelay = Runes.DemonHunter.FocusedMind.IsActive ? 15000 : 500;
+            meta.ReUseDelay = Runes.DemonHunter.FocusedMind.IsActive ? 15000 : 500;
             meta.CastFlags = CanCastFlags.NoTimer;
             
             if (!Runes.DemonHunter.Punishment.IsActive && Player.SecondaryResource <= V.F("DemonHunter.MinPreparationDiscipline"))

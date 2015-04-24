@@ -156,7 +156,7 @@ namespace Trinity.Objects
         /// <summary>
         /// How long to wait (in Milliseconds) after using skill.
         /// </summary>
-        [DefaultValue(100)]
+        [DefaultValue(50)]
         public float AfterUseDelay
         {
             get { return _afterUseDelay.GetValueOrDefaultAttribute(); }
@@ -164,9 +164,18 @@ namespace Trinity.Objects
         }
 
         /// <summary>
+        /// How long to wait before using a skill again
+        /// </summary>
+        public float ReUseDelay
+        {
+            get { return _reUseDelay.GetValueOrDefault(); }
+            set { _reUseDelay = value; }
+        }
+
+        /// <summary>
         /// How long to wait (in Milliseconds) before using skill
         /// </summary>
-        [DefaultValue(100)]
+        [DefaultValue(50)]
         public float BeforeUseDelay
         {
             get { return _beforeUseDelay.GetValueOrDefaultAttribute(); }
@@ -295,6 +304,7 @@ namespace Trinity.Objects
         private float? _maxCastDistance;
         private float? _maxTargetDistance;
         private float? _afterUseDelay;
+        private float? _reUseDelay;
         private float? _beforeUseDelay;
         private bool? _isDestructableSkill;
         private bool? _isDefensiveSkill;
@@ -352,6 +362,7 @@ namespace Trinity.Objects
                 MaxTargetDistance = other._maxTargetDistance ?? MaxTargetDistance;
                 CastRange = other._maxCastDistance ?? CastRange;
                 AfterUseDelay = other._afterUseDelay ?? AfterUseDelay;
+                ReUseDelay = other._reUseDelay ?? ReUseDelay;
                 BeforeUseDelay = other._beforeUseDelay ?? BeforeUseDelay;
                 RequiredCluster = other._requiredCluster ?? RequiredCluster;
                 RequiredResource = other._requiredResource ?? RequiredResource;
@@ -388,6 +399,7 @@ namespace Trinity.Objects
             other.MaxTargetDistance = _maxTargetDistance ?? other.MaxTargetDistance;
             other.CastRange = _maxCastDistance ?? other.CastRange;
             other.AfterUseDelay = _afterUseDelay ?? other.AfterUseDelay;
+            other.ReUseDelay = _reUseDelay ?? other.ReUseDelay;
             other.BeforeUseDelay = _beforeUseDelay ?? other.BeforeUseDelay;
             other.RequiredCluster = _requiredCluster ?? other.RequiredCluster;
             other.RequiredResource = _requiredResource ?? other.RequiredResource;
