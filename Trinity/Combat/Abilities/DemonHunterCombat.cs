@@ -55,6 +55,10 @@ namespace Trinity.Combat.Abilities
                 if (ShouldRefreshBastiansGeneratorBuff && TryGetPower(GetAttackGenerator(), out power))
                     return power;
 
+                // Use Spender for the Bastians Ring Set buff
+                if (ShouldRefreshBastiansSpenderBuff && TryGetPower(GetAttackSpender(), out power))
+                    return power;
+
                 // Main ability selection 
                 if (TryGetPower(GetCombatPower(CombatSkillOrder), out power))
                     return power;                
@@ -115,11 +119,11 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         public static void SetConditions()
         {
+            Skills.DemonHunter.RainOfVengeance.Meta.CastCondition = RainOfVengeanceCondition;
             Skills.DemonHunter.Vengeance.Meta.CastCondition = VengeanceCondition;
             Skills.DemonHunter.ShadowPower.Meta.CastCondition = ShadowPowerCondition;
             Skills.DemonHunter.SmokeScreen.Meta.CastCondition = SmokeScreenCondition;
             Skills.DemonHunter.Preparation.Meta.CastCondition = PreperationCondition;
-            Skills.DemonHunter.RainOfVengeance.Meta.CastCondition = RainOfVengeanceCondition;
             Skills.DemonHunter.Sentry.Meta.CastCondition = SentryCondition;
             Skills.DemonHunter.Caltrops.Meta.CastCondition = CaltropsCondition;
             Skills.DemonHunter.Companion.Meta.CastCondition = CompanionCondition;

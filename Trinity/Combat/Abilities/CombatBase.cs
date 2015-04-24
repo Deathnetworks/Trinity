@@ -586,7 +586,8 @@ namespace Trinity.Combat.Abilities
                 if (Sets.BastionsOfWill.IsFullyEquipped && !CacheData.Buffs.HasBastiansWillGeneratorBuff)
                     return true;
 
-                return SpellHistory.TimeSinceGeneratorCast >= 3500;
+                // Some Generators take a while to actually hit something (chakram for example)
+                return SpellHistory.TimeSinceGeneratorCast >= 4000;
             }
         }
 
@@ -600,7 +601,7 @@ namespace Trinity.Combat.Abilities
                 if (Sets.BastionsOfWill.IsFullyEquipped && !CacheData.Buffs.HasBastiansWillSpenderBuff)
                     return true;
 
-                return  SpellHistory.TimeSinceSpenderCast >= 3500;
+                return  SpellHistory.TimeSinceSpenderCast >= 4750;
             }
         }
 
