@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Zeta.Game;
+using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
+using Zeta.Game.Internals.Actors.Gizmos;
 using Zeta.Game.Internals.SNO;
 using Logger = Trinity.Technicals.Logger;
 
@@ -16,13 +19,13 @@ namespace Trinity.LazyCache
     {
         public CacheBase(ACD acd)
         {
-            UpdateSource(acd);
-            ACDGuid = acd.ACDGuid;            
+            ACDGuid = acd.ACDGuid;     
+            UpdateSource(acd);       
         }
 
         /// <summary>
-        /// Check if the underlying ACD is valid. When false, LazyCache will return only cached values 
-        /// and this object will be destroyed in the next purge.
+        /// Check if the underlying ACD is valid. When false, LazyCache will return only 
+        /// cached values and this object will be destroyed in the next purge.
         /// </summary>
         public bool IsValid
         {
@@ -32,12 +35,36 @@ namespace Trinity.LazyCache
         #region Core Propperties
 
         public ACD Source { get; private set; }
+
         public int ACDGuid { get; private set; }
-        public int UpdateTicks { get; private set; }
+
+        public DateTime LastUpdated { get; private set; }
 
         public ActorType ActorType
         {
-            get { return CacheManager.GetCacheValue(this, parent => parent.Source.ActorType); }
+            get { return CacheManager.GetCacheValue(this, o => o.Source.ActorType); }
+        }
+
+        public DiaObject Object
+        {
+            get { return CacheManager.GetCacheValue(this, o => o.Source.AsRActor); }
+        }
+
+        public DiaGizmo Gizmo
+        {
+            // Todo replace with faster call, ACD Based Obj or ActorManager.GetActorByRActorGuid() when nesox adds it.
+            get { return CacheManager.GetCacheValue(this, o => ZetaDia.Actors.GetActorsOfType<DiaGizmo>(true).FirstOrDefault(u => u.ACDGuid == ACDGuid)); }
+        }
+
+        public ACDItem Item
+        {
+            get { return CacheManager.GetCacheValue(this, o => ActorType == ActorType.Item ? o.Source as ACDItem : null); }
+        }
+
+        public DiaUnit Unit
+        {
+            // Todo replace with faster call, ACD Based Obj or ActorManager.GetActorByRActorGuid() when nesox adds it.
+            get { return CacheManager.GetCacheValue(this, o => ZetaDia.Actors.GetActorsOfType<DiaUnit>(true).FirstOrDefault(u => u.ACDGuid == ACDGuid)); }
         }
 
         #endregion
@@ -58,14 +85,10 @@ namespace Trinity.LazyCache
 
         #region Methods
 
-        /// <summary>
-        /// this should only be called by CacheManager.Update and only once per tick per object.
-        /// </summary>
-        /// <param name="acd"></param>
         internal void UpdateSource(ACD acd)
         {
             Source = acd;
-            ++UpdateTicks;
+            LastUpdated = DateTime.UtcNow;
         }
 
         public override int GetHashCode()

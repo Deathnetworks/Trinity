@@ -132,6 +132,10 @@
     <Compile Include="LazyCache\CacheField.cs" />
     <Compile Include="LazyCache\CacheManager.cs" />
     <Compile Include="LazyCache\CacheUtilities.cs" />
+    <Compile Include="LazyCache\TrinityAvoidance.cs" />
+    <Compile Include="LazyCache\TrinityUnit.cs" />
+    <Compile Include="LazyCache\TrinityPlayer.cs" />
+    <Compile Include="LazyCache\TrinityGizmo.cs" />
     <Compile Include="LazyCache\TrinityItem.cs" />
     <Compile Include="LazyCache\TrinityMonster.cs" />
     <Compile Include="LazyCache\TrinityObject.cs" />

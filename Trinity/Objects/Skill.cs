@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Trinity.Combat;
 using Trinity.Combat.Abilities;
+using Trinity.LazyCache;
 using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
+using Zeta.Game.Internals.SNO;
 
 namespace Trinity.Objects
 {
@@ -455,6 +457,11 @@ namespace Trinity.Objects
         {
             get { return SkillUtils.GetSkillMeta(this); }
             set { SkillUtils.SetSkillMeta(value); }
+        }
+
+        public static explicit operator Skill(ActiveSkillEntry x)
+        {
+            return SkillUtils.ById((SNOPower)x.SNOPower);
         }
 
     }

@@ -219,7 +219,8 @@ namespace Trinity
         /// Contains the list of Boss Level Area ID's
         /// </summary>
         public static HashSet<int> BossLevelAreaIDs { get { return bossLevelAreaIDs; } }
-        private static readonly HashSet<int> bossLevelAreaIDs = new HashSet<int> { 
+        private static readonly HashSet<int> bossLevelAreaIDs = new HashSet<int>
+        { 
             109457, 185228, 60194, 130163, 60714, 19789, 62726, 90881, 195268, 58494, 81178, 60757, 111232, 112580, 
             119656, 111516, 143648, 215396, 119882, 109563, 153669, 215235, 55313, 60193, 19789, 330576,
         };
@@ -596,7 +597,8 @@ namespace Trinity
         /// ActorSNO's of Very fast moving mobs (eg wasps), for special skill-selection decisions
         /// </summary>
         public static HashSet<int> FastMovingMonsterIds { get { return fastMovementMonsterIds; } }
-        private static readonly HashSet<int> fastMovementMonsterIds = new HashSet<int> {
+        private static readonly HashSet<int> fastMovementMonsterIds = new HashSet<int>
+        {
             5212
          };
 
@@ -604,7 +606,8 @@ namespace Trinity
         /// A list of crappy "summoned mobs" we should always ignore unless they are very close to us, eg "grunts", summoned skeletons etc.
         /// </summary>
         public static HashSet<int> ShortRangeAttackMonsterIds { get { return shortRangeAttackMonsterIds; } }
-        private static readonly HashSet<int> shortRangeAttackMonsterIds = new HashSet<int> {
+        private static readonly HashSet<int> shortRangeAttackMonsterIds = new HashSet<int>
+        {
             4084, 4085, 5395, 144315,
          };
 
@@ -612,7 +615,8 @@ namespace Trinity
         /// Dictionary of Actor SNO's and cooresponding weighting/Priority 
         /// </summary>
         public static Dictionary<int, int> MonsterCustomWeights { get { return monsterCustomWeights; } }
-        private static readonly Dictionary<int, int> monsterCustomWeights = new Dictionary<int, int> {
+        private static readonly Dictionary<int, int> monsterCustomWeights = new Dictionary<int, int>
+        {
             // Wood wraiths all this line (495 & 496 & 6572 & 139454 & 139456 & 170324 & 170325)
             {495, 901}, {496, 901}, {6572, 901}, {139454, 901}, {139456, 901}, {170324, 901}, {170325, 901},
             // -- added 4099 (act 2 fallen shaman)
@@ -681,7 +685,8 @@ namespace Trinity
         /// A list of all known SNO's of treasure goblins/bandits etc.
         /// </summary>
         public static HashSet<int> GoblinIds { get { return goblinIds; } }
-        private static readonly HashSet<int> goblinIds = new HashSet<int> {
+        private static readonly HashSet<int> goblinIds = new HashSet<int>
+        {
             5984, 5985, 5987, 5988, 405186, 380657
          };
 
@@ -689,7 +694,8 @@ namespace Trinity
         /// Contains ActorSNO of ranged units that should be attacked even if outside of kill radius
         /// </summary>
         public static HashSet<int> RangedMonsterIds { get { return rangedMonsterIds; } }
-        private static readonly HashSet<int> rangedMonsterIds = new HashSet<int> {
+        private static readonly HashSet<int> rangedMonsterIds = new HashSet<int>
+        {
             365, 4100, // fallen
             4304, 4300, // goat shaman 
             4738, // pestilence 
@@ -761,21 +767,25 @@ namespace Trinity
         // Three special lists used purely for checking for the existance of a player's summoned mystic ally, gargantuan, or zombie dog
 
         public static HashSet<int> MysticAllyIds { get { return mysticAllyIds; } }
-        private static readonly HashSet<int> mysticAllyIds = new HashSet<int> { 
+        private static readonly HashSet<int> mysticAllyIds = new HashSet<int>
+        { 
             169123, 123885, 169890, 168878, 169891, 169077, 169904, 169907, 169906, 169908, 169905, 169909 
         };
 
         public static HashSet<int> GargantuanIds { get { return gargantuanIds; } }
-        private static readonly HashSet<int> gargantuanIds = new HashSet<int> { 
+        private static readonly HashSet<int> gargantuanIds = new HashSet<int>
+        { 
             179780, 179778, 179772, 179779, 179776, 122305 };
 
         public static HashSet<int> ZombieDogIds { get { return zombieDogIds; } }
-        private static readonly HashSet<int> zombieDogIds = new HashSet<int> { 
+        private static readonly HashSet<int> zombieDogIds = new HashSet<int>
+        { 
             110959, 103235, 103215, 105763, 103217, 51353, 
         };
 
         public static HashSet<int> DemonHunterPetIds { get { return demonHunterPetIds; } }
-        private static readonly HashSet<int> demonHunterPetIds = new HashSet<int> { 
+        private static readonly HashSet<int> demonHunterPetIds = new HashSet<int>
+        { 
             178664, 
             173827, 
             133741, 
@@ -789,7 +799,8 @@ namespace Trinity
         };
 
         public static HashSet<int> DemonHunterSentryIds { get { return demonHunterSentryIds; } }
-        private static readonly HashSet<int> demonHunterSentryIds = new HashSet<int> { 
+        private static readonly HashSet<int> demonHunterSentryIds = new HashSet<int>
+        { 
            141402, 150025, 150024, 168815, 150026, 150027,
         };
 
@@ -810,7 +821,8 @@ namespace Trinity
         /// A list of SNO's to *FORCE* to type: Item. (BE CAREFUL WITH THIS!).
         /// </summary>
         public static HashSet<int> ForceToItemOverrideIds { get { return forceToItemOverrideIds; } }
-        private static readonly HashSet<int> forceToItemOverrideIds = new HashSet<int> {
+        private static readonly HashSet<int> forceToItemOverrideIds = new HashSet<int>
+        {
             166943, // DemonTrebuchetKey, infernal key
             255880, // DemonKey_Destruction
             255881, // DemonKey_Hate
@@ -821,7 +833,8 @@ namespace Trinity
         /// Interactable whitelist - things that need interacting with like special wheels, levers - they will be blacklisted for 30 seconds after one-use
         /// </summary>
         public static HashSet<int> InteractWhiteListIds { get { return interactWhiteListIds; } }
-        private static readonly HashSet<int> interactWhiteListIds = new HashSet<int> {
+        private static readonly HashSet<int> interactWhiteListIds = new HashSet<int>
+        {
             56686, // a3dun_Keep_Bridge_Switch 
             211999, // a3dun_Keep_Bridge_Switch_B 
             52685, // a3dun_Keep_Bridge
@@ -860,7 +873,8 @@ namespace Trinity
         /// BEFORE trying to actually "click it". Certain objects need you to get very close, so it's worth having them listed with low interact ranges
         /// </summary>
         public static Dictionary<int, float> CustomObjectRadius { get { return customObjectRadius; } }
-        private static readonly Dictionary<int, float> customObjectRadius = new Dictionary<int, float> {
+        private static readonly Dictionary<int, float> customObjectRadius = new Dictionary<int, float>
+        {
             {56686, 4}, 
             {52685, 4}, 
             {54882, 40}, 
@@ -880,7 +894,8 @@ namespace Trinity
         /// MAKE SURE you add the *SAME* SNO to the "size" dictionary below, and include a reasonable size (keep it smaller rather than larger) for the SNO.
         /// </summary>
         public static HashSet<int> NavigationObstacleIds { get { return navigationObstacleIds; } }
-        private static readonly HashSet<int> navigationObstacleIds = new HashSet<int> {
+        private static readonly HashSet<int> navigationObstacleIds = new HashSet<int>
+        {
             174900, 185391, // demonic forge
             194682, 81699, 3340, 123325, 
 
@@ -908,7 +923,8 @@ namespace Trinity
         /// Size of the navigation obstacles above (actual SNO list must be matching the above list!)
         /// </summary>
         public static Dictionary<int, float> ObstacleCustomRadius { get { return obstacleCustomRadius; } }
-        private static readonly Dictionary<int, float> obstacleCustomRadius = new Dictionary<int, float> {
+        private static readonly Dictionary<int, float> obstacleCustomRadius = new Dictionary<int, float>
+        {
             {174900, 25}, {194682, 20}, {81699, 20}, {3340, 12}, {123325, 25}, {185391, 25},
             {104596, 15}, // trOut_FesteringWoods_Neph_Column_B
             {104632, 15}, // trOut_FesteringWoods_Neph_Column_B_Broken_Base
@@ -942,7 +958,8 @@ namespace Trinity
         /// This is the RadiusDistance at which destructibles and barricades (logstacks, large crates, carts, etc.) are added to the cache
         /// </summary>
         public static Dictionary<int, float> DestructableObjectRadius { get { return destructableObjectRadius; } }
-        private static readonly Dictionary<int, float> destructableObjectRadius = new Dictionary<int, float> {
+        private static readonly Dictionary<int, float> destructableObjectRadius = new Dictionary<int, float>
+        {
             {2972, 10}, {80357, 16}, {116508, 10}, {113932, 8}, {197514, 18}, {108587, 8}, {108618, 8}, {108612, 8}, {116409, 18}, {121586, 22},
             {195101, 10}, {195108, 25}, {170657, 5}, {181228, 10}, {211959, 25}, {210418, 25}, {174496, 4}, {193963, 5}, {159066, 12}, {160570, 12},
             {55325, 5}, {5718, 14}, {5909, 10}, {5792, 8}, {108194, 8}, {129031, 30}, {192867, 3.5f}, {155255, 8}, {54530, 6}, {157541, 6},
@@ -953,7 +970,8 @@ namespace Trinity
         /// Destructible things that need targeting by a location instead of an ACDGUID (stuff you can't "click on" to destroy in-game)
         /// </summary>
         public static HashSet<int> DestroyAtLocationIds { get { return destroyAtLocationIds; } }
-        private static readonly HashSet<int> destroyAtLocationIds = new HashSet<int> {
+        private static readonly HashSet<int> destroyAtLocationIds = new HashSet<int>
+        {
             170657, 116409, 121586, 155255, 104596, 93306,
          };
 
@@ -961,7 +979,8 @@ namespace Trinity
         /// Resplendent chest SNO list
         /// </summary>
         public static HashSet<int> ResplendentChestIds { get { return resplendentChestIds; } }
-        private static readonly HashSet<int> resplendentChestIds = new HashSet<int> {
+        private static readonly HashSet<int> resplendentChestIds = new HashSet<int>
+        {
             62873, 95011, 81424, 108230, 111808, 111809, 211861, 62866, 109264, 62866, 62860, 96993,
             // Magi
 			112182,
@@ -997,7 +1016,8 @@ namespace Trinity
         /// Chests/average-level containers that deserve a bit of extra radius (ie - they are more worthwhile to loot than "random" misc/junk containers)
         /// </summary>
         public static HashSet<int> ContainerWhiteListIds { get { return containerWhiteListIds; } }
-        private static readonly HashSet<int> containerWhiteListIds = new HashSet<int> {
+        private static readonly HashSet<int> containerWhiteListIds = new HashSet<int>
+        {
             62859,  // TrOut_Fields_Chest
             62865,  // TrOut_Highlands_Chest
             62872,  // CaOut_Oasis_Chest
@@ -1040,7 +1060,8 @@ namespace Trinity
         /// Contains ActorSNO's of world objects that should be blacklisted
         /// </summary>
         public static HashSet<int> BlackListIds { get { return blacklistIds; } }
-        private static HashSet<int> blacklistIds = new HashSet<int> {
+        private static HashSet<int> blacklistIds = new HashSet<int>
+        {
             
             362323, // x1_WestmHub_GuardNoHelmUnarmed
             // World Objects
@@ -1177,7 +1198,7 @@ namespace Trinity
             internal set { lastUseAbilityTimeDefaults = value; }
         }
         private static Dictionary<SNOPower, DateTime> lastUseAbilityTimeDefaults = new Dictionary<SNOPower, DateTime>
-            {
+        {
                 {SNOPower.DrinkHealthPotion, DateTime.MinValue},
                 {SNOPower.Weapon_Melee_Instant, DateTime.MinValue},
                 {SNOPower.Weapon_Ranged_Instant, DateTime.MinValue},
@@ -1229,7 +1250,7 @@ namespace Trinity
             "Diabolic Wand"
         };
         // Chamber of Suffering (Butcher's Lair)
-        public static HashSet<Vector3> ChamberOfSufferingSafePoints = new HashSet<Vector3> 
+        public static HashSet<Vector3> ChamberOfSufferingSafePoints = new HashSet<Vector3>
         {
             new Vector3(122.3376f, 120.1721f, 0), // Center
             new Vector3(138.504f,  88.64854f, 0), // Top Left
@@ -1278,6 +1299,34 @@ namespace Trinity
             { Skills.Wizard.Archon, Sets.VyrsAmazingArcana },
         };
 
+        public readonly static HashSet<TrinityObjectType> InteractableTypes = new HashSet<TrinityObjectType>
+        {
+            TrinityObjectType.Item,
+            TrinityObjectType.Door,
+            TrinityObjectType.Container,
+            TrinityObjectType.HealthWell,  
+            TrinityObjectType.CursedChest,
+            TrinityObjectType.Interactable,
+            TrinityObjectType.Shrine,
+            TrinityObjectType.CursedShrine               
+        };
+
+        public readonly static HashSet<TrinityObjectType> DestroyableTypes = new HashSet<TrinityObjectType>
+        {
+            TrinityObjectType.Barricade,
+            TrinityObjectType.Destructible,
+            TrinityObjectType.HealthGlobe,
+            TrinityObjectType.ProgressionGlobe                        
+        };
+
+        public readonly static HashSet<TrinityObjectType> NoPickupClickTypes = new HashSet<TrinityObjectType>
+        {
+                    TrinityObjectType.Gold,
+                    TrinityObjectType.PowerGlobe,
+                    TrinityObjectType.HealthGlobe,
+                    TrinityObjectType.ProgressionGlobe                     
+        };
+
         #region Methods
 
         /// <summary>
@@ -1296,6 +1345,5 @@ namespace Trinity
                 return false;
         }
         #endregion
-
     }
 }
