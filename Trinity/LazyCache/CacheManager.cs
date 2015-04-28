@@ -19,6 +19,7 @@ namespace Trinity.LazyCache
     * - Any property can be is configured with its own cache duration.
     * - If the duration hasn't expired on a property, a cached value is returned instead.
     * - All objects with the same ACDGuid share cached values regardless of instance.
+    * - Things aren't excluded from the cache for the purposes of targetting.
     */
 
     /// <summary>
@@ -44,7 +45,7 @@ namespace Trinity.LazyCache
             CacheUpdated +=  args =>
             {
 
-                Logger.Log("Cached Updated Monsters={0} Elites={1} Gizmos={2} Items={3} Players={4} Objects={5} Avoidances={6} (Added={7} Updated={8} Removed={9}) in {9}ms",
+                Logger.Log("Cached Updated Monsters={0} Elites={1} Gizmos={2} Items={3} Players={4} Objects={5} Avoidances={6} (Added={7} Updated={8} Removed={9}) in {10}ms",
                     Monsters.Count,
                     EliteRareUniqueBoss.Count,
                     Gizmos.Count,

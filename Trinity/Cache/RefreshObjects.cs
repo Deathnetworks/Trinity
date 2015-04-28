@@ -771,11 +771,7 @@ namespace Trinity
             CacheData.FullClear();
         }
 
-        private static HashSet<string> ignoreNames = new HashSet<string>
-        {
-            "MarkerLocation", "Generic_Proxy", "Hireling", "Start_Location", "SphereTrigger", "Checkpoint", "ConductorProxyMaster", "BoxTrigger", "SavePoint", "TriggerSphere", 
-            "minimapicon", 
-        };
+
 
 
         private static List<DiaObject> ReadDebugActorsFromMemory()

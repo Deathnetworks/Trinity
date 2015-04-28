@@ -38,6 +38,16 @@ namespace Trinity.LazyCache
             get { return CacheManager.GetCacheValue(this, o => ZetaDia.Me.CurrentSecondaryResource, 0); }
         }
 
+        public float SecondaryResourcePct
+        {
+            get { return CacheManager.GetCacheValue(this, o => MaxPrimaryResource > 0 ? CurrentPrimaryResource / MaxPrimaryResource : 0, 50); }
+        }
+
+        public float PrimaryResourcePct
+        {
+            get { return CacheManager.GetCacheValue(this, o => MaxSecondaryResource > 0 ? CurrentSecondaryResource / MaxSecondaryResource : 0, 50); }
+        }
+
         public int DeathCount
         {
             get { return CacheManager.GetCacheValue(this, o => ZetaDia.Me.DeathCount, 5000); }

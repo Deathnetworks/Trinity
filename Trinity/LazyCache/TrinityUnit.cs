@@ -364,6 +364,12 @@ namespace Trinity.LazyCache
             get { return CacheManager.GetCacheValue(this, o => ZetaDia.Me.Movement.Rotation, 50); }
         }
 
+        public float CurrentHealthPct
+        {
+            get { return CacheManager.GetCacheValue(this, o => o.Unit.HitpointsCurrentPct, 50); }
+        }       
+
+
         public bool IsMarker { get; set; }
 
         #endregion

@@ -1321,10 +1321,52 @@ namespace Trinity
 
         public readonly static HashSet<TrinityObjectType> NoPickupClickTypes = new HashSet<TrinityObjectType>
         {
-                    TrinityObjectType.Gold,
-                    TrinityObjectType.PowerGlobe,
-                    TrinityObjectType.HealthGlobe,
-                    TrinityObjectType.ProgressionGlobe                     
+            TrinityObjectType.Gold,
+            TrinityObjectType.PowerGlobe,
+            TrinityObjectType.HealthGlobe,
+            TrinityObjectType.ProgressionGlobe                     
+        };
+
+        public readonly static HashSet<SNOActor> Shrines = new HashSet<SNOActor>
+        {
+            SNOActor.Shrine_Global_Fortune,
+            SNOActor.Shrine_Global_Blessed,
+            SNOActor.Shrine_Global_Frenzied,
+            SNOActor.Shrine_Global_Reloaded,                     
+            SNOActor.Shrine_Global_Enlightened,    
+            SNOActor.Shrine_Global_Hoarder,    
+            SNOActor.x1_LR_Shrine_Infinite_Casting,    
+            SNOActor.x1_LR_Shrine_Electrified,    
+            SNOActor.x1_LR_Shrine_Invulnerable,    
+            SNOActor.x1_LR_Shrine_Run_Speed,    
+            SNOActor.x1_LR_Shrine_Damage 
+        };
+
+        internal static HashSet<string> ActorIgnoreNames = new HashSet<string>
+        {
+            "MarkerLocation", 
+            "Generic_Proxy", 
+            "Hireling", 
+            "Start_Location", 
+            "SphereTrigger", 
+            "Checkpoint", 
+            "ConductorProxyMaster", 
+            "BoxTrigger", 
+            "SavePoint", 
+            "TriggerSphere", 
+            "minimapicon", 
+        };
+
+        internal static HashSet<SNOAnim> ActorChargeAnimations = new HashSet<SNOAnim>
+        {
+            SNOAnim.Beast_start_charge_02, 
+            SNOAnim.Beast_charge_02, 
+            SNOAnim.Beast_charge_04, 
+            SNOAnim.Butcher_Attack_Charge_01_in, 
+            SNOAnim.Butcher_Attack_Chain_01_out,
+            SNOAnim.Butcher_Attack_05_telegraph, 
+            SNOAnim.Butcher_Attack_Chain_01_in, 
+            SNOAnim.Butcher_BreakFree_run_01,  
         };
 
         #region Methods

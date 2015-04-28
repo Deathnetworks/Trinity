@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Navigation;
+using Trinity.DbProvider;
+using Zeta.Bot.Navigation;
+using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 using Logger = Trinity.Technicals.Logger;
@@ -19,7 +23,12 @@ namespace Trinity.LazyCache
 
         public bool HasBeenOperated
         {
-            get { return CacheManager.GetCacheValue(this, o => o.Gizmo.HasBeenOperated); }
+            get { return CacheManager.GetCacheValue(this, o => o.Gizmo.HasBeenOperated, 200); }
+        }
+
+        public bool IsGizmoUsed
+        {
+            get { return CacheManager.GetCacheValue(this, CacheUtilities.IsGizmoUsed, 200); }
         }
 
         public bool IsBarricade
@@ -69,7 +78,7 @@ namespace Trinity.LazyCache
 
         public int GizmoCharges
         {
-            get { return CacheManager.GetCacheValue(this, o => o.Gizmo.GizmoCharges); }
+            get { return CacheManager.GetCacheValue(this, o => o.Gizmo.GizmoCharges, 200); }
         }
 
         public int GizmoOperatorACDID
@@ -79,7 +88,77 @@ namespace Trinity.LazyCache
 
         public int GizmoState
         {
-            get { return CacheManager.GetCacheValue(this, o => o.Gizmo.GizmoState); }
+            get { return CacheManager.GetCacheValue(this, o => o.Gizmo.GizmoState, 200); }
+        }
+
+        public bool IsChestOpen
+        {
+            get { return CacheManager.GetCacheValue(this, o => o.Source.GetAttributeOrDefault<int>(ActorAttributeType.ChestOpen) > 0); }
+        }
+
+        public bool IsCorpse
+        {
+            get { return CacheManager.GetCacheValue(this, o => o.InternalName.ToLower().Contains("corpse")); }
+        }
+
+        public bool IsWeaponRack
+        {
+            get { return CacheManager.GetCacheValue(this, o => o.InternalName.ToLower().Contains("rack")); }
+        }
+
+        public bool IsGroundClicky
+        {
+            get { return CacheManager.GetCacheValue(this, o => o.InternalName.ToLower().Contains("ground_clicky")); }
+        }
+
+        public bool IsChest
+        {
+            get
+            {
+                return CacheManager.GetCacheValue(this, o => (!IsRareChest && o.InternalName.ToLower().Contains("chest")) ||
+                            DataDictionary.ContainerWhiteListIds.Contains(o.ActorSNO)); 
+            }
+        }
+
+        public bool IsRareChest
+        {
+            get 
+            { 
+                return CacheManager.GetCacheValue(this, o => o.InternalName.ToLower().Contains("chest_rare") || 
+                DataDictionary.ResplendentChestIds.Contains(o.ActorSNO)); 
+            }
+        }
+
+        public bool IsCloseDestructable
+        {
+            get { return CacheManager.GetCacheValue(this, o => IsDestructibleObject && Distance < 6f); }
+        }
+
+        public bool IsCloseLargeDestructable
+        {
+            get { return CacheManager.GetCacheValue(this, o => IsCloseDestructable && o.Radius >= 10f); }
+        }
+
+        public bool IsWithinDestroyRange
+        {
+            get { return CacheManager.GetCacheValue(this, o => DestroyRange <= Distance); }
+        }
+
+        public bool IsShrine
+        {
+            get { return CacheManager.GetCacheValue(this, o => Type == TrinityObjectType.Shrine || Type == TrinityObjectType.CursedShrine); }
+        }
+
+        public float DestroyRange
+        {
+            get
+            {
+                return CacheManager.GetCacheValue(this, o =>
+                {
+                    float maxRadiusDistance;
+                    return DataDictionary.DestructableObjectRadius.TryGetValue(o.ActorSNO, out maxRadiusDistance) ? maxRadiusDistance : Trinity.Settings.WorldObject.DestructibleRange;
+                });
+            }
         }
 
         public int GrantsNoXp

@@ -144,6 +144,11 @@ namespace Trinity.LazyCache
             get { return CacheManager.GetCacheValue(this, o => o.Unit.IgnoresCriticalHits); }
         }
 
+        public bool IsCharging
+        {
+            get { return CacheManager.GetCacheValue(this, o => o.Unit.IsFacingPlayer && DataDictionary.ActorChargeAnimations.Any(a => a == o.CurrentAnimation), 50); }
+        }
+
         public bool HasDOTDps
         {
             get { return CacheManager.GetCacheValue(this, o => o.Source.GetAttributeOrDefault<int>(ActorAttributeType.DOTDPS) != 0); }

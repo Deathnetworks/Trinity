@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using Zeta.Game;
+using Zeta.Common;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 using Logger = Trinity.Technicals.Logger;
@@ -130,8 +131,14 @@ namespace Trinity.LazyCache
 
         internal static TrinityObjectType GetTrinityObjectType(this TrinityObject trinityObject)
         {
+            var id = trinityObject.ActorSNO;
+            var snoActor = (SNOActor)id;
+
             if (trinityObject.AvoidanceType != AvoidanceType.None)
                 return TrinityObjectType.Avoidance;
+
+            if (DataDictionary.Shrines.Any(s => s == snoActor))
+                return TrinityObjectType.Shrine;
 
             if (trinityObject.GizmoType != GizmoType.None)
                 return TrinityObjectType.Interactable;            
@@ -139,7 +146,56 @@ namespace Trinity.LazyCache
             if (trinityObject.IsUnit)
                 return TrinityObjectType.Unit;
 
+
+
             return TrinityObjectType.Unknown;
+        }
+
+        internal static bool IsBossSNO(int actorSNO)
+        {
+            return DataDictionary.BossIds.Contains(actorSNO);
+        }
+
+        internal static bool IsAvoidanceSNO(int actorSNO)
+        {
+            return DataDictionary.Avoidances.Contains(actorSNO) || DataDictionary.ButcherFloorPanels.Contains(actorSNO) || DataDictionary.AvoidanceProjectiles.Contains(actorSNO);
+        }
+
+        internal static bool IsGizmoUsed(TrinityGizmo gizmo)
+        {
+            int endAnimation;
+            if (gizmo.Type == TrinityObjectType.Interactable &&
+                DataDictionary.InteractEndAnimations.TryGetValue(gizmo.ActorSNO, out endAnimation) &&
+                endAnimation == (int)gizmo.CurrentAnimation)
+                return true;
+
+            if (gizmo.HasBeenOperated || gizmo.IsChestOpen)
+                return true;
+
+            if (gizmo.GizmoState == 1)
+                return true;
+
+            if (gizmo.Type == TrinityObjectType.Door)
+            {
+                string currentAnimation = gizmo.CurrentAnimation.ToString().ToLower();
+
+                // special hax for A3 Iron Gates
+                if (currentAnimation.Contains("irongate") && currentAnimation.Contains("open"))
+                    return false;
+
+                if (currentAnimation.Contains("irongate") && currentAnimation.Contains("idle"))
+                    return true;
+
+                if (currentAnimation.EndsWith("open") || currentAnimation.EndsWith("opening"))
+                    return true;                
+            }
+
+            return false;
+        }
+
+        internal static float GetZDiff(Vector3 position)
+        {
+            return position != Vector3.Zero ? Math.Abs(CacheManager.Me.Position.Z - position.Z) : 0f;
         }
     }
 }

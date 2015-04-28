@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Trinity.DbProvider;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Game;
@@ -35,6 +36,11 @@ namespace Trinity.LazyCache
             get { return CacheManager.GetCacheValue(this, o => o.Source.Distance, 50); }
         }
 
+        public int RActorGuid
+        {
+            get { return CacheManager.GetCacheValue(this, o => o.Object.RActorGuid, 50); }
+        }
+
         public float RadiusDistance
         {
             get { return CacheManager.GetCacheValue(this, o => Math.Max(Distance - Radius, 0f), 50); }
@@ -57,7 +63,17 @@ namespace Trinity.LazyCache
 
         public float Radius
         {
-            get { return CacheManager.GetCacheValue(this, o => o.Unit.CollisionSphere.Radius); }
+            get 
+            { 
+                return CacheManager.GetCacheValue(this, o =>
+                {
+                    float radius;
+                    if (IsNavigationObstacle && DataDictionary.CustomObjectRadius.TryGetValue(o.ActorId, out radius))
+                        return radius;
+
+                    return o.Unit.CollisionSphere.Radius;
+                }); 
+            }
         }
 
         public bool InLineOfSight
@@ -196,9 +212,46 @@ namespace Trinity.LazyCache
             get { return CacheManager.GetCacheValue(this, o => DataDictionary.DestroyableTypes.Any(t => t == Type)); }
         }
 
-        public bool ShouldIgnore { get; set; }
+        public bool IsUntargetable
+        {
+            get { return CacheManager.GetCacheValue(this, o => o.Source.GetAttributeOrDefault<int>(ActorAttributeType.NoDamage) > 0); }
+        }
 
-        public IgnoreReasonFlags IgnoreReasons { get; set; }
+        public bool IsInvulnerable
+        {
+            get { return CacheManager.GetCacheValue(this, o => o.Source.GetAttributeOrDefault<int>(ActorAttributeType.Invulnerable) > 0); }
+        }
+
+        public bool IsNavigationObstacle
+        {
+            get { return CacheManager.GetCacheValue(this, o => DataDictionary.NavigationObstacleIds.Contains(o.ActorSNO)); }
+        }
+
+        public bool IsBlocking
+        {
+            get { return CacheManager.GetCacheValue(this, o => o.RadiusDistance <= 2f && PlayerMover.GetMovementSpeed() <= 0); }
+        }
+
+        public bool IsNoDamage
+        {
+            get { return CacheManager.GetCacheValue(this, o => o.Source.GetAttributeOrDefault<int>(ActorAttributeType.Untargetable) > 0); }
+        }
+
+        public bool IsIgnored
+        {
+            get { return IgnoreReasons.Any(); }
+        }
+
+        public float Weight { get; set; }
+
+        //public List<Weighting.Weight> WeightFactors { get; set; }
+
+        //public float Weight
+        //{
+        //    get { return CacheManager.GetCacheValue(this, Weighting.CalculateWeight, 500); }
+        //}
+
+        public List<IgnoreReason> IgnoreReasons { get; set; }
 
         #endregion
 
