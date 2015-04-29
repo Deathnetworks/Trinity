@@ -232,6 +232,37 @@ namespace Trinity
         Any = Freeze | Stun | Knockback | Immobilize | Chill | Blind | Charm | Slow
     }
 
+    public enum IgnoreReason
+    {        
+        None = 0,
+        Invalid,
+        ObjectType,
+        PlayerSummon,
+        Environment,
+        ClientEffect,
+        Blacklist,
+        ZDiff,
+        IgnoreUnknown,
+        IgnoreLoS,
+        IgnoreName,
+        Distance,
+        Invulnerable,
+        Invisible,
+        PlayerHeadstone,
+        NotInRange,
+        DisabledByScript,
+        NoDamage,
+        HasBeenOperated,
+        IsLocked,
+        DoorAnimating,
+        GizmoState1,
+        Untargetable,
+        EndAnimation,
+        Settings,
+        AlreadyOpen
+    }
+    
+
     /// <summary>
     /// Enum CraftingMaterialType - this is not finalized, i don't have all the items
     /// </summary>
@@ -262,4 +293,19 @@ namespace Trinity
         KeyOfHate = 255881,
         KeyOfTerror = 255882,
     }
+
+    public enum MonsterQuality
+    {
+        Normal = 0,
+        Champion = 1,
+        Rare = 2,
+        Minion = 3,
+        Unique = 4,
+        Hireling = 5,
+        Boss = 7
+    }
+
+
+
 }
+

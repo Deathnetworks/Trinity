@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using Trinity.Helpers;
 using Trinity.Items;
+using Trinity.LazyCache;
 using Trinity.UI.UIComponents;
 using Zeta.Bot;
 using Zeta.Game;
@@ -48,7 +49,8 @@ namespace Trinity.UI
                     CreateButton("Dump My Build", DumpBuildEventHandler);
                     CreateButton("Show Cache", ShowCacheWindowEventHandler);
                     CreateButton("Reset TVars", ResetTVarsEventHandler);
-
+                    CreateButton("Start LazyCache", StartLazyCacheEventHandler);
+                    CreateButton("Stop LazyCache", StopLazyCacheEventHandler);
 
                     _tabItem = new TabItem
                     {
@@ -106,6 +108,31 @@ namespace Trinity.UI
          *  
          *************/
 
+        private static void StartLazyCacheEventHandler(object sender, RoutedEventArgs routedEventArgs)
+        {
+            try
+            {
+                CacheManager.Start();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error Starting LazyCache: " + ex);
+            }
+        }
+
+        private static void StopLazyCacheEventHandler(object sender, RoutedEventArgs routedEventArgs)
+        {
+            try
+            {
+                CacheManager.Stop();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error Starting LazyCache: " + ex);
+            }
+        }
+
+
         private static void ResetTVarsEventHandler(object sender, RoutedEventArgs routedEventArgs)
         {
             try
@@ -120,6 +147,7 @@ namespace Trinity.UI
                 Logger.LogError("Error Resetting TVar's:" + ex);
             }
         }
+
         private static void ShowCacheWindowEventHandler(object sender, RoutedEventArgs routedEventArgs)
         {
             try

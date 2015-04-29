@@ -429,7 +429,7 @@ namespace Trinity
             CurrentCacheObject.Type = TrinityObjectType.Unknown;
 
             var currentInternalName = CurrentCacheObject.InternalName.ToLower();
-            foreach (var ignoreName in ignoreNames)
+            foreach (var ignoreName in DataDictionary.ActorIgnoreNames)
             {
                 if (currentInternalName.StartsWith(ignoreName.ToLower(), StringComparison.InvariantCultureIgnoreCase))
                 {

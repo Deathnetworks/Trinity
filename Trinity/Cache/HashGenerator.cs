@@ -91,7 +91,7 @@ namespace Trinity
             }
         }
 
-        static string GetMd5Hash(MD5 md5Hash, string input)
+        internal static string GetMd5Hash(MD5 md5Hash, string input)
         {
             using (new PerformanceLogger("GetMd5Hash"))
             {

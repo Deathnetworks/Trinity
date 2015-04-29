@@ -1,7 +1,9 @@
 ﻿using Trinity.Combat;
 using Trinity.Combat.Abilities;
+using Trinity.Reference;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
+using Zeta.Game.Internals.SNO;
 
 namespace Trinity.Objects
 {
@@ -97,5 +99,10 @@ namespace Trinity.Objects
         }
 
         public string IconSlug { get; set; }
+
+        public static explicit operator Passive(TraitEntry x)
+        {
+            return PassiveUtils.ById((SNOPower)x.SNOPower);
+        }
     }
 }
