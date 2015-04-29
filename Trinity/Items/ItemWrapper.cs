@@ -50,11 +50,10 @@ namespace Trinity.Items
 
         public ItemWrapper(ACDItem item)
         {
-
-            ActorSNO = item.ActorSNO;
-            Name = item.Name;
             try
             {
+                ActorSNO = item.ActorSNO;
+                Name = item.Name;
                 GameBalanceId = item.GameBalanceId;
                 DynamicID = item.DynamicId;
                 ACDGuid = item.ACDGuid;
@@ -93,7 +92,7 @@ namespace Trinity.Items
             }
             catch (Exception ex)
             {
-                Logger.LogError("Error wrapping item {0}/{1}: " + ex, Name, ActorSNO);
+                Logger.LogError("Error wrapping item {0}: " + ex);
             }
         }
 

@@ -641,6 +641,11 @@ namespace Trinity.Reference
                         meta.IsAreaEffectSkill = true;
                         meta.AreaEffectShape = AreaEffectShapeType.Beam;
                     }
+
+                    if (skill.CurrentRune == Runes.Barbarian.Punish)
+                    {
+                        meta.IsBuffingSkill = true;
+                    }
                 }
             };
 
@@ -745,6 +750,7 @@ namespace Trinity.Reference
                     meta.IsCombatOnly = true;
                     meta.IsOffensiveSkill = true;
                     meta.CastRange = 6f;
+                    meta.IsDestructableSkill = true;
                 }
             };
 
@@ -882,6 +888,7 @@ namespace Trinity.Reference
                     meta.IsCastOnSelf = true;
                     meta.IsDefensiveSkill = true;
                     meta.IsOffensiveSkill = true;
+                    meta.IsBuffingSkill = true;
                 }
             };
 
@@ -914,6 +921,7 @@ namespace Trinity.Reference
                     meta.IsCastOnSelf = true;
                     meta.IsDefensiveSkill = true;
                     meta.IsOffensiveSkill = true;
+                    meta.IsBuffingSkill = true;
                 }
             };
 

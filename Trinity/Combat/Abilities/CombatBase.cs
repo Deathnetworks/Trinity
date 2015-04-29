@@ -643,7 +643,7 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         internal static TrinityPower GetAvoidanceSkill()
         {
-            return FindSkill("Avoidance", s => (s.Meta.IsAvoidanceSkill || s.Meta.IsMovementSkill) && s.Meta.IsDefensiveSkill && s.CanCast());
+            return FindSkill("Avoidance", s => (s.Meta.IsAvoidanceSkill || s.Meta.IsMovementSkill) && s.CanCast());
         }
 
         /// <summary>
@@ -715,10 +715,10 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         /// <param name="skill">the Skill to check</param>
         /// <param name="changes">action to modify existing skill data</param>
-        public static bool CanCast(Skill skill, Action<SkillMeta> changes)
-        {
-            return CanCast(skill, null, c => { changes(c); return true; });
-        }
+        //public static bool CanCast(Skill skill, Action<SkillMeta> changes)
+        //{
+        //    return CanCast(skill, null, c => { changes(c); return true; });
+        //}
 
         /// <summary>
         /// Checks if a skill can and should be cast.
