@@ -586,7 +586,8 @@ namespace Trinity
                              */
                             bool addToCache = CacheDiaObject(currentObject);
                             CurrentCacheObject.IgnoreReason = c_IgnoreReason + "." + c_IgnoreSubStep; // (!addToCache ? ((c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : "");
-                            CacheData.IgnoreReasons.Add(currentObject.RActorGuid, CurrentCacheObject.IgnoreReason);
+                            if (!CacheData.IgnoreReasons.ContainsKey(currentObject.RActorGuid))
+                                CacheData.IgnoreReasons.Add(currentObject.RActorGuid, CurrentCacheObject.IgnoreReason);
                             if (addToCache)
                                 ObjectCache.Add(CurrentCacheObject);
                         }
@@ -601,7 +602,8 @@ namespace Trinity
                             bool addToCache = CacheDiaObject(currentObject);
 
                             CurrentCacheObject.IgnoreReason = c_IgnoreReason + "." + c_IgnoreSubStep; // (!addToCache ? ((c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : "");
-                            CacheData.IgnoreReasons.Add(currentObject.RActorGuid, CurrentCacheObject.IgnoreReason);
+                            if (!CacheData.IgnoreReasons.ContainsKey(currentObject.RActorGuid))
+                                CacheData.IgnoreReasons.Add(currentObject.RActorGuid, CurrentCacheObject.IgnoreReason);
                             if (addToCache)
                                 ObjectCache.Add(CurrentCacheObject);
 

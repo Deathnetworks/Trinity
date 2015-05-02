@@ -471,19 +471,15 @@ namespace Trinity.Combat.Abilities
         }
         private static bool HammerOfTheAncientsCondition(SkillMeta meta)
         {
-            bool hotaresult =
+            bool result =
              (Player.PrimaryResource >= V.F("Barbarian.HammerOfTheAncients.MinFury") || LastPowerUsed == SNOPower.Barbarian_HammerOfTheAncients) &&
              (!Hotbar.Contains(SNOPower.Barbarian_Whirlwind) || (Player.CurrentHealthPct >= Settings.Combat.Barbarian.MinHotaHealth && Hotbar.Contains(SNOPower.Barbarian_Whirlwind)));
 
             if (Legendary.LutSocks.IsEquipped)
             {
-                return !CanUseLeap && hotaresult;
+                return !CanUseLeap && result;
             }
-            else
-            {
-                return hotaresult;
-            }
-            return true;
+            return result;
         }
         private static bool LeapCondition(SkillMeta meta)
         {

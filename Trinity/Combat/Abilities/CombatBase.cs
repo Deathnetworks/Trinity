@@ -85,6 +85,15 @@ namespace Trinity.Combat.Abilities
                     KiteDistance = Settings.Combat.WitchDoctor.KiteLimit;
                     KiteMode = KiteMode.Always;
                     break;
+
+                case ActorClass.DemonHunter:
+                    EmergencyHealthPotionLimit = Settings.Combat.DemonHunter.PotionLevel;
+                    EmergencyHealthGlobeLimit = Settings.Combat.DemonHunter.HealthGlobeLevel;
+                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
+                    KiteDistance = Settings.Combat.DemonHunter.KiteLimit;
+                    KiteMode = Settings.Combat.DemonHunter.KiteMode;
+                    EnergyReserve = Sets.EmbodimentOfTheMarauder.IsFullyEquipped ? 20 : 25;
+                    break;
             }
 
             // Monk Seven Sided Strike: Sustained Attack

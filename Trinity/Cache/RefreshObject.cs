@@ -1075,7 +1075,6 @@ namespace Trinity
             catch
             {
                 // Stuff it
-
             }
         }
         private static void CacheObjectIsBountyObjective()
