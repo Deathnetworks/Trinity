@@ -57,7 +57,7 @@ namespace Trinity.Combat.Abilities
                 case ActorClass.Crusader:
                     EmergencyHealthPotionLimit = Settings.Combat.Crusader.PotionLevel;
                     EmergencyHealthGlobeLimit = Settings.Combat.Crusader.HealthGlobeLevel;
-                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
+                    HealthGlobeResource = Settings.Combat.Crusader.HealthGlobeLevelResource;
                     KiteDistance = 0;
                     KiteMode = KiteMode.Never;
                     break;
@@ -65,7 +65,7 @@ namespace Trinity.Combat.Abilities
                 case ActorClass.Monk:
                     EmergencyHealthPotionLimit = Settings.Combat.Monk.PotionLevel;
                     EmergencyHealthGlobeLimit = Settings.Combat.Monk.HealthGlobeLevel;
-                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
+                    HealthGlobeResource = Settings.Combat.Monk.HealthGlobeLevelResource;
                     KiteDistance = 0;
                     KiteMode = KiteMode.Never;
                     break;
@@ -73,7 +73,7 @@ namespace Trinity.Combat.Abilities
                 case ActorClass.Wizard:
                     EmergencyHealthPotionLimit = Settings.Combat.Wizard.PotionLevel;
                     EmergencyHealthGlobeLimit = Settings.Combat.Wizard.HealthGlobeLevel;
-                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
+                    HealthGlobeResource = Settings.Combat.Wizard.HealthGlobeLevelResource;
                     KiteDistance = Settings.Combat.Wizard.KiteLimit;
                     KiteMode = KiteMode.Always;
                     break;
@@ -81,7 +81,7 @@ namespace Trinity.Combat.Abilities
                 case ActorClass.Witchdoctor:
                     EmergencyHealthPotionLimit = Settings.Combat.WitchDoctor.PotionLevel;
                     EmergencyHealthGlobeLimit = Settings.Combat.WitchDoctor.HealthGlobeLevel;
-                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
+                    HealthGlobeResource = Settings.Combat.WitchDoctor.HealthGlobeLevelResource;
                     KiteDistance = Settings.Combat.WitchDoctor.KiteLimit;
                     KiteMode = KiteMode.Always;
                     break;
@@ -89,7 +89,7 @@ namespace Trinity.Combat.Abilities
                 case ActorClass.DemonHunter:
                     EmergencyHealthPotionLimit = Settings.Combat.DemonHunter.PotionLevel;
                     EmergencyHealthGlobeLimit = Settings.Combat.DemonHunter.HealthGlobeLevel;
-                    HealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
+                    HealthGlobeResource = Settings.Combat.DemonHunter.HealthGlobeLevelResource;
                     KiteDistance = Settings.Combat.DemonHunter.KiteLimit;
                     KiteMode = Settings.Combat.DemonHunter.KiteMode;
                     EnergyReserve = Sets.EmbodimentOfTheMarauder.IsFullyEquipped ? 20 : 25;
