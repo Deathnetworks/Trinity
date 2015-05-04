@@ -59,7 +59,7 @@ namespace Trinity.UI.UIComponents
             Url = item.Url;
             IconUrl = item.IconUrl;
             IsTwoHanded = item.IsTwoHanded;
-            TinityItemType = item.TinityItemType;
+            TrinityItemType = item.TrinityItemType;
             IsSetItem = item.IsSetItem;
             SetName = item.IsSetItem ? item.Set.Name : "None";
         }
@@ -311,7 +311,7 @@ namespace Trinity.UI.UIComponents
                 {
                     Id = (int)property,
                     ItemStatRange = statRange,
-                    TinityItemType = TinityItemType,
+                    TrinityItemType = TrinityItemType,
                     RuleType = ruleType,
                     Value = LRule.GetDefaultValue(property)
                 });

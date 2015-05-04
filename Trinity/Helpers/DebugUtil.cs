@@ -242,20 +242,20 @@ namespace Trinity.Helpers
             var p = Logger.Prefix;
             Logger.Prefix = "";
 
-            var dropItems = Legendary.ToList().Where(i => !i.IsCrafted && i.Id==0).OrderBy(i => i.TinityItemType).ToList();
-            var craftedItems = Legendary.ToList().Where(i => i.IsCrafted && i.Id==0).OrderBy(i => i.TinityItemType).ToList();
+            var dropItems = Legendary.ToList().Where(i => !i.IsCrafted && i.Id==0).OrderBy(i => i.TrinityItemType).ToList();
+            var craftedItems = Legendary.ToList().Where(i => i.IsCrafted && i.Id==0).OrderBy(i => i.TrinityItemType).ToList();
 
             Logger.Log("Dropped Items: {0}", dropItems.Count);
             foreach (var item in dropItems)
             {
-                    Logger.Log("{0} - {1} = 0", item.TinityItemType, item.Name);                    
+                    Logger.Log("{0} - {1} = 0", item.TrinityItemType, item.Name);                    
             }
 
             Logger.Log(" ");
             Logger.Log("Crafted Items: {0}", craftedItems.Count);
             foreach (var item in craftedItems)
             {
-                    Logger.Log("{0} - {1} = 0", item.TinityItemType, item.Name);
+                    Logger.Log("{0} - {1} = 0", item.TrinityItemType, item.Name);
             }
 
             Logger.Prefix = p;

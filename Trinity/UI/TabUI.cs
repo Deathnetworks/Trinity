@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -6,6 +8,7 @@ using System.Windows.Controls.Primitives;
 using Trinity.Helpers;
 using Trinity.Items;
 using Trinity.LazyCache;
+using Trinity.Technicals;
 using Trinity.UI.UIComponents;
 using Zeta.Bot;
 using Zeta.Game;
@@ -51,6 +54,7 @@ namespace Trinity.UI
                     CreateButton("Reset TVars", ResetTVarsEventHandler);
                     CreateButton("Start LazyCache", StartLazyCacheEventHandler);
                     CreateButton("Stop LazyCache", StopLazyCacheEventHandler);
+                    CreateButton("Cache Test", CacheTestCacheEventHandler);
 
                     _tabItem = new TabItem
                     {
@@ -107,6 +111,128 @@ namespace Trinity.UI
          * WARNING
          *  
          *************/
+
+        private static void CacheTestCacheEventHandler(object sender, RoutedEventArgs routedEventArgs)
+        {
+            try
+            {
+                var testUnit = CacheManager.Units.FirstOrDefault();
+                if (testUnit != null)
+                {
+                    var rActorGuid = testUnit.RActorGuid;
+                    var ACDGuid = testUnit.ACDGuid;
+                    var accessCount = 25;
+                    var timerA = new Stopwatch();
+                    var timerB = new Stopwatch();
+
+                    var timerBResults = new List<double>();
+
+                    Logger.Log("Starting NOT-CACHED Test for {0}, {1} cycles", testUnit.InternalName, accessCount);
+
+                    // Not Cached
+
+                    timerA.Start();
+                    var zetaObj = ZetaDia.Actors.GetActorsOfType<DiaUnit>(true).FirstOrDefault(o => o.RActorGuid == rActorGuid);
+                    timerA.Stop();
+
+                    for (int i = 0; i < accessCount; i++)
+                    {
+                        timerB.Reset();
+                        timerB.Start();  
+                        var position = zetaObj.Position;
+                        var distance = zetaObj.Distance;
+                        var actorType = zetaObj.ActorType;
+                        var los = NavHelper.CanRayCast(position);
+                        timerB.Stop();
+                        timerBResults.Add(timerB.Elapsed.TotalMilliseconds);
+                        Logger.Log("Position={0} Distance={1} los={2} type={3} time={4:00.0000}ms", position, distance, los, actorType, timerB.Elapsed.TotalMilliseconds);
+                    }
+
+                    Logger.Log("FindTime={0:00.0000}ms Cycles={1:00.0000}ms CycleAVG={2:00.0000}ms", timerA.Elapsed.TotalMilliseconds, timerBResults.Sum(), timerBResults.Average());
+
+                    Logger.Log("Starting LAZYCACHE Test for {0}, {1} cycles", testUnit.InternalName, accessCount);
+
+                    // LazyCache
+
+                    timerA.Reset();
+                    timerBResults.Clear();
+
+                    timerA.Start();
+                    var trinityObject = CacheManager.GetActorByACDGuid<TrinityUnit>(ACDGuid);
+                    timerA.Stop();
+
+                    if (trinityObject == null)
+                    {
+                        Logger.Log("Actor not found. RActorGuid={0}", rActorGuid);
+                    }
+                    else
+                    {
+                        for (int x = 0; x < accessCount; x++)
+                        {
+                            timerB.Reset();
+                            timerB.Start();
+                            var position = trinityObject.Position;
+                            var distance = trinityObject.Distance;
+                            var actorType = trinityObject.ActorType;
+                            var los = trinityObject.IsInLineOfSight;
+                            timerB.Stop();
+                            timerBResults.Add(timerB.Elapsed.TotalMilliseconds);
+                            Logger.Log("Position={0} Distance={1} los={2} type={3} time={4:00.0000}ms", position, distance, los, actorType, timerB.Elapsed.TotalMilliseconds);
+                        }
+
+                        Logger.Log("FindTime={0:00.0000}ms Cycles={1:00.0000}ms CycleAVG={2:00.0000}ms", timerA.Elapsed.TotalMilliseconds, timerBResults.Sum(), timerBResults.Average());
+                    }
+
+
+                    Logger.Log("Starting TRINITYCACHEOBJECT Test for {0}, {1} cycles", testUnit.InternalName, accessCount);
+
+                    // existing TrinityCacheObject
+
+                    timerA.Reset();
+                    timerBResults.Clear();
+                    timerA.Start();
+                    zetaObj = ZetaDia.Actors.GetActorsOfType<DiaUnit>(true).FirstOrDefault(o => o.RActorGuid == rActorGuid);
+                    TrinityCacheObject trinObj = new TrinityCacheObject();
+                    timerA.Stop();
+
+                    if (zetaObj == null)
+                    {
+                        Logger.Log("Actor not found. RActorGuid={0}", rActorGuid);
+                    }
+                    else
+                    {
+                        for (int i = 0; i < accessCount; i++)
+                        {
+                            timerB.Reset();
+                            timerB.Start();
+                            if (i == 0)
+                            {
+                                trinObj.Position = zetaObj.Position;
+                                trinObj.Distance = zetaObj.Distance;
+                                trinObj.HasBeenInLoS = NavHelper.CanRayCast(trinObj.Position);
+                            }
+                            var position = trinObj.Position;
+                            var distance = trinObj.Distance;
+                            var actorType = trinObj.ActorType;
+                            var los = trinObj.HasBeenInLoS;
+                            timerB.Stop();
+                            timerBResults.Add(timerB.Elapsed.TotalMilliseconds);
+                            Logger.Log("Position={0} Distance={1} los={2} type={3} time={4:00.0000}ms", position, distance, los, actorType, timerB.Elapsed.TotalMilliseconds);
+                        }
+
+                        Logger.Log("FindTime={0:00.0000}ms Cycles={1:00.0000}ms CycleAVG={2:00.0000}ms", timerA.Elapsed.TotalMilliseconds, timerBResults.Sum(), timerBResults.Average());
+                        
+                    }
+
+
+                }
+                Logger.Log("Finished Cache Test");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Exception {0}", ex);
+            }
+        }
 
         private static void StartLazyCacheEventHandler(object sender, RoutedEventArgs routedEventArgs)
         {

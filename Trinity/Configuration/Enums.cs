@@ -5,7 +5,7 @@ namespace Trinity
     /// <summary>
     /// Primary "lowest level" item type (eg EXACTLY what kind of item it is)
     /// </summary>
-    public enum TinityItemType
+    public enum TrinityItemType
     {
         Unknown,
         Amethyst,
@@ -122,11 +122,14 @@ namespace Trinity
         SavePoint,
         ServerProp,
         Shrine,
-        StartLocation, 
+        StartLocation,
         Trigger,
         Unit,
         CursedChest,
         CursedShrine,
+        Portal,
+        Banner,
+        Waypoint,
     }
 
     public enum Element
@@ -303,6 +306,18 @@ namespace Trinity
         Unique = 4,
         Hireling = 5,
         Boss = 7
+    }
+
+    public enum SummonType
+    {
+        Unknown = 0,
+        Sentry,
+        Hydra,
+        ZombieDog,
+        MysticAlly,
+        Gargantuan,
+        Companion,
+        Hireling,
     }
 
 

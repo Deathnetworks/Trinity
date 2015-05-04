@@ -161,7 +161,7 @@ namespace Trinity
         public FollowerType FollowerType { get; set; }
 
         [DataMember]
-        public TinityItemType TrinityItemType { get; set; }
+        public TrinityItemType TrinityItemType { get; set; }
 
         [DataMember]
         public DateTime LastSeenTime { get; set; }

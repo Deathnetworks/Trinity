@@ -599,7 +599,7 @@ namespace Trinity.Settings.Loot
                       
                         selectedItem.Rules.ForEach(r =>
                         {
-                            r.TinityItemType = item.TinityItemType;
+                            r.TrinityItemType = item.TrinityItemType;
                             r.ItemStatRange = item.GetItemStatRange(r.ItemProperty);
                         });
                         item.IsSelected = true;

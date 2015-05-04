@@ -5,6 +5,7 @@ using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
+using Zeta.Game.Internals.SNO;
 
 namespace Trinity
 {
@@ -1357,6 +1358,28 @@ namespace Trinity
             "minimapicon", 
         };
 
+        internal static HashSet<string> ActorIgnoreNameParts = new HashSet<string>
+        {
+            "markerlocation", 
+            "start_location", 
+            "checkpoint", 
+            "savepoint", 
+            "triggersphere", 
+            "minimapicon", 
+            "proxy",
+            "invisbox",
+            "trigger",
+            "invisible"
+        };
+
+        /// <summary>
+        /// ActorIds that should be ignored
+        /// </summary>
+        internal static HashSet<int> ActorIgnoreIds = new HashSet<int>
+        {
+            0000, 
+        };
+
         internal static HashSet<SNOAnim> ActorChargeAnimations = new HashSet<SNOAnim>
         {
             SNOAnim.Beast_start_charge_02, 
@@ -1367,6 +1390,25 @@ namespace Trinity
             SNOAnim.Butcher_Attack_05_telegraph, 
             SNOAnim.Butcher_Attack_Chain_01_in, 
             SNOAnim.Butcher_BreakFree_run_01,  
+        };
+
+        /// <summary>
+        /// Actor types that we dont wan't to even look at from DB's ACD List.
+        /// </summary>
+        public static HashSet<ActorType> ExcludedActorTypes = new HashSet<ActorType>
+        {
+            ActorType.Environment,
+            ActorType.ClientEffect,
+            ActorType.AxeSymbol,
+            ActorType.CustomBrain,
+            ActorType.Invalid,
+            ActorType.ServerProp,
+            ActorType.Critter
+        };
+
+        public static Dictionary<int, MonsterType> MonsterTypeOverrides = new Dictionary<int, MonsterType>
+        {
+            { 86624, MonsterType.Undead }, // Jondar, DB thinks he's permanent ally
         };
 
         #region Methods

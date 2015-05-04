@@ -2,42 +2,104 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ut="clr-namespace:Trinity.UIComponents"
              mc:Ignorable="d" Foreground="{DynamicResource TextBush}"
              d:DesignHeight="300" d:DesignWidth="1400">
-    <StackPanel>
-        <UniformGrid>
-            <CheckBox Margin="5" IsChecked="{Binding Path=Enabled}">Enable/Disable</CheckBox>
-        </UniformGrid>
-        <Grid>
+    <UserControl.Resources>
+        <DataTemplate x:Key="CellTemplate">
+            <TextBlock Text="{Binding}" />
+        </DataTemplate>
+    </UserControl.Resources>
+    <DockPanel>
+        <WrapPanel DockPanel.Dock="Top">
+            <CheckBox Margin="5" Foreground="Black" IsChecked="{Binding Path=Enabled}">On/Off</CheckBox>
+            <CheckBox Margin="5" Foreground="Black" IsChecked="{Binding Path=IsDefaultVisible}">Show Default Cache</CheckBox>
+            <CheckBox Margin="5" Foreground="Black" IsChecked="{Binding Path=IsLazyCacheVisible}">Show Lazy Cache</CheckBox>            
+        </WrapPanel>
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ut:ColumnDefinitionExtended Visible="{Binding IsDefaultVisible}" Width="*" />
+                <ut:ColumnDefinitionExtended Visible="{Binding IsLazyCacheVisible}" Width="5" />
+                <ut:ColumnDefinitionExtended Visible="{Binding IsLazyCacheVisible}" Width="*" />
+            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
-            <DataGrid Grid.Row="0" 
+
+            <DataGrid Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top" 
                   ItemsSource="{Binding Path=Cache}" 
                   AutoGenerateColumns="false" 
                   CanUserSortColumns="False" 
                   EnableColumnVirtualization="True" 
                   EnableRowVirtualization="True" MaxWidth="1920" MaxHeight="1080" >
-                <DataGrid.Columns>
-                    <DataGridTextColumn Width="50" IsReadOnly="True" Binding="{Binding Path=Distance}" Header="Distance" />
-                    <DataGridTextColumn Width="50" IsReadOnly="True" Binding="{Binding Path=Radius}" Header="Radius" />
-                    <!--<DataGridTextColumn Width="80" IsReadOnly="True" Binding="{Binding Path=RadiusDistance}" Header="RadiusDistance" />-->
-                    <DataGridTextColumn Width="170" IsReadOnly="True" Binding="{Binding Path=Name}" Header="Name" />
-                    <DataGridTextColumn Width="80" IsReadOnly="True" Binding="{Binding Path=Type}" Header="Type" />
-                    <DataGridTextColumn Width="70" IsReadOnly="True" Binding="{Binding Path=Weight}" Header="Weight" />
-                    <DataGridTextColumn Width="50" IsReadOnly="True" Binding="{Binding Path=InCache}" Header="InCache" />
-                    <DataGridTextColumn Width="120" IsReadOnly="True" Binding="{Binding Path=IgnoreReason}" Header="IgnoreReason" />
-                    <DataGridTextColumn Width="850" IsReadOnly="True" Binding="{Binding Path=WeightInfo}" Header="WeightInfo" />
-                    <DataGridTextColumn Width="50" IsReadOnly="True" Binding="{Binding Path=IsBoss}" Header="IsBoss" />
-                    <DataGridTextColumn Width="50" IsReadOnly="True" Binding="{Binding Path=IsElite}" Header="IsElite" />
-                    <DataGridTextColumn Width="100" IsReadOnly="True" Binding="{Binding Path=IsQuestMonster}" Header="IsQuestMonster" />
-                    <DataGridTextColumn Width="100" IsReadOnly="True" Binding="{Binding Path=IsMinimapActive}" Header="IsMinimapActive" />
-                    <DataGridTextColumn Width="100" IsReadOnly="True" Binding="{Binding Path=MarkerHash}" Header="MarkerHash" />
-                    <DataGridTextColumn Width="100" IsReadOnly="True" Binding="{Binding Path=MinimapTexture}" Header="MinimapTexture" />
-                    <!--<DataGridTextColumn Width="80" IsReadOnly="True" Binding="{Binding Path=RActorGUID}" Header="RActorGUID" />
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Width="50" IsReadOnly="True" Binding="{Binding Path=ACDGuid}" Header="ACDGuid" />
+                        <DataGridTextColumn Width="50" IsReadOnly="True" Binding="{Binding Path=Distance}" Header="Distance" />
+                        <DataGridTextColumn Width="50" IsReadOnly="True" Binding="{Binding Path=Radius}" Header="Radius" />
+                        <!--<DataGridTextColumn Width="80" IsReadOnly="True" Binding="{Binding Path=RadiusDistance}" Header="RadiusDistance" />-->
+                        <DataGridTextColumn Width="170" IsReadOnly="True" Binding="{Binding Path=Name}" Header="Name" />
+                        <DataGridTextColumn Width="80" IsReadOnly="True" Binding="{Binding Path=Type}" Header="Type" />
+                        <DataGridTextColumn Width="70" IsReadOnly="True" Binding="{Binding Path=Weight}" Header="Weight" />
+                        <DataGridTextColumn Width="50" IsReadOnly="True" Binding="{Binding Path=InCache}" Header="InCache" />
+                        <DataGridTextColumn Width="120" IsReadOnly="True" Binding="{Binding Path=IgnoreReason}" Header="IgnoreReason" />
+                        <DataGridTextColumn Width="850" IsReadOnly="True" Binding="{Binding Path=WeightInfo}" Header="WeightInfo" />
+                        <DataGridTextColumn Width="50" IsReadOnly="True" Binding="{Binding Path=IsBoss}" Header="IsBoss" />
+                        <DataGridTextColumn Width="50" IsReadOnly="True" Binding="{Binding Path=IsElite}" Header="IsElite" />
+                        <DataGridTextColumn Width="100" IsReadOnly="True" Binding="{Binding Path=IsQuestMonster}" Header="IsQuestMonster" />
+                        <DataGridTextColumn Width="100" IsReadOnly="True" Binding="{Binding Path=IsMinimapActive}" Header="IsMinimapActive" />
+                        <DataGridTextColumn Width="100" IsReadOnly="True" Binding="{Binding Path=MarkerHash}" Header="MarkerHash" />
+                        <DataGridTextColumn Width="100" IsReadOnly="True" Binding="{Binding Path=MinimapTexture}" Header="MinimapTexture" />
+                        <!--<DataGridTextColumn Width="80" IsReadOnly="True" Binding="{Binding Path=RActorGUID}" Header="RActorGUID" />
                 <DataGridTextColumn Width="70" IsReadOnly="True" Binding="{Binding Path=ActorSNO}" Header="ActorSNO" />-->
-                </DataGrid.Columns>
+                    </DataGrid.Columns>
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                        <Setter Property="TextElement.Foreground" Value="DarkGray"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=InCache}" Value="True">
+                                    <Setter Property="TextElement.Foreground" Value="Black"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.RowStyle>
             </DataGrid>
+
+            <GridSplitter Background="Teal" Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
+
+            <ScrollViewer Grid.Column="2" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
+            <DataGrid  
+                ItemsSource="{Binding Path=LazyCache}" 
+                AutoGenerateColumns="False" 
+                IsReadOnly="True"
+                CanUserSortColumns="False" 
+                VerticalScrollBarVisibility="Disabled"
+                HorizontalScrollBarVisibility="Disabled"
+                Width="Auto"
+                EnableColumnVirtualization="True" 
+                EnableRowVirtualization="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=RActorGuid}" Header="RActorGuid" />
+                        <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=ACDGuid}" Header="ACDGuid" />
+                        <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=Name}" Header="Name" />
+                        <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=Distance}" Header="Distance" />
+                        <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=Radius}" Header="Radius" />
+                        <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=TrinityType}" Header="TrinityType" />
+                        <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=ActorType}" Header="ActorType" />
+                        <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=CurrentAnimation}" Header="Animation" />
+                        <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=IsInLineOfSight}" Header="LOS" />
+                    </DataGrid.Columns>
+                    <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                    <Setter Property="TextElement.Foreground" Value="Black"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Path=Type}" Value="Unknown">
+                                <Setter Property="TextElement.Foreground" Value="DarkGray"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+            </DataGrid>
+            </ScrollViewer>
         </Grid>
-    </StackPanel>
+    </DockPanel>
 </UserControl>

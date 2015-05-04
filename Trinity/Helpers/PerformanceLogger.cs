@@ -10,9 +10,11 @@ namespace Trinity.Technicals
         private readonly string _BlockName;
         private readonly Stopwatch _Stopwatch;
         private bool _IsDisposed;
+        private bool _ForceLog;
 
-        public PerformanceLogger(string blockName)
+        public PerformanceLogger(string blockName, bool forceLog = false)
         {
+            _ForceLog = forceLog;
             _BlockName = blockName;
             _Stopwatch = new Stopwatch();
             _Stopwatch.Start();
@@ -28,7 +30,7 @@ namespace Trinity.Technicals
                 _Stopwatch.Stop();
                 if (_Stopwatch.Elapsed.TotalMilliseconds > 5)
                 {
-                    if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance))
+                    if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance) || _ForceLog)
                     {
                         Logging.DebugFormat("[Trinity][Performance] Execution of {0} took {1:00.00}ms.", _BlockName,
                                             _Stopwatch.Elapsed.TotalMilliseconds);

@@ -104,7 +104,7 @@ namespace Trinity.UIComponents
             {
                 if (_variants == null || !_variants.Any())
                 {
-                    _variants = ItemDataUtils.GetItemPropertyVariants(ItemProperty, TinityItemType);
+                    _variants = ItemDataUtils.GetItemPropertyVariants(ItemProperty, TrinityItemType);
 
                     if (_variant == 0)
                     {
@@ -160,7 +160,7 @@ namespace Trinity.UIComponents
 
         public ItemStatRange ItemStatRange { get; set; }
 
-        public TinityItemType TinityItemType { get; set; }
+        public TrinityItemType TrinityItemType { get; set; }
 
         public override int GetHashCode()
         {

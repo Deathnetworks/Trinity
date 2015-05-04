@@ -1389,7 +1389,7 @@ namespace Trinity
                 if (!ItemDropStats._hashsetItemPicksLookedAt.Contains(itemSha1Hash))
                 {
                     ItemDropStats._hashsetItemPicksLookedAt.Add(itemSha1Hash);
-                    TinityItemType itemType = TrinityItemManager.DetermineItemType(CurrentTarget.InternalName, CurrentTarget.DBItemType, CurrentTarget.FollowerType);
+                    TrinityItemType itemType = TrinityItemManager.DetermineItemType(CurrentTarget.InternalName, CurrentTarget.DBItemType, CurrentTarget.FollowerType);
                     TrinityItemBaseType itemBaseType = TrinityItemManager.DetermineBaseType(itemType);
                     if (itemBaseType == TrinityItemBaseType.Armor || itemBaseType == TrinityItemBaseType.WeaponOneHand || itemBaseType == TrinityItemBaseType.WeaponTwoHand ||
                         itemBaseType == TrinityItemBaseType.WeaponRange || itemBaseType == TrinityItemBaseType.Jewelry || itemBaseType == TrinityItemBaseType.FollowerItem ||
@@ -1422,22 +1422,22 @@ namespace Trinity
                     {
                         int iGemType = 0;
                         ItemDropStats.ItemsPickedStats.TotalGems++;
-                        if (itemType == TinityItemType.Topaz)
+                        if (itemType == TrinityItemType.Topaz)
                             iGemType = ItemDropStats.GEMTOPAZ;
-                        if (itemType == TinityItemType.Ruby)
+                        if (itemType == TrinityItemType.Ruby)
                             iGemType = ItemDropStats.GEMRUBY;
-                        if (itemType == TinityItemType.Emerald)
+                        if (itemType == TrinityItemType.Emerald)
                             iGemType = ItemDropStats.GEMEMERALD;
-                        if (itemType == TinityItemType.Amethyst)
+                        if (itemType == TrinityItemType.Amethyst)
                             iGemType = ItemDropStats.GEMAMETHYST;
-                        if (itemType == TinityItemType.Diamond)
+                        if (itemType == TrinityItemType.Diamond)
                             iGemType = ItemDropStats.GEMDIAMOND;
 
                         ItemDropStats.ItemsPickedStats.GemsPerType[iGemType]++;
                         ItemDropStats.ItemsPickedStats.GemsPerLevel[CurrentTarget.ItemLevel]++;
                         ItemDropStats.ItemsPickedStats.GemsPerTPerL[iGemType, CurrentTarget.ItemLevel]++;
                     }
-                    else if (itemType == TinityItemType.HealthPotion)
+                    else if (itemType == TrinityItemType.HealthPotion)
                     {
                         ItemDropStats.ItemsPickedStats.TotalPotions++;
                         if ((CurrentTarget.ItemLevel < 0) || (CurrentTarget.ItemLevel > 63))
@@ -1446,7 +1446,7 @@ namespace Trinity
                         }
                         ItemDropStats.ItemsPickedStats.PotionsPerLevel[CurrentTarget.ItemLevel]++;
                     }
-                    else if (_cItemTinityItemType == TinityItemType.InfernalKey)
+                    else if (_cItemTinityItemType == TrinityItemType.InfernalKey)
                     {
                         ItemDropStats.ItemsPickedStats.TotalInfernalKeys++;
                     }

@@ -13,7 +13,7 @@ namespace Trinity.Cache
         public ItemBaseType DBBaseType { get; set; }
         public ItemType DBItemType { get; set; }
         public TrinityItemBaseType TBaseType { get; set; }
-        public TinityItemType TType { get; set; }
+        public TrinityItemType TType { get; set; }
         public bool IsOneHand { get; set; }
         public bool IsTwoHand { get; set; }
         public FollowerType ItemFollowerType { get; set; }
@@ -31,7 +31,7 @@ namespace Trinity.Cache
 
         public PickupItem() { }
 
-        public PickupItem(ACDItem item, TrinityItemBaseType trinityItemBaseType, TinityItemType tinityItemType)
+        public PickupItem(ACDItem item, TrinityItemBaseType trinityItemBaseType, TrinityItemType trinityItemType)
         {
             Name = item.Name;
             InternalName = Trinity.NameNumberTrimRegex.Replace(item.InternalName, ""); ;
@@ -41,7 +41,7 @@ namespace Trinity.Cache
             DBBaseType = item.ItemBaseType;
             DBItemType = item.ItemType;
             TBaseType = trinityItemBaseType;
-            TType = tinityItemType;
+            TType = trinityItemType;
             IsOneHand = item.IsOneHand;
             IsTwoHand = item.IsTwoHand;
             ItemFollowerType = item.FollowerSpecialType;

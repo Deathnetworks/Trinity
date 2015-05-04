@@ -126,7 +126,6 @@
     <Compile Include="Helpers\EnumValue.cs" />
     <Compile Include="Helpers\ExportHelper.cs" />
     <Compile Include="Helpers\GetAttributeExtensions.cs" />
-    <Compile Include="LazyCache\CacheAttachment.cs" />
     <Compile Include="LazyCache\CacheBase.cs" />
     <Compile Include="LazyCache\CacheFactory.cs" />
     <Compile Include="LazyCache\CacheField.cs" />
@@ -137,8 +136,8 @@
     <Compile Include="LazyCache\TrinityPlayer.cs" />
     <Compile Include="LazyCache\TrinityGizmo.cs" />
     <Compile Include="LazyCache\TrinityItem.cs" />
-    <Compile Include="LazyCache\TrinityMonster.cs" />
     <Compile Include="LazyCache\TrinityObject.cs" />
+    <Compile Include="LazyCache\UpdateSpeed.cs" />
     <Compile Include="Objects\CachedBuff.cs" />
     <Compile Include="Objects\IUnique.cs" />
     <Compile Include="Objects\ItemStatRange.cs" />
@@ -279,6 +278,7 @@
     <Compile Include="UI\UIComponents\Behaviors\ComboAlwaysFireSelection.cs" />
     <Compile Include="UI\UIComponents\Behaviors\InputBindingBehavior.cs" />
     <Compile Include="UI\UIComponents\CacheUIDataModel.cs" />
+    <Compile Include="UI\UIComponents\Controls\ColumnDefinitionExtended.cs" />
     <Compile Include="UI\UIComponents\Converters\BoolInverterConverter.cs" />
     <Compile Include="UI\UIComponents\Converters\BoolToTypeConverters.cs" />
     <Compile Include="UI\UIComponents\Converters\UrlToCachedImageConverter.cs" />

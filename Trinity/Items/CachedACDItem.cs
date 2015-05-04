@@ -30,7 +30,7 @@ namespace Trinity
         public ItemType DBItemType { get; set; }
         public ItemBaseType DBBaseType { get; set; }
         public TrinityItemBaseType TrinityItemBaseType { get; set; }
-        public TinityItemType TrinityItemType { get; set; }
+        public TrinityItemType TrinityItemType { get; set; }
         public FollowerType FollowerType { get; set; }
         public bool IsUnidentified { get; set; }
         public int ItemStackQuantity { get; set; }

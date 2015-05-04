@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Trinity.LazyCache;
 using Trinity.UI.UIComponents;
 using Zeta.Game.Internals.Actors;
 
@@ -34,6 +35,7 @@ namespace Trinity.Cache
             try
             {
                 RActorGUID = obj.RActorGuid;
+                ACDGuid = obj.ACDGuid;
                 ActorSNO = obj.ActorSNO;
                 Distance = (int)obj.Distance;
                 Radius = (int)obj.CollisionSphere.Radius;
@@ -130,5 +132,7 @@ namespace Trinity.Cache
         {
             return !(a == b);
         }
+
+        public int ACDGuid { get; set; }
     }
 }

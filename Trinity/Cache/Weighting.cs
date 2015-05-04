@@ -27,31 +27,41 @@ namespace Trinity
     {
         const double MaxWeight = 50000d;
 
-        public static float CalculateWeight(TrinityObject trinityObject)
+        public static float CalculateWeight(TrinityObject trinityObject, out List<Weight> weightFactors)
         {
-            var weights = new List<Weight>();
+            weightFactors = new List<Weight>();
 
-            weights.Add(new Weight(5000, WeightMethod.Set, WeightReason.StartingWeight));
+            //var trinityUnit = trinityObject as TrinityUnit;
+            //if (trinityUnit != null)
+            //{
+            //    if (trinityUnit.IsTrash)
+            //    {
+            //        var nearbyUnits = trinityUnit.NearbyUnitsWithinDistance(15f);
 
-            weights.Add(new Weight(5000, WeightMethod.Add, WeightReason.AvoidanceNearby));
+            //    }
+            //}
 
-            weights.Add(new Weight(5000, WeightMethod.Add, WeightReason.IsCloseRange));
+            //weights.Add(new Weight(5000, WeightMethod.Set, WeightReason.StartingWeight));
 
-            weights.Add(new Weight(5000, WeightMethod.Add, WeightReason.HighPriorityShrine));
+            //weights.Add(new Weight(5000, WeightMethod.Add, WeightReason.AvoidanceNearby));
 
-            if(IsHealthGlobeEmergency(trinityObject))
-                weights.Add(new Weight(5000, WeightMethod.Add, WeightReason.HealthEmergency));
+            //weights.Add(new Weight(5000, WeightMethod.Add, WeightReason.IsCloseRange));
 
-            weights.Add(new Weight(5000, WeightMethod.Add, WeightReason.HighPriorityContainer));
+            //weights.Add(new Weight(5000, WeightMethod.Add, WeightReason.HighPriorityShrine));
 
-            weights.Add(new Weight(0, WeightMethod.Set, WeightReason.IgnoreElites, true));
+            //if(IsHealthGlobeEmergency(trinityObject))
+            //    weights.Add(new Weight(5000, WeightMethod.Add, WeightReason.HealthEmergency));
+
+            //weights.Add(new Weight(5000, WeightMethod.Add, WeightReason.HighPriorityContainer));
+
+            //weights.Add(new Weight(0, WeightMethod.Set, WeightReason.IgnoreElites, true));
 
             //trinityObject.WeightFactors = weights;
 
             var finalWeight = 0f;
 
-            foreach (var w in weights)
-            {               
+            foreach (var w in weightFactors)
+            {
                 switch (w.Method)
                 {
                     case WeightMethod.Add:
@@ -80,7 +90,7 @@ namespace Trinity
 
         private static bool IsHealthGlobeEmergency(TrinityObject trinityObject)
         {
-            return (CacheManager.Me.CurrentHealthPct <= CombatBase.EmergencyHealthGlobeLimit || 
+            return (CacheManager.Me.CurrentHealthPct <= CombatBase.EmergencyHealthGlobeLimit ||
                    CacheManager.Me.PrimaryResourcePct <= CombatBase.HealthGlobeResource) &&
                    trinityObject.IsGlobe && Trinity.Settings.Combat.Misc.HiPriorityHG;
         }

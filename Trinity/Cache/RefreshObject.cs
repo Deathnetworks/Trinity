@@ -36,7 +36,7 @@ namespace Trinity
         private static ItemType c_DBItemType = ItemType.Unknown;
         private static ItemBaseType c_DBItemBaseType = ItemBaseType.None;
         private static FollowerType c_item_tFollowerType = FollowerType.None;
-        private static TinityItemType _cItemTinityItemType = TinityItemType.Unknown;
+        private static TrinityItemType _cItemTinityItemType = TrinityItemType.Unknown;
         private static MonsterSize c_unit_MonsterSize = MonsterSize.Unknown;
         private static DiaObject c_diaObject = null;
         private static DiaUnit c_diaUnit = null;
@@ -392,7 +392,7 @@ namespace Trinity
             c_DBItemBaseType = ItemBaseType.None;
             c_DBItemType = ItemType.Unknown;
             c_item_tFollowerType = FollowerType.None;
-            _cItemTinityItemType = TinityItemType.Unknown;
+            _cItemTinityItemType = TrinityItemType.Unknown;
             c_unit_MonsterSize = MonsterSize.Unknown;
             c_diaObject = null;
             c_diaUnit = null;

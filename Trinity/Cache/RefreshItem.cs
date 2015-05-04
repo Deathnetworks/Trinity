@@ -119,27 +119,27 @@ namespace Trinity
                 };
 
                 // Blood Shards == HoradricRelic
-                if (_cItemTinityItemType == TinityItemType.HoradricRelic && ZetaDia.CPlayer.BloodshardCount >= 500)
+                if (_cItemTinityItemType == TrinityItemType.HoradricRelic && ZetaDia.CPlayer.BloodshardCount >= 500)
                 {
                     return false;
                 }
 
                 // Treat all globes as a yes
-                if (_cItemTinityItemType == TinityItemType.HealthGlobe)
+                if (_cItemTinityItemType == TrinityItemType.HealthGlobe)
                 {
                     CurrentCacheObject.Type = TrinityObjectType.HealthGlobe;
                     return true;
                 }
 
                 // Treat all globes as a yes
-                if (_cItemTinityItemType == TinityItemType.PowerGlobe)
+                if (_cItemTinityItemType == TrinityItemType.PowerGlobe)
                 {
                     CurrentCacheObject.Type = TrinityObjectType.PowerGlobe;
                     return true;
                 }
 
                 // Treat all globes as a yes
-                if (_cItemTinityItemType == TinityItemType.ProgressionGlobe)
+                if (_cItemTinityItemType == TrinityItemType.ProgressionGlobe)
                 {
                     CurrentCacheObject.Type = TrinityObjectType.ProgressionGlobe;
                     return true;
@@ -200,7 +200,7 @@ namespace Trinity
                 if (!AddToCache && c_IgnoreSubStep == String.Empty)
                     c_IgnoreSubStep = "NoMatchingRule";
 
-                if (Settings.Advanced.LogDroppedItems && logNewItem && _cItemTinityItemType != TinityItemType.HealthGlobe && _cItemTinityItemType != TinityItemType.HealthPotion && _cItemTinityItemType != TinityItemType.PowerGlobe && _cItemTinityItemType != TinityItemType.ProgressionGlobe)
+                if (Settings.Advanced.LogDroppedItems && logNewItem && _cItemTinityItemType != TrinityItemType.HealthGlobe && _cItemTinityItemType != TrinityItemType.HealthPotion && _cItemTinityItemType != TrinityItemType.PowerGlobe && _cItemTinityItemType != TrinityItemType.ProgressionGlobe)
                     //LogDroppedItem();
                     ItemDroppedAppender.Instance.AppendDroppedItem(pickupItem);
 
@@ -291,15 +291,15 @@ namespace Trinity
                         {
                             int iThisGemType = 0;
                             ItemDropStats.ItemsDroppedStats.TotalGems++;
-                            if (_cItemTinityItemType == TinityItemType.Topaz)
+                            if (_cItemTinityItemType == TrinityItemType.Topaz)
                                 iThisGemType = ItemDropStats.GEMTOPAZ;
-                            if (_cItemTinityItemType == TinityItemType.Ruby)
+                            if (_cItemTinityItemType == TrinityItemType.Ruby)
                                 iThisGemType = ItemDropStats.GEMRUBY;
-                            if (_cItemTinityItemType == TinityItemType.Emerald)
+                            if (_cItemTinityItemType == TrinityItemType.Emerald)
                                 iThisGemType = ItemDropStats.GEMEMERALD;
-                            if (_cItemTinityItemType == TinityItemType.Amethyst)
+                            if (_cItemTinityItemType == TrinityItemType.Amethyst)
                                 iThisGemType = ItemDropStats.GEMAMETHYST;
-                            if (_cItemTinityItemType == TinityItemType.Diamond)
+                            if (_cItemTinityItemType == TrinityItemType.Diamond)
                                 iThisGemType = ItemDropStats.GEMDIAMOND;
                             ItemDropStats.ItemsDroppedStats.GemsPerType[iThisGemType]++;
                             ItemDropStats.ItemsDroppedStats.GemsPerLevel[c_ItemLevel]++;
@@ -310,7 +310,7 @@ namespace Trinity
                             Logger.LogError("Error refreshing item stats for Gem: " + ex.ToString());
                         }
                     }
-                    else if (_cItemTinityItemType == TinityItemType.InfernalKey)
+                    else if (_cItemTinityItemType == TrinityItemType.InfernalKey)
                     {
                         try
                         {
