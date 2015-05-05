@@ -46,11 +46,11 @@ namespace Trinity.Combat.Abilities
             else
             {
                 // Use Generator for the Bastians Ring Set buff
-                if (ShouldRefreshBastiansGeneratorBuff && TryGetPower(GetAttackGenerator(), out power))
+                if (!IsCurrentlyAvoiding && ShouldRefreshBastiansGeneratorBuff && TryGetPower(GetAttackGenerator(), out power))
                     return power;
 
                 // Use Spender for the Bastians Ring Set buff
-                if (ShouldRefreshBastiansSpenderBuff && TryGetPower(GetAttackSpender(), out power))
+                if (!IsCurrentlyAvoiding && ShouldRefreshBastiansSpenderBuff && TryGetPower(GetAttackSpender(), out power))
                     return power;
 
                 // Main ability selection 

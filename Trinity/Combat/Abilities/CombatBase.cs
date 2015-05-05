@@ -697,10 +697,10 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         /// <param name="skill">the Skill to check</param>
         /// <param name="condition">function to test against</param>
-        public static bool CanCast(Skill skill, Func<SkillMeta, bool> condition)
-        {
-            return CanCast(skill, null, condition);
-        }
+        //public static bool CanCast(Skill skill, Func<SkillMeta, bool> condition)
+        //{
+        //    return CanCast(skill, null, condition);
+        //}
 
         /// <summary>
         /// Checks if a skill can and should be cast.
@@ -718,7 +718,7 @@ namespace Trinity.Combat.Abilities
         /// <param name="skill">the Skill to check</param>
         /// <param name="cd">Optional combat data to use</param>
         /// <param name="adhocCondition">Optional function to test against</param>
-        public static bool CanCast(Skill skill, SkillMeta sm = null, Func<SkillMeta, bool> adhocCondition = null)
+        public static bool CanCast(Skill skill, SkillMeta sm = null)
         {
             try
             {
@@ -732,7 +732,7 @@ namespace Trinity.Combat.Abilities
                     if (Player.IsIncapacitated)
                         return "IsIncapacitated";
 
-                    var adhocConditionResult = (adhocCondition == null) || adhocCondition(meta);
+                    //var adhocConditionResult = (adhocCondition == null) || adhocCondition(meta);
                     var metaConditionResult = (meta.CastCondition == null) || meta.CastCondition(meta);
 
                     if (!meta.CastFlags.HasFlag(CanCastFlags.NoTimer) && !SNOPowerUseTimer(skill.SNOPower))
@@ -765,8 +765,8 @@ namespace Trinity.Combat.Abilities
                     //if (meta.IsEliteOnly && !CurrentTarget.IsBossOrEliteRareUnique)
                     //    return false;
 
-                    if (!adhocConditionResult)
-                        return "AdHocConditionFailure";
+                    //if (!adhocConditionResult)
+                    //    return "AdHocConditionFailure";
 
                     if (!metaConditionResult)
                         return "ConditionFailure";

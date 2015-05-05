@@ -1130,12 +1130,6 @@ namespace Trinity.Reference
                     meta.IsAreaEffectSkill = true;
                     meta.AreaEffectShape = AreaEffectShapeType.Cone;
                     meta.CastRange = 30f;
-
-                    if (skill.CurrentRune == Runes.DemonHunter.Focus)
-                    {
-                        meta.IsAvoidanceSkill = false;
-                        meta.IsDefensiveSkill = false;
-                    }
                 }
             };
 
@@ -1195,6 +1189,7 @@ namespace Trinity.Reference
                 {
                     meta.IsCombatOnly = true;
                     meta.IsOffensiveSkill = true;
+                    meta.IsMovementSkill = true;
 
                     if (skill.CurrentRune == Runes.DemonHunter.Demolition)
                     {
