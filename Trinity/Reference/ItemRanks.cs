@@ -27,7 +27,7 @@ namespace Trinity.Reference
                 {
                     result = false;
                 }
-                else if (Trinity.Settings.Loot.ItemRank.RequireSocketsOnJewelry && wrappedItem.IsJewlery && cItem.AcdItem.NumSockets != 0)
+                else if (Trinity.Settings.Loot.ItemRank.RequireSocketsOnJewelry && wrappedItem.IsJewelry && cItem.AcdItem.NumSockets != 0)
                 {
                     result = false;
                 }

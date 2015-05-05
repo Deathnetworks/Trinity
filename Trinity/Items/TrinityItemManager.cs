@@ -623,29 +623,29 @@ namespace Trinity.Items
             {
                 ZetaDia.Memory.TemporaryCacheState(false);
 
-                List<ACDItem> itemList = new List<ACDItem>();
+                List<ItemWrapper> itemList = new List<ItemWrapper>();
 
                 switch (location)
                 {
                     case DumpItemLocation.All:
-                        itemList = ZetaDia.Actors.GetActorsOfType<ACDItem>(true).OrderBy(i => i.InventorySlot).ThenBy(i => i.Name).ToList();
+                        itemList = ZetaDia.Actors.GetActorsOfType<ACDItem>(true).Select(i => new ItemWrapper(i)).OrderBy(i => i.InventorySlot).ThenBy(i => i.Name).ToList();
                         break;
                     case DumpItemLocation.Backpack:
-                        itemList = ZetaDia.Me.Inventory.Backpack.ToList();
+                        itemList = ZetaDia.Me.Inventory.Backpack.Select(i => new ItemWrapper(i)).ToList();
                         break;
                     case DumpItemLocation.Merchant:
-                        itemList = ZetaDia.Me.Inventory.MerchantItems.ToList();
+                        itemList = ZetaDia.Me.Inventory.MerchantItems.Select(i => new ItemWrapper(i)).ToList();
                         break;
                     case DumpItemLocation.Ground:
-                        itemList = ZetaDia.Actors.GetActorsOfType<DiaItem>(true).Select(i => i.CommonData).ToList();
+                        itemList = ZetaDia.Actors.GetActorsOfType<DiaItem>(true).Select(i => new ItemWrapper(i.CommonData)).ToList();
                         break;
                     case DumpItemLocation.Equipped:
-                        itemList = ZetaDia.Me.Inventory.Equipped.ToList();
+                        itemList = ZetaDia.Me.Inventory.Equipped.Select(i => new ItemWrapper(i)).ToList();
                         break;
                     case DumpItemLocation.Stash:
                         if (UIElements.StashWindow.IsVisible)
                         {
-                            itemList = ZetaDia.Me.Inventory.StashItems.ToList();
+                            itemList = ZetaDia.Me.Inventory.StashItems.Select(i => new ItemWrapper(i)).ToList();
                         }
                         else
                         {
@@ -655,7 +655,7 @@ namespace Trinity.Items
                 }
 
                 itemList.RemoveAll(i => i == null);
-                itemList.RemoveAll(i => !i.IsValid);
+                //itemList.RemoveAll(i => !i.IsValid);
 
                 foreach (var item in itemList.OrderBy(i => i.InventorySlot).ThenBy(i => i.Name))
                 {
@@ -674,8 +674,8 @@ namespace Trinity.Items
                     {
                         foreach (object val in Enum.GetValues(typeof(ActorAttributeType)))
                         {
-                            int iVal = item.GetAttribute<int>((ActorAttributeType)val);
-                            float fVal = item.GetAttribute<float>((ActorAttributeType)val);
+                            int iVal = item.Item.GetAttribute<int>((ActorAttributeType)val);
+                            float fVal = item.Item.GetAttribute<float>((ActorAttributeType)val);
 
                             if (iVal > 0 || fVal > 0)
                                 Logger.Log("Attribute: {0}, iVal: {1}, fVal: {2}", val, iVal, (fVal != fVal) ? "" : fVal.ToString());
@@ -703,7 +703,7 @@ namespace Trinity.Items
 
                     try
                     {
-                        Logger.Log("Link Color ItemQuality=" + item.ItemLinkColorQuality());
+                        Logger.Log("Link Color ItemQuality=" + item.Item.ItemLinkColorQuality());
                     }
                     catch (Exception ex)
                     {

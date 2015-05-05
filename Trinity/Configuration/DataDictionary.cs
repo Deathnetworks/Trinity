@@ -464,6 +464,7 @@ namespace Trinity
             377090, // X1_Unique_Monster_Generic_Projectile_Lightning
             377091, // X1_Unique_Monster_Generic_Projectile_Physical
             377092, // X1_Unique_Monster_Generic_Projectile_Poison
+            (int)SNOActor.x1_LR_boss_terrorDemon_A_projectile, 
 
         };
 
@@ -511,7 +512,8 @@ namespace Trinity
 
             // 4394, //g_ChargedBolt_Projectile-200915 (4394) Type=Projectile
             // 368392, // x1_Cesspool_Slime_Posion_Attack_Projectile-222254 (368392) Type=Projectile
-      };
+            (int)SNOActor.x1_LR_boss_terrorDemon_A_projectile, 
+        };
 
         /// <summary>
         /// A list of SNO's that spawn AoE then disappear from the object manager
@@ -588,6 +590,8 @@ namespace Trinity
             {377090, 10f}, // X1_Unique_Monster_Generic_Projectile_Lightning
             {377091, 10f}, // X1_Unique_Monster_Generic_Projectile_Physical
             {377092, 10f}, // X1_Unique_Monster_Generic_Projectile_Poison
+            {(int)SNOActor.x1_LR_boss_terrorDemon_A_projectile, 10f}, 
+
         };
 
         /*

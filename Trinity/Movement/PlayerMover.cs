@@ -4,10 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Trinity.Combat;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
-using Trinity.Objects;
 using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -556,6 +554,14 @@ namespace Trinity.DbProvider
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Vault for OOC movement, distance={0}", destinationDistance);
                     return;
+                }
+
+                // DemonHunter Strafe
+                if (Skills.DemonHunter.Strafe.IsActive && Trinity.Player.PrimaryResource > 12 && TargetUtil.AnyMobsInRange(30f, false))
+                {
+                    if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Strafe for OOC movement, distance={0}", destinationDistance);
+                    Skills.DemonHunter.Strafe.Cast(destination);
                 }
 
                 // Tempest rush for a monk

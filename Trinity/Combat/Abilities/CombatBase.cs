@@ -24,8 +24,6 @@ namespace Trinity.Combat.Abilities
 		}
         
         private static TrinityPower _currentPower = new TrinityPower();
-        private static Vector3 _lastZigZagLocation = Vector3.Zero;
-        private static Vector3 _zigZagPosition = Vector3.Zero;
         private static bool _isCombatAllowed = true;
         private static KiteMode _kiteMode = KiteMode.Never;
 
@@ -173,15 +171,6 @@ namespace Trinity.Combat.Abilities
         public static bool IsQuestingMode { get; set; }
 
         /// <summary>
-        /// The last "ZigZag" position, used with Barb Whirlwind, Monk Tempest Rush, etc.
-        /// </summary>
-        public static Vector3 ZigZagPosition
-        {
-            get { return _zigZagPosition; }
-            internal set { _zigZagPosition = value; }
-        }
-
-        /// <summary>
         /// A dictionary containing the date time we last used a specific spell
         /// </summary>
         public static Dictionary<SNOPower, DateTime> AbilityLastUsedCache
@@ -311,12 +300,6 @@ namespace Trinity.Combat.Abilities
                         return false;
                 }
             }
-        }
-
-        public static Vector3 LastZigZagLocation
-        {
-            get { return _lastZigZagLocation; }
-            set { _lastZigZagLocation = value; }
         }
 
         public static TrinityPower CurrentPower
@@ -782,7 +765,10 @@ namespace Trinity.Combat.Abilities
                     //if (meta.IsEliteOnly && !CurrentTarget.IsBossOrEliteRareUnique)
                     //    return false;
 
-                    if (!adhocConditionResult || !metaConditionResult)
+                    if (!adhocConditionResult)
+                        return "AdHocConditionFailure";
+
+                    if (!metaConditionResult)
                         return "ConditionFailure";
 
                     return string.Empty;

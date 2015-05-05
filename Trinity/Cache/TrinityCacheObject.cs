@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.Serialization;
+using Trinity.Helpers;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Game;
@@ -23,7 +24,7 @@ namespace Trinity
         {
             get
             {
-                if (_object == null || (_object != null && !_object.IsValid))
+                if (_object == null)
                 {
                     _object = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, true).FirstOrDefault(o => o.RActorGuid == RActorGuid);
                 }
@@ -33,33 +34,55 @@ namespace Trinity
         }
 
         [NoCopy]
+        private DiaUnit _unit;
+        [NoCopy]
         public DiaUnit Unit
         {
             get
             {
-                if (Object != null && Object.IsValid && Object is DiaUnit)
-                    return Object as DiaUnit;
+                if (_unit != null && _unit.IsFullyValid())
+                    return _unit;
+                if (Object != null && Object.IsFullyValid() && Object is DiaUnit)
+                {
+                    _unit = Object as DiaUnit;
+                    return _unit;
+                }
                 return default(DiaUnit);
             }
         }
+
+        [NoCopy]
+        private DiaGizmo _gizmo;
         [NoCopy]
         public DiaGizmo Gizmo
         {
             get
             {
-                if (Object != null && Object.IsValid && Object is DiaGizmo)
-                    return Object as DiaGizmo;
+                if (_gizmo != null && _unit.IsFullyValid())
+                    return _gizmo;
+                if (Object != null && Object.IsFullyValid() && Object is DiaGizmo)
+                {
+                    _gizmo = Object as DiaGizmo;
+                    return _gizmo;
+                }
                 return default(DiaGizmo);
             }
         }
 
         [NoCopy]
+        private DiaItem _item;
+        [NoCopy]
         public DiaItem Item
         {
             get
             {
-                if (Object != null && Object.IsValid && Object is DiaItem)
-                    return Object as DiaItem;
+                if (_item != null && _unit.IsFullyValid())
+                    return _item;
+                if (Object != null && Object.IsFullyValid() && Object is DiaItem)
+                {
+                    _item = Object as DiaItem;
+                    return _item;
+                }
                 return default(DiaItem);
             }
         }
@@ -82,7 +105,7 @@ namespace Trinity
         {
             get
             {
-                return CommonData != null && CommonData.IsValid;
+                return IsFullyValid();
             }
         }
 
@@ -452,6 +475,11 @@ namespace Trinity
         public bool IsInLineOfSight()
         {
             return !Navigator.Raycast(Trinity.Player.Position, Position);
+        }
+
+        public bool IsFullyValid()
+        {
+            return _object != null && _object.CommonData != null && _object.IsValid && _object.CommonData.IsValid;
         }
     }
 }

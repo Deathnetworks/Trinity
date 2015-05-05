@@ -323,7 +323,8 @@ namespace Trinity.Combat.Abilities
         {
             meta.CastRange = 65f;
             meta.ReUseDelay = 250;
-            meta.TargetPositionSelector = ret => TargetUtil.GetZigZagTarget(CurrentTarget.Position, V.F("Barbarian.Whirlwind.ZigZagDistance"));
+            //meta.TargetPositionSelector = ret => TargetUtil.GetZigZagTarget(CurrentTarget.Position, V.F("Barbarian.Whirlwind.ZigZagDistance"));
+            meta.TargetPositionSelector = ret => NavHelper.FindSafeZone(false, 0, CurrentTarget.Position, true, Trinity.ObjectCache, false);
             meta.CastFlags = CanCastFlags.NoTimer;
             meta.RequiredResource = Settings.Combat.DemonHunter.StrafeMinHatred;
 
@@ -464,6 +465,9 @@ namespace Trinity.Combat.Abilities
         {
             meta.CastRange = 90f;            
             meta.CastFlags = CanCastFlags.NoTimer;
+
+            if (Legendary.CrashingRain.IsEquipped)
+                meta.TargetPositionSelector = skillMeta => TargetUtil.GetBestClusterPoint(30f, 80f); 
 
             if (Settings.Combat.DemonHunter.RainOfVengeanceOffCD || Sets.NatalyasVengeance.IsEquipped)
                 return true;

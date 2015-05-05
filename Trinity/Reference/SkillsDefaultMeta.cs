@@ -796,7 +796,6 @@ namespace Trinity.Reference
                 Defaults = (skill, meta) =>
                 {
                     meta.IsCastOnSelf = true;
-                    meta.IsBuffingSkill = true;
                     meta.IsDefensiveSkill = true;
                     meta.IsOffensiveSkill = true;
                 }
@@ -1127,12 +1126,10 @@ namespace Trinity.Reference
                 Defaults = (skill, meta) =>
                 {
                     meta.IsCombatOnly = true;
-                    meta.IsAvoidanceSkill = true;
                     meta.IsOffensiveSkill = true;
-                    meta.IsDefensiveSkill = true;
                     meta.IsAreaEffectSkill = true;
                     meta.AreaEffectShape = AreaEffectShapeType.Cone;
-                    meta.MaxTargetDistance = 30f;
+                    meta.CastRange = 30f;
 
                     if (skill.CurrentRune == Runes.DemonHunter.Focus)
                     {

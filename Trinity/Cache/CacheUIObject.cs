@@ -1,17 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Trinity.LazyCache;
-using Trinity.UI.UIComponents;
 using Zeta.Game.Internals.Actors;
 
 namespace Trinity.Cache
 {
     public class CacheUIObject : IEquatable<CacheUIObject>
     {
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+                return false;
+            if (ReferenceEquals(this, obj))
+                return true;
+            if (obj.GetType() != GetType())
+                return false;
+            return Equals((CacheUIObject) obj);
+        }
+
         public int Distance { get; set; }
         public int Radius { get; set; }
         public int RadiusDistance { get; set; }
@@ -73,7 +79,7 @@ namespace Trinity.Cache
                 IsElite = BoolToString(cacheObject.IsEliteRareUnique);
                 WeightInfo = cacheObject.WeightInfo;
 
-                string ignoreReason = "";
+                string ignoreReason;
                 CacheData.IgnoreReasons.TryGetValue(RActorGUID, out ignoreReason);
                 IgnoreReason = ignoreReason;
 
@@ -94,7 +100,7 @@ namespace Trinity.Cache
         private string IntToString(int val)
         {
             if (val != 0)
-                return val.ToString();
+                return val.ToString(CultureInfo.InvariantCulture);
             return "";
         }
 
@@ -105,14 +111,37 @@ namespace Trinity.Cache
 
         public bool Equals(CacheUIObject other)
         {
-            if (other == null)
+            if (ReferenceEquals(null, other))
                 return false;
-            return GetHashCode() != other.GetHashCode();
+            if (ReferenceEquals(this, other))
+                return true;
+            return Distance == other.Distance && Radius == other.Radius && RadiusDistance == other.RadiusDistance && string.Equals(Name, other.Name) && string.Equals(Type, other.Type) && string.Equals(InCache, other.InCache) && string.Equals(IgnoreReason, other.IgnoreReason) && string.Equals(Weight, other.Weight) && string.Equals(IsBoss, other.IsBoss) && string.Equals(IsElite, other.IsElite) && string.Equals(IsQuestMonster, other.IsQuestMonster) && string.Equals(IsMinimapActive, other.IsMinimapActive) && string.Equals(MarkerHash, other.MarkerHash) && string.Equals(MinimapTexture, other.MinimapTexture) && string.Equals(WeightInfo, other.WeightInfo) && RActorGUID == other.RActorGUID && ActorSNO == other.ActorSNO && ACDGuid == other.ACDGuid;
         }
 
         public override int GetHashCode()
         {
-            return RActorGUID.GetHashCode() ^ Name.GetHashCode() ^ Distance.GetHashCode() ^ InCache.GetHashCode();
+            unchecked
+            {
+                int hashCode = Distance;
+                hashCode = (hashCode*397) ^ Radius;
+                hashCode = (hashCode*397) ^ RadiusDistance;
+                hashCode = (hashCode*397) ^ (Name != null ? Name.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (Type != null ? Type.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (InCache != null ? InCache.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (IgnoreReason != null ? IgnoreReason.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (Weight != null ? Weight.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (IsBoss != null ? IsBoss.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (IsElite != null ? IsElite.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (IsQuestMonster != null ? IsQuestMonster.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (IsMinimapActive != null ? IsMinimapActive.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (MarkerHash != null ? MarkerHash.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (MinimapTexture != null ? MinimapTexture.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (WeightInfo != null ? WeightInfo.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ RActorGUID;
+                hashCode = (hashCode*397) ^ ActorSNO;
+                hashCode = (hashCode*397) ^ ACDGuid;
+                return hashCode;
+            }
         }
         public static bool operator ==(CacheUIObject a, CacheUIObject b)
         {

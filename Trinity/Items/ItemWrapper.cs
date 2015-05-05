@@ -13,7 +13,7 @@ namespace Trinity.Items
     {
         public int ActorSNO { get; set; }
         public int GameBalanceId { get; set; }
-        public int DynamicID { get; set; }
+        public int DynamicId { get; set; }
         public int ACDGuid { get; set; }
         public int RequiredLevel { get; set; }
         public InventorySlot InventorySlot { get; set; }
@@ -29,7 +29,7 @@ namespace Trinity.Items
         public bool IsShield { get; set; }
         public bool IsOffHand { get; set; }
         public bool IsWeapon { get; set; }
-        public bool IsJewlery { get; set; }
+        public bool IsJewelry { get; set; }
         public bool IsArmor { get; set; }
         public bool IsEquipment { get; set; }
         public bool IsMisc { get; set; }
@@ -55,7 +55,7 @@ namespace Trinity.Items
                 ActorSNO = item.ActorSNO;
                 Name = item.Name;
                 GameBalanceId = item.GameBalanceId;
-                DynamicID = item.DynamicId;
+                DynamicId = item.DynamicId;
                 ACDGuid = item.ACDGuid;
                 InventorySlot = item.InventorySlot;
                 ValidInventorySlots = item.ValidInventorySlots;
@@ -69,7 +69,7 @@ namespace Trinity.Items
                 IsShield = ShieldTypes.Contains(ItemType);
                 IsOffHand = OffHandTypes.Contains(ItemType);
                 IsArmor = ArmorTypes.Contains(ItemType);
-                IsJewlery = JewleryTypes.Contains(ItemType);
+                IsJewelry = JewleryTypes.Contains(ItemType);
                 IsWeapon = WeaponTypes.Contains(ItemType);
                 IsEquipment = item.ItemBaseType == ItemBaseType.Armor || item.ItemBaseType == ItemBaseType.Jewelry || item.ItemBaseType == ItemBaseType.Weapon;
                 IsMisc = MiscTypes.Contains(ItemType);
@@ -189,7 +189,7 @@ namespace Trinity.Items
 
         public bool Equals(ItemWrapper other)
         {
-            if (DynamicID == other.DynamicID)
+            if (DynamicId == other.DynamicId)
                 return true;
 
             return ItemType == other.ItemType &&

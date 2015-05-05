@@ -336,6 +336,13 @@ namespace Trinity
                         }
                     }
 
+                    // DemonHunter Strafe
+                    if (Skills.DemonHunter.Strafe.IsActive && Player.PrimaryResource > 12 && TargetUtil.AnyMobsInRange(30f, false))
+                    {
+                        Skills.DemonHunter.Strafe.Cast(CurrentDestination);
+                        return GetRunStatus(RunStatus.Running);
+                    }
+
                     if (Player.ActorClass == ActorClass.Monk && CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike) && ((Skills.Monk.DashingStrike.Charges > 1 && ZetaDia.Me.CurrentPrimaryResource > 75) || CacheData.Buffs.HasCastingShrine))
 					{
 						Logger.Log("Dash towards: {0}, charges={1}", GetTargetName(), Skills.Monk.DashingStrike.Charges);
@@ -346,7 +353,7 @@ namespace Trinity
 
                     if (Player.ActorClass == ActorClass.Barbarian)
                     {
-                        bool wwToItem = (CurrentTarget.Type != TrinityObjectType.Item || (CurrentTarget.Type == TrinityObjectType.Item && CurrentTarget.Distance > 10f));
+                        bool wwToItem = (CurrentTarget.Type != TrinityObjectType.Item || (CurrentTarget.Type == TrinityObjectType.Item && CurrentTarget.Distance > 10f && NavHelper.CanRayCast(CurrentTarget.Position)));
                         // Whirlwind against everything within range
                         if (Player.PrimaryResource >= 10 && CombatBase.CanCast(SNOPower.Barbarian_Whirlwind) && wwToItem &&
                             (TargetUtil.AnyMobsInRange(20, false) || Sets.BulKathossOath.IsFullyEquipped) && !IsWaitingForSpecial)
@@ -848,7 +855,7 @@ namespace Trinity
                 // Leap movement for a barb
                 if (CombatBase.CanCast(SNOPower.Barbarian_Leap))
                 {
-                    ZetaDia.Me.UsePower(SNOPower.Barbarian_Leap, CurrentDestination, CurrentWorldDynamicId, -1);
+                    ZetaDia.Me.UsePower(SNOPower.Barbarian_Leap, CurrentDestination, CurrentWorldDynamicId);
                     SpellHistory.RecordSpell(SNOPower.Barbarian_Leap);
                     return true;
                 }
@@ -856,7 +863,7 @@ namespace Trinity
                 // Furious Charge movement for a barb
                 if (CombatBase.CanCast(SNOPower.Barbarian_FuriousCharge) && Settings.Combat.Barbarian.UseChargeOOC)
                 {
-                    ZetaDia.Me.UsePower(SNOPower.Barbarian_FuriousCharge, CurrentDestination, CurrentWorldDynamicId, -1);
+                    ZetaDia.Me.UsePower(SNOPower.Barbarian_FuriousCharge, CurrentDestination, CurrentWorldDynamicId);
                     SpellHistory.RecordSpell(SNOPower.Barbarian_FuriousCharge);
                     return true;
                 }
@@ -865,7 +872,7 @@ namespace Trinity
                 if (attackableSpecialMovement && !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker
                     && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource >= 10)
                 {
-                    ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, CurrentDestination, CurrentWorldDynamicId, -1);
+                    ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, CurrentDestination, CurrentWorldDynamicId);
                     // Store the current destination for comparison incase of changes next loop
                     LastMoveToTarget = CurrentDestination;
                     // Reset total body-block count, since we should have moved
@@ -880,7 +887,7 @@ namespace Trinity
                     !CacheData.TimeBoundAvoidance.Any(a => a.Position.Distance(CurrentDestination) <= CombatBase.KiteDistance))) &&
                     (!CacheData.TimeBoundAvoidance.Any(a => MathEx.IntersectsPath(a.Position, a.Radius, Player.Position, CurrentDestination))))
                 {
-                    ZetaDia.Me.UsePower(SNOPower.DemonHunter_Vault, CurrentDestination, CurrentWorldDynamicId, -1);
+                    ZetaDia.Me.UsePower(SNOPower.DemonHunter_Vault, CurrentDestination, CurrentWorldDynamicId);
                     SpellHistory.RecordSpell(SNOPower.DemonHunter_Vault);
                     return true;
                 }
@@ -888,7 +895,7 @@ namespace Trinity
                 // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
                 if (CombatBase.CanCast(SNOPower.Wizard_Teleport))
                 {
-                    ZetaDia.Me.UsePower(SNOPower.Wizard_Teleport, CurrentDestination, CurrentWorldDynamicId, -1);
+                    ZetaDia.Me.UsePower(SNOPower.Wizard_Teleport, CurrentDestination, CurrentWorldDynamicId);
                     SpellHistory.RecordSpell(SNOPower.Wizard_Teleport);
                     return true;
                 }
@@ -907,7 +914,7 @@ namespace Trinity
                     Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly &&
                     MonkCombat.IsTempestRushReady())
                 {
-                    ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, CurrentDestination, CurrentWorldDynamicId, -1);
+                    ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, CurrentDestination, CurrentWorldDynamicId);
                     CacheData.AbilityLastUsed[SNOPower.Monk_TempestRush] = DateTime.UtcNow;
                     LastPowerUsed = SNOPower.Monk_TempestRush;
                     MonkCombat.LastTempestRushLocation = CurrentDestination;
@@ -922,7 +929,7 @@ namespace Trinity
                 // Strafe for a Demon Hunter
                 if (attackableSpecialMovement && CombatBase.CanCast(SNOPower.DemonHunter_Strafe))
                 {
-                    ZetaDia.Me.UsePower(SNOPower.DemonHunter_Strafe, CurrentDestination, CurrentWorldDynamicId, -1);
+                    ZetaDia.Me.UsePower(SNOPower.DemonHunter_Strafe, CurrentDestination, CurrentWorldDynamicId);
                     // Store the current destination for comparison incase of changes next loop
                     LastMoveToTarget = CurrentDestination;
                     // Reset total body-block count, since we should have moved

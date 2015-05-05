@@ -22,13 +22,13 @@ namespace Trinity
             if (!(c_diaObject is DiaUnit))
                 return false;
 
-            if (c_diaUnit == null)
+            if (CurrentCacheObject.Unit == null)
                 return false;
 
-            if (!c_diaUnit.IsValid)
+            if (!CurrentCacheObject.Unit.IsValid)
                 return false;
 
-            if (!c_diaUnit.CommonData.IsValid)
+            if (!CurrentCacheObject.Unit.CommonData.IsValid)
                 return false;
 
             if (c_diaObject.CommonData.ACDGuid == -1)
@@ -38,7 +38,7 @@ namespace Trinity
             CurrentCacheObject.KillRange = CurrentBotKillRange;
 
             // grab this first
-            c_CurrentAnimation = c_diaUnit.CommonData.CurrentAnimation;
+            c_CurrentAnimation = CurrentCacheObject.Unit.CommonData.CurrentAnimation;
 
             // See if this is a boss
             CurrentCacheObject.IsBoss = DataDictionary.BossIds.Contains(CurrentCacheObject.ActorSNO) || CurrentCacheObject.InternalName.ToLower().Contains("boss");
@@ -50,11 +50,11 @@ namespace Trinity
 
             try
             {
-                if (c_diaUnit.Movement.IsValid)
+                if (CurrentCacheObject.Unit.Movement.IsValid)
                 {
-                    c_IsFacingPlayer = c_diaUnit.IsFacingPlayer;
-                    c_Rotation = c_diaUnit.Movement.Rotation;
-                    c_DirectionVector = c_diaUnit.Movement.DirectionVector;
+                    c_IsFacingPlayer = CurrentCacheObject.Unit.IsFacingPlayer;
+                    CurrentCacheObject.Rotation = CurrentCacheObject.Unit.Movement.Rotation;
+                    CurrentCacheObject.DirectionVector = CurrentCacheObject.Unit.Movement.DirectionVector;
                 }
             }
             catch (Exception ex)
@@ -62,20 +62,10 @@ namespace Trinity
                 Logger.LogDebug(LogCategory.CacheManagement, "Error while reading Rotation/Facing: {0}", ex.ToString());
             }
 
-            // Invulnerable
-            try
-            {
-                CurrentCacheObject.IsInvulnerable = CurrentCacheObject.Unit.IsInvulnerable;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogDebug(LogCategory.CacheManagement, "Error while reading IsInvulnerable: {0}", ex.ToString());
-            }
-
             /*
             *  TeamID  - check once for all units except bosses (which can potentially change teams - Belial, Cydea)
             */
-            string teamIdHash = HashGenerator.GetGenericHash("teamId.RActorGuid=" + CurrentCacheObject.RActorGuid + ".ActorSNO=" + CurrentCacheObject.ActorSNO + ".WorldId=" + Player.WorldID);
+            string teamIdHash = "teamId.RActorGuid=" + CurrentCacheObject.RActorGuid + ".ActorSNO=" + CurrentCacheObject.ActorSNO + ".WorldId=" + Player.WorldID;
 
             int teamId;
             if (!CurrentCacheObject.IsBoss && GenericCache.ContainsKey(teamIdHash))
@@ -84,7 +74,7 @@ namespace Trinity
             }
             else
             {
-                teamId = c_diaUnit.TeamId;
+                teamId = CurrentCacheObject.Unit.TeamId;
 
                 GenericCache.AddToCache(new GenericCacheObject
                 {
@@ -98,7 +88,7 @@ namespace Trinity
 
             try
             {
-                CurrentCacheObject.IsNPC = c_diaUnit.IsNPC;
+                CurrentCacheObject.IsNPC = CurrentCacheObject.Unit.IsNPC;
             }
             catch (Exception)
             {
@@ -111,7 +101,7 @@ namespace Trinity
 
             try
             {
-                CurrentCacheObject.IsQuestMonster = c_diaUnit.IsQuestMonster;
+                CurrentCacheObject.IsQuestMonster = CurrentCacheObject.Unit.IsQuestMonster;
                 if (CurrentCacheObject.IsQuestMonster)
                     CurrentCacheObject.KillRange = CurrentCacheObject.RadiusDistance + 10f;
             }
@@ -123,7 +113,7 @@ namespace Trinity
 
             try
             {
-                CurrentCacheObject.IsQuestGiver = c_diaUnit.IsQuestGiver;
+                CurrentCacheObject.IsQuestGiver = CurrentCacheObject.Unit.IsQuestGiver;
 
                 // Interact with quest givers, except when doing town-runs
                 if (ZetaDia.CurrentAct == Act.OpenWorld && CurrentCacheObject.IsQuestGiver && !(WantToTownRun || ForceVendorRunASAP || BrainBehavior.IsVendoring))
@@ -211,7 +201,7 @@ namespace Trinity
                 return addToCache;
             }
 
-            if (c_diaUnit.IsDead)
+            if (CurrentCacheObject.Unit.IsDead)
             {
                 addToCache = false;
                 c_IgnoreSubStep = "IsDead";
@@ -221,7 +211,7 @@ namespace Trinity
             if (CurrentCacheObject.IsQuestMonster || CurrentCacheObject.IsBountyObjective)
                 return true;
 
-            addToCache = RefreshUnitAttributes(addToCache, c_diaUnit);
+            addToCache = RefreshUnitAttributes(addToCache, CurrentCacheObject.Unit);
 
             if (!addToCache)
                 return addToCache;
@@ -254,7 +244,7 @@ namespace Trinity
 
         private static void RefreshMonsterSize()
         {
-            SNORecordMonster monsterInfo = c_diaUnit.MonsterInfo;
+            SNORecordMonster monsterInfo = CurrentCacheObject.Unit.MonsterInfo;
             if (monsterInfo != null)
             {
                 c_unit_MonsterSize = monsterInfo.MonsterSize;
@@ -268,7 +258,7 @@ namespace Trinity
 
         private static void RefreshMonsterHealth()
         {
-            if (!c_diaUnit.IsValid)
+            if (!CurrentCacheObject.Unit.IsValid)
                 return;
 
             // health calculations
@@ -276,12 +266,12 @@ namespace Trinity
             // Get the max health of this unit, a cached version if available, if not cache it
             if (!CacheData.UnitMaxHealth.TryGetValue(CurrentCacheObject.RActorGuid, out maxHealth))
             {
-                maxHealth = c_diaUnit.HitpointsMax;
+                maxHealth = CurrentCacheObject.Unit.HitpointsMax;
                 CacheData.UnitMaxHealth.Add(CurrentCacheObject.RActorGuid, maxHealth);
             }
 
             // Health calculations            
-            c_HitPoints = c_diaUnit.HitpointsCurrent;
+            c_HitPoints = CurrentCacheObject.Unit.HitpointsCurrent;
 
             // And finally put the two together for a current health percentage
             c_HitPointsPct = c_HitPoints / maxHealth;
@@ -306,7 +296,7 @@ namespace Trinity
                 return AddToCache;
             }
 
-            bool isBurrowed = false;
+            bool isBurrowed;
             if (!CacheData.UnitIsBurrowed.TryGetValue(CurrentCacheObject.RActorGuid, out isBurrowed))
             {
                 isBurrowed = unit.IsBurrowed;
@@ -433,11 +423,11 @@ namespace Trinity
         }
         private static bool RefreshStepCachedSummons()
         {
-            if (c_diaUnit.IsFullyValid())
+            if (CurrentCacheObject.Unit.IsFullyValid())
             {
                 try
                 {
-                    CurrentCacheObject.SummonedByACDId = c_diaUnit.SummonedByACDId;
+                    CurrentCacheObject.SummonedByACDId = CurrentCacheObject.Unit.SummonedByACDId;
                 }
                 catch
                 {
@@ -445,7 +435,7 @@ namespace Trinity
                 }
                 try
                 {
-                    CurrentCacheObject.IsSummoner = c_diaUnit.SummonerId > 0;
+                    CurrentCacheObject.IsSummoner = CurrentCacheObject.Unit.SummonerId > 0;
                 }
                 catch
                 {

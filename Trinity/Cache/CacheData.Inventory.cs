@@ -55,8 +55,12 @@ namespace Trinity
                         return;
 
                     Clear();
+                    //var itemList = ZetaDia.Actors.GetActorsOfType<ACDItem>();
 
-                    foreach (var item in ZetaDia.Actors.GetActorsOfType<ACDItem>())
+                    // Using backpack only for now, as grabbing all ACDItems is just slow and we don't have a use for them yet.
+                    var itemList = ZetaDia.Me.Inventory.Backpack;
+
+                    foreach (var item in itemList)
                     {
                         if (!item.IsValid)
                             continue;

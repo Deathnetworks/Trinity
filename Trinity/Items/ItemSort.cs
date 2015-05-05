@@ -36,7 +36,7 @@ namespace Trinity.Items
         public static int Compare(this ItemWrapper thisItem, ItemWrapper thatItem)
         {
             Logger.LogDebug("Comparing item {0} ({1}) to {2} ({3})", thisItem.Name, thisItem.InternalName, thatItem.Name, thatItem.InternalName);
-            if (thisItem.DynamicID == thatItem.DynamicID)
+            if (thisItem.DynamicId == thatItem.DynamicId)
                 return 0;
 
             string thisInternalName = thisItem.InternalName.ToLower().Replace("x1_", "").Replace("p1_", "");
@@ -515,7 +515,7 @@ namespace Trinity.Items
                     string msg = String.Format("Moving item {0} from {1},{2} to {3},{4}", i.Name, i.Item.InventoryColumn, i.Item.InventoryRow, currentCol, currentRow);
                     BotMain.StatusText = msg;
                     Logger.LogDebug(msg);
-                    ZetaDia.Me.Inventory.MoveItem(i.DynamicID, myDynamicId, inventorySlot, currentCol, currentRow);
+                    ZetaDia.Me.Inventory.MoveItem(i.DynamicId, myDynamicId, inventorySlot, currentCol, currentRow);
 
                     MarkCellAsUsed(currentRow, currentCol, i);
                     currentCol++;
@@ -612,7 +612,7 @@ namespace Trinity.Items
                     string msg = String.Format("Moving item {0} from {1},{2} to {3},{4}", i.Name, i.Item.InventoryColumn, i.Item.InventoryRow, currentCol, currentRow);
                     BotMain.StatusText = msg;
                     Logger.LogDebug(msg);
-                    ZetaDia.Me.Inventory.MoveItem(i.DynamicID, myDynamicId, inventorySlot, currentCol, currentRow);
+                    ZetaDia.Me.Inventory.MoveItem(i.DynamicId, myDynamicId, inventorySlot, currentCol, currentRow);
 
                     MarkCellAsUsed(currentRow, currentCol, i);
                     currentCol--;

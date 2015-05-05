@@ -6,11 +6,9 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Windows.Media;
 using Trinity.Config.Combat;
 using Trinity.Reference;
 using Trinity.Technicals;
-using Zeta.Bot;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 
@@ -136,7 +134,7 @@ namespace Trinity.Helpers
             return new EnumValue<TEnum>(e);
         }
 
-        private static Regex ItemQualityRegex = new Regex("{c:[a-zA-Z0-9]{8}}", RegexOptions.Compiled);
+        private static Regex _itemQualityRegex = new Regex("{c:[a-zA-Z0-9]{8}}", RegexOptions.Compiled);
 
         public static ItemQuality ItemLinkColorQuality(this ACDItem item)
         {
@@ -154,10 +152,9 @@ namespace Trinity.Helpers
 
             string itemLink = item.ItemLink;
 
-            string linkColor = ItemQualityRegex.Match(itemLink).Value;
+            string linkColor = _itemQualityRegex.Match(itemLink).Value;
 
             ItemQuality qualityResult;
-            string itemLinkLog = itemLink.Replace("{", "{{").Replace("}", "}}");
 
             switch (linkColor)
             {
@@ -207,7 +204,7 @@ namespace Trinity.Helpers
 
             string itemLink = item.ItemLink;
 
-            string linkColor = ItemQualityRegex.Match(itemLink).Value;
+            string linkColor = _itemQualityRegex.Match(itemLink).Value;
 
             if (linkColor == "{c:ff00ff00}")
                 return true;
@@ -253,7 +250,7 @@ namespace Trinity.Helpers
         /// <returns></returns>
         public static bool IsFullyValid(this DiaObject diaObject)
         {
-            return diaObject != null && diaObject.IsValid && diaObject.ACDGuid != 0 && diaObject.CommonData != null && diaObject.CommonData.IsValid;
+            return diaObject != null && diaObject.IsValid && diaObject.CommonData != null && diaObject.CommonData.IsValid;
         }
 
         /// <summary>

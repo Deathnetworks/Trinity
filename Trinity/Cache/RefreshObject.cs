@@ -39,7 +39,6 @@ namespace Trinity
         private static TrinityItemType _cItemTinityItemType = TrinityItemType.Unknown;
         private static MonsterSize c_unit_MonsterSize = MonsterSize.Unknown;
         private static DiaObject c_diaObject = null;
-        private static DiaUnit c_diaUnit = null;
         private static DiaGizmo c_diaGizmo = null;
         private static SNOAnim c_CurrentAnimation = SNOAnim.Invalid;
         private static bool c_unit_IsElite = false;
@@ -58,8 +57,6 @@ namespace Trinity
         private static bool c_HasDotDPS = false;
         private static MonsterAffixes c_MonsterAffixes = MonsterAffixes.None;
         private static bool c_IsFacingPlayer;
-        private static float c_Rotation;
-        private static Vector2 c_DirectionVector = Vector2.Zero;
 
         private static bool CacheDiaObject(DiaObject freshObject)
         {
@@ -88,11 +85,11 @@ namespace Trinity
             /*
              *  Get primary reference objects and keys
              */
-            c_diaObject = freshObject;
+            CurrentCacheObject.Object = c_diaObject = freshObject;
 
             try
             {
-                // Ractor GUID
+                // RActor GUID
                 CurrentCacheObject.RActorGuid = freshObject.RActorGuid;
                 // Check to see if we've already looked at this GUID
                 CurrentCacheObject.ACDGuid = freshObject.ACDGuid;
@@ -269,7 +266,6 @@ namespace Trinity
             CurrentCacheObject.Animation = c_CurrentAnimation;
             CurrentCacheObject.DBItemBaseType = c_DBItemBaseType;
             CurrentCacheObject.DBItemType = c_DBItemType;
-            CurrentCacheObject.DirectionVector = c_DirectionVector;
             CurrentCacheObject.Distance = CurrentCacheObject.Distance;
             CurrentCacheObject.DynamicID = CurrentCacheObject.DynamicID;
             CurrentCacheObject.FollowerType = c_item_tFollowerType;
@@ -286,7 +282,6 @@ namespace Trinity
             CurrentCacheObject.IsAttackable = c_unit_IsAttackable;
             CurrentCacheObject.IsElite = c_unit_IsElite;
             CurrentCacheObject.IsEliteRareUnique = c_IsEliteRareUnique;
-            CurrentCacheObject.IsFacingPlayer = c_IsFacingPlayer;
             CurrentCacheObject.IsMinion = c_unit_IsMinion;
             CurrentCacheObject.IsRare = c_unit_IsRare;
             CurrentCacheObject.IsTreasureGoblin = c_unit_IsTreasureGoblin;
@@ -299,7 +294,6 @@ namespace Trinity
             CurrentCacheObject.OneHanded = c_IsOneHandedItem;
             CurrentCacheObject.RActorGuid = CurrentCacheObject.RActorGuid;
             CurrentCacheObject.Radius = CurrentCacheObject.Radius;
-            CurrentCacheObject.Rotation = c_Rotation;
             CurrentCacheObject.TrinityItemType = _cItemTinityItemType;
             CurrentCacheObject.TwoHanded = c_IsTwoHandedItem;
             CurrentCacheObject.Type = CurrentCacheObject.Type;
@@ -395,14 +389,10 @@ namespace Trinity
             _cItemTinityItemType = TrinityItemType.Unknown;
             c_unit_MonsterSize = MonsterSize.Unknown;
             c_diaObject = null;
-            c_diaUnit = null;
             c_diaGizmo = null;
             c_CurrentAnimation = SNOAnim.Invalid;
             c_HasDotDPS = false;
             c_MonsterAffixes = MonsterAffixes.None;
-            c_IsFacingPlayer = false;
-            c_Rotation = 0f;
-            c_DirectionVector = Vector2.Zero;
         }
 
         private static bool RefreshStepIgnoreNullCommonData(bool AddToCache)
@@ -446,32 +436,32 @@ namespace Trinity
                 bool isAvoidanceSNO = DataDictionary.Avoidances.Contains(CurrentCacheObject.ActorSNO) ||
                     DataDictionary.ButcherFloorPanels.Contains(CurrentCacheObject.ActorSNO) ||
                     DataDictionary.AvoidanceProjectiles.Contains(CurrentCacheObject.ActorSNO);
-                try
+
+                // Check if it's a unit with an animation we should avoid. We need to recheck this every time.
+                if (c_diaObject is DiaUnit && Settings.Combat.Misc.AvoidAOE &&
+                    DataDictionary.AvoidanceAnimations.Contains(new DoubleInt(CurrentCacheObject.ActorSNO, (int)c_diaObject.CommonData.CurrentAnimation)))
                 {
-                    // Check if it's a unit with an animation we should avoid. We need to recheck this every time.
-                    if (c_diaObject is DiaUnit && Settings.Combat.Misc.AvoidAOE && 
-                        DataDictionary.AvoidanceAnimations.Contains(new DoubleInt(CurrentCacheObject.ActorSNO, (int)c_diaObject.CommonData.CurrentAnimation)))
-                    {
-                        // The ActorSNO and Animation match a known pair, avoid this!
-                        // Example: "Grotesque" death animation
-                        AddToCache = true;
-                        CurrentCacheObject.Type = TrinityObjectType.Avoidance;
-                        isAvoidanceSNO = true;
-                    }
+                    // The ActorSNO and Animation match a known pair, avoid this!
+                    // Example: "Grotesque" death animation
+                    AddToCache = true;
+                    CurrentCacheObject.Type = TrinityObjectType.Avoidance;
+                    isAvoidanceSNO = true;
+                }
 
-
+                if (CurrentCacheObject.Unit != null && CurrentCacheObject.Unit.Movement.IsValid)
+                {
+                    CurrentCacheObject.Rotation = CurrentCacheObject.Unit.Movement.Rotation;
+                    CurrentCacheObject.DirectionVector = CurrentCacheObject.Unit.Movement.DirectionVector;
                     // Check if it's a unit with an animation we should avoid. We need to recheck this every time.
-                    if (c_diaObject is DiaUnit && Settings.Combat.Misc.AvoidAOE && c_diaObject.IsFacingPlayer &&
+                    if (c_diaObject is DiaUnit && Settings.Combat.Misc.AvoidAOE && CurrentCacheObject.IsFacing(Player.Position) &&
                         DataDictionary.DirectionalAvoidanceAnimations.Contains(new DoubleInt(CurrentCacheObject.ActorSNO, (int)c_diaObject.CommonData.CurrentAnimation)))
                     {
                         // The ActorSNO and Animation match a known pair, avoid this!
-                        // Example: "Grotesque" death animation
                         AddToCache = true;
                         CurrentCacheObject.Type = TrinityObjectType.Avoidance;
                         isAvoidanceSNO = true;
                     }
                 }
-                catch { }
 
                 // We're avoiding AoE and this is an AoE
                 if (Settings.Combat.Misc.AvoidAOE && isAvoidanceSNO)
@@ -534,7 +524,6 @@ namespace Trinity
                             }
                             else
                             {
-                                c_diaUnit = c_diaObject as DiaUnit;
                                 CurrentCacheObject.Type = TrinityObjectType.Unit;
                             }
                         }
@@ -720,10 +709,10 @@ namespace Trinity
                 case TrinityObjectType.CursedChest:
                 case TrinityObjectType.CursedShrine:
                     {
-                        AddToCache = RefreshGizmo(AddToCache);
+                        AddToCache = RefreshGizmo();
                         break;
                     }
-                // Object switch on type (to seperate shrines, destructibles, barricades etc.)
+                // Object switch on type (to separate shrines, destructibles, barricades etc.)
                 default:
                     {
                         DebugUtil.LogUnknown(c_diaObject);

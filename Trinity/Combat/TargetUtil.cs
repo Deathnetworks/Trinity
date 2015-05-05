@@ -107,7 +107,7 @@ namespace Trinity
             {
                 return
                     (from u in ObjectCache
-                     where u.IsUnit && u.CommonDataIsValid &&
+                     where u.IsUnit && u.IsFullyValid() &&
                      u.Weight > 0 &&
                      u.IsBossOrEliteRareUnique &&
                      u.RadiusDistance <= range
@@ -146,7 +146,7 @@ namespace Trinity
 
             var clusterCheck =
                 (from u in ObjectCache
-                 where u.IsUnit && u.CommonDataIsValid &&
+                 where u.IsUnit && u.IsFullyValid() &&
                  u.RadiusDistance <= maxRange &&
                  u.NearbyUnitsWithinDistance(radius) >= minCount
                  select u).Any();
@@ -171,7 +171,7 @@ namespace Trinity
 
             var clusterUnit =
                 (from u in ObjectCache
-                 where u.IsUnit && u.CommonDataIsValid &&
+                 where u.IsUnit && u.IsFullyValid() &&
                  u.RadiusDistance <= 200 &&
                  u.NearbyUnitsWithinDistance(clusterRadius) >= minCount
                  orderby u.NearbyUnitsWithinDistance(clusterRadius)
@@ -368,11 +368,11 @@ namespace Trinity
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="radius"></param>
-        /// <param name="maxRange"></param>
-        /// <param name="count"></param>
-        /// <param name="useWeights"></param>
-        /// <param name="includeUnitsInAoe"></param>
+        /// <param name="radius">Cluster Radius</param>
+        /// <param name="maxRange">Unit Max Distance</param>
+        /// <param name="count">Minimum number of mobs</param>
+        /// <param name="useWeights">Include Mobs with Weight or not</param>
+        /// <param name="includeUnitsInAoe">Include mobs in AoE or not</param>
         /// <returns></returns>
         internal static TrinityCacheObject GetBestClusterUnit(float radius = 15f, float maxRange = 65f, int count = 1, bool useWeights = true, bool includeUnitsInAoe = true)
         {
@@ -494,7 +494,7 @@ namespace Trinity
         internal static bool AnyMobsInRangeOfPosition(Vector3 position, float range = 15f, int unitsRequired = 1)
         {
             var inRangeCount = (from u in ObjectCache
-                                where u.IsUnit && u.CommonDataIsValid &&
+                                where u.IsUnit && u.IsFullyValid() &&
                                         u.Weight > 0 &&
                                         u.Position.Distance2D(position) <= range
                                 select u).Count();
@@ -507,7 +507,7 @@ namespace Trinity
         internal static int NumMobsInRangeOfPosition(Vector3 position, float range = 15f)
         {
             return (from u in ObjectCache
-                    where u.IsUnit && u.CommonDataIsValid &&
+                    where u.IsUnit && u.IsFullyValid() &&
                             u.Weight > 0 &&
                             u.Position.Distance2D(position) <= range
                     select u).Count();
@@ -518,7 +518,7 @@ namespace Trinity
         internal static int NumBossInRangeOfPosition(Vector3 position, float range = 15f)
         {
             return (from u in ObjectCache
-                    where u.IsUnit && u.CommonDataIsValid &&
+                    where u.IsUnit && u.IsFullyValid() &&
                             u.Weight > 0 &&
                             u.IsBoss &&
                             u.Position.Distance2D(position) <= range
@@ -530,7 +530,7 @@ namespace Trinity
         internal static List<TrinityCacheObject> ListUnitsInRangeOfPosition(Vector3 position, float range = 15f)
         {
             return (from u in ObjectCache
-                    where u.IsUnit && u.CommonDataIsValid &&
+                    where u.IsUnit && u.IsFullyValid() &&
                         u.Weight > 0 &&
                         u.Position.Distance2D(position) <= range
                     select u).ToList();
@@ -592,7 +592,7 @@ namespace Trinity
         internal static bool AnyElitesInRangeOfPosition(Vector3 position, float range = 15f, int unitsRequired = 1)
         {
             var inRangeCount = (from u in ObjectCache
-                                where u.IsUnit && u.CommonDataIsValid &&
+                                where u.IsUnit && u.IsFullyValid() &&
                                         u.Weight > 0 &&
                                         u.IsBossOrEliteRareUnique &&
                                         u.Position.Distance2D(position) <= range
@@ -606,7 +606,7 @@ namespace Trinity
         internal static int NumElitesInRangeOfPosition(Vector3 position, float range = 15f)
         {
             return (from u in ObjectCache
-                    where u.IsUnit && u.CommonDataIsValid &&
+                    where u.IsUnit && u.IsFullyValid() &&
                             u.Weight > 0 &&
                             u.IsBossOrEliteRareUnique &&
                             u.Position.Distance2D(position) <= range
@@ -838,7 +838,7 @@ namespace Trinity
         internal static bool IsUnitWithDebuffInRangeOfPosition(float range, Vector3 position, SNOPower power, int unitsRequiredWithDebuff = 1)
         {
             var unitsWithDebuff = (from u in ObjectCache
-                                   where u.IsUnit && u.CommonDataIsValid &&
+                                   where u.IsUnit && u.IsFullyValid() &&
                                           u.Weight > 0 &&
                                           u.Position.Distance2D(position) <= range &&
                                           SpellTracker.IsUnitTracked(u.ACDGuid, power)
@@ -892,7 +892,7 @@ namespace Trinity
         {
             TrinityCacheObject harvestTarget =
             (from u in ObjectCache
-             where u.IsUnit && u.CommonDataIsValid &&
+             where u.IsUnit && u.IsFullyValid() &&
              u.RadiusDistance <= maxRange &&
              u.IsBossOrEliteRareUnique &&
              u.CommonData.GetAttribute<int>(ActorAttributeType.BuffVisualEffect) != 0
@@ -912,7 +912,7 @@ namespace Trinity
         internal static bool PercentOfMobsDebuffed(float maxRange = 30f, float minPercent = 0.5f)
         {
             int debuffed = (from u in ObjectCache
-                            where u.IsUnit && u.CommonDataIsValid &&
+                            where u.IsUnit && u.IsFullyValid() &&
                             u.RadiusDistance <= maxRange &&
                             u.CommonData.GetAttribute<int>(ActorAttributeType.BuffVisualEffect) != 0
                             select u).Count();
@@ -931,7 +931,7 @@ namespace Trinity
         internal static int MobsWithDebuff(SNOPower power, float maxRange = 30f)
         {
             return (from u in ObjectCache
-                    where u.IsUnit && u.CommonDataIsValid &&
+                    where u.IsUnit && u.IsFullyValid() &&
                     u.RadiusDistance <= maxRange &&
                     u.HasDebuff(power)
                     select u).Count();
@@ -940,7 +940,7 @@ namespace Trinity
         internal static int MobsWithDebuff(IEnumerable<SNOPower> powers, float maxRange = 30f)
         {
             return (from u in ObjectCache
-                    where u.IsUnit && u.CommonDataIsValid &&
+                    where u.IsUnit && u.IsFullyValid() &&
                     u.RadiusDistance <= maxRange &&
                     powers.Any(u.HasDebuff)
                     select u).Count();
@@ -949,7 +949,7 @@ namespace Trinity
         internal static int MobsWithDebuff(IEnumerable<SNOPower> powers, IEnumerable<TrinityCacheObject> units)
         {
             return (from u in units
-                    where u.IsUnit && u.CommonDataIsValid &&
+                    where u.IsUnit && u.IsFullyValid() &&
                     powers.Any(u.HasDebuff)
                     select u).Count();
         }
@@ -957,7 +957,7 @@ namespace Trinity
         internal static int DebuffCount(IEnumerable<SNOPower> powers, float maxRange = 30f)
         {
             return (from u in ObjectCache
-                    where u.IsUnit && u.CommonDataIsValid &&
+                    where u.IsUnit && u.IsFullyValid() &&
                     u.RadiusDistance <= maxRange &&
                     powers.Any(u.HasDebuff)
                     select powers.Count(u.HasDebuff)
@@ -967,7 +967,7 @@ namespace Trinity
         internal static int DebuffCount(IEnumerable<SNOPower> powers, IEnumerable<TrinityCacheObject> units)
         {
             return (from u in units
-                    where u.IsUnit && u.CommonDataIsValid &&
+                    where u.IsUnit && u.IsFullyValid() &&
                     powers.Any(u.HasDebuff)
                     select powers.Count(u.HasDebuff)
                     ).Sum();
@@ -981,7 +981,7 @@ namespace Trinity
 
             TrinityCacheObject lowestHealthTarget;
             var unitsByHealth = (from u in ObjectCache
-                                 where u.IsUnit && u.CommonDataIsValid &&
+                                 where u.IsUnit && u.IsFullyValid() &&
                                         u.Weight > 0 &&
                                         u.Position.Distance2D(position) <= range &&
                                         (debuff == SNOPower.None || !SpellTracker.IsUnitTracked(u.ACDGuid, debuff)) &&
@@ -1006,7 +1006,7 @@ namespace Trinity
 
             TrinityCacheObject lowestHealthTarget;
             var unitsByHealth = (from u in ObjectCache
-                                 where u.IsUnit && u.CommonDataIsValid &&
+                                 where u.IsUnit && u.IsFullyValid() &&
                                         u.Weight > 0 &&
                                         u.Position.Distance2D(position) <= range &&
                                         !SpellTracker.IsUnitTracked(u.ACDGuid, SNOPower.Monk_ExplodingPalm) &&
@@ -1032,7 +1032,7 @@ namespace Trinity
 
             TrinityCacheObject target;
             var unitsByWeight = (from u in ObjectCache
-                                 where u.IsUnit && u.CommonDataIsValid &&
+                                 where u.IsUnit && u.IsFullyValid() &&
                                         u.Weight > 0 &&
                                         u.Position.Distance2D(position) <= range &&
                                         !debuffs.All(u.HasDebuff)
@@ -1054,7 +1054,7 @@ namespace Trinity
         {
             var result =
                 (from u in ObjectCache
-                 where u.IsUnit && u.Distance >= procDistance && u.CommonDataIsValid &&
+                 where u.IsUnit && u.Distance >= procDistance && u.IsFullyValid() &&
                  u.RadiusDistance <= maxRange
                  orderby u.RadiusDistance descending
                  select u).FirstOrDefault();
