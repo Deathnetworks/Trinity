@@ -130,6 +130,11 @@ namespace Trinity.LazyCache
             get { return GetActorsOfType<TrinityObject>(); }
         }
 
+        public static List<TrinityObject> NavigationObstacles
+        {
+            get { return GetActorsOfType<TrinityObject>().Where(i => i.IsNavigationObstacle).ToList(); }
+        }
+
         public static List<TrinityUnit> Units
         {
             get { return GetActorsOfType<TrinityUnit>(); }
@@ -138,6 +143,11 @@ namespace Trinity.LazyCache
         public static List<TrinityUnit> EliteRareUniqueBoss
         {
             get { return GetActorsOfType<TrinityUnit>().Where(i => i.IsBossOrEliteRareUnique).ToList(); }
+        }
+
+        public static List<TrinityUnit> Trash
+        {
+            get { return GetActorsOfType<TrinityUnit>().Where(i => i.IsTrash).ToList(); }
         }
 
         public static List<TrinityUnit> Goblins

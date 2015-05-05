@@ -127,5 +127,10 @@ namespace Trinity
             return LocationIsInHotSpot(cacheObject.Position, Trinity.Player.WorldID);
         }
 
+        internal static bool CacheObjectIsInHotSpot(Vector3 position)
+        {
+            return LocationIsInHotSpot(position, Trinity.Player.WorldID);
+        }
+
     }
 }

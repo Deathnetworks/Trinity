@@ -601,7 +601,7 @@ namespace Trinity
 
                         // Set min distance to user-defined setting
                         minDistance = Settings.WorldObject.DestructibleRange + CurrentCacheObject.Radius;
-                        if (_forceCloseRangeTarget)
+                        if (ForceCloseRangeTarget)
                             minDistance += 6f;
 
                         // This object isn't yet in our destructible desire range
@@ -713,7 +713,7 @@ namespace Trinity
 
                         // Set min distance to user-defined setting
                         minDistance = Settings.WorldObject.DestructibleRange;
-                        if (_forceCloseRangeTarget)
+                        if (ForceCloseRangeTarget)
                             minDistance += 6f;
 
                         // Only break destructables if we're stuck and using IgnoreNonBlocking

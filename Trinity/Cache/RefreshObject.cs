@@ -980,7 +980,7 @@ namespace Trinity
                     return AddToCache;
                 }
                 // Temporary ractor GUID ignoring, to prevent 2 interactions in a very short time which can cause stucks
-                if (_ignoreTargetForLoops > 0 && _ignoreRactorGuid == CurrentCacheObject.RActorGuid)
+                if (IgnoreTargetForLoops > 0 && IgnoreRactorGuid == CurrentCacheObject.RActorGuid)
                 {
                     AddToCache = false;
                     c_IgnoreSubStep = "IgnoreRactorGUID";

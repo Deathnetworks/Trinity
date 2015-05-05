@@ -20,119 +20,6 @@ using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
-    /// <summary>
-    /// Prototype Weighting System
-    /// </summary>
-    public class Weighting
-    {
-        const double MaxWeight = 50000d;
-
-        public static float CalculateWeight(TrinityObject trinityObject, out List<Weight> weightFactors)
-        {
-            weightFactors = new List<Weight>();
-
-            //var trinityUnit = trinityObject as TrinityUnit;
-            //if (trinityUnit != null)
-            //{
-            //    if (trinityUnit.IsTrash)
-            //    {
-            //        var nearbyUnits = trinityUnit.NearbyUnitsWithinDistance(15f);
-
-            //    }
-            //}
-
-            //weights.Add(new Weight(5000, WeightMethod.Set, WeightReason.StartingWeight));
-
-            //weights.Add(new Weight(5000, WeightMethod.Add, WeightReason.AvoidanceNearby));
-
-            //weights.Add(new Weight(5000, WeightMethod.Add, WeightReason.IsCloseRange));
-
-            //weights.Add(new Weight(5000, WeightMethod.Add, WeightReason.HighPriorityShrine));
-
-            //if(IsHealthGlobeEmergency(trinityObject))
-            //    weights.Add(new Weight(5000, WeightMethod.Add, WeightReason.HealthEmergency));
-
-            //weights.Add(new Weight(5000, WeightMethod.Add, WeightReason.HighPriorityContainer));
-
-            //weights.Add(new Weight(0, WeightMethod.Set, WeightReason.IgnoreElites, true));
-
-            //trinityObject.WeightFactors = weights;
-
-            var finalWeight = 0f;
-
-            foreach (var w in weightFactors)
-            {
-                switch (w.Method)
-                {
-                    case WeightMethod.Add:
-                        finalWeight = finalWeight + w.Amount;
-                        break;
-
-                    case WeightMethod.Subtract:
-                        finalWeight = finalWeight - w.Amount;
-                        break;
-
-                    case WeightMethod.Multiply:
-                        finalWeight = finalWeight * w.Amount;
-                        break;
-
-                    case WeightMethod.Set:
-                        finalWeight = w.Amount;
-                        break;
-                }
-
-                if (w.IsFinal)
-                    break;
-            }
-
-            return (float)Math.Max(finalWeight, MaxWeight);
-        }
-
-        private static bool IsHealthGlobeEmergency(TrinityObject trinityObject)
-        {
-            return (CacheManager.Me.CurrentHealthPct <= CombatBase.EmergencyHealthGlobeLimit ||
-                   CacheManager.Me.PrimaryResourcePct <= CombatBase.HealthGlobeResource) &&
-                   trinityObject.IsGlobe && Trinity.Settings.Combat.Misc.HiPriorityHG;
-        }
-
-        public struct Weight
-        {
-            public Weight(float amount, WeightMethod method, WeightReason reason, bool isFinal = false)
-            {
-                Amount = amount;
-                Reason = reason;
-                Method = method;
-                IsFinal = isFinal;
-            }
-
-            public bool IsFinal;
-            public WeightReason Reason;
-            public WeightMethod Method;
-            public float Amount;
-        }
-
-        public enum WeightMethod
-        {
-            None = 0,
-            Multiply,
-            Set,
-            Add,
-            Subtract
-        }
-
-        public enum WeightReason
-        {
-            None = 0,
-            StartingWeight,
-            AvoidanceNearby,
-            IsCloseRange,
-            IgnoreElites,
-            HighPriorityContainer,
-            HighPriorityShrine,
-            HealthEmergency,
-        }
-    }
-
     public partial class Trinity
     {
         private static double GetLastHadUnitsInSights()
@@ -154,7 +41,7 @@ namespace Trinity
 
                 bool avoidanceNearby = Settings.Combat.Misc.AvoidAOE && ObjectCache.Any(o => o.Type == TrinityObjectType.Avoidance && o.Distance <= 15f);
 
-                bool prioritizeCloseRangeUnits = (avoidanceNearby || _forceCloseRangeTarget || Player.IsRooted || DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds < 1000 &&
+                bool prioritizeCloseRangeUnits = (avoidanceNearby || ForceCloseRangeTarget || Player.IsRooted || DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds < 1000 &&
                                                   ObjectCache.Count(u => u.IsUnit && u.RadiusDistance < 10f) >= 3);
 
                 bool hiPriorityHealthGlobes = Settings.Combat.Misc.HiPriorityHG;
@@ -539,16 +426,16 @@ namespace Trinity
                                             !MathUtil.IntersectsPath(obj.Position, obj.Radius, Player.Position, cacheObject.Position)))
                                         {
                                             // Logging goblin sightings
-                                            if (lastGoblinTime == DateTime.MinValue)
+                                            if (LastGoblinTime == DateTime.MinValue)
                                             {
                                                 TotalNumberGoblins++;
-                                                lastGoblinTime = DateTime.UtcNow;
+                                                LastGoblinTime = DateTime.UtcNow;
                                                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Goblin #{0} in sight. Distance={1:0}", TotalNumberGoblins, cacheObject.Distance);
                                             }
                                             else
                                             {
-                                                if (DateTime.UtcNow.Subtract(lastGoblinTime).TotalMilliseconds > 30000)
-                                                    lastGoblinTime = DateTime.MinValue;
+                                                if (DateTime.UtcNow.Subtract(LastGoblinTime).TotalMilliseconds > 30000)
+                                                    LastGoblinTime = DateTime.MinValue;
                                             }
 
                                             if (CacheData.TimeBoundAvoidance.Any(aoe => cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius) && Settings.Combat.Misc.GoblinPriority != GoblinPriority.Kamikaze)
