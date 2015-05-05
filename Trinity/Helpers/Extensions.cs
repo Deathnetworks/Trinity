@@ -283,5 +283,10 @@ namespace Trinity.Helpers
             }
             return newText.ToString();
         }
+
+        public static int GetItemStackQuantity(this ACDItem item)
+        {
+            return (item.GetAttribute<int>(ActorAttributeType.ItemStackQuantityHi) << 32) | item.GetAttribute<int>(ActorAttributeType.ItemStackQuantityLo);
+        }
     }
 }

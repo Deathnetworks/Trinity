@@ -322,7 +322,7 @@ namespace Trinity.Combat.Abilities
         private static bool StrafeCondition(SkillMeta meta)
         {
             meta.CastRange = 65f;
-            meta.ReUseDelay = 250;
+            //meta.ReUseDelay = 250;
             //meta.TargetPositionSelector = ret => TargetUtil.GetZigZagTarget(CurrentTarget.Position, V.F("Barbarian.Whirlwind.ZigZagDistance"));
             meta.TargetPositionSelector = ret => NavHelper.FindSafeZone(false, 0, CurrentTarget.Position, true, Trinity.ObjectCache, false);
             meta.CastFlags = CanCastFlags.NoTimer;

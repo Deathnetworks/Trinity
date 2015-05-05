@@ -1606,14 +1606,22 @@ namespace Trinity.Items
         /// <exception cref="System.ArgumentException">InventorySlot  + inventorySlot +  is not supported for GetStackCount method</exception>
         internal static int GetItemStackCount(CachedACDItem cItem, InventorySlot inventorySlot)
         {
-            switch (inventorySlot)
+            try
             {
-                case InventorySlot.BackpackItems:
-                    return ZetaDia.Me.Inventory.Backpack.Where(i => StackItemMatchFunc(i, cItem)).Sum(i => i.ItemStackQuantity);
-                case InventorySlot.SharedStash:
-                    return ZetaDia.Me.Inventory.StashItems.Where(i => StackItemMatchFunc(i, cItem)).Sum(i => i.ItemStackQuantity);
+                switch (inventorySlot)
+                {
+                    case InventorySlot.BackpackItems:
+                        return ZetaDia.Me.Inventory.Backpack.Where(i => StackItemMatchFunc(i, cItem)).Sum(i => i.GetItemStackQuantity());
+                    case InventorySlot.SharedStash:
+                        return ZetaDia.Me.Inventory.StashItems.Where(i => StackItemMatchFunc(i, cItem)).Sum(i => i.GetItemStackQuantity());
+                }
+                throw new ArgumentException("InventorySlot " + inventorySlot + " is not supported for GetStackCount method");
             }
-            throw new ArgumentException("InventorySlot " + inventorySlot + " is not supported for GetStackCount method");
+            catch (Exception ex)
+            {
+                Logger.LogDebug("Error Getting ItemStackQuantity {0}", ex);
+                return -1;
+            }
         }
     }
 }
