@@ -306,7 +306,7 @@ namespace Trinity.DbProvider
             }
 
             // If we just used a spell, we "moved"
-            if (DateTime.UtcNow.Subtract(Trinity.lastGlobalCooldownUse).TotalMilliseconds <= 1000)
+            if (DateTime.UtcNow.Subtract(Trinity.LastGlobalCooldownUse).TotalMilliseconds <= 1000)
                 return 1d;
 
             if (DateTime.UtcNow.Subtract(Trinity.lastHadUnitInSights).TotalMilliseconds <= 1000)

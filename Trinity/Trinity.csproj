@@ -112,9 +112,13 @@
     <Compile Include="Combat\Abilities\WizardCombat.cs" />
     <Compile Include="Combat\AvoidanceManager.cs" />
     <Compile Include="Combat\AvoidanceType.cs" />
+    <Compile Include="Combat\Targetting\CombatContext.cs" />
     <Compile Include="Combat\Enemies.cs" />
     <Compile Include="Combat\Routine\TrinityRoutine.cs" />
     <Compile Include="Combat\SpellTracker.cs" />
+    <Compile Include="Combat\Targetting\TargetHandler.cs" />
+    <Compile Include="Combat\Targetting\TargetSelector.cs" />
+    <Compile Include="Combat\Targetting\Weighting.cs" />
     <Compile Include="Configuration\Events.cs" />
     <Compile Include="Configuration\TVar.cs" />
     <Compile Include="Configuration\TVars.cs" />

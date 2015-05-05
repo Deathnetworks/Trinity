@@ -81,8 +81,9 @@
                         <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=RActorGuid}" Header="RActorGuid" />
                         <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=ACDGuid}" Header="ACDGuid" />
                         <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=Name}" Header="Name" />
-                        <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=Distance}" Header="Distance" />
-                        <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=Radius}" Header="Radius" />
+                        <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=Distance, StringFormat={}{0:N2}}" Header="Distance" />
+                        <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=Weight, StringFormat={}{0:N2}}" Header="Weight" />
+                        <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=Radius, StringFormat={}{0:N2}}" Header="Radius" />
                         <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=TrinityType}" Header="TrinityType" />
                         <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=ActorType}" Header="ActorType" />
                         <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=CurrentAnimation}" Header="Animation" />

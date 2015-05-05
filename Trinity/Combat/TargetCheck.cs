@@ -37,13 +37,13 @@ namespace Trinity
                     return TargetCheckResult(false, "Is Dead");
                 }
 
-                _timesBlockedMoving = 0;
+                TimesBlockedMoving = 0;
                 IsAlreadyMoving = false;
-                lastMovementCommand = DateTime.MinValue;
-                _isWaitingForPower = false;
-                _isWaitingAfterPower = false;
-                _isWaitingForPotion = false;
-                wasRootedLastTick = false;
+                LastMovementCommand = DateTime.MinValue;
+                IsWaitingForPower = false;
+                IsWaitingAfterPower = false;
+                IsWaitingForPotion = false;
+                WasRootedLastTick = false;
 
                 ClearBlacklists();
 
@@ -56,7 +56,7 @@ namespace Trinity
                 // We have a target, start the target handler!
                 if (CurrentTarget != null)
                 {
-                    _shouldPickNewAbilities = true;
+                    ShouldPickNewAbilities = true;
                     return TargetCheckResult(true, "Current Target is not null");
                 }
 
@@ -74,12 +74,12 @@ namespace Trinity
                         UsePotionIfNeededTask();
                     }
                 }
-                _statusText = "[Trinity] No more targets - DemonBuddy/profile management is now in control";
+                StatusText = "[Trinity] No more targets - DemonBuddy/profile management is now in control";
 
-                if (Settings.Advanced.DebugInStatusBar && _resetStatusText)
+                if (Settings.Advanced.DebugInStatusBar && ResetStatusText)
                 {
-                    _resetStatusText = false;
-                    BotMain.StatusText = _statusText;
+                    ResetStatusText = false;
+                    BotMain.StatusText = StatusText;
                 }
 
                 // Nothing to do... do we have some maintenance we can do instead, like out of combat buffing?
@@ -97,21 +97,21 @@ namespace Trinity
                             BarbarianCombat.AllowSprintOOC = true;
                             DisableOutofCombatSprint = false;
 
-                            powerBuff = AbilitySelector(UseOOCBuff: true);
+                            PowerBuff = AbilitySelector(UseOOCBuff: true);
 
-                            if (powerBuff.SNOPower != SNOPower.None)
+                            if (PowerBuff.SNOPower != SNOPower.None)
                             {
 
-                                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Using OOC Buff: {0}", powerBuff.SNOPower.ToString());
-                                ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetACDGUID);
-                                LastPowerUsed = powerBuff.SNOPower;
-                                CacheData.AbilityLastUsed[powerBuff.SNOPower] = DateTime.UtcNow;
+                                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Using OOC Buff: {0}", PowerBuff.SNOPower.ToString());
+                                ZetaDia.Me.UsePower(PowerBuff.SNOPower, PowerBuff.TargetPosition, PowerBuff.TargetDynamicWorldId, PowerBuff.TargetACDGUID);
+                                LastPowerUsed = PowerBuff.SNOPower;
+                                CacheData.AbilityLastUsed[PowerBuff.SNOPower] = DateTime.UtcNow;
 
                                 // Monk Stuffs get special attention
                                 {
-                                    if (powerBuff.SNOPower == SNOPower.Monk_TempestRush)
+                                    if (PowerBuff.SNOPower == SNOPower.Monk_TempestRush)
                                         MonkCombat.LastTempestRushLocation = CombatBase.CurrentPower.TargetPosition;
-                                    if (powerBuff.SNOPower == SNOPower.Monk_SweepingWind)
+                                    if (PowerBuff.SNOPower == SNOPower.Monk_SweepingWind)
                                         MonkCombat.LastSweepingWindRefresh = DateTime.UtcNow;
                                 }
 
@@ -119,8 +119,8 @@ namespace Trinity
                         }
                         else if (isLoopingAnimation)
                         {
-                            _keepKillRadiusExtendedForSeconds = 20;
-                            _timeKeepKillRadiusExtendedUntil = DateTime.UtcNow.AddSeconds(_keepKillRadiusExtendedForSeconds);
+                            KeepKillRadiusExtendedForSeconds = 20;
+                            TimeKeepKillRadiusExtendedUntil = DateTime.UtcNow.AddSeconds(KeepKillRadiusExtendedForSeconds);
                         }
                     }
                 }

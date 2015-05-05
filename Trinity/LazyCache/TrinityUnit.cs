@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Trinity.DbProvider;
 using Trinity.Technicals;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
@@ -37,7 +38,6 @@ namespace Trinity.LazyCache
         private readonly CacheField<bool> _isRare = new CacheField<bool>();
         private readonly CacheField<bool> _isUnique = new CacheField<bool>();
         private readonly CacheField<bool> _isBoss = new CacheField<bool>();
-        private readonly CacheField<bool> _isTrash = new CacheField<bool>();
         private readonly CacheField<bool> _isMinion = new CacheField<bool>();
         private readonly CacheField<bool> _isFacingPlayer = new CacheField<bool>();
         private readonly CacheField<MonsterAffixes> _monsterAffixes = new CacheField<MonsterAffixes>();
@@ -58,7 +58,7 @@ namespace Trinity.LazyCache
         private readonly CacheField<bool> _isTreasureGoblin = new CacheField<bool>();
         private readonly CacheField<bool> _isEliteRareUnique = new CacheField<bool>();
         private readonly CacheField<bool> _isBossOrEliteRareUnique = new CacheField<bool>();
-        private readonly CacheField<bool> _isTrashMob = new CacheField<bool>();
+        private readonly CacheField<bool> _isTrash = new CacheField<bool>();
         private readonly CacheField<int> _summonedBySNO = new CacheField<int>();
         private readonly CacheField<int> _summonerId = new CacheField<int>();
         private readonly CacheField<int> _summonerACDGuid = new CacheField<int>();
@@ -103,6 +103,10 @@ namespace Trinity.LazyCache
         private readonly CacheField<float> _rotation = new CacheField<float>(UpdateSpeed.Fast);
         private readonly CacheField<float> _rotationDegrees = new CacheField<float>(UpdateSpeed.Fast);
         private readonly CacheField<float> _currentHealthPct = new CacheField<float>(UpdateSpeed.Fast);
+        private readonly CacheField<double> _killRange = new CacheField<double>(UpdateSpeed.Fast);
+        private readonly CacheField<bool> _isSummoner = new CacheField<bool>(UpdateSpeed.Slow);
+        private readonly CacheField<bool> _isChargeTarget = new CacheField<bool>();
+        
 
         #endregion
 
@@ -262,15 +266,6 @@ namespace Trinity.LazyCache
         }
 
         /// <summary>
-        /// If Boss unit
-        /// </summary>
-        public bool IsTrash
-        {
-            get { return _isTrash.IsCacheValid ? _isTrash.CachedValue : (_isTrash.CachedValue = MonsterQualityLevel == MonsterQuality.Normal); }
-            set { _isTrash.SetValueOverride(value); }
-        }
-
-        /// <summary>
         /// Is currently facing the player
         /// </summary>
         public bool IsFacingPlayer
@@ -406,7 +401,7 @@ namespace Trinity.LazyCache
         }
 
         /// <summary>
-        /// If unit is webbed
+        /// If has shielding affix
         /// </summary>
         public bool HasShieldingAffix
         {
@@ -444,10 +439,10 @@ namespace Trinity.LazyCache
         /// <summary>
         /// Is just a shitty mob
         /// </summary>
-        public bool IsTrashMob
+        public bool IsTrash
         {
-            get { return _isTrashMob.IsCacheValid ? _isTrashMob.CachedValue : (_isTrashMob.CachedValue = !(IsBossOrEliteRareUnique || IsTreasureGoblin)); }
-            set { _isTrashMob.SetValueOverride(value); }
+            get { return _isTrash.IsCacheValid ? _isTrash.CachedValue : (_isTrash.CachedValue = !(IsBossOrEliteRareUnique || IsTreasureGoblin)); }
+            set { _isTrash.SetValueOverride(value); }
         }
 
         /// <summary>
@@ -554,7 +549,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsAlive
         {
-            get { return _isAlive.IsCacheValid ? _isAlive.CachedValue : (_isAlive.CachedValue = GetUnitProperty(x => x.IsAlive)); }
+            get { return _isAlive.IsCacheValid ? _isAlive.CachedValue : (_isAlive.CachedValue = !IsDead); }
             set { _isAlive.SetValueOverride(value); }
         }
 
@@ -847,6 +842,36 @@ namespace Trinity.LazyCache
             set { _currentHealthPct.SetValueOverride(value); }
         }
 
+        /// <summary>
+        /// If unit is this amount or closer to the player, kill it.
+        /// </summary>
+        public double KillRange
+        {
+            get { return _killRange.IsCacheValid ? _killRange.CachedValue : (_killRange.CachedValue = GetUnitProperty(x => GetKillRange(this))); }
+            set { _killRange.SetValueOverride(value); }
+        }
+
+        /// <summary>
+        /// If this unit summons stuff
+        /// </summary>
+        public bool IsSummoner
+        {
+            get { return _isSummoner.IsCacheValid ? _isSummoner.CachedValue : (_isSummoner.CachedValue = SummonerId > 0); }
+            set { _isSummoner.SetValueOverride(value); }
+        }
+
+        /// <summary>
+        /// If this unit is a good candidate for leap/charge abilities
+        /// </summary>
+        public bool IsChargeTarget
+        {
+            get { return _isChargeTarget.IsCacheValid ? _isChargeTarget.CachedValue : (_isChargeTarget.CachedValue = MonsterSize == MonsterSize.Ranged || DataDictionary.RangedMonsterIds.Contains(ActorSNO)); }
+            set { _isChargeTarget.SetValueOverride(value); }
+        }
+
+
+            
+        
 
         #endregion
 
@@ -885,6 +910,35 @@ namespace Trinity.LazyCache
             return (from u in CacheManager.Units
                     where u.ACDGuid != o.ACDGuid && o.IsAlive && MathUtil.IntersectsPath(u.Position, u.Radius, CacheManager.Me.Position, o.Position)
                 select u).Count();
+        }
+
+        /// <summary>
+        /// Get attack distance specific to a unit
+        /// </summary>
+        private static double GetKillRange(TrinityUnit o)
+        {
+            var killRange = (double)Math.Max(Trinity.Settings.Combat.Misc.EliteRange, Trinity.Settings.Combat.Misc.NonEliteRange);
+
+            // Always within kill range if in the NoCheckKillRange list!
+            if (DataDictionary.NoCheckKillRange.Contains(o.ActorSNO))
+                return o.RadiusDistance + 100f;
+
+            // Bosses, always kill
+            if (o.IsBoss)
+                return o.RadiusDistance + 100f;
+
+            // Elitey type mobs and things
+            if (o.IsEliteRareUnique)
+                killRange = Trinity.Settings.Combat.Misc.EliteRange;
+
+            if (!TownRun.IsTryingToTownPortal())
+                return killRange;
+
+            // Safety for TownRuns
+            if (killRange <= V.F("Cache.TownPortal.KillRange")) 
+                killRange = V.F("Cache.TownPortal.KillRange");
+
+            return killRange;
         }
 
         /// <summary>

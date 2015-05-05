@@ -107,8 +107,8 @@ namespace Trinity.UI.UIComponents
             {
                 return CacheManager.GetActorsOfType<TrinityObject>()
                     //.OrderByDescending(o => o.InCache)
-                    //.ThenByDescending(o => o.Weight)
-                    .OrderBy(o => o.Distance)
+                    .OrderByDescending(o => o.Weight)
+                    .ThenBy(o => o.Distance)
                     .ToList();
             }         
         }

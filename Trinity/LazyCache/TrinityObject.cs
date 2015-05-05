@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Trinity.Combat;
 using Trinity.DbProvider;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
@@ -57,6 +58,7 @@ namespace Trinity.LazyCache
         private readonly CacheField<bool> _isCursedChest = new CacheField<bool>();
         private readonly CacheField<bool> _isCursedShrine = new CacheField<bool>();
         private readonly CacheField<bool> _isBountyObjective = new CacheField<bool>();
+        private readonly CacheField<bool> _isShrine = new CacheField<bool>();
         private readonly CacheField<bool> _isMinimapActive = new CacheField<bool>(UpdateSpeed.Slow);
         private readonly CacheField<bool> _isUnit = new CacheField<bool>();
         private readonly CacheField<bool> _isGlobe = new CacheField<bool>();
@@ -68,7 +70,7 @@ namespace Trinity.LazyCache
         private readonly CacheField<bool> _isInvulnerable = new CacheField<bool>();
         private readonly CacheField<bool> _isBlocking = new CacheField<bool>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isNoDamage = new CacheField<bool>();
-        private readonly CacheField<float> _weight = new CacheField<float>();
+        private readonly CacheField<double> _weight = new CacheField<double>(UpdateSpeed.Fast);
         private readonly CacheField<SNORecordMonster> _monsterInfo = new CacheField<SNORecordMonster>();
 
         #endregion
@@ -323,6 +325,15 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsCursedShrine
         {
+            get { return _isCursedShrine.IsCacheValid ? _isCursedShrine.CachedValue : (_isCursedShrine.CachedValue = TrinityType == TrinityObjectType.CursedShrine || TrinityType == TrinityObjectType.HealthWell || TrinityType == TrinityObjectType.Shrine); }
+            set { _isCursedShrine.SetValueOverride(value); }
+        }
+
+        /// <summary>
+        /// Is any kind of shrine
+        /// </summary>
+        public bool IsShrine
+        {
             get { return _isCursedShrine.IsCacheValid ? _isCursedShrine.CachedValue : (_isCursedShrine.CachedValue = TrinityType == TrinityObjectType.CursedShrine); }
             set { _isCursedShrine.SetValueOverride(value); }
         }
@@ -332,7 +343,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsBountyObjective
         {
-            get { return _isBountyObjective.IsCacheValid ? _isBountyObjective.CachedValue : (_isCursedShrine.CachedValue = Source.GetAttributeOrDefault<int>(ActorAttributeType.BountyObjective) > 0); }
+            get { return _isBountyObjective.IsCacheValid ? _isBountyObjective.CachedValue : (_isBountyObjective.CachedValue = CacheManager.Me.ActiveBounty != null && Source.GetAttributeOrDefault<int>(ActorAttributeType.BountyObjective) > 0); }
             set { _isBountyObjective.SetValueOverride(value); }
         }
 
@@ -422,7 +433,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsBlocking
         {
-            get { return _isBlocking.IsCacheValid ? _isBlocking.CachedValue : (_isBlocking.CachedValue = RadiusDistance <= 3f && PlayerMover.GetMovementSpeed() <= 0); }
+            get { return _isBlocking.IsCacheValid ? _isBlocking.CachedValue : (_isBlocking.CachedValue = GetIsNavBlocking()); }
             set { _isBlocking.SetValueOverride(value); }
         }
 
@@ -449,9 +460,17 @@ namespace Trinity.LazyCache
         }
 
         /// <summary>
+        /// If this was the last target selected
+        /// </summary>
+        public bool IsLastTarget
+        {
+            get { return Trinity.LastTargetRactorGUID != ACDGuid; }
+        }
+
+        /// <summary>
         /// For targetting, degree of importance given the current combat situation
         /// </summary>
-        public float Weight
+        public double Weight
         {
             get { return _weight.IsCacheValid ? _weight.CachedValue : (_weight.CachedValue = Weighting.CalculateWeight(this, out WeightFactors)); }
             set { _weight.SetValueOverride(value); }
@@ -501,9 +520,7 @@ namespace Trinity.LazyCache
             var actorType = acd.ActorType;
             var internalName = acd.Name;
             var gizmoType = acd.GizmoType;
-
-            if (actorType == ActorType.Item || DataDictionary.ForceToItemOverrideIds.Contains(id))
-                return TrinityObjectType.Item;
+            var isItem = acd is ACDItem;
 
             if (actorType == ActorType.Monster)
                 return TrinityObjectType.Unit;
@@ -517,8 +534,11 @@ namespace Trinity.LazyCache
             if (DataDictionary.Shrines.Any(s => s == snoActor))
                 return TrinityObjectType.Shrine;
 
-            if (internalName.ToLower().StartsWith("gold"))
+            if (isItem && internalName.ToLower().Contains("gold"))
                 return TrinityObjectType.Gold;
+
+            if (actorType == ActorType.Item || DataDictionary.ForceToItemOverrideIds.Contains(id))
+                return TrinityObjectType.Item;
 
             if (DataDictionary.InteractWhiteListIds.Contains(id))
                 return TrinityObjectType.Interactable;
@@ -596,9 +616,12 @@ namespace Trinity.LazyCache
         {
             var pos = o.Position;
 
-            // Distance on Ground Items must be called on the ACDItem/DiaItem (not the ACD)
+            // Position/Distance on Ground Items must be called on the ACDItem/DiaItem (not the ACD)
             if (o.ActorType == ActorType.Item && o.Source is ACDItem)
-                pos = o.GetDiaItemProperty(x => x.Position);
+            {
+                if(o.Item != null && o.Item.IsValid)
+                    pos = o.GetDiaItemProperty(x => x.Position);
+            }
 
             return pos == Vector3.Zero ? 0f : pos.Distance2D(CacheManager.Me.Position);
         }
@@ -668,6 +691,20 @@ namespace Trinity.LazyCache
         internal static float GetZDiff(Vector3 position)
         {
             return position != Vector3.Zero ? Math.Abs(CacheManager.Me.Position.Z - position.Z) : 0f;
+        }
+
+        /// <summary>
+        /// If this actor is blocking the bot from moving
+        /// </summary>
+        private bool GetIsNavBlocking()
+        {
+            if (RadiusDistance <= 3f && PlayerMover.GetMovementSpeed() <= 0)
+                return true;
+
+            if (CacheManager.NavigationObstacles.Any(ob => MathUtil.IntersectsPath(ob.Position, ob.Radius, CacheManager.Me.Position, Position)))
+                return true;
+
+            return false;
         }
 
         /// <summary>

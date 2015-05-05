@@ -90,7 +90,11 @@ namespace Trinity.LazyCache
         private readonly CacheField<double> _riftResurrectionTime = new CacheField<double>(UpdateSpeed.Fast);
         private readonly CacheField<int> _stashTabsPurchased = new CacheField<int>();
         private readonly CacheField<double> _lastClickZAxis = new CacheField<double>(UpdateSpeed.Fast);
-
+        private readonly CacheField<bool> _isInHotspot = new CacheField<bool>(UpdateSpeed.Normal);
+        private readonly CacheField<Act> _worldType = new CacheField<Act>(UpdateSpeed.Normal);
+        private readonly CacheField<int> _currentQuestSNO = new CacheField<int>(UpdateSpeed.Normal);
+        private readonly CacheField<int> _currentQuestStep = new CacheField<int>(UpdateSpeed.Normal);
+        
         #endregion
 
         #region Properties
@@ -678,6 +682,47 @@ namespace Trinity.LazyCache
         {
             get { return _lastClickZAxis.IsCacheValid ? _lastClickZAxis.CachedValue : (_lastClickZAxis.CachedValue = ZetaDia.Me.Movement.LastClickZAxis); }
             set { _lastClickZAxis.SetValueOverride(value); }
+        }
+
+        /// <summary>
+        /// If player is currently standing in a hotspot
+        /// </summary>
+        public bool IsInHotspot
+        {
+            get
+            {
+                if (_isInHotspot.IsCacheValid)
+                    return _isInHotspot.CachedValue;
+
+                return _isInHotspot.CachedValue = GroupHotSpots.CacheObjectIsInHotSpot(Position);
+            }
+        }
+
+        /// <summary>
+        /// World type
+        /// </summary>
+        public Act WorldType
+        {
+            get { return _worldType.IsCacheValid ? _worldType.CachedValue : (_worldType.CachedValue = ZetaDia.WorldType); }
+            set { _worldType.SetValueOverride(value); }
+        }
+
+        /// <summary>
+        /// Current quest sno
+        /// </summary>
+        public int CurrentQuestSNO
+        {
+            get { return _currentQuestSNO.IsCacheValid ? _currentQuestSNO.CachedValue : (_currentQuestSNO.CachedValue = ZetaDia.CurrentQuest.QuestSNO); }
+            set { _currentQuestSNO.SetValueOverride(value); }
+        }
+
+        /// <summary>
+        /// Current quest step
+        /// </summary>
+        public int CurrentQuestStep
+        {
+            get { return _currentQuestStep.IsCacheValid ? _currentQuestStep.CachedValue : (_currentQuestStep.CachedValue = ZetaDia.CurrentQuest.StepId); }
+            set { _currentQuestStep.SetValueOverride(value); }
         }
 
         //public List<Buff> AllDebuffs
