@@ -1410,6 +1410,15 @@ namespace Trinity
             ActorType.Critter
         };
 
+        public static HashSet<MonsterType> NonHostileMonsterTypes = new HashSet<MonsterType>
+        {
+            MonsterType.Ally,
+            MonsterType.Scenery,
+            MonsterType.Team,
+            MonsterType.None,
+            MonsterType.Helper,
+        };
+
         public static Dictionary<int, MonsterType> MonsterTypeOverrides = new Dictionary<int, MonsterType>
         {
             { 86624, MonsterType.Undead }, // Jondar, DB thinks he's permanent ally

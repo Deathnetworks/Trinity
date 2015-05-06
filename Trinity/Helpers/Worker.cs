@@ -31,10 +31,13 @@ namespace Trinity.Helpers
         /// Run code in a new worker thread. WorkerDelegate should return true to end, false to repeat.
         /// </summary>
         /// <param name="worker">Delegate to be run</param>
-        public static void Start(Func<bool> worker)
+        /// <param name="waitTime"></param>
+        public static void Start(Func<bool> worker, int waitTime = 50)
         {
             if (IsRunning)
                 return;
+
+            WaitTime = waitTime;
 
             var frame = new StackFrame(1);
             var method = frame.GetMethod();

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Trinity.Combat;
+using Trinity.Combat.Weighting;
 using Trinity.DbProvider;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
@@ -181,7 +182,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public Sphere CollisionSphere
         {
-            get { return _collisionSphere.IsCacheValid ? _collisionSphere.CachedValue : (_collisionSphere.CachedValue = Object.ActorInfo.Sphere); }
+            get { return _collisionSphere.IsCacheValid ? _collisionSphere.CachedValue : (_collisionSphere.CachedValue = Source.ActorInfo.Sphere); }
             set { _collisionSphere.SetValueOverride(value); }
         }
 
@@ -472,14 +473,14 @@ namespace Trinity.LazyCache
         /// </summary>
         public double Weight
         {
-            get { return _weight.IsCacheValid ? _weight.CachedValue : (_weight.CachedValue = Weighting.CalculateWeight(this, out WeightFactors)); }
+            get { return _weight.IsCacheValid ? _weight.CachedValue : (_weight.CachedValue = WeightManager.CalculateWeight(this, out WeightFactors)); }
             set { _weight.SetValueOverride(value); }
         }
 
         /// <summary>
         /// The individual factors that contribute to a final weight
         /// </summary>
-        public List<Weighting.Weight> WeightFactors = new List<Weighting.Weight>();
+        public List<Weight> WeightFactors = new List<Weight>();
 
         #endregion
 
@@ -522,7 +523,8 @@ namespace Trinity.LazyCache
             var gizmoType = acd.GizmoType;
             var isItem = acd is ACDItem;
 
-            if (actorType == ActorType.Monster)
+            //Non-hostile monster types will throw exceptions almost all DiaUnit properties, despite being classified as a unit.
+            if (actorType == ActorType.Monster && !DataDictionary.NonHostileMonsterTypes.Contains(acd.MonsterInfo.MonsterType))
                 return TrinityObjectType.Unit;
 
             if (internalName.Contains("CursedChest"))

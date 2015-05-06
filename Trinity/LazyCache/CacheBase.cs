@@ -130,7 +130,10 @@ namespace Trinity.LazyCache
         /// </summary>
         public DiaUnit Unit
         {
-            get { return Object as DiaUnit; }
+            get
+            {
+                return Object as DiaUnit;
+            }
         }
 
         #endregion

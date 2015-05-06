@@ -90,9 +90,24 @@ namespace Trinity.LazyCache
 
         #region Properties
 
+        private static readonly CacheField<List<TrinityUnit>> _units = new CacheField<List<TrinityUnit>>(UpdateSpeed.Ultra);
+        public static List<TrinityUnit> Units
+        {
+            get
+            {
+                if (_units.IsCacheValid) return _units.CachedValue;
+                return _units.CachedValue = GetActorsOfType<TrinityUnit>().ToList();
+            }
+        }
+
+        private static readonly CacheField<List<TrinityUnit>> _monsters = new CacheField<List<TrinityUnit>>(UpdateSpeed.Ultra);
         public static List<TrinityUnit> Monsters
         {
-            get { return GetActorsOfType<TrinityUnit>().Where(i => i.IsHostile).ToList(); }
+            get
+            {
+                if (_monsters.IsCacheValid) return _monsters.CachedValue;
+                return _monsters.CachedValue = Units.Where(i => i.IsTrash || i.IsBossOrEliteRareUnique).ToList();
+            }
         }
 
         public static List<TrinityObject> Gold
@@ -135,10 +150,7 @@ namespace Trinity.LazyCache
             get { return GetActorsOfType<TrinityObject>().Where(i => i.IsNavigationObstacle).ToList(); }
         }
 
-        public static List<TrinityUnit> Units
-        {
-            get { return GetActorsOfType<TrinityUnit>(); }
-        }
+
 
         public static List<TrinityUnit> EliteRareUniqueBoss
         {
@@ -197,7 +209,7 @@ namespace Trinity.LazyCache
 
         public static TrinityPlayer Me { get; private set; }
 
-        public static bool IsRunning { get; private set; }
+        public static bool IsRunning { get; internal set; }
 
         #endregion
 
