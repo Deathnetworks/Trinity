@@ -545,7 +545,7 @@ namespace Trinity.LazyCache
         }
 
         /// <summary>
-        /// If unit is alive (hitpoints based)
+        /// If unit is alive 
         /// </summary>
         public bool IsAlive
         {
@@ -554,11 +554,11 @@ namespace Trinity.LazyCache
         }
 
         /// <summary>
-        /// If unit is dead (hitpoints based)
+        /// If unit is dead 
         /// </summary>
         public bool IsDead
         {
-            get { return _isDead.IsCacheValid ? _isDead.CachedValue : (_isDead.CachedValue = GetUnitProperty(x => x.IsDead)); }
+            get { return _isDead.IsCacheValid ? _isDead.CachedValue : (_isDead.CachedValue = GetUnitProperty(x => x.HitpointsCurrent <= 0)); }
             set { _isDead.SetValueOverride(value); }
         }
 

@@ -80,12 +80,14 @@
                     <DataGrid.Columns>
                         <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=RActorGuid}" Header="RActorGuid" />
                         <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=ACDGuid}" Header="ACDGuid" />
+                        <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=ActorSNO}" Header="ActorSNO" />
                         <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=Name}" Header="Name" />
                         <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=Distance, StringFormat={}{0:N2}}" Header="Distance" />
                         <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=Weight, StringFormat={}{0:N2}}" Header="Weight" />
-                        <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=Radius, StringFormat={}{0:N2}}" Header="Radius" />
                         <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=TrinityType}" Header="TrinityType" />
+                        <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=MonsterQualityLevel}" Header="M-Quality" />
                         <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=ActorType}" Header="ActorType" />
+                        <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=Radius, StringFormat={}{0:N2}}" Header="Radius" />                        
                         <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=CurrentAnimation}" Header="Animation" />
                         <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=IsInLineOfSight}" Header="LOS" />
                     </DataGrid.Columns>
@@ -93,7 +95,7 @@
                     <Style TargetType="DataGridRow">
                     <Setter Property="TextElement.Foreground" Value="Black"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Path=Type}" Value="Unknown">
+                            <DataTrigger Binding="{Binding Path=TrinityType}" Value="Unknown">
                                 <Setter Property="TextElement.Foreground" Value="DarkGray"/>
                             </DataTrigger>
                         </Style.Triggers>

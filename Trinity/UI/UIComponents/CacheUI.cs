@@ -12,6 +12,7 @@ using Trinity.Cache;
 using Trinity.Helpers;
 using Trinity.LazyCache;
 using Trinity.Technicals;
+using Zeta.Bot;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals;
@@ -51,7 +52,11 @@ namespace Trinity.UI.UIComponents
 
                 _isWindowOpen = true;
                 _window.Closed += Window_Closed;
+
                 Configuration.Events.OnCacheUpdated += Update;
+                
+                RegisterNotRunningLazyCacheUpdate();
+
                 _window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
 
             }
@@ -61,6 +66,46 @@ namespace Trinity.UI.UIComponents
             }
 
             return _window;
+        }
+
+        /// <summary>
+        /// Allows the UICache LazyCache Panel to be updated while bot is not started.
+        /// </summary>
+        private static void RegisterNotRunningLazyCacheUpdate()
+        {
+            if (!BotMain.IsRunning && !BotMain.IsPausedForStateExecution)
+            {
+                Logger.Log("Starting CacheUI update thread");
+                Worker.Start(() =>
+                {
+                    if (BotMain.IsRunning || !_isWindowOpen)
+                    {
+                        Logger.Log("Shutting down CacheUI update thread");
+
+                        if (!_isWindowOpen)
+                            CacheManager.Stop();
+
+                        return true;
+                    }
+
+                    if (!BotMain.IsPausedForStateExecution && DataModel.IsLazyCacheVisible)
+                    {
+                        using (new MemoryHelper())
+                        {
+                            ZetaDia.Actors.Update();
+
+                            if (!CacheManager.IsRunning)
+                                CacheManager.Start();
+
+                            CacheManager.Update();
+                            CacheUI.Update();
+                        }
+                    }
+
+                    return false;
+
+                }, 250); //250ms Ticks
+            }
         }
 
         private static bool _isUpdating;
