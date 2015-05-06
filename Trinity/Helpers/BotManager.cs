@@ -69,10 +69,28 @@ namespace Trinity.Helpers
                 return true;
             }
 
+            var equippedItems = ZetaDia.Me.Inventory.Equipped.Where(i => i.IsValid);
+            bool needEmergencyRepair = false;
+            //ZetaDia.Me.Inventory.Equipped.Where(i => i.ACDGuid != 0 && i.IsValid).Average(i => i.DurabilityPercent) < 0.05
+            foreach (var item in equippedItems)
+            {
+                if (item.ACDGuid == 0) continue;
+                float durabilitySum = 0f;
+                int itemCount = 0;
+                try
+                {
+                    durabilitySum += item.DurabilityPercent;
+                    itemCount++;
+                }
+                catch { 
+                    // Ring them bells for the chosen few who will judge the many when the game is through
+                }
+                if (itemCount > 0 && durabilitySum / itemCount < 0.05)
+                    needEmergencyRepair = true;
+            }
+
             // We keep dying because we're spawning in AoE and next to 50 elites and we need to just leave the game
-            if (DateTime.UtcNow.Subtract(Trinity.LastDeathTime).TotalSeconds < 30 &&
-                ZetaDia.Me.Inventory.Equipped.Any() &&
-                ZetaDia.Me.Inventory.Equipped.Where(i => i.ACDGuid != 0 && i.IsValid).Average(i => i.DurabilityPercent) < 0.05 && !ZetaDia.IsInTown)
+            if (DateTime.UtcNow.Subtract(Trinity.LastDeathTime).TotalSeconds < 30 && !ZetaDia.IsInTown && needEmergencyRepair)
             {
                 Logger.Log("Durability is zero, emergency leave game");
                 ZetaDia.Service.Party.LeaveGame(true);

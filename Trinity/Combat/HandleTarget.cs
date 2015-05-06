@@ -36,7 +36,7 @@ namespace Trinity
         /// </summary>
         /// <param name="rs"></param>
         /// <returns></returns>
-        private static RunStatus GetRunStatus(RunStatus status)
+        private static RunStatus GetRunStatus(RunStatus status, string location)
         {
             MonkCombat.RunOngoingPowers();
 
@@ -64,7 +64,7 @@ namespace Trinity
             if (CombatBase.CurrentPower != null && (CombatBase.CurrentPower.ShouldWaitBeforeUse || CombatBase.CurrentPower.ShouldWaitAfterUse))
                 extras += " " + CombatBase.CurrentPower;
 
-            Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "HandleTarget returning {0} to tree" + extras, status);
+            Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "HandleTarget returning {0} to tree from " + location + " " + extras, status);
 
             return status;
 
@@ -83,13 +83,13 @@ namespace Trinity
                     if (!Player.IsValid)
                     {
                         Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "No longer in game world", true);
-                        return GetRunStatus(RunStatus.Failure);
+                        return GetRunStatus(RunStatus.Failure, "PlayerInvalid");
                     }
 
                     if (Player.IsDead)
                     {
                         Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Player is dead", true);
-                        return GetRunStatus(RunStatus.Failure);
+                        return GetRunStatus(RunStatus.Failure, "PlayerDead");
                     }
 
                     // Make sure we reset unstucker stuff here
@@ -103,7 +103,7 @@ namespace Trinity
                     // Time based wait delay for certain powers with animations
                     if (IsWaitingAfterPower && CombatBase.CurrentPower.ShouldWaitAfterUse)
                     {
-                        return GetRunStatus(RunStatus.Running);
+                        return GetRunStatus(RunStatus.Running, "IsWaitingAfterPower");
                     }
 
                     IsWaitingAfterPower = false;
@@ -129,39 +129,39 @@ namespace Trinity
                     if (CombatBase.CombatMovement.IsQueuedMovement & CombatBase.IsCombatAllowed)
                     {
                         CombatBase.CombatMovement.Execute();
-                        return GetRunStatus(RunStatus.Running);
+                        return GetRunStatus(RunStatus.Running, "ExecuteCombatMovement");
                     }
 
                     while (CurrentTarget == null && (ForceVendorRunASAP || WantToTownRun) && !Zeta.Bot.Logic.BrainBehavior.IsVendoring && TownRun.TownRunTimerRunning())
                     {
                         Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "CurrentTarget is null but we are ready to to Town Run, waiting... ");
-                        return GetRunStatus(RunStatus.Running);
+                        return GetRunStatus(RunStatus.Running, "CurrentTargetNull");
                     }
 
                     while (CurrentTarget == null && TownRun.IsTryingToTownPortal() && TownRun.TownRunTimerRunning())
                     {
                         Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "Waiting for town run... ");
-                        return GetRunStatus(RunStatus.Running);
+                        return GetRunStatus(RunStatus.Running, "TownRunWait");
                     }
 
                     if (CurrentTarget == null && TownRun.IsTryingToTownPortal() && TownRun.TownRunTimerFinished())
                     {
                         Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "Town Run Ready!");
-                        return GetRunStatus(RunStatus.Success);
+                        return GetRunStatus(RunStatus.Success, "TownRunRead");
                     }
 
 
                     if (CurrentTarget == null)
                     {
                         Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "CurrentTarget set as null in refresh! Error 2, Returning Failure");
-                        return GetRunStatus(RunStatus.Failure);
+                        return GetRunStatus(RunStatus.Failure, "CurrentTargetNull2");
                     }
 
                     // Handle Target stuck / timeout
                     if (HandleTargetTimeoutTask())
                     {
                         Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "Blacklisted Target, Returning Failure");
-                        return GetRunStatus(RunStatus.Running);
+                        return GetRunStatus(RunStatus.Running, "BlackListTarget");
                     }
 
                     if (CurrentTarget != null)
@@ -171,7 +171,7 @@ namespace Trinity
 
                     if (UsePotionIfNeededTask())
                     {
-                        return GetRunStatus(RunStatus.Running);
+                        return GetRunStatus(RunStatus.Running, "UsePotionTask");
                     }
 
                     using (new PerformanceLogger("HandleTarget.CheckAvoidanceBuffs"))
@@ -185,6 +185,7 @@ namespace Trinity
                                 ZetaDia.Me.UsePower(PowerBuff.SNOPower, PowerBuff.TargetPosition, PowerBuff.TargetDynamicWorldId, PowerBuff.TargetACDGUID);
                                 LastPowerUsed = PowerBuff.SNOPower;
                                 CacheData.AbilityLastUsed[PowerBuff.SNOPower] = DateTime.UtcNow;
+                                return GetRunStatus(RunStatus.Running, "UsePowerBuff");
                             }
                         }
                     }
@@ -261,13 +262,13 @@ namespace Trinity
                         // Interact/use power on target if already in range
                         if (noRangeRequired || (TargetCurrentDistance <= TargetRangeRequired && CurrentTargetIsInLoS) || stuckOnTarget || npcInRange)
                         {
-                            Logger.LogDebug(LogCategory.Behavior, "Object in Range: noRangeRequired={0} Target In Range={1} stuckOnTarget={2} npcInRange={3}",
-                                noRangeRequired, (TargetCurrentDistance <= TargetRangeRequired && CurrentTargetIsInLoS), stuckOnTarget, npcInRange);
+                            Logger.LogDebug(LogCategory.Behavior, "Object in Range: noRangeRequired={0} Target In Range={1} stuckOnTarget={2} npcInRange={3} power={4}",
+                                noRangeRequired, (TargetCurrentDistance <= TargetRangeRequired && CurrentTargetIsInLoS), stuckOnTarget, npcInRange, CombatBase.CurrentPower.SNOPower);
 
                             UpdateStatusTextTarget(true);
 
                             HandleObjectInRange();
-                            return GetRunStatus(RunStatus.Running);
+                            return GetRunStatus(RunStatus.Running, "HandleObjectInRange");
                         }
 
                     }
@@ -283,13 +284,13 @@ namespace Trinity
                     if (Player.IsIncapacitated || Player.IsRooted)
                     {
                         Logger.Log(LogCategory.Behavior, "Player is rooted or incapacitated!");
-                        return GetRunStatus(RunStatus.Running);
+                        return GetRunStatus(RunStatus.Running, "PlayerRooted");
                     }
 
                     // Check to see if we're stuck in moving to the target
                     if (HandleTargetDistanceCheck())
                     {
-                        return GetRunStatus(RunStatus.Running);
+                        return GetRunStatus(RunStatus.Running, "DistanceCheck");
                     }
                     // Update the last distance stored
                     LastDistanceFromTarget = TargetCurrentDistance;
@@ -331,7 +332,7 @@ namespace Trinity
                                 if (DateTime.UtcNow.Subtract(LastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                                     TimesBlockedMoving = 0;
 
-                                return GetRunStatus(RunStatus.Running);
+                                return GetRunStatus(RunStatus.Running, "UsedSpecialMovement");
                             }
                         }
                     }
@@ -340,15 +341,15 @@ namespace Trinity
                     if (Skills.DemonHunter.Strafe.IsActive && Player.PrimaryResource > 12 && TargetUtil.AnyMobsInRange(30f, false))
                     {
                         Skills.DemonHunter.Strafe.Cast(CurrentDestination);
-                        return GetRunStatus(RunStatus.Running);
+                        return GetRunStatus(RunStatus.Running, "Strafe");
                     }
 
                     if (Player.ActorClass == ActorClass.Monk && CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike) && ((Skills.Monk.DashingStrike.Charges > 1 && ZetaDia.Me.CurrentPrimaryResource > 75) || CacheData.Buffs.HasCastingShrine))
 					{
 						Logger.Log("Dash towards: {0}, charges={1}", GetTargetName(), Skills.Monk.DashingStrike.Charges);
                         Skills.Monk.DashingStrike.Cast(CurrentDestination);
-						
-						return GetRunStatus(RunStatus.Running);
+
+                        return GetRunStatus(RunStatus.Running, "Dash");
 					}
 
                     if (Player.ActorClass == ActorClass.Barbarian)
@@ -360,19 +361,19 @@ namespace Trinity
                         {
                             Skills.Barbarian.Whirlwind.Cast(CurrentDestination);
                             LastMoveToTarget = CurrentDestination;
-                            return GetRunStatus(RunStatus.Running);
+                            return GetRunStatus(RunStatus.Running, "Whirlwind");
                         }
                     }
                 }
                 catch (Exception ex)
                 {
                     Logger.LogError("Error in HandleTarget: {0}", ex);
-                    return GetRunStatus(RunStatus.Failure);
+                    return GetRunStatus(RunStatus.Failure, "Exception");
                 }
 
                 HandleTargetBasicMovement(ForceNewMovement);
                 Logger.LogDebug(LogCategory.Behavior, "End of HandleTarget");
-                return GetRunStatus(RunStatus.Running);
+                return GetRunStatus(RunStatus.Running, "End");
             }
         }
 

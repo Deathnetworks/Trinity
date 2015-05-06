@@ -185,7 +185,7 @@ namespace Trinity.DbProvider
                     }
 
                     // Fix for A1 new game with bags full
-                    if (Trinity.Player.LevelAreaId == 19947 && ZetaDia.CurrentQuest.QuestSNO == 87700 && (ZetaDia.CurrentQuest.StepId == -1 || ZetaDia.CurrentQuest.StepId == 42))
+                    if (Trinity.Player.LevelAreaId == 19947 && ZetaDia.CurrentQuest.QuestSNO == 87700)
                     {
                         Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Can't townrun with the current quest!");
                         Trinity.WantToTownRun = false;

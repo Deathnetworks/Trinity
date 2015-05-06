@@ -92,7 +92,7 @@ namespace Trinity
                         // Monks
                         case ActorClass.Monk:
                             power = MonkCombat.GetPower();
-                            if (GetHasBuff(SNOPower.X1_Monk_Epiphany) && power.MinimumRange > 0)
+                            if (power != null && GetHasBuff(SNOPower.X1_Monk_Epiphany) && power.MinimumRange > 0)
                                 power.MinimumRange = 75f;
                             break;
                         // Wizards

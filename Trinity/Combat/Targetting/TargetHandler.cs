@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.DbProvider;
@@ -1083,6 +1081,9 @@ namespace Trinity.Combat.Targetting
         {
             using (new PerformanceLogger("HandleTarget.SetRequiredRange"))
             {
+                if (CombatBase.CurrentPower.SNOPower == SNOPower.None)
+                    return;
+
                 Trinity.TargetRangeRequired = 2f;
                 Trinity.TargetCurrentDistance = CurrentTarget.RadiusDistance;
                 Trinity.CurrentTargetIsInLoS = false;

@@ -32,6 +32,10 @@ namespace Trinity.Combat.Abilities
             if (power != null && power.SNOPower != SNOPower.None)
                 return power;
 
+            // Destructibles
+            if (UseDestructiblePower)
+                return DestroyObjectPower();
+
             // In Combat, Avoiding
             if (IsCurrentlyAvoiding)
             {
@@ -42,9 +46,6 @@ namespace Trinity.Combat.Abilities
             {
                 return GetCombatPower();
             }
-            // Destructibles
-            if (UseDestructiblePower)
-                return DestroyObjectPower();
 
             // Default attacks
             return DefaultPower;

@@ -79,7 +79,7 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // No buffs, do nothing
-                return default(TrinityPower);
+                return new TrinityPower();
             }
 
             if (IsCurrentlyAvoiding)

@@ -189,6 +189,9 @@ namespace Trinity.Items
 
         public bool Equals(ItemWrapper other)
         {
+            if (other == null)
+                return false;
+
             if (DynamicId == other.DynamicId)
                 return true;
 
@@ -203,9 +206,23 @@ namespace Trinity.Items
             return Item.GetHashCode();
         }
 
-        public static bool operator ==(ItemWrapper item, ItemWrapper other)
+        public static bool operator ==(ItemWrapper a, ItemWrapper b)
         {
-            return item.Equals(other);
+            if (ReferenceEquals(a, b))
+            {
+                return true;
+            }
+            // If one is null, but not both, return false.
+            if (((object)a == null) || ((object)b == null))
+            {
+                return false;
+            }
+
+            // Return true if the fields match:
+            return a.ItemType == b.ItemType &&
+                a.ItemBaseType == b.ItemBaseType &&
+                a.Item.ItemQualityLevel == b.Item.ItemQualityLevel &&
+                a.Item.Name == b.Name;
         }
 
         public static bool operator !=(ItemWrapper item, ItemWrapper other)
