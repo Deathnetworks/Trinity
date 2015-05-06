@@ -58,60 +58,66 @@ namespace Trinity
                     //var itemList = ZetaDia.Actors.GetActorsOfType<ACDItem>();
 
                     // Using backpack only for now, as grabbing all ACDItems is just slow and we don't have a use for them yet.
-                    var itemList = ZetaDia.Me.Inventory.Backpack;
+                    //var itemList = ZetaDia.Me.Inventory.Backpack;
+                    var inventory = ZetaDia.Me.Inventory;
+                    
+                    Equipped = inventory.Equipped.ToList();
+                    EquippedIds = new HashSet<int>(Equipped.Select(i => i.ActorSNO));
+                    Backpack = inventory.Backpack.ToList();
+                    Stash = inventory.StashItems.ToList();
 
-                    foreach (var item in itemList)
-                    {
-                        if (!item.IsValid)
-                            continue;
+                    //foreach (var item in itemList)
+                    //{
+                    //    if (!item.IsValid)
+                    //        continue;
 
-                        switch (item.InventorySlot)
-                        {
-                            case InventorySlot.BackpackItems:
-                                Backpack.Add(item);
-                                break;
+                    //    switch (item.InventorySlot)
+                    //    {
+                    //        case InventorySlot.BackpackItems:
+                    //            Backpack.Add(item);
+                    //            break;
 
-                            case InventorySlot.SharedStash:
-                                Stash.Add(item);
-                                break;
+                    //        case InventorySlot.SharedStash:
+                    //            Stash.Add(item);
+                    //            break;
 
-                            case InventorySlot.Bracers:
-                            case InventorySlot.Feet:
-                            case InventorySlot.Hands:
-                            case InventorySlot.Head:
-                            case InventorySlot.Waist:
-                            case InventorySlot.Shoulders:
-                            case InventorySlot.Torso:
-                            case InventorySlot.LeftFinger:
-                            case InventorySlot.RightFinger:
-                            case InventorySlot.RightHand:
-                            case InventorySlot.LeftHand:
-                            case InventorySlot.Legs:
-                            case InventorySlot.Neck:
-                            case InventorySlot.Socket:
-                                Equipped.Add(item);
-                                EquippedIds.Add(item.ActorSNO);
-                                break;
+                    //        case InventorySlot.Bracers:
+                    //        case InventorySlot.Feet:
+                    //        case InventorySlot.Hands:
+                    //        case InventorySlot.Head:
+                    //        case InventorySlot.Waist:
+                    //        case InventorySlot.Shoulders:
+                    //        case InventorySlot.Torso:
+                    //        case InventorySlot.LeftFinger:
+                    //        case InventorySlot.RightFinger:
+                    //        case InventorySlot.RightHand:
+                    //        case InventorySlot.LeftHand:
+                    //        case InventorySlot.Legs:
+                    //        case InventorySlot.Neck:
+                    //        case InventorySlot.Socket:
+                    //            Equipped.Add(item);
+                    //            EquippedIds.Add(item.ActorSNO);
+                    //            break;
 
-                            case InventorySlot.Buyback:
-                                Buyback.Add(item);
-                                break;
+                    //        case InventorySlot.Buyback:
+                    //            Buyback.Add(item);
+                    //            break;
 
-                            case InventorySlot.None:
-                                Ground.Add(item);
-                                break;
+                    //        case InventorySlot.None:
+                    //            Ground.Add(item);
+                    //            break;
 
-                            default:
-                                if ((int)item.InventorySlot == 19)
-                                {
-                                    Equipped.Add(item);
-                                    EquippedIds.Add(item.ActorSNO);
-                                }
-                                Other.Add(item);
-                                break;
+                    //        default:
+                    //            if ((int)item.InventorySlot == 19)
+                    //            {
+                    //                Equipped.Add(item);
+                    //                EquippedIds.Add(item.ActorSNO);
+                    //            }
+                    //            Other.Add(item);
+                    //            break;
 
-                        }
-                    }
+                    //    }
+                    //}
 
                     IsGroundItemOverload = (Ground.Count > 50);
 
