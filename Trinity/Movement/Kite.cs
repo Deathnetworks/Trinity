@@ -120,7 +120,7 @@ namespace Trinity
                     {
 
                         if ((DateTime.UtcNow.Subtract(LastKitePosition.PositionFoundTime).TotalMilliseconds > 3000 && LastKitePosition.Position == vAnySafePoint) ||
-                            (CurrentTarget != null && DateTime.UtcNow.Subtract(LastGlobalCooldownUse).TotalMilliseconds > 1500 && TryToKite))
+                            (CurrentTarget != null && DateTime.UtcNow.Subtract(lastGlobalCooldownUse).TotalMilliseconds > 1500 && TryToKite))
                         {
                             timeCancelledKiteMove = DateTime.UtcNow;
                             cancelledKiteMoveForMilliseconds = 1500;

@@ -20,6 +20,9 @@ using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
+    /// <summary>
+    /// Prototype Weighting System
+    /// </summary>
     public partial class Trinity
     {
         private static double GetLastHadUnitsInSights()
@@ -41,7 +44,7 @@ namespace Trinity
 
                 bool avoidanceNearby = Settings.Combat.Misc.AvoidAOE && ObjectCache.Any(o => o.Type == TrinityObjectType.Avoidance && o.Distance <= 15f);
 
-                bool prioritizeCloseRangeUnits = (avoidanceNearby || ForceCloseRangeTarget || Player.IsRooted || DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds < 1000 &&
+                bool prioritizeCloseRangeUnits = (avoidanceNearby || _forceCloseRangeTarget || Player.IsRooted || DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds < 1000 &&
                                                   ObjectCache.Count(u => u.IsUnit && u.RadiusDistance < 10f) >= 3);
 
                 bool hiPriorityHealthGlobes = Settings.Combat.Misc.HiPriorityHG;
@@ -426,16 +429,16 @@ namespace Trinity
                                             !MathUtil.IntersectsPath(obj.Position, obj.Radius, Player.Position, cacheObject.Position)))
                                         {
                                             // Logging goblin sightings
-                                            if (LastGoblinTime == DateTime.MinValue)
+                                            if (lastGoblinTime == DateTime.MinValue)
                                             {
                                                 TotalNumberGoblins++;
-                                                LastGoblinTime = DateTime.UtcNow;
+                                                lastGoblinTime = DateTime.UtcNow;
                                                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Goblin #{0} in sight. Distance={1:0}", TotalNumberGoblins, cacheObject.Distance);
                                             }
                                             else
                                             {
-                                                if (DateTime.UtcNow.Subtract(LastGoblinTime).TotalMilliseconds > 30000)
-                                                    LastGoblinTime = DateTime.MinValue;
+                                                if (DateTime.UtcNow.Subtract(lastGoblinTime).TotalMilliseconds > 30000)
+                                                    lastGoblinTime = DateTime.MinValue;
                                             }
 
                                             if (CacheData.TimeBoundAvoidance.Any(aoe => cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius) && Settings.Combat.Misc.GoblinPriority != GoblinPriority.Kamikaze)

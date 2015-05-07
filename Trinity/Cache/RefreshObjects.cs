@@ -179,8 +179,8 @@ namespace Trinity
 
 
                 // Reduce ignore-for-loops counter
-                if (IgnoreTargetForLoops > 0)
-                    IgnoreTargetForLoops--;
+                if (_ignoreTargetForLoops > 0)
+                    _ignoreTargetForLoops--;
                 // If we have an avoidance under our feet, then create a new object which contains a safety point to move to
                 // But only if we aren't force-cancelling avoidance for XX time
                 bool hasFoundSafePoint = false;
@@ -377,7 +377,7 @@ namespace Trinity
                             CurrentTarget.Type
                             );
 
-                        LastPickedTargetTime = DateTime.UtcNow;
+                        _lastPickedTargetTime = DateTime.UtcNow;
                         _targetLastHealth = 0f;
                     }
                     else
@@ -390,7 +390,7 @@ namespace Trinity
                             {
                                 Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Keeping Target {0} - CurrentTarget.HitPoints: {1:0.00} TargetLastHealth: {2:0.00} ",
                                                 CurrentTarget.RActorGuid, CurrentTarget.HitPointsPct, _targetLastHealth);
-                                LastPickedTargetTime = DateTime.UtcNow;
+                                _lastPickedTargetTime = DateTime.UtcNow;
                             }
                             // Now store the target's last-known health
                             _targetLastHealth = CurrentTarget.HitPointsPct;
@@ -712,36 +712,36 @@ namespace Trinity
 
                 if (Player.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
                 { //!sp - keep looking for kills while WOTB is up
-                    KeepKillRadiusExtendedForSeconds = Math.Max(3, KeepKillRadiusExtendedForSeconds);
-                    TimeKeepKillRadiusExtendedUntil = DateTime.UtcNow.AddSeconds(KeepKillRadiusExtendedForSeconds);
+                    _keepKillRadiusExtendedForSeconds = Math.Max(3, _keepKillRadiusExtendedForSeconds);
+                    _timeKeepKillRadiusExtendedUntil = DateTime.UtcNow.AddSeconds(_keepKillRadiusExtendedForSeconds);
                 }
                 // Counter for how many cycles we extend or reduce our attack/kill radius, and our loot radius, after a last kill
-                if (KeepKillRadiusExtendedForSeconds > 0)
+                if (_keepKillRadiusExtendedForSeconds > 0)
                 {
-                    TimeSpan diffResult = DateTime.UtcNow.Subtract(TimeKeepKillRadiusExtendedUntil);
-                    KeepKillRadiusExtendedForSeconds = (int)diffResult.Seconds;
+                    TimeSpan diffResult = DateTime.UtcNow.Subtract(_timeKeepKillRadiusExtendedUntil);
+                    _keepKillRadiusExtendedForSeconds = (int)diffResult.Seconds;
                     //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kill Radius remaining " + diffResult.Seconds + "s");
-                    if (TimeKeepKillRadiusExtendedUntil <= DateTime.UtcNow)
+                    if (_timeKeepKillRadiusExtendedUntil <= DateTime.UtcNow)
                     {
-                        KeepKillRadiusExtendedForSeconds = 0;
+                        _keepKillRadiusExtendedForSeconds = 0;
                     }
                 }
-                if (KeepLootRadiusExtendedForSeconds > 0)
-                    KeepLootRadiusExtendedForSeconds--;
+                if (_keepLootRadiusExtendedForSeconds > 0)
+                    _keepLootRadiusExtendedForSeconds--;
 
                 // Clear forcing close-range priority on mobs after XX period of time
-                if (ForceCloseRangeTarget && DateTime.UtcNow.Subtract(LastForcedKeepCloseRange).TotalMilliseconds > ForceCloseRangeForMilliseconds)
+                if (_forceCloseRangeTarget && DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds > ForceCloseRangeForMilliseconds)
                 {
-                    ForceCloseRangeTarget = false;
+                    _forceCloseRangeTarget = false;
                 }
 
                 //AnyElitesPresent = false;
                 AnyMobsInRange = false;
 
                 // Clear our very short-term destructible blacklist within 3 seconds of last attacking a destructible
-                if (NeedClearDestructibles && DateTime.UtcNow.Subtract(LastDestroyedDestructible).TotalMilliseconds > 2500)
+                if (_needClearDestructibles && DateTime.UtcNow.Subtract(_lastDestroyedDestructible).TotalMilliseconds > 2500)
                 {
-                    NeedClearDestructibles = false;
+                    _needClearDestructibles = false;
                     _destructible3SecBlacklist = new HashSet<int>();
                 }
                 // Clear our very short-term ignore-monster blacklist (from not being able to raycast on them or already dead units)

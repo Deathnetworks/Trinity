@@ -52,6 +52,7 @@ namespace Trinity
         public static bool RunFromPoison = false;
         public static bool GotFrenzyShrine = false;
         public static bool GotBlessedShrine = false;
+        public static bool PrioritizeCloseRangeUnits = false;
 
         /// <summary>
         /// This object is used for the main handling - the "current target" etc. as selected by the target-selecter, whether it be a unit, an item, a shrine, anything. 
@@ -62,42 +63,42 @@ namespace Trinity
         /// <summary>
         /// A flag to indicate if we should pick a new power/ability to use or not
         /// </summary>
-        internal static bool ShouldPickNewAbilities;
+        private static bool _shouldPickNewAbilities;
 
         /// <summary>
         /// Flag used to indicate if we are simply waiting for a power to go off - so don't do any new target checking or anything
         /// </summary>
-        internal static bool IsWaitingForPower;
+        private static bool _isWaitingForPower;
 
         /// <summary>
         /// A special post power use pause, causes targetHandler to wait on any new decisions
         /// </summary>
-        internal static bool IsWaitingAfterPower;
+        private static bool _isWaitingAfterPower;
 
         /// <summary>
         /// If TargetHandle is waiting waiting before popping a potion - we won't refresh cache/change targets/unstuck/etc
         /// </summary>
-        internal static bool IsWaitingForPotion;
+        private static bool _isWaitingForPotion;
 
         /// <summary>
         /// Status text for DB main window status
         /// </summary>
-        internal static string StatusText = "";
+        private static string _statusText = "";
 
         /// <summary>
         /// Timestamp of when our position was last measured as changed
         /// </summary>
-        internal static DateTime LastMovedDuringCombat = DateTime.MinValue;
+        private static DateTime _lastMovedDuringCombat = DateTime.MinValue;
 
         /// <summary>
-        /// Used to ignore a specific RActor for <see cref="IgnoreTargetForLoops"/> ticks
+        /// Used to ignore a specific RActor for <see cref="_ignoreTargetForLoops"/> ticks
         /// </summary>
-        internal static int IgnoreRactorGuid;
+        private static int _ignoreRactorGuid;
 
         /// <summary>
-        /// Ignore <see cref=" IgnoreRactorGuid"/> for this many ticks
+        /// Ignore <see cref=" _ignoreRactorGuid"/> for this many ticks
         /// </summary>
-        internal static int IgnoreTargetForLoops;
+        private static int _ignoreTargetForLoops;
 
         /// <summary>
         /// Holds all of the player's current info handily cached, updated once per loop with a minimum timer on updates to save D3 memory hits
@@ -136,8 +137,8 @@ namespace Trinity
         // These are a bunch of safety counters for how many times in a row we register having *NO* ability to select when we need one (eg all off cooldown)
 
         // After so many, give the player a friendly warning to check their skill/build setup
-        internal static int NoAbilitiesAvailableInARow = 0;
-        internal static DateTime LastRemindedAboutAbilities = DateTime.MinValue;
+        private static int NoAbilitiesAvailableInARow = 0;
+        private static DateTime lastRemindedAboutAbilities = DateTime.MinValue;
 
         // Last had any mob in range, for loot-waiting
         internal static DateTime lastHadUnitInSights = DateTime.MinValue;
@@ -149,27 +150,27 @@ namespace Trinity
         internal static DateTime lastHadContainerInSights = DateTime.MinValue;
 
         // Do we need to reset the debug bar after combat handling?
-        internal static bool ResetStatusText;
+        private static bool _resetStatusText;
 
         // Death counts
         public static int DeathsThisRun = 0;
 
         // Force a target update after certain interactions
-        internal static bool _forceTargetUpdate;
+        private static bool _forceTargetUpdate;
 
         /// <summary>
         /// This holds whether or not we want to prioritize a close-target, used when we might be body-blocked by monsters
         /// </summary>
-        internal static bool ForceCloseRangeTarget;
+        private static bool _forceCloseRangeTarget;
 
         // How many times a movement fails because of being "blocked"
-        internal static int TimesBlockedMoving;
+        private static int _timesBlockedMoving;
 
         // how long to force close-range targets for
         private const int ForceCloseRangeForMilliseconds = 0;
 
         // Date time we were last told to stick to close range targets
-        internal static DateTime LastForcedKeepCloseRange = DateTime.MinValue;
+        private static DateTime _lastForcedKeepCloseRange = DateTime.MinValue;
 
 
         // Caching of the current primary target's health, to detect if we AREN'T damaging it for a period of time
@@ -181,7 +182,7 @@ namespace Trinity
         /// <summary>
         /// Store the date-time when we *FIRST* picked this target, so we can blacklist after X period of time targeting
         /// </summary>
-        internal static DateTime LastPickedTargetTime = DateTime.MinValue;
+        private static DateTime _lastPickedTargetTime = DateTime.MinValue;
 
         // These values below are set on a per-class basis later on, so don't bother changing them here! These are the old default values
         public static double PlayerEmergencyHealthPotionLimit = 0.35;
@@ -216,17 +217,16 @@ namespace Trinity
 
         // This is a blacklist that is cleared within 3 seconds of last attacking a destructible
         private static HashSet<int> _destructible3SecBlacklist = new HashSet<int>();
-        internal static DateTime LastDestroyedDestructible = DateTime.MinValue;
-        internal static bool NeedClearDestructibles;
+        private static DateTime _lastDestroyedDestructible = DateTime.MinValue;
+        private static bool _needClearDestructibles;
 
         // The number of loops to extend kill range for after a fight to try to maximize kill bonus exp etc.
-        internal static int KeepKillRadiusExtendedForSeconds;
-        internal static DateTime TimeKeepKillRadiusExtendedUntil = DateTime.MinValue;
+        private static int _keepKillRadiusExtendedForSeconds;
+        private static DateTime _timeKeepKillRadiusExtendedUntil = DateTime.MinValue;
 
         // The number of loops to extend loot range for after a fight to try to stop missing loot
-        internal static int KeepLootRadiusExtendedForSeconds;
+        private static int _keepLootRadiusExtendedForSeconds;
 
-        internal static double HighestWeightFound = 0f;
         // Some avoidance related variables
 
         /// <summary>
@@ -252,10 +252,10 @@ namespace Trinity
         private static int cancelledKiteMoveForMilliseconds = 0;
 
         // Variable to let us force new target creations immediately after a root
-        internal static bool WasRootedLastTick = false;
+        private static bool wasRootedLastTick = false;
 
         // Variables used to actually hold powers the power-selector has picked to use, for buffing and main power use
-        internal static TrinityPower PowerBuff;
+        private static TrinityPower powerBuff;
 
         private static SNOPower lastPowerUsed = SNOPower.None;
         public static SNOPower LastPowerUsed
@@ -270,7 +270,7 @@ namespace Trinity
         // Target provider and core routine variables
         //private static bool AnyElitesPresent = false;
         private static bool AnyTreasureGoblinsPresent = false;
-        internal static bool AnyMobsInRange = false;
+        private static bool AnyMobsInRange = false;
         private static float CurrentBotKillRange = 0f;
         private static float CurrentBotLootRange = 0f;
         internal static bool MaintainTempestRush = false;
@@ -286,14 +286,14 @@ namespace Trinity
         private static bool isWaitingForSpecial = false;
 
         // Goblinney things
-        internal static int TotalNumberGoblins = 0;
-        internal static DateTime LastGoblinTime = DateTime.MinValue;
+        private static int TotalNumberGoblins = 0;
+        private static DateTime lastGoblinTime = DateTime.MinValue;
 
 
-        internal static bool IsAlreadyMoving = false;
-        internal static Vector3 LastMoveToTarget;
-        internal static float LastDistanceFromTarget;
-        internal static DateTime LastMovementCommand = DateTime.MinValue;
+        private static bool IsAlreadyMoving = false;
+        private static Vector3 LastMoveToTarget;
+        private static float LastDistanceFromTarget;
+        private static DateTime lastMovementCommand = DateTime.MinValue;
 
         // Contains our apparent *CURRENT* hotbar abilities, cached in a fast hash
         public static List<SNOPower> Hotbar = new List<SNOPower>();
@@ -353,10 +353,13 @@ namespace Trinity
         /// <summary>
         /// The RActorGUID of the last CurrentTarget (PrimaryTarget)
         /// </summary>
-        internal static int LastTargetRactorGUID;
+        private static int LastTargetRactorGUID;
 
         internal static int LastTargetACDGuid;
-
+        /// <summary>
+        /// The number of monsters within melee range distance of the player
+        /// </summary>
+        private static double HighestWeightFound;
 
         private static bool NeedToKite = false;
 
@@ -379,13 +382,13 @@ namespace Trinity
         }
 
         // When did we last send a move-power command?
-        internal static DateTime LastSentMovePower = DateTime.MinValue;
+        private static DateTime lastSentMovePower = DateTime.MinValue;
 
 
         /// <summary>
         /// If we should force movement
         /// </summary>
-        internal static bool ForceNewMovement = false;
+        private static bool ForceNewMovement = false;
 
         /// <summary>
         /// Store player current position
@@ -418,17 +421,17 @@ namespace Trinity
         /// <summary>
         /// Behaviors: How close we need to get to the target before we consider it "reached"
         /// </summary>
-        internal static float TargetRangeRequired = 1f;
+        private static float TargetRangeRequired = 1f;
 
         /// <summary>
         /// An adjusted distance from the current target />
         /// </summary>
-        public static float TargetCurrentDistance;
+        private static float TargetCurrentDistance;
 
         /// <summary>
         /// If our current target is in LoS for use in Behavior handling
         /// </summary>
-        internal static bool CurrentTargetIsInLoS;
+        private static bool CurrentTargetIsInLoS;
 
         // Darkfriend's Looting Rule
         public static Interpreter StashRule = null; // = new Interpreter();
@@ -444,7 +447,7 @@ namespace Trinity
         /// <summary>
         /// And a "global cooldown" to prevent non-signature-spells being used too fast
         /// </summary>
-        public static DateTime LastGlobalCooldownUse = DateTime.MinValue;
+        public static DateTime lastGlobalCooldownUse = DateTime.MinValue;
 
         // track bounties completed
         public static int TotalBountyCachesOpened = 0;
