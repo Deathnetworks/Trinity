@@ -27,27 +27,41 @@ namespace Trinity.LazyCache
         /// <summary>
         /// Converts an ACD into the appropriate Trinity object
         /// </summary>
-        public static TrinityObject CreateTypedTrinityObject(ACD acd)
+        public static TrinityObject CreateTypedTrinityObject(ACD acd, ActorType actorType, int acdGuid)
         {
-            var trinityType = TrinityObject.GetTrinityObjectType(acd);
-            var actorType = acd.ActorType;
+            var gizmoType = acd.GizmoType;
+            var actorSNO = acd.ActorSNO;
+            var internalName = acd.Name;
+            var trinityType = TrinityObject.GetTrinityObjectType(acd, actorType, actorSNO, gizmoType, internalName);
 
-            if (acd.ActorType == ActorType.Monster && trinityType == TrinityObjectType.Unit)
-                return new TrinityUnit(acd);
+            TrinityObject result;
 
-            if (actorType == ActorType.Gizmo)
-                return new TrinityGizmo(acd);
+            if (actorType == ActorType.Monster && trinityType == TrinityObjectType.Unit)
+                result = new TrinityUnit(acd, acdGuid);
 
-            if(actorType == ActorType.Item && trinityType == TrinityObjectType.Item)
-                return new TrinityItem(acd);
+            else if (actorType == ActorType.Gizmo)
+                result = new TrinityGizmo(acd, acdGuid);
 
-            if(actorType == ActorType.Player && trinityType == TrinityObjectType.Player)
-                return new TrinityPlayer(acd);
+            else if(actorType == ActorType.Item && trinityType == TrinityObjectType.Item)
+                result = new TrinityItem(acd, acdGuid);
 
-            if (trinityType == TrinityObjectType.Avoidance)
-                return new TrinityAvoidance(acd);
+            else if(actorType == ActorType.Player && trinityType == TrinityObjectType.Player)
+                result = new TrinityPlayer(acd, acdGuid);
 
-            return new TrinityObject(acd);
+            else if (trinityType == TrinityObjectType.Avoidance)
+                result = new TrinityAvoidance(acd, acdGuid);
+
+            else
+                result = new TrinityObject(acd, acdGuid);
+
+            // Assign the properties we've used so far so they're only called once
+            result.ActorType = actorType;
+            result.TrinityType = trinityType;
+            result.ActorSNO = actorSNO;
+            result.InternalName = internalName;
+            result.GizmoType = gizmoType;
+
+            return result;
         }
     }
 }

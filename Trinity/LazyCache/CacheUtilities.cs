@@ -73,7 +73,7 @@ namespace Trinity.LazyCache
 
         public static bool IsProperValid(this ACD acd)
         {
-            return acd != null && acd.IsValid && !acd.IsDisposed && acd.ACDGuid != -1;
+            return acd != null && acd.IsValid;
         }
 
         /// <summary>

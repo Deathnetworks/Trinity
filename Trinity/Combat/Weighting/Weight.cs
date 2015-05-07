@@ -160,6 +160,7 @@ namespace Trinity.Combat.Weighting
         LowHPGoblin,
         GoblinNormal,
         GoblinPriority,
-        AntiFlipFlop
+        AntiFlipFlop,
+        IsNPC
     }
 }

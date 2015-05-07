@@ -151,7 +151,6 @@ namespace Trinity.UI.UIComponents
             using (new PerformanceLogger("CacheUI LazyCacheActorList", true))
             {
                 return CacheManager.GetActorsOfType<TrinityObject>()
-                    //.OrderByDescending(o => o.InCache)
                     .OrderByDescending(o => o.Weight)
                     .ThenBy(o => o.Distance)
                     .ToList();
@@ -162,7 +161,6 @@ namespace Trinity.UI.UIComponents
         {
             using (new PerformanceLogger("CacheUI DefaultActorList", true))
             {
-
                 return ZetaDia.Actors.GetActorsOfType<DiaObject>(true)
                     .Where(i => i.IsFullyValid())
                     .Select(o => new CacheUIObject(o))

@@ -1410,6 +1410,15 @@ namespace Trinity
             ActorType.Critter
         };
 
+        /// <summary>
+        /// Actor types that we dont wan't to even look at from DB's ACD List.
+        /// </summary>
+        public static HashSet<int> ExcludedActorIds = new HashSet<int>
+        {
+            -1,
+         
+        };
+
         public static HashSet<MonsterType> NonHostileMonsterTypes = new HashSet<MonsterType>
         {
             MonsterType.Ally,

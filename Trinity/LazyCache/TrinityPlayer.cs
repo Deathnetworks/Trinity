@@ -22,6 +22,7 @@ namespace Trinity.LazyCache
     public class TrinityPlayer : TrinityUnit
     {
         public TrinityPlayer(ACD acd) : base(acd) { }
+        public TrinityPlayer(ACD acd, int acdGuid) : base(acd, acdGuid) { }
 
         #region Fields
 

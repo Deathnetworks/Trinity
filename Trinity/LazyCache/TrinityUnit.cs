@@ -19,6 +19,7 @@ namespace Trinity.LazyCache
     public class TrinityUnit : TrinityObject
     {
         public TrinityUnit(ACD acd) : base(acd) { }
+        public TrinityUnit(ACD acd, int acdGuid) : base(acd, acdGuid) { }
 
         #region Fields
 

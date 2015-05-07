@@ -135,22 +135,30 @@ namespace Trinity.LazyCache
             get { return GetActorsOfType<TrinityGizmo>().Where(i => i.IsShrine).ToList(); }
         }
 
+        private static CacheField<List<TrinityPlayer>> _Players = new CacheField<List<TrinityPlayer>>(UpdateSpeed.Ultra);
         public static List<TrinityPlayer> Players
         {
-            get { return GetActorsOfType<TrinityPlayer>(); }
+            get
+            {
+                if (_Players.IsCacheValid) return _Players.CachedValue;
+                return _Players.CachedValue = GetActorsOfType<TrinityPlayer>().ToList();
+            }
         }
 
+        private static CacheField<List<TrinityObject>> _objects = new CacheField<List<TrinityObject>>(UpdateSpeed.Ultra);
         public static List<TrinityObject> Objects
         {
-            get { return GetActorsOfType<TrinityObject>(); }
+            get
+            {
+                if (_objects.IsCacheValid) return _objects.CachedValue;
+                return _objects.CachedValue = GetActorsOfType<TrinityObject>();
+            }
         }
 
         public static List<TrinityObject> NavigationObstacles
         {
             get { return GetActorsOfType<TrinityObject>().Where(i => i.IsNavigationObstacle).ToList(); }
         }
-
-
 
         public static List<TrinityUnit> EliteRareUniqueBoss
         {
@@ -167,9 +175,14 @@ namespace Trinity.LazyCache
             get { return GetActorsOfType<TrinityUnit>().Where(i => i.IsTreasureGoblin).ToList(); }
         }
 
+        private static CacheField<List<TrinityAvoidance>> _avoidances = new CacheField<List<TrinityAvoidance>>(UpdateSpeed.Ultra);
         public static List<TrinityAvoidance> Avoidances
         {
-            get { return GetActorsOfType<TrinityAvoidance>().Where(i => i.TrinityType == TrinityObjectType.Avoidance).ToList(); }
+            get
+            {
+                if (_avoidances.IsCacheValid) return _avoidances.CachedValue;
+                return _avoidances.CachedValue = GetActorsOfType<TrinityAvoidance>().Where(i => i.TrinityType == TrinityObjectType.Avoidance).ToList();
+            }            
         }
 
         public static List<TrinityObject> Globes
@@ -267,23 +280,26 @@ namespace Trinity.LazyCache
 
             _rActorByACDGuid = ZetaDia.Actors.RActorList.OfType<DiaObject>().DistinctBy(i => i.ACDGuid).ToDictionary(k => k.ACDGuid, v => v);
 
-            using (new PerformanceLogger("LazyCache.Update.Objects"))
+            using (new PerformanceLogger("LazyCache.Update.Objects", true))
             {
                 foreach (var acd in ZetaDia.Actors.ACDList.OfType<ACD>())
                 {
-                    if (!acd.IsProperValid() || 
-                        DataDictionary.ExcludedActorTypes.Contains(acd.ActorType) ||
-                        TrinityObject.IsIgnoredName(acd.Name) ||
+                    var guid = acd.ACDGuid;
+                    var actorType = acd.ActorType;
+
+                    if (!acd.IsProperValid() ||
+                        DataDictionary.ExcludedActorTypes.Contains(actorType) ||
+                        DataDictionary.ExcludedActorIds.Contains(guid) ||
                         acd is ACDItem && (acd as ACDItem).InventorySlot != InventorySlot.None) // Ignore Non-Ground Items
                     {
                         excludedCount++;
                         continue;
                     }
 
-                    CachedObjects.AddOrUpdate(acd.ACDGuid, i =>
+                    CachedObjects.AddOrUpdate(guid, i =>
                     {
                         addedCount++;
-                        return CacheFactory.CreateTypedTrinityObject(acd);
+                        return CacheFactory.CreateTypedTrinityObject(acd, actorType, guid);
 
                     }, (key, existingActor) =>
                     {
@@ -294,7 +310,7 @@ namespace Trinity.LazyCache
                 }
             }
 
-            using (new PerformanceLogger("LazyCache.Update.Purge"))
+            using (new PerformanceLogger("LazyCache.Update.Purge", true))
             {
                 CachedObjects.ForEach(o =>
                 {
@@ -307,7 +323,7 @@ namespace Trinity.LazyCache
                 });
             }
 
-            _actorsByRActorGuid = CachedObjects.Values.OfType<TrinityObject>().DistinctBy(i => i.RActorGuid).ToDictionary(k => k.RActorGuid, v => v);
+            _actorsByRActorGuid = CachedObjects.Values.DistinctBy(i => i.RActorGuid).ToDictionary(k => k.RActorGuid, v => v);
 
             stopwatch.Stop();
 

@@ -19,6 +19,11 @@ namespace Trinity.LazyCache
             AvoidanceStartTime = CacheManager.LastUpdated;
         }
 
+        public TrinityAvoidance(ACD acd, int acdGuid) : base(acd, acdGuid)
+        {
+            AvoidanceStartTime = CacheManager.LastUpdated;
+        }
+
         #region Fields
 
         private readonly CacheField<float> _avoidanceHealth = new CacheField<float>(UpdateSpeed.Ultra);

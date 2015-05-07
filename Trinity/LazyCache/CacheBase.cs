@@ -27,6 +27,12 @@ namespace Trinity.LazyCache
 
         public CacheBase() { }
 
+        public CacheBase(ACD acd, int acdGuid)
+        {
+            ACDGuid = acdGuid;
+            Source = acd;
+        }
+
         public CacheBase(ACD acd)
         {
             ACDGuid = acd.ACDGuid;     
@@ -46,6 +52,10 @@ namespace Trinity.LazyCache
         private readonly CacheField<ActorType> _actorType = new CacheField<ActorType>(500);
         private readonly CacheField<DiaObject> _object = new CacheField<DiaObject>();
         private readonly CacheField<ACD> _source = new CacheField<ACD>();
+        private readonly CacheField<DiaItem> _diaItem = new CacheField<DiaItem>();
+        private readonly CacheField<ACDItem> _acdItem = new CacheField<ACDItem>();
+        private readonly CacheField<DiaGizmo> _diaGizmo = new CacheField<DiaGizmo>();
+        private readonly CacheField<DiaUnit> _diaUnit = new CacheField<DiaUnit>();
 
         #endregion
 
@@ -69,7 +79,11 @@ namespace Trinity.LazyCache
         /// </summary>
         public TrinityObjectType TrinityType
         {
-            get { return _trinityType.IsCacheValid ? _trinityType.CachedValue : (_trinityType.CachedValue = TrinityObject.GetTrinityObjectType(Source)); }
+            get
+            {
+                if (_trinityType.IsCacheValid) return _trinityType.CachedValue;
+                else return _trinityType.CachedValue = TrinityObject.GetTrinityObjectType(Source, ActorType);
+            }
             set { _trinityType.SetValueOverride(value); }
         }
 
@@ -78,7 +92,11 @@ namespace Trinity.LazyCache
         /// </summary>
         public ActorType ActorType
         {
-            get { return _actorType.IsCacheValid ? _actorType.CachedValue : (_actorType.CachedValue = Source.ActorType); }
+            get
+            {
+                if (_actorType.IsCacheValid) return _actorType.CachedValue;
+                else return _actorType.CachedValue = Source.ActorType;
+            }
             set { _actorType.SetValueOverride(value); }
         }
 
@@ -87,7 +105,11 @@ namespace Trinity.LazyCache
         /// </summary>
         public DiaObject Object
         {
-            get { return _object.IsCacheValid ? _object.CachedValue : (_object.CachedValue = CacheManager.GetRActorOfTypeByACDGuid<DiaObject>(ACDGuid)); }
+            get
+            {
+                if (_object.IsCacheValid) return _object.CachedValue;
+                else return _object.CachedValue = CacheManager.GetRActorOfTypeByACDGuid<DiaObject>(ACDGuid);
+            }
             set { _object.SetValueOverride(value); }
         }
 
@@ -96,7 +118,11 @@ namespace Trinity.LazyCache
         /// </summary>
         public ACD Source
         {
-            get { return _source.IsCacheValid ? _source.CachedValue : ACDGuid != 0 ? (_source.CachedValue = ZetaDia.Actors.GetACDById(ACDGuid)) : null; }
+            get
+            {
+                if (_source.IsCacheValid) return _source.CachedValue;
+                else return ACDGuid != 0 ? (_source.CachedValue = ZetaDia.Actors.GetACDByGuid(ACDGuid)) : null;
+            }
             set { _source.SetValueOverride(value); }
         }
 
@@ -105,7 +131,11 @@ namespace Trinity.LazyCache
         /// </summary>
         public DiaGizmo Gizmo
         {
-            get { return Object as DiaGizmo; }
+            get
+            {
+                if (_diaGizmo.IsCacheValid) return _diaGizmo.CachedValue;
+                return ACDGuid != 0 ? (_diaGizmo.CachedValue = Object as DiaGizmo) : null;
+            }
         }
 
         /// <summary>
@@ -113,16 +143,23 @@ namespace Trinity.LazyCache
         /// </summary>
         public ACDItem Item
         {
-            get { return Source as ACDItem; }
+            get
+            {
+                if (_acdItem.IsCacheValid) return _acdItem.CachedValue;
+                return ACDGuid != 0 ? (_acdItem.CachedValue = Source as ACDItem) : null;
+            }
         }
-
 
         /// <summary>
         /// DB's actual Gizmo (accessing properties reads directly from Diablo memory)
         /// </summary>
         public DiaItem DiaItem
         {
-            get { return Object as DiaItem; }
+            get
+            {
+                if (_diaItem.IsCacheValid) return _diaItem.CachedValue;
+                return ACDGuid != 0 ? (_diaItem.CachedValue = Object as DiaItem) : null;
+            }
         }
 
         /// <summary>
@@ -132,7 +169,8 @@ namespace Trinity.LazyCache
         {
             get
             {
-                return Object as DiaUnit;
+                if (_diaUnit.IsCacheValid) return _diaUnit.CachedValue;
+                return ACDGuid != 0 ? (_diaUnit.CachedValue = Object as DiaUnit) : null;
             }
         }
 

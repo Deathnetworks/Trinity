@@ -26,6 +26,7 @@ namespace Trinity.LazyCache
         public TrinityObject() { }
         public TrinityObject(int acdGuid) : base(acdGuid) { }
         public TrinityObject(ACD acd) : base(acd) { }
+        public TrinityObject(ACD acd, int acdGuid) : base(acd, acdGuid) { }
 
         #endregion
 
@@ -71,7 +72,7 @@ namespace Trinity.LazyCache
         private readonly CacheField<bool> _isInvulnerable = new CacheField<bool>();
         private readonly CacheField<bool> _isBlocking = new CacheField<bool>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isNoDamage = new CacheField<bool>();
-        private readonly CacheField<double> _weight = new CacheField<double>(UpdateSpeed.Fast);
+        private readonly CacheField<double> _weight = new CacheField<double>(UpdateSpeed.Normal);
         private readonly CacheField<SNORecordMonster> _monsterInfo = new CacheField<SNORecordMonster>();
 
         #endregion
@@ -465,7 +466,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsLastTarget
         {
-            get { return Trinity.LastTargetRactorGUID != ACDGuid; }
+            get { return false; } //Trinity.LastTargetRactorGUID != ACDGuid; }
         }
 
         /// <summary>
@@ -511,18 +512,19 @@ namespace Trinity.LazyCache
             }
         }
 
+        public static TrinityObjectType GetTrinityObjectType(ACD source, ActorType actorType)
+        {
+            var id = source.ActorSNO;
+            var internalName = source.Name;
+            var gizmoType = source.GizmoType;
+            return GetTrinityObjectType(source, actorType, id, gizmoType, internalName);
+        }
+
         /// <summary>
         /// Trinity's actor type.
         /// </summary>
-        internal static TrinityObjectType GetTrinityObjectType(ACD acd)
+        internal static TrinityObjectType GetTrinityObjectType(ACD acd, ActorType actorType, int actorSNO, GizmoType gizmoType, string internalName)
         {
-            var id = acd.ActorSNO;
-            var snoActor = (SNOActor)id;
-            var actorType = acd.ActorType;
-            var internalName = acd.Name;
-            var gizmoType = acd.GizmoType;
-            var isItem = acd is ACDItem;
-
             //Non-hostile monster types will throw exceptions almost all DiaUnit properties, despite being classified as a unit.
             if (actorType == ActorType.Monster && !DataDictionary.NonHostileMonsterTypes.Contains(acd.MonsterInfo.MonsterType))
                 return TrinityObjectType.Unit;
@@ -533,19 +535,19 @@ namespace Trinity.LazyCache
             if (internalName.Contains("CursedShrine"))
                 return TrinityObjectType.CursedShrine;
 
-            if (DataDictionary.Shrines.Any(s => s == snoActor))
+            if (DataDictionary.Shrines.Any(s => s == (SNOActor)actorSNO))
                 return TrinityObjectType.Shrine;
 
-            if (isItem && internalName.ToLower().Contains("gold"))
+            if (acd is ACDItem && internalName.ToLower().Contains("gold"))
                 return TrinityObjectType.Gold;
 
-            if (actorType == ActorType.Item || DataDictionary.ForceToItemOverrideIds.Contains(id))
+            if (actorType == ActorType.Item || DataDictionary.ForceToItemOverrideIds.Contains(actorSNO))
                 return TrinityObjectType.Item;
 
-            if (DataDictionary.InteractWhiteListIds.Contains(id))
+            if (DataDictionary.InteractWhiteListIds.Contains(actorSNO))
                 return TrinityObjectType.Interactable;
 
-            if (AvoidanceManager.GetAvoidanceType(id) != AvoidanceType.None)
+            if (AvoidanceManager.GetAvoidanceType(actorSNO) != AvoidanceType.None)
                 return TrinityObjectType.Avoidance;
 
             if (actorType == ActorType.Gizmo)
@@ -739,5 +741,7 @@ namespace Trinity.LazyCache
         }
 
         #endregion
+
+
     }
 }
