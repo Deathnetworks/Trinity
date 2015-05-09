@@ -36,7 +36,7 @@ namespace Trinity.Combat.Weighting
                 return weightFactors;
             }
 
-            weightFactors.Add(new Weight(Math.Max((175 - item.Distance) / 175 * WeightManager.MaxWeight, 100d), WeightMethod.Set, WeightReason.StartingWeight));
+            weightFactors.Add(new Weight(Math.Max((175 - item.Distance) / 175 * WeightManager.MaxWeight, 100d), WeightMethod.Set, WeightReason.Start));
             weightFactors.TryAddWeight(cacheObject, WeightReason.PreviousTarget, 800);
 
             // Ignore gold in AoE
@@ -77,7 +77,7 @@ namespace Trinity.Combat.Weighting
             }
 
             // Default Weight
-            weightFactors.Add(new Weight(Math.Max((175 - item.Distance) / 175 * WeightManager.MaxWeight, 100d), WeightMethod.Set, WeightReason.StartingWeight));
+            weightFactors.Add(new Weight(Math.Max((175 - item.Distance) / 175 * WeightManager.MaxWeight, 100d), WeightMethod.Set, WeightReason.Start));
 
             // Don't pickup items if we're doing a TownRun
             if (TrinityItemManager.FindValidBackpackLocation(item.IsTwoSquareItem) == new Vector2(-1, -1))

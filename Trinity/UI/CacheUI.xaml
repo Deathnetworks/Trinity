@@ -50,8 +50,8 @@
                         <DataGridTextColumn Width="100" IsReadOnly="True" Binding="{Binding Path=MarkerHash}" Header="MarkerHash" />
                         <DataGridTextColumn Width="100" IsReadOnly="True" Binding="{Binding Path=MinimapTexture}" Header="MinimapTexture" />
                         <!--<DataGridTextColumn Width="80" IsReadOnly="True" Binding="{Binding Path=RActorGUID}" Header="RActorGUID" />
-                <DataGridTextColumn Width="70" IsReadOnly="True" Binding="{Binding Path=ActorSNO}" Header="ActorSNO" />-->
-                    </DataGrid.Columns>
+                <DataGridTextColumn Width="70" IsReadOnly="True" Binding="{Binding Path=ActorSNO}" Header="ActorSNO" />--> 
+                </DataGrid.Columns>
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
                         <Setter Property="TextElement.Foreground" Value="DarkGray"/>
@@ -90,6 +90,7 @@
                         <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=Radius, StringFormat={}{0:N2}}" Header="Radius" />                        
                         <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=CurrentAnimation}" Header="Animation" />
                         <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=IsInLineOfSight}" Header="LOS" />
+                        <DataGridTextColumn Width="Auto" IsReadOnly="True" Binding="{Binding Path=WeightReasons}" Header="WeightReasons" />
                     </DataGrid.Columns>
                     <DataGrid.RowStyle>
                     <Style TargetType="DataGridRow">

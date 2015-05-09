@@ -46,7 +46,7 @@ namespace Trinity.Combat.Weighting
             }
 
             // Weight Interactable Specials
-            weightFactors.Add(new Weight((300d - cacheObject.Distance) / 300d * 1000d, WeightMethod.Set, WeightReason.StartingWeight));
+            weightFactors.Add(new Weight((300d - cacheObject.Distance) / 300d * 1000d, WeightMethod.Set, WeightReason.Start));
 
             weightFactors.TryAddWeight(cacheObject, WeightReason.CloseProximity);
 

@@ -19,7 +19,7 @@ namespace Trinity.LazyCache
             AvoidanceStartTime = CacheManager.LastUpdated;
         }
 
-        public TrinityAvoidance(ACD acd, int acdGuid) : base(acd, acdGuid)
+        public TrinityAvoidance(ACD acd, int acdGuid, bool loadActorProps = true) : base(acd, acdGuid, loadActorProps)
         {
             AvoidanceStartTime = CacheManager.LastUpdated;
         }

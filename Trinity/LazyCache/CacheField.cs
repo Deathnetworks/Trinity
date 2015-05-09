@@ -76,14 +76,14 @@ namespace Trinity.LazyCache
                 if (Delay == (int) UpdateSpeed.Once)
                     return true;
 
+                // Always use cache for requests on the same DB pulse
+                if (CacheManager.LastUpdated.Ticks == LastUpdate.Ticks)
+                    return true;
+
                 // Always update if set to realtime
                 if (Delay == (int) UpdateSpeed.RealTime)
                     return false;
 
-                // Always use cache for requests on the same DB pulse
-                if (CacheManager.LastUpdated.Ticks == LastUpdate.Ticks)
-                    return true;
-                
                 // Use cache value if delay hasnt passed yet.
                 if (CacheManager.LastUpdated.Subtract(LastUpdate).TotalMilliseconds >= Delay)
                     return false;

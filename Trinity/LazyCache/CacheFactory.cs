@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 using Logger = Trinity.Technicals.Logger;
@@ -27,39 +28,33 @@ namespace Trinity.LazyCache
         /// <summary>
         /// Converts an ACD into the appropriate Trinity object
         /// </summary>
-        public static TrinityObject CreateTypedTrinityObject(ACD acd, ActorType actorType, int acdGuid)
+        public static TrinityObject CreateTypedTrinityObject(ACD acd, ActorType actorType, int acdGuid, int sno)
         {
-            var gizmoType = acd.GizmoType;
-            var actorSNO = acd.ActorSNO;
-            var internalName = acd.Name;
-            var trinityType = TrinityObject.GetTrinityObjectType(acd, actorType, actorSNO, gizmoType, internalName);
+            var baseObj = new CacheBase(acd, acdGuid)
+            {
+                ActorType = actorType,
+                ActorSNO = sno                
+            };
 
             TrinityObject result;
 
-            if (actorType == ActorType.Monster && trinityType == TrinityObjectType.Unit)
-                result = new TrinityUnit(acd, acdGuid);
+            if (actorType == ActorType.Monster && baseObj.TrinityType == TrinityObjectType.Unit)
+                result = baseObj.ToTrinityUnit();
 
-            else if (actorType == ActorType.Gizmo)
-                result = new TrinityGizmo(acd, acdGuid);
+            else if (baseObj.ActorType == ActorType.Gizmo)
+                result = baseObj.ToTrinityGizmo();
 
-            else if(actorType == ActorType.Item && trinityType == TrinityObjectType.Item)
-                result = new TrinityItem(acd, acdGuid);
+            else if (baseObj.ActorType == ActorType.Item && baseObj.TrinityType == TrinityObjectType.Item)
+                result = baseObj.ToTrinityItem();
 
-            else if(actorType == ActorType.Player && trinityType == TrinityObjectType.Player)
+            else if (baseObj.ActorType == ActorType.Player && baseObj.TrinityType == TrinityObjectType.Player)
                 result = new TrinityPlayer(acd, acdGuid);
 
-            else if (trinityType == TrinityObjectType.Avoidance)
-                result = new TrinityAvoidance(acd, acdGuid);
+            else if (baseObj.TrinityType == TrinityObjectType.Avoidance)
+                result = baseObj.ToTrinityAvoidance();
 
             else
-                result = new TrinityObject(acd, acdGuid);
-
-            // Assign the properties we've used so far so they're only called once
-            result.ActorType = actorType;
-            result.TrinityType = trinityType;
-            result.ActorSNO = actorSNO;
-            result.InternalName = internalName;
-            result.GizmoType = gizmoType;
+                result = baseObj.ToTrinityObject();
 
             return result;
         }

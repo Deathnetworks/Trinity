@@ -13,6 +13,16 @@ namespace Trinity.Combat.Weighting
     public static class WeightUtilities
     {
         /// <summary>
+        /// Utility for setting a weight and returning the collection
+        /// </summary>
+        public static List<Weight> Return(this List<Weight> weightFactors, WeightReason reason, double value = 0)        
+        {
+            weightFactors.Add(new Weight(0, WeightMethod.Set, reason));
+            return weightFactors;
+        }
+
+
+        /// <summary>
         /// Utility for common weight factors
         /// </summary>
         public static bool TryAddWeight(this List<Weight> weightFactors, TrinityObject cacheObject, WeightReason reason, double value = -1, WeightMethod method = WeightMethod.None)

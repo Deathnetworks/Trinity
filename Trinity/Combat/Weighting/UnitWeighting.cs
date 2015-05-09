@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.LazyCache;
+using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
@@ -21,12 +22,90 @@ namespace Trinity.Combat.Weighting
         public static IEnumerable<Weight> GetWeight(TrinityObject cacheObject)
         {
             var weightFactors = new List<Weight>();
-            //var unit = cacheObject as TrinityUnit;
-            //if (unit == null)
-            //{
-            //    weightFactors.Add(new Weight(0, WeightMethod.Set, WeightReason.InvalidType));
-            //    return weightFactors;
-            //}
+            var unit = cacheObject as TrinityUnit;            
+            
+            /*
+             * Ignore rules 
+             * 
+             * */
+
+            if (unit == null)
+                return weightFactors.Return(WeightReason.InvalidType);
+
+            if (unit.IsSummonedByPlayer)
+                return weightFactors.Return(WeightReason.IsSummon);
+
+            if (!unit.IsHostile)
+                return weightFactors.Return(WeightReason.NotHostile);
+
+            if (unit.IsDead)
+                return weightFactors.Return(WeightReason.DeadUnit);
+
+            if (unit.HasShieldingAffix && unit.IsInvulnerable)
+                return weightFactors.Return(WeightReason.NotAttackable);
+
+            if(unit.IsBoss && CombatContext.ShouldIgnoreBosses)
+                return weightFactors.Return(WeightReason.IgnoreBosses);
+
+            if (unit.IsEliteRareUnique && CombatContext.ShouldIgnoreElites)
+                return weightFactors.Return(WeightReason.IgnoreElites);
+            
+            if (unit.IsTrash && CombatContext.ShouldIgnoreTrashMobs)
+                return weightFactors.Return(WeightReason.IgnoreTrash);
+
+            if (!unit.IsBoss && !unit.IsGoblin)
+            {
+                if (Trinity.Settings.Combat.Misc.IgnoreTrashBelowHealth > 0 && unit.CurrentHealthPct < Trinity.Settings.Combat.Misc.IgnoreTrashBelowHealth)
+                    return weightFactors.Return(WeightReason.IgnoreHealth);
+
+                if (Trinity.Settings.Combat.Misc.IgnoreTrashBelowHealthDoT > 0 && unit.HasDotDps && unit.CurrentHealthPct < Trinity.Settings.Combat.Misc.IgnoreTrashBelowHealthDoT)
+                    return weightFactors.Return(WeightReason.IgnoreHealthDot);
+            }
+
+            if (Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Ignore && unit.IsGoblin)
+                return weightFactors.Return(WeightReason.GoblinIgnore);
+
+            /*
+             * Force Kill Rules
+             * 
+             * */
+
+            if (Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze && unit.IsGoblin)
+                return weightFactors.Return(WeightReason.GoblinKamikaze, WeightManager.MaxWeight);
+
+            /*
+             * Unit Weighting
+             * 
+             * */
+
+            weightFactors.Add(new Weight(5000, WeightMethod.Set, WeightReason.Start));
+
+            if(unit.IsBoss)
+                weightFactors.Add(new Weight(30000, WeightMethod.Add, WeightReason.IsBoss));
+
+            if(unit.IsEliteRareUnique)
+                weightFactors.Add(new Weight(15000, WeightMethod.Add, WeightReason.IsElite));
+
+            // Distance - Negative weight for units beyond kill radius, positive weight to those closer
+            weightFactors.Add(new Weight((CombatContext.KillRadius - unit.Distance) * 100, WeightMethod.Add, WeightReason.Distance));
+
+            if (Trinity.Settings.Combat.Misc.ForceKillSummoners && unit.IsSummoner)
+                weightFactors.Add(new Weight(1000, WeightMethod.Add, WeightReason.Summoner));
+
+            // Clustering - Add weight to groups of units.
+            weightFactors.Add(new Weight(unit.UnitsNearby * 250, WeightMethod.Add, WeightReason.Cluster));
+
+            // Avoidance - Reduce weight for units in avoidance
+            if (CacheManager.Me.IsMelee && unit.IsStandingInAvoidance)
+                weightFactors.Add(new Weight(0.5, WeightMethod.Multiply, WeightReason.InAvoidance));
+
+            // Goblin Priority
+            if (Trinity.Settings.Combat.Misc.GoblinPriority == GoblinPriority.Prioritize && unit.IsGoblin)
+                weightFactors.Add(new Weight(10000, WeightMethod.Add, WeightReason.GoblinPriority));
+
+
+
+
 
             //if (unit.IsTownVendor || !unit.IsAttackable)
             //{

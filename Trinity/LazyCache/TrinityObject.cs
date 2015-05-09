@@ -23,10 +23,9 @@ namespace Trinity.LazyCache
     {
         #region Constructors
 
-        public TrinityObject() { }
         public TrinityObject(int acdGuid) : base(acdGuid) { }
         public TrinityObject(ACD acd) : base(acd) { }
-        public TrinityObject(ACD acd, int acdGuid) : base(acd, acdGuid) { }
+        public TrinityObject(ACD acd, int acdGuid, bool loadActorProps) : base(acd, acdGuid, loadActorProps) { }
 
         #endregion
 
@@ -36,7 +35,6 @@ namespace Trinity.LazyCache
         private readonly CacheField<int> _rActorGuid = new CacheField<int>();
         private readonly CacheField<Vector3> _position = new CacheField<Vector3>(UpdateSpeed.Ultra);
         private readonly CacheField<float> _distance = new CacheField<float>(UpdateSpeed.Fast);
-        private readonly CacheField<int> _actorSNO = new CacheField<int>();
         private readonly CacheField<SNOAnim> _currentAnimation = new CacheField<SNOAnim>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isInLineOfSight = new CacheField<bool>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isNavigationObstacle = new CacheField<bool>();
@@ -49,7 +47,6 @@ namespace Trinity.LazyCache
         private readonly CacheField<int> _balanceId = new CacheField<int>();
         private readonly CacheField<int> _minimapVisibilityFlags = new CacheField<int>();
         private readonly CacheField<int> _worldDynamicId = new CacheField<int>();
-        private readonly CacheField<SNORecordActor> _actorInfo = new CacheField<SNORecordActor>();
         private readonly CacheField<ACDAnimationInfo> _animationInfo = new CacheField<ACDAnimationInfo>();
         private readonly CacheField<AnimationState> _animationState = new CacheField<AnimationState>(UpdateSpeed.Fast);
         private readonly CacheField<GameBalanceType> _gameBalanceType = new CacheField<GameBalanceType>();
@@ -73,7 +70,6 @@ namespace Trinity.LazyCache
         private readonly CacheField<bool> _isBlocking = new CacheField<bool>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isNoDamage = new CacheField<bool>();
         private readonly CacheField<double> _weight = new CacheField<double>(UpdateSpeed.Normal);
-        private readonly CacheField<SNORecordMonster> _monsterInfo = new CacheField<SNORecordMonster>();
 
         #endregion
 
@@ -122,15 +118,6 @@ namespace Trinity.LazyCache
         {
             get { return _distance.IsCacheValid ? _distance.CachedValue : (_distance.CachedValue = GetDistance(this)); }
             set { _distance.SetValueOverride(value); }
-        }
-
-        /// <summary>
-        /// Unique identifier for the actor
-        /// </summary>
-        public int ActorSNO
-        {
-            get { return _actorSNO.IsCacheValid ? _actorSNO.CachedValue : (_actorSNO.CachedValue = Source.ActorSNO); }
-            set { _actorSNO.SetValueOverride(value); }
         }
 
         /// <summary>
@@ -183,7 +170,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public Sphere CollisionSphere
         {
-            get { return _collisionSphere.IsCacheValid ? _collisionSphere.CachedValue : (_collisionSphere.CachedValue = Source.ActorInfo.Sphere); }
+            get { return _collisionSphere.IsCacheValid ? _collisionSphere.CachedValue : (_collisionSphere.CachedValue = ActorInfo.Sphere); }
             set { _collisionSphere.SetValueOverride(value); }
         }
 
@@ -239,15 +226,6 @@ namespace Trinity.LazyCache
         {
             get { return _worldDynamicId.IsCacheValid ? _worldDynamicId.CachedValue : (_worldDynamicId.CachedValue = GetSourceProperty(x => x.WorldDynamicId)); }
             set { _worldDynamicId.SetValueOverride(value); }
-        }
-
-        /// <summary>
-        /// Source for detailed actor info like collision Sphere, Bounds, GizmoType, ArtisanType etc (accessing properties reads directly from Diablo memory)
-        /// </summary>
-        public SNORecordActor ActorInfo
-        {
-            get { return _actorInfo.IsCacheValid ? _actorInfo.CachedValue : (_actorInfo.CachedValue = GetSourceProperty(x => x.ActorInfo)); }
-            set { _actorInfo.SetValueOverride(value); }
         }
 
         /// <summary>
@@ -483,6 +461,12 @@ namespace Trinity.LazyCache
         /// </summary>
         public List<Weight> WeightFactors = new List<Weight>();
 
+
+        public string WeightReasons 
+        {
+            get { return string.Join(", ", WeightFactors.Select(x => x.ToString()).ToArray()); }
+        }
+
         #endregion
 
         #region Methods
@@ -525,9 +509,14 @@ namespace Trinity.LazyCache
         /// </summary>
         internal static TrinityObjectType GetTrinityObjectType(ACD acd, ActorType actorType, int actorSNO, GizmoType gizmoType, string internalName)
         {
-            //Non-hostile monster types will throw exceptions almost all DiaUnit properties, despite being classified as a unit.
-            if (actorType == ActorType.Monster && !DataDictionary.NonHostileMonsterTypes.Contains(acd.MonsterInfo.MonsterType))
-                return TrinityObjectType.Unit;
+                       
+            if (actorType == ActorType.Monster)
+            {
+                // Exclude Non-hostile monster types as they will throw lots of exceptions on DiaUnit properties
+                //var monsterInfo = GetMonsterInfo(acd, actorSNO);
+                //if(monsterInfo != null) // && !DataDictionary.NonHostileMonsterTypes.Contains(monsterInfo.MonsterType))
+                    return TrinityObjectType.Unit;
+            }                
 
             if (internalName.Contains("CursedChest"))
                 return TrinityObjectType.CursedChest;
@@ -620,10 +609,10 @@ namespace Trinity.LazyCache
         {
             var pos = o.Position;
 
-            // Position/Distance on Ground Items must be called on the ACDItem/DiaItem (not the ACD)
+            // Position/Distance only works for Ground Items if called on DiaItem
             if (o.ActorType == ActorType.Item && o.Source is ACDItem)
             {
-                if(o.Item != null && o.Item.IsValid)
+                if (o.Item != null && o.Item.IsValid)
                     pos = o.GetDiaItemProperty(x => x.Position);
             }
 
@@ -648,7 +637,7 @@ namespace Trinity.LazyCache
         internal static MonsterType GetMonsterType(TrinityObject o)
         {
             MonsterType monsterTypeOverride;
-            return DataDictionary.MonsterTypeOverrides.TryGetValue(o.ActorSNO, out monsterTypeOverride) ? monsterTypeOverride : o.GetSourceProperty(x => x.MonsterInfo.MonsterType);
+            return DataDictionary.MonsterTypeOverrides.TryGetValue(o.ActorSNO, out monsterTypeOverride) ? monsterTypeOverride : o.MonsterInfo.MonsterType;
         }
 
         /// <summary>
@@ -720,15 +709,6 @@ namespace Trinity.LazyCache
                 return o.Item.Name;
 
             return o.InternalName;
-        }
-
-        /// <summary>
-        /// Soruce for monster information
-        /// </summary>
-        public SNORecordMonster MonsterInfo
-        {
-            get { return _monsterInfo.IsCacheValid ? _monsterInfo.CachedValue : (_monsterInfo.CachedValue = GetSourceProperty(x => x.MonsterInfo)); }
-            set { _monsterInfo.SetValueOverride(value); }
         }
 
         #endregion

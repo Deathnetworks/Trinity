@@ -33,14 +33,14 @@ namespace Trinity.Combat.Weighting
 
             // Weight Containers
             float maxOpenRange = cacheObject.InternalName.ToLower().Contains("chest_rare") ? 250 : Trinity.Settings.WorldObject.ContainerOpenRange;
-            weightFactors.Add(new Weight((maxOpenRange - cacheObject.Distance) / maxOpenRange * 100d, WeightMethod.Set, WeightReason.StartingWeight));
+            weightFactors.Add(new Weight((maxOpenRange - cacheObject.Distance) / maxOpenRange * 100d, WeightMethod.Set, WeightReason.Start));
 
             weightFactors.TryAddWeight(cacheObject, WeightReason.CloseProximity, 600);
 
             // Open container for the damage buff
             if (Legendary.HarringtonWaistguard.IsEquipped && !Legendary.HarringtonWaistguard.IsBuffActive &&
                 ZetaDia.Me.IsInCombat && cacheObject.Distance < 80f || CombatContext.ShouldPrioritizeContainers)
-                weightFactors.Add(new Weight(20000, WeightMethod.Add, WeightReason.StartingWeight));
+                weightFactors.Add(new Weight(20000, WeightMethod.Add, WeightReason.Start));
 
             weightFactors.TryAddWeight(cacheObject, WeightReason.PreviousTarget);
             weightFactors.TryAddWeight(cacheObject, WeightReason.MonsterInLoS, 0.5, WeightMethod.Multiply);

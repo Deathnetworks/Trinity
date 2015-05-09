@@ -18,7 +18,7 @@ namespace Trinity.LazyCache
     public class TrinityGizmo : TrinityObject
     {
         public TrinityGizmo(ACD acd) : base(acd) { }
-        public TrinityGizmo(ACD acd, int acdGuid) : base(acd, acdGuid) { }
+        public TrinityGizmo(ACD acd, int acdGuid, bool loadActorProps = true) : base(acd, acdGuid, loadActorProps) { }
 
         #region Fields
 

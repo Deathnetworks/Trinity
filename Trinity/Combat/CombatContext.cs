@@ -87,12 +87,12 @@ namespace Trinity.Combat
                 var trashRadius = 0f;
 
                 if (CacheManager.EliteRareUniqueBoss.Any())
-                    eliteRadius = Trinity.Settings.Combat.Misc.NonEliteRange;
+                    eliteRadius = Trinity.Settings.Combat.Misc.EliteRange;
 
                 if (CacheManager.Trash.Any())
                     trashRadius = Trinity.Settings.Combat.Misc.NonEliteRange;
                 
-                return _killRadius.CachedValue = Math.Max(trashRadius,eliteRadius);
+                return _killRadius.CachedValue = Math.Min(trashRadius,eliteRadius);
             }
         }
 

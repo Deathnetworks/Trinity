@@ -33,7 +33,7 @@ namespace Trinity
         public TrinityItemType TrinityItemType { get; set; }
         public FollowerType FollowerType { get; set; }
         public bool IsUnidentified { get; set; }
-        public int ItemStackQuantity { get; set; }
+        public long ItemStackQuantity { get; set; }
         public float Dexterity { get; set; }
         public float Intelligence { get; set; }
         public float Strength { get; set; }

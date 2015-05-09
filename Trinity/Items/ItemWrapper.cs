@@ -39,7 +39,7 @@ namespace Trinity.Items
         public ItemQuality ItemQualityLevel { get; set; }
         public GemQuality GemQuality { get; set; }
         public int TieredLootRunKeyLevel { get; set; }
-        public int ItemStackQuantity { get; set; }
+        public long ItemStackQuantity { get; set; }
         public bool IsSetItem { get; set; }
         public string ItemSetName { get; set; }
 

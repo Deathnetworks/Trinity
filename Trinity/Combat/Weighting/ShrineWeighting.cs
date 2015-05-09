@@ -36,7 +36,7 @@ namespace Trinity.Combat.Weighting
             var priorityShrines = Trinity.Settings.WorldObject.HiPriorityShrines;
             var startingWeight = priorityShrines ? WeightManager.MaxWeight * 0.75 : Math.Max(((maxRange - cacheObject.RadiusDistance) / maxRange * 15000d), 100d);
 
-            weightFactors.Add(new Weight(startingWeight, WeightMethod.Set, WeightReason.StartingWeight));
+            weightFactors.Add(new Weight(startingWeight, WeightMethod.Set, WeightReason.Start));
 
             // Very close shrines get a weight increase
             if (cacheObject.Distance <= 30f)

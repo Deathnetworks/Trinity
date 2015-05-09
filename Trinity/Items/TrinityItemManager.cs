@@ -1054,7 +1054,7 @@ namespace Trinity.Items
                     // Potion filtering
                     if (itemType == TrinityItemType.HealthPotion && item.Quality < ItemQuality.Legendary)
                     {
-                        int potionsInBackPack = ZetaDia.Me.Inventory.Backpack.Where(p => p.ItemType == ItemType.Potion).Sum(p => p.ItemStackQuantity);
+                        long potionsInBackPack = ZetaDia.Me.Inventory.Backpack.Where(p => p.ItemType == ItemType.Potion).Sum(p => p.ItemStackQuantity);
 
                         if (potionsInBackPack >= Trinity.Settings.Loot.Pickup.PotionCount)
                             return false;

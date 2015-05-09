@@ -19,7 +19,7 @@ namespace Trinity.LazyCache
     public class TrinityUnit : TrinityObject
     {
         public TrinityUnit(ACD acd) : base(acd) { }
-        public TrinityUnit(ACD acd, int acdGuid) : base(acd, acdGuid) { }
+        public TrinityUnit(ACD acd, int acdGuid, bool loadActorProps = true) : base(acd, acdGuid, loadActorProps) { }
 
         #region Fields
 
@@ -107,7 +107,6 @@ namespace Trinity.LazyCache
         private readonly CacheField<double> _killRange = new CacheField<double>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isSummoner = new CacheField<bool>(UpdateSpeed.Slow);
         private readonly CacheField<bool> _isChargeTarget = new CacheField<bool>();
-        
 
         #endregion
 
@@ -118,7 +117,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public float HitpointsCurrent
         {
-            get { return _hitpointsCurrent.IsCacheValid ? _hitpointsCurrent.CachedValue : (_hitpointsCurrent.CachedValue = GetUnitProperty(x => x.HitpointsCurrent)); }
+            get { return _hitpointsCurrent.IsCacheValid ? _hitpointsCurrent.CachedValue : (_hitpointsCurrent.CachedValue = Source.GetAttributeOrDefault<float>(ActorAttributeType.HitpointsCur)); }
             set { _hitpointsCurrent.SetValueOverride(value); }
         }
 
@@ -208,7 +207,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsSummonedByPlayer
         {
-            get { return _isSummonedByPlayer.IsCacheValid ? _isSummonedByPlayer.CachedValue : (_isSummonedByPlayer.CachedValue = SummonedByACDId == CacheManager.Me.DynamicId || PetCreatorACDId == ZetaDia.Me.ACDGuid); }
+            get { return _isSummonedByPlayer.IsCacheValid ? _isSummonedByPlayer.CachedValue : (_isSummonedByPlayer.CachedValue = SummonedByACDId == CacheManager.Me.DynamicId || PetCreatorACDId == ZetaDia.Me.ACDGuid || PetType != SummonType.Unknown); }
             set { _isSummonedByPlayer.SetValueOverride(value); }
         }
 
@@ -361,7 +360,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public MonsterRace MonsterRace
         {
-            get { return _monsterRace.IsCacheValid ? _monsterRace.CachedValue : (_monsterRace.CachedValue = GetUnitProperty(x => x.MonsterInfo.MonsterRace)); }
+            get { return _monsterRace.IsCacheValid ? _monsterRace.CachedValue : (_monsterRace.CachedValue = MonsterInfo.MonsterRace); }
             set { _monsterRace.SetValueOverride(value); }
         }
 
@@ -370,7 +369,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public MonsterSize MonsterSize
         {
-            get { return _monsterSize.IsCacheValid ? _monsterSize.CachedValue : (_monsterSize.CachedValue = GetUnitProperty(x => x.MonsterInfo.MonsterSize)); }
+            get { return _monsterSize.IsCacheValid ? _monsterSize.CachedValue : (_monsterSize.CachedValue = MonsterInfo.MonsterSize); }
             set { _monsterSize.SetValueOverride(value); }
         }
 
@@ -413,7 +412,7 @@ namespace Trinity.LazyCache
         /// <summary>
         /// Is a treasure goblin
         /// </summary>
-        public bool IsTreasureGoblin
+        public bool IsGoblin
         {
             get { return _isTreasureGoblin.IsCacheValid ? _isTreasureGoblin.CachedValue : (_isTreasureGoblin.CachedValue = DataDictionary.GoblinIds.Contains(ActorSNO) || InternalName.ToLower().StartsWith("treasureGoblin")); }
             set { _isTreasureGoblin.SetValueOverride(value); }
@@ -442,7 +441,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsTrash
         {
-            get { return _isTrash.IsCacheValid ? _isTrash.CachedValue : (_isTrash.CachedValue = !(IsBossOrEliteRareUnique || IsTreasureGoblin)); }
+            get { return _isTrash.IsCacheValid ? _isTrash.CachedValue : (_isTrash.CachedValue = !(IsBossOrEliteRareUnique || IsGoblin)); }
             set { _isTrash.SetValueOverride(value); }
         }
 
@@ -559,9 +558,14 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsDead
         {
-            get { return _isDead.IsCacheValid ? _isDead.CachedValue : (_isDead.CachedValue = GetUnitProperty(x => x.HitpointsCurrent <= 0)); }
+            get
+            {
+                if (_isDead.IsCacheValid) return _isDead.CachedValue;
+                return _isDead.CachedValue = GetUnitProperty(x => x.IsDead);
+            }
             set { _isDead.SetValueOverride(value); }
         }
+
 
         /// <summary>
         /// If unit is attackable
@@ -667,7 +671,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsHostile
         {
-            get { return _isHostile.IsCacheValid ? _isHostile.CachedValue : (_isHostile.CachedValue = GetUnitProperty(x => x.IsHostile)); }
+            get { return _isHostile.IsCacheValid ? _isHostile.CachedValue : (_isHostile.CachedValue = GetUnitProperty(x => !DataDictionary.NonHostileMonsterTypes.Contains(MonsterType))); }
             set { _isHostile.SetValueOverride(value); }
         }
 
@@ -947,9 +951,9 @@ namespace Trinity.LazyCache
         /// </summary>
         internal static int GetUnitsNearby(TrinityUnit o)
         {
-            return (from u in CacheManager.Units
-                where u.ACDGuid != o.ACDGuid && o.IsAlive && MathUtil.PositionIsInCircle(u.Position, o.Position, Trinity.Settings.Combat.Misc.TrashPackClusterRadius)
-                select u).Count();
+            return (from u in CacheManager.Monsters
+                    where u.ACDGuid != o.ACDGuid && MathUtil.PositionIsInCircle(u.Position, o.Position, Trinity.Settings.Combat.Misc.TrashPackClusterRadius)
+                    select u).Count();
         }
 
         /// <summary>

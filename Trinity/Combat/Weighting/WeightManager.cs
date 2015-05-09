@@ -145,7 +145,19 @@ namespace Trinity.Combat.Weighting
                 }
             }
             return (float)Math.Min(finalWeight, MaxWeight);
-        } 
+        }
+
+        private static CacheField<bool> _hasAreaEffectSkill = new CacheField<bool>(UpdateSpeed.Slow);
+        public static bool HasAreaEffectSkill
+        {
+            get
+            {
+                if (_hasAreaEffectSkill.IsCacheValid) return _hasAreaEffectSkill.CachedValue;
+                return _hasAreaEffectSkill.CachedValue = SkillUtils.Active.Any(s => s.Meta.IsAreaEffectSkill);
+            }
+        }
+
+
     }
 
 

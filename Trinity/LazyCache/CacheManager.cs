@@ -7,11 +7,13 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Security;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Common;
 using Zeta.Game;
+using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 using Logger = Trinity.Technicals.Logger;
@@ -59,15 +61,6 @@ namespace Trinity.LazyCache
 
         #endregion
 
-        #region Constants
-
-        /// <summary>
-        /// How long after not having seen an object before it is removed from the cache.
-        /// </summary>
-        private const int PurgeLimitSeconds = 5;
-
-        #endregion
-
         #region Fields
 
         /// <summary>
@@ -106,7 +99,7 @@ namespace Trinity.LazyCache
             get
             {
                 if (_monsters.IsCacheValid) return _monsters.CachedValue;
-                return _monsters.CachedValue = Units.Where(i => i.IsTrash || i.IsBossOrEliteRareUnique).ToList();
+                return _monsters.CachedValue = Units.Where(i => !i.IsSummonedByPlayer && (i.IsTrash || i.IsBossOrEliteRareUnique)).ToList();
             }
         }
 
@@ -155,6 +148,16 @@ namespace Trinity.LazyCache
             }
         }
 
+        private static CacheField<List<TrinityObject>> _hireling = new CacheField<List<TrinityObject>>(UpdateSpeed.Ultra);
+        public static List<TrinityObject> Hireling
+        {
+            get
+            {
+                if (_hireling.IsCacheValid) return _hireling.CachedValue;
+                return _hireling.CachedValue = GetActorsOfType<TrinityObject>().Where(o => (HirelingType)o.Source.GetAttribute<int>(ActorAttributeType.HirelingClass) != HirelingType.None).ToList();
+            }
+        }
+
         public static List<TrinityObject> NavigationObstacles
         {
             get { return GetActorsOfType<TrinityObject>().Where(i => i.IsNavigationObstacle).ToList(); }
@@ -172,7 +175,7 @@ namespace Trinity.LazyCache
 
         public static List<TrinityUnit> Goblins
         {
-            get { return GetActorsOfType<TrinityUnit>().Where(i => i.IsTreasureGoblin).ToList(); }
+            get { return GetActorsOfType<TrinityUnit>().Where(i => i.IsGoblin).ToList(); }
         }
 
         private static CacheField<List<TrinityAvoidance>> _avoidances = new CacheField<List<TrinityAvoidance>>(UpdateSpeed.Ultra);
@@ -226,33 +229,6 @@ namespace Trinity.LazyCache
 
         #endregion
 
-        #region Events
-
-        /// <summary>
-        /// Arguments for all cache management related events
-        /// </summary>
-        public class CacheManagementEventArgs
-        {
-            public int Added { get; set; }
-            public int Removed { get; set; }
-            public int Total { get; set; }
-            public int Updated { get; set; }
-            public int Excluded { get; set; }
-            public long Time { get; set; }
-        }
-
-        /// <summary>
-        /// Event Delegate for all cache management related events
-        /// </summary>
-        public delegate void CacheManagementEvent(CacheManagementEventArgs args);
-
-        /// <summary>
-        /// Event that fires whenever the cache is updated
-        /// </summary> 
-        public static event CacheManagementEvent CacheUpdated = args => { };
-
-        #endregion
-
         #region Methods
 
         /// <summary>
@@ -260,85 +236,45 @@ namespace Trinity.LazyCache
         /// </summary>
         public static void Update()
         {
-            int addedCount = 0, updatedCount = 0, removedCount = 0, excludedCount = 0;
-
-            if (!ZetaDia.IsInGame)
+            if (ZetaDia.Me == null)
                 return;
 
             if (Me == null || !Me.IsValid)
-            {
                 Me = new TrinityPlayer(ZetaDia.Me.CommonData);
-            }
-            else
-            {
-                Me.UpdateSource(ZetaDia.Me.CommonData);
-            }
 
             LastUpdated = DateTime.UtcNow;
                 
-            var stopwatch = Stopwatch.StartNew();
-
             _rActorByACDGuid = ZetaDia.Actors.RActorList.OfType<DiaObject>().DistinctBy(i => i.ACDGuid).ToDictionary(k => k.ACDGuid, v => v);
 
-            using (new PerformanceLogger("LazyCache.Update.Objects", true))
+            // Add/Update All Objects
+            foreach (var acd in ZetaDia.Actors.ACDList.OfType<ACD>())
             {
-                foreach (var acd in ZetaDia.Actors.ACDList.OfType<ACD>())
+                var guid = acd.ACDGuid;
+                var actorType = acd.ActorType;
+                var actorSNO = acd.ActorSNO;
+                var inventorySlot = acd is ACDItem ? (acd as ACDItem).InventorySlot : InventorySlot.None;
+
+                if (acd.IsProperValid() && DataDictionary.ExcludedActorTypes.Contains(actorType) ||
+                    DataDictionary.ExcludedActorIds.Contains(actorSNO) ||
+                    inventorySlot != InventorySlot.None) // Ignore Non-Ground Items
                 {
-                    var guid = acd.ACDGuid;
-                    var actorType = acd.ActorType;
-
-                    if (!acd.IsProperValid() ||
-                        DataDictionary.ExcludedActorTypes.Contains(actorType) ||
-                        DataDictionary.ExcludedActorIds.Contains(guid) ||
-                        acd is ACDItem && (acd as ACDItem).InventorySlot != InventorySlot.None) // Ignore Non-Ground Items
-                    {
-                        excludedCount++;
-                        continue;
-                    }
-
-                    CachedObjects.AddOrUpdate(guid, i =>
-                    {
-                        addedCount++;
-                        return CacheFactory.CreateTypedTrinityObject(acd, actorType, guid);
-
-                    }, (key, existingActor) =>
-                    {
-                        updatedCount++;
-                        existingActor.UpdateSource(acd);
-                        return existingActor;
-                    });
+                    continue;
                 }
+
+                CachedObjects.AddOrUpdate(guid, i => CacheFactory.CreateTypedTrinityObject(acd, actorType, guid, actorSNO), (key, existingActor) =>
+                {
+                    existingActor.UpdateSource(acd);
+                    return existingActor;
+                });
             }
 
-            using (new PerformanceLogger("LazyCache.Update.Purge", true))
+            foreach (var o in CachedObjects)
             {
-                CachedObjects.ForEach(o =>
-                {
-                    var isOld = LastUpdated.Subtract(o.Value.LastUpdated).TotalSeconds > PurgeLimitSeconds;
-
-                    if ((!CacheUtilities.IsProperValid(o.Value.Source) || isOld) && CachedObjects.TryRemove(o.Key, o.Value))
-                    {   
-                        removedCount++;
-                    }
-                });
+                if (!o.Value.Source.IsProperValid() || LastUpdated.Subtract(o.Value.LastUpdated).TotalSeconds > 3)
+                    CachedObjects.TryRemove(o.Key, o.Value);
             }
 
             _actorsByRActorGuid = CachedObjects.Values.DistinctBy(i => i.RActorGuid).ToDictionary(k => k.RActorGuid, v => v);
-
-            stopwatch.Stop();
-
-            using (new PerformanceLogger("LazyCache.Update.Event"))
-            {
-                CacheUpdated(new CacheManagementEventArgs
-                {
-                    Added = addedCount,
-                    Removed = removedCount,
-                    Updated = updatedCount,
-                    Excluded = excludedCount,
-                    Total = CachedObjects.Count,                    
-                    Time = stopwatch.ElapsedMilliseconds
-                });
-            }
         }
 
         public static T GetRActorOfTypeByACDGuid<T>(int acdGuid) where T : class
@@ -386,6 +322,8 @@ namespace Trinity.LazyCache
         {
             return new CacheUtilities.ForceRefreshHelper();
         }
+
+
 
         #endregion
 

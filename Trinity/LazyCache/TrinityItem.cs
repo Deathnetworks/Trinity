@@ -16,7 +16,7 @@ namespace Trinity.LazyCache
     public class TrinityItem : TrinityObject
     {
         public TrinityItem(ACD acd) : base(acd) { }
-        public TrinityItem(ACD acd, int acdGuid) : base(acd, acdGuid) { }
+        public TrinityItem(ACD acd, int acdGuid, bool loadActorProps = true) : base(acd, acdGuid, loadActorProps) { }
 
         #region Fields
 
@@ -33,7 +33,7 @@ namespace Trinity.LazyCache
         private readonly CacheField<int> _inventoryRow = new CacheField<int>();
         private readonly CacheField<int> _itemLegendaryItemLevelOverride = new CacheField<int>();
         private readonly CacheField<int> _itemLevelRequirementReduction = new CacheField<int>();
-        private readonly CacheField<int> _itemStackQuantity = new CacheField<int>();
+        private readonly CacheField<long> _itemStackQuantity = new CacheField<long>();
         private readonly CacheField<int> _jewelRank = new CacheField<int>();
         private readonly CacheField<int> _level = new CacheField<int>();
         private readonly CacheField<int> _lockedToACD = new CacheField<int>();
@@ -54,6 +54,7 @@ namespace Trinity.LazyCache
         private readonly CacheField<bool> _isPotion = new CacheField<bool>();
         private readonly CacheField<bool> _isTwoSquareItem = new CacheField<bool>();
         private readonly CacheField<bool> _isUnidentified = new CacheField<bool>();
+        private readonly CacheField<bool> _isOnGround = new CacheField<bool>(UpdateSpeed.Normal);       
         private readonly CacheField<bool> _isVendorBought = new CacheField<bool>();
         private readonly CacheField<bool> _isAutoPickup = new CacheField<bool>();
         private readonly CacheField<ItemQuality> _itemQuality = new CacheField<ItemQuality>();
@@ -222,7 +223,7 @@ namespace Trinity.LazyCache
         /// <summary>
         /// Amount of item level requirement reduction
         /// </summary>
-        public int ItemStackQuantity
+        public long ItemStackQuantity
         {
             get { return _itemStackQuantity.IsCacheValid ? _itemStackQuantity.CachedValue : (_itemStackQuantity.CachedValue = GetACDItemProperty(x => x.ItemStackQuantity)); }
             set { _itemStackQuantity.SetValueOverride(value); }
@@ -427,11 +428,11 @@ namespace Trinity.LazyCache
         }
 
         /// <summary>
-        /// If item can be picked up automatically
+        /// Quality of the item (Legendary, Rare etc)
         /// </summary>
         public ItemQuality ItemQuality
         {
-            get { return _itemQuality.IsCacheValid ? _itemQuality.CachedValue : (_itemQuality.CachedValue = GetACDItemProperty(x => x.ItemQualityLevel)); }
+            get { return _itemQuality.IsCacheValid ? _itemQuality.CachedValue : (_itemQuality.CachedValue = GetItemQuality(this)); }
             set { _itemQuality.SetValueOverride(value); }
         }
 
@@ -481,6 +482,15 @@ namespace Trinity.LazyCache
         }
 
         /// <summary>
+        /// Is on the ground at the moment
+        /// </summary>
+        public bool IsOnGround
+        {
+            get { return _isOnGround.IsCacheValid ? _isOnGround.CachedValue : (_isOnGround.CachedValue = InventorySlot == InventorySlot.None); }
+            set { _isOnGround.SetValueOverride(value); }
+        }
+
+        /// <summary>
         /// The MINIMUM end of the damage range listed on a weapon e.g. 1450-1790 fire damage
         /// </summary>
         public double WeaponBaseMinPhysicalDamage
@@ -507,6 +517,14 @@ namespace Trinity.LazyCache
         public static double SkillDamagePercent(ACDItem acdItem, SNOPower power)
         {
             return Math.Round(acdItem.GetAttribute<float>(((int)power << 12) + ((int)ActorAttributeType.PowerDamagePercentBonus & 0xFFF)) * 100, MidpointRounding.AwayFromZero);
+        }
+
+        public static ItemQuality GetItemQuality(TrinityItem item)
+        {
+            if (item.IsOnGround)
+                return item.GetDiaItemProperty(x => x.CommonData.ItemQualityLevel);
+
+            return item.GetACDItemProperty(x => x.ItemQualityLevel);
         }
 
         public override string ToString()

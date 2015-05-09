@@ -20,7 +20,7 @@ namespace Trinity.Combat.Weighting
 
             // rrrix added this as a single "weight" source based on the DestructableRange.
             // Calculate the weight based on distance, where a distance = 1 is 5000, 90 = 0
-            weightFactors.Add(new Weight((90f - cacheObject.RadiusDistance) / 90f * 5000f, WeightMethod.Set, WeightReason.StartingWeight));
+            weightFactors.Add(new Weight((90f - cacheObject.RadiusDistance) / 90f * 5000f, WeightMethod.Set, WeightReason.Start));
 
             weightFactors.TryAddWeight(cacheObject, WeightReason.PreviousTarget);
             weightFactors.TryAddWeight(cacheObject, WeightReason.CloseProximity, 30000);
@@ -50,7 +50,7 @@ namespace Trinity.Combat.Weighting
 
             // rrrix added this as a single "weight" source based on the DestructableRange.
             // Calculate the weight based on distance, where a distance = 1 is 5000, 90 = 0
-            weightFactors.Add(new Weight((90f - cacheObject.RadiusDistance) / 90f * 1000f, WeightMethod.Set, WeightReason.StartingWeight));
+            weightFactors.Add(new Weight((90f - cacheObject.RadiusDistance) / 90f * 1000f, WeightMethod.Set, WeightReason.Start));
 
             weightFactors.TryAddWeight(cacheObject, WeightReason.PreviousTarget);
             weightFactors.TryAddWeight(cacheObject, WeightReason.CloseProximity, 1500);

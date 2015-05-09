@@ -5,7 +5,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Windows.Navigation;
+using Org.BouncyCastle.Asn1.X509.Qualified;
 using Zeta.Game;
+using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
 using Logger = Trinity.Technicals.Logger;
 
@@ -71,9 +74,94 @@ namespace Trinity.LazyCache
             return activator(args);                
         }
 
+        static readonly Dictionary<Type, Func<int, IntPtr>> GetRecordPtrMethods = new Dictionary<Type, Func<int, IntPtr>>();
+
+        /// <summary>
+        /// Call private method GetRecordPtr on SNOTable instance
+        /// GetRecordPtr() finds a record pointer in a table for given value
+        /// e.g. var testPtr = ZetaDia.SNO[ClientSNOTable.ActorInfo].GetRecordPtr(ZetaDia.Me.ActorSNO);
+        /// </summary>
+        public static IntPtr GetRecordPtr(this SNOTable table, int id)
+        {
+            var type = typeof(SNOTable);
+            Func<int, IntPtr> expr;
+           
+            if (!GetRecordPtrMethods.TryGetValue(type, out expr))
+            {
+                // Get all delcared private methods
+                var methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
+                // GetRecordPtr is obfusticated with no name so find a method with the right pattern of args
+                var method = methods.FirstOrDefault(m => m.ReturnType == typeof (IntPtr));
+
+                if (method == null)
+                    throw new NullReferenceException("GetRecordPtr MethodInfo cannot be null");
+
+                // Define that expression will take an Int argument
+                var parameterExpr = Expression.Parameter(typeof(int), "input");
+
+                // Define instance that MethodInfo will be executed against.
+                var instanceExpr = Expression.Constant(table);
+
+                // Formalize instance, method and arguments.
+                var methodCallExpr = Expression.Call(instanceExpr, method, parameterExpr);
+
+                expr = Expression.Lambda<Func<int, IntPtr>>(methodCallExpr, parameterExpr).Compile();
+
+                GetRecordPtrMethods.Add(type, expr);                
+            }
+            
+            return expr != null ? expr(id) : new IntPtr(-1);                 
+        }
+
+        static readonly Dictionary<Type, Action<IntPtr>> PurgeSNORecordPtrMethods = new Dictionary<Type, Action<IntPtr>>();
+
+        /// <summary>
+        /// Call private method GetRecordPtr on SNOTable instance.
+        /// Apparently bad things ensue if you don't purge the record after using it
+        /// </summary>
+        public static void PurgeRecordPtr(this SNOTable table, IntPtr ptr)
+        {
+            var type = typeof(SNOTable);
+            Action<IntPtr> expr;
+
+            if (!PurgeSNORecordPtrMethods.TryGetValue(type, out expr))
+            {
+                // Get all delcared private methods
+                var methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
+                // PurgeSNORecord is obfusticated with no name so find a method with the right pattern of args
+                var method = methods.FirstOrDefault(m => m.ReturnType == typeof(void));
+
+                if (method == null)
+                    throw new NullReferenceException("GetRecordPtr MethodInfo cannot be null");
+
+                // Define that expression will take an Int argument
+                var parameterExpr = Expression.Parameter(typeof(IntPtr), "input");
+
+                // Define instance that MethodInfo will be executed against.
+                var instanceExpr = Expression.Constant(table);
+
+                // Formalize instance, method and arguments.
+                var methodCallExpr = Expression.Call(instanceExpr, method, parameterExpr);
+
+                expr = Expression.Lambda<Action<IntPtr>>(methodCallExpr, parameterExpr).Compile();
+
+                PurgeSNORecordPtrMethods.Add(type, expr);
+            }
+
+            if (expr != null)
+                expr(ptr);
+        }
+            
         public static bool IsProperValid(this ACD acd)
         {
-            return acd != null && acd.IsValid;
+            return acd != null && acd.IsValid && !acd.IsDisposed && acd.ACDGuid != -1;
+        }
+
+        public static bool IsProperValid(this SNORecord acd)
+        {
+            return acd != null && acd.IsValid && !acd.IsDisposed;
         }
 
         /// <summary>

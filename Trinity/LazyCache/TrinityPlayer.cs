@@ -22,7 +22,7 @@ namespace Trinity.LazyCache
     public class TrinityPlayer : TrinityUnit
     {
         public TrinityPlayer(ACD acd) : base(acd) { }
-        public TrinityPlayer(ACD acd, int acdGuid) : base(acd, acdGuid) { }
+        public TrinityPlayer(ACD acd, int acdGuid, bool loadActorProps = true) : base(acd, acdGuid, loadActorProps) { }
 
         #region Fields
 
@@ -53,10 +53,12 @@ namespace Trinity.LazyCache
         private readonly CacheField<bool> _isInCombat = new CacheField<bool>(UpdateSpeed.Ultra);
         private readonly CacheField<bool> _isInConversation = new CacheField<bool>(UpdateSpeed.Ultra);
         private readonly CacheField<bool> _isSkillOverrideActive = new CacheField<bool>(UpdateSpeed.Ultra);
+        private readonly CacheField<bool> _isMelee = new CacheField<bool>();
         private readonly CacheField<double> _goldPickupRadius = new CacheField<double>();
         private readonly CacheField<double> _meleeDamageeduction = new CacheField<double>();
         private readonly CacheField<int> _currentExperience = new CacheField<int>();
         private readonly CacheField<int> _jewelUpgradesLeft = new CacheField<int>();
+        private readonly CacheField<int> _maxBloodShards = new CacheField<int>();
         private readonly CacheField<int> _jewelUpgradesMax = new CacheField<int>();
         private readonly CacheField<int> _jewelUpgradesUsed = new CacheField<int>();
         private readonly CacheField<double> _loopingAnimationEndTime = new CacheField<double>();
@@ -68,7 +70,7 @@ namespace Trinity.LazyCache
         private readonly CacheField<DiaActivePlayer.InventoryManager> _inventory = new CacheField<DiaActivePlayer.InventoryManager>();
         private readonly CacheField<int> _paragonCurrentExperience = new CacheField<int>();
         private readonly CacheField<int> _paragonLevel = new CacheField<int>();
-        private readonly CacheField<int> _restExperience = new CacheField<int>();
+        private readonly CacheField<long> _restExperience = new CacheField<long>();
         private readonly CacheField<bool> _canUseTownPortal = new CacheField<bool>(UpdateSpeed.Normal);
         private readonly CacheField<float> _secondaryResourceMissing = new CacheField<float>(UpdateSpeed.Fast);
         private readonly CacheField<float> _primaryResourceMissing = new CacheField<float>(UpdateSpeed.Fast);
@@ -95,7 +97,7 @@ namespace Trinity.LazyCache
         private readonly CacheField<Act> _worldType = new CacheField<Act>(UpdateSpeed.Normal);
         private readonly CacheField<int> _currentQuestSNO = new CacheField<int>(UpdateSpeed.Normal);
         private readonly CacheField<int> _currentQuestStep = new CacheField<int>(UpdateSpeed.Normal);
-        
+
         #endregion
 
         #region Properties
@@ -326,6 +328,19 @@ namespace Trinity.LazyCache
         }
 
         /// <summary>
+        /// If player is a melee class
+        /// </summary>
+        public bool IsMelee
+        {
+            get
+            {
+                if (_isMelee.IsCacheValid) return _isMelee.CachedValue;
+                return _isMelee.CachedValue = ActorClass == ActorClass.Barbarian || ActorClass == ActorClass.Monk || ActorClass == ActorClass.Crusader;
+            }
+            set { _isMelee.SetValueOverride(value); }
+        }
+
+        /// <summary>
         /// If talking to another actor
         /// </summary>
         public bool IsInConversation
@@ -368,6 +383,16 @@ namespace Trinity.LazyCache
         {
             get { return _currentExperience.IsCacheValid ? _currentExperience.CachedValue : (_currentExperience.CachedValue = ZetaDia.Me.CurrentExperience); }
             set { _currentExperience.SetValueOverride(value); }
+        }
+
+
+        /// <summary>
+        ///Maximum blood shards
+        /// </summary>
+        public int MaxBloodShards
+        {
+            get { return _maxBloodShards.IsCacheValid ? _maxBloodShards.CachedValue : (_maxBloodShards.CachedValue = 500 + ZetaDia.Me.CommonData.GetAttributeOrDefault<int>(ActorAttributeType.HighestSoloRiftLevel) * 10); }
+            set { _maxBloodShards.SetValueOverride(value); }
         }
 
         /// <summary>
@@ -481,7 +506,7 @@ namespace Trinity.LazyCache
         /// <summary>
         /// About of rested experience
         /// </summary>
-        public int RestExperience
+        public long RestExperience
         {
             get { return _restExperience.IsCacheValid ? _restExperience.CachedValue : (_restExperience.CachedValue = ZetaDia.Me.RestExperience); }
             set { _restExperience.SetValueOverride(value); }

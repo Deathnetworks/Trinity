@@ -21,6 +21,22 @@ namespace Trinity.Combat.Weighting
         public WeightReason Reason;
         public WeightMethod Method;
         public double Amount;
+
+        public override string ToString()
+        {
+            var op = string.Empty;
+
+            if (Method == WeightMethod.Add && Amount > 0)
+                op = "+";
+            else if (Method == WeightMethod.Multiply)
+                op = "*";
+            else if (Method == WeightMethod.Set)
+                op = "$";
+            else if (Method == WeightMethod.Subtract && Amount > 0)
+                op = "+";
+
+            return string.Format("{0}: {1}{2:00.00}", Reason, op, Amount);
+        }
     }
 
     /// <summary>
@@ -41,7 +57,7 @@ namespace Trinity.Combat.Weighting
     public enum WeightReason
     {
         None = 0,
-        StartingWeight,
+        Start,
         AvoidanceNearby,
 
         /// <summary>
@@ -74,7 +90,7 @@ namespace Trinity.Combat.Weighting
         /// Add, 400, If this was the target last tick
         /// </summary>
         PreviousTarget,
-        AvoidanceAtPosition,
+        InAvoidance,
 
         /// <summary>
         /// Set, 1, If monsters are between us and the object
@@ -161,6 +177,16 @@ namespace Trinity.Combat.Weighting
         GoblinNormal,
         GoblinPriority,
         AntiFlipFlop,
-        IsNPC
+        IsNPC,
+        IsBoss,
+        Distance,
+        IgnoreBosses,
+        IgnoreTrash,
+        Cluster,
+        GoblinIgnore,
+        IsElite,
+        IsSummon,
+        IgnoreHealth,
+        NotHostile
     }
 }

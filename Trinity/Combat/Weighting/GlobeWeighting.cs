@@ -145,7 +145,7 @@ namespace Trinity.Combat.Weighting
 
             if (!TownRun.IsTryingToTownPortal())
             {
-                weightFactors.Add(new Weight((90f - item.RadiusDistance) / 90f * 5000d, WeightMethod.Set, WeightReason.StartingWeight));
+                weightFactors.Add(new Weight((90f - item.RadiusDistance) / 90f * 5000d, WeightMethod.Set, WeightReason.Start));
             }
 
             weightFactors.TryAddWeight(cacheObject, WeightReason.CloseProximity);
@@ -170,7 +170,7 @@ namespace Trinity.Combat.Weighting
 
             if (!TownRun.IsTryingToTownPortal())
             {
-                weightFactors.Add(new Weight((90f - cacheObject.RadiusDistance) / 90f * WeightManager.MaxWeight, WeightMethod.Set, WeightReason.StartingWeight));
+                weightFactors.Add(new Weight((90f - cacheObject.RadiusDistance) / 90f * WeightManager.MaxWeight, WeightMethod.Set, WeightReason.Start));
             }
 
             weightFactors.TryAddWeight(cacheObject, WeightReason.CloseProximity);

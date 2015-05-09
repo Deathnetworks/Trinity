@@ -1411,12 +1411,17 @@ namespace Trinity
         };
 
         /// <summary>
-        /// Actor types that we dont wan't to even look at from DB's ACD List.
+        /// ActorSNO that we want to completely ignore
         /// </summary>
         public static HashSet<int> ExcludedActorIds = new HashSet<int>
         {
-            -1,
-         
+            -1, 
+            4176, // Generic Proxy
+            5502, // Start Location
+            375658, // Banter Trigger
+            3462, // Box Trigger
+            5466, // Sphere Trigger
+            3461 // OneShot Box Trigger
         };
 
         public static HashSet<MonsterType> NonHostileMonsterTypes = new HashSet<MonsterType>
