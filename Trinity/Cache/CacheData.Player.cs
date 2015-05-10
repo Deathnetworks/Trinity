@@ -98,6 +98,7 @@ namespace Trinity
             public int CurrentQuestSNO { get; private set; }
             public int CurrentQuestStep { get; private set; }
             public Act WorldType { get; private set; }
+            public int MaxBloodShards { get; private set; }
 
             public class SceneInfo
             {
@@ -189,6 +190,7 @@ namespace Trinity
                 MovementSpeed = _me.Movement.SpeedXY;
                 IsMoving = _me.Movement.IsMoving;
                 IsInCombat = _me.IsInCombat;       
+                MaxBloodShards = 500 + ZetaDia.Me.CommonData.GetAttributeOrDefault<int>(ActorAttributeType.HighestSoloRiftLevel) * 10;
 
                 // For WD Angry Chicken
                 IsHidden = _me.IsHidden;

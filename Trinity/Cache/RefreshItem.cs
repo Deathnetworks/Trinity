@@ -119,7 +119,7 @@ namespace Trinity
                 };
 
                 // Blood Shards == HoradricRelic
-                if (_cItemTinityItemType == TrinityItemType.HoradricRelic && ZetaDia.CPlayer.BloodshardCount >= 500)
+                if (_cItemTinityItemType == TrinityItemType.HoradricRelic && ZetaDia.CPlayer.BloodshardCount >= Trinity.Player.MaxBloodShards)
                 {
                     return false;
                 }

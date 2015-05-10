@@ -973,7 +973,7 @@ namespace Trinity.Items
             }
 
             // Blood Shards == HoradricRelic
-            if (itemType == TrinityItemType.HoradricRelic && ZetaDia.CPlayer.BloodshardCount < 500)
+            if (itemType == TrinityItemType.HoradricRelic && ZetaDia.CPlayer.BloodshardCount < Trinity.Player.MaxBloodShards)
             {
                 return Trinity.Settings.Loot.Pickup.BloodShards;
             }
