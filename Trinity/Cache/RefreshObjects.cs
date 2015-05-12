@@ -432,7 +432,7 @@ namespace Trinity
             const int setItemMarkerTexture = 404424;
             const int legendaryItemMarkerTexture = 275968;
 
-            if (!WantToTownRun && !ForceVendorRunASAP)
+            if (!WantToTownRun && !ForceVendorRunASAP && Settings.Loot.Pickup.PickupLegendaries)
             {
                 var legendaryItemMarkers = ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsValid &&
                                     m.Position.Distance2D(Player.Position) >= 45f && m.Position.Distance2D(Player.Position) < 300f &&
