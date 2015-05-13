@@ -353,7 +353,7 @@ namespace Trinity
         /// <summary>
         /// The RActorGUID of the last CurrentTarget (PrimaryTarget)
         /// </summary>
-        private static int LastTargetRactorGUID;
+        public static int LastTargetRactorGUID;
 
         internal static int LastTargetACDGuid;
         /// <summary>

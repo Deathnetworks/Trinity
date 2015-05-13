@@ -308,7 +308,7 @@ namespace Trinity
         Boss = 7
     }
 
-    public enum SummonType
+    public enum TrinityPetType
     {
         Unknown = 0,
         Sentry,
@@ -320,7 +320,50 @@ namespace Trinity
         Hireling,
     }
 
-
+    
+    /// <summary>
+    /// MonsterAffixes indexed by GameBalanceId
+    /// </summary>
+    public enum TrinityMonsterAffix
+    {
+        // Direct Cast from DiaUnit.Affixes is 5x faster than the MonsterAffixEntries/MonsterAffixes properties
+        None = -1,
+        ArcaneEnchanted = -1669589516,
+        Avenger = 1165197192,
+        Desecrator = -121983956,
+        Electrified = -1752429632,
+        Fast = 3775118,
+        FireChains = -439707236,
+        Frozen = -163836908,
+        FrozenPulse = 1886876669,
+        Frenzy = -164208642,
+        HealthLink = 1799201764,
+        Horde = 127452338,
+        Illusionist = 394214687,
+        Jailer = -27686857,
+        Knockback = -2088540441,
+        MissileDampening = -1412750743,
+        Molten = 106438735,
+        Mortar = 106654229,
+        Nightmarish = -1245918914,
+        Orbiter = 1905614711,
+        Plagued = -1333953694,
+        PoisonEnchanted = 1929212066,
+        ReflectsDamage = -1374592233,
+        Shielding = -725865705,
+        Teleporter = -507706394,
+        Thunderstorm = -50556465,
+        Vortex = 458872904,
+        Waller = 481181063,
+        Wormhole = 1156956365,
+        //ExtraHealth = 3, // Disabled in Patch 2.1.2
+        //Vampiric = 14, // Disabled in Patch 2.1.2
+        //Rare = 4206314,
+        //ChampionBase = 924743082, 
+        //Elite = 16, // Can't seem to find this one
+        //Minion = 99383434, 
+        //Unique = 418225399,
+    }
 
 }
 
