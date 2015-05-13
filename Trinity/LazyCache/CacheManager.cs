@@ -20,12 +20,6 @@ using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.LazyCache
 {
-    /*  
-    * - Properties can be configured with their own cache duration.
-    * - If the duration hasn't expired on a property, a cached value is returned instead.
-    * - Things aren't excluded from the cache for the purposes of targetting.
-    */
-
     /// <summary>
     /// LazyCache creates a caching layer between DB's memory reading and Trinity to 
     /// avoid wasting time on reading values that don't change very fast or at all.
@@ -75,7 +69,7 @@ namespace Trinity.LazyCache
 
         public static DateTime LastUpdated = DateTime.MinValue;
 
-        private static Dictionary<int, DiaObject> _rActorByACDGuid = new Dictionary<int, DiaObject>();
+        //private static Dictionary<int, DiaObject> _rActorByACDGuid = new Dictionary<int, DiaObject>();
 
         private static Dictionary<int, TrinityObject> _actorsByRActorGuid = new Dictionary<int, TrinityObject>();
 
@@ -148,19 +142,24 @@ namespace Trinity.LazyCache
             }
         }
 
-        private static CacheField<List<TrinityObject>> _hireling = new CacheField<List<TrinityObject>>(UpdateSpeed.Ultra);
-        public static List<TrinityObject> Hireling
+        private static CacheField<List<TrinityObject>> _hirelings = new CacheField<List<TrinityObject>>(UpdateSpeed.Ultra);
+        public static List<TrinityObject> Hirelings
         {
             get
             {
-                if (_hireling.IsCacheValid) return _hireling.CachedValue;
-                return _hireling.CachedValue = GetActorsOfType<TrinityObject>().Where(o => (HirelingType)o.Source.GetAttribute<int>(ActorAttributeType.HirelingClass) != HirelingType.None).ToList();
+                if (_hirelings.IsCacheValid) return _hirelings.CachedValue;
+                return _hirelings.CachedValue = GetActorsOfType<TrinityObject>().Where(o => o.ActorMeta.HirelingType != HirelingType.None).ToList();
             }
         }
 
+        private static CacheField<List<TrinityObject>> _navigationObstacles = new CacheField<List<TrinityObject>>(UpdateSpeed.Ultra);
         public static List<TrinityObject> NavigationObstacles
         {
-            get { return GetActorsOfType<TrinityObject>().Where(i => i.IsNavigationObstacle).ToList(); }
+            get
+            {
+                if (_navigationObstacles.IsCacheValid) return _navigationObstacles.CachedValue;
+                return _navigationObstacles.CachedValue = GetActorsOfType<TrinityObject>().Where(i => i.IsNavigationObstacle).ToList();
+            }
         }
 
         public static List<TrinityUnit> EliteRareUniqueBoss
@@ -239,14 +238,8 @@ namespace Trinity.LazyCache
             if (ZetaDia.Me == null)
                 return;
 
-            if (Me == null || !Me.IsValid)
-                Me = new TrinityPlayer(ZetaDia.Me.CommonData);
-
             LastUpdated = DateTime.UtcNow;
-                
-            _rActorByACDGuid = ZetaDia.Actors.RActorList.OfType<DiaObject>().DistinctBy(i => i.ACDGuid).ToDictionary(k => k.ACDGuid, v => v);
 
-            // Add/Update All Objects
             foreach (var acd in ZetaDia.Actors.ACDList.OfType<ACD>())
             {
                 var guid = acd.ACDGuid;
@@ -260,27 +253,23 @@ namespace Trinity.LazyCache
                 {
                     continue;
                 }
-
-                CachedObjects.AddOrUpdate(guid, i => CacheFactory.CreateTypedTrinityObject(acd, actorType, guid, actorSNO), (key, existingActor) =>
-                {
-                    existingActor.UpdateSource(acd);
-                    return existingActor;
-                });
+             
+                CachedObjects.AddOrUpdate(guid, 
+                    i => CacheFactory.CreateTypedTrinityObject(acd, guid, actorSNO), 
+                    (key, actor) => actor.UpdateSource(actor, acd));
             }
 
             foreach (var o in CachedObjects)
             {
-                if (!o.Value.Source.IsProperValid() || LastUpdated.Subtract(o.Value.LastUpdated).TotalSeconds > 3)
+                if (!o.Value.Source.IsProperValid() || o.Value.Source.IsDisposed ||
+                    o.Value.ActorType == ActorType.Item && (o.Value is TrinityItem) && !((TrinityItem) o.Value).IsOnGround || // Speed up removal of items on pick up
+                    LastUpdated.Subtract(o.Value.LastUpdated).TotalSeconds > 20)
                     CachedObjects.TryRemove(o.Key, o.Value);
             }
 
-            _actorsByRActorGuid = CachedObjects.Values.DistinctBy(i => i.RActorGuid).ToDictionary(k => k.RActorGuid, v => v);
-        }
+            Me = Players.FirstOrDefault(p => p.IsMe);
 
-        public static T GetRActorOfTypeByACDGuid<T>(int acdGuid) where T : class
-        {
-            DiaObject rActor;
-            return _rActorByACDGuid.TryGetValue(acdGuid, out rActor) ? rActor as T : null;
+            _actorsByRActorGuid = CachedObjects.Values.DistinctBy(i => i.RActorGuid).ToDictionary(k => k.RActorGuid, v => v);
         }
 
         /// <summary>
@@ -320,13 +309,27 @@ namespace Trinity.LazyCache
         /// </summary>
         public static IDisposable ForceRefresh()
         {
-            return new CacheUtilities.ForceRefreshHelper();
+            return new ForceRefreshHelper();
         }
 
+        /// <summary>
+        /// IDisposable for ForceRefresh
+        /// </summary>
+        public class ForceRefreshHelper : IDisposable
+        {
+            public ForceRefreshHelper()
+            {
+                ++ForceRefreshLevel;
+            }
 
+            public void Dispose()
+            {
+                --ForceRefreshLevel;
+                GC.SuppressFinalize(this);
+            }
+        }
 
         #endregion
-
     }
 
 }

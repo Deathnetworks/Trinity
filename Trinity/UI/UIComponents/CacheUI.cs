@@ -75,22 +75,22 @@ namespace Trinity.UI.UIComponents
         {
             if (!BotMain.IsRunning && !BotMain.IsPausedForStateExecution)
             {
-                Logger.Log("Starting CacheUI update thread");
-                Worker.Start(() =>
+                using (new MemoryHelper())
                 {
-                    if (BotMain.IsRunning || !_isWindowOpen)
+                    Logger.Log("Starting CacheUI update thread");
+                    Worker.Start(() =>
                     {
-                        Logger.Log("Shutting down CacheUI update thread");
+                        if (BotMain.IsRunning || !_isWindowOpen)
+                        {
+                            Logger.Log("Shutting down CacheUI update thread");
 
-                        if (!_isWindowOpen)
-                            CacheManager.Stop();
+                            if (!_isWindowOpen)
+                                CacheManager.Stop();
 
-                        return true;
-                    }
+                            return true;
+                        }
 
-                    if (!BotMain.IsPausedForStateExecution && DataModel.IsLazyCacheVisible)
-                    {
-                        using (new MemoryHelper())
+                        if (!BotMain.IsPausedForStateExecution && DataModel.IsLazyCacheVisible && ZetaDia.IsInGame && ZetaDia.Me != null)
                         {
                             ZetaDia.Actors.Update();
 
@@ -100,11 +100,12 @@ namespace Trinity.UI.UIComponents
                             CacheManager.Update();
                             CacheUI.Update();
                         }
-                    }
+                    
 
-                    return false;
+                        return false;
 
-                }, 250); //250ms Ticks
+                    }, 250); //250ms Ticks
+                }
             }
         }
 
@@ -148,18 +149,15 @@ namespace Trinity.UI.UIComponents
 
         public static List<TrinityObject> GetLazyCacheActorList()
         {
-            using (new PerformanceLogger("CacheUI LazyCacheActorList", true))
-            {
-                return CacheManager.GetActorsOfType<TrinityObject>()
-                    .OrderByDescending(o => o.Weight)
-                    .ThenBy(o => o.Distance)
-                    .ToList();
-            }         
+            return CacheManager.GetActorsOfType<TrinityObject>()
+                .OrderByDescending(o => o.Weight)
+                .ThenBy(o => o.Distance)
+                .ToList();               
         }
 
         public static List<CacheUIObject> GetCacheActorList()
         {
-            using (new PerformanceLogger("CacheUI DefaultActorList", true))
+            using (new PerformanceLogger("CacheUI DefaultActorList"))
             {
                 return ZetaDia.Actors.GetActorsOfType<DiaObject>(true)
                     .Where(i => i.IsFullyValid())

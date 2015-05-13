@@ -36,6 +36,13 @@ namespace Trinity.LazyCache
         /// <summary>
         /// Every 2000ms
         /// </summary>
-        Slow = 2000
+        Slow = 1000,
+
+        /// <summary>
+        /// Every 2000ms
+        /// </summary>
+        VerySlow = 2000
+
+
     }
 }

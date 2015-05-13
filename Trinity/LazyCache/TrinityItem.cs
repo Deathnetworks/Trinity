@@ -15,8 +15,7 @@ namespace Trinity.LazyCache
     /// </summary>
     public class TrinityItem : TrinityObject
     {
-        public TrinityItem(ACD acd) : base(acd) { }
-        public TrinityItem(ACD acd, int acdGuid, bool loadActorProps = true) : base(acd, acdGuid, loadActorProps) { }
+        public TrinityItem(ACD acd, int acdGuid) : base(acd, acdGuid) { }
 
         #region Fields
 
@@ -46,7 +45,7 @@ namespace Trinity.LazyCache
         private readonly CacheField<bool> _isArmor = new CacheField<bool>();
         private readonly CacheField<bool> _isCrafted = new CacheField<bool>();
         private readonly CacheField<bool> _isCraftingPage = new CacheField<bool>();
-        private readonly CacheField<bool> _isEquipped = new CacheField<bool>(UpdateSpeed.Slow);
+        private readonly CacheField<bool> _isEquipped = new CacheField<bool>(UpdateSpeed.VerySlow);
         private readonly CacheField<bool> _isGem = new CacheField<bool>();
         private readonly CacheField<bool> _isMisc = new CacheField<bool>();
         private readonly CacheField<bool> _isOneHanded = new CacheField<bool>();
@@ -54,7 +53,7 @@ namespace Trinity.LazyCache
         private readonly CacheField<bool> _isPotion = new CacheField<bool>();
         private readonly CacheField<bool> _isTwoSquareItem = new CacheField<bool>();
         private readonly CacheField<bool> _isUnidentified = new CacheField<bool>();
-        private readonly CacheField<bool> _isOnGround = new CacheField<bool>(UpdateSpeed.Normal);       
+        private readonly CacheField<bool> _isOnGround = new CacheField<bool>(UpdateSpeed.Ultra);       
         private readonly CacheField<bool> _isVendorBought = new CacheField<bool>();
         private readonly CacheField<bool> _isAutoPickup = new CacheField<bool>();
         private readonly CacheField<ItemQuality> _itemQuality = new CacheField<ItemQuality>();
@@ -68,8 +67,6 @@ namespace Trinity.LazyCache
         private readonly CacheField<ItemBaseType> _itemBaseType = new CacheField<ItemBaseType>();
         private readonly CacheField<TrinityItemType> _trinityItemType = new CacheField<TrinityItemType>();
         private readonly CacheField<TrinityItemBaseType> _trinityItemBaseType = new CacheField<TrinityItemBaseType>();
-
-
 
 
         #endregion

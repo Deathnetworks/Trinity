@@ -21,25 +21,24 @@ namespace Trinity.LazyCache
     /// </summary>
     public class TrinityPlayer : TrinityUnit
     {
-        public TrinityPlayer(ACD acd) : base(acd) { }
-        public TrinityPlayer(ACD acd, int acdGuid, bool loadActorProps = true) : base(acd, acdGuid, loadActorProps) { }
+        public TrinityPlayer(ACD acd, int acdGuid) : base(acd, acdGuid) {}
 
         #region Fields
 
-        private readonly CacheField<float> _corpseResurrectionCharges = new CacheField<float>(UpdateSpeed.Slow);
+        private readonly CacheField<float> _corpseResurrectionCharges = new CacheField<float>(UpdateSpeed.VerySlow);
         private readonly CacheField<float> _currentPrimaryResource = new CacheField<float>(UpdateSpeed.RealTime);
         private readonly CacheField<float> _currentSecondaryResource = new CacheField<float>(UpdateSpeed.RealTime);
         private readonly CacheField<float> _secondaryResourcePct = new CacheField<float>(UpdateSpeed.Ultra);
         private readonly CacheField<float> _primaryResourcePct = new CacheField<float>(UpdateSpeed.Ultra);
         private readonly CacheField<float> _maxPrimaryResource = new CacheField<float>(UpdateSpeed.Ultra);
         private readonly CacheField<float> _maxSecondaryResource = new CacheField<float>(UpdateSpeed.Ultra);
-        private readonly CacheField<int> _deathCount = new CacheField<int>(UpdateSpeed.Slow);
-        private readonly CacheField<int> _level = new CacheField<int>(UpdateSpeed.Slow);
+        private readonly CacheField<int> _deathCount = new CacheField<int>(UpdateSpeed.VerySlow);
+        private readonly CacheField<int> _level = new CacheField<int>(UpdateSpeed.VerySlow);
         private readonly CacheField<int> _tieredLootRunLevel = new CacheField<int>(UpdateSpeed.Normal);
         private readonly CacheField<bool> _inTieredLootRunLevel = new CacheField<bool>(UpdateSpeed.Normal);
         private readonly CacheField<int> _levelCap = new CacheField<int>();
         private readonly CacheField<int> _sharedStashSlots = new CacheField<int>();
-        private readonly CacheField<ActorClass> _actorClass = new CacheField<ActorClass>(UpdateSpeed.Slow);
+        private readonly CacheField<ActorClass> _actorClass = new CacheField<ActorClass>(UpdateSpeed.VerySlow);
         private readonly CacheField<int> _armor = new CacheField<int>();
         private readonly CacheField<double> _attacksPerSecond = new CacheField<double>();
         private readonly CacheField<double> _criticalDamagePercent = new CacheField<double>();
@@ -48,8 +47,8 @@ namespace Trinity.LazyCache
         private readonly CacheField<double> _strength = new CacheField<double>();
         private readonly CacheField<double> _intelligence = new CacheField<double>();
         private readonly CacheField<double> _vitality = new CacheField<double>();
-        private readonly CacheField<bool> _isAfk = new CacheField<bool>(UpdateSpeed.Slow);
-        private readonly CacheField<bool> _isBusy = new CacheField<bool>(UpdateSpeed.Slow);
+        private readonly CacheField<bool> _isAfk = new CacheField<bool>(UpdateSpeed.VerySlow);
+        private readonly CacheField<bool> _isBusy = new CacheField<bool>(UpdateSpeed.VerySlow);
         private readonly CacheField<bool> _isInCombat = new CacheField<bool>(UpdateSpeed.Ultra);
         private readonly CacheField<bool> _isInConversation = new CacheField<bool>(UpdateSpeed.Ultra);
         private readonly CacheField<bool> _isSkillOverrideActive = new CacheField<bool>(UpdateSpeed.Ultra);
@@ -785,7 +784,7 @@ namespace Trinity.LazyCache
 
         #region Methods
 
-        public int CountSummonsOfType(SummonType type)
+        public int CountSummonsOfType(TrinityPetType type)
         {
             return CacheManager.Pets.Count(p => p.PetType == type);
         }

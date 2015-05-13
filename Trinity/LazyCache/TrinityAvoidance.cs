@@ -14,12 +14,12 @@ namespace Trinity.LazyCache
     /// </summary>
     public class TrinityAvoidance : TrinityObject
     {
-        public TrinityAvoidance(ACD acd) : base(acd)
+        public TrinityAvoidance(ACD acd, int acdGuid) : base(acd, acdGuid)
         {
             AvoidanceStartTime = CacheManager.LastUpdated;
         }
 
-        public TrinityAvoidance(ACD acd, int acdGuid, bool loadActorProps = true) : base(acd, acdGuid, loadActorProps)
+        public TrinityAvoidance()
         {
             AvoidanceStartTime = CacheManager.LastUpdated;
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Trinity.Combat.Abilities;
@@ -31,84 +32,80 @@ namespace Trinity.Combat.Weighting
         /// </summary>
         public static double CalculateWeight(TrinityObject trinityObject, out List<Weight> outFactors)
         {
-            double finalWeight;
+            //var timer = Stopwatch.StartNew();
 
-            using (new PerformanceLogger(string.Format("CalculateWeight Type={0}", trinityObject.TrinityType), true))
-            {
-                var weightFactors = new List<Weight>();
+            var weightFactors = new List<Weight>();
 
-                switch (trinityObject.TrinityType)
-                {
-                    case TrinityObjectType.Unit:
-                        weightFactors.AddRange(UnitWeighting.GetWeight(trinityObject));
-                        break;
+            //switch (trinityObject.TrinityType)
+            //{
+            //    case TrinityObjectType.Unit:
+            //        weightFactors.AddRange(UnitWeighting.GetWeight(trinityObject));
+            //        break;
 
-                    case TrinityObjectType.HotSpot:
-                        weightFactors.AddRange(HotSpotWeighting.GetWeight(trinityObject));
-                        break;
+            //    case TrinityObjectType.HotSpot:
+            //        weightFactors.AddRange(HotSpotWeighting.GetWeight(trinityObject));
+            //        break;
 
-                    case TrinityObjectType.Item:
-                        weightFactors.AddRange(ItemWeighting.GetItemWeight(trinityObject));
-                        break;
+            //    case TrinityObjectType.Item:
+            //        weightFactors.AddRange(ItemWeighting.GetItemWeight(trinityObject));
+            //        break;
 
-                    case TrinityObjectType.Gold:
-                        weightFactors.AddRange(ItemWeighting.GetGoldWeight(trinityObject));
-                        break;
+            //    case TrinityObjectType.Gold:
+            //        weightFactors.AddRange(ItemWeighting.GetGoldWeight(trinityObject));
+            //        break;
 
-                    case TrinityObjectType.PowerGlobe:
-                        weightFactors.AddRange(GlobeWeighting.GetPowerGlobeWeight(trinityObject));
-                        break;
+            //    case TrinityObjectType.PowerGlobe:
+            //        weightFactors.AddRange(GlobeWeighting.GetPowerGlobeWeight(trinityObject));
+            //        break;
 
-                    case TrinityObjectType.HealthGlobe:
-                        weightFactors.AddRange(GlobeWeighting.GetHealthGlobeWeight(trinityObject));
-                        break;
+            //    case TrinityObjectType.HealthGlobe:
+            //        weightFactors.AddRange(GlobeWeighting.GetHealthGlobeWeight(trinityObject));
+            //        break;
 
-                    case TrinityObjectType.ProgressionGlobe:
-                        weightFactors.AddRange(GlobeWeighting.GetProgressionGlobeWeight(trinityObject));
-                        break;
+            //    case TrinityObjectType.ProgressionGlobe:
+            //        weightFactors.AddRange(GlobeWeighting.GetProgressionGlobeWeight(trinityObject));
+            //        break;
 
-                    case TrinityObjectType.HealthWell:
-                        weightFactors.AddRange(HealthWellWeighting.GetWeight(trinityObject));
-                        break;
+            //    case TrinityObjectType.HealthWell:
+            //        weightFactors.AddRange(HealthWellWeighting.GetWeight(trinityObject));
+            //        break;
 
-                    case TrinityObjectType.CursedShrine:
-                    case TrinityObjectType.Shrine:
-                        weightFactors.AddRange(ShrineWeighting.GetWeight(trinityObject));
-                        break;
+            //    case TrinityObjectType.CursedShrine:
+            //    case TrinityObjectType.Shrine:
+            //        weightFactors.AddRange(ShrineWeighting.GetWeight(trinityObject));
+            //        break;
 
-                    case TrinityObjectType.Door:
-                        weightFactors.AddRange(DoorWeighting.GetWeight(trinityObject));
-                        break;
+            //    case TrinityObjectType.Door:
+            //        weightFactors.AddRange(DoorWeighting.GetWeight(trinityObject));
+            //        break;
 
-                    case TrinityObjectType.Barricade:
-                        weightFactors.AddRange(ObstacleWeighting.GetBarricadeWeight(trinityObject));
-                        break;
+            //    case TrinityObjectType.Barricade:
+            //        weightFactors.AddRange(ObstacleWeighting.GetBarricadeWeight(trinityObject));
+            //        break;
 
-                    case TrinityObjectType.Destructible:
-                        weightFactors.AddRange(ObstacleWeighting.GetDestructibleWeight(trinityObject));
-                        break;
+            //    case TrinityObjectType.Destructible:
+            //        weightFactors.AddRange(ObstacleWeighting.GetDestructibleWeight(trinityObject));
+            //        break;
 
-                    case TrinityObjectType.Interactable:
-                        weightFactors.AddRange(InteractableWeighting.GetWeight(trinityObject));
-                        break;
+            //    case TrinityObjectType.Interactable:
+            //        weightFactors.AddRange(InteractableWeighting.GetWeight(trinityObject));
+            //        break;
 
-                    case TrinityObjectType.Container:
-                        weightFactors.AddRange(ContainerWeighting.GetWeight(trinityObject));
-                        break;
-                }
+            //    case TrinityObjectType.Container:
+            //        weightFactors.AddRange(ContainerWeighting.GetWeight(trinityObject));
+            //        break;
+            //}
 
-                finalWeight = CombineWeights(weightFactors);
+            var finalWeight = CombineWeights(weightFactors);
 
-                // Prevent current target dynamic ranged weighting flip-flop 
-                if (trinityObject.IsLastTarget && finalWeight <= 1 && !trinityObject.IsBlocking)
-                {
-                    weightFactors.Add(new Weight(100, WeightMethod.Set, WeightReason.AntiFlipFlop));
-                    finalWeight = CombineWeights(weightFactors);
-                }
+            // Prevent current target dynamic ranged weighting flip-flop 
+            if (trinityObject.IsLastTarget && finalWeight <= 1 && !trinityObject.IsBlocking)
+                finalWeight = 100;
 
-                // Spurt the history of our work for debugging etc
-                outFactors = weightFactors;
-            }
+            // Spurt the history of our work for debugging etc
+            outFactors = weightFactors;
+
+            //CacheUtilities.LogTime(timer);
 
             return finalWeight;
         }
@@ -145,16 +142,6 @@ namespace Trinity.Combat.Weighting
                 }
             }
             return (float)Math.Min(finalWeight, MaxWeight);
-        }
-
-        private static CacheField<bool> _hasAreaEffectSkill = new CacheField<bool>(UpdateSpeed.Slow);
-        public static bool HasAreaEffectSkill
-        {
-            get
-            {
-                if (_hasAreaEffectSkill.IsCacheValid) return _hasAreaEffectSkill.CachedValue;
-                return _hasAreaEffectSkill.CachedValue = SkillUtils.Active.Any(s => s.Meta.IsAreaEffectSkill);
-            }
         }
 
 

@@ -1,15 +1,21 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Web.SessionState;
 using System.Windows.Navigation;
 using Org.BouncyCastle.Asn1.X509.Qualified;
+using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
+using Zeta.Game.Internals.SNO;
 using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.LazyCache
@@ -69,9 +75,41 @@ namespace Trinity.LazyCache
         /// </summary>
         public static T New<T>(params object[] args)
         {
-            var ctor = typeof(T).GetConstructors().First();
+            var type = typeof (T);
+            var argTypes = args.Select(arg => arg.GetType()).ToArray();
+            var ctor = type.GetConstructors().FirstOrDefault();
+            
+            if(ctor==null)
+                ctor = type.GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, argTypes, null);
+
             var activator = FastConstructor.GetActivator<T>(ctor);
             return activator(args);                
+        }
+
+        #region Zeta API
+
+        private static readonly Type ZetaDiaType = typeof (ZetaDia);
+
+        private static Func<ACDManager> _getActorCommonData;
+
+        public static ACDManager GetActorCommonData()
+        {
+            if (_getActorCommonData == null)
+            {
+                _getActorCommonData = GetStaticAccessor<ACDManager>(ZetaDiaType, "ActorCommonData");
+            }
+            return _getActorCommonData();
+        }
+
+        private static Func<RActorManager> _getRActors;
+
+        public static RActorManager GetRActors()
+        {
+            if (_getRActors == null)
+            {
+                _getRActors = GetStaticAccessor<RActorManager>(ZetaDiaType, "RActors");
+            }
+            return _getRActors();
         }
 
         static readonly Dictionary<Type, Func<int, IntPtr>> GetRecordPtrMethods = new Dictionary<Type, Func<int, IntPtr>>();
@@ -85,14 +123,14 @@ namespace Trinity.LazyCache
         {
             var type = typeof(SNOTable);
             Func<int, IntPtr> expr;
-           
+
             if (!GetRecordPtrMethods.TryGetValue(type, out expr))
             {
                 // Get all delcared private methods
                 var methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
                 // GetRecordPtr is obfusticated with no name so find a method with the right pattern of args
-                var method = methods.FirstOrDefault(m => m.ReturnType == typeof (IntPtr));
+                var method = methods.FirstOrDefault(m => m.ReturnType == typeof(IntPtr));
 
                 if (method == null)
                     throw new NullReferenceException("GetRecordPtr MethodInfo cannot be null");
@@ -108,10 +146,10 @@ namespace Trinity.LazyCache
 
                 expr = Expression.Lambda<Func<int, IntPtr>>(methodCallExpr, parameterExpr).Compile();
 
-                GetRecordPtrMethods.Add(type, expr);                
+                GetRecordPtrMethods.Add(type, expr);
             }
-            
-            return expr != null ? expr(id) : new IntPtr(-1);                 
+
+            return expr != null ? expr(id) : new IntPtr(-1);
         }
 
         static readonly Dictionary<Type, Action<IntPtr>> PurgeSNORecordPtrMethods = new Dictionary<Type, Action<IntPtr>>();
@@ -153,10 +191,122 @@ namespace Trinity.LazyCache
             if (expr != null)
                 expr(ptr);
         }
-            
+
+        public static IntPtr GetMonsterInfoPointer(int monsterSNO)
+        {
+            return GetRecordPtr((SNOTable) MonsterSNOTable, monsterSNO);
+        }
+
+        public static IntPtr GetActorInfoPointer(int actorSNO)
+        {
+            return GetRecordPtr((SNOTable) ActorSNOTable, actorSNO);
+        }
+
+        internal static SNOTable ActorSNOTable
+        {
+            get { return ZetaDia.SNO[ClientSNOTable.Actor]; }
+        }
+
+        internal static SNOTable MonsterSNOTable
+        {
+            get { return ZetaDia.SNO[ClientSNOTable.Monster]; }
+        }
+
+        #endregion        
+
+        #region Reflection Utiltiies
+
+        /// <summary>
+        /// Gets a static field or property
+        /// </summary>
+        /// <typeparam name="T">the return type of the member</typeparam>
+        /// <param name="containingClassType">type of the containing class</param>
+        /// <param name="memberName">the name of the member</param>
+        /// <returns>function to access the member</returns>
+        public static Func<T> GetStaticAccessor<T>(Type containingClassType, string memberName)
+        {
+            var param = Expression.Parameter(containingClassType, "arg");
+            var member = StaticPropertyOrField(containingClassType, memberName);
+            var lambda = Expression.Lambda(member);
+            return (Func<T>)lambda.Compile();
+        }
+
+        /// <summary>
+        /// Gets an instanced field or property
+        /// </summary>
+        /// <typeparam name="T">class containing the member</typeparam>
+        /// <typeparam name="TR">the return type of the member</typeparam>
+        /// <param name="memberName">the name of the member</param>
+        /// <returns>function to access the member</returns>
+        public static Func<T, TR> GetInstanceAccessor<T, TR>(string memberName)
+        {
+            var type = typeof(T);
+            var param = Expression.Parameter(type, "arg");
+            var member = Expression.PropertyOrField(param, memberName);
+            var lambda = Expression.Lambda(typeof(Func<T, TR>), member, param);
+            return (Func<T, TR>)lambda.Compile();
+        }
+
+        /// <summary>
+        /// Create a MemberExpression for a static Property or Field
+        /// </summary>
+        public static MemberExpression StaticPropertyOrField(Type type, string propertyOrFieldName)
+        {
+            if(type == null)
+                throw new ArgumentNullException("type");
+
+            PropertyInfo property = type.GetProperty(propertyOrFieldName, BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Static);
+            if (property != null)
+            {
+                return Expression.Property(null, property);
+            }
+            FieldInfo field = type.GetField(propertyOrFieldName, BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Static);
+            if (field == null)
+            {
+                property = type.GetProperty(propertyOrFieldName, BindingFlags.FlattenHierarchy | BindingFlags.NonPublic | BindingFlags.IgnoreCase | BindingFlags.Static);
+                if (property != null)
+                {
+                    return Expression.Property(null, property);
+                }
+                field = type.GetField(propertyOrFieldName, BindingFlags.FlattenHierarchy | BindingFlags.NonPublic | BindingFlags.IgnoreCase | BindingFlags.Static);
+                if (field == null)
+                {
+                    throw new ArgumentException(String.Format("{0} NotAMemberOfType {1}", propertyOrFieldName, type));
+                }
+            }
+            return Expression.Field(null, field);
+        }
+
+        #endregion
+
+        #region Collection Utilities
+
+        /// <summary>
+        /// Removed duplicates from a list based on specified property .DistinctBy(o => o.property)
+        /// </summary>
+        public static IEnumerable<TSource> DistinctBy<TSource, TKey>
+            (this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+        {
+            var seenKeys = new HashSet<TKey>();
+            return source.Where(element => seenKeys.Add(keySelector(element)));
+        }
+
+        /// <summary>
+        /// Attempt to remove Key/Value object from ConcurrentDictionary
+        /// </summary>
+        public static bool TryRemove<TKey, TValue>(
+            this ConcurrentDictionary<TKey, TValue> dictionary, TKey key, TValue value)
+        {
+            if (dictionary == null) throw new ArgumentNullException("dictionary");
+            return ((ICollection<KeyValuePair<TKey, TValue>>)dictionary).Remove(
+                new KeyValuePair<TKey, TValue>(key, value));
+        }
+
+        #endregion
+
         public static bool IsProperValid(this ACD acd)
         {
-            return acd != null && acd.IsValid && !acd.IsDisposed && acd.ACDGuid != -1;
+            return acd != null && acd.IsValid;
         }
 
         public static bool IsProperValid(this SNORecord acd)
@@ -184,44 +334,6 @@ namespace Trinity.LazyCache
         }
 
         /// <summary>
-        /// Removed duplicates from a list based on specified property .DistinctBy(o => o.property)
-        /// </summary>
-        public static IEnumerable<TSource> DistinctBy<TSource, TKey>
-            (this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
-        {
-            var seenKeys = new HashSet<TKey>();
-            return source.Where(element => seenKeys.Add(keySelector(element)));
-        }
-
-        /// <summary>
-        /// Attempt to remove Key/Value object from ConcurrentDictionary
-        /// </summary>
-        public static bool TryRemove<TKey, TValue>(
-            this ConcurrentDictionary<TKey, TValue> dictionary, TKey key, TValue value)
-        {
-            if (dictionary == null) throw new ArgumentNullException("dictionary");
-            return ((ICollection<KeyValuePair<TKey, TValue>>)dictionary).Remove(
-                new KeyValuePair<TKey, TValue>(key, value));
-        }
-
-        /// <summary>
-        /// IDisposable for ForceRefresh
-        /// </summary>
-        public class ForceRefreshHelper : IDisposable
-        {
-            public ForceRefreshHelper()
-            {
-                ++CacheManager.ForceRefreshLevel;
-            }
-
-            public void Dispose()
-            {
-                --CacheManager.ForceRefreshLevel;
-                GC.SuppressFinalize(this);
-            }
-        }
-
-        /// <summary>
         /// Get an attribute, ReadProcessMemory exceptions get swallowed and default returned
         /// </summary>
         public static T GetAttributeOrDefault<T>(this ACD actor, ActorAttributeType type) where T : struct
@@ -234,8 +346,8 @@ namespace Trinity.LazyCache
             {
                 if (ex.Message.StartsWith("Only part of a ReadProcessMemory"))
                 {
-                    Logger.LogError("DB Memory Exception in GetAttributeOrDefault Caller={0} ACDGuid={1} InternalName={2} ActorType={3} SNO={4} Exception={5} {6}",
-                        "", actor.ACDGuid, actor.Name, actor.ActorType, actor.ActorSNO, ex.Message, ex.InnerException);
+                    //Logger.LogError("DB Memory Exception in GetAttributeOrDefault Caller={0} ACDGuid={1} InternalName={2} ActorType={3} SNO={4} Exception={5} {6}",
+                    //    "", actor.ACDGuid, actor.Name, actor.ActorType, actor.ActorSNO, ex.Message, ex.InnerException);
                 }
                 else throw;  
             }
@@ -255,7 +367,7 @@ namespace Trinity.LazyCache
             {
                 if (!ex.Message.StartsWith("Only part of a ReadProcessMemory"))
                 {
-                    Logger.LogError("ReadMemoryValueOrDefault Offset={0} Exception={1} {2}", offset, ex.Message, ex.InnerException);
+                    //Logger.LogError("ReadMemoryValueOrDefault Offset={0} Exception={1} {2}", offset, ex.Message, ex.InnerException);
                 }
                 else throw;
             }
@@ -271,9 +383,22 @@ namespace Trinity.LazyCache
         /// </summary>
         public static T Default<T>()
         {
-            var value = default(T);
-            return typeof(T) == typeof(string) ? (T)(object)String.Empty : value;
+            var type = typeof (T);
+
+            if (type == typeof (string))
+                return (T)(object)String.Empty;
+
+            if (type == typeof(MonsterType))
+                return (T)(object)MonsterType.None;
+
+            return default(T);
+        }
+
+        internal static void LogTime(Stopwatch sw, [CallerMemberName] string member = "")
+        {
+            Logger.Log("{0} took {1:00.00000}ms.", member, sw.Elapsed.TotalMilliseconds);
         }
     }
 
+ 
 }

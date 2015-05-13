@@ -7,8 +7,10 @@ using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
 using System.Web.Security;
+using System.Web.UI.WebControls;
 using System.Windows;
 using System.Windows.Controls.Primitives;
+using Trinity.Technicals;
 using Zeta.Game;
 using Zeta.Common;
 using Zeta.Game.Internals;
@@ -24,59 +26,31 @@ namespace Trinity.LazyCache
     /// </summary>
     public class CacheBase
     {
-        #region Constructors
-
-        public CacheBase(ACD acd, int acdGuid, bool loadActorProps = true)
-        {
-            ACDGuid = acdGuid;
-            Source = acd;
-
-            if(loadActorProps)
-                LoadActorProperties();
-        }
-
-        public CacheBase(ACD acd, bool loadActorProps = true)
-        {
-            ACDGuid = acd.ACDGuid;     
-            Source = acd;
-
-            if (loadActorProps)
-                LoadActorProperties();
-        }
-
-        public CacheBase(int acdGuid, bool loadActorProps = true)
-        {
-            ACDGuid = acdGuid;
-
-            if (loadActorProps)
-                LoadActorProperties();
-        }
-
-        private void LoadActorProperties()
-        {            
-            var aProps = CacheNatives.GetActorProperties(ActorSNO);
-            _actorInfo = aProps.CachedActorInfo;
-            _monsterInfo = aProps.CachedMonsterInfo;
-            _isCorruptDiaUnit = aProps.IsInvalidMonsterInfo;
-        }
-
-        #endregion
-
         #region Fields
 
         private readonly CacheField<TrinityObjectType> _trinityType = new CacheField<TrinityObjectType>();
+        private readonly CacheField<CacheMeta.ActorMeta> _actorMeta = new CacheField<CacheMeta.ActorMeta>();
         private readonly CacheField<ActorType> _actorType = new CacheField<ActorType>();
-        private readonly CacheField<DiaObject> _object = new CacheField<DiaObject>(UpdateSpeed.RealTime);
+        private readonly CacheField<DiaObject> _object = new CacheField<DiaObject>();
         private readonly CacheField<ACD> _source = new CacheField<ACD>();
-        private readonly CacheField<DiaItem> _diaItem = new CacheField<DiaItem>(UpdateSpeed.RealTime);
-        private readonly CacheField<ACDItem> _acdItem = new CacheField<ACDItem>(UpdateSpeed.RealTime);
-        private readonly CacheField<DiaGizmo> _diaGizmo = new CacheField<DiaGizmo>(UpdateSpeed.RealTime);
-        private readonly CacheField<DiaUnit> _diaUnit = new CacheField<DiaUnit>(UpdateSpeed.RealTime);
         private readonly CacheField<int> _actorSNO = new CacheField<int>();
 
-        private CacheNatives.CachedActorInfo _actorInfo;
-        private CacheNatives.CachedMonsterInfo _monsterInfo;
-        private bool _isCorruptDiaUnit;
+        public CacheBase(ACD x, int acdGuid)
+        {
+            Source = x;
+            ACDGuid = acdGuid;
+        }
+
+        public CacheBase(ACD x)
+        {
+            Source = x;
+            ACDGuid = x.ACDGuid;
+        }
+
+        public CacheBase()
+        {
+
+        }
 
         #endregion
 
@@ -85,7 +59,7 @@ namespace Trinity.LazyCache
         /// <summary>
         /// Unique id for getting actor from DB's ActorManager
         /// </summary>
-        public int ACDGuid { get; set; }
+        public int ACDGuid { get; set; }            
 
         /// <summary>
         /// Time since source object was assigned.
@@ -110,6 +84,19 @@ namespace Trinity.LazyCache
         }
 
         /// <summary>
+        /// ActorInfo and MonsterInfo data
+        /// </summary>
+        public CacheMeta.ActorMeta ActorMeta
+        {
+            get
+            {
+                if (_actorMeta.IsCacheValid) return _actorMeta.CachedValue;
+                return _actorMeta.CachedValue = CacheMeta.GetActorMeta(this);
+            }
+            set { _actorMeta.SetValueOverride(value); }
+        }
+
+        /// <summary>
         /// Trinity's actor type
         /// </summary>
         public TrinityObjectType TrinityType
@@ -117,7 +104,7 @@ namespace Trinity.LazyCache
             get
             {
                 if (_trinityType.IsCacheValid) return _trinityType.CachedValue;
-                else return _trinityType.CachedValue = TrinityObject.GetTrinityObjectType(Source, ActorType);
+                return _trinityType.CachedValue = TrinityObject.GetTrinityObjectType(this);
             }
             set { _trinityType.SetValueOverride(value); }
         }
@@ -130,7 +117,7 @@ namespace Trinity.LazyCache
             get
             {
                 if (_actorType.IsCacheValid) return _actorType.CachedValue;
-                else return _actorType.CachedValue = Source.ActorType;
+                return _actorType.CachedValue = Source.ActorType;
             }
             set { _actorType.SetValueOverride(value); }
         }
@@ -143,7 +130,9 @@ namespace Trinity.LazyCache
             get
             {
                 if (_object.IsCacheValid) return _object.CachedValue;
-                return _object.CachedValue = CacheManager.GetRActorOfTypeByACDGuid<DiaObject>(ACDGuid);
+                return _object.CachedValue = ZetaDia.Actors.GetActorByACDId(ACDGuid);
+                
+                //return _object.CachedValue = CacheFactory.CreateTypedDiaObject(Source, ActorType);
             }
             set { _object.SetValueOverride(value); }
         }
@@ -156,7 +145,7 @@ namespace Trinity.LazyCache
             get
             {
                 if (_source.IsCacheValid) return _source.CachedValue;
-                else return ACDGuid != 0 ? (_source.CachedValue = ZetaDia.Actors.GetACDByGuid(ACDGuid)) : null;
+                return ACDGuid != 0 ? (_source.CachedValue = ZetaDia.Actors.GetACDByGuid(ACDGuid)) : null;
             }
             set { _source.SetValueOverride(value); }
         }
@@ -166,11 +155,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public DiaGizmo Gizmo
         {
-            get
-            {
-                if (_diaGizmo.IsCacheValid) return _diaGizmo.CachedValue;
-                return ACDGuid != 0 ? (_diaGizmo.CachedValue = Object as DiaGizmo) : null;
-            }
+            get { return Object as DiaGizmo; }
         }
 
         /// <summary>
@@ -178,11 +163,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public ACDItem Item
         {
-            get
-            {
-                if (_acdItem.IsCacheValid) return _acdItem.CachedValue;
-                return ACDGuid != 0 ? (_acdItem.CachedValue = Source as ACDItem) : null;
-            }
+            get { return Source as ACDItem; }
         }
 
         /// <summary>
@@ -190,37 +171,15 @@ namespace Trinity.LazyCache
         /// </summary>
         public DiaItem DiaItem
         {
-            get
-            {
-                if (_diaItem.IsCacheValid) return _diaItem.CachedValue;
-                return ACDGuid != 0 ? (_diaItem.CachedValue = Object as DiaItem) : null;
-            }
-        }
-
-        public DiaUnit Unit
-        {
-            get
-            {
-                if (_diaUnit.IsCacheValid || _isCorruptDiaUnit)
-                    return _diaUnit.CachedValue;
-
-                return ACDGuid != 0 ? (_diaUnit.CachedValue = Object as DiaUnit) : null;
-            }
+            get { return Object as DiaItem; }
         }
 
         /// <summary>
-        /// ActorInfo
+        /// DB's actual Unit (accessing properties reads directly from Diablo memory)
         /// </summary>
-        public CacheNatives.CachedActorInfo ActorInfo
+        public DiaUnit Unit
         {
-            get { return _actorInfo; }
-            set { _actorInfo = value; }
-        }
-
-        public CacheNatives.CachedMonsterInfo MonsterInfo
-        {
-            get { return _monsterInfo; }
-            set { _monsterInfo = value; }
+            get { return Object as DiaUnit; }
         }
 
         #endregion
@@ -242,7 +201,7 @@ namespace Trinity.LazyCache
         {
             try
             {
-                return selector != null && Unit != null && !_isCorruptDiaUnit && Unit.IsValid && Source.IsProperValid() ? selector(Unit) : CacheUtilities.Default<T>();
+                return selector != null && Unit != null && Unit.IsValid && Source.IsProperValid() ? selector(Unit) : CacheUtilities.Default<T>();
             }
             catch (Exception ex)
             {
@@ -251,8 +210,8 @@ namespace Trinity.LazyCache
                     var acd = ZetaDia.Actors.GetACDByGuid(ACDGuid);
                     var actor = ZetaDia.Actors.GetActorsOfType<DiaUnit>().Where(u => u.ACDGuid == ACDGuid);
 
-                    Logger.LogError("DB Memory Exception in GetUnitProperty Caller={0} ACDGuid={1} ActorType={2} Name={3} SNO={4} Exception={5} {6}",
-                        caller, ACDGuid, ActorType, (Source != null) ? Source.Name : string.Empty, ActorSNO, ex.Message, ex.InnerException);
+                    //Logger.LogError("DB Memory Exception in GetUnitProperty Caller={0} ACDGuid={1} ActorType={2} Name={3} SNO={4} Exception={5} {6}",
+                    //    caller, ACDGuid, ActorType, (Source != null) ? Source.Name : string.Empty, ActorSNO, ex.Message, ex.InnerException);
                 }
                 else throw;
             }
@@ -285,9 +244,9 @@ namespace Trinity.LazyCache
         /// </summary>
         public T GetDiaItemProperty<T>(Func<DiaItem, T> selector, [CallerMemberName] string caller = "")
         {
-            try
+            try            
             {
-                return selector != null && Item != null && DiaItem.IsValid && Source.IsProperValid() ? selector(DiaItem) : CacheUtilities.Default<T>();
+                return selector != null && DiaItem != null && DiaItem.IsValid && Source.IsProperValid() ? selector(DiaItem) : CacheUtilities.Default<T>();
             }
             catch (Exception ex)
             {
@@ -388,10 +347,18 @@ namespace Trinity.LazyCache
         /// <summary>
         /// Replace the source ACD with a new object reference
         /// </summary>
-        /// <param name="acd"></param>
         public void UpdateSource(ACD acd)
         {
             Source = acd;
+        }
+
+        /// <summary>
+        /// Replace the source ACD with a new object reference
+        /// </summary>
+        public TrinityObject UpdateSource(TrinityObject obj, ACD acd)
+        {
+            obj.Source = acd;
+            return obj;
         }
 
         /// <summary>
@@ -413,8 +380,6 @@ namespace Trinity.LazyCache
             return GetHashCode() == obj.GetHashCode();
         }
 
-
-
         #endregion
 
         #region Operators
@@ -431,47 +396,46 @@ namespace Trinity.LazyCache
 
         public TrinityUnit ToTrinityUnit()
         {
-            return CopyTo(new TrinityUnit(Source, ACDGuid, false));
+            return CopyTo(new TrinityUnit(Source, ACDGuid));
         }
 
         public TrinityGizmo ToTrinityGizmo()
         {
-            return CopyTo(new TrinityGizmo(Source, ACDGuid, false));
+            return CopyTo(new TrinityGizmo(Source, ACDGuid));
         }
 
         public TrinityAvoidance ToTrinityAvoidance()
         {
-            return CopyTo(new TrinityAvoidance(Source, ACDGuid, false));
+            return CopyTo(new TrinityAvoidance(Source, ACDGuid));
         }
 
         public TrinityItem ToTrinityItem()
         {
-            return CopyTo(new TrinityItem(Source, ACDGuid, false));
+            return CopyTo(new TrinityItem(Source, ACDGuid));
         }
 
         public TrinityPlayer ToTrinityPlayer()
         {
-            return CopyTo(new TrinityPlayer(Source, ACDGuid, false));
+            return CopyTo(new TrinityPlayer(Source, ACDGuid));
         }
 
         public TrinityObject ToTrinityObject()
         {
-            return CopyTo(new TrinityObject(Source, ACDGuid, false));
+            return CopyTo(new TrinityObject(Source, ACDGuid));
         }
 
         public T CopyTo<T>(T other) where T : CacheBase
         {
             other.Object = Object;
-            other.LastUpdated = LastUpdated;
-            other.MonsterInfo = MonsterInfo;
-            other.ActorInfo = ActorInfo;
+            other.ACDGuid = ACDGuid;
+            other.LastUpdated = _source.LastUpdate;
+            other.ActorMeta = ActorMeta;
             other.TrinityType = TrinityType;
             other.ActorSNO = ActorSNO;
             other.ActorType = ActorType;
             return other;
         }
 
-        #endregion 
-
+        #endregion
     }
 }

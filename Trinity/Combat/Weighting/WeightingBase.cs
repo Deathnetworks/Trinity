@@ -8,6 +8,11 @@ namespace Trinity.Combat.Weighting
 {
     public class WeightingBase
     {
+        protected static List<Weight> GetBaseWeight()
+        {
+            var weightFactors = new List<Weight>();
 
+            return weightFactors;            
+        }
     }
 }

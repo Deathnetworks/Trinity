@@ -21,7 +21,7 @@ namespace Trinity.Combat.Weighting
         /// </summary>
         public static IEnumerable<Weight> GetWeight(TrinityObject cacheObject)
         {
-            var weightFactors = new List<Weight>();
+            var weightFactors = GetBaseWeight();
             var unit = cacheObject as TrinityUnit;            
             
             /*
@@ -93,7 +93,7 @@ namespace Trinity.Combat.Weighting
                 weightFactors.Add(new Weight(1000, WeightMethod.Add, WeightReason.Summoner));
 
             // Clustering - Add weight to groups of units.
-            weightFactors.Add(new Weight(unit.UnitsNearby * 250, WeightMethod.Add, WeightReason.Cluster));
+            weightFactors.Add(new Weight((unit.UnitsNearby * unit.UnitsNearby) * 100, WeightMethod.Add, WeightReason.Cluster));
 
             // Avoidance - Reduce weight for units in avoidance
             if (CacheManager.Me.IsMelee && unit.IsStandingInAvoidance)

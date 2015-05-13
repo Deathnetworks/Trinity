@@ -30,6 +30,7 @@ namespace Trinity.Config
         private bool _ShowHeroClass;
         private bool _DisableAllMovement;
         private bool _AllowDuplicateMessages;
+        private bool _exportNewActorMeta;
         #endregion Fields
 
         #region Events
@@ -447,10 +448,25 @@ namespace Trinity.Config
                 }
             }
         }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool ExportNewActorMeta
+        {
+            get
+            {
+                return _exportNewActorMeta;
+            }
+            set
+            {
+                if (_exportNewActorMeta != value)
+                {
+                    _exportNewActorMeta = value;
+                    OnPropertyChanged("ExportNewCacheMeta");
+                }
+            }
+        }
         #endregion Properties
-
-
-
 
         #region Methods
         public void Reset()

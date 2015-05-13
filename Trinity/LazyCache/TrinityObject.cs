@@ -21,19 +21,15 @@ namespace Trinity.LazyCache
     /// </summary>
     public class TrinityObject : CacheBase
     {
-        #region Constructors
-
-        public TrinityObject(int acdGuid) : base(acdGuid) { }
-        public TrinityObject(ACD acd) : base(acd) { }
-        public TrinityObject(ACD acd, int acdGuid, bool loadActorProps) : base(acd, acdGuid, loadActorProps) { }
-
-        #endregion
+        public TrinityObject(ACD acd, int acdGuid) : base(acd, acdGuid) { }
+        protected TrinityObject() {}
 
         #region Fields
 
         private readonly CacheField<string> _internalName = new CacheField<string>();
         private readonly CacheField<int> _rActorGuid = new CacheField<int>();
-        private readonly CacheField<Vector3> _position = new CacheField<Vector3>(UpdateSpeed.Ultra);
+        private readonly CacheField<int> _monsterSNO = new CacheField<int>();
+        private readonly CacheField<Vector3> _position = new CacheField<Vector3>(UpdateSpeed.Fast);
         private readonly CacheField<float> _distance = new CacheField<float>(UpdateSpeed.Fast);
         private readonly CacheField<SNOAnim> _currentAnimation = new CacheField<SNOAnim>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isInLineOfSight = new CacheField<bool>(UpdateSpeed.Fast);
@@ -58,8 +54,9 @@ namespace Trinity.LazyCache
         private readonly CacheField<bool> _isCursedShrine = new CacheField<bool>();
         private readonly CacheField<bool> _isBountyObjective = new CacheField<bool>();
         private readonly CacheField<bool> _isShrine = new CacheField<bool>();
-        private readonly CacheField<bool> _isMinimapActive = new CacheField<bool>(UpdateSpeed.Slow);
+        private readonly CacheField<bool> _isMinimapActive = new CacheField<bool>(UpdateSpeed.VerySlow);
         private readonly CacheField<bool> _isUnit = new CacheField<bool>();
+        private readonly CacheField<bool> _isGizmo = new CacheField<bool>();
         private readonly CacheField<bool> _isGlobe = new CacheField<bool>();
         private readonly CacheField<string> _objectHash = new CacheField<string>();
         private readonly CacheField<bool> _isPickupNoClick = new CacheField<bool>();
@@ -89,7 +86,16 @@ namespace Trinity.LazyCache
         /// </summary>
         public string InternalName
         {
-            get { return _internalName.IsCacheValid ? _internalName.CachedValue : (_internalName.CachedValue = Trinity.NameNumberTrimRegex.Replace(Source.Name, "")); }
+            get { return _internalName.IsCacheValid ? _internalName.CachedValue : (_internalName.CachedValue = ((SNOActor)ActorSNO).ToString()); }
+            set { _internalName.SetValueOverride(value); }
+        }
+
+        /// <summary>
+        /// Diablo's internal name, converted to lower case
+        /// </summary>
+        public string InternalNameLowerCase
+        {
+            get { return _internalName.IsCacheValid ? _internalName.CachedValue : (_internalName.CachedValue = InternalName.ToLowerInvariant()); }
             set { _internalName.SetValueOverride(value); }
         }
 
@@ -100,6 +106,15 @@ namespace Trinity.LazyCache
         {
             get { return _rActorGuid.IsCacheValid ? _rActorGuid.CachedValue : (_rActorGuid.CachedValue = GetObjectProperty(x => x.RActorGuid)); }
             set { _rActorGuid.SetValueOverride(value); }
+        }
+
+        /// <summary>
+        /// SNOMonster id, used for MonsterInfo record in SNOTable
+        /// </summary>
+        public int MonsterSNO
+        {
+            get { return _monsterSNO.IsCacheValid ? _monsterSNO.CachedValue : (_monsterSNO.CachedValue = ActorMeta.MonsterSNO); }
+            set { _monsterSNO.SetValueOverride(value); }
         }
 
         /// <summary>
@@ -163,15 +178,6 @@ namespace Trinity.LazyCache
         {
             get { return _isNavigationObstacle.IsCacheValid ? _isNavigationObstacle.CachedValue : (_isNavigationObstacle.CachedValue = DataDictionary.NavigationObstacleIds.Contains(ActorSNO)); }
             set { _isNavigationObstacle.SetValueOverride(value); }
-        }
-
-        /// <summary>
-        /// Sphere around an actor that is used for collision detection by diablo3 (accessing properties reads directly from Diablo memory)
-        /// </summary>
-        public Sphere CollisionSphere
-        {
-            get { return _collisionSphere.IsCacheValid ? _collisionSphere.CachedValue : (_collisionSphere.CachedValue = ActorInfo.Sphere); }
-            set { _collisionSphere.SetValueOverride(value); }
         }
 
         /// <summary>
@@ -260,7 +266,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public GizmoType GizmoType 
         {
-            get { return _gizmoType.IsCacheValid ? _gizmoType.CachedValue : (_gizmoType.CachedValue = GetSourceProperty(x => x.GizmoType)); }
+            get { return _gizmoType.IsCacheValid ? _gizmoType.CachedValue : (_gizmoType.CachedValue = ActorMeta.GizmoType); }
             set { _gizmoType.SetValueOverride(value); }
         }
 
@@ -341,8 +347,17 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsUnit
         {
-            get { return _isUnit.IsCacheValid ? _isUnit.CachedValue : (_isUnit.CachedValue = TrinityType == TrinityObjectType.Unit); }
+            get { return _isUnit.IsCacheValid ? _isUnit.CachedValue : (_isUnit.CachedValue = ActorMeta.IsUnit); }
             set { _isUnit.SetValueOverride(value); }
+        }
+
+        /// <summary>
+        /// Is the actor a gizmo
+        /// </summary>
+        public bool IsGizmo
+        {
+            get { return _isGizmo.IsCacheValid ? _isGizmo.CachedValue : (_isGizmo.CachedValue = ActorMeta.IsGizmo); }
+            set { _isGizmo.SetValueOverride(value); }
         }
 
         /// <summary>
@@ -444,7 +459,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsLastTarget
         {
-            get { return false; } //Trinity.LastTargetRactorGUID != ACDGuid; }
+            get { return Trinity.LastTargetRactorGUID != ACDGuid; }
         }
 
         /// <summary>
@@ -460,7 +475,6 @@ namespace Trinity.LazyCache
         /// The individual factors that contribute to a final weight
         /// </summary>
         public List<Weight> WeightFactors = new List<Weight>();
-
 
         public string WeightReasons 
         {
@@ -496,12 +510,9 @@ namespace Trinity.LazyCache
             }
         }
 
-        public static TrinityObjectType GetTrinityObjectType(ACD source, ActorType actorType)
+        public static TrinityObjectType GetTrinityObjectType(CacheBase cacheBase)
         {
-            var id = source.ActorSNO;
-            var internalName = source.Name;
-            var gizmoType = source.GizmoType;
-            return GetTrinityObjectType(source, actorType, id, gizmoType, internalName);
+            return GetTrinityObjectType(cacheBase.Source, cacheBase.ActorType, cacheBase.ActorSNO, cacheBase.ActorMeta.GizmoType, cacheBase.ActorMeta.InternalName);
         }
 
         /// <summary>
@@ -511,12 +522,7 @@ namespace Trinity.LazyCache
         {
                        
             if (actorType == ActorType.Monster)
-            {
-                // Exclude Non-hostile monster types as they will throw lots of exceptions on DiaUnit properties
-                //var monsterInfo = GetMonsterInfo(acd, actorSNO);
-                //if(monsterInfo != null) // && !DataDictionary.NonHostileMonsterTypes.Contains(monsterInfo.MonsterType))
-                    return TrinityObjectType.Unit;
-            }                
+                return TrinityObjectType.Unit;
 
             if (internalName.Contains("CursedChest"))
                 return TrinityObjectType.CursedChest;
@@ -586,15 +592,6 @@ namespace Trinity.LazyCache
         }
 
         /// <summary>
-        /// If name in our list of actors we never care about.
-        /// </summary>
-        internal static bool IsIgnoredName(string name)
-        {
-            name = name.ToLower();
-            return DataDictionary.ActorIgnoreNameParts.Any(ignoreName => name.Contains(ignoreName));
-        }
-
-        /// <summary>
         /// Is ActorSNO in our DataDictionary lists of avoidances.
         /// </summary>
         internal static bool IsAvoidanceSNO(int actorSNO)
@@ -607,15 +604,8 @@ namespace Trinity.LazyCache
         /// </summary>
         internal static float GetDistance(TrinityObject o)
         {
-            var pos = o.Position;
-
             // Position/Distance only works for Ground Items if called on DiaItem
-            if (o.ActorType == ActorType.Item && o.Source is ACDItem)
-            {
-                if (o.Item != null && o.Item.IsValid)
-                    pos = o.GetDiaItemProperty(x => x.Position);
-            }
-
+            var pos = (o.ActorType == ActorType.Item) ? o.GetDiaItemProperty(x => x.Position) : o.Position;
             return pos == Vector3.Zero ? 0f : pos.Distance2D(CacheManager.Me.Position);
         }
 
@@ -628,7 +618,7 @@ namespace Trinity.LazyCache
             if (o.IsNavigationObstacle && DataDictionary.CustomObjectRadius.TryGetValue(o.ActorSNO, out radius))
                 return radius;
 
-            return o.CollisionSphere.Radius;
+            return (float)o.ActorMeta.Radius;
         }
 
         /// <summary>
@@ -637,7 +627,7 @@ namespace Trinity.LazyCache
         internal static MonsterType GetMonsterType(TrinityObject o)
         {
             MonsterType monsterTypeOverride;
-            return DataDictionary.MonsterTypeOverrides.TryGetValue(o.ActorSNO, out monsterTypeOverride) ? monsterTypeOverride : o.MonsterInfo.MonsterType;
+            return DataDictionary.MonsterTypeOverrides.TryGetValue(o.ActorSNO, out monsterTypeOverride) ? monsterTypeOverride : o.ActorMeta.MonsterType;
         }
 
         /// <summary>
@@ -655,27 +645,27 @@ namespace Trinity.LazyCache
         /// <summary>
         /// The type of player-summoned actor this is.
         /// </summary>
-        internal static SummonType GetSummonType(TrinityObject o)
+        internal static TrinityPetType GetSummonType(TrinityObject o)
         {
             if (DataDictionary.MysticAllyIds.Contains(o.ActorSNO))
-                return SummonType.MysticAlly;
+                return TrinityPetType.MysticAlly;
 
             if (DataDictionary.DemonHunterPetIds.Contains(o.ActorSNO))
-                return SummonType.Companion;
+                return TrinityPetType.Companion;
 
             if (DataDictionary.DemonHunterSentryIds.Contains(o.ActorSNO))
-                return SummonType.Sentry;
+                return TrinityPetType.Sentry;
 
             if (DataDictionary.WizardHydraIds.Contains(o.ActorSNO))
-                return SummonType.Hydra;
+                return TrinityPetType.Hydra;
 
             if (DataDictionary.GargantuanIds.Contains(o.ActorSNO))
-                return SummonType.Gargantuan;
+                return TrinityPetType.Gargantuan;
 
             if (DataDictionary.ZombieDogIds.Contains(o.ActorSNO))
-                return SummonType.ZombieDog;
+                return TrinityPetType.ZombieDog;
 
-            return SummonType.Unknown;
+            return TrinityPetType.Unknown;
         }
 
         /// <summary>

@@ -18,8 +18,8 @@ namespace Trinity.LazyCache
     /// </summary>
     public class TrinityUnit : TrinityObject
     {
-        public TrinityUnit(ACD acd) : base(acd) { }
-        public TrinityUnit(ACD acd, int acdGuid, bool loadActorProps = true) : base(acd, acdGuid, loadActorProps) { }
+        public TrinityUnit(ACD acd, int acdGuid) : base(acd, acdGuid) { }
+
 
         #region Fields
 
@@ -27,7 +27,8 @@ namespace Trinity.LazyCache
         private readonly CacheField<float> _hitpointsCurrentPct = new CacheField<float>(UpdateSpeed.Fast);
         private readonly CacheField<float> _hitpointsMax = new CacheField<float>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isPetOwner = new CacheField<bool>(UpdateSpeed.Normal);
-        private readonly CacheField<SummonType> _petType = new CacheField<SummonType>();
+        private readonly CacheField<TrinityPetType> _petType = new CacheField<TrinityPetType>();
+        private readonly CacheField<int> _internalPetType = new CacheField<int>();
         private readonly CacheField<int> _petCreatorACDId = new CacheField<int>();
         private readonly CacheField<int> _appearanceSNO = new CacheField<int>();
         private readonly CacheField<int> _physMeshSNO = new CacheField<int>();
@@ -41,14 +42,13 @@ namespace Trinity.LazyCache
         private readonly CacheField<bool> _isBoss = new CacheField<bool>();
         private readonly CacheField<bool> _isMinion = new CacheField<bool>();
         private readonly CacheField<bool> _isFacingPlayer = new CacheField<bool>();
-        private readonly CacheField<MonsterAffixes> _monsterAffixes = new CacheField<MonsterAffixes>();
-        private readonly CacheField<List<MonsterAffixEntry>> _monsterAffixEntries = new CacheField<List<MonsterAffixEntry>>();
-        private readonly CacheField<List<MonsterAffix>> _affixes = new CacheField<List<MonsterAffix>>();
+        private readonly CacheField<HashSet<TrinityMonsterAffix>> _affixes = new CacheField<HashSet<TrinityMonsterAffix>>();
         private readonly CacheField<bool> _isBleeding = new CacheField<bool>(UpdateSpeed.Normal);
         private readonly CacheField<bool> _isBurrowed = new CacheField<bool>(UpdateSpeed.Normal);
         private readonly CacheField<bool> _isEnraged = new CacheField<bool>();
         private readonly CacheField<bool> _isQuestMonster = new CacheField<bool>(UpdateSpeed.Normal);
         private readonly CacheField<bool> _isStealthed = new CacheField<bool>(UpdateSpeed.Normal);
+        private readonly CacheField<bool> _isMonster = new CacheField<bool>();
         private readonly CacheField<bool> _isUninterruptible = new CacheField<bool>();
         private readonly CacheField<MonsterRace> _monsterRace = new CacheField<MonsterRace>();
         private readonly CacheField<MonsterSize> _monsterSize = new CacheField<MonsterSize>();
@@ -73,8 +73,8 @@ namespace Trinity.LazyCache
         private readonly CacheField<float> _runningRateTotal = new CacheField<float>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isAlive = new CacheField<bool>(UpdateSpeed.Ultra);
         private readonly CacheField<bool> _isDead = new CacheField<bool>(UpdateSpeed.Ultra);
-        private readonly CacheField<bool> _isAttackable = new CacheField<bool>(UpdateSpeed.Slow);
-        private readonly CacheField<bool> _isFriendly = new CacheField<bool>(UpdateSpeed.Slow);
+        private readonly CacheField<bool> _isAttackable = new CacheField<bool>(UpdateSpeed.VerySlow);
+        private readonly CacheField<bool> _isFriendly = new CacheField<bool>(UpdateSpeed.VerySlow);
         private readonly CacheField<bool> _isHelper = new CacheField<bool>();
         private readonly CacheField<bool> _isHidden = new CacheField<bool>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isRooted = new CacheField<bool>(UpdateSpeed.Fast);
@@ -84,10 +84,10 @@ namespace Trinity.LazyCache
         private readonly CacheField<bool> _isFrozen = new CacheField<bool>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isStunned = new CacheField<bool>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isSlowed = new CacheField<bool>(UpdateSpeed.Fast);
-        private readonly CacheField<bool> _isHostile = new CacheField<bool>(UpdateSpeed.Slow);
+        private readonly CacheField<bool> _isHostile = new CacheField<bool>(UpdateSpeed.VerySlow);
         private readonly CacheField<bool> _isNPC = new CacheField<bool>();
-        private readonly CacheField<bool> _isNPCOperable = new CacheField<bool>(UpdateSpeed.Slow);
-        private readonly CacheField<bool> _isQuestGiver = new CacheField<bool>(UpdateSpeed.Slow);
+        private readonly CacheField<bool> _isNPCOperable = new CacheField<bool>(UpdateSpeed.VerySlow);
+        private readonly CacheField<bool> _isQuestGiver = new CacheField<bool>(UpdateSpeed.VerySlow);
         private readonly CacheField<bool> _isSalvageShortcut = new CacheField<bool>();
         private readonly CacheField<bool> _isTownVendor = new CacheField<bool>();
         private readonly CacheField<HirelingType> _hirelingType = new CacheField<HirelingType>();
@@ -104,9 +104,10 @@ namespace Trinity.LazyCache
         private readonly CacheField<float> _rotation = new CacheField<float>(UpdateSpeed.Fast);
         private readonly CacheField<float> _rotationDegrees = new CacheField<float>(UpdateSpeed.Fast);
         private readonly CacheField<float> _currentHealthPct = new CacheField<float>(UpdateSpeed.Fast);
-        private readonly CacheField<double> _killRange = new CacheField<double>(UpdateSpeed.Fast);
-        private readonly CacheField<bool> _isSummoner = new CacheField<bool>(UpdateSpeed.Slow);
+        private readonly CacheField<double> _killRange = new CacheField<double>(UpdateSpeed.Normal);
+        private readonly CacheField<bool> _isSummoner = new CacheField<bool>();
         private readonly CacheField<bool> _isChargeTarget = new CacheField<bool>();
+
 
         #endregion
 
@@ -151,10 +152,19 @@ namespace Trinity.LazyCache
         /// <summary>
         /// Type of pets owned
         /// </summary>
-        public SummonType PetType
+        public TrinityPetType PetType
         {
             get { return _petType.IsCacheValid ? _petType.CachedValue : (_petType.CachedValue = GetSummonType(this)); }
             set { _petType.SetValueOverride(value); }
+        }
+
+        /// <summary>
+        /// DB/D3s pet type number (this probably maps to an enum we haven't discovered yet)
+        /// </summary>
+        public int InternalPetType
+        {
+            get { return _internalPetType.IsCacheValid ? _internalPetType.CachedValue : (_internalPetType.CachedValue = ActorMeta.PetType); }
+            set { _internalPetType.SetValueOverride(value); }
         }
 
         /// <summary>
@@ -171,7 +181,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public int AppearanceSNO
         {
-            get { return _appearanceSNO.IsCacheValid ? _appearanceSNO.CachedValue : (_appearanceSNO.CachedValue = GetObjectProperty(x => x.AppearanceSNO)); }
+            get { return _appearanceSNO.IsCacheValid ? _appearanceSNO.CachedValue : (_appearanceSNO.CachedValue = ActorMeta.ApperanceSNO); }
             set { _appearanceSNO.SetValueOverride(value); }
         }
 
@@ -180,7 +190,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public int PhysMeshSNO
         {
-            get { return _physMeshSNO.IsCacheValid ? _physMeshSNO.CachedValue : (_physMeshSNO.CachedValue = GetObjectProperty(x => x.PhysMeshSNO)); }
+            get { return _physMeshSNO.IsCacheValid ? _physMeshSNO.CachedValue : (_physMeshSNO.CachedValue = ActorMeta.PhysMeshSNO); }
             set { _physMeshSNO.SetValueOverride(value); }
         }
 
@@ -207,7 +217,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsSummonedByPlayer
         {
-            get { return _isSummonedByPlayer.IsCacheValid ? _isSummonedByPlayer.CachedValue : (_isSummonedByPlayer.CachedValue = SummonedByACDId == CacheManager.Me.DynamicId || PetCreatorACDId == ZetaDia.Me.ACDGuid || PetType != SummonType.Unknown); }
+            get { return _isSummonedByPlayer.IsCacheValid ? _isSummonedByPlayer.CachedValue : (_isSummonedByPlayer.CachedValue = (IsSummoned && (SummonedByACDId == CacheManager.Me.DynamicId || PetCreatorACDId == ZetaDia.Me.ACDGuid)) || PetType != TrinityPetType.Unknown); }
             set { _isSummonedByPlayer.SetValueOverride(value); }
         }
 
@@ -275,29 +285,15 @@ namespace Trinity.LazyCache
         }
 
         /// <summary>
-        /// Monster Affixes
-        /// </summary>
-        public MonsterAffixes MonsterAffixes
-        {
-            get { return _monsterAffixes.IsCacheValid ? _monsterAffixes.CachedValue : (_monsterAffixes.CachedValue = GetSourceProperty(x => x.MonsterAffixes)); }
-            set { _monsterAffixes.SetValueOverride(value); }
-        }
-
-        /// <summary>
-        /// Monster Affix Entries
-        /// </summary>
-        public List<MonsterAffixEntry> MonsterAffixEntries
-        {
-            get { return _monsterAffixEntries.IsCacheValid ? _monsterAffixEntries.CachedValue : (_monsterAffixEntries.CachedValue = GetSourceProperty(x => x.MonsterAffixEntries).ToList()); }
-            set { _monsterAffixEntries.SetValueOverride(value); }
-        }
-
-        /// <summary>
         /// Affixes
         /// </summary>
-        public List<MonsterAffix> Affixes
+        public HashSet<TrinityMonsterAffix> MonsterAffixes
         {
-            get { return _affixes.IsCacheValid ? _affixes.CachedValue : (_affixes.CachedValue = GetSourceProperty(x => x.Affixes).Select(x => (MonsterAffix)x).ToList()); }
+            get
+            {
+                if (_affixes.IsCacheValid) return _affixes.CachedValue;
+                return _affixes.CachedValue = GetMonsterAffixes(this);
+            }
             set { _affixes.SetValueOverride(value); }
         }
 
@@ -347,6 +343,15 @@ namespace Trinity.LazyCache
         }
 
         /// <summary>
+        /// If unit has a SNOMonster record that isnt -1
+        /// </summary>
+        public bool IsMonster
+        {
+            get { return _isMonster.IsCacheValid ? _isMonster.CachedValue : (_isMonster.CachedValue = ActorMeta.IsMonster); }
+            set { _isMonster.SetValueOverride(value); }
+        }
+
+        /// <summary>
         /// If unit can't be interrupted
         /// </summary>
         public bool IsUninterruptible
@@ -360,7 +365,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public MonsterRace MonsterRace
         {
-            get { return _monsterRace.IsCacheValid ? _monsterRace.CachedValue : (_monsterRace.CachedValue = MonsterInfo.MonsterRace); }
+            get { return _monsterRace.IsCacheValid ? _monsterRace.CachedValue : (_monsterRace.CachedValue = ActorMeta.MonsterRace); }
             set { _monsterRace.SetValueOverride(value); }
         }
 
@@ -369,7 +374,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public MonsterSize MonsterSize
         {
-            get { return _monsterSize.IsCacheValid ? _monsterSize.CachedValue : (_monsterSize.CachedValue = MonsterInfo.MonsterSize); }
+            get { return _monsterSize.IsCacheValid ? _monsterSize.CachedValue : (_monsterSize.CachedValue = ActorMeta.MonsterSize); }
             set { _monsterSize.SetValueOverride(value); }
         }
 
@@ -405,7 +410,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool HasShieldingAffix
         {
-            get { return _hasShieldingAffix.IsCacheValid ? _hasShieldingAffix.CachedValue : (_hasShieldingAffix.CachedValue = MonsterAffixes.HasFlag(MonsterAffixes.Shielding)); }
+            get { return _hasShieldingAffix.IsCacheValid ? _hasShieldingAffix.CachedValue : (_hasShieldingAffix.CachedValue = MonsterAffixes.Contains(TrinityMonsterAffix.Shielding)); }
             set { _hasShieldingAffix.SetValueOverride(value); }
         }
 
@@ -414,7 +419,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsGoblin
         {
-            get { return _isTreasureGoblin.IsCacheValid ? _isTreasureGoblin.CachedValue : (_isTreasureGoblin.CachedValue = DataDictionary.GoblinIds.Contains(ActorSNO) || InternalName.ToLower().StartsWith("treasureGoblin")); }
+            get { return _isTreasureGoblin.IsCacheValid ? _isTreasureGoblin.CachedValue : (_isTreasureGoblin.CachedValue = DataDictionary.GoblinIds.Contains(ActorSNO) || MonsterRace == MonsterRace.TreasureGoblin); }
             set { _isTreasureGoblin.SetValueOverride(value); }
         }
 
@@ -581,7 +586,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsFriendly
         {
-            get { return _isFriendly.IsCacheValid ? _isFriendly.CachedValue : (_isFriendly.CachedValue = GetUnitProperty(x => x.IsFriendly)); }
+            get { return _isFriendly.IsCacheValid ? _isFriendly.CachedValue : (_isFriendly.CachedValue = !IsHostile); }
             set { _isFriendly.SetValueOverride(value); }
         }
 
@@ -590,7 +595,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsHelper
         {
-            get { return _isHelper.IsCacheValid ? _isHelper.CachedValue : (_isHelper.CachedValue = GetUnitProperty(x => x.IsHelper)); }
+            get { return _isHelper.IsCacheValid ? _isHelper.CachedValue : (_isHelper.CachedValue = ActorMeta.IsHelper); }
             set { _isHelper.SetValueOverride(value); }
         }
 
@@ -671,7 +676,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsHostile
         {
-            get { return _isHostile.IsCacheValid ? _isHostile.CachedValue : (_isHostile.CachedValue = GetUnitProperty(x => !DataDictionary.NonHostileMonsterTypes.Contains(MonsterType))); }
+            get { return _isHostile.IsCacheValid ? _isHostile.CachedValue : (_isHostile.CachedValue = ActorMeta.IsHostile); }
             set { _isHostile.SetValueOverride(value); }
         }
 
@@ -680,7 +685,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsNPC
         {
-            get { return _isNPC.IsCacheValid ? _isNPC.CachedValue : (_isNPC.CachedValue = GetUnitProperty(x => x.IsNPC)); }
+            get { return _isNPC.IsCacheValid ? _isNPC.CachedValue : (_isNPC.CachedValue = ActorMeta.IsNPC); }
             set { _isNPC.SetValueOverride(value); }
         }
 
@@ -693,13 +698,12 @@ namespace Trinity.LazyCache
             set { _isNPCOperable.SetValueOverride(value); }
         }
 
-
         /// <summary>
         /// Unit has a quest to give
         /// </summary>
         public bool IsQuestGiver
         {
-            get { return _isQuestGiver.IsCacheValid ? _isQuestGiver.CachedValue : (_isQuestGiver.CachedValue = GetUnitProperty(x => x.IsQuestGiver)); }
+            get { return _isQuestGiver.IsCacheValid ? _isQuestGiver.CachedValue : (_isQuestGiver.CachedValue = ActorMeta.IsQuestGiver); }
             set { _isQuestGiver.SetValueOverride(value); }
         }
 
@@ -726,7 +730,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public HirelingType HirelingType
         {
-            get { return _hirelingType.IsCacheValid ? _hirelingType.CachedValue : (_hirelingType.CachedValue = GetUnitProperty(x => x.HirelingType)); }
+            get { return _hirelingType.IsCacheValid ? _hirelingType.CachedValue : (_hirelingType.CachedValue = ActorMeta.HirelingType); }
             set { _hirelingType.SetValueOverride(value); }
         }
 
@@ -861,7 +865,16 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsSummoner
         {
-            get { return _isSummoner.IsCacheValid ? _isSummoner.CachedValue : (_isSummoner.CachedValue = SummonerId > 0); }
+            get { return _isSummoner.IsCacheValid ? _isSummoner.CachedValue : (_isSummoner.CachedValue = ActorMeta.IsSummoner); }
+            set { _isSummoner.SetValueOverride(value); }
+        }
+
+        /// <summary>
+        /// If this unit has been summoned
+        /// </summary>
+        public bool IsSummoned
+        {
+            get { return _isSummoner.IsCacheValid ? _isSummoner.CachedValue : (_isSummoner.CachedValue = ActorMeta.IsSummoned); }
             set { _isSummoner.SetValueOverride(value); }
         }
 
@@ -873,10 +886,6 @@ namespace Trinity.LazyCache
             get { return _isChargeTarget.IsCacheValid ? _isChargeTarget.CachedValue : (_isChargeTarget.CachedValue = MonsterSize == MonsterSize.Ranged || DataDictionary.RangedMonsterIds.Contains(ActorSNO)); }
             set { _isChargeTarget.SetValueOverride(value); }
         }
-
-
-            
-        
 
         #endregion
 
@@ -981,6 +990,28 @@ namespace Trinity.LazyCache
                 Logger.Log("Exception in HasDebuff for {0} on {1}. {2}", debuffSNO, Name, ex);
             }
             return false;
+        }
+
+        /// <summary>
+        /// Map affix GameBalanceIds to enum, excluding Bad Axe Data / -1
+        /// </summary>
+        /// <param name="trinityUnit"></param>
+        /// <returns></returns>
+        private static HashSet<TrinityMonsterAffix> GetMonsterAffixes(TrinityUnit trinityUnit)
+        {
+            var affixes = new HashSet<TrinityMonsterAffix>();
+            var sourceAffixes = trinityUnit.GetSourceProperty(x => x.Affixes).ToList();
+            
+            if (!sourceAffixes.Any())
+                return affixes;
+
+            foreach (var sourceAffix in sourceAffixes)
+            {
+                if (sourceAffix != -1)
+                    affixes.Add((TrinityMonsterAffix)sourceAffix);
+            }
+
+            return affixes;
         }
 
         /// <summary>

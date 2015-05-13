@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Data;
 using Trinity.Cache;
 using Trinity.LazyCache;
 
@@ -48,6 +49,14 @@ namespace Trinity.UI.UIComponents
             get { return _lazyCache; }
             set { SetField(ref _lazyCache, value); }
         }
+
+        private CollectionViewSource _collection = new CollectionViewSource();
+        public CollectionViewSource Collection
+        {
+            get { return _collection; }
+            set { SetField(ref _collection, value); }
+        }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged(string propertyName)

@@ -17,8 +17,7 @@ namespace Trinity.LazyCache
     /// </summary>
     public class TrinityGizmo : TrinityObject
     {
-        public TrinityGizmo(ACD acd) : base(acd) { }
-        public TrinityGizmo(ACD acd, int acdGuid, bool loadActorProps = true) : base(acd, acdGuid, loadActorProps) { }
+        public TrinityGizmo(ACD acd, int acdGuid) : base(acd, acdGuid) { }
 
         #region Fields
 
@@ -47,7 +46,7 @@ namespace Trinity.LazyCache
         private readonly CacheField<bool> _isWithinDestroyRange = new CacheField<bool>();
         private readonly CacheField<bool> _isShrine = new CacheField<bool>();
         private readonly CacheField<float> _destroyRange = new CacheField<float>();
-        private readonly CacheField<bool> _grantsNoXP = new CacheField<bool>();      
+        private readonly CacheField<bool> _grantsNoXP = new CacheField<bool>();
 
         #endregion
 
@@ -76,7 +75,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsBarricade
         {
-            get { return _isBarricade.IsCacheValid ? _isBarricade.CachedValue : (_isBarricade.CachedValue = GetGizmoProperty(x => x.IsBarricade)); }
+            get { return _isBarricade.IsCacheValid ? _isBarricade.CachedValue : (_isBarricade.CachedValue = ActorMeta.IsBarracade); }
             set { _isBarricade.SetValueOverride(value); }
         }
 
@@ -85,7 +84,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsDestructible
         {
-            get { return _isDestructible.IsCacheValid ? _isDestructible.CachedValue : (_isDestructible.CachedValue = GetGizmoProperty(x => x.IsDestructibleObject)); }
+            get { return _isDestructible.IsCacheValid ? _isDestructible.CachedValue : (_isDestructible.CachedValue = ActorMeta.GizmoIsDestructible); }
             set { _isDestructible.SetValueOverride(value); }
         }
 
@@ -94,7 +93,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsDisabledByScript
         {
-            get { return _isDisabledByScript.IsCacheValid ? _isDisabledByScript.CachedValue : (_isDisabledByScript.CachedValue = GetGizmoProperty(x => x.IsGizmoDisabledByScript)); }
+            get { return _isDisabledByScript.IsCacheValid ? _isDisabledByScript.CachedValue : (_isDisabledByScript.CachedValue = ActorMeta.GizmoIsDisabledByScript); }
             set { _isDisabledByScript.SetValueOverride(value); }
         }
 
@@ -112,7 +111,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsPortal
         {
-            get { return _isPortal.IsCacheValid ? _isPortal.CachedValue : (_isPortal.CachedValue = GetGizmoProperty(x => x.IsPortal)); }
+            get { return _isPortal.IsCacheValid ? _isPortal.CachedValue : (_isPortal.CachedValue = ActorMeta.GizmoIsPortal); }
             set { _isPortal.SetValueOverride(value); }
         }
 
@@ -121,7 +120,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsTownPortal
         {
-            get { return _isTownPortal.IsCacheValid ? _isTownPortal.CachedValue : (_isTownPortal.CachedValue = GetGizmoProperty(x => x.IsTownPortal)); }
+            get { return _isTownPortal.IsCacheValid ? _isTownPortal.CachedValue : (_isTownPortal.CachedValue = ActorMeta.GizmoIsTownPortal); }
             set { _isTownPortal.SetValueOverride(value); }
         }
 
@@ -148,7 +147,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsDropsNoLoot
         {
-            get { return _isDropsNoLoot.IsCacheValid ? _isDropsNoLoot.CachedValue : (_isDropsNoLoot.CachedValue = GetGizmoProperty(x => x.DropsNoLoot) > 0); }
+            get { return _isDropsNoLoot.IsCacheValid ? _isDropsNoLoot.CachedValue : (_isDropsNoLoot.CachedValue = ActorMeta.GizmoDropNoLoot > 0); }
             set { _isDropsNoLoot.SetValueOverride(value); }
         }
 
@@ -193,7 +192,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsCorpse
         {
-            get { return _isCorpse.IsCacheValid ? _isCorpse.CachedValue : (_isCorpse.CachedValue = InternalName.ToLower().Contains("corpse")); }
+            get { return _isCorpse.IsCacheValid ? _isCorpse.CachedValue : (_isCorpse.CachedValue = InternalNameLowerCase.Contains("corpse")); }
             set { _isCorpse.SetValueOverride(value); }
         }
 
@@ -202,7 +201,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsWeaponRack
         {
-            get { return _isWeaponRack.IsCacheValid ? _isWeaponRack.CachedValue : (_isWeaponRack.CachedValue = InternalName.ToLower().Contains("rack")); }
+            get { return _isWeaponRack.IsCacheValid ? _isWeaponRack.CachedValue : (_isWeaponRack.CachedValue = InternalNameLowerCase.Contains("rack")); }
             set { _isWeaponRack.SetValueOverride(value); }
         }
 
@@ -211,7 +210,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsGroundClicky
         {
-            get { return _isGroundClicky.IsCacheValid ? _isGroundClicky.CachedValue : (_isGroundClicky.CachedValue = InternalName.ToLower().Contains("ground_clicky")); }
+            get { return _isGroundClicky.IsCacheValid ? _isGroundClicky.CachedValue : (_isGroundClicky.CachedValue = InternalNameLowerCase.Contains("ground_clicky")); }
             set { _isGroundClicky.SetValueOverride(value); }
         }
 
@@ -220,7 +219,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsChest
         {
-            get { return _isChest.IsCacheValid ? _isChest.CachedValue : (_isChest.CachedValue = (!IsRareChest && InternalName.ToLower().Contains("chest")) || DataDictionary.ContainerWhiteListIds.Contains(ActorSNO)); }
+            get { return _isChest.IsCacheValid ? _isChest.CachedValue : (_isChest.CachedValue = (!IsRareChest && InternalNameLowerCase.Contains("chest")) || DataDictionary.ContainerWhiteListIds.Contains(ActorSNO)); }
             set { _isChest.SetValueOverride(value); }
         }
 
@@ -229,7 +228,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsRareChest
         {
-            get { return _isRareChest.IsCacheValid ? _isRareChest.CachedValue : (_isRareChest.CachedValue = InternalName.ToLower().Contains("chest_rare") || DataDictionary.ResplendentChestIds.Contains(ActorSNO)); }
+            get { return _isRareChest.IsCacheValid ? _isRareChest.CachedValue : (_isRareChest.CachedValue = InternalNameLowerCase.Contains("chest_rare") || DataDictionary.ResplendentChestIds.Contains(ActorSNO)); }
             set { _isRareChest.SetValueOverride(value); }
         }
 
@@ -283,7 +282,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool GrantsNoXp
         {
-            get { return _grantsNoXP.IsCacheValid ? _grantsNoXP.CachedValue : (_grantsNoXP.CachedValue = GetGizmoProperty(x => x.GrantsNoXp) > 0); }
+            get { return _grantsNoXP.IsCacheValid ? _grantsNoXP.CachedValue : (_grantsNoXP.CachedValue = ActorMeta.GizmoGrantsNoXp > 0); }
             set { _grantsNoXP.SetValueOverride(value); }
         }
 

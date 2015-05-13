@@ -43,7 +43,7 @@ namespace Trinity.Combat.Weighting
                 weightFactors.Add(new Weight(10000, WeightMethod.Add, WeightReason.CloseProximity));
 
             // Disable safety checks for Rift Pylons
-            if (!CacheManager.Me.IsInRift && cacheObject.Weight > 0)
+            if (!CacheManager.Me.IsInRift)
             {
                 weightFactors.TryAddWeight(cacheObject, WeightReason.PreviousTarget);
                 weightFactors.TryAddWeight(cacheObject, WeightReason.MonsterInLoS);

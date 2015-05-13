@@ -1421,7 +1421,10 @@ namespace Trinity
             375658, // Banter Trigger
             3462, // Box Trigger
             5466, // Sphere Trigger
-            3461 // OneShot Box Trigger
+            3461, // OneShot Box Trigger
+            //6442, // Waypoint
+            3795, // Checkpoint
+            5992, // OneShot Trigger Sphere
         };
 
         public static HashSet<MonsterType> NonHostileMonsterTypes = new HashSet<MonsterType>
