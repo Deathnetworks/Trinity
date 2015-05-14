@@ -39,6 +39,11 @@ namespace Trinity
 
         // [1DD61C20] Mouseover: 0x981391BBDF64B009, Name: Root.TopLayer.credits_dialog_main_X1.creditsClose_button
 
+        public static UIElement ChinaStoreCloseButton
+        {
+            get { return UIElement.FromHash(0xCDD29D7F6A61DAD8); }
+        }
+
         public static UIElement CloseCreditsButton
         {
             get { return UIElement.FromHash(0x981391BBDF64B009); }
@@ -246,6 +251,8 @@ namespace Trinity
             if (SafeClickElement(CloseCreditsButton, "Close Credits Button"))
                 return;
             if (SafeClickElement(PatchOKButton, "Patch Update OK Button"))
+                return;
+            if (Trinity.Player.IsInGame && SafeClickElement(ChinaStoreCloseButton, "Closing China Store Window"))
                 return;
             if (Trinity.Player.IsInGame && SafeClickElement(BountyRewardDialog, "Bounty Reward Dialog"))
                 return;
