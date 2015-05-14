@@ -304,62 +304,65 @@ namespace Trinity
                     {
                         // return GetTaskResult(true);
                     }
-                    using (new PerformanceLogger("HandleTarget.SpecialMovement"))
+                    if (!Player.IsInTown)
                     {
-
-                        bool Monk_SpecialMovement = ((CurrentTarget.Type == TrinityObjectType.Gold ||
-                            CurrentTarget.IsUnit || CurrentTarget.IsDestroyable) && MonkCombat.IsTempestRushReady());
-
-                        // If we're doing avoidance, globes or backtracking, try to use special abilities to move quicker
-                        if ((CurrentTarget.Type == TrinityObjectType.Avoidance ||
-                            CurrentTarget.Type == TrinityObjectType.HealthGlobe ||
-                            CurrentTarget.Type == TrinityObjectType.PowerGlobe ||
-                            CurrentTarget.Type == TrinityObjectType.ProgressionGlobe ||
-                            CurrentTarget.Type == TrinityObjectType.Shrine ||
-                            Monk_SpecialMovement)
-                            && NavHelper.CanRayCast(Player.Position, CurrentDestination)
-                            )
+                        using (new PerformanceLogger("HandleTarget.SpecialMovement"))
                         {
-                            bool usedSpecialMovement = UsedSpecialMovement();
 
-                            if (usedSpecialMovement)
+                            bool Monk_SpecialMovement = ((CurrentTarget.Type == TrinityObjectType.Gold ||
+                                CurrentTarget.IsUnit || CurrentTarget.IsDestroyable) && MonkCombat.IsTempestRushReady());
+
+                            // If we're doing avoidance, globes or backtracking, try to use special abilities to move quicker
+                            if ((CurrentTarget.Type == TrinityObjectType.Avoidance ||
+                                CurrentTarget.Type == TrinityObjectType.HealthGlobe ||
+                                CurrentTarget.Type == TrinityObjectType.PowerGlobe ||
+                                CurrentTarget.Type == TrinityObjectType.ProgressionGlobe ||
+                                CurrentTarget.Type == TrinityObjectType.Shrine ||
+                                Monk_SpecialMovement)
+                                && NavHelper.CanRayCast(Player.Position, CurrentDestination)
+                                )
                             {
-                                // Store the current destination for comparison incase of changes next loop
-                                LastMoveToTarget = CurrentDestination;
-                                // Reset total body-block count, since we should have moved
-                                if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
-                                    _timesBlockedMoving = 0;
+                                bool usedSpecialMovement = UsedSpecialMovement();
 
-                                return GetRunStatus(RunStatus.Running, "UsedSpecialMovement");
+                                if (usedSpecialMovement)
+                                {
+                                    // Store the current destination for comparison incase of changes next loop
+                                    LastMoveToTarget = CurrentDestination;
+                                    // Reset total body-block count, since we should have moved
+                                    if (DateTime.UtcNow.Subtract(_lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
+                                        _timesBlockedMoving = 0;
+
+                                    return GetRunStatus(RunStatus.Running, "UsedSpecialMovement");
+                                }
                             }
                         }
-                    }
 
-                    // DemonHunter Strafe
-                    if (Skills.DemonHunter.Strafe.IsActive && Player.PrimaryResource > 12 && TargetUtil.AnyMobsInRange(30f, false))
-                    {
-                        Skills.DemonHunter.Strafe.Cast(CurrentDestination);
-                        return GetRunStatus(RunStatus.Running, "Strafe");
-                    }
-
-                    if (Player.ActorClass == ActorClass.Monk && CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike) && ((Skills.Monk.DashingStrike.Charges > 1 && ZetaDia.Me.CurrentPrimaryResource > 75) || CacheData.Buffs.HasCastingShrine))
-					{
-						Logger.Log("Dash towards: {0}, charges={1}", GetTargetName(), Skills.Monk.DashingStrike.Charges);
-                        Skills.Monk.DashingStrike.Cast(CurrentDestination);
-
-                        return GetRunStatus(RunStatus.Running, "Dash");
-					}
-
-                    if (Player.ActorClass == ActorClass.Barbarian)
-                    {
-                        bool wwToItem = (CurrentTarget.Type != TrinityObjectType.Item || (CurrentTarget.Type == TrinityObjectType.Item && CurrentTarget.Distance > 10f && NavHelper.CanRayCast(CurrentTarget.Position)));
-                        // Whirlwind against everything within range
-                        if (Player.PrimaryResource >= 10 && CombatBase.CanCast(SNOPower.Barbarian_Whirlwind) && wwToItem &&
-                            (TargetUtil.AnyMobsInRange(20, false) || Sets.BulKathossOath.IsFullyEquipped) && !IsWaitingForSpecial)
+                        // DemonHunter Strafe
+                        if (Skills.DemonHunter.Strafe.IsActive && Player.PrimaryResource > 12 && TargetUtil.AnyMobsInRange(30f, false))
                         {
-                            Skills.Barbarian.Whirlwind.Cast(CurrentDestination);
-                            LastMoveToTarget = CurrentDestination;
-                            return GetRunStatus(RunStatus.Running, "Whirlwind");
+                            Skills.DemonHunter.Strafe.Cast(CurrentDestination);
+                            return GetRunStatus(RunStatus.Running, "Strafe");
+                        }
+
+                        if (Player.ActorClass == ActorClass.Monk && CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike) && ((Skills.Monk.DashingStrike.Charges > 1 && ZetaDia.Me.CurrentPrimaryResource > 75) || CacheData.Buffs.HasCastingShrine))
+                        {
+                            Logger.Log("Dash towards: {0}, charges={1}", GetTargetName(), Skills.Monk.DashingStrike.Charges);
+                            Skills.Monk.DashingStrike.Cast(CurrentDestination);
+
+                            return GetRunStatus(RunStatus.Running, "Dash");
+                        }
+
+                        if (Player.ActorClass == ActorClass.Barbarian)
+                        {
+                            bool wwToItem = (CurrentTarget.Type != TrinityObjectType.Item || (CurrentTarget.Type == TrinityObjectType.Item && CurrentTarget.Distance > 10f && NavHelper.CanRayCast(CurrentTarget.Position)));
+                            // Whirlwind against everything within range
+                            if (Player.PrimaryResource >= 10 && CombatBase.CanCast(SNOPower.Barbarian_Whirlwind) && wwToItem &&
+                                (TargetUtil.AnyMobsInRange(20, false) || Sets.BulKathossOath.IsFullyEquipped) && !IsWaitingForSpecial)
+                            {
+                                Skills.Barbarian.Whirlwind.Cast(CurrentDestination);
+                                LastMoveToTarget = CurrentDestination;
+                                return GetRunStatus(RunStatus.Running, "Whirlwind");
+                            }
                         }
                     }
                 }
