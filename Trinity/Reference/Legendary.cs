@@ -15,6 +15,190 @@ namespace Trinity.Reference
         /***************  START TEMP ITEMS FOR 2.20 Patch ****************/
 
         /// <summary>
+        /// Overwhelming Desire Chance on hit to charm the enemy. While charmed, the enemy takes 35% more damage.
+        /// </summary>
+        public static Item OverwhelmingDesire = new Item
+        {
+            Id = 298053,
+            Name = "Overwhelming Desire",
+            Quality = ItemQuality.Legendary,
+            Slug = "overwhelming-desire-1I0LYo",
+            ItemType = ItemType.Amulet,
+            TrinityItemType = TrinityItemType.Amulet,
+            IsTwoHanded = false,
+            BaseType = ItemBaseType.None,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/overwhelming-desire-1I0LYo",
+            Url = "http://us.battle.net/d3/en/item/overwhelming-desire-1I0LYo",
+            IconUrl = "http://media.blizzard.com/d3/icons/items/large/unique_amulet_106_x1_demonhunter_male.png",
+            RelativeUrl = "",
+            IsCrafted = false,
+            LegendaryAffix = "Chance on hit to charm the enemy. While charmed, the enemy takes 35% more damage.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Mad Monarch's Scepter After killing 10 enemies, you release a Poison Nova that deals 1050–1400% weapon damage as Poison to enemies within 30 yards.
+        /// </summary>
+        public static Item MadMonarchsScepter = new Item
+        {
+            Id = 271663,
+            Name = "Mad Monarch's Scepter",
+            Quality = ItemQuality.Legendary,
+            Slug = "mad-monarchs-scepter-2F34bH",
+            ItemType = ItemType.Mace,
+            TrinityItemType = TrinityItemType.Mace,
+            IsTwoHanded = false,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/mad-monarchs-scepter-2F34bH",
+            Url = "http://us.battle.net/d3/en/item/mad-monarchs-scepter-2F34bH",
+            IconUrl = "http://media.blizzard.com/d3/icons/items/large/unique_mace_1h_101_x1_demonhunter_male.png",
+            RelativeUrl = "",
+            IsCrafted = false,
+            LegendaryAffix = "After killing 10 enemies, you release a Poison Nova that deals 1050–1400% weapon damage as Poison to enemies within 30 yards.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Coven's Criterion You take 45–60% less damage from blocked attacks.
+        /// </summary>
+        public static Item CovensCriterion = new Item
+        {
+            Id = 298191,
+            Name = "Coven's Criterion",
+            Quality = ItemQuality.Legendary,
+            Slug = "covens-criterion-dzvKS",
+            ItemType = ItemType.Shield,
+            TrinityItemType = TrinityItemType.Shield,
+            IsTwoHanded = false,
+            BaseType = ItemBaseType.None,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/covens-criterion-dzvKS",
+            Url = "http://us.battle.net/d3/en/item/covens-criterion-dzvKS",
+            IconUrl = "http://media.blizzard.com/d3/icons/items/large/unique_shield_107_x1_demonhunter_male.png",
+            RelativeUrl = "",
+            IsCrafted = false,
+            LegendaryAffix = "You take 45–60% less damage from blocked attacks.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Cloak of Deception Enemy missiles sometimes pass through you harmlessly.
+        /// </summary>
+        public static Item CloakOfDeception = new Item
+        {
+            Id = 332208,
+            Name = "Cloak of Deception",
+            Quality = ItemQuality.Legendary,
+            Slug = "cloak-of-deception-hEilc",
+            ItemType = ItemType.Chest,
+            TrinityItemType = TrinityItemType.Chest,
+            IsTwoHanded = false,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/cloak-of-deception-hEilc",
+            Url = "http://us.battle.net/d3/en/item/cloak-of-deception-hEilc",
+            IconUrl = "http://media.blizzard.com/d3/icons/items/large/unique_cloak_102_x1_demonhunter_male.png",
+            RelativeUrl = "",
+            IsCrafted = false,
+            LegendaryAffix = "Enemy missiles sometimes pass through you harmlessly.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Insatiable Belt Picking up a Health Globe increases your maximum Life by 5% for 15 seconds, stacking up to 5 times.
+        /// </summary>
+        public static Item InsatiableBelt = new Item
+        {
+            Id = 298126,
+            Name = "Insatiable Belt",
+            Quality = ItemQuality.Legendary,
+            Slug = "insatiable-belt-1Yuo9W",
+            ItemType = ItemType.Belt,
+            TrinityItemType = TrinityItemType.Belt,
+            IsTwoHanded = false,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/insatiable-belt-1Yuo9W",
+            Url = "http://us.battle.net/d3/en/item/insatiable-belt-1Yuo9W",
+            IconUrl = "http://media.blizzard.com/d3/icons/items/large/unique_belt_103_x1_demonhunter_male.png",
+            RelativeUrl = "",
+            IsCrafted = false,
+            LegendaryAffix = "Picking up a Health Globe increases your maximum Life by 5% for 15 seconds, stacking up to 5 times.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Salvation Blocked attacks heal you and your allies for 20–30% of the amount blocked.
+        /// </summary>
+        public static Item Salvation = new Item
+        {
+            Id = 299418,
+            Name = "Salvation",
+            Quality = ItemQuality.Legendary,
+            Slug = "salvation-TxMPT",
+            ItemType = ItemType.Shield,
+            TrinityItemType = TrinityItemType.Shield,
+            IsTwoHanded = false,
+            BaseType = ItemBaseType.None,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/salvation-TxMPT",
+            Url = "http://us.battle.net/d3/en/item/salvation-TxMPT",
+            IconUrl = "http://media.blizzard.com/d3/icons/items/large/unique_crushield_108_x1_demonhunter_male.png",
+            RelativeUrl = "",
+            IsCrafted = false,
+            LegendaryAffix = "Blocked attacks heal you and your allies for 20–30% of the amount blocked.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Death's Bargain Gain an aura of death that deals 750–1000% of your Life per Second as Physical damage to enemies within 16 yards. You no longer regenerate Life.
+        /// </summary>
+        public static Item DeathsBargain = new Item
+        {
+            Id = 332205,
+            Name = "Death's Bargain",
+            Quality = ItemQuality.Legendary,
+            Slug = "deaths-bargain-3STVps",
+            ItemType = ItemType.Legs,
+            TrinityItemType = TrinityItemType.Legs,
+            IsTwoHanded = false,
+            BaseType = ItemBaseType.Armor,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/deaths-bargain-3STVps",
+            Url = "http://us.battle.net/d3/en/item/deaths-bargain-3STVps",
+            IconUrl = "http://media.blizzard.com/d3/icons/items/large/unique_pants_102_x1_demonhunter_male.png",
+            RelativeUrl = "",
+            IsCrafted = false,
+            LegendaryAffix = "Gain an aura of death that deals 750–1000% of your Life per Second as Physical damage to enemies within 16 yards. You no longer regenerate Life.",
+            SetName = "",
+        };
+
+        /// <summary>
+        /// Soulsmasher When you kill an enemy, it explodes for 450–600% of your Life per Kill as damage to all enemies within 20 yards. You no longer benefit from your Life per Kill.
+        /// </summary>
+        public static Item Soulsmasher = new Item
+        {
+            Id = 271671,
+            Name = "Soulsmasher",
+            Quality = ItemQuality.Legendary,
+            Slug = "soulsmasher-6EmZ3",
+            ItemType = ItemType.Mace,
+            TrinityItemType = TrinityItemType.TwoHandMace,
+            IsTwoHanded = true,
+            BaseType = ItemBaseType.Weapon,
+            InternalName = "",
+            DataUrl = "https://us.battle.net/api/d3/data/item/soulsmasher-6EmZ3",
+            Url = "http://us.battle.net/d3/en/item/soulsmasher-6EmZ3",
+            IconUrl = "http://media.blizzard.com/d3/icons/items/large/unique_mace_2h_104_x1_demonhunter_male.png",
+            RelativeUrl = "",
+            IsCrafted = false,
+            LegendaryAffix = "When you kill an enemy, it explodes for 450–600% of your Life per Kill as damage to all enemies within 20 yards. You no longer benefit from your Life per Kill.",
+            SetName = "",
+        };
+
+        /// <summary>
         /// Envious Blade Gain 100% Critical Hit Chance against enemies at full health.
         /// </summary>
         public static Item EnviousBlade = new Item
@@ -113,7 +297,7 @@ namespace Trinity.Reference
         //    Quality = ItemQuality.Legendary,
         //    ItemType = ItemType.Ring,
         //    BaseType = ItemBaseType.Jewelry,
-        //    GItemType = GItemType.Ring,
+        //    TrinityItemType = TrinityItemType.Ring,
         //    LegendaryAffix = "Gain 150-200% increased damage to a single element for 4 seconds",
         //    SetName = "",
         //};
@@ -125,7 +309,7 @@ namespace Trinity.Reference
         //    Quality = ItemQuality.Legendary,
         //    ItemType = ItemType.Dagger,
         //    BaseType = ItemBaseType.Weapon,
-        //    GItemType = GItemType.Dagger,
+        //    TrinityItemType = TrinityItemType.Dagger,
         //    LegendaryAffix = "Attacking enemies below 17-20% life freezes them for 3 seconds",
         //    SetName = "",
         //};
@@ -137,7 +321,7 @@ namespace Trinity.Reference
         //    Quality = ItemQuality.Legendary,
         //    ItemType = ItemType.Sword,
         //    BaseType = ItemBaseType.Weapon,
-        //    GItemType = GItemType.Sword,
+        //    TrinityItemType = TrinityItemType.Sword,
         //    LegendaryAffix = "Cooldowns are reduced by 8-10 seconds for 15 seconds after killing an elite pack",
         //    SetName = "",
         //};

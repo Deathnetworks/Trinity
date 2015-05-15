@@ -126,7 +126,7 @@ var Items = function() {
             LegendaryText: "",
             IsSet: false,
             IsTwoHanded: false,
-            GItemType: "Unknown"
+            TrinityItemType: "Unknown"
     }
 
         var request = function(itemTypeSlug, callback) {            
@@ -320,101 +320,101 @@ var Items = function() {
 
 
                     if (itemTypeName.contains("Bracers"))
-                        item.GItemType = "Bracer";
+                        item.TrinityItemType = "Bracer";
                     else if (itemTypeName.contains("Chest"))
-                        item.GItemType = "Chest";
+                        item.TrinityItemType = "Chest";
                     else if (itemTypeName.contains("Cloak"))
-                        item.GItemType = "Chest";
+                        item.TrinityItemType = "Chest";
                     else if (itemTypeName.contains("Shoulders"))
-                        item.GItemType = "Shoulder";
+                        item.TrinityItemType = "Shoulder";
                     else if (itemTypeName.contains("Helm"))
-                        item.GItemType = "Helm";
+                        item.TrinityItemType = "Helm";
                     else if (itemTypeName.contains("Spirit"))
-                        item.GItemType = "SpiritStone";
+                        item.TrinityItemType = "SpiritStone";
                     else if (itemTypeName.contains("Voodoo"))
-                        item.GItemType = "VoodooMask";
+                        item.TrinityItemType = "VoodooMask";
                     else if (itemTypeName.contains("Wizard Hat"))
-                        item.GItemType = "WizardHat";
+                        item.TrinityItemType = "WizardHat";
                     else if (itemTypeName.contains("Gloves"))
-                        item.GItemType = "Gloves";
+                        item.TrinityItemType = "Gloves";
                     else if (itemTypeName.contains("Belt"))
-                        item.GItemType = "Belt";
+                        item.TrinityItemType = "Belt";
                     else if (itemTypeName.contains("Mighty Belt"))
-                        item.GItemType = "MightyBelt";
+                        item.TrinityItemType = "MightyBelt";
                     else if (itemTypeName.contains("Pants"))
-                        item.GItemType = "Legs";
+                        item.TrinityItemType = "Legs";
                     else if (itemTypeName.contains("Boots"))
-                        item.GItemType = "Boots";
+                        item.TrinityItemType = "Boots";
                     else if (itemTypeName.contains("Amulet"))
-                        item.GItemType = "Amulet";
+                        item.TrinityItemType = "Amulet";
                     else if (itemTypeName.contains("Ring"))
-                        item.GItemType = "Ring";
+                        item.TrinityItemType = "Ring";
                     else if (itemTypeName.contains("Shield"))
-                        item.GItemType = "Shield";
+                        item.TrinityItemType = "Shield";
                     else if (itemTypeName.contains("Crusader"))
-                        item.GItemType = "CrusaderShield";
+                        item.TrinityItemType = "CrusaderShield";
                     else if (itemTypeName.contains("Mojo"))
-                        item.GItemType = "Mojo";
+                        item.TrinityItemType = "Mojo";
                     else if (itemTypeName.contains("Source"))
-                        item.GItemType = "Orb";
+                        item.TrinityItemType = "Orb";
                     else if (itemTypeName.contains("Quiver"))
-                        item.GItemType = "Quiver";
+                        item.TrinityItemType = "Quiver";
                     else if (itemTypeName.contains("Focus"))
-                        item.GItemType = "FollowerEnchantress";
+                        item.TrinityItemType = "FollowerEnchantress";
                     else if (itemTypeName.contains("Token"))
-                        item.GItemType = "FollowerScoundrel";
+                        item.TrinityItemType = "FollowerScoundrel";
                     else if (itemTypeName.contains("Relic"))
-                        item.GItemType = "FollowerTemplar";
+                        item.TrinityItemType = "FollowerTemplar";
                     else if (itemTypeName.contains("Two-Handed Flail"))
-                        item.GItemType = "TwoHandFlail";
+                        item.TrinityItemType = "TwoHandFlail";
                     else if (itemTypeName.contains("Two-Handed Mace"))
-                        item.GItemType = "TwoHandMace";
+                        item.TrinityItemType = "TwoHandMace";
                     else if (itemTypeName.contains("Two-Handed Sword"))
-                        item.GItemType = "TwoHandSword";
+                        item.TrinityItemType = "TwoHandSword";
                     else if (itemTypeName.contains("Two-Handed Axe"))
-                        item.GItemType = "TwoHandAxe";
+                        item.TrinityItemType = "TwoHandAxe";
                     else if (itemTypeName.contains("Two-Handed Mighty"))
-                        item.GItemType = "TwoHandMighty";
+                        item.TrinityItemType = "TwoHandMighty";
                     else if (itemTypeName.contains("Axe"))
-                        item.GItemType = "Axe";
+                        item.TrinityItemType = "Axe";
                     else if (itemTypeName.contains("Dagger"))
-                        item.GItemType = "Dagger";
+                        item.TrinityItemType = "Dagger";
                     else if (itemTypeName.contains("Mace"))
-                        item.GItemType = "Mace";
+                        item.TrinityItemType = "Mace";
                     else if (itemTypeName.contains("Spear"))
-                        item.GItemType = "Spear";
+                        item.TrinityItemType = "Spear";
                     else if (itemTypeName.contains("Sword"))
-                        item.GItemType = "Sword";
+                        item.TrinityItemType = "Sword";
                     else if (itemTypeName.contains("Knife"))
-                        item.GItemType = "CeremonialKnife";
+                        item.TrinityItemType = "CeremonialKnife";
                     else if (itemTypeName.contains("Fist"))
-                        item.GItemType = "FistWeapon";
+                        item.TrinityItemType = "FistWeapon";
                     else if (itemTypeName.contains("Flail"))
-                        item.GItemType = "Flail";
+                        item.TrinityItemType = "Flail";
                     else if (itemTypeName.contains("Mighty Weapon"))
-                        item.GItemType = "MightyWeapon";
+                        item.TrinityItemType = "MightyWeapon";
                     else if (itemTypeName.contains("Hand Crossbow"))
-                        item.GItemType = "HandCrossbow";
+                        item.TrinityItemType = "HandCrossbow";
                     else if (itemTypeName.contains("Wand"))
-                        item.GItemType = "Wand";
+                        item.TrinityItemType = "Wand";
                     else if (itemTypeName.contains("Crossbow"))
-                        item.GItemType = "TwoHandCrossbow";
+                        item.TrinityItemType = "TwoHandCrossbow";
                     else if (itemTypeName.contains("Bow"))
-                        item.GItemType = "TwoHandBow";
+                        item.TrinityItemType = "TwoHandBow";
                     else if (itemTypeName.contains("Polearm"))
-                        item.GItemType = "TwoHandPolearm";
+                        item.TrinityItemType = "TwoHandPolearm";
                     else if (itemTypeName.contains("Staff"))
-                        item.GItemType = "TwoHandStaff";
+                        item.TrinityItemType = "TwoHandStaff";
                     else if (itemTypeName.contains("Daibo"))
-                        item.GItemType = "TwoHandDaibo";
+                        item.TrinityItemType = "TwoHandDaibo";
                     else
-                        item.GItemType = "Unknown";
+                        item.TrinityItemType = "Unknown";
 
-                    item.IsTwoHanded = item.GItemType.contains("TwoHand");
+                    item.IsTwoHanded = item.TrinityItemType.contains("TwoHand");
 
                     if (itemHtml.find(".item-weapon-damage").length !== 0) {
                         item.BaseType = "Weapon"
-                    } else if (item.GItemType == "Amulet" || item.GItemType == "Ring") {
+                    } else if (item.TrinityItemType == "Amulet" || item.TrinityItemType == "Ring") {
                         item.BaseType = "Jewelry"
                     } else if (itemDetails.find(".item-armor-weapon.item-armor-armor").length !== 0) {
                         item.BaseType = "Armor"

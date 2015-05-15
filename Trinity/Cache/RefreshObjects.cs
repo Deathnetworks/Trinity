@@ -11,6 +11,7 @@ using Trinity.Helpers;
 using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Bot;
+using Zeta.Bot.Logic;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Game;
@@ -432,7 +433,7 @@ namespace Trinity
             const int setItemMarkerTexture = 404424;
             const int legendaryItemMarkerTexture = 275968;
 
-            if (!WantToTownRun && !ForceVendorRunASAP && Settings.Loot.Pickup.PickupLegendaries)
+            if (!BrainBehavior.IsVendoring && !WantToTownRun && !ForceVendorRunASAP && Settings.Loot.Pickup.PickupLegendaries)
             {
                 var legendaryItemMarkers = ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.IsValid &&
                                     m.Position.Distance2D(Player.Position) >= 45f && m.Position.Distance2D(Player.Position) < 300f &&

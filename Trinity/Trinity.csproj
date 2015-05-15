@@ -444,11 +444,16 @@
     <Content Include="Resources\JS Class Generator\create_class_skills.htm" />
     <Content Include="Resources\JS Class Generator\create_itemrank.htm" />
     <Content Include="Resources\JS Class Generator\create_items.htm" />
+    <Content Include="Resources\JS Class Generator\create_items_BountyCacheItems.htm" />
+    <Content Include="Resources\JS Class Generator\create_items_SpecificPage.htm" />
     <Content Include="Resources\JS Class Generator\handlebars.js" />
     <Content Include="Resources\JS Class Generator\handlebars_helper.js" />
     <Content Include="Resources\JS Class Generator\item-parse.js" />
+    <Content Include="Resources\JS Class Generator\item-SpecificPage.js" />
     <Content Include="Resources\JS Class Generator\itemrank-parse.js" />
+    <Content Include="Resources\JS Class Generator\ItemReference.js" />
     <Content Include="Resources\JS Class Generator\jquery.xdomainajax.js" />
+    <Content Include="Resources\JS Class Generator\olditemsreference.txt" />
     <Content Include="Resources\JS Class Generator\skills.js" />
   </ItemGroup>
   <ItemGroup>
