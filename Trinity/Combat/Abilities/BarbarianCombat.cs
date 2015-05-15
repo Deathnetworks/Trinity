@@ -200,9 +200,6 @@ namespace Trinity.Combat.Abilities
                  * And not on the Heart of sin
                  */
 
-                if (!CanCast(SNOPower.Barbarian_WrathOfTheBerserker))
-                    return false;
-
                 bool anyTime = (Settings.Combat.Barbarian.WOTBMode == BarbarianWOTBMode.WhenReady && !Player.IsInTown);
                 bool hasBuff = GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
                 bool hasInfiniteCasting = GetHasBuff(SNOPower.Pages_Buff_Infinite_Casting);
@@ -210,11 +207,10 @@ namespace Trinity.Combat.Abilities
                 bool emergencyHealth = Player.CurrentHealthPct <= V.F("Barbarian.WOTB.EmergencyHealth");
 
                 bool result =
-                    (!UseOOCBuff || anyTime) &&
                     //Player.PrimaryResource >= V.I("Barbarian.WOTB.MinFury") && // WOTB is "free" !
                     // Don't still have the buff
-                    !hasBuff &&
-                    (WOTBGoblins || WOTBIgnoreElites || WOTBElitesPresent || emergencyHealth || hasInfiniteCasting);
+                    !hasBuff && CanCast(SNOPower.Barbarian_WrathOfTheBerserker) &&
+                    (WOTBGoblins || WOTBIgnoreElites || WOTBElitesPresent || emergencyHealth || hasInfiniteCasting || anyTime);
 
                 return result;
             }
