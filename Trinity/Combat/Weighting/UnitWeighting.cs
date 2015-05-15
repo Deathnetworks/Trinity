@@ -30,7 +30,7 @@ namespace Trinity.Combat.Weighting
              * */
 
             if (unit == null)
-                return weightFactors.Return(WeightReason.InvalidType);
+                return weightFactors.Return(WeightReason.TypeMismatch);
 
             if (unit.IsSummonedByPlayer)
                 return weightFactors.Return(WeightReason.IsSummon);
@@ -87,15 +87,15 @@ namespace Trinity.Combat.Weighting
                 weightFactors.Add(new Weight(15000, WeightMethod.Add, WeightReason.IsElite));
 
             // Distance - Negative weight for units beyond kill radius, positive weight to those closer
-            weightFactors.Add(new Weight((CombatContext.KillRadius - unit.Distance) * 100, WeightMethod.Add, WeightReason.Distance));
+            weightFactors.Add(new Weight((CombatContext.KillRadius - unit.Distance/2) * 100, WeightMethod.Add, WeightReason.Distance));
 
             if (Trinity.Settings.Combat.Misc.ForceKillSummoners && unit.IsSummoner)
                 weightFactors.Add(new Weight(1000, WeightMethod.Add, WeightReason.Summoner));
 
             // Clustering - Add weight to groups of units.
-            weightFactors.Add(new Weight((unit.UnitsNearby * unit.UnitsNearby) * 100, WeightMethod.Add, WeightReason.Cluster));
+            //weightFactors.Add(new Weight((unit.UnitsNearby * unit.UnitsNearby) * 10, WeightMethod.Add, WeightReason.Cluster));
 
-            // Avoidance - Reduce weight for units in avoidance
+            // Avoidance - Reduce weight if melee and targets standing in avoidance
             if (CacheManager.Me.IsMelee && unit.IsStandingInAvoidance)
                 weightFactors.Add(new Weight(0.5, WeightMethod.Multiply, WeightReason.InAvoidance));
 

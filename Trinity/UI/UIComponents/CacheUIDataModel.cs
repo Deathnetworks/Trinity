@@ -1,18 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Data;
 using Trinity.Cache;
 using Trinity.LazyCache;
+using Trinity.UIComponents;
 
-namespace Trinity.UI.UIComponents
+namespace Trinity.UIComponents
 {
     public class CacheUIDataModel : INotifyPropertyChanged
     {
         public CacheUIDataModel()
         {
-
         }
 
         private bool _enabled = true;
@@ -22,7 +23,7 @@ namespace Trinity.UI.UIComponents
             set { SetField(ref _enabled, value); }
         }
 
-        private bool _isDefaultVisible = true;
+        private bool _isDefaultVisible;
         public bool IsDefaultVisible
         {
             get { return _isDefaultVisible; }
@@ -50,13 +51,19 @@ namespace Trinity.UI.UIComponents
             set { SetField(ref _lazyCache, value); }
         }
 
-        private CollectionViewSource _collection = new CollectionViewSource();
-        public CollectionViewSource Collection
+        private ObservableCollection<ChartDatum> _cacheUpdateTime = new ObservableCollection<ChartDatum>();
+        public ObservableCollection<ChartDatum> CacheUpdateTime
         {
-            get { return _collection; }
-            set { SetField(ref _collection, value); }
+            get { return _cacheUpdateTime; }
+            set { SetField(ref _cacheUpdateTime, value); }
         }
 
+        private ObservableCollection<ChartDatum> _weightUpdateTime = new ObservableCollection<ChartDatum>();
+        public ObservableCollection<ChartDatum> WeightUpdateTime
+        {
+            get { return _weightUpdateTime; }
+            set { SetField(ref _weightUpdateTime, value); }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged(string propertyName)
@@ -72,5 +79,19 @@ namespace Trinity.UI.UIComponents
             OnPropertyChanged(propertyName);
             return true;
         }
+
+        public struct ChartDatum
+        {
+            public ChartDatum(DateTime dateTime, double value) : this()
+            {
+                DateTime = dateTime;
+                Value = value;
+            }
+
+            public DateTime DateTime { set; get; }
+            public double Value { set; get; }
+        }
+
     }
+
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Media;
 using Zeta.Game.Internals.Actors;
@@ -9,19 +10,28 @@ using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.LazyCache
 {
+    public interface IFreezable
+    {
+        bool IsFrozen { get; set; }
+    }
+
     /// <summary>
     /// Information about a field and the tools to refresh it.
     /// </summary>
-    public class CacheField<T> 
+    public class CacheField<T> : IFreezable
     {
         private T _cachedValue;
+
+        private readonly Type _type;
 
         /// <summary>
         /// Create cache field; specifying an update interval
         /// </summary>
-        public CacheField(UpdateSpeed speed)
+        public CacheField(UpdateSpeed speed, T defaultValue = default(T))
         {
             Delay = (int)speed;
+            _cachedValue = defaultValue;
+            _type = typeof (T);
         }
 
         /// <summary>
@@ -30,6 +40,7 @@ namespace Trinity.LazyCache
         public CacheField(int delay = -1)
         {
             Delay = delay;
+            _type = typeof(T);
         }
 
         /// <summary>
@@ -54,6 +65,11 @@ namespace Trinity.LazyCache
         public bool IsValueCreated { get; set; }
 
         /// <summary>
+        /// Field has been told to always return cached value;
+        /// </summary>
+        public bool IsFrozen { get; set; }
+
+        /// <summary>
         /// Indicates if a new value should be requested
         /// </summary>
         public bool IsCacheValid 
@@ -61,7 +77,11 @@ namespace Trinity.LazyCache
             get
             {
                 // Always use cache if SetValueOverride() was used.
-                if (IsValueOverride)
+                if (IsValueOverride || IsFrozen)
+                    return true;
+
+                // Return cached values while cachemanager is Updating (Thread Safety for CacheUI)
+                if (CacheManager.IsUpdatePending)
                     return true;
 
                 // Always update the cache if update forcing refresh is turned on
@@ -127,6 +147,27 @@ namespace Trinity.LazyCache
             IsValueOverride = false;
             IsValueCreated = false;
             CachedValue = default(T);
+        }
+
+        /// <summary>
+        /// Time since last update in Milliseconds
+        /// </summary>
+        public double Age
+        {
+            get { return DateTime.UtcNow.Subtract(LastUpdate).TotalMilliseconds;  }
+        }
+
+        public override string ToString()
+        {
+            var isValid = IsCacheValid;
+            var state = IsFrozen || IsValueCreated || IsValueOverride || isValid ? string.Format(" [ {0}{1}{2}{3}]", 
+                IsFrozen ? "Frozen " : "",
+                IsValueCreated ? "HasValue " : "",
+                IsValueOverride ? "Override " : "",
+                isValid ? "Valid " : ""
+                ) : string.Empty;
+
+            return string.Format("CacheField<{0}>{1} Age={2} Delay={3}", _type.CSharpName(), state, Age, Delay);
         }
     }
 

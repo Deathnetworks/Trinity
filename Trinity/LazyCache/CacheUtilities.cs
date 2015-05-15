@@ -7,6 +7,8 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.SessionState;
 using System.Windows.Navigation;
@@ -216,6 +218,18 @@ namespace Trinity.LazyCache
 
         #region Reflection Utiltiies
 
+        public static Type GetEnumerableType(Type type)
+        {
+            foreach (Type intType in type.GetInterfaces())
+            {
+                if (intType.IsGenericType && intType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                {
+                    return intType.GetGenericArguments()[0];
+                }
+            }
+            return null;
+        }
+
         /// <summary>
         /// Gets a static field or property
         /// </summary>
@@ -398,6 +412,104 @@ namespace Trinity.LazyCache
         {
             Logger.Log("{0} took {1:00.00000}ms.", member, sw.Elapsed.TotalMilliseconds);
         }
+
+        static readonly Dictionary<Type, List<FieldInfo>> ReflectedFields = new Dictionary<Type, List<FieldInfo>>();
+
+        internal static List<FieldInfo> GetFields<T>()
+        {
+            var type = typeof (T);
+            List<FieldInfo> fields;
+            if (!ReflectedFields.TryGetValue(type, out fields))
+            {
+                fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).ToList();
+                ReflectedFields.Add(type,fields);
+            }
+            return fields;
+        }
+
+        /// <summary>
+        /// Set all CacheField in object IsFrozen to True
+        /// </summary>
+        internal static void Freeze<T>(T cacheBase)
+        {
+            foreach (var field in GetFields<T>())
+            {
+                if (field.FieldType.IsConstructedGenericType && field.FieldType.GetGenericTypeDefinition() == typeof(CacheField<>))
+                {
+                    var val = field.GetValue(cacheBase);
+
+                    if (val is IFreezable)
+                        (val as IFreezable).IsFrozen = true;                    
+                }
+            }
+        }
+
+        /// <summary>
+        /// Set all CacheField in object IsFrozen to False
+        /// </summary>
+        internal static void UnFreeze<T>(T cacheBase)
+        {
+            foreach (var field in GetFields<T>())
+            {
+                if (field.FieldType.IsConstructedGenericType && field.FieldType.GetGenericTypeDefinition() == typeof(CacheField<>))
+                {
+                    var val = field.GetValue(cacheBase);
+
+                    if (val is IFreezable)
+                        (val as IFreezable).IsFrozen = false;
+                }
+            }
+        }
+
+        static LambdaExpression CreateLambda(Type type, string methodName)
+        {
+            var source = Expression.Parameter(
+                typeof(IEnumerable<>).MakeGenericType(type), "source");
+
+            var call = Expression.Call(
+                typeof(Enumerable), methodName, new Type[] { type }, source);
+
+            return Expression.Lambda(call, source);
+        }
+
+        static Expression<Func<IEnumerable<T>, T>> CreateLambda<T>(string methodName)
+        {
+            var source = Expression.Parameter(
+                typeof(IEnumerable<T>), "source");
+
+            var call = Expression.Call(
+                typeof(Enumerable), methodName, new Type[] { typeof(T) }, source);
+
+            return Expression.Lambda<Func<IEnumerable<T>, T>>(call, source);
+        }
+
+        static bool IsSubclassOfRawGeneric(Type generic, Type toCheck)
+        {
+            while (toCheck != null && toCheck != typeof(object))
+            {
+                var cur = toCheck.IsGenericType ? toCheck.GetGenericTypeDefinition() : toCheck;
+                if (generic == cur)
+                {
+                    return true;
+                }
+                toCheck = toCheck.BaseType;
+            }
+            return false;
+        }
+
+        public static string CSharpName(this Type type)
+        {
+            var sb = new StringBuilder();
+            var name = type.Name;
+            if (!type.IsGenericType) return name;
+            sb.Append(name.Substring(0, name.IndexOf('`')));
+            sb.Append("<");
+            sb.Append(string.Join(", ", type.GetGenericArguments()
+                                            .Select(t => t.CSharpName())));
+            sb.Append(">");
+            return sb.ToString();
+        }
+
     }
 
  

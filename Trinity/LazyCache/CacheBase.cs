@@ -26,172 +26,77 @@ namespace Trinity.LazyCache
     /// </summary>
     public class CacheBase
     {
-        #region Fields
+        #region Constructors
 
-        private readonly CacheField<TrinityObjectType> _trinityType = new CacheField<TrinityObjectType>();
-        private readonly CacheField<CacheMeta.ActorMeta> _actorMeta = new CacheField<CacheMeta.ActorMeta>();
-        private readonly CacheField<ActorType> _actorType = new CacheField<ActorType>();
-        private readonly CacheField<DiaObject> _object = new CacheField<DiaObject>();
-        private readonly CacheField<ACD> _source = new CacheField<ACD>();
-        private readonly CacheField<int> _actorSNO = new CacheField<int>();
+        public CacheBase() { }
 
-        public CacheBase(ACD x, int acdGuid)
+        public CacheBase(DiaObject rActor)
         {
-            Source = x;
-            ACDGuid = acdGuid;
-        }
-
-        public CacheBase(ACD x)
-        {
-            Source = x;
-            ACDGuid = x.ACDGuid;
-        }
-
-        public CacheBase()
-        {
-
+            Object = rActor;
+            Source = rActor.CommonData;
+            ACDGuid = rActor.ACDGuid;
+            RActorGuid = rActor.RActorGuid;
+            ActorSNO = rActor.ActorSNO;
+            ActorType = rActor.ActorType;
+            ActorMeta = CacheMeta.GetOrCreateActorMeta(this);            
+            InternalName = ActorMeta.InternalName;
+            TrinityType = GetTrinityType(Source, ActorType, ActorSNO, ActorMeta.GizmoType, InternalName);
+            LastUpdated = CacheManager.LastUpdated;
+            ACDItem = Source as ACDItem;
+            DiaGizmo = Object as DiaGizmo;
+            DiaItem = Object as DiaItem;
+            DiaUnit = Object as DiaUnit;            
         }
 
         #endregion
 
         #region Properties
 
-        /// <summary>
-        /// Unique id for getting actor from DB's ActorManager
-        /// </summary>
-        public int ACDGuid { get; set; }            
-
-        /// <summary>
-        /// Time since source object was assigned.
-        /// </summary>
-        public DateTime LastUpdated
-        {
-            get { return _source.LastUpdate; }
-            set { _source.LastUpdate = value; }
-        }
-
-        /// <summary>
-        /// Unique identifier for the actor
-        /// </summary>
-        public int ActorSNO
-        {
-            get
-            {
-                if (_actorSNO.IsCacheValid) return _actorSNO.CachedValue;
-                return _actorSNO.CachedValue = Source.ActorSNO;
-            }
-            set { _actorSNO.SetValueOverride(value); }
-        }
-
-        /// <summary>
-        /// ActorInfo and MonsterInfo data
-        /// </summary>
-        public CacheMeta.ActorMeta ActorMeta
-        {
-            get
-            {
-                if (_actorMeta.IsCacheValid) return _actorMeta.CachedValue;
-                return _actorMeta.CachedValue = CacheMeta.GetActorMeta(this);
-            }
-            set { _actorMeta.SetValueOverride(value); }
-        }
-
-        /// <summary>
-        /// Trinity's actor type
-        /// </summary>
-        public TrinityObjectType TrinityType
-        {
-            get
-            {
-                if (_trinityType.IsCacheValid) return _trinityType.CachedValue;
-                return _trinityType.CachedValue = TrinityObject.GetTrinityObjectType(this);
-            }
-            set { _trinityType.SetValueOverride(value); }
-        }
-
-        /// <summary>
-        /// DB's actor type
-        /// </summary>
-        public ActorType ActorType
-        {
-            get
-            {
-                if (_actorType.IsCacheValid) return _actorType.CachedValue;
-                return _actorType.CachedValue = Source.ActorType;
-            }
-            set { _actorType.SetValueOverride(value); }
-        }
-
-        /// <summary>
-        /// DB's actual DiaObject (accessing properties reads directly from Diablo memory)
-        /// </summary>
-        public DiaObject Object
-        {
-            get
-            {
-                if (_object.IsCacheValid) return _object.CachedValue;
-                return _object.CachedValue = ZetaDia.Actors.GetActorByACDId(ACDGuid);
-                
-                //return _object.CachedValue = CacheFactory.CreateTypedDiaObject(Source, ActorType);
-            }
-            set { _object.SetValueOverride(value); }
-        }
-
-        /// <summary>
-        /// DB's actual ACD object (accessing properties reads directly from Diablo memory)
-        /// </summary>
-        public ACD Source
-        {
-            get
-            {
-                if (_source.IsCacheValid) return _source.CachedValue;
-                return ACDGuid != 0 ? (_source.CachedValue = ZetaDia.Actors.GetACDByGuid(ACDGuid)) : null;
-            }
-            set { _source.SetValueOverride(value); }
-        }
-
-        /// <summary>
-        /// DB's actual Gizmo object (accessing properties reads directly from Diablo memory)
-        /// </summary>
-        public DiaGizmo Gizmo
-        {
-            get { return Object as DiaGizmo; }
-        }
-
-        /// <summary>
-        /// DB's actual Item object (accessing properties reads directly from Diablo memory)
-        /// </summary>
-        public ACDItem Item
-        {
-            get { return Source as ACDItem; }
-        }
-
-        /// <summary>
-        /// DB's actual Gizmo (accessing properties reads directly from Diablo memory)
-        /// </summary>
-        public DiaItem DiaItem
-        {
-            get { return Object as DiaItem; }
-        }
-
-        /// <summary>
-        /// DB's actual Unit (accessing properties reads directly from Diablo memory)
-        /// </summary>
-        public DiaUnit Unit
-        {
-            get { return Object as DiaUnit; }
-        }
+        public int ACDGuid { get; set; }
+        public int RActorGuid { get; set; }
+        public int ActorSNO { get; set; }
+        public ActorType ActorType { get; set; }
+        public TrinityObjectType TrinityType { get; set; }
+        public ACD Source { get; set; }
+        public DiaObject Object { get; set; }
+        public string InternalName { get; set; }
+        public CacheMeta.ActorMeta ActorMeta { get; set; }
+        public DateTime LastUpdated { get; set; }
+        public ACDItem ACDItem { get; set; }
+        public DiaGizmo DiaGizmo { get; set; }
+        public DiaItem DiaItem { get; set; }
+        public DiaUnit DiaUnit { get; set; }
 
         #endregion
 
         #region Methods
 
-        /// <summary>
-        /// Checks ACD for Null/IsValid/Disposed etc.
-        /// </summary>
         public bool IsValid
         {
-            get { return _source.CachedValue != null && _source.CachedValue.IsValid && !_source.CachedValue.IsDisposed && _source.CachedValue.ACDGuid != -1; }
+            get { return IsProperValid(Object, Source, ActorType, ACDGuid, RActorGuid); }
+        }
+
+        public static bool IsProperValid(DiaObject obj, ACD acd, ActorType actorType, int acdGuid, int rActorGuid)
+        {
+            if (acd == null || obj == null)
+                return false;
+
+            if (!acd.IsValid || !obj.IsValid || acd.IsDisposed)
+                return false;
+
+            if (actorType == ActorType.Monster && (obj as DiaUnit) == null)
+                return false;
+
+            if (actorType == ActorType.Gizmo && (obj as DiaGizmo) == null)
+                return false;
+
+            if (acdGuid == -1 || rActorGuid == -1)
+                return false;
+
+            //if (string.IsNullOrEmpty(internalName))
+            //    return false;
+
+            return true;
         }
 
         /// <summary>
@@ -201,7 +106,7 @@ namespace Trinity.LazyCache
         {
             try
             {
-                return selector != null && Unit != null && Unit.IsValid && Source.IsProperValid() ? selector(Unit) : CacheUtilities.Default<T>();
+                return selector != null && DiaUnit != null && DiaUnit.IsValid && Source.IsProperValid() ? selector(DiaUnit) : CacheUtilities.Default<T>();
             }
             catch (Exception ex)
             {
@@ -225,14 +130,14 @@ namespace Trinity.LazyCache
         {
             try
             {
-                return selector != null && Item != null && Item.IsValid && Source.IsProperValid() ? selector(Item) : CacheUtilities.Default<T>();
+                return selector != null && ACDItem != null && ACDItem.IsValid && Source.IsProperValid() ? selector(ACDItem) : CacheUtilities.Default<T>();
             }
             catch (Exception ex)
             {
                 if (ex.Message.StartsWith("Only part of a ReadProcessMemory"))
                 {
                     Logger.LogError("DB Memory Exception in GetACDItemProperty Caller={0} ACDGuid={1} ActorType={2} Name={3} SNO={4} Exception={5} {6}",
-                        caller, ACDGuid, ActorType, (Source != null) ? Source.Name : string.Empty, ActorSNO, ex.Message, ex.InnerException);
+                        caller, ACDGuid, ActorType, (Source != null) ? Source.Name : String.Empty, ActorSNO, ex.Message, ex.InnerException);
                 }
                 else throw;
             }
@@ -253,7 +158,7 @@ namespace Trinity.LazyCache
                 if (ex.Message.StartsWith("Only part of a ReadProcessMemory"))
                 {
                     Logger.LogError("DB Memory Exception in GetDiaItemProperty Caller={0} ACDGuid={1} ActorType={2} Name={3} SNO={4} Exception={5} {6}",
-                        caller, ACDGuid, ActorType, (Source != null) ? Source.Name : string.Empty, (Source != null) ? Source.ActorSNO.ToString() : string.Empty, ex.Message, ex.InnerException);
+                        caller, ACDGuid, ActorType, (Source != null) ? Source.Name : String.Empty, (Source != null) ? Source.ActorSNO.ToString() : String.Empty, ex.Message, ex.InnerException);
                 }
                 else throw;
             }
@@ -267,14 +172,14 @@ namespace Trinity.LazyCache
         {
             try
             {
-                return selector != null && Gizmo != null && Gizmo.IsValid && Source.IsProperValid() ? selector(Gizmo) : CacheUtilities.Default<T>();
+                return selector != null && DiaGizmo != null && DiaGizmo.IsValid && Source.IsProperValid() ? selector(DiaGizmo) : CacheUtilities.Default<T>();
             }
             catch (Exception ex)
             {
                 if (ex.Message.StartsWith("Only part of a ReadProcessMemory"))
                 {
                     Logger.LogError("DB Memory Exception in GetGizmoProperty Caller={0} ACDGuid={1} ActorType={2} Name={3} SNO={4} Exception={5} {6}",
-                        caller, ACDGuid, ActorType, (Source != null) ? Source.Name : string.Empty, ActorSNO, ex.Message, ex.InnerException);
+                        caller, ACDGuid, ActorType, (Source != null) ? Source.Name : String.Empty, ActorSNO, ex.Message, ex.InnerException);
                 }
                 else throw;
             }
@@ -295,7 +200,7 @@ namespace Trinity.LazyCache
                 if (ex.Message.StartsWith("Only part of a ReadProcessMemory"))
                 {
                     Logger.LogError("DB Memory Exception in GetObjectProperty Caller={0} ACDGuid={1} ActorType={2} Name={3} SNO={4} Exception={5} {6}",
-                        caller, ACDGuid, ActorType, (Source != null) ? Source.Name : string.Empty, (Source != null) ? Source.ActorSNO.ToString() : string.Empty, ex.Message, ex.InnerException);
+                        caller, ACDGuid, ActorType, (Source != null) ? Source.Name : String.Empty, (Source != null) ? Source.ActorSNO.ToString() : String.Empty, ex.Message, ex.InnerException);
                 }
                 else throw;                
             }
@@ -316,7 +221,7 @@ namespace Trinity.LazyCache
                 if (ex.Message.StartsWith("Only part of a ReadProcessMemory"))
                 {
                     Logger.LogError("DB Memory Exception in GetSourceProperty Caller={0} ACDGuid={1} ActorType={2} Name={3} SNO={4} Exception={5} {6}",
-                        caller, ACDGuid, ActorType, (Source != null) ? Source.Name : string.Empty, (Source != null) ? Source.ActorSNO.ToString() : string.Empty, ex.Message, ex.InnerException);
+                        caller, ACDGuid, ActorType, (Source != null) ? Source.Name : String.Empty, (Source != null) ? Source.ActorSNO.ToString() : String.Empty, ex.Message, ex.InnerException);
                 }
                 else throw;
             }
@@ -330,7 +235,7 @@ namespace Trinity.LazyCache
         {
             try
             {
-                return selector != null && Unit != null && Unit.IsValid && Source.IsProperValid() ? selector(source) : CacheUtilities.Default<T2>();
+                return selector != null && DiaUnit != null && DiaUnit.IsValid && Source.IsProperValid() ? selector(source) : CacheUtilities.Default<T2>();
             }
             catch (Exception ex)
             {
@@ -345,30 +250,99 @@ namespace Trinity.LazyCache
         }
 
         /// <summary>
-        /// Replace the source ACD with a new object reference
+        /// Replace the data source with a new object reference
         /// </summary>
-        public void UpdateSource(ACD acd)
+        public void UpdateSource(DiaObject rActor)
         {
-            Source = acd;
+            Object = rActor;
+            Source = rActor.CommonData;
         }
 
         /// <summary>
-        /// Replace the source ACD with a new object reference
+        /// Replace the data source with a new object reference
         /// </summary>
-        public TrinityObject UpdateSource(TrinityObject obj, ACD acd)
-        {
+        public TrinityObject UpdateSource(TrinityObject obj, ACD acd, DiaObject rActor)
+        {            
+            obj.Object = rActor;
             obj.Source = acd;
             return obj;
         }
 
         /// <summary>
-        /// Triggers source to update itself using a new ACDGuid
+        /// Trinity's actor type.
         /// </summary>
-        public void UpdateSource(int acdGuid)
+        internal static TrinityObjectType GetTrinityType(ACD acd, ActorType actorType, int actorSNO, GizmoType gizmoType, string internalName)
         {
-            ACDGuid = acdGuid;
-            _source.IsValueCreated = false;
-        }        
+
+            if (actorType == ActorType.Monster)
+                return TrinityObjectType.Unit;
+
+            if (internalName.Contains("CursedChest"))
+                return TrinityObjectType.CursedChest;
+
+            if (internalName.Contains("CursedShrine"))
+                return TrinityObjectType.CursedShrine;
+
+            if (DataDictionary.Shrines.Any(s => s == (SNOActor)actorSNO))
+                return TrinityObjectType.Shrine;
+
+            if (acd is ACDItem && internalName.ToLower().Contains("gold"))
+                return TrinityObjectType.Gold;
+
+            if (actorType == ActorType.Item || DataDictionary.ForceToItemOverrideIds.Contains(actorSNO))
+                return TrinityObjectType.Item;
+
+            if (DataDictionary.InteractWhiteListIds.Contains(actorSNO))
+                return TrinityObjectType.Interactable;
+
+            if (AvoidanceManager.GetAvoidanceType(actorSNO) != AvoidanceType.None)
+                return TrinityObjectType.Avoidance;
+
+            if (actorType == ActorType.Gizmo)
+            {
+                switch (gizmoType)
+                {
+                    case GizmoType.HealingWell:
+                        return TrinityObjectType.HealthWell;
+
+                    case GizmoType.Door:
+                        return TrinityObjectType.Door;
+
+                    case GizmoType.BreakableDoor:
+                        return TrinityObjectType.Barricade;
+
+                    case GizmoType.PoolOfReflection:
+                    case GizmoType.PowerUp:
+                        return TrinityObjectType.Shrine;
+
+                    case GizmoType.Chest:
+                        return TrinityObjectType.Container;
+
+                    case GizmoType.DestroyableObject:
+                    case GizmoType.BreakableChest:
+                        return TrinityObjectType.Destructible;
+
+                    case GizmoType.PlacedLoot:
+                    case GizmoType.Switch:
+                    case GizmoType.Headstone:
+                        return TrinityObjectType.Interactable;
+
+                    case GizmoType.Portal:
+                        return TrinityObjectType.Portal;
+                }
+            }
+
+            if (acd.ActorType == ActorType.Player)
+                return TrinityObjectType.Player;
+
+            if (internalName.StartsWith("Banner_Player"))
+                return TrinityObjectType.Banner;
+
+            if (internalName.StartsWith("Waypoint-"))
+                return TrinityObjectType.Waypoint;
+
+            return TrinityObjectType.Unknown;
+        }
 
         public override int GetHashCode()
         {
@@ -384,55 +358,52 @@ namespace Trinity.LazyCache
 
         #region Operators
 
-        public static implicit operator CacheBase(ACD x)
-        {
-            return new CacheBase(x);
-        }
-
-        public static explicit operator ACD(CacheBase x)
-        {
-            return x.Source;
-        }
-
         public TrinityUnit ToTrinityUnit()
         {
-            return CopyTo(new TrinityUnit(Source, ACDGuid));
+            return CopyTo(new TrinityUnit());
         }
 
         public TrinityGizmo ToTrinityGizmo()
         {
-            return CopyTo(new TrinityGizmo(Source, ACDGuid));
+            return CopyTo(new TrinityGizmo());
         }
 
         public TrinityAvoidance ToTrinityAvoidance()
         {
-            return CopyTo(new TrinityAvoidance(Source, ACDGuid));
+            return CopyTo(new TrinityAvoidance());
         }
 
         public TrinityItem ToTrinityItem()
         {
-            return CopyTo(new TrinityItem(Source, ACDGuid));
+            return CopyTo(new TrinityItem());
         }
 
         public TrinityPlayer ToTrinityPlayer()
         {
-            return CopyTo(new TrinityPlayer(Source, ACDGuid));
+            return CopyTo(new TrinityPlayer());
         }
 
         public TrinityObject ToTrinityObject()
         {
-            return CopyTo(new TrinityObject(Source, ACDGuid));
+            return CopyTo(new TrinityObject());
         }
 
         public T CopyTo<T>(T other) where T : CacheBase
         {
             other.Object = Object;
+            other.Source = Source;                
             other.ACDGuid = ACDGuid;
-            other.LastUpdated = _source.LastUpdate;
-            other.ActorMeta = ActorMeta;
-            other.TrinityType = TrinityType;
+            other.RActorGuid = RActorGuid;
             other.ActorSNO = ActorSNO;
             other.ActorType = ActorType;
+            other.ActorMeta = ActorMeta;
+            other.InternalName = InternalName;
+            other.TrinityType = TrinityType;
+            other.LastUpdated = LastUpdated;
+            other.ACDItem = ACDItem;
+            other.DiaGizmo = DiaGizmo;
+            other.DiaItem = DiaItem;
+            other.DiaUnit = DiaUnit;
             return other;
         }
 

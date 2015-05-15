@@ -21,7 +21,9 @@ namespace Trinity.LazyCache
     /// </summary>
     public class TrinityPlayer : TrinityUnit
     {
-        public TrinityPlayer(ACD acd, int acdGuid) : base(acd, acdGuid) {}
+        public TrinityPlayer() { }
+
+        public TrinityPlayer(DiaObject rActor) : base(rActor) { }
 
         #region Fields
 
@@ -86,7 +88,6 @@ namespace Trinity.LazyCache
         private readonly CacheField<bool> _isLoadingWorld = new CacheField<bool>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isInTown = new CacheField<bool>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isInGame = new CacheField<bool>(UpdateSpeed.Fast);
-        private readonly CacheField<bool> _isMe = new CacheField<bool>();
         private readonly CacheField<int> _riftRewardKey = new CacheField<int>(UpdateSpeed.Normal);
         private readonly CacheField<int> _riftDeathCount = new CacheField<int>(UpdateSpeed.Normal);
         private readonly CacheField<double> _riftResurrectionTime = new CacheField<double>(UpdateSpeed.Fast);
@@ -656,15 +657,6 @@ namespace Trinity.LazyCache
         }
 
         /// <summary>
-        /// If this TrinityPlayer object is for the current player
-        /// </summary>
-        public bool IsMe
-        {
-            get { return _isMe.IsCacheValid ? _isMe.CachedValue : (_isMe.CachedValue = ACDGuid == ZetaDia.ActivePlayerACDGuid); }
-            set { _isMe.SetValueOverride(value); }
-        }
-
-        /// <summary>
         /// Number of times you've died so far in the current rift (effects respawn delay)
         /// </summary>
         public int RiftDeathCount
@@ -855,11 +847,6 @@ namespace Trinity.LazyCache
         }
 
         #endregion
-
-        public static implicit operator TrinityPlayer(ACD x)
-        {
-            return CacheFactory.CreateObject<TrinityPlayer>(x);
-        }
 
     }
 }

@@ -23,75 +23,60 @@ namespace Trinity.LazyCache
         /// <returns>baseObject converted to an instance of T</returns>
         public static T CreateObject<T>(CacheBase cacheBase)
         {            
-            return CacheUtilities.New<T>(cacheBase.Source);
+            return CacheUtilities.New<T>(cacheBase.Object);
+        }
+
+        public static TrinityObject CreateTrinityObject(DiaObject rActor)
+        {
+            return CreateTrinityObject(rActor, rActor.CommonData, rActor.ACDGuid, rActor.RActorGuid, rActor.ActorSNO, rActor.ActorType);
         }
 
         /// <summary>
         /// Converts an ACD into the appropriate Trinity object
         /// </summary>
-        public static TrinityObject CreateTypedTrinityObject(ACD acd, int guid, int actorSNO)
+        public static TrinityObject CreateTrinityObject(DiaObject rActor, ACD acd, int acdGuid, int rActorGuid, int actorSNO, ActorType actorType)
         {
-            CacheBase baseObj;
-
-            using (new PerformanceLogger(string.Format("BaseCtor {0} ActorType={1} SNO={2}", acd.Name, guid, actorSNO)))
-            {
-                baseObj = new CacheBase(acd, guid)
-                {
-                    ActorSNO = actorSNO                    
-                };
-            }
-
             TrinityObject result;
 
-            var actorType = baseObj.ActorType;
-            var trinityType = baseObj.TrinityType;
+            var meta = CacheMeta.GetOrCreateActorMeta(rActor, acd, actorSNO, actorType);
 
-            if (actorType == ActorType.Player && trinityType == TrinityObjectType.Player)
-                result = baseObj.ToTrinityPlayer();
+            var trinityType = CacheBase.GetTrinityType(acd, actorType, actorSNO, meta.GizmoType, meta.InternalName);
 
-            else if (actorType == ActorType.Monster && trinityType == TrinityObjectType.Unit)
-                result = baseObj.ToTrinityUnit();
+            //if (actorType == ActorType.Player)
+            //    result = new TrinityPlayer();
+
+            if (actorType == ActorType.Monster && trinityType != TrinityObjectType.Player)
+                result = new TrinityUnit();
 
             else if (actorType == ActorType.Gizmo)
-                result = baseObj.ToTrinityGizmo();
+                result = new TrinityGizmo();
 
-            else if (actorType == ActorType.Item && trinityType == TrinityObjectType.Item)
-                result = baseObj.ToTrinityItem();
+            else if (actorType == ActorType.Item)
+                result = new TrinityItem();
 
             else if (trinityType == TrinityObjectType.Avoidance)
-                result = baseObj.ToTrinityAvoidance();
+                result = new TrinityAvoidance();
 
             else
-                result = baseObj.ToTrinityObject();
+                result = new TrinityObject();
+
+            result.Object = rActor;
+            result.Source = acd;
+            result.ACDGuid = acdGuid;
+            result.RActorGuid = rActorGuid;
+            result.ActorSNO = actorSNO;
+            result.ActorMeta = meta;
+            result.ActorType = actorType;
+            result.InternalName = meta.InternalName;
+            result.TrinityType = trinityType;
+            result.LastUpdated = CacheManager.LastUpdated;
+            result.ACDItem = acd as ACDItem;
+            result.DiaGizmo = rActor as DiaGizmo;
+            result.DiaItem = rActor as DiaItem;
+            result.DiaUnit = rActor as DiaUnit;    
 
             return result;
         }
 
-        /// <summary>
-        /// Converts an ACD into the appropriate DiaObject
-        /// </summary>
-        public static DiaObject CreateTypedDiaObject(ACD acd, ActorType actorType)
-        {
-            switch (actorType)
-            {
-                case ActorType.Monster:
-                    return CacheUtilities.New<DiaUnit>(acd.BaseAddress);
-
-                case ActorType.Gizmo:
-                    return CacheUtilities.New<DiaGizmo>(acd.BaseAddress);
-
-                case ActorType.Player:
-
-                    if(acd.ACDGuid == ZetaDia.ActivePlayerACDGuid)
-                        return CacheUtilities.New<DiaActivePlayer>(acd.BaseAddress);
-
-                    return CacheUtilities.New<DiaPlayer>(acd.BaseAddress);
-
-                case ActorType.Item:
-                    return CacheUtilities.New<DiaItem>(acd.BaseAddress);
-            }
-
-            return CacheUtilities.New<DiaObject>(acd.BaseAddress);
-        }
     }
 }

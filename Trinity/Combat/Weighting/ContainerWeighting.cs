@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Trinity.LazyCache;
 using Trinity.Reference;
 using Zeta.Game;
+using Zeta.Game.Internals.Actors;
+using Zeta.Game.Internals.SNO;
 
 namespace Trinity.Combat.Weighting
 {
@@ -17,6 +19,12 @@ namespace Trinity.Combat.Weighting
         public static IEnumerable<Weight> GetWeight(TrinityObject cacheObject)
         {
             var weightFactors = new List<Weight>();
+
+            if (cacheObject == null)
+                return weightFactors.Return(WeightReason.NullObject);
+
+            if (cacheObject.ActorType == ActorType.Gizmo && cacheObject.DiaGizmo == null)
+                return weightFactors.Return(WeightReason.TypeMismatch);
 
             if (weightFactors.TryAddWeight(cacheObject, WeightReason.CloseRangePriority))
                 return weightFactors;

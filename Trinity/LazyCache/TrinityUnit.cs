@@ -18,8 +18,9 @@ namespace Trinity.LazyCache
     /// </summary>
     public class TrinityUnit : TrinityObject
     {
-        public TrinityUnit(ACD acd, int acdGuid) : base(acd, acdGuid) { }
+        public TrinityUnit() { }
 
+        public TrinityUnit(DiaObject rActor) : base(rActor) { }
 
         #region Fields
 
@@ -109,6 +110,7 @@ namespace Trinity.LazyCache
         private readonly CacheField<bool> _isChargeTarget = new CacheField<bool>();
 
 
+
         #endregion
 
         #region Properties
@@ -172,7 +174,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public int PetCreatorACDId
         {
-            get { return _petCreatorACDId.IsCacheValid ? _petCreatorACDId.CachedValue : (_petCreatorACDId.CachedValue = (GetUnitProperty(x => x.PetCreator) != null) ? Unit.PetCreator.ACDGuid : 0); }
+            get { return _petCreatorACDId.IsCacheValid ? _petCreatorACDId.CachedValue : (_petCreatorACDId.CachedValue = (GetUnitProperty(x => x.PetCreator) != null) ? DiaUnit.PetCreator.ACDGuid : 0); }
             set { _petCreatorACDId.SetValueOverride(value); }
         }
 
@@ -419,7 +421,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsGoblin
         {
-            get { return _isTreasureGoblin.IsCacheValid ? _isTreasureGoblin.CachedValue : (_isTreasureGoblin.CachedValue = DataDictionary.GoblinIds.Contains(ActorSNO) || MonsterRace == MonsterRace.TreasureGoblin); }
+            get { return _isTreasureGoblin.IsCacheValid ? _isTreasureGoblin.CachedValue : (_isTreasureGoblin.CachedValue = MonsterRace == MonsterRace.TreasureGoblin || DataDictionary.GoblinIds.Contains(ActorSNO)); }
             set { _isTreasureGoblin.SetValueOverride(value); }
         }
 
@@ -446,7 +448,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsTrash
         {
-            get { return _isTrash.IsCacheValid ? _isTrash.CachedValue : (_isTrash.CachedValue = !(IsBossOrEliteRareUnique || IsGoblin)); }
+            get { return _isTrash.IsCacheValid ? _isTrash.CachedValue : (_isTrash.CachedValue = IsHostile && !(IsBossOrEliteRareUnique || IsGoblin)); }
             set { _isTrash.SetValueOverride(value); }
         }
 
@@ -961,7 +963,7 @@ namespace Trinity.LazyCache
         internal static int GetUnitsNearby(TrinityUnit o)
         {
             return (from u in CacheManager.Monsters
-                    where u.ACDGuid != o.ACDGuid && MathUtil.PositionIsInCircle(u.Position, o.Position, Trinity.Settings.Combat.Misc.TrashPackClusterRadius)
+                    where u.ACDGuid != o.ACDGuid && MathUtil.PositionIsInCircle(u.Position, o.Position, Trinity.Settings.Combat.Misc.TrashPackClusterRadius/2)
                     select u).Count();
         }
 
@@ -1064,18 +1066,5 @@ namespace Trinity.LazyCache
 
         #endregion
 
-        #region Operators
-
-        public static implicit operator TrinityUnit(ACD x)
-        {
-            return CacheFactory.CreateObject<TrinityUnit>(x);
-        }
-
-        public static explicit operator DiaUnit(TrinityUnit x)
-        {
-            return x.Unit;
-        }
-
-        #endregion
     }
 }

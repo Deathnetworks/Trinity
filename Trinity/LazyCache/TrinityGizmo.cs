@@ -17,7 +17,9 @@ namespace Trinity.LazyCache
     /// </summary>
     public class TrinityGizmo : TrinityObject
     {
-        public TrinityGizmo(ACD acd, int acdGuid) : base(acd, acdGuid) { }
+        public TrinityGizmo() { }
+
+        public TrinityGizmo(DiaObject rActor) : base(rActor) { }
 
         #region Fields
 
@@ -337,18 +339,5 @@ namespace Trinity.LazyCache
 
         #endregion
 
-        #region Operators
-
-        public static implicit operator TrinityGizmo(ACD x)
-        {
-            return CacheFactory.CreateObject<TrinityGizmo>(x);
-        }
-
-        public static explicit operator DiaGizmo(TrinityGizmo x)
-        {
-            return x.Gizmo;
-        }
-
-        #endregion
     }
 }

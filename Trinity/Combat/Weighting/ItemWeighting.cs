@@ -23,7 +23,7 @@ namespace Trinity.Combat.Weighting
             var item = cacheObject as TrinityItem;
             if (item == null)
             {
-                weightFactors.Add(new Weight(0, WeightMethod.Set, WeightReason.InvalidType));
+                weightFactors.Add(new Weight(0, WeightMethod.Set, WeightReason.TypeMismatch));
                 return weightFactors;
             }
 
@@ -63,7 +63,7 @@ namespace Trinity.Combat.Weighting
             var item = cacheObject as TrinityItem;
             if (item == null)
             {
-                weightFactors.Add(new Weight(0, WeightMethod.Set, WeightReason.InvalidType));
+                weightFactors.Add(new Weight(0, WeightMethod.Set, WeightReason.TypeMismatch));
                 return weightFactors;
             }
 

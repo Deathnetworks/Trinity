@@ -1376,14 +1376,6 @@ namespace Trinity
             "invisible"
         };
 
-        /// <summary>
-        /// ActorIds that should be ignored
-        /// </summary>
-        internal static HashSet<int> ActorIgnoreIds = new HashSet<int>
-        {
-            0000, 
-        };
-
         internal static HashSet<SNOAnim> ActorChargeAnimations = new HashSet<SNOAnim>
         {
             SNOAnim.Beast_start_charge_02, 
@@ -1407,7 +1399,8 @@ namespace Trinity
             ActorType.CustomBrain,
             ActorType.Invalid,
             ActorType.ServerProp,
-            ActorType.Critter
+            ActorType.Projectile,
+            ActorType.Critter,
         };
 
         /// <summary>

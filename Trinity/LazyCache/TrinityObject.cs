@@ -21,20 +21,23 @@ namespace Trinity.LazyCache
     /// </summary>
     public class TrinityObject : CacheBase
     {
-        public TrinityObject(ACD acd, int acdGuid) : base(acd, acdGuid) { }
-        protected TrinityObject() {}
+        #region Constructors
+
+        public TrinityObject() { }
+
+        public TrinityObject(DiaObject rActor) : base(rActor) {}
+
+        #endregion
 
         #region Fields
 
-        private readonly CacheField<string> _internalName = new CacheField<string>();
-        private readonly CacheField<int> _rActorGuid = new CacheField<int>();
         private readonly CacheField<int> _monsterSNO = new CacheField<int>();
         private readonly CacheField<Vector3> _position = new CacheField<Vector3>(UpdateSpeed.Fast);
         private readonly CacheField<float> _distance = new CacheField<float>(UpdateSpeed.Fast);
         private readonly CacheField<SNOAnim> _currentAnimation = new CacheField<SNOAnim>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isInLineOfSight = new CacheField<bool>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isNavigationObstacle = new CacheField<bool>();
-        private readonly CacheField<float> _radiusDistance = new CacheField<float>();
+        private readonly CacheField<float> _radiusDistance = new CacheField<float>(UpdateSpeed.Fast);
         private readonly CacheField<float> _radius = new CacheField<float>();
         private readonly CacheField<Sphere> _collisionSphere = new CacheField<Sphere>();
         private readonly CacheField<MonsterType> _monsterType = new CacheField<MonsterType>();
@@ -59,6 +62,8 @@ namespace Trinity.LazyCache
         private readonly CacheField<bool> _isGizmo = new CacheField<bool>();
         private readonly CacheField<bool> _isGlobe = new CacheField<bool>();
         private readonly CacheField<string> _objectHash = new CacheField<string>();
+        private readonly CacheField<string> _internalNameLowerCase = new CacheField<string>();
+        private readonly CacheField<string> _name = new CacheField<string>();
         private readonly CacheField<bool> _isPickupNoClick = new CacheField<bool>();
         private readonly CacheField<bool> _isInteractable = new CacheField<bool>();
         private readonly CacheField<bool> _isDetroyable = new CacheField<bool>();
@@ -67,6 +72,9 @@ namespace Trinity.LazyCache
         private readonly CacheField<bool> _isBlocking = new CacheField<bool>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isNoDamage = new CacheField<bool>();
         private readonly CacheField<double> _weight = new CacheField<double>(UpdateSpeed.Normal);
+        private readonly CacheField<bool> _isMe = new CacheField<bool>();
+        private readonly CacheField<bool> _isItem = new CacheField<bool>();
+        private double _weightTime;
 
         #endregion
 
@@ -77,17 +85,8 @@ namespace Trinity.LazyCache
         /// </summary>
         public string Name
         {
-            get { return _internalName.IsCacheValid ? _internalName.CachedValue : (_internalName.CachedValue = GetName(this)); }
-            set { _internalName.SetValueOverride(value); }
-        }
-
-        /// <summary>
-        /// Diablo's internal name
-        /// </summary>
-        public string InternalName
-        {
-            get { return _internalName.IsCacheValid ? _internalName.CachedValue : (_internalName.CachedValue = ((SNOActor)ActorSNO).ToString()); }
-            set { _internalName.SetValueOverride(value); }
+            get { return _name.IsCacheValid ? _name.CachedValue : (_name.CachedValue = GetName(this)); }
+            set { _name.SetValueOverride(value); }
         }
 
         /// <summary>
@@ -95,17 +94,8 @@ namespace Trinity.LazyCache
         /// </summary>
         public string InternalNameLowerCase
         {
-            get { return _internalName.IsCacheValid ? _internalName.CachedValue : (_internalName.CachedValue = InternalName.ToLowerInvariant()); }
-            set { _internalName.SetValueOverride(value); }
-        }
-
-        /// <summary>
-        /// Unique identifier for the RActor list
-        /// </summary>
-        public int RActorGuid
-        {
-            get { return _rActorGuid.IsCacheValid ? _rActorGuid.CachedValue : (_rActorGuid.CachedValue = GetObjectProperty(x => x.RActorGuid)); }
-            set { _rActorGuid.SetValueOverride(value); }
+            get { return _internalNameLowerCase.IsCacheValid ? _internalNameLowerCase.CachedValue : (_internalNameLowerCase.CachedValue = InternalName.ToLowerInvariant()); }
+            set { _internalNameLowerCase.SetValueOverride(value); }
         }
 
         /// <summary>
@@ -325,6 +315,15 @@ namespace Trinity.LazyCache
         }
 
         /// <summary>
+        /// Is any kind of shrine
+        /// </summary>
+        public bool IsItem
+        {
+            get { return _isItem.IsCacheValid ? _isItem.CachedValue : (_isItem.CachedValue = TrinityType == TrinityObjectType.Item); }
+            set { _isItem.SetValueOverride(value); }
+        }
+
+        /// <summary>
         /// If the actor the objective for the current bounty quest
         /// </summary>
         public bool IsBountyObjective
@@ -370,20 +369,15 @@ namespace Trinity.LazyCache
         }
 
         /// <summary>
-        /// A unique identifier caclulated from the actors position and other properties
-        /// </summary>
-        public string ObjectHash
-        {
-            get { return _objectHash.IsCacheValid ? _objectHash.CachedValue : (_objectHash.CachedValue = GenerateObjectHash(this)); }
-            set { _objectHash.SetValueOverride(value); }
-        }
-
-        /// <summary>
         /// If can be picked up just by walking near to it
         /// </summary>
         public bool IsPickupNoClick
         {
-            get { return _isPickupNoClick.IsCacheValid ? _isPickupNoClick.CachedValue : (_isPickupNoClick.CachedValue = DataDictionary.NoPickupClickTypes.Any(t => t == TrinityType)); }
+            get
+            {
+                if (_isPickupNoClick.IsCacheValid) return _isPickupNoClick.CachedValue;
+                return _isPickupNoClick.CachedValue = DataDictionary.NoPickupClickTypes.Any(t => t == TrinityType);
+            }
             set { _isPickupNoClick.SetValueOverride(value); }
         }
 
@@ -392,7 +386,11 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsInteractable
         {
-            get { return _isInteractable.IsCacheValid ? _isInteractable.CachedValue : (_isInteractable.CachedValue = DataDictionary.InteractableTypes.Any(t => t == TrinityType)); }
+            get
+            {
+                if (_isInteractable.IsCacheValid) return _isInteractable.CachedValue;
+                return _isInteractable.CachedValue = DataDictionary.InteractableTypes.Any(t => t == TrinityType);
+            }
             set { _isInteractable.SetValueOverride(value); }
         }
 
@@ -401,7 +399,11 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsDestroyable
         {
-            get { return _isDetroyable.IsCacheValid ? _isDetroyable.CachedValue : (_isDetroyable.CachedValue = DataDictionary.DestroyableTypes.Any(t => t == TrinityType)); }
+            get
+            {
+                if (_isDetroyable.IsCacheValid) return _isDetroyable.CachedValue;
+                return _isDetroyable.CachedValue = DataDictionary.DestroyableTypes.Any(t => t == TrinityType);
+            }
             set { _isDetroyable.SetValueOverride(value); }
         }
 
@@ -410,7 +412,11 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsUntargetable
         {
-            get { return _isUntargetable.IsCacheValid ? _isUntargetable.CachedValue : (_isUntargetable.CachedValue = Source.GetAttributeOrDefault<int>(ActorAttributeType.Untargetable) > 0); }
+            get
+            {
+                if (_isUntargetable.IsCacheValid) return _isUntargetable.CachedValue;
+                return _isUntargetable.CachedValue = Source.GetAttributeOrDefault<int>(ActorAttributeType.Untargetable) > 0;
+            }
             set { _isUntargetable.SetValueOverride(value); }
         }
 
@@ -419,7 +425,11 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsInvulnerable
         {
-            get { return _isInvulnerable.IsCacheValid ? _isInvulnerable.CachedValue : (_isInvulnerable.CachedValue = Source.GetAttributeOrDefault<int>(ActorAttributeType.Invulnerable) > 0); }
+            get
+            {
+                if (_isInvulnerable.IsCacheValid) return _isInvulnerable.CachedValue;
+                return _isInvulnerable.CachedValue = Source.GetAttributeOrDefault<int>(ActorAttributeType.Invulnerable) > 0;
+            }
             set { _isInvulnerable.SetValueOverride(value); }
         }
 
@@ -428,7 +438,11 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsBlocking
         {
-            get { return _isBlocking.IsCacheValid ? _isBlocking.CachedValue : (_isBlocking.CachedValue = GetIsNavBlocking()); }
+            get
+            {
+                if (_isBlocking.IsCacheValid) return _isBlocking.CachedValue;
+                return _isBlocking.CachedValue = GetIsNavBlocking();
+            }
             set { _isBlocking.SetValueOverride(value); }
         }
 
@@ -437,7 +451,11 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsNoDamage
         {
-            get { return _isNoDamage.IsCacheValid ? _isNoDamage.CachedValue : (_isNoDamage.CachedValue = Source.GetAttributeOrDefault<int>(ActorAttributeType.NoDamage) > 0); }
+            get
+            {
+                if (_isNoDamage.IsCacheValid) return _isNoDamage.CachedValue;
+                return _isNoDamage.CachedValue = Source.GetAttributeOrDefault<int>(ActorAttributeType.NoDamage) > 0;
+            }
             set { _isNoDamage.SetValueOverride(value); }
         }
 
@@ -467,14 +485,36 @@ namespace Trinity.LazyCache
         /// </summary>
         public double Weight
         {
-            get { return _weight.IsCacheValid ? _weight.CachedValue : (_weight.CachedValue = WeightManager.CalculateWeight(this, out WeightFactors)); }
+            get
+            {
+                if (_weight.IsCacheValid) return _weight.CachedValue;
+                return _weight.CachedValue = WeightManager.CalculateWeight(this, out WeightFactors, out _weightTime);
+            }
             set { _weight.SetValueOverride(value); }
+        }
+
+        /// <summary>
+        /// If this TrinityPlayer object is for the current player
+        /// </summary>
+        public bool IsMe
+        {
+            get { return _isMe.IsCacheValid ? _isMe.CachedValue : (_isMe.CachedValue = ACDGuid == CacheManager.ActivePlayerGuid); }
+            set { _isMe.SetValueOverride(value); }
         }
 
         /// <summary>
         /// The individual factors that contribute to a final weight
         /// </summary>
-        public List<Weight> WeightFactors = new List<Weight>();
+        public List<Weight> WeightFactors = new List<Weight>();        
+
+        /// <summary>
+        /// How long it took to weight this
+        /// </summary>
+        public double WeightTime
+        {
+            get { return _weightTime; }
+            set { _weightTime = value; }
+        }
 
         public string WeightReasons 
         {
@@ -485,110 +525,22 @@ namespace Trinity.LazyCache
 
         #region Methods
 
-        /// <summary>
-        /// Generates an SHA1 hash of a particular CacheObject
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public static string GenerateObjectHash(TrinityObject obj)
-        {
-            using (MD5 md5 = MD5.Create())
-            {
-                string objHashBase;
-                if (obj.TrinityType == TrinityObjectType.Unit)
-                    objHashBase = obj.ActorSNO + obj.InternalName + obj.Position + obj.TrinityType + Trinity.CurrentWorldDynamicId;
-                else if (obj.TrinityType == TrinityObjectType.Item && obj is TrinityItem)
-                {
-                    var objItem = (TrinityItem)obj;
-                    return HashGenerator.GenerateItemHash(obj.Position, obj.ActorSNO, obj.InternalName, Trinity.CurrentWorldId, objItem.ItemQuality, objItem.Level);
-                }
-                else
-                    objHashBase = String.Format("{0}{1}{2}{3}", obj.ActorSNO, obj.Position, obj.TrinityType, Trinity.CurrentWorldDynamicId);
-
-                string objHash = HashGenerator.GetMd5Hash(md5, objHashBase);
-                return objHash;
-            }
-        }
-
         public static TrinityObjectType GetTrinityObjectType(CacheBase cacheBase)
         {
-            return GetTrinityObjectType(cacheBase.Source, cacheBase.ActorType, cacheBase.ActorSNO, cacheBase.ActorMeta.GizmoType, cacheBase.ActorMeta.InternalName);
+            return GetTrinityType(cacheBase.Source, cacheBase.ActorType, cacheBase.ActorSNO, cacheBase.ActorMeta.GizmoType, cacheBase.ActorMeta.InternalName);
         }
 
         /// <summary>
-        /// Trinity's actor type.
+        /// Update weights that need updating
         /// </summary>
-        internal static TrinityObjectType GetTrinityObjectType(ACD acd, ActorType actorType, int actorSNO, GizmoType gizmoType, string internalName)
+        internal bool TryCalculateWeight()
         {
-                       
-            if (actorType == ActorType.Monster)
-                return TrinityObjectType.Unit;
-
-            if (internalName.Contains("CursedChest"))
-                return TrinityObjectType.CursedChest;
-
-            if (internalName.Contains("CursedShrine"))
-                return TrinityObjectType.CursedShrine;
-
-            if (DataDictionary.Shrines.Any(s => s == (SNOActor)actorSNO))
-                return TrinityObjectType.Shrine;
-
-            if (acd is ACDItem && internalName.ToLower().Contains("gold"))
-                return TrinityObjectType.Gold;
-
-            if (actorType == ActorType.Item || DataDictionary.ForceToItemOverrideIds.Contains(actorSNO))
-                return TrinityObjectType.Item;
-
-            if (DataDictionary.InteractWhiteListIds.Contains(actorSNO))
-                return TrinityObjectType.Interactable;
-
-            if (AvoidanceManager.GetAvoidanceType(actorSNO) != AvoidanceType.None)
-                return TrinityObjectType.Avoidance;
-
-            if (actorType == ActorType.Gizmo)
+            if (!_weight.IsCacheValid && !IsMe)
             {
-                switch (gizmoType)
-                {
-                    case GizmoType.HealingWell:
-                        return TrinityObjectType.HealthWell;
-
-                    case GizmoType.Door:
-                        return TrinityObjectType.Door;
-
-                    case GizmoType.BreakableDoor:
-                        return TrinityObjectType.Barricade;
-
-                    case GizmoType.PoolOfReflection:
-                    case GizmoType.PowerUp:
-                        return TrinityObjectType.Shrine;
-
-                    case GizmoType.Chest:
-                        return TrinityObjectType.Container;
-
-                    case GizmoType.DestroyableObject:
-                    case GizmoType.BreakableChest:
-                        return TrinityObjectType.Destructible;
-
-                    case GizmoType.PlacedLoot:
-                    case GizmoType.Switch:
-                    case GizmoType.Headstone:
-                        return TrinityObjectType.Interactable;
-
-                    case GizmoType.Portal:
-                        return TrinityObjectType.Portal;
-                }
+                _weight.CachedValue = WeightManager.CalculateWeight(this, out WeightFactors, out _weightTime);
+                return true;
             }
-
-            if (acd.ActorType == ActorType.Player)
-                return TrinityObjectType.Player;
-
-            if (internalName.StartsWith("Banner_Player"))
-                return TrinityObjectType.Banner;
-
-            if (internalName.StartsWith("Waypoint-"))
-                return TrinityObjectType.Waypoint;
-
-            return TrinityObjectType.Unknown;
+            return false;
         }
 
         /// <summary>
@@ -635,11 +587,11 @@ namespace Trinity.LazyCache
         /// </summary>
         public static float GetRadiusDistance(TrinityObject o)
         {
-            if (o.TrinityType != TrinityObjectType.Destructible)
-                return Math.Max(o.Distance - o.Radius, 0f);
+            float customRadiusDistance;
+            if (o.TrinityType == TrinityObjectType.Destructible && DataDictionary.DestructableObjectRadius.TryGetValue(o.ActorSNO, out customRadiusDistance))
+                return customRadiusDistance;
 
-            float maxRadiusDistance;
-            return DataDictionary.DestructableObjectRadius.TryGetValue(o.ActorSNO, out maxRadiusDistance) ? maxRadiusDistance : Trinity.Settings.WorldObject.DestructibleRange;
+            return Math.Max(o.Distance - o.Radius - CacheManager.Me.Radius, 0f);
         }
 
         /// <summary>
@@ -695,23 +647,13 @@ namespace Trinity.LazyCache
         /// </summary>
         internal static string GetName(TrinityObject o)
         {
-            if (o.Source is ACDItem && o.Item != null)
-                return o.Item.Name;
+            if (o.ActorType == ActorType.Item && o.DiaItem != null)
+                return o.DiaItem.Name;
 
             return o.InternalName;
         }
 
         #endregion
-
-        #region Cast Conversions
-
-        public static implicit operator TrinityObject(ACD x)
-        {
-            return CacheFactory.CreateObject<TrinityObject>(x);
-        }
-
-        #endregion
-
 
     }
 }

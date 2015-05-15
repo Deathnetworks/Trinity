@@ -40,7 +40,7 @@ namespace Trinity.Combat
         private static CacheField<bool> _inActiveEvent = new CacheField<bool>(UpdateSpeed.Fast);
         private static CacheField<bool> _hasEventInspectionTask = new CacheField<bool>(UpdateSpeed.Fast);
         private static CacheField<bool> _shouldKamakaziGoblins = new CacheField<bool>(UpdateSpeed.Fast);
-        private static CacheField<float> _killRadius = new CacheField<float>(UpdateSpeed.Fast);
+        private static CacheField<float> _killRadius = new CacheField<float>(UpdateSpeed.Normal);
 
         /// <summary>
         /// If our health is low enough that we should prioritize picking up health globes
@@ -243,7 +243,7 @@ namespace Trinity.Combat
                               CacheManager.Me.TieredLootRunLevel != 0 && // Rift Trials
                               !TownRun.IsTryingToTownPortal() &&
                               !IsProfileTagNonCombat &&
-                              PlayerMover.MovementSpeed >= 1 &&
+                              CacheManager.Me.MovementSpeed >= 1 &&
                               Trinity.Settings.Combat.Misc.TrashPackSize > 1 &&
                               CacheManager.Me.Level >= 15 &&
                               CacheManager.Me.CurrentHealthPct > 0.10 &&

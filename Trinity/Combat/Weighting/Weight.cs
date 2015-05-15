@@ -31,11 +31,11 @@ namespace Trinity.Combat.Weighting
             else if (Method == WeightMethod.Multiply)
                 op = "*";
             else if (Method == WeightMethod.Set)
-                op = "$";
+                op = string.Empty;
             else if (Method == WeightMethod.Subtract && Amount > 0)
                 op = "+";
 
-            return string.Format("{0}: {1}{2:00.00}", Reason, op, Amount);
+            return string.Format("{0}: {1}{2:0.##}", Reason, op, Amount);
         }
     }
 
@@ -112,7 +112,7 @@ namespace Trinity.Combat.Weighting
         /// </summary>
         BossOrEliteNearby,
 
-        InvalidType,
+        TypeMismatch,
 
         /// <summary>
         /// Set, 1, If combatlooting is disabled and we're in combat
@@ -187,6 +187,7 @@ namespace Trinity.Combat.Weighting
         IsElite,
         IsSummon,
         IgnoreHealth,
-        NotHostile
+        NotHostile,
+        NullObject
     }
 }

@@ -6,19 +6,22 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using Trinity.Cache;
 using Trinity.Helpers;
 using Trinity.LazyCache;
 using Trinity.Technicals;
+using Trinity.UIComponents;
 using Zeta.Bot;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
+using Application = System.Windows.Application;
 using Logger = Trinity.Technicals.Logger;
+using UserControl = System.Windows.Controls.UserControl;
 
 namespace Trinity.UI.UIComponents
 {
@@ -50,7 +53,10 @@ namespace Trinity.UI.UIComponents
                     DataContext = DataModel
                 };
 
+                DataModel.CacheUpdateTime.Clear();
+
                 _isWindowOpen = true;
+                _updateCount = 0;
                 _window.Closed += Window_Closed;
 
                 Configuration.Events.OnCacheUpdated += Update;
@@ -75,41 +81,45 @@ namespace Trinity.UI.UIComponents
         {
             if (!BotMain.IsRunning && !BotMain.IsPausedForStateExecution)
             {
-                using (new MemoryHelper())
+
+                Logger.Log("Starting CacheUI update thread");
+                Worker.Start(() =>
                 {
-                    Logger.Log("Starting CacheUI update thread");
-                    Worker.Start(() =>
+                    if (BotMain.IsRunning || !_isWindowOpen)
                     {
-                        if (BotMain.IsRunning || !_isWindowOpen)
+                        Logger.Log("Shutting down CacheUI update thread");
+
+                        if (!_isWindowOpen)
+                            CacheManager.Stop();
+
+                        return true;
+                    }
+
+                    using (new MemoryHelper())
+                    {
+
+                        if (!BotMain.IsPausedForStateExecution && DataModel.IsLazyCacheVisible)
                         {
-                            Logger.Log("Shutting down CacheUI update thread");
+                            if (ZetaDia.IsInGame && ZetaDia.Me != null)
+                            {
+                                if (!CacheManager.IsRunning)
+                                    CacheManager.Start();
 
-                            if (!_isWindowOpen)
-                                CacheManager.Stop();
-
-                            return true;
+                                CacheManager.Update();
+                                CacheUI.Update();                                    
+                            }
                         }
+                    }
 
-                        if (!BotMain.IsPausedForStateExecution && DataModel.IsLazyCacheVisible && ZetaDia.IsInGame && ZetaDia.Me != null)
-                        {
-                            ZetaDia.Actors.Update();
+                    return false;
 
-                            if (!CacheManager.IsRunning)
-                                CacheManager.Start();
-
-                            CacheManager.Update();
-                            CacheUI.Update();
-                        }
-                    
-
-                        return false;
-
-                    }, 250); //250ms Ticks
-                }
+                }, 250); //250ms Ticks
+               
             }
         }
 
         private static bool _isUpdating;
+        private static int _updateCount;
         private static readonly Stopwatch LastUpdatedStopwatch = new Stopwatch();
         private static void Update()
         {
@@ -132,11 +142,31 @@ namespace Trinity.UI.UIComponents
                     return;
                 _isUpdating = true;
 
+                _updateCount++;
+
                 if(DataModel.IsDefaultVisible)
                     DataModel.Cache = new ObservableCollection<CacheUIObject>(GetCacheActorList());
 
-                if(DataModel.IsLazyCacheVisible)
+                if (DataModel.IsLazyCacheVisible)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        // The initial update is always huge and messes up the charts.
+                        if (_updateCount > 1 || CacheManager.LastUpdated == DateTime.MinValue)
+                        {
+                            DataModel.CacheUpdateTime.Add(new CacheUIDataModel.ChartDatum(CacheManager.LastUpdated, CacheManager.LastUpdateTimeTaken));
+                            DataModel.WeightUpdateTime.Add(new CacheUIDataModel.ChartDatum(CacheManager.LastUpdated, CacheManager.LastWeightingTimeTaken));
+                        }
+
+                        if (DataModel.CacheUpdateTime.Count > 100)
+                            DataModel.CacheUpdateTime.RemoveAt(0);
+
+                        if (DataModel.WeightUpdateTime.Count > 100)
+                            DataModel.WeightUpdateTime.RemoveAt(0);
+                    });                       
+
                     DataModel.LazyCache = new ObservableCollection<TrinityObject>(GetLazyCacheActorList());
+                }
 
                 _isUpdating = false;
             }
@@ -149,10 +179,19 @@ namespace Trinity.UI.UIComponents
 
         public static List<TrinityObject> GetLazyCacheActorList()
         {
-            return CacheManager.GetActorsOfType<TrinityObject>()
-                .OrderByDescending(o => o.Weight)
-                .ThenBy(o => o.Distance)
-                .ToList();               
+            try
+            {
+                return CacheManager.GetActorsOfType<TrinityObject>()
+                    .OrderByDescending(o => o.Weight)
+                    .ThenBy(o => o.Distance)
+                    .ToList();     
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Exception in GetLazyCacheActorList > GetActorsOfType. {0}", ex.Message, ex.InnerException);
+                throw;
+            }
+          
         }
 
         public static List<CacheUIObject> GetCacheActorList()

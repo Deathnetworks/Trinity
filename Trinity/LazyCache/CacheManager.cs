@@ -1,28 +1,26 @@
-﻿using System;
+﻿#region Usings
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Security;
-using Trinity.Technicals;
+using System.Threading.Tasks;
+using Trinity.Combat.Weighting;
 using Zeta.Bot;
 using Zeta.Common;
 using Zeta.Game;
-using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 using Logger = Trinity.Technicals.Logger;
 
+#endregion
+
 namespace Trinity.LazyCache
 {
     /// <summary>
-    /// LazyCache creates a caching layer between DB's memory reading and Trinity to 
-    /// avoid wasting time on reading values that don't change very fast or at all.
+    ///     LazyCache creates a caching layer between DB's memory reading and Trinity to
+    ///     avoid wasting time on reading values that don't change very fast or at all.
     /// </summary>
     public static class CacheManager
     {
@@ -38,6 +36,7 @@ namespace Trinity.LazyCache
             if (IsRunning)
                 return;
 
+            IsUpdatePending = true;
             IsRunning = true;
             Pulsator.OnPulse += PulsatorOnPulse;
         }
@@ -57,27 +56,37 @@ namespace Trinity.LazyCache
 
         #region Fields
 
-        /// <summary>
-        /// The Primary DataStore of CacheObjects
-        /// </summary>
+        private static readonly CacheField<List<TrinityUnit>> _units = new CacheField<List<TrinityUnit>>(UpdateSpeed.Ultra, new List<TrinityUnit>());
+        private static readonly CacheField<List<TrinityUnit>> _monsters = new CacheField<List<TrinityUnit>>(UpdateSpeed.Ultra, new List<TrinityUnit>());
+        private static readonly CacheField<List<TrinityItem>> _gold = new CacheField<List<TrinityItem>>(UpdateSpeed.Ultra, new List<TrinityItem>());
+        private static readonly CacheField<List<TrinityGizmo>> _containers = new CacheField<List<TrinityGizmo>>(UpdateSpeed.Ultra, new List<TrinityGizmo>());
+        private static readonly CacheField<List<TrinityGizmo>> _destructibles = new CacheField<List<TrinityGizmo>>(UpdateSpeed.Ultra, new List<TrinityGizmo>());
+        private static readonly CacheField<List<TrinityGizmo>> _shrines = new CacheField<List<TrinityGizmo>>(UpdateSpeed.Ultra, new List<TrinityGizmo>());
+        private static readonly CacheField<List<TrinityGizmo>> _doors = new CacheField<List<TrinityGizmo>>(UpdateSpeed.Ultra, new List<TrinityGizmo>());
+        private static readonly CacheField<List<TrinityPlayer>> _Players = new CacheField<List<TrinityPlayer>>(UpdateSpeed.Ultra, new List<TrinityPlayer>());
+        private static readonly CacheField<List<TrinityObject>> _objects = new CacheField<List<TrinityObject>>(UpdateSpeed.Ultra, new List<TrinityObject>());
+        private static readonly CacheField<List<TrinityObject>> _hirelings = new CacheField<List<TrinityObject>>(UpdateSpeed.Ultra, new List<TrinityObject>());
+        private static readonly CacheField<List<TrinityObject>> _navigationObstacles = new CacheField<List<TrinityObject>>(UpdateSpeed.Ultra, new List<TrinityObject>());
+        private static readonly CacheField<List<TrinityUnit>> _eliteRareUniqueBoss = new CacheField<List<TrinityUnit>>(UpdateSpeed.Ultra, new List<TrinityUnit>());
+        private static readonly CacheField<List<TrinityUnit>> _trash = new CacheField<List<TrinityUnit>>(UpdateSpeed.Ultra, new List<TrinityUnit>());
+        private static readonly CacheField<List<TrinityUnit>> _goblins = new CacheField<List<TrinityUnit>>(UpdateSpeed.Ultra, new List<TrinityUnit>());
+        private static readonly CacheField<List<TrinityAvoidance>> _avoidances = new CacheField<List<TrinityAvoidance>>(UpdateSpeed.Ultra, new List<TrinityAvoidance>());
+        private static readonly CacheField<List<TrinityObject>> _globes = new CacheField<List<TrinityObject>>(UpdateSpeed.Ultra, new List<TrinityObject>());
+        private static readonly CacheField<List<TrinityGizmo>> _gizmos = new CacheField<List<TrinityGizmo>>(UpdateSpeed.Ultra, new List<TrinityGizmo>());
+        private static readonly CacheField<List<TrinityItem>> _items = new CacheField<List<TrinityItem>>(UpdateSpeed.Ultra, new List<TrinityItem>());
+        private static readonly CacheField<List<TrinityUnit>> _pets = new CacheField<List<TrinityUnit>>(UpdateSpeed.Ultra, new List<TrinityUnit>());
+        private static readonly CacheField<List<TrinityUnit>> _summoners = new CacheField<List<TrinityUnit>>(UpdateSpeed.Ultra, new List<TrinityUnit>());
+
         public static readonly ConcurrentDictionary<int, TrinityObject> CachedObjects = new ConcurrentDictionary<int, TrinityObject>();
-
-        /// <summary>
-        /// If execution is within a using(CacheManager.ForceRefresh()) block
-        /// </summary>
         internal static int ForceRefreshLevel;
-
         public static DateTime LastUpdated = DateTime.MinValue;
-
-        //private static Dictionary<int, DiaObject> _rActorByACDGuid = new Dictionary<int, DiaObject>();
-
+        public static int ActivePlayerGuid = -1;
         private static Dictionary<int, TrinityObject> _actorsByRActorGuid = new Dictionary<int, TrinityObject>();
 
         #endregion
 
         #region Properties
 
-        private static readonly CacheField<List<TrinityUnit>> _units = new CacheField<List<TrinityUnit>>(UpdateSpeed.Ultra);
         public static List<TrinityUnit> Units
         {
             get
@@ -87,42 +96,60 @@ namespace Trinity.LazyCache
             }
         }
 
-        private static readonly CacheField<List<TrinityUnit>> _monsters = new CacheField<List<TrinityUnit>>(UpdateSpeed.Ultra);
         public static List<TrinityUnit> Monsters
         {
             get
             {
                 if (_monsters.IsCacheValid) return _monsters.CachedValue;
-                return _monsters.CachedValue = Units.Where(i => !i.IsSummonedByPlayer && (i.IsTrash || i.IsBossOrEliteRareUnique)).ToList();
+                return _monsters.CachedValue = Units.Where(i => i.ActorMeta.IsMonster && i.IsHostile).ToList();
             }
         }
 
-        public static List<TrinityObject> Gold
+        public static List<TrinityItem> Gold
         {
-            get { return GetActorsOfType<TrinityObject>().Where(i => i.TrinityType == TrinityObjectType.Gold).ToList(); }
+            get
+            {
+                if (_gold.IsCacheValid) return _gold.CachedValue;
+                return _gold.CachedValue = GetActorsOfType<TrinityItem>().Where(i => i.TrinityType == TrinityObjectType.Gold).ToList();
+            }
         }
 
-        public static List<TrinityObject> Containers
+        public static List<TrinityGizmo> Containers
         {
-            get { return GetActorsOfType<TrinityObject>().Where(i => i.TrinityType == TrinityObjectType.Container).ToList(); }
+            get
+            {
+                if (_containers.IsCacheValid) return _containers.CachedValue;
+                return _containers.CachedValue = GetActorsOfType<TrinityGizmo>().Where(i => i.TrinityType == TrinityObjectType.Container).ToList();
+            }
         }
 
-        public static List<TrinityObject> Destructibles
+        public static List<TrinityGizmo> Destructibles
         {
-            get { return GetActorsOfType<TrinityObject>().Where(i => i.TrinityType == TrinityObjectType.Destructible).ToList(); }
-        }
-
-        public static List<TrinityObject> Doors
-        {
-            get { return GetActorsOfType<TrinityObject>().Where(i => i.TrinityType == TrinityObjectType.Door).ToList(); }
+            get
+            {
+                if (_destructibles.IsCacheValid) return _destructibles.CachedValue;
+                return _destructibles.CachedValue = GetActorsOfType<TrinityGizmo>().Where(i => i.TrinityType == TrinityObjectType.Destructible).ToList();
+            }
         }
 
         public static List<TrinityGizmo> Shrines
         {
-            get { return GetActorsOfType<TrinityGizmo>().Where(i => i.IsShrine).ToList(); }
+            get
+            {
+                if (_shrines.IsCacheValid) return _shrines.CachedValue;
+                return _shrines.CachedValue = GetActorsOfType<TrinityGizmo>().Where(i => i.IsShrine).ToList();
+            }
         }
 
-        private static CacheField<List<TrinityPlayer>> _Players = new CacheField<List<TrinityPlayer>>(UpdateSpeed.Ultra);
+        public static List<TrinityGizmo> Doors
+        {
+            get
+            {
+                if (_doors.IsCacheValid) return _doors.CachedValue;
+                return _doors.CachedValue = GetActorsOfType<TrinityGizmo>().Where(i => i.TrinityType == TrinityObjectType.Door).ToList();
+            }
+        }
+
         public static List<TrinityPlayer> Players
         {
             get
@@ -132,7 +159,6 @@ namespace Trinity.LazyCache
             }
         }
 
-        private static CacheField<List<TrinityObject>> _objects = new CacheField<List<TrinityObject>>(UpdateSpeed.Ultra);
         public static List<TrinityObject> Objects
         {
             get
@@ -142,7 +168,6 @@ namespace Trinity.LazyCache
             }
         }
 
-        private static CacheField<List<TrinityObject>> _hirelings = new CacheField<List<TrinityObject>>(UpdateSpeed.Ultra);
         public static List<TrinityObject> Hirelings
         {
             get
@@ -152,7 +177,6 @@ namespace Trinity.LazyCache
             }
         }
 
-        private static CacheField<List<TrinityObject>> _navigationObstacles = new CacheField<List<TrinityObject>>(UpdateSpeed.Ultra);
         public static List<TrinityObject> NavigationObstacles
         {
             get
@@ -164,67 +188,90 @@ namespace Trinity.LazyCache
 
         public static List<TrinityUnit> EliteRareUniqueBoss
         {
-            get { return GetActorsOfType<TrinityUnit>().Where(i => i.IsBossOrEliteRareUnique).ToList(); }
+            get
+            {
+                if (_eliteRareUniqueBoss.IsCacheValid) return _eliteRareUniqueBoss.CachedValue;
+                return _eliteRareUniqueBoss.CachedValue = GetActorsOfType<TrinityUnit>().Where(i => i.IsBossOrEliteRareUnique).ToList();
+            }
         }
 
         public static List<TrinityUnit> Trash
         {
-            get { return GetActorsOfType<TrinityUnit>().Where(i => i.IsTrash).ToList(); }
+            get
+            {
+                if (_trash.IsCacheValid) return _trash.CachedValue;
+                return _trash.CachedValue = GetActorsOfType<TrinityUnit>().Where(i => i.IsTrash).ToList();
+            }
         }
 
         public static List<TrinityUnit> Goblins
         {
-            get { return GetActorsOfType<TrinityUnit>().Where(i => i.IsGoblin).ToList(); }
+            get
+            {
+                if (_goblins.IsCacheValid) return _goblins.CachedValue;
+                return _goblins.CachedValue = GetActorsOfType<TrinityUnit>().Where(i => i.IsGoblin).ToList();
+            }
         }
 
-        private static CacheField<List<TrinityAvoidance>> _avoidances = new CacheField<List<TrinityAvoidance>>(UpdateSpeed.Ultra);
         public static List<TrinityAvoidance> Avoidances
         {
             get
             {
                 if (_avoidances.IsCacheValid) return _avoidances.CachedValue;
                 return _avoidances.CachedValue = GetActorsOfType<TrinityAvoidance>().Where(i => i.TrinityType == TrinityObjectType.Avoidance).ToList();
-            }            
+            }
         }
 
         public static List<TrinityObject> Globes
         {
-            get { return GetActorsOfType<TrinityObject>().Where(i => i.IsGlobe).ToList(); }
+            get
+            {
+                if (_globes.IsCacheValid) return _globes.CachedValue;
+                return _globes.CachedValue = GetActorsOfType<TrinityObject>().Where(i => i.IsGlobe).ToList();
+            }
         }
 
         public static List<TrinityGizmo> Gizmos
         {
-            get { return GetActorsOfType<TrinityGizmo>(); }
+            get
+            {
+                if (_gizmos.IsCacheValid) return _gizmos.CachedValue;
+                return _gizmos.CachedValue = GetActorsOfType<TrinityGizmo>().Where(i => i.IsGizmo).ToList();
+            }
         }
-
-        //public static List<TrinityItem> Stash
-        //{
-        //    get { return GetActorsOfType<TrinityItem>().Where(i => i.InventorySlot == InventorySlot.SharedStash).ToList(); }
-        //}
-
-        //public static List<TrinityItem> Backpack
-        //{
-        //    get { return GetActorsOfType<TrinityItem>().Where(i => i.InventorySlot == InventorySlot.BackpackItems).ToList(); }
-        //}
-
-        //public static List<TrinityItem> Equipped
-        //{
-        //    get { return GetActorsOfType<TrinityItem>().Where(i => i.IsEquipped).ToList(); }
-        //}
 
         public static List<TrinityItem> Items
         {
-            get { return GetActorsOfType<TrinityItem>().ToList(); }
+            get
+            {
+                if (_items.IsCacheValid) return _items.CachedValue;
+                return _items.CachedValue = GetActorsOfType<TrinityItem>().Where(i => i.IsItem).ToList();
+            }
         }
 
         public static List<TrinityUnit> Pets
         {
-            get { return GetActorsOfType<TrinityUnit>().Where(i => i.IsSummonedByPlayer).ToList(); }
+            get
+            {
+                if (_pets.IsCacheValid) return _pets.CachedValue;
+                return _pets.CachedValue = GetActorsOfType<TrinityUnit>().Where(i => i.IsSummonedByPlayer).ToList();
+            }
+        }
+
+        public static List<TrinityUnit> Summoners
+        {
+            get
+            {
+                if (_summoners.IsCacheValid) return _summoners.CachedValue;
+                return _summoners.CachedValue = GetActorsOfType<TrinityUnit>().Where(i => i.ActorMeta.IsSummoner).ToList();
+            }
         }
 
         public static TrinityPlayer Me { get; private set; }
 
         public static bool IsRunning { get; internal set; }
+
+        public static bool IsUpdatePending { get; set; }
 
         #endregion
 
@@ -235,41 +282,91 @@ namespace Trinity.LazyCache
         /// </summary>
         public static void Update()
         {
+            IsUpdatePending = true;
+
+            var refreshTimer = Stopwatch.StartNew();
+
             if (ZetaDia.Me == null)
                 return;
 
             LastUpdated = DateTime.UtcNow;
 
-            foreach (var acd in ZetaDia.Actors.ACDList.OfType<ACD>())
-            {
-                var guid = acd.ACDGuid;
-                var actorType = acd.ActorType;
-                var actorSNO = acd.ActorSNO;
-                var inventorySlot = acd is ACDItem ? (acd as ACDItem).InventorySlot : InventorySlot.None;
+            if (Me == null)
+                Me = new TrinityPlayer(ZetaDia.Me);
+            else
+                Me.UpdateSource(ZetaDia.Me);
 
-                if (acd.IsProperValid() && DataDictionary.ExcludedActorTypes.Contains(actorType) ||
-                    DataDictionary.ExcludedActorIds.Contains(actorSNO) ||
-                    inventorySlot != InventorySlot.None) // Ignore Non-Ground Items
-                {
+            ActivePlayerGuid = Me.ACDGuid;
+
+            foreach (var rActor in ZetaDia.Actors.RActorList.OfType<DiaObject>())
+            {
+                if (rActor == null)
                     continue;
-                }
-             
-                CachedObjects.AddOrUpdate(guid, 
-                    i => CacheFactory.CreateTypedTrinityObject(acd, guid, actorSNO), 
-                    (key, actor) => actor.UpdateSource(actor, acd));
+
+                var acd = rActor.CommonData;
+                if (acd == null || !acd.IsValid)
+                    continue;
+
+                var actorSNO = rActor.ActorSNO;
+                if (DataDictionary.ExcludedActorIds.Contains(actorSNO))
+                    continue;
+
+                var actorType = rActor.ActorType;
+                if (DataDictionary.ExcludedActorTypes.Contains(actorType))
+                    continue;
+
+                var acdGuid = rActor.ACDGuid;
+                var rActorGuid = rActor.RActorGuid;
+                if (!CacheBase.IsProperValid(rActor, acd, actorType, acdGuid, rActorGuid))
+                    continue;
+
+                CachedObjects.AddOrUpdate(acdGuid,
+                    i => CacheFactory.CreateTrinityObject(rActor, acd, acdGuid, rActorGuid, actorSNO, actorType),
+                    (key, actor) => actor.UpdateSource(actor, acd, rActor));
             }
+
+            IsUpdatePending = false;
 
             foreach (var o in CachedObjects)
             {
-                if (!o.Value.Source.IsProperValid() || o.Value.Source.IsDisposed ||
+                if (!o.Value.IsValid ||
+                    string.IsNullOrEmpty(o.Value.InternalName) || // Bad Records 0
+                    (string.IsNullOrEmpty(o.Value.Name) && o.Value.Distance == 0) || // Bad Item Records 1
+                    o.Value.WeightFactors.Any(r => r.Reason == WeightReason.TypeMismatch && o.Value.Distance == 0) || // Bad Records 2
                     o.Value.ActorType == ActorType.Item && (o.Value is TrinityItem) && !((TrinityItem) o.Value).IsOnGround || // Speed up removal of items on pick up
                     LastUpdated.Subtract(o.Value.LastUpdated).TotalSeconds > 20)
                     CachedObjects.TryRemove(o.Key, o.Value);
             }
 
-            Me = Players.FirstOrDefault(p => p.IsMe);
-
             _actorsByRActorGuid = CachedObjects.Values.DistinctBy(i => i.RActorGuid).ToDictionary(k => k.RActorGuid, v => v);
+
+            refreshTimer.Stop();
+            LastUpdateTimeTaken = refreshTimer.Elapsed.TotalMilliseconds;
+
+            var weightTimer = Stopwatch.StartNew();
+
+            try
+            {
+                Parallel.ForEach(CachedObjects, cacheObject =>
+                {
+                    try
+                    {
+                        cacheObject.Value.TryCalculateWeight();
+                    }
+                    catch (Exception)
+                    {
+                        Logger.Log("Exception in Parallel Weighting");
+                    }
+
+                });
+            }
+            catch (Exception)
+            {
+                Logger.Log("Exception in Parallel.ForEach Enumeration");
+            }
+
+            LastUpdateTimeTaken = refreshTimer.Elapsed.TotalMilliseconds;
+            LastWeightingTimeTaken = weightTimer.Elapsed.TotalMilliseconds;
         }
 
         /// <summary>
@@ -305,7 +402,7 @@ namespace Trinity.LazyCache
         }
 
         /// <summary>
-        /// using (CacheManager.ForceRefresh())
+        /// Using (CacheManager.ForceRefresh())
         /// </summary>
         public static IDisposable ForceRefresh()
         {
@@ -330,6 +427,10 @@ namespace Trinity.LazyCache
         }
 
         #endregion
-    }
 
+
+        public static double LastUpdateTimeTaken { get; set; }
+        public static double LastWeightingTimeTaken { get; set; }
+        
+    }
 }

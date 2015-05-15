@@ -15,7 +15,9 @@ namespace Trinity.LazyCache
     /// </summary>
     public class TrinityItem : TrinityObject
     {
-        public TrinityItem(ACD acd, int acdGuid) : base(acd, acdGuid) { }
+        public TrinityItem() { }
+
+        public TrinityItem(DiaObject rActor) : base(rActor) { }
 
         #region Fields
 
@@ -503,12 +505,12 @@ namespace Trinity.LazyCache
 
         public bool GetStatChanges(out float toughness, out float healing, out float damage)
         {
-            return Item.GetStatChanges(out toughness, out healing, out damage);
+            return ACDItem.GetStatChanges(out toughness, out healing, out damage);
         }
 
         public void Socket(ACDItem gem)
         {
-            Item.Socket(gem);
+            ACDItem.Socket(gem);
         }
 
         public static double SkillDamagePercent(ACDItem acdItem, SNOPower power)
@@ -531,24 +533,6 @@ namespace Trinity.LazyCache
 
         #endregion
 
-        #region Operators
-
-        public static implicit operator TrinityItem(ACD x)
-        {
-            return CacheFactory.CreateObject<TrinityItem>(x);
-        }
-
-        public static explicit operator ACDItem(TrinityItem x)
-        {
-            return x.Item;
-        }
-
-        public static explicit operator DiaItem(TrinityItem x)
-        {
-            return x.DiaItem;
-        }
-
-        #endregion
 
     }
 }

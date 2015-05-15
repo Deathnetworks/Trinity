@@ -18,7 +18,7 @@ namespace Trinity.Combat.Weighting
             var gizmo = cacheObject as TrinityGizmo;
             if (gizmo == null)
             {
-                weightFactors.Add(new Weight(0, WeightMethod.Set, WeightReason.InvalidType));
+                weightFactors.Add(new Weight(0, WeightMethod.Set, WeightReason.TypeMismatch));
                 return weightFactors;
             }
 

@@ -14,15 +14,19 @@ namespace Trinity.LazyCache
     /// </summary>
     public class TrinityAvoidance : TrinityObject
     {
-        public TrinityAvoidance(ACD acd, int acdGuid) : base(acd, acdGuid)
-        {
-            AvoidanceStartTime = CacheManager.LastUpdated;
-        }
+        #region Constructors
 
         public TrinityAvoidance()
         {
             AvoidanceStartTime = CacheManager.LastUpdated;
         }
+
+        public TrinityAvoidance(DiaObject rActor) : base(rActor)
+        {
+            AvoidanceStartTime = CacheManager.LastUpdated;
+        }
+
+        #endregion
 
         #region Fields
 
@@ -130,15 +134,6 @@ namespace Trinity.LazyCache
         {
             TimeSpan duration;
             return DataDictionary.AvoidanceSpawnerDuration.TryGetValue(ActorSNO, out duration) ? duration : TimeSpan.Zero;
-        }
-
-        #endregion
-
-        #region Operators
-
-        public static implicit operator TrinityAvoidance(ACD x)
-        {
-            return CacheFactory.CreateObject<TrinityAvoidance>(x);
         }
 
         #endregion
