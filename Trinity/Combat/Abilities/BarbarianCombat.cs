@@ -40,6 +40,10 @@ namespace Trinity.Combat.Abilities
                 // Refresh Frenzy
                 if (IsNull(power) && CanCast(SNOPower.Barbarian_Frenzy) && TimeSincePowerUse(SNOPower.Barbarian_Frenzy) > 3000 && TimeSincePowerUse(SNOPower.Barbarian_Frenzy) < 4000)
                     power = PowerFrenzy;
+
+                // Refresh Bash - Punish
+                if (IsNull(power) && CanCast(SNOPower.Barbarian_Bash) && TimeSincePowerUse(SNOPower.Barbarian_Bash) > 4000 && TimeSincePowerUse(SNOPower.Barbarian_Punish) < 5000)
+                    power = PowerBash;
             }
             // Ignore Pain when low on health
             if (IsNull(power) && CanCastIgnorePain)
@@ -504,43 +508,8 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                // minimum checks
-                if (UseOOCBuff)
-                    return false;
-                if (IsCurrentlyAvoiding)
-                    return false;
-                if (!Hotbar.Contains(SNOPower.Barbarian_Bash))
-                    return false;
-
-                //skillDict.Add("Bash", SNOPower.Barbarian_Bash);
-                //runeDict.Add("Clobber", 2);
-                //runeDict.Add("Onslaught", 0);
-                //runeDict.Add("Punish", 1);
-                //runeDict.Add("Instigation", 3);
-                //runeDict.Add("Pulverize", 4);
-
-                bool hasPunish = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.Barbarian_Bash && s.RuneIndex == 1);
-
-                // for combo use with Frenzy or Cleave
-                if (hasPunish)
-                {
-                    // haven't bashed, ever
-                    if (!SpellHistory.HasUsedSpell(SNOPower.Barbarian_Bash))
-                        return true;
-
-                    int timeSinceUse = SpellHistory.TimeSinceUse(SNOPower.Barbarian_Bash).Milliseconds;
-
-                    // been almost 5 seconds since our last bash (keep the Punish buff up)
-                    if (timeSinceUse >= 4600)
-                        return true;
-
-                    // if it's been less than 5 seconds, check if we have used 2 in 10 seconds
-                    if (SpellHistory.HistoryQueue.Count(i => i.TimeSinceUse.TotalMilliseconds < 9600) <= 2)
-                        return true;
-
-                    // if it's been less than 5 seconds, check if we have used 3 in 15 seconds (for full stack)
-                    if (SpellHistory.HistoryQueue.Count(i => i.TimeSinceUse.TotalSeconds < 14600) <= 3)
-                        return true;
+                return !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsRooted && Hotbar.Contains(SNOPower.Barbarian_Bash) &&
+                    Runes.Barbarian.Punish.IsActive && !TargetUtil.AnyMobsInRange(15f, 3) && GetBuffStacks(SNOPower.Barbarian_Bash) < 3;
                 }
 
                 return false;
@@ -702,7 +671,7 @@ namespace Trinity.Combat.Abilities
         public static TrinityPower PowerHammerOfTheAncients { get { return new TrinityPower(SNOPower.Barbarian_HammerOfTheAncients, V.F("Barbarian.HammerOfTheAncients.UseRange"), CurrentTarget.ACDGuid); } }
         public static TrinityPower PowerWeaponThrow { get { return new TrinityPower(SNOPower.X1_Barbarian_WeaponThrow, V.F("Barbarian.WeaponThrow.UseRange"), CurrentTarget.ACDGuid); } }
         public static TrinityPower PowerFrenzy { get { return new TrinityPower(SNOPower.Barbarian_Frenzy, V.F("Barbarian.Frenzy.UseRange"), CurrentTarget.ACDGuid); } }
-        public static TrinityPower PowerBash { get { return new TrinityPower(SNOPower.Barbarian_Bash, V.F("Barbarian.Bash.UseRange"), Vector3.Zero, -1, CurrentTarget.ACDGuid, 2, 2); } }
+        public static TrinityPower PowerBash { get { return new TrinityPower(SNOPower.Barbarian_Bash, V.F("Barbarian.Bash.UseRange"), CurrentTarget.ACDGuid); } }
         public static TrinityPower PowerCleave { get { return new TrinityPower(SNOPower.Barbarian_Cleave, V.F("Barbarian.Cleave.UseRange"), CurrentTarget.ACDGuid); } }
 
         private static TrinityPower DestroyObjectPower
