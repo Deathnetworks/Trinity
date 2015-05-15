@@ -200,6 +200,9 @@ namespace Trinity.Combat.Abilities
                  * And not on the Heart of sin
                  */
 
+                if (!CanCast(SNOPower.Barbarian_WrathOfTheBerserker))
+                    return false;
+
                 bool anyTime = (Settings.Combat.Barbarian.WOTBMode == BarbarianWOTBMode.WhenReady && !Player.IsInTown);
                 bool hasBuff = GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
                 bool hasInfiniteCasting = GetHasBuff(SNOPower.Pages_Buff_Infinite_Casting);
