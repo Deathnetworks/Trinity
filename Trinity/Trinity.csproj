@@ -453,7 +453,6 @@
     <Folder Include="ItemRules\Rules\custom\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Configuration\Dictionaries.xml" />
     <Content Include="ItemRules\ItemRules2.txt" />
     <Content Include="Resources\JS Class Generator\create_class_passives.htm" />
     <Content Include="Resources\JS Class Generator\create_class_runes.htm" />
@@ -473,9 +472,6 @@
     <Content Include="Resources\JS Class Generator\skills.js" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Configuration\Dictionaries.xsd">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="ItemRules\Rules\hard\common.dis" />
     <None Include="ItemRules\Rules\hard\legendary.dis" />
     <None Include="ItemRules\Rules\hard\magic.dis" />

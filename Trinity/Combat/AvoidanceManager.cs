@@ -12,41 +12,17 @@ namespace Trinity
 {
     public static class AvoidanceManager
     {
-        /// <summary>
-        /// Initializes the <see cref="AvoidanceManager" /> class.
-        /// </summary>
-        static AvoidanceManager()
-        {
-            LoadAvoidanceDictionary();
-        }
-
-        private static void LoadAvoidanceDictionary(bool force = false)
-        {
-            if (SNOAvoidanceType == null || !SNOAvoidanceType.Any() || force)
-            {
-                SNOAvoidanceType = FileManager.Load<int, AvoidanceType>("AvoidanceType", "SNO", "Type");
-            }
-        }
-
-        private static IDictionary<int, AvoidanceType> SNOAvoidanceType
-        {
-            get;
-            set;
-        }
-
         public static AvoidanceType GetAvoidanceType(int actorSno)
         {
-            LoadAvoidanceDictionary(false);
-            if (SNOAvoidanceType.ContainsKey(actorSno))
-                return SNOAvoidanceType[actorSno];
-            else
-                return AvoidanceType.None;
+            AvoidanceType type;
+            if (DataDictionary.AvoidanceTypeSNO.TryGetValue(actorSno, out type)) 
+                return type;
+            
+            return default(AvoidanceType);
         }
 
         public static float GetAvoidanceRadius(AvoidanceType type, float defaultValue)
         {
-            LoadAvoidanceDictionary(false);
-            //TODO : Make mapping between Type and Config
             switch (type)
             {
                 case AvoidanceType.Arcane:
@@ -128,30 +104,26 @@ namespace Trinity
         public static float GetAvoidanceRadius(TrinityObject trinityObject)
         {
             float customRadius;
+
             if (!DataDictionary.DefaultAvoidanceCustomRadius.TryGetValue(trinityObject.ActorSNO, out customRadius))
             {
                 DataDictionary.DefaultAvoidanceAnimationCustomRadius.TryGetValue((int) trinityObject.CurrentAnimation, out customRadius);
             }
 
-            using (new PerformanceLogger("GetAvoidanceRadiusBySNO"))
-            {
-                return SNOAvoidanceType.ContainsKey(trinityObject.ActorSNO) ? GetAvoidanceRadius(SNOAvoidanceType[trinityObject.ActorSNO], customRadius) : customRadius;
-            }
+            if (DataDictionary.AvoidanceTypeSNO.ContainsKey(trinityObject.ActorSNO))
+                return GetAvoidanceRadius(DataDictionary.AvoidanceTypeSNO[trinityObject.ActorSNO], customRadius);
+
+            return customRadius;
         }
 
         public static float GetAvoidanceRadiusBySNO(int snoId, float defaultValue)
         {
             using (new PerformanceLogger("GetAvoidanceRadiusBySNO"))
             {
-                if (SNOAvoidanceType.ContainsKey(snoId))
+                if (DataDictionary.AvoidanceTypeSNO.ContainsKey(snoId))
                 {
-                    float radius = GetAvoidanceRadius(SNOAvoidanceType[snoId], defaultValue);
-                    //DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Found avoidance Radius of={0} for snoId={1} (default={2})", radius, snoId, defaultValue);
+                    float radius = GetAvoidanceRadius(DataDictionary.AvoidanceTypeSNO[snoId], defaultValue);
                     return radius;
-                }
-                else
-                {
-                    //Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Unkown Avoidance type for Radius! {0}", snoId);
                 }
                 return defaultValue;
             }
@@ -218,8 +190,6 @@ namespace Trinity
                 }
             }            
 
-            //TODO : Make mapping between Type and Config
-            LoadAvoidanceDictionary(false);
             IAvoidanceHealth avoidanceHealth = null;
             switch (Trinity.Player.ActorClass)
             {
@@ -416,16 +386,12 @@ namespace Trinity
         {
             using (new PerformanceLogger("GetAvoidanceHealthbySNO"))
             {
-                if (SNOAvoidanceType.ContainsKey(snoId))
+                if (DataDictionary.AvoidanceTypeSNO.ContainsKey(snoId))
                 {
-                    float health = GetAvoidanceHealth(SNOAvoidanceType[snoId], defaultValue);
-                    //DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Found avoidance Health of={0} for snoId={1} (default={2})", health, snoId, defaultValue);
+                    float health = GetAvoidanceHealth(DataDictionary.AvoidanceTypeSNO[snoId], defaultValue);
                     return health;
                 }
-                else
-                {
-                    //Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Unkown Avoidance type for Health! {0}", snoId);
-                }
+
                 return defaultValue;
             }
         }

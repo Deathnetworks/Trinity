@@ -3,7 +3,7 @@ namespace Trinity
 {
     public enum AvoidanceType
     {
-        None,
+        None = 0,
         Arcane,
         AzmoFireball,
         AzmodanBody,
@@ -39,6 +39,7 @@ namespace Trinity
         ZoltBubble,
         ZoltTwister,
         RimeCold,
-        MorluMeteor
+        MorluMeteor,
+        DiabloLightning
     }
 }
