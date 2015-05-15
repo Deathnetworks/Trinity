@@ -169,7 +169,7 @@ namespace Trinity.Combat.Abilities
                 if (CanCast(SNOPower.Barbarian_IgnorePain) && Player.CurrentHealthPct <= V.F("Barbarian.IgnorePain.MinHealth"))
                     return true;
 
-                return Sets.TheLegacyOfRaekor.IsFullyEquipped && ShouldFuryDump;
+                return Sets.TheLegacyOfRaekor.IsFullyEquipped && ShouldFuryDump && CanCast(SNOPower.Barbarian_IgnorePain);
             }
         }
         public static bool CanUseCallOfTheAncients
