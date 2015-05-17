@@ -42,7 +42,7 @@ namespace Trinity.Combat.Abilities
                     power = PowerFrenzy;
 
                 // Refresh Bash - Punish
-                if (IsNull(power) && CanCast(SNOPower.Barbarian_Bash) && TimeSincePowerUse(SNOPower.Barbarian_Bash) > 4000 && TimeSincePowerUse(SNOPower.Barbarian_Punish) < 5000)
+                if (IsNull(power) && CanCast(SNOPower.Barbarian_Bash) && TimeSincePowerUse(SNOPower.Barbarian_Bash) > 4000 && TimeSincePowerUse(SNOPower.Barbarian_Bash) < 5000)
                     power = PowerBash;
             }
             // Ignore Pain when low on health
@@ -510,9 +510,6 @@ namespace Trinity.Combat.Abilities
             {
                 return !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsRooted && Hotbar.Contains(SNOPower.Barbarian_Bash) &&
                     Runes.Barbarian.Punish.IsActive && !TargetUtil.AnyMobsInRange(15f, 3) && GetBuffStacks(SNOPower.Barbarian_Bash) < 3;
-                }
-
-                return false;
             }
         }
         public static bool CanUseWhirlwind
