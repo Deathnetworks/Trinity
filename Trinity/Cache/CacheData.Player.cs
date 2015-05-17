@@ -249,12 +249,9 @@ namespace Trinity
                 SecondaryResourceMax = GetMaxSecondaryResource(_me);
                 PrimaryResourceMax = GetMaxPrimaryResource(_me);
 
-                Logger.Log("PrimaryResourceMax={0}, SecondaryResourceMax={1}", PrimaryResourceMax, SecondaryResourceMax);
-
 			    IsRanged = ActorClass == ActorClass.Witchdoctor || ActorClass == ActorClass.Wizard || ActorClass == ActorClass.DemonHunter;
 				LastVerySlowUpdate = DateTime.UtcNow;			    
 			}
-
 
             private float GetMaxPrimaryResource(DiaActivePlayer player)
             {
