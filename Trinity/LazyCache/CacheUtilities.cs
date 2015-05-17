@@ -318,12 +318,12 @@ namespace Trinity.LazyCache
 
         #endregion
 
-        public static bool IsProperValid(this ACD acd)
+        public static bool IsProbablyValid(this ACD acd)
         {
             return acd != null && acd.IsValid;
         }
 
-        public static bool IsProperValid(this SNORecord acd)
+        public static bool IsProbablyValid(this SNORecord acd)
         {
             return acd != null && acd.IsValid && !acd.IsDisposed;
         }
@@ -397,13 +397,19 @@ namespace Trinity.LazyCache
         /// </summary>
         public static T Default<T>()
         {
-            var type = typeof (T);
+            var type = typeof(T).Name;
 
-            if (type == typeof (string))
-                return (T)(object)String.Empty;
+            switch (type)
+            {
+                case "string":
+                    return (T)(object)String.Empty;
 
-            if (type == typeof(MonsterType))
-                return (T)(object)MonsterType.None;
+                case "MonsterType":
+                    return (T)(object)MonsterType.None;
+
+                case "InventorySlot":
+                    return (T)(object)InventorySlot.None;
+            }
 
             return default(T);
         }

@@ -25,6 +25,7 @@
             <Button Content="Full Dump ALL items (SLOW!!)" Command="{Binding Path=DumpAllItemsCommand}"/>
             <Button Content="Dump Build / Items" Command="{Binding Path=DumpSkillsAndItemsCommand}"/>
             <Button Content="Dump Invalid Items" Command="{Binding Path=DumpInvalidItemsCommand}"/>
+            <Button Content="Dump ItemSNO Reference" Command="{Binding Path=DumpItemSNOReference}"/>            
         </UniformGrid>
     </StackPanel>
 </UserControl>

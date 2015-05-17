@@ -185,7 +185,7 @@ namespace Trinity.Combat.Weighting
         Cluster,
         GoblinIgnore,
         IsElite,
-        IsSummon,
+        IsSummoned,
         IgnoreHealth,
         NotHostile,
         NullObject

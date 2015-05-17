@@ -8,6 +8,8 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Forms;
+using System.Windows.Input;
+using System.Windows.Media;
 using Trinity.Cache;
 using Trinity.Helpers;
 using Trinity.LazyCache;
@@ -209,6 +211,12 @@ namespace Trinity.UI.UIComponents
         }
 
         private static bool _isWindowOpen;
+
+        private static ICommand CopyToClipboardCommand = new RelayCommand(param =>
+        {
+            Logger.Log("Copy to Clipboard Command Fired {0}", param);
+        });
+
         private static void Window_Closed(object sender, EventArgs e)
         {
             try

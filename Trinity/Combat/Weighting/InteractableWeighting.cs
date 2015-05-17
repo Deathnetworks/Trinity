@@ -33,7 +33,7 @@ namespace Trinity.Combat.Weighting
 
             // nearby monsters attacking us - don't try to use headtone
             if (cacheObject.Object is DiaGizmo && cacheObject.GizmoType == GizmoType.Headstone &&
-                CacheManager.Units.Any(u => u.RadiusDistance < 25f && u.IsFacingPlayer))
+                CacheManager.Units.Any(u => u.RadiusDistance < 25f))
             {
                 weightFactors.Add(new Weight(0, WeightMethod.Set, WeightReason.MonstersNearPlayer));
                 return weightFactors;

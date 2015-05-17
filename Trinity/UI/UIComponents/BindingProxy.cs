@@ -7,6 +7,10 @@ using System.Windows;
 
 namespace Trinity.UIComponents
 {
+    /// <summary>
+    /// Add Proxy <ut:BindingProxy x:Key="Proxy" Data="{Binding}" /> to Resources
+    /// Bind like <Element Property="{Binding Data.MyValue, Source={StaticResource Proxy}}" />   
+    /// </summary>
     public class BindingProxy : Freezable
     {
         #region Overrides of Freezable

@@ -40,10 +40,12 @@ namespace Trinity.LazyCache
 
             var meta = CacheMeta.GetOrCreateActorMeta(rActor, acd, actorSNO, actorType);
 
-            var trinityType = CacheBase.GetTrinityType(acd, actorType, actorSNO, meta.GizmoType, meta.InternalName);
+            var internalName = CacheBase.GetInternalName(meta, acd);            
+
+            var trinityType = CacheBase.GetTrinityType(acd, actorType, actorSNO, meta.GizmoType, internalName);
 
             //if (actorType == ActorType.Player)
-            //    result = new TrinityPlayer();
+            //    result = new TrinityObject();
 
             if (actorType == ActorType.Monster && trinityType != TrinityObjectType.Player)
                 result = new TrinityUnit();
@@ -67,7 +69,7 @@ namespace Trinity.LazyCache
             result.ActorSNO = actorSNO;
             result.ActorMeta = meta;
             result.ActorType = actorType;
-            result.InternalName = meta.InternalName;
+            result.InternalName = internalName;
             result.TrinityType = trinityType;
             result.LastUpdated = CacheManager.LastUpdated;
             result.ACDItem = acd as ACDItem;

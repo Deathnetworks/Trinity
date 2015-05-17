@@ -26,6 +26,8 @@ namespace Trinity.LazyCache
     /// </summary>
     public class CacheBase
     {
+        public static SNOTable _getActorTable;
+
         #region Constructors
 
         public CacheBase() { }
@@ -37,15 +39,21 @@ namespace Trinity.LazyCache
             ACDGuid = rActor.ACDGuid;
             RActorGuid = rActor.RActorGuid;
             ActorSNO = rActor.ActorSNO;
-            ActorType = rActor.ActorType;
-            ActorMeta = CacheMeta.GetOrCreateActorMeta(this);            
-            InternalName = ActorMeta.InternalName;
-            TrinityType = GetTrinityType(Source, ActorType, ActorSNO, ActorMeta.GizmoType, InternalName);
+
+            TrinityItemType trinityItemType;
+            ActorType actorType;
+            GetActorAndItemType(rActor, ActorSNO, out actorType, out trinityItemType);
+            ActorType = actorType;
+            TrinityItemType = trinityItemType;
+
+            ActorMeta = CacheMeta.GetOrCreateActorMeta(this);                                   
             LastUpdated = CacheManager.LastUpdated;
             ACDItem = Source as ACDItem;
             DiaGizmo = Object as DiaGizmo;
             DiaItem = Object as DiaItem;
-            DiaUnit = Object as DiaUnit;            
+            DiaUnit = Object as DiaUnit;
+            InternalName = GetInternalName(ActorMeta, Source);
+            TrinityType = GetTrinityType(Source, ActorType, ActorSNO, ActorMeta.GizmoType, InternalName);
         }
 
         #endregion
@@ -66,6 +74,7 @@ namespace Trinity.LazyCache
         public DiaGizmo DiaGizmo { get; set; }
         public DiaItem DiaItem { get; set; }
         public DiaUnit DiaUnit { get; set; }
+        public TrinityItemType TrinityItemType { get; set; }
 
         #endregion
 
@@ -73,10 +82,10 @@ namespace Trinity.LazyCache
 
         public bool IsValid
         {
-            get { return IsProperValid(Object, Source, ActorType, ACDGuid, RActorGuid); }
+            get { return IsProperValid(Object, Source, ActorType, ACDGuid, RActorGuid, ActorSNO); }
         }
 
-        public static bool IsProperValid(DiaObject obj, ACD acd, ActorType actorType, int acdGuid, int rActorGuid)
+        public static bool IsProperValid(DiaObject obj, ACD acd, ActorType actorType, int acdGuid, int rActorGuid, int actorSNO)
         {
             if (acd == null || obj == null)
                 return false;
@@ -84,19 +93,32 @@ namespace Trinity.LazyCache
             if (!acd.IsValid || !obj.IsValid || acd.IsDisposed)
                 return false;
 
+            if (actorType == ActorType.Item && (!(obj is DiaItem) || !(acd is ACDItem)))
+                return false;
+
             if (actorType == ActorType.Monster && (obj as DiaUnit) == null)
                 return false;
 
             if (actorType == ActorType.Gizmo && (obj as DiaGizmo) == null)
                 return false;
-
+            
             if (acdGuid == -1 || rActorGuid == -1)
                 return false;
 
-            //if (string.IsNullOrEmpty(internalName))
-            //    return false;
-
             return true;
+        }
+
+        private void GetActorAndItemType(DiaObject obj, int actorSNO, out ActorType outActorType, out TrinityItemType outTrinityItemType)
+        {
+            TrinityItemType trinityItemType = TrinityItemType.Unknown;
+            if (DataDictionary.ItemTypeReference.ContainsKey(actorSNO))
+            {
+                outTrinityItemType = trinityItemType;
+                outActorType = ActorType.Item;
+                return;
+            }
+            outTrinityItemType = trinityItemType;
+            outActorType = obj.ActorType;            
         }
 
         /// <summary>
@@ -106,17 +128,14 @@ namespace Trinity.LazyCache
         {
             try
             {
-                return selector != null && DiaUnit != null && DiaUnit.IsValid && Source.IsProperValid() ? selector(DiaUnit) : CacheUtilities.Default<T>();
+                return selector != null && DiaUnit != null && DiaUnit.IsValid && Source.IsProbablyValid() ? selector(DiaUnit) : CacheUtilities.Default<T>();
             }
             catch (Exception ex)
             {
                 if (ex.Message.StartsWith("Only part of a ReadProcessMemory"))
                 {
-                    var acd = ZetaDia.Actors.GetACDByGuid(ACDGuid);
-                    var actor = ZetaDia.Actors.GetActorsOfType<DiaUnit>().Where(u => u.ACDGuid == ACDGuid);
-
-                    //Logger.LogError("DB Memory Exception in GetUnitProperty Caller={0} ACDGuid={1} ActorType={2} Name={3} SNO={4} Exception={5} {6}",
-                    //    caller, ACDGuid, ActorType, (Source != null) ? Source.Name : string.Empty, ActorSNO, ex.Message, ex.InnerException);
+                    Logger.LogError("DB Memory Exception in GetUnitProperty Caller={0} ACDGuid={1} ActorType={2} Name={3} SNO={4} Exception={5} {6}",
+                        caller, ACDGuid, ActorType, (Source != null) ? Source.Name : string.Empty, ActorSNO, ex.Message, ex.InnerException);
                 }
                 else throw;
             }
@@ -130,7 +149,7 @@ namespace Trinity.LazyCache
         {
             try
             {
-                return selector != null && ACDItem != null && ACDItem.IsValid && Source.IsProperValid() ? selector(ACDItem) : CacheUtilities.Default<T>();
+                return selector != null && ACDItem != null && ACDItem.IsValid && Source.IsProbablyValid() ? selector(ACDItem) : CacheUtilities.Default<T>();
             }
             catch (Exception ex)
             {
@@ -151,7 +170,7 @@ namespace Trinity.LazyCache
         {
             try            
             {
-                return selector != null && DiaItem != null && DiaItem.IsValid && Source.IsProperValid() ? selector(DiaItem) : CacheUtilities.Default<T>();
+                return selector != null && DiaItem != null && DiaItem.IsValid && Source.IsProbablyValid() ? selector(DiaItem) : CacheUtilities.Default<T>();
             }
             catch (Exception ex)
             {
@@ -172,7 +191,7 @@ namespace Trinity.LazyCache
         {
             try
             {
-                return selector != null && DiaGizmo != null && DiaGizmo.IsValid && Source.IsProperValid() ? selector(DiaGizmo) : CacheUtilities.Default<T>();
+                return selector != null && DiaGizmo != null && DiaGizmo.IsValid && Source.IsProbablyValid() ? selector(DiaGizmo) : CacheUtilities.Default<T>();
             }
             catch (Exception ex)
             {
@@ -193,7 +212,7 @@ namespace Trinity.LazyCache
         {
             try
             {
-                return selector != null && Object != null && Object.IsValid && Source.IsProperValid() ? selector(Object) : CacheUtilities.Default<T>();
+                return selector != null && Object != null && Object.IsValid && Source.IsProbablyValid() ? selector(Object) : CacheUtilities.Default<T>();
             }
             catch (Exception ex)
             {
@@ -214,7 +233,7 @@ namespace Trinity.LazyCache
         {
             try
             {
-                return selector != null && Source != null && Source.IsProperValid() ? selector(Source) : CacheUtilities.Default<T>();
+                return selector != null && Source != null && Source.IsProbablyValid() ? selector(Source) : CacheUtilities.Default<T>();
             }
             catch (Exception ex)
             {
@@ -235,7 +254,7 @@ namespace Trinity.LazyCache
         {
             try
             {
-                return selector != null && DiaUnit != null && DiaUnit.IsValid && Source.IsProperValid() ? selector(source) : CacheUtilities.Default<T2>();
+                return selector != null && DiaUnit != null && DiaUnit.IsValid && Source.IsProbablyValid() ? selector(source) : CacheUtilities.Default<T2>();
             }
             catch (Exception ex)
             {
@@ -274,19 +293,16 @@ namespace Trinity.LazyCache
         internal static TrinityObjectType GetTrinityType(ACD acd, ActorType actorType, int actorSNO, GizmoType gizmoType, string internalName)
         {
 
-            if (actorType == ActorType.Monster)
-                return TrinityObjectType.Unit;
-
-            if (internalName.Contains("CursedChest"))
+            if (DataDictionary.CursedChestSNO.Contains(actorSNO))
                 return TrinityObjectType.CursedChest;
 
-            if (internalName.Contains("CursedShrine"))
+            if (DataDictionary.CursedShrineSNO.Contains(actorSNO))
                 return TrinityObjectType.CursedShrine;
 
-            if (DataDictionary.Shrines.Any(s => s == (SNOActor)actorSNO))
+            if (DataDictionary.ShrineSNO.Contains(actorSNO))
                 return TrinityObjectType.Shrine;
 
-            if (acd is ACDItem && internalName.ToLower().Contains("gold"))
+            if (DataDictionary.GoldSNO.Contains(actorSNO))
                 return TrinityObjectType.Gold;
 
             if (actorType == ActorType.Item || DataDictionary.ForceToItemOverrideIds.Contains(actorSNO))
@@ -295,8 +311,11 @@ namespace Trinity.LazyCache
             if (DataDictionary.InteractWhiteListIds.Contains(actorSNO))
                 return TrinityObjectType.Interactable;
 
-            if (AvoidanceManager.GetAvoidanceType(actorSNO) != AvoidanceType.None)
+            if (DataDictionary.AvoidanceTypeSNO.ContainsKey(actorSNO) || DataDictionary.AvoidanceSNO.Contains(actorSNO))
                 return TrinityObjectType.Avoidance;
+
+            if (actorType == ActorType.Monster)
+                return TrinityObjectType.Unit;
 
             if (actorType == ActorType.Gizmo)
             {
@@ -335,13 +354,21 @@ namespace Trinity.LazyCache
             if (acd.ActorType == ActorType.Player)
                 return TrinityObjectType.Player;
 
-            if (internalName.StartsWith("Banner_Player"))
+            if (DataDictionary.PlayerBannerSNO.Contains(actorSNO))
                 return TrinityObjectType.Banner;
 
             if (internalName.StartsWith("Waypoint-"))
                 return TrinityObjectType.Waypoint;
 
             return TrinityObjectType.Unknown;
+        }
+
+        public static string GetInternalName(CacheMeta.ActorMeta meta, ACD acd)
+        {
+            if (meta.IsValid)
+                return meta.InternalName;
+
+            return Trinity.NameNumberTrimRegex.Replace(acd.Name, "");
         }
 
         public override int GetHashCode()

@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Trinity.Combat.Weighting;
+using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Common;
 using Zeta.Game;
@@ -267,10 +268,19 @@ namespace Trinity.LazyCache
             }
         }
 
+        /// <summary>
+        /// Replacement for ZetaDia.Me
+        /// </summary>
         public static TrinityPlayer Me { get; private set; }
 
+        /// <summary>
+        /// If CacheManager is turned on
+        /// </summary>
         public static bool IsRunning { get; internal set; }
 
+        /// <summary>
+        /// Flag that all CacheField object check, while True, they will return a cached value
+        /// </summary>
         public static bool IsUpdatePending { get; set; }
 
         #endregion
@@ -283,59 +293,82 @@ namespace Trinity.LazyCache
         public static void Update()
         {
             IsUpdatePending = true;
-
             var refreshTimer = Stopwatch.StartNew();
 
-            if (ZetaDia.Me == null)
-                return;
+            using (new PerformanceLogger("lazyCache.Update.PreUpdate"))
+            {               
+                if (ZetaDia.Me == null)
+                    return;
 
-            LastUpdated = DateTime.UtcNow;
+                LastUpdated = DateTime.UtcNow;
 
-            if (Me == null)
-                Me = new TrinityPlayer(ZetaDia.Me);
-            else
-                Me.UpdateSource(ZetaDia.Me);
+                if (Me == null)
+                    Me = new TrinityPlayer(ZetaDia.Me);
+                else
+                    Me.UpdateSource(ZetaDia.Me);
 
-            ActivePlayerGuid = Me.ACDGuid;
+                ActivePlayerGuid = Me.ACDGuid;
+            }
 
-            foreach (var rActor in ZetaDia.Actors.RActorList.OfType<DiaObject>())
+            using (new PerformanceLogger("lazyCache.Update.Refresh"))
             {
-                if (rActor == null)
-                    continue;
+                foreach (var rActor in ZetaDia.Actors.RActorList.OfType<DiaObject>())
+                {
+                    ACD acd;
+                    int rActorGuid;
+                    int acdGuid;
+                    ActorType actorType;
+                    int actorSNO;
+                    using (new PerformanceLogger("lazyCache.Update.Refresh.PreFilter"))
+                    {
+                        if (rActor == null)
+                            continue;
 
-                var acd = rActor.CommonData;
-                if (acd == null || !acd.IsValid)
-                    continue;
+                        acd = rActor.CommonData;
+                        if (acd == null || !acd.IsValid)
+                            continue;
 
-                var actorSNO = rActor.ActorSNO;
-                if (DataDictionary.ExcludedActorIds.Contains(actorSNO))
-                    continue;
+                        actorSNO = acd.ActorSNO;
+                        if (DataDictionary.ExcludedActorIds.Contains(actorSNO))
+                            continue;
 
-                var actorType = rActor.ActorType;
-                if (DataDictionary.ExcludedActorTypes.Contains(actorType))
-                    continue;
+                        actorType = acd.ActorType;
+                        if (DataDictionary.ExcludedActorTypes.Contains(actorType))
+                            continue;
+                       
+                        acdGuid = acd.ACDGuid;
+                        rActorGuid = rActor.RActorGuid;
+                      
+                        if (!CacheBase.IsProperValid(rActor, acd, actorType, acdGuid, rActorGuid, actorSNO))
+                            continue;                      
+                    }
 
-                var acdGuid = rActor.ACDGuid;
-                var rActorGuid = rActor.RActorGuid;
-                if (!CacheBase.IsProperValid(rActor, acd, actorType, acdGuid, rActorGuid))
-                    continue;
-
-                CachedObjects.AddOrUpdate(acdGuid,
-                    i => CacheFactory.CreateTrinityObject(rActor, acd, acdGuid, rActorGuid, actorSNO, actorType),
-                    (key, actor) => actor.UpdateSource(actor, acd, rActor));
+                    using (new PerformanceLogger("lazyCache.Update.Refresh.AddOrUpdate"))
+                    {
+                        CachedObjects.AddOrUpdate(acdGuid,
+                            i => CacheFactory.CreateTrinityObject(rActor, acd, acdGuid, rActorGuid, actorSNO, actorType),
+                            (key, actor) => actor.UpdateSource(actor, acd, rActor));
+                    }
+                }
             }
 
             IsUpdatePending = false;
 
-            foreach (var o in CachedObjects)
-            {
-                if (!o.Value.IsValid ||
-                    string.IsNullOrEmpty(o.Value.InternalName) || // Bad Records 0
-                    (string.IsNullOrEmpty(o.Value.Name) && o.Value.Distance == 0) || // Bad Item Records 1
-                    o.Value.WeightFactors.Any(r => r.Reason == WeightReason.TypeMismatch && o.Value.Distance == 0) || // Bad Records 2
-                    o.Value.ActorType == ActorType.Item && (o.Value is TrinityItem) && !((TrinityItem) o.Value).IsOnGround || // Speed up removal of items on pick up
-                    LastUpdated.Subtract(o.Value.LastUpdated).TotalSeconds > 20)
-                    CachedObjects.TryRemove(o.Key, o.Value);
+            using (new PerformanceLogger("lazyCache.Update.Purge"))
+            {               
+                foreach (var o in CachedObjects)
+                {
+                    if (!o.Value.IsValid)
+                        CachedObjects.TryRemove(o.Key, o.Value);
+
+                    //if (!o.Value.IsValid ||
+                    //    string.IsNullOrEmpty(o.Value.InternalName) || // Bad Records 0
+                    //    (string.IsNullOrEmpty(o.Value.Name) && o.Value.Distance == 0) || // Bad Item Records 1
+                    //    o.Value.WeightFactors.Any(r => r.Reason == WeightReason.TypeMismatch && o.Value.Distance == 0) || // Bad Records 2
+                    //    o.Value.ActorType == ActorType.Item && (o.Value is TrinityItem) && !((TrinityItem) o.Value).IsOnGround || // Speed up removal of items on pick up
+                    //    LastUpdated.Subtract(o.Value.LastUpdated).TotalSeconds > 20)
+                    //    CachedObjects.TryRemove(o.Key, o.Value);
+                }
             }
 
             _actorsByRActorGuid = CachedObjects.Values.DistinctBy(i => i.RActorGuid).ToDictionary(k => k.RActorGuid, v => v);
@@ -345,24 +378,27 @@ namespace Trinity.LazyCache
 
             var weightTimer = Stopwatch.StartNew();
 
-            try
+            using (new PerformanceLogger("lazyCache.Update.Weighting"))
             {
-                Parallel.ForEach(CachedObjects, cacheObject =>
+                try
                 {
-                    try
+                    Parallel.ForEach(CachedObjects, cacheObject =>
                     {
-                        cacheObject.Value.TryCalculateWeight();
-                    }
-                    catch (Exception)
-                    {
-                        Logger.Log("Exception in Parallel Weighting");
-                    }
+                        try
+                        {
+                            cacheObject.Value.TryCalculateWeight();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log("Exception in Parallel Weighting {0} {1}", ex.Message, ex.InnerException);
+                        }
 
-                });
-            }
-            catch (Exception)
-            {
-                Logger.Log("Exception in Parallel.ForEach Enumeration");
+                    });
+                }
+                catch (Exception)
+                {
+                    Logger.Log("Exception in Parallel.ForEach Enumeration");
+                }
             }
 
             LastUpdateTimeTaken = refreshTimer.Elapsed.TotalMilliseconds;

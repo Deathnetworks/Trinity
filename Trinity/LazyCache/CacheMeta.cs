@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Win32.SafeHandles;
+using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
@@ -24,43 +25,53 @@ namespace Trinity.LazyCache
 
         public static ActorMeta GetOrCreateActorMeta(DiaObject diaObject, ACD acd, int actorSNO, ActorType actorType)
         {
-            ActorMeta actorMeta;
-
-            if (!ReferenceActorMeta.TryGetValue(actorSNO, out actorMeta))
+            using (new PerformanceLogger("GetOrCreateActorMeta"))
             {
-                actorMeta = CreateActorMeta(diaObject, acd, actorSNO, actorType);
-            }
+                ActorMeta actorMeta;
 
-            return actorMeta;
+                if (!ReferenceActorMeta.TryGetValue(actorSNO, out actorMeta))
+                {
+                    actorMeta = CreateActorMeta(diaObject, acd, actorSNO, actorType);
+                }
+
+                return actorMeta;
+            }
         }
 
         private static ActorMeta CreateActorMeta(DiaObject diaObject, ACD acd, int actorSNO, ActorType actorType)
         {
-            ActorMeta actorMeta;
-
-            if (actorType == ActorType.Monster && diaObject is DiaUnit || actorType == ActorType.Gizmo && diaObject is DiaGizmo || actorType == ActorType.Player)
+            using (new PerformanceLogger("CreateActorMeta"))
             {
-                actorMeta = new ActorMeta(diaObject, acd, actorSNO, actorType);
+                ActorMeta actorMeta;
 
-                if (Trinity.Settings.Advanced.ExportNewActorMeta && actorMeta.IsValid && !actorMeta.IsPartial)
-                {
-                    Logger.Log("Exporting ActorMeta for {0} ({1})", acd.Name, actorSNO);
-                    WriteToLog(actorMeta);
-                }
+                // We only care about having accurate information on Units and Gizmos.
+                // Everything else can just return the default.
+
+                //if (actorType == ActorType.Monster && diaObject is DiaUnit || 
+                //    actorType == ActorType.Gizmo && diaObject is DiaGizmo || 
+                //    actorType == ActorType.Player)
+                //{
+                    actorMeta = new ActorMeta(diaObject, acd, actorSNO, actorType);
+               
+                    if (Trinity.Settings.Advanced.ExportNewActorMeta && actorMeta.IsValid && !actorMeta.IsPartial)
+                    {
+                        Logger.Log("Exporting ActorMeta for {0} ({1})", acd.Name, actorSNO);
+                        WriteToLog(actorMeta);
+                    }
+                //}
+                //else if (actorType == ActorType.Player)
+                //{
+                //    actorMeta = new ActorMeta(diaObject, acd, actorSNO, actorType);
+                //}
+                //else
+                //{
+                //    actorMeta = new ActorMeta();
+                //}
 
                 ReferenceActorMeta.Add(actorSNO, actorMeta);
 
+                return actorMeta;
             }
-            else if (actorType == ActorType.Player)
-            {
-                actorMeta = new ActorMeta(diaObject, acd, actorSNO, actorType);
-            }
-            else
-            {
-                actorMeta = new ActorMeta();
-            }
-
-            return actorMeta;
         }
 
         private static ActorMeta CreateActorMeta(CacheBase cacheBase)
@@ -104,11 +115,14 @@ namespace Trinity.LazyCache
                 if (diaObject == null || acd == null)
                     return;
 
+                // We need to really really really make sure that we only export from valid objects
+
                 var actorInfo = acd.ActorInfo;
                 var monsterInfo = acd.MonsterInfo;
                 var unit = diaObject as DiaUnit;
                 var gizmo = diaObject as DiaGizmo;
-
+                var item = diaObject as DiaItem;
+               
                 ActorSNO = actorSNO;
                 ActorType = actorType;
 
@@ -120,7 +134,7 @@ namespace Trinity.LazyCache
 
                 try
                 {
-                    _isPartial = (gizmo != null && !gizmo.IsValid) || (unit != null && !unit.IsValid);
+                    _isPartial = (gizmo != null && !gizmo.IsValid) || (unit != null && !unit.IsValid) || (item != null && !item.IsValid);
                 }
                 catch (Exception) { }
 
@@ -129,79 +143,152 @@ namespace Trinity.LazyCache
 
                 if (acd.IsValid && !acd.IsDisposed)
                 {                    
-                    InternalName = Trinity.NameNumberTrimRegex.Replace(acd.Name, "");
+                    InternalName = Trinity.NameNumberTrimRegex.Replace(acd.Name, "");                    
                 }
 
-                if (actorInfo != null && actorInfo.IsValid && !actorInfo.IsDisposed)
+                if (actorInfo == null)
                 {
-                    MonsterSNO = actorInfo.SNOMonster;
-                    Radius = acd.ActorInfo.Sphere.Radius;
-                    PhysMeshSNO = actorInfo.SNOPhysMesh;
-                    ApperanceSNO = actorInfo.SNOApperance;
-                    AnimSetSNO = actorInfo.SNOAnimSet;
-                    IsMerchant = actorInfo.IsMerchant;
+                    _isValid = false;
+                }
+                else
+                {
+                    var actorSNOSources = new HashSet<int>
+                    {
+                        acd.ActorSNO,
+                        diaObject.ActorSNO,
+                        diaObject.CommonData.ActorSNO,
+                        acd.ActorInfo.SNOId,                        
+                    };
+
+                    if (actorInfo.SNOMonster != -1)
+                        actorSNOSources.Add(acd.MonsterInfo.SNOActor);
+
+                    if (actorSNOSources.Any(o => o != actorSNO))
+                    {
+                        Logger.Log("Detected ActorSNO Mismatch ({0} / {1} / {2} / {3} / {4} / {5})",
+                            actorSNO,
+                            acd.ActorSNO,
+                            diaObject.ActorSNO,
+                            diaObject.CommonData.ActorSNO,
+                            acd.ActorInfo.SNOId,
+                            acd.MonsterInfo.SNOActor);
+
+                        _isValid = false;
+                    }
+
+                    var internalNameSources = new HashSet<string>
+                    {
+                        Trinity.NameNumberTrimRegex.Replace(diaObject.Name, ""),
+                        ((SNOActor) actorSNO).ToString(),
+                        ((SNOActor) acd.ActorSNO).ToString(),
+                        ((SNOActor) acd.ActorInfo.SNOId).ToString(),
+                    };
+
+                    if (internalNameSources.Any(o => o != InternalName))
+                    {
+                        Logger.Log("Detected InternalName Mismatch ({0} / {1} / {2} / {3} / {4})",
+                            InternalName,
+                            Trinity.NameNumberTrimRegex.Replace(diaObject.Name, ""),
+                            ((SNOActor) actorSNO).ToString(),
+                            ((SNOActor) acd.ActorSNO).ToString(),
+                            ((SNOActor) acd.ActorInfo.SNOId).ToString());
+
+                        _isValid = false;
+                    }
+
+                    if (acd.ActorType != ActorType.Monster && acd.ActorInfo.SNOMonster != -1)
+                    {
+                        Logger.Log("MonsterSNO on non-monster type.");
+                        _isValid = false;
+                    }
                 }
 
-                if (MonsterSNO != -1 && unit != null && unit.IsValid && monsterInfo.IsValid && !monsterInfo.IsDisposed)
+                if (TrinityItemManager.DetermineItemType(InternalName, ItemType.Unknown) != TrinityItemType.Unknown)
                 {
-                    IsMonster = true;
-                    MonsterType = monsterInfo.MonsterType;
-                    MonsterRace = monsterInfo.MonsterRace;
-                    MonsterSize = monsterInfo.MonsterSize;
+                    _isValid = false;
+                    Logger.Log("Detected Item Mis-classified as Gizmo or Monster. InternalName={0} IsGizmo={1} IsUnit={2}", InternalName, gizmo != null, unit != null);
                 }
 
-                if (unit != null && unit.IsValid)
+                if (actorInfo != null && (int)actorInfo.GizmoType == 5)
                 {
-                    IsUnit = true;
-                    GizmoType = GizmoType.None;
-                    try { IsHostile = unit.IsHostile; }
-                    catch (Exception) { }
-                    try { IsNPC = unit.IsNPC; }
-                    catch (Exception) { }
-                    try { PetType = unit.PetType; }
-                    catch (Exception) { }
-                    try { IsSalvageShortcut = unit.IsSalvageShortcut; }
-                    catch (Exception) { }
-                    try { HirelingType = unit.HirelingType; }
-                    catch (Exception) { }
-                    try { IsHelper = unit.IsHelper; }
-                    catch (Exception) { }
-                    try { IsDefaultHidden = unit.IsHidden; }
-                    catch (Exception) { }
-                    try { IsQuestGiver = unit.IsQuestGiver; }
-                    catch (Exception) { }
-                    try { IsSummoned = unit.Summoner != null || unit.SummonedBySNO != -1 || unit.SummonedByACDId != -1; }
-                    catch (Exception) { }
-                    try { IsSummoner = acd.Name.ToLower().Contains("summoner") || CacheManager.Units.Any(u => u.SummonedByACDId == acd.DynamicId); }
-                    catch (Exception) { }
+                    _isValid = false;
+                    Logger.Log("Detected Invalid GizmoType 5", InternalName, gizmo != null, unit != null);
                 }
 
-                if (gizmo != null && gizmo.IsValid)
-                {
-                    IsGizmo = true;
-                    try { GizmoType = acd.GizmoType; }
-                    catch (Exception) { }
-                    try { GizmoIsBarracade = gizmo.IsBarricade; }
-                    catch (Exception) { }
-                    try { GizmoIsDestructible = gizmo.IsDestructibleObject; }
-                    catch (Exception) { }
-                    try { GizmoIsDisabledByScript = gizmo.IsGizmoDisabledByScript; }
-                    catch (Exception) { }
-                    try { GizmoIsPortal = gizmo.IsPortal; }
-                    catch (Exception) { }
-                    try { GizmoIsTownPortal = gizmo.IsTownPortal; }
-                    catch (Exception) { }
-                    try { GizmoDefaultCharges = gizmo.GizmoCharges; }
-                    catch (Exception) { }
-                    try { GizmoDefaultState = gizmo.GizmoState; }
-                    catch (Exception) { }
-                    try { GizmoGrantsNoXp = gizmo.GrantsNoXp; }
-                    catch (Exception) { }
-                    try { GizmoDropNoLoot = gizmo.DropsNoLoot; }
-                    catch (Exception) { }
-                    try { GizmoIsOperatable = gizmo.Operatable; }
-                    catch (Exception) { }
-                }                
+                if (_isValid)
+                {                    
+                    if (actorInfo != null && actorInfo.IsValid && !actorInfo.IsDisposed)
+                    {
+                        MonsterSNO = actorInfo.SNOMonster;
+                        Radius = acd.ActorInfo.Sphere.Radius;
+                        PhysMeshSNO = actorInfo.SNOPhysMesh;
+                        ApperanceSNO = actorInfo.SNOApperance;
+                        AnimSetSNO = actorInfo.SNOAnimSet;
+                        IsMerchant = actorInfo.IsMerchant;
+                    }
+
+                    if (MonsterSNO != -1 && unit != null && unit.IsValid && monsterInfo.IsValid && !monsterInfo.IsDisposed)
+                    {
+                        IsMonster = true;
+                        MonsterType = monsterInfo.MonsterType;
+                        MonsterRace = monsterInfo.MonsterRace;
+                        MonsterSize = monsterInfo.MonsterSize;
+                    }
+
+                    if (unit != null && unit.IsValid)
+                    {
+                        IsUnit = true;
+                        GizmoType = GizmoType.None;
+                        try { IsHostile = unit.IsHostile; }
+                        catch (Exception) { }
+                        try { IsNPC = unit.IsNPC; }
+                        catch (Exception) { }
+                        try { PetType = unit.PetType; }
+                        catch (Exception) { }
+                        try { IsSalvageShortcut = unit.IsSalvageShortcut; }
+                        catch (Exception) { }
+                        try { HirelingType = unit.HirelingType; }
+                        catch (Exception) { }
+                        try { IsHelper = unit.IsHelper; }
+                        catch (Exception) { }
+                        try { IsDefaultHidden = unit.IsHidden; }
+                        catch (Exception) { }
+                        try { IsQuestGiver = unit.IsQuestGiver; }
+                        catch (Exception) { }
+                        try { IsSummoned = unit.Summoner != null || unit.SummonedBySNO != -1 || unit.SummonedByACDId != -1; }
+                        catch (Exception) { }
+                        try { IsSummoner = acd.Name.ToLower().Contains("summoner") || CacheManager.Units.Any(u => u.SummonedByACDId == acd.DynamicId); }
+                        catch (Exception) { }
+                    }
+
+                    if (gizmo != null && gizmo.IsValid)
+                    {
+                        IsGizmo = true;
+                        try { GizmoType = acd.GizmoType; }
+                        catch (Exception) { }
+                        try { GizmoIsBarracade = gizmo.IsBarricade; }
+                        catch (Exception) { }
+                        try { GizmoIsDestructible = gizmo.IsDestructibleObject; }
+                        catch (Exception) { }
+                        try { GizmoIsDisabledByScript = gizmo.IsGizmoDisabledByScript; }
+                        catch (Exception) { }
+                        try { GizmoIsPortal = gizmo.IsPortal; }
+                        catch (Exception) { }
+                        try { GizmoIsTownPortal = gizmo.IsTownPortal; }
+                        catch (Exception) { }
+                        try { GizmoDefaultCharges = gizmo.GizmoCharges; }
+                        catch (Exception) { }
+                        try { GizmoDefaultState = gizmo.GizmoState; }
+                        catch (Exception) { }
+                        try { GizmoGrantsNoXp = gizmo.GrantsNoXp; }
+                        catch (Exception) { }
+                        try { GizmoDropNoLoot = gizmo.DropsNoLoot; }
+                        catch (Exception) { }
+                        try { GizmoIsOperatable = gizmo.Operatable; }
+                        catch (Exception) { }
+                    }
+
+                }
             }
 
             public int ActorSNO = -1;

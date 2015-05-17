@@ -37,6 +37,7 @@ namespace Trinity.LazyCache
         private readonly CacheField<SNOAnim> _currentAnimation = new CacheField<SNOAnim>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isInLineOfSight = new CacheField<bool>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isNavigationObstacle = new CacheField<bool>();
+        private readonly CacheField<bool> _isOwnedByPlayer = new CacheField<bool>();
         private readonly CacheField<float> _radiusDistance = new CacheField<float>(UpdateSpeed.Fast);
         private readonly CacheField<float> _radius = new CacheField<float>();
         private readonly CacheField<Sphere> _collisionSphere = new CacheField<Sphere>();
@@ -168,6 +169,15 @@ namespace Trinity.LazyCache
         {
             get { return _isNavigationObstacle.IsCacheValid ? _isNavigationObstacle.CachedValue : (_isNavigationObstacle.CachedValue = DataDictionary.NavigationObstacleIds.Contains(ActorSNO)); }
             set { _isNavigationObstacle.SetValueOverride(value); }
+        }
+
+        /// <summary>
+        /// Is actor listed as something that blocks navigation/movement
+        /// </summary>
+        public bool IsOwnedByPlayer
+        {
+            get { return _isOwnedByPlayer.IsCacheValid ? _isOwnedByPlayer.CachedValue : (_isOwnedByPlayer.CachedValue = DataDictionary.PlayerOwnedSNO.Contains(ActorSNO)); }
+            set { _isOwnedByPlayer.SetValueOverride(value); }
         }
 
         /// <summary>
@@ -651,6 +661,11 @@ namespace Trinity.LazyCache
                 return o.DiaItem.Name;
 
             return o.InternalName;
+        }
+
+        public override string ToString()
+        {
+            return String.Format("{0}, Type={1} Dist={2} RActorGuid={3} ACDGuid={4} ActorSNO={5} WeightReasons={6}", InternalName, TrinityType, RadiusDistance, RActorGuid, ACDGuid, ActorSNO, WeightReasons);
         }
 
         #endregion

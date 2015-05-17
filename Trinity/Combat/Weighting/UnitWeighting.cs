@@ -33,7 +33,7 @@ namespace Trinity.Combat.Weighting
                 return weightFactors.Return(WeightReason.TypeMismatch);
 
             if (unit.IsSummonedByPlayer)
-                return weightFactors.Return(WeightReason.IsSummon);
+                return weightFactors.Return(WeightReason.IsSummoned);
 
             if (!unit.IsHostile)
                 return weightFactors.Return(WeightReason.NotHostile);
@@ -91,6 +91,9 @@ namespace Trinity.Combat.Weighting
 
             if (Trinity.Settings.Combat.Misc.ForceKillSummoners && unit.IsSummoner)
                 weightFactors.Add(new Weight(1000, WeightMethod.Add, WeightReason.Summoner));
+
+            if (Trinity.Settings.Combat.Misc.ForceKillSummoners && unit.IsSummoned)
+                weightFactors.Add(new Weight(0, WeightMethod.Add, WeightReason.IsSummoned));
 
             // Clustering - Add weight to groups of units.
             //weightFactors.Add(new Weight((unit.UnitsNearby * unit.UnitsNearby) * 10, WeightMethod.Add, WeightReason.Cluster));

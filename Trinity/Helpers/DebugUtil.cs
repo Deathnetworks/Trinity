@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Trinity.Items;
 using Trinity.Objects;
 using Trinity.Reference;
 using Trinity.Technicals;
@@ -55,7 +56,7 @@ namespace Trinity.Helpers
             CacheMaintenance();
         }
 
-        internal static void LogInFile(string file, string msg)
+        internal static void LogInFile(string file, string msg, string filename = "")
         {
             FileStream logStream = null;
 
@@ -295,6 +296,53 @@ namespace Trinity.Helpers
             }        
         }
 
+        internal static void DumpItemSNOReference()
+        {
+            string[] names = Enum.GetNames(typeof(SNOActor));
+            int[] values = (int[])Enum.GetValues(typeof(SNOActor));
+            var toLog = new List<string>();
+            for( int i = 0; i < names.Length; i++ )
+            {
+                var sno = values[i];
+                var name = names[i];
+                var type = TrinityItemManager.DetermineItemType(name, ItemType.Unknown);
+                if (type != TrinityItemType.Unknown || DataDictionary.GoldSNO.Contains(sno) ||
+                    DataDictionary.ForceToItemOverrideIds.Contains(sno) || DataDictionary.HealthGlobeSNO.Contains(sno) || Legendary.ItemIds.Contains(sno))
+                {
+                    toLog.Add(string.Format("{{ {0}, TrinityItemType.{1} }}, // {2}", sno, type, name));
+                }
+            }
+
+            var path = WriteLinesToLog("ItemSNOReference.log", toLog, true);
+            Logger.Log("Finished Dumping Item SNO Reference to {0}", path);
+        }
+
+        /// <summary>
+        /// Writes an ActorMeta record to the log file in the format for a Dictionary collection initializer
+        /// </summary>
+        public static string WriteLinesToLog(string logFileName, IEnumerable<string> msgs, bool deleteFirst = false)
+        {
+            var fullFilePath = Path.Combine(FileManager.LoggingPath, logFileName);
+
+            if (deleteFirst && File.Exists(fullFilePath))
+            {
+                File.Delete(fullFilePath);
+            }               
+
+            var logStream = File.Open(fullFilePath, FileMode.Append, FileAccess.Write, FileShare.Read);
+
+            using (var logWriter = new StreamWriter(logStream))
+            {
+                foreach (var msg in msgs)
+                {
+                    logWriter.WriteLine(msg);
+                }                
+            }
+
+            logStream.Close();
+
+            return fullFilePath;
+        }
 
     }
 }

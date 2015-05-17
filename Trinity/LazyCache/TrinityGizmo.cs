@@ -334,7 +334,8 @@ namespace Trinity.LazyCache
 
         public override string ToString()
         {
-            return String.Format("{0}, Type={1} GizmoType={2} Dist={3}", Name, TrinityType, GizmoType, RadiusDistance);
+            return String.Format("{0}, Type={1} GizmoType={2} Dist={3} RActorGuid={4} ACDGuid={5} ActorSNO={6} WeightReasons={7}", 
+                Name, TrinityType, GizmoType, RadiusDistance, RActorGuid, ACDGuid, ActorSNO, WeightReasons);
         }
 
         #endregion

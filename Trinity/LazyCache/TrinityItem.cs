@@ -15,7 +15,7 @@ namespace Trinity.LazyCache
     /// </summary>
     public class TrinityItem : TrinityObject
     {
-        public TrinityItem() { }
+        public TrinityItem() { } 
 
         public TrinityItem(DiaObject rActor) : base(rActor) { }
 
@@ -91,15 +91,6 @@ namespace Trinity.LazyCache
         {
             get { return _itemBaseType.IsCacheValid ? _itemBaseType.CachedValue : (_itemBaseType.CachedValue = GetACDItemProperty(x => x.ItemBaseType)); }
             set { _itemBaseType.SetValueOverride(value); }
-        }
-
-        /// <summary>
-        /// Trinity's Item Type
-        /// </summary>
-        public TrinityItemType TrinityItemType
-        {
-            get { return _trinityItemType.IsCacheValid ? _trinityItemType.CachedValue : (_trinityItemType.CachedValue = TrinityItemManager.DetermineItemType(InternalName, ItemType, FollowerSpecialType)); }
-            set { _trinityItemType.SetValueOverride(value); }
         }
 
         /// <summary>

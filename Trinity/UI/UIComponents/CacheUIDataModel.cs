@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Windows;
+using System.Windows.Media;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Data;
+using System.Windows.Input;
 using Trinity.Cache;
 using Trinity.LazyCache;
 using Trinity.UIComponents;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.UIComponents
 {
@@ -91,6 +95,20 @@ namespace Trinity.UIComponents
             public DateTime DateTime { set; get; }
             public double Value { set; get; }
         }
+
+        public ICommand CopyCommand
+        {
+            get
+            {
+                return new RelayCommand(param =>
+                {
+                    var objectToString = param.ToString();
+                    Clipboard.SetText(objectToString);
+                    Logger.Log("Copied to Clipboard: {0}", objectToString);
+                });
+            }
+        }
+
 
     }
 

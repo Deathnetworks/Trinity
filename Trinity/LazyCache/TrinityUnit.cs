@@ -813,7 +813,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public float MovementSpeed
         {
-            get { return _movementSpeed.IsCacheValid ? _movementSpeed.CachedValue : (_movementSpeed.CachedValue = GetProperty(Movement, x => x.SpeedXY)); }
+            get { return _movementSpeed.IsCacheValid ? _movementSpeed.CachedValue : (_movementSpeed.CachedValue = GetUnitProperty(x => x.Movement.SpeedXY)); }
             set { _movementSpeed.SetValueOverride(value); }
         }
 
@@ -867,7 +867,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsSummoner
         {
-            get { return _isSummoner.IsCacheValid ? _isSummoner.CachedValue : (_isSummoner.CachedValue = ActorMeta.IsSummoner); }
+            get { return _isSummoner.IsCacheValid ? _isSummoner.CachedValue : (_isSummoner.CachedValue = DataDictionary.SummonerSNO.Contains(ActorSNO)); }
             set { _isSummoner.SetValueOverride(value); }
         }
 
@@ -1002,6 +1002,10 @@ namespace Trinity.LazyCache
         private static HashSet<TrinityMonsterAffix> GetMonsterAffixes(TrinityUnit trinityUnit)
         {
             var affixes = new HashSet<TrinityMonsterAffix>();
+
+            if (!trinityUnit.IsBossOrEliteRareUnique)
+                return affixes;
+            
             var sourceAffixes = trinityUnit.GetSourceProperty(x => x.Affixes).ToList();
             
             if (!sourceAffixes.Any())
@@ -1061,7 +1065,8 @@ namespace Trinity.LazyCache
 
         public override string ToString()
         {
-            return String.Format("{0}, Type={1} Dist={2} IsBossOrEliteRareUnique={3} IsAttackable={4}", Name, TrinityType, RadiusDistance, IsBossOrEliteRareUnique, IsAttackable);
+            return String.Format("{0}, Type={1} Dist={2} IsBossOrEliteRareUnique={3} IsAttackable={4} RActorGuid={5} ACDGuid={6} ActorSNO={7} WeightReasons={8}", 
+                Name, TrinityType, RadiusDistance, IsBossOrEliteRareUnique, IsAttackable, RActorGuid, ACDGuid, ActorSNO, WeightReasons);
         }
 
         #endregion

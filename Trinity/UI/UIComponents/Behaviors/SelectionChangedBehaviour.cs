@@ -20,7 +20,7 @@ namespace Trinity.UIComponents
             Selector selector = (Selector)depObj;
             if (selector != null)
             {
-                selector.SelectionChanged += new SelectionChangedEventHandler(SelectionChanged);
+                selector.SelectionChanged += SelectionChanged;
             }
         }
 

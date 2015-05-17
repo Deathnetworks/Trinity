@@ -152,7 +152,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public float MaxPrimaryResource
         {
-            get { return _maxPrimaryResource.IsCacheValid ? _maxPrimaryResource.CachedValue : (_maxPrimaryResource.CachedValue = ZetaDia.Me.MaxPrimaryResource); }
+            get { return _maxPrimaryResource.IsCacheValid ? _maxPrimaryResource.CachedValue : (_maxPrimaryResource.CachedValue = GetMaxPrimaryResource(this)); }
             set { _maxPrimaryResource.SetValueOverride(value); }
         }
 
@@ -161,7 +161,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public float MaxSecondaryResource
         {
-            get { return _maxSecondaryResource.IsCacheValid ? _maxSecondaryResource.CachedValue : (_maxSecondaryResource.CachedValue = ZetaDia.Me.MaxPrimaryResource); }
+            get { return _maxSecondaryResource.IsCacheValid ? _maxSecondaryResource.CachedValue : (_maxSecondaryResource.CachedValue = GetMaxSecondaryResource(this)); }
             set { _maxSecondaryResource.SetValueOverride(value); }
         }
 
@@ -775,6 +775,37 @@ namespace Trinity.LazyCache
         #endregion
 
         #region Methods
+
+        private float GetMaxPrimaryResource(TrinityPlayer trinityPlayer)
+        {
+            switch (ActorClass)
+            {
+                case ActorClass.Wizard:
+                    return trinityPlayer.Source.GetAttribute<float>(149 | (int)ResourceType.Arcanum << 12) + trinityPlayer.Source.GetAttribute<float>(ActorAttributeType.ResourceMaxBonusArcanePower);
+                case ActorClass.Barbarian:
+                    return trinityPlayer.Source.GetAttribute<float>(149 | (int)ResourceType.Fury << 12) + trinityPlayer.Source.GetAttribute<float>(ActorAttributeType.ResourceMaxBonusFury);
+                case ActorClass.Monk:
+                    return trinityPlayer.Source.GetAttribute<float>(149 | (int)ResourceType.Spirit << 12) + trinityPlayer.Source.GetAttribute<float>(ActorAttributeType.ResourceMaxBonusSpirit);
+                case ActorClass.Crusader:
+                    return trinityPlayer.Source.GetAttribute<float>(149 | (int)ResourceType.Faith << 12) + trinityPlayer.Source.GetAttribute<float>(ActorAttributeType.ResourceMaxBonusFaith);
+                case ActorClass.DemonHunter:
+                    return trinityPlayer.Source.GetAttribute<float>(149 | (int)ResourceType.Hatred << 12) + trinityPlayer.Source.GetAttribute<float>(ActorAttributeType.ResourceMaxBonusHatred);
+                case ActorClass.Witchdoctor:
+                    return trinityPlayer.Source.GetAttribute<float>(149 | (int)ResourceType.Mana << 12) + trinityPlayer.Source.GetAttribute<float>(ActorAttributeType.ResourceMaxBonusMana);
+            }
+            return -1;
+        }
+
+        private float GetMaxSecondaryResource(TrinityPlayer trinityPlayer)
+        {
+            switch (ActorClass)
+            {
+                case ActorClass.DemonHunter:
+                    return trinityPlayer.Source.GetAttribute<float>(149 | (int)ResourceType.Discipline << 12) + trinityPlayer.Source.GetAttribute<float>(ActorAttributeType.ResourceMaxBonusDiscipline);
+            }
+            return -1;
+        }
+
 
         public int CountSummonsOfType(TrinityPetType type)
         {
