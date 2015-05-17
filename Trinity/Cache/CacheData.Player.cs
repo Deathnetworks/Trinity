@@ -246,11 +246,45 @@ namespace Trinity
                 ParagonCurrentExperience = ZetaDia.Me.ParagonCurrentExperience;
                 ParagonExperienceNextLevel = ZetaDia.Me.ParagonExperienceNextLevel;
                 GameDifficulty = ZetaDia.Service.Hero.CurrentDifficulty;
-                SecondaryResourceMax = _me.MaxSecondaryResource;
-                PrimaryResourceMax = _me.MaxPrimaryResource;
+                SecondaryResourceMax = GetMaxSecondaryResource(_me);
+                PrimaryResourceMax = GetMaxPrimaryResource(_me);
+
+                Logger.Log("PrimaryResourceMax={0}, SecondaryResourceMax={1}", PrimaryResourceMax, SecondaryResourceMax);
+
 			    IsRanged = ActorClass == ActorClass.Witchdoctor || ActorClass == ActorClass.Wizard || ActorClass == ActorClass.DemonHunter;
 				LastVerySlowUpdate = DateTime.UtcNow;			    
 			}
+
+
+            private float GetMaxPrimaryResource(DiaActivePlayer player)
+            {
+                switch (ActorClass)
+                {
+                    case ActorClass.Wizard:
+                        return ZetaDia.Me.CommonData.GetAttribute<float>(149 | (int)ResourceType.Arcanum << 12) + player.CommonData.GetAttribute<float>(ActorAttributeType.ResourceMaxBonusArcanePower);
+                    case ActorClass.Barbarian:
+                        return ZetaDia.Me.CommonData.GetAttribute<float>(149 | (int)ResourceType.Fury << 12) + player.CommonData.GetAttribute<float>(ActorAttributeType.ResourceMaxBonusFury);
+                    case ActorClass.Monk:
+                        return ZetaDia.Me.CommonData.GetAttribute<float>(149 | (int)ResourceType.Spirit << 12) + player.CommonData.GetAttribute<float>(ActorAttributeType.ResourceMaxBonusSpirit);
+                    case ActorClass.Crusader:
+                        return ZetaDia.Me.CommonData.GetAttribute<float>(149 | (int)ResourceType.Faith << 12) + player.CommonData.GetAttribute<float>(ActorAttributeType.ResourceMaxBonusFaith);
+                    case ActorClass.DemonHunter:
+                        return ZetaDia.Me.CommonData.GetAttribute<float>(149 | (int)ResourceType.Hatred << 12) + player.CommonData.GetAttribute<float>(ActorAttributeType.ResourceMaxBonusHatred);
+                    case ActorClass.Witchdoctor:
+                        return ZetaDia.Me.CommonData.GetAttribute<float>(149 | (int)ResourceType.Mana << 12) + player.CommonData.GetAttribute<float>(ActorAttributeType.ResourceMaxBonusMana);
+                }
+                return -1;
+            }
+
+            private float GetMaxSecondaryResource(DiaActivePlayer player)
+            {
+                switch (ActorClass)
+                {
+                    case ActorClass.DemonHunter:
+                        return ZetaDia.Me.CommonData.GetAttribute<float>(149 | (int)ResourceType.Discipline << 12) + player.CommonData.GetAttribute<float>(ActorAttributeType.ResourceMaxBonusDiscipline);
+                }
+                return -1;
+            }
 
 			public void Clear()
 			{
@@ -285,6 +319,7 @@ namespace Trinity
                 LastSlowUpdate = DateTime.MinValue;
                 LastVerySlowUpdate = DateTime.MinValue;
             }
+
 
 			public bool IsFacing(Vector3 targetPosition, float arcDegrees = 70f)
 			{
