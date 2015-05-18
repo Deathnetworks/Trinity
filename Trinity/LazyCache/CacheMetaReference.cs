@@ -2964,30 +2964,6 @@ namespace Trinity.LazyCache
 { 5214, new ActorMeta ( 5214,-1,"SandWasp_Projectile_impact",4,2.03,-1,-1,-1,-1,false,false,false,-1,14312,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
 { 267589, new ActorMeta ( 267589,-1,"X1_Catacomb_Floor_Runes_A_Dead",4,25.53,-1,-1,-1,-1,false,false,false,-1,267048,267590,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
 
-{ 215853, new ActorMeta ( 215853,-1,"Wizard_Meteor_Pending_addDamage",4,2.71,-1,-1,-1,-1,false,false,false,-1,14315,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
-{ 394102, new ActorMeta ( 394102,-1,"p1_Wizard_Meteor_afterBurn_damage",4,2.71,-1,-1,-1,-1,false,false,false,-1,14315,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
-{ 189460, new ActorMeta ( 189460,-1,"Wizard_magicMissileRune_pierce_impact",4,2.71,-1,-1,-1,-1,false,false,false,-1,14315,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
-{ 84517, new ActorMeta ( 84517,-1,"NoSpawnActor150feet",4,2.87,-1,-1,-1,-1,false,false,false,-1,14168,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
-{ 343582, new ActorMeta ( 343582,-1,"X1_MonsterAffix_Orbiter_FocalPoint",4,2.03,-1,-1,-1,-1,false,false,false,-1,14312,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
-{ 368453, new ActorMeta ( 368453,-1,"x1_LR_Boss_MalletDemon_FallingRocks",4,16.08,-1,-1,-1,-1,false,false,false,-1,225671,225673,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
-{ 370682, new ActorMeta ( 370682,-1,"X1_Bog_Props_Bogpeople_Spawner_Door_Noframe",4,12.32,-1,-1,-1,-1,false,false,false,-1,370683,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
-{ 160401, new ActorMeta ( 160401,-1,"demonFlyer_fireball_impact",4,2.71,-1,-1,-1,-1,false,false,false,-1,14315,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
-{ 343740, new ActorMeta ( 343740,-1,"X1_Bog_Closed_Door",4,11.65,-1,-1,-1,-1,false,false,false,373112,343739,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
-{ 359571, new ActorMeta ( 359571,-1,"x1_BogBlight_Corpse",2,16.88,-1,-1,-1,1,false,false,false,-1,377268,359572,false,false,false,false,false,false,0,0,-1,0,false,false,-1,false,false,0,false,false,false,true,false,false ) },
-{ 377662, new ActorMeta ( 377662,-1,"x1_Bog_CatacombsPortal_FloorMarker",4,4.07,-1,-1,-1,-1,false,false,false,-1,14751,11819,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
-{ 172029, new ActorMeta ( 172029,-1,"a2dun_Spider_EggSack_Clusters_D",4,32.48,-1,-1,-1,-1,false,false,false,179983,172027,172031,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
-{ 171998, new ActorMeta ( 171998,-1,"a2dun_Spider_EggSack_Clusters_B",4,32.71,-1,-1,-1,-1,false,false,false,-1,171996,172000,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
-{ 172010, new ActorMeta ( 172010,-1,"a2dun_Spider_EggSack_Clusters_C",4,30.47,-1,-1,-1,-1,false,false,false,179982,172009,172013,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
-{ 171527, new ActorMeta ( 171527,-1,"a2dun_Spider_EggSack_Clusters_A",4,31.55,-1,-1,-1,-1,false,false,false,-1,171526,171530,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
-{ 378237, new ActorMeta ( 378237,-1,"X1_LR_Boss_AsteroidRain",2,61.20,-1,-1,-1,60,false,false,false,-1,273293,273295,false,false,false,false,false,false,0,0,1,0,false,false,-1,false,false,0,false,false,false,true,false,false ) },
-{ 429649, new ActorMeta ( 429649,-1,"MarkerLocation_SpecialGoblinRiftSpawn",4,4.07,-1,-1,-1,-1,false,false,false,-1,14751,11819,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
-{ 6578, new ActorMeta ( 6578,-1,"WoodWraith_sporeCloud_emitter",4,2.71,-1,-1,-1,-1,false,false,false,-1,14315,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
-{ 360046, new ActorMeta ( 360046,-1,"X1_Unique_Monster_Generic_AOE_DOT_Poison_10foot",4,2.71,-1,-1,-1,-1,false,false,false,-1,14315,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
-{ 376981, new ActorMeta ( 376981,-1,"X1_Westm_Hub_Vendor_Ground_C",4,19.01,-1,-1,-1,-1,false,false,false,-1,302191,318193,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
-{ 5215, new ActorMeta ( 5215,-1,"SandWasp_Projectile_targetImpact",4,2.03,-1,-1,-1,-1,false,false,false,-1,14312,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
-{ 5214, new ActorMeta ( 5214,-1,"SandWasp_Projectile_impact",4,2.03,-1,-1,-1,-1,false,false,false,-1,14312,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
-{ 267589, new ActorMeta ( 267589,-1,"X1_Catacomb_Floor_Runes_A_Dead",4,25.53,-1,-1,-1,-1,false,false,false,-1,267048,267590,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
-
 
         };
 

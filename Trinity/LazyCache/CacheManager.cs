@@ -384,18 +384,7 @@ namespace Trinity.LazyCache
             {
                 try
                 {
-                    Parallel.ForEach(CachedObjects, cacheObject =>
-                    {
-                        try
-                        {
-                            cacheObject.Value.TryCalculateWeight();
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Log("Exception in Parallel Weighting {0} {1}", ex.Message, ex.InnerException);
-                        }
-
-                    });
+                    Parallel.ForEach(CachedObjects, cacheObject => cacheObject.Value.TryCalculateWeight());
                 }
                 catch (Exception)
                 {
