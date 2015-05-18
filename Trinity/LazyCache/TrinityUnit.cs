@@ -107,6 +107,7 @@ namespace Trinity.LazyCache
         private readonly CacheField<float> _currentHealthPct = new CacheField<float>(UpdateSpeed.Fast);
         private readonly CacheField<double> _killRange = new CacheField<double>(UpdateSpeed.Normal);
         private readonly CacheField<bool> _isSummoner = new CacheField<bool>();
+        private readonly CacheField<bool> _isSummoned = new CacheField<bool>();
         private readonly CacheField<bool> _isChargeTarget = new CacheField<bool>();        
         private readonly TrinityMovement _movement = new TrinityMovement();
 
@@ -881,7 +882,11 @@ namespace Trinity.LazyCache
         /// </summary>
         public double KillRange
         {
-            get { return _killRange.IsCacheValid ? _killRange.CachedValue : (_killRange.CachedValue = GetUnitProperty(x => GetKillRange(this))); }
+            get
+            {
+                if (_killRange.IsCacheValid) return _killRange.CachedValue;
+                return _killRange.CachedValue = GetUnitProperty(x => GetKillRange(this));
+            }
             set { _killRange.SetValueOverride(value); }
         }
 
@@ -890,7 +895,11 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsSummoner
         {
-            get { return _isSummoner.IsCacheValid ? _isSummoner.CachedValue : (_isSummoner.CachedValue = DataDictionary.SummonerSNO.Contains(ActorSNO)); }
+            get
+            {
+                if (_isSummoner.IsCacheValid) return _isSummoner.CachedValue;
+                return _isSummoner.CachedValue = DataDictionary.SummonerSNO.Contains(ActorSNO);
+            }
             set { _isSummoner.SetValueOverride(value); }
         }
 
@@ -899,8 +908,12 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsSummoned
         {
-            get { return _isSummoner.IsCacheValid ? _isSummoner.CachedValue : (_isSummoner.CachedValue = ActorMeta.IsSummoned); }
-            set { _isSummoner.SetValueOverride(value); }
+            get
+            {
+                if (_isSummoned.IsCacheValid) return _isSummoned.CachedValue;
+                return _isSummoned.CachedValue = ActorMeta.IsSummoned;
+            }
+            set { _isSummoned.SetValueOverride(value); }
         }
 
         /// <summary>
@@ -908,7 +921,11 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsChargeTarget
         {
-            get { return _isChargeTarget.IsCacheValid ? _isChargeTarget.CachedValue : (_isChargeTarget.CachedValue = MonsterSize == MonsterSize.Ranged || DataDictionary.RangedMonsterIds.Contains(ActorSNO)); }
+            get
+            {
+                if (_isChargeTarget.IsCacheValid) return _isChargeTarget.CachedValue;
+                return  _isChargeTarget.CachedValue = MonsterSize == MonsterSize.Ranged || DataDictionary.RangedMonsterIds.Contains(ActorSNO);
+            }
             set { _isChargeTarget.SetValueOverride(value); }
         }
 

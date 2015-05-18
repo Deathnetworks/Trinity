@@ -2964,6 +2964,21 @@ namespace Trinity.LazyCache
 { 5214, new ActorMeta ( 5214,-1,"SandWasp_Projectile_impact",4,2.03,-1,-1,-1,-1,false,false,false,-1,14312,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
 { 267589, new ActorMeta ( 267589,-1,"X1_Catacomb_Floor_Runes_A_Dead",4,25.53,-1,-1,-1,-1,false,false,false,-1,267048,267590,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
 
+{ 3079, new ActorMeta ( 3079,-1,"a2Dun_Zolt_Zoltan_Sphere",4,8.85,-1,-1,-1,-1,false,false,false,206021,12556,760,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 3059, new ActorMeta ( 3059,-1,"a2dun_zolt_smallSandObject",4,4.60,-1,-1,-1,-1,false,false,false,-1,15259,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 290109, new ActorMeta ( 290109,-1,"x1_westmarchRanged_projectile_miss",4,2.03,-1,-1,-1,-1,false,false,false,-1,14312,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 290108, new ActorMeta ( 290108,-1,"x1_westmarchRanged_projectile_impact",4,2.03,-1,-1,-1,-1,false,false,false,-1,14312,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 215809, new ActorMeta ( 215809,-1,"Wizard_Meteor_Impact_addDamage",4,2.71,-1,-1,-1,-1,false,false,false,-1,14315,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 2991, new ActorMeta ( 2991,-1,"a2dun_zolt_LargeSandObject",4,4.60,-1,-1,-1,-1,false,false,false,-1,15259,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 375187, new ActorMeta ( 375187,375193,"x1_ZombieFemale_Skeleton_A_LR_Boss",1,5.46,0,4,4,-1,false,true,false,-1,342245,342246,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,true,false,0,false,false,false,false,true,true ) },
+{ 291717, new ActorMeta ( 291717,-1,"x1_Abattoir_Barricade_Solid",4,26.83,-1,-1,-1,-1,false,false,false,-1,338751,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 80308, new ActorMeta ( 80308,-1,"NoSpawnActor25feet",4,2.87,-1,-1,-1,-1,false,false,false,-1,14168,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 205459, new ActorMeta ( 205459,-1,"NoSpawnActor75feet",4,2.87,-1,-1,-1,-1,false,false,false,-1,14168,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 427243, new ActorMeta ( 427243,-1,"p4_RatKing_ThunderdomeWall",4,6.00,-1,-1,-1,-1,false,false,false,-1,14813,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 427588, new ActorMeta ( 427588,-1,"p4_ratKing_thunderdome_proxyActor",4,2.71,-1,-1,-1,-1,false,false,false,-1,14315,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 289827, new ActorMeta ( 289827,-1,"x1_westmarchBrute_leap_telegraph",4,2.71,-1,-1,-1,-1,false,false,false,-1,14315,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 5369, new ActorMeta ( 5369,-1,"skeletonMage_Cold_groundImpact",4,2.03,-1,-1,-1,-1,false,false,false,-1,14312,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+
 
         };
 

@@ -83,16 +83,23 @@ namespace Trinity.UI.UIComponents
             var dataModel = sender as CacheUIDataModel;
             if (dataModel == null)
                 return;
-            
-            // Freeze records to return cached data only because the collection will get stale and cause exceptions
-            // when user tries to do anything with them like Copy to clipboard.
+
             if (propertyChangedEventArgs.PropertyName == "Enabled")
             {
-                if(dataModel.Enabled)
-                    dataModel.LazyCache.ForEach(CacheUtilities.UnFreeze);
-                else
-                    dataModel.LazyCache.ForEach(CacheUtilities.Freeze);
+                FreezeLazyCache();
             }
+        }
+
+        /// <summary>
+        /// Freeze records to return cached data only; useful when bot is or records are being stored
+        /// for longer than pulse/framelock, and the object no longer has valid references to memory.
+        /// </summary>
+        private static void FreezeLazyCache()
+        {
+            if (DataModel.Enabled)
+                DataModel.LazyCache.ForEach(CacheUtilities.UnFreeze);
+            else
+                DataModel.LazyCache.ForEach(CacheUtilities.Freeze);
         }
 
         /// <summary>
@@ -102,7 +109,6 @@ namespace Trinity.UI.UIComponents
         {
             if (!BotMain.IsRunning && !BotMain.IsPausedForStateExecution)
             {
-
                 Logger.Log("Starting CacheUI update thread");
                 Worker.Start(() =>
                 {
@@ -111,14 +117,14 @@ namespace Trinity.UI.UIComponents
                         Logger.Log("Shutting down CacheUI update thread");
 
                         if (!_isWindowOpen)
+                        {
                             CacheManager.Stop();
-
+                        }
                         return true;
                     }
 
                     using (new MemoryHelper())
                     {
-
                         if (!BotMain.IsPausedForStateExecution && DataModel.IsLazyCacheVisible)
                         {
                             if (ZetaDia.IsInGame && ZetaDia.Me != null)
@@ -242,6 +248,7 @@ namespace Trinity.UI.UIComponents
             {
                 _isWindowOpen = false;
                 Configuration.Events.OnCacheUpdated -= Update;
+                DataModel.PropertyChanged -= DataModelOnPropertyChanged;
                 _window = null;
             }
             catch (Exception ex)
@@ -250,6 +257,5 @@ namespace Trinity.UI.UIComponents
 
             }
         }
-
     }
 }
