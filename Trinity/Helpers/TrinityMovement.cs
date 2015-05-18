@@ -23,7 +23,7 @@ namespace Trinity.Helpers
     /// </summary>
     public class TrinityMovement
     {
-        private static readonly List<SpeedSensor> SpeedSensors = new List<SpeedSensor>();
+        private readonly List<SpeedSensor> _speedSensors = new List<SpeedSensor>();
         private const int MaxSpeedSensors = 5;
         private DateTime _lastRecordedPositionTime = DateTime.MinValue;
         
@@ -32,15 +32,19 @@ namespace Trinity.Helpers
         private string _lastHeading = string.Empty;
         private double _lastMovementSpeed;
 
+        /// <summary>
+        /// This is separated from GetMovementSpeed() to prevent parrallel tasks failing on changed collection.
+        /// </summary>
+        /// <param name="o"></param>
         public void RecordMovement(TrinityObject o)
         {
             if (DateTime.UtcNow.Subtract(_lastRecordedPositionTime).TotalMilliseconds >= 250)
             {
-                if (!SpeedSensors.Any())
+                if (!_speedSensors.Any())
                 {
-                    SpeedSensors.Add(new SpeedSensor
+                    _speedSensors.Add(new SpeedSensor
                     {
-                        Location = CacheManager.Me.Position,
+                        Location = o.Position,
                         TimeSinceLastMove = new TimeSpan(0),
                         Distance = 0f,
                         WorldID = CacheManager.WorldDynamicId
@@ -49,11 +53,11 @@ namespace Trinity.Helpers
                 }
                 else
                 {
-                    var lastSensor = SpeedSensors.Last();
+                    var lastSensor = _speedSensors.Last();
                     var distanceTravelled = Vector3.Distance(o.Position, lastSensor.Location);
                     if (distanceTravelled > 1f)
                     {
-                        SpeedSensors.Add(new SpeedSensor
+                        _speedSensors.Add(new SpeedSensor
                         {
                             Location = o.Position,
                             TimeSinceLastMove = new TimeSpan(DateTime.UtcNow.Subtract(lastSensor.TimeSinceLastMove).Ticks),
@@ -67,18 +71,18 @@ namespace Trinity.Helpers
             }
 
             // Check if we have enough recorded positions, remove one if so
-            while (SpeedSensors.Count > MaxSpeedSensors - 1)
+            while (_speedSensors.Count > MaxSpeedSensors - 1)
             {
-                SpeedSensors.RemoveAt(0);
+                _speedSensors.RemoveAt(0);
             }            
         }
 
         public Vector2 GetDirectionVector()
         {
-            if (SpeedSensors.Count >= 2)
+            if (_speedSensors.Count >= 2)
             {
-                var startPosition = SpeedSensors.ElementAt(SpeedSensors.Count - 2).Location;
-                var endPosition = SpeedSensors.ElementAt(SpeedSensors.Count - 1).Location;
+                var startPosition = _speedSensors.ElementAt(_speedSensors.Count - 2).Location;
+                var endPosition = _speedSensors.ElementAt(_speedSensors.Count - 1).Location;
                 return MathUtil.GetDirectionVector(startPosition, endPosition);
             }
             return Vector2.Zero;
@@ -86,13 +90,13 @@ namespace Trinity.Helpers
 
         public float GetHeadingDegrees()
         {
-            if (SpeedSensors.Count >= 2)
+            if (_speedSensors.Count >= 2)
             {
                 if (_lastMovementSpeed == 0)
                     return _lastHeadingDegrees;
 
-                var startPosition = SpeedSensors.ElementAt(SpeedSensors.Count - 2).Location;
-                var endPosition = SpeedSensors.ElementAt(SpeedSensors.Count - 1).Location;
+                var startPosition = _speedSensors.ElementAt(_speedSensors.Count - 2).Location;
+                var endPosition = _speedSensors.ElementAt(_speedSensors.Count - 1).Location;
                 var headingDegrees = MathUtil.FindDirectionDegree(startPosition, endPosition);                
                 _lastHeadingDegrees = headingDegrees;
                 return headingDegrees;
@@ -102,13 +106,13 @@ namespace Trinity.Helpers
 
         public float GetHeadingRadians()
         {
-            if (SpeedSensors.Count >= 2)
+            if (_speedSensors.Count >= 2)
             {
                 if (_lastMovementSpeed == 0)
                     return _lastHeadingRadians;
 
-                var startPosition = SpeedSensors.ElementAt(SpeedSensors.Count - 2).Location;
-                var endPosition = SpeedSensors.ElementAt(SpeedSensors.Count - 1).Location;
+                var startPosition = _speedSensors.ElementAt(_speedSensors.Count - 2).Location;
+                var endPosition = _speedSensors.ElementAt(_speedSensors.Count - 1).Location;
                 var headingRadians = (float)MathUtil.FindDirectionRadian(startPosition, endPosition);
                 _lastHeadingRadians = headingRadians;
                 return headingRadians;
@@ -118,7 +122,7 @@ namespace Trinity.Helpers
 
         public string GetHeading()
         {
-            if (SpeedSensors.Any())
+            if (_speedSensors.Any())
             {
                 if (_lastMovementSpeed == 0)
                     return _lastHeading;
@@ -142,23 +146,21 @@ namespace Trinity.Helpers
 
         public double GetMovementSpeed(TrinityObject o)
         {
-            var movementSpeed = 0d;
+            double movementSpeed;
 
-            if (SpeedSensors.Any(s => s != null && s.WorldID != CacheManager.WorldDynamicId))
+            if (_speedSensors.Any(s => s != null && s.WorldID != CacheManager.WorldDynamicId))
             {
-                SpeedSensors.Clear();
+                _speedSensors.Clear();
                 movementSpeed = 1d;
             }
 
-            else if (o.IsMe)
+            else if (o.IsMe && DateTime.UtcNow.Subtract(SpellHistory.GetSpellLastused()).TotalMilliseconds <= 1000)
             {
-                // If we just used a spell, we "moved"
-                if (DateTime.UtcNow.Subtract(SpellHistory.GetSpellLastused()).TotalMilliseconds <= 1000)
-                    movementSpeed = 1d;                
+                movementSpeed = 1d;                
             }
 
             // Minimum of 2 records to calculate speed
-            else if (!SpeedSensors.Any() || SpeedSensors.Count <= 1)
+            else if (!_speedSensors.Any() || _speedSensors.Count <= 1)
                 movementSpeed = 0d;                
 
             // If we haven't "moved" in over a second, then we're standing still
@@ -167,8 +169,8 @@ namespace Trinity.Helpers
 
             else
             {
-                double averageRecordingTime = SpeedSensors.Average(s => s.TimeSinceLastMove.TotalHours); ;           
-                double averageMovementSpeed = SpeedSensors.Average(s => Vector3.Distance(s.Location, o.Position) * 1000000);
+                double averageRecordingTime = _speedSensors.Average(s => s.TimeSinceLastMove.TotalHours);        
+                double averageMovementSpeed = _speedSensors.Average(s => Vector3.Distance(s.Location, o.Position) * 1000000);
                 movementSpeed =  averageMovementSpeed / averageRecordingTime;
             }
 

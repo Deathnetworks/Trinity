@@ -44,10 +44,10 @@ namespace Trinity.LazyCache
 
             var trinityType = CacheBase.GetTrinityType(acd, actorType, actorSNO, meta.GizmoType, internalName);
 
-            //if (actorType == ActorType.Player)
-            //    result = new TrinityObject();
+            if (actorType == ActorType.Player)
+                result = new TrinityUnit();
 
-            if (actorType == ActorType.Monster && trinityType != TrinityObjectType.Player)
+            else if (actorType == ActorType.Monster)
                 result = new TrinityUnit();
 
             else if (actorType == ActorType.Gizmo)
