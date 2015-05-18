@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Trinity.Combat.Weighting;
+using Trinity.Helpers;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Common;
@@ -83,6 +84,7 @@ namespace Trinity.LazyCache
         public static DateTime LastUpdated = DateTime.MinValue;
         public static int ActivePlayerGuid = -1;
         private static Dictionary<int, TrinityObject> _actorsByRActorGuid = new Dictionary<int, TrinityObject>();
+        public static int WorldDynamicId;
 
         #endregion
 
@@ -102,7 +104,7 @@ namespace Trinity.LazyCache
             get
             {
                 if (_monsters.IsCacheValid) return _monsters.CachedValue;
-                return _monsters.CachedValue = Units.Where(i => i.ActorMeta.IsMonster && i.IsHostile).ToList();
+                return _monsters.CachedValue = Units.Where(i => i.ActorMeta.IsMonster && i.IsHostile && !i.IsDead).ToList();
             }
         }
 
@@ -308,6 +310,7 @@ namespace Trinity.LazyCache
                     Me.UpdateSource(ZetaDia.Me);
 
                 ActivePlayerGuid = Me.ACDGuid;
+                WorldDynamicId = Me.WorldDynamicId;
             }
 
             using (new PerformanceLogger("lazyCache.Update.Refresh"))
@@ -356,18 +359,17 @@ namespace Trinity.LazyCache
 
             using (new PerformanceLogger("lazyCache.Update.Purge"))
             {               
-                foreach (var o in CachedObjects)
+                foreach (var o in CachedObjects.Where(o => !o.Value.IsValid)) 
                 {
-                    if (!o.Value.IsValid)
-                        CachedObjects.TryRemove(o.Key, o.Value);
+                    CachedObjects.TryRemove(o.Key, o.Value);
+                }
+            }
 
-                    //if (!o.Value.IsValid ||
-                    //    string.IsNullOrEmpty(o.Value.InternalName) || // Bad Records 0
-                    //    (string.IsNullOrEmpty(o.Value.Name) && o.Value.Distance == 0) || // Bad Item Records 1
-                    //    o.Value.WeightFactors.Any(r => r.Reason == WeightReason.TypeMismatch && o.Value.Distance == 0) || // Bad Records 2
-                    //    o.Value.ActorType == ActorType.Item && (o.Value is TrinityItem) && !((TrinityItem) o.Value).IsOnGround || // Speed up removal of items on pick up
-                    //    LastUpdated.Subtract(o.Value.LastUpdated).TotalSeconds > 20)
-                    //    CachedObjects.TryRemove(o.Key, o.Value);
+            using (new PerformanceLogger("lazyCache.Update.Movement"))
+            {
+                foreach (var u in Units)
+                {
+                    u.Movement.RecordMovement(u);
                 }
             }
 

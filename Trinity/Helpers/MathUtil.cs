@@ -2,6 +2,7 @@
 using Zeta.Common;
 using Zeta.Game.Internals;
 using Zeta.Game.Internals.SNO;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
@@ -133,6 +134,44 @@ namespace Trinity
             return MathEx.IntersectsPath(obstacle, radius, start, destination);
         }
 
+        public static bool TrinityIntersectsPath(Vector3 start, Vector3 obstacle, Vector3 destination, float distanceToObstacle = -1, float distanceToDestination = -1)
+        {
+            var toObstacle = distanceToObstacle >= 0 ? distanceToObstacle : start.Distance2D(obstacle);
+            var toDestination = distanceToDestination >= 0 ? distanceToDestination : start.Distance2D(destination);
+
+            if (toDestination > 500)
+                return false;
+
+            var relativeAngularVariance = GetRelativeAngularVariance(start, obstacle, destination);
+
+            // Angular Variance at 20yd distance
+            const int angularVarianceBase = 45;
+
+            // Halve/Double required angle every 20yd; 60* @ 15yd, 11.25* @ 80yd
+            var angularVarianceThreshold = Math.Min(angularVarianceBase / (toDestination / 20), 90);
+
+            //Logger.Log("DistToObj={0} DistToDest={1} relativeAV={2} AVThreshold={3} Result={4}", 
+            //    toObstacle, toDestination, relativeAngularVariance, angularVarianceThreshold, 
+            //    toObstacle < toDestination && relativeAngularVariance <= angularVarianceThreshold);
+
+            // Obstacle must be than destination
+            if (toObstacle < toDestination)
+            {
+                // If the radius between lines (A) from start to obstacle and (B) from start to destination
+                // are small enough then we know both targets are in the same-ish direction from start.
+                if (relativeAngularVariance <= angularVarianceThreshold)
+                {
+                    return true;
+                }                
+            }
+            return false;
+        }
+
+        public static Vector2 GetDirectionVector(Vector3 start, Vector3 end)
+        {
+            return new Vector2(end.X - start.X, end.Y - start.Y);
+        }
+
         #region Angular Measure Unit Conversion
         public static double Normalize180(double angleA, double angleB)
         {
@@ -176,14 +215,20 @@ namespace Trinity
         {
             return GetHeading(FindDirectionDegree(Trinity.Player.Position, TargetPoint));
         }
-        public static string GetHeading(float heading)
+        
+        /// <summary>
+        /// Gets string heading NE,S,NE etc
+        /// </summary>
+        /// <param name="headingDegrees">heading in degrees</param>
+        /// <returns></returns>
+        public static string GetHeading(float headingDegrees)
         {
             var directions = new string[] {
               //"n", "ne", "e", "se", "s", "sw", "w", "nw", "n"
                 "s", "se", "e", "ne", "n", "nw", "w", "sw", "s"
             };
 
-            var index = (((int)heading) + 23) / 45;
+            var index = (((int)headingDegrees) + 23) / 45;
             return directions[index].ToUpper();
         }
         #endregion

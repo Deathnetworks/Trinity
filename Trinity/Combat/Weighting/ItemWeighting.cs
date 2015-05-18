@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Trinity.Combat.Abilities;
 using Trinity.Items;
 using Trinity.LazyCache;
+using Zeta.Bot.Settings;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
@@ -27,27 +28,36 @@ namespace Trinity.Combat.Weighting
                 return weightFactors;
             }
 
+            if (!Trinity.Settings.Loot.Pickup.PickupGold)
+            {
+                 weightFactors.Add(new Weight(0, WeightMethod.Set, WeightReason.DisabledInSettings));
+                return weightFactors;
+            }
+
+            if (item.Gold < Trinity.Settings.Loot.Pickup.MinimumGoldStack)
+            {
+                weightFactors.Add(new Weight(0, WeightMethod.Set, WeightReason.MinGoldStack, item.Gold, Trinity.Settings.Loot.Pickup.MinimumGoldStack));
+                return weightFactors;
+            }
+
             if (weightFactors.TryAddWeight(cacheObject, WeightReason.DisableForQuest))
                 return weightFactors;
 
-            if (CacheManager.Units.Any(m => m.IsBossOrEliteRareUnique))
+            if (Trinity.Settings.Loot.Pickup.IgnoreGoldNearElites && CacheManager.Units.Any(m => m.IsBossOrEliteRareUnique))
             {
                 weightFactors.Add(new Weight(0, WeightMethod.Set, WeightReason.BossOrEliteNearby));
                 return weightFactors;
             }
 
-            weightFactors.Add(new Weight(Math.Max((175 - item.Distance) / 175 * WeightManager.MaxWeight, 100d), WeightMethod.Set, WeightReason.Start));
-            weightFactors.TryAddWeight(cacheObject, WeightReason.PreviousTarget, 800);
-
-            // Ignore gold in AoE
             if (Trinity.Settings.Loot.Pickup.IgnoreGoldInAoE && CacheManager.Avoidances.Any(aoe => item.Position.Distance2D(aoe.Position) <= aoe.Radius))
             {
-                weightFactors.Add(new Weight(0, WeightMethod.Set, WeightReason.AvoidanceNearby));
+                weightFactors.Add(new Weight(0, WeightMethod.Set, WeightReason.InAOE));
             }
 
-            if (item.ItemQuality < ItemQuality.Legendary)
-                weightFactors.TryAddWeight(cacheObject, WeightReason.NoCombatLooting);
+            weightFactors.Add(new Weight(Math.Max((175 - item.Distance) / 175 * WeightManager.MaxWeight, 100d), WeightMethod.Set, WeightReason.Start));
 
+            weightFactors.TryAddWeight(cacheObject, WeightReason.PreviousTarget, 800);
+            weightFactors.TryAddWeight(cacheObject, WeightReason.NoCombatLooting);
             weightFactors.TryAddWeight(cacheObject, WeightReason.MonsterInLoS);
             weightFactors.TryAddWeight(cacheObject, WeightReason.AvoidanceInLoS);
 
@@ -105,7 +115,7 @@ namespace Trinity.Combat.Weighting
             if (Trinity.Settings.Loot.Pickup.IgnoreLegendaryInAoE && item.ItemQuality >= ItemQuality.Legendary &&
                 CacheManager.Avoidances.Any(aoe => cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius))
             {
-                weightFactors.Add(new Weight(0, WeightMethod.Set, WeightReason.AvoidanceNearby));
+                weightFactors.Add(new Weight(0, WeightMethod.Set, WeightReason.InAOE));
                 return weightFactors;
             }
 
@@ -113,7 +123,7 @@ namespace Trinity.Combat.Weighting
             if (Trinity.Settings.Loot.Pickup.IgnoreNonLegendaryInAoE && item.ItemQuality < ItemQuality.Legendary &&
                 CacheManager.Avoidances.Any(aoe => cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius))
             {
-                weightFactors.Add(new Weight(0, WeightMethod.Set, WeightReason.AvoidanceNearby));
+                weightFactors.Add(new Weight(0, WeightMethod.Set, WeightReason.InAOE));
                 return weightFactors;
             }
 

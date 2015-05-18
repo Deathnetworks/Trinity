@@ -76,10 +76,18 @@ namespace Trinity.Combat.Abilities
             return SNOPower.None;
         }
 
-        public static DateTime GetSpellLastused(SNOPower power)
+        public static DateTime GetSpellLastused(SNOPower power = SNOPower.None)
         {
-            DateTime lastUsed = DateTime.MinValue;
-            CacheData.AbilityLastUsed.TryGetValue(power, out lastUsed);
+            DateTime lastUsed;
+            if (power == SNOPower.None && CacheData.AbilityLastUsed.Any())
+            {
+                var pair = CacheData.AbilityLastUsed.LastOrDefault();
+                lastUsed = pair.Value;
+            }
+            else
+            {
+                CacheData.AbilityLastUsed.TryGetValue(power, out lastUsed);
+            }
             return lastUsed;
         }
 

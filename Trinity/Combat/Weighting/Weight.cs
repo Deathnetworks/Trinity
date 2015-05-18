@@ -11,15 +11,26 @@ namespace Trinity.Combat.Weighting
     /// </summary>
     public struct Weight
     {
+
         public Weight(double amount, WeightMethod method, WeightReason reason)
         {
             Amount = amount;
             Reason = reason;
             Method = method;
+            ExtraInfo = null;
+        }
+
+        public Weight(double amount, WeightMethod method, WeightReason reason, params object[] extraInfo)
+        {
+            Amount = amount;
+            Reason = reason;
+            Method = method;
+            ExtraInfo = extraInfo;
         }
 
         public WeightReason Reason;
         public WeightMethod Method;
+        public object[] ExtraInfo;
         public double Amount;
 
         public override string ToString()
@@ -35,7 +46,9 @@ namespace Trinity.Combat.Weighting
             else if (Method == WeightMethod.Subtract && Amount > 0)
                 op = "+";
 
-            return string.Format("{0}: {1}{2:0.##}", Reason, op, Amount);
+            var extraInfo = ExtraInfo != null && ExtraInfo.Length > 0 ? "(" + string.Join(",", ExtraInfo) + ")" : string.Empty;
+
+            return string.Format("{0}{1}: {2}{3:0.##}", Reason, extraInfo, op, Amount);
         }
     }
 
@@ -58,7 +71,7 @@ namespace Trinity.Combat.Weighting
     {
         None = 0,
         Start,
-        AvoidanceNearby,
+        InAOE,
 
         /// <summary>
         /// Set, 1, If there are monsters close to player
@@ -188,6 +201,8 @@ namespace Trinity.Combat.Weighting
         IsSummoned,
         IgnoreHealth,
         NotHostile,
-        NullObject
+        NullObject,
+        OwnedByPlayer,
+        MinGoldStack
     }
 }

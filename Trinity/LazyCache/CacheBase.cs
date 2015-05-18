@@ -96,7 +96,7 @@ namespace Trinity.LazyCache
             if (actorType == ActorType.Item && (!(obj is DiaItem) || !(acd is ACDItem)))
                 return false;
 
-            if (actorType == ActorType.Monster && (obj as DiaUnit) == null)
+            if (actorType == ActorType.Monster && ((obj as DiaUnit) == null || !obj.Movement.IsValid))
                 return false;
 
             if (actorType == ActorType.Gizmo && (obj as DiaGizmo) == null)

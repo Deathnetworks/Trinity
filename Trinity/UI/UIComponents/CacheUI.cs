@@ -57,6 +57,8 @@ namespace Trinity.UI.UIComponents
 
                 DataModel.CacheUpdateTime.Clear();
 
+                DataModel.PropertyChanged += DataModelOnPropertyChanged;
+
                 _isWindowOpen = true;
                 _updateCount = 0;
                 _window.Closed += Window_Closed;
@@ -74,6 +76,23 @@ namespace Trinity.UI.UIComponents
             }
 
             return _window;
+        }
+
+        private static void DataModelOnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
+        {
+            var dataModel = sender as CacheUIDataModel;
+            if (dataModel == null)
+                return;
+            
+            // Freeze records to return cached data only because the collection will get stale and cause exceptions
+            // when user tries to do anything with them like Copy to clipboard.
+            if (propertyChangedEventArgs.PropertyName == "Enabled")
+            {
+                if(dataModel.Enabled)
+                    dataModel.LazyCache.ForEach(CacheUtilities.UnFreeze);
+                else
+                    dataModel.LazyCache.ForEach(CacheUtilities.Freeze);
+            }
         }
 
         /// <summary>

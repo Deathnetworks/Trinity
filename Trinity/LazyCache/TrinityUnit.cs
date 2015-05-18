@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Trinity.DbProvider;
+using Trinity.Helpers;
 using Trinity.Technicals;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
@@ -98,7 +99,6 @@ namespace Trinity.LazyCache
         private readonly CacheField<int> _unitsBehind = new CacheField<int>(UpdateSpeed.Fast);
         private readonly CacheField<int> _unitsInFront = new CacheField<int>(UpdateSpeed.Fast);
         private readonly CacheField<int> _unitsNearby = new CacheField<int>(UpdateSpeed.Fast);
-        private readonly CacheField<ActorMovement> _movement = new CacheField<ActorMovement>(UpdateSpeed.Fast);
         private readonly CacheField<Vector2> _directionVector = new CacheField<Vector2>(UpdateSpeed.Fast);
         private readonly CacheField<float> _movementSpeed = new CacheField<float>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isMoving = new CacheField<bool>(UpdateSpeed.Ultra);
@@ -107,8 +107,8 @@ namespace Trinity.LazyCache
         private readonly CacheField<float> _currentHealthPct = new CacheField<float>(UpdateSpeed.Fast);
         private readonly CacheField<double> _killRange = new CacheField<double>(UpdateSpeed.Normal);
         private readonly CacheField<bool> _isSummoner = new CacheField<bool>();
-        private readonly CacheField<bool> _isChargeTarget = new CacheField<bool>();
-
+        private readonly CacheField<bool> _isChargeTarget = new CacheField<bool>();        
+        private readonly TrinityMovement _movement = new TrinityMovement();
 
 
         #endregion
@@ -791,12 +791,11 @@ namespace Trinity.LazyCache
         }
 
         /// <summary>
-        /// Source for movement related information (accessing properties reads directly from Diablo memory)
+        /// Source for movement related information
         /// </summary>
-        public ActorMovement Movement
+        public TrinityMovement Movement
         {
-            get { return _movement.IsCacheValid ? _movement.CachedValue : (_movement.CachedValue = GetUnitProperty(x => x.Movement)); }
-            set { _movement.SetValueOverride(value); }
+            get { return _movement; }
         }
 
         /// <summary>
@@ -804,7 +803,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public Vector2 DirectionVector
         {
-            get { return _directionVector.IsCacheValid ? _directionVector.CachedValue : (_directionVector.CachedValue = GetProperty(Movement, x => x.DirectionVector)); }
+            get { return _directionVector.IsCacheValid ? _directionVector.CachedValue : (_directionVector.CachedValue = _movement.GetDirectionVector()); }
             set { _directionVector.SetValueOverride(value); }
         }
 
@@ -813,7 +812,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public float MovementSpeed
         {
-            get { return _movementSpeed.IsCacheValid ? _movementSpeed.CachedValue : (_movementSpeed.CachedValue = GetUnitProperty(x => x.Movement.SpeedXY)); }
+            get { return _movementSpeed.IsCacheValid ? _movementSpeed.CachedValue : (_movementSpeed.CachedValue = (float)_movement.GetMovementSpeed(this)); }
             set { _movementSpeed.SetValueOverride(value); }
         }
 
@@ -822,7 +821,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public bool IsMoving
         {
-            get { return _isMoving.IsCacheValid ? _isMoving.CachedValue : (_isMoving.CachedValue = GetProperty(Movement, x => x.IsMoving)); }
+            get { return _isMoving.IsCacheValid ? _isMoving.CachedValue : (_isMoving.CachedValue = MovementSpeed > 0); }
             set { _isMoving.SetValueOverride(value); }
         }
 
@@ -831,8 +830,32 @@ namespace Trinity.LazyCache
         /// </summary>
         public float Rotation
         {
-            get { return _rotation.IsCacheValid ? _rotation.CachedValue : (_rotation.CachedValue = GetProperty(Movement, x => x.Rotation)); }
+            get { return _rotation.IsCacheValid ? _rotation.CachedValue : (_rotation.CachedValue = _movement.GetHeadingRadians()); }
             set { _rotation.SetValueOverride(value); }
+        }
+
+        /// <summary>
+        /// Rotation of the actor
+        /// </summary>
+        public float DBRotation
+        {
+            get { return DiaUnit.Movement.Rotation; }
+        }
+
+        /// <summary>
+        /// Rotation of the actor
+        /// </summary>
+        public float DBRotationDegrees
+        {
+            get { return DiaUnit.Movement.RotationDegrees; }
+        }
+
+        /// <summary>
+        /// Rotation of the actor
+        /// </summary>
+        public Vector2 DBDirectionVector
+        {
+            get { return DiaUnit.Movement.DirectionVector; }
         }
 
         /// <summary>
@@ -840,7 +863,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public float RotationDegrees
         {
-            get { return _rotationDegrees.IsCacheValid ? _rotationDegrees.CachedValue : (_rotationDegrees.CachedValue = GetProperty(Movement, x => x.RotationDegrees)); }
+            get { return _rotationDegrees.IsCacheValid ? _rotationDegrees.CachedValue : (_rotationDegrees.CachedValue = _movement.GetHeadingDegrees()); }
             set { _rotationDegrees.SetValueOverride(value); }
         }
 

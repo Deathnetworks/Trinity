@@ -2859,6 +2859,13 @@ namespace Trinity.LazyCache
 { 294987, new ActorMeta ( 294987,294988,"x1_Tentacle_Goatman_Melee_A_Unique",1,7.36,2,2,4,-1,false,true,false,-1,295002,367951,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,true,true ) },
 
 
+{ 353517, new ActorMeta ( 353517,353519,"X1_LR_Boss_Secret_Cow",1,7.36,2,10,4,-1,false,true,false,-1,295003,435291,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,true,true ) },
+{ 360430, new ActorMeta ( 360430,-1,"x1_westmarchRanged_projectile_invisible",10,2.32,-1,-1,-1,-1,false,false,false,-1,14813,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 365259, new ActorMeta ( 365259,365258,"Skeleton_C_LR_Boss_Fast",1,5.87,0,4,4,-1,false,true,false,-1,959,11921,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,true,false,0,false,false,false,false,true,true ) },
+{ 199583, new ActorMeta ( 199583,-1,"CaOut_BoneYard_WormCave_Chest_Rare",2,10.27,-1,-1,-1,1,false,false,false,-1,199587,106174,false,false,false,false,false,false,0,0,-1,0,false,false,-1,false,false,0,false,false,false,true,false,false ) },
+{ 437, new ActorMeta ( 437,219333,"Spiderling_C",1,6.17,2,6,6,-1,false,true,false,-1,15420,11931,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,true,true ) },
+
+
         };
 
     }

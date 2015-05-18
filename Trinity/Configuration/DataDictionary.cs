@@ -1398,7 +1398,7 @@ namespace Trinity
             ActorType.AxeSymbol,
             ActorType.CustomBrain,
             ActorType.Invalid,
-            ActorType.ServerProp,
+            //ActorType.ServerProp,
             ActorType.Player,
             //ActorType.Projectile, //lots of avoidance are classified as projectile
             ActorType.Critter,

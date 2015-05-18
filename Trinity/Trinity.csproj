@@ -146,6 +146,7 @@
     <Compile Include="Helpers\EnumValue.cs" />
     <Compile Include="Helpers\ExportHelper.cs" />
     <Compile Include="Helpers\GetAttributeExtensions.cs" />
+    <Compile Include="Helpers\TrinityMovement.cs" />
     <Compile Include="LazyCache\CacheBase.cs" />
     <Compile Include="LazyCache\CacheFactory.cs" />
     <Compile Include="LazyCache\CacheField.cs" />

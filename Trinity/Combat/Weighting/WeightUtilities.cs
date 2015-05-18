@@ -35,89 +35,113 @@ namespace Trinity.Combat.Weighting
                 case WeightReason.PreviousTarget:
 
                     if (cacheObject.IsLastTarget && cacheObject.Distance <= 25f)
+                    {
                         weightFactors.Add(new Weight(isValue ? value : 400, isMethod ? method : WeightMethod.Add, WeightReason.PreviousTarget));
-
-                    return true;
+                        return true;
+                    }
+                    break;
 
                 case WeightReason.AvoidanceInLoS:
 
                     if (CacheManager.Avoidances.Any(a => MathUtil.IntersectsPath(a.Position, a.Radius + 5f, CacheManager.Me.Position, cacheObject.Position)))
+                    {
                         weightFactors.Add(new Weight(isValue ? value : 0, isMethod ? method : WeightMethod.Set, WeightReason.AvoidanceInLoS));
-
-                    return true;
+                        return true;
+                    }
+                    break;
 
                 case WeightReason.MonsterInLoS:
 
-                    if (CacheManager.Units.Any(cp => MathUtil.IntersectsPath(cp.Position, cp.Radius * 1.2f, CacheManager.Me.Position, cacheObject.Position)))
+                    if (CacheManager.Units.Any(u => MathUtil.TrinityIntersectsPath(CacheManager.Me.Position, u.Position, cacheObject.Position, u.Distance, cacheObject.Distance)))
+                    {
                         weightFactors.Add(new Weight(isValue ? value : 0, isMethod ? method : WeightMethod.Set, WeightReason.MonsterInLoS));
-
-                    return true;
+                        return true;
+                    }
+                    break;
 
                 case WeightReason.DangerClose:
 
                     if (CacheManager.Monsters.Any(u => u.Distance <= 15f) && !CacheManager.Me.IsInRift || CombatContext.PrioritizeCloseRangeUnits)
+                    {
                         weightFactors.Add(new Weight(isValue ? value : 0, isMethod ? method : WeightMethod.Set, WeightReason.DangerClose));
-
-                    return true;
+                        return true;
+                    }
+                    break;
 
                 case WeightReason.TouchProximity:
 
                     if (cacheObject.RadiusDistance <= 4f)
-                        weightFactors.Add(new Weight(isValue ? value : 5000, isMethod ? method : WeightMethod.Add, WeightReason.TouchProximity));
-
-                    return true;
+                    {
+                        weightFactors.Add(new Weight(isValue ? value : 5000, isMethod ? method : WeightMethod.Add, WeightReason.TouchProximity));                    
+                        return true;
+                    }
+                    break;
 
                 case WeightReason.CloseProximity:
 
                     if (cacheObject.RadiusDistance <= 12f)
+                    {
                         weightFactors.Add(new Weight(isValue ? value : 1000, isMethod ? method : WeightMethod.Add, WeightReason.CloseProximity));
-
-                    return true;
+                        return true;
+                    }
+                    break;
 
                 case WeightReason.UnitsBehind:
 
                     if (CacheManager.Units.Any(u => u.IsUnit && u.HitpointsCurrentPct > 0 && u.Distance > cacheObject.Distance && MathUtil.IntersectsPath(cacheObject.Position, cacheObject.Radius, CacheManager.Me.Position, u.Position)))
+                    {
                         weightFactors.Add(new Weight(isValue ? value : 250, isMethod ? method : WeightMethod.Add, WeightReason.UnitsBehind));
-
-                    return true;
+                        return true;
+                    }
+                    break;
 
                 case WeightReason.DisableForQuest:
 
                     // Campaign A5 Quest "Lost Treasure of the Nephalem" - have to interact with nephalem switches first... 
                     // Quest: x1_Adria, Id: 257120, Step: 108 - disable all looting, pickup, and objects
                     if (CacheManager.Me.WorldType != Act.OpenWorld && CacheManager.Me.CurrentQuestSNO == 257120 && CacheManager.Me.CurrentQuestStep == 108)
+                    {
                         weightFactors.Add(new Weight(isValue ? value : 0, isMethod ? method : WeightMethod.Set, WeightReason.DisableForQuest));
-
-                    return true;
+                        return true;
+                    }
+                    break;
 
                 case WeightReason.CloseRangePriority:
 
                     if (CombatContext.PrioritizeCloseRangeUnits)
+                    {
                         weightFactors.Add(new Weight(isValue ? value : 0, isMethod ? method : WeightMethod.Set, WeightReason.CloseRangePriority));
-
-                    return true;
+                        return true;
+                    }
+                    break;
 
                 case WeightReason.NavBlocking:
 
                     if (cacheObject.IsBlocking)
+                    {
                         weightFactors.Add(new Weight(isValue ? value : 0, isMethod ? method : WeightMethod.Set, WeightReason.NavBlocking));
-
-                    return true;
+                        return true;
+                    }
+                    break;
 
                 case WeightReason.BossOrEliteNearby:
 
                     if (CacheManager.Units.Any(m => m.IsBossOrEliteRareUnique))
+                    {
                         weightFactors.Add(new Weight(isValue ? value : 0, isMethod ? method : WeightMethod.Set, WeightReason.BossOrEliteNearby));
-
-                    return true;
+                        return true;
+                    }
+                    break;
 
 
                 case WeightReason.NoCombatLooting:
 
-                    if (CharacterSettings.Instance.CombatLooting && CombatBase.IsInCombat && CacheManager.Monsters.Any(u => u.Distance <= CombatContext.KillRadius))
+                    if (!CharacterSettings.Instance.CombatLooting && CombatBase.IsInCombat && CacheManager.Monsters.Any(u => u.Distance <= CombatContext.KillRadius))
+                    {
                         weightFactors.Add(new Weight(isValue ? value : 0, isMethod ? method : WeightMethod.Set, WeightReason.NoCombatLooting));
-
-                    return true;
+                        return true;
+                    }
+                    break;
 
             }
 

@@ -113,7 +113,7 @@ namespace Trinity.LazyCache
         /// </summary>
         public Vector3 Position
         {
-            get { return _position.IsCacheValid ? _position.CachedValue : (_position.CachedValue = Source.Position); }
+            get { return _position.IsCacheValid ? _position.CachedValue : (_position.CachedValue = GetPosition(this)); }
             set { _position.SetValueOverride(value); }
         }
 
@@ -566,9 +566,20 @@ namespace Trinity.LazyCache
         /// </summary>
         internal static float GetDistance(TrinityObject o)
         {
-            // Position/Distance only works for Ground Items if called on DiaItem
-            var pos = (o.ActorType == ActorType.Item) ? o.GetDiaItemProperty(x => x.Position) : o.Position;
+            var pos = o.Position;
             return pos == Vector3.Zero ? 0f : pos.Distance2D(CacheManager.Me.Position);
+        }
+
+        /// <summary>
+        /// Faster distance call than ACD.Distance due to being 2d and calling cached player position.
+        /// </summary>
+        internal static Vector3 GetPosition(TrinityObject o)
+        {
+            // Position/Distance only works for Ground Items if called on DiaItem
+            if(o.ActorType == ActorType.Item)
+                return o.GetDiaItemProperty(x => x.Position);
+
+            return o.GetSourceProperty(x => x.Position);
         }
 
         /// <summary>

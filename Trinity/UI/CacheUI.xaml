@@ -78,6 +78,7 @@
                         <GridViewColumn Width="80" Header="TrinityType" DisplayMemberBinding="{Binding TrinityType, Mode=OneWay}" CellTemplate="{StaticResource ListViewTextCellTemplate}" />
                         <GridViewColumn Width="60" Header="DBType" DisplayMemberBinding="{Binding ActorType, Mode=OneWay}" CellTemplate="{StaticResource ListViewTextCellTemplate}" />
                         <GridViewColumn Width="Auto" Header="Radius" DisplayMemberBinding="{Binding Radius, Mode=OneWay, StringFormat={}{0:0.##}}" CellTemplate="{StaticResource ListViewTextCellTemplate}" />
+                        <GridViewColumn Width="Auto" Header="MoveSpeed" DisplayMemberBinding="{Binding MovementSpeed, Mode=OneWay, StringFormat={}{0:0.##}}" CellTemplate="{StaticResource ListViewTextCellTemplate}" />
                         <GridViewColumn Width="Auto" Header="WeightTime" DisplayMemberBinding="{Binding WeightTime, Mode=OneWay, StringFormat={}{0:0.##}}" CellTemplate="{StaticResource ListViewTextCellTemplate}" />
                         <GridViewColumn Width="Auto" Header="WeightReasons" DisplayMemberBinding="{Binding WeightReasons, Mode=OneWay}" CellTemplate="{StaticResource ListViewTextCellTemplate}" />
                     </ut:AutoSizedGridView>
