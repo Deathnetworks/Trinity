@@ -32,7 +32,7 @@ namespace Trinity.LazyCache
         #region Fields
 
         private readonly CacheField<int> _monsterSNO = new CacheField<int>();
-        private readonly CacheField<Vector3> _position = new CacheField<Vector3>(UpdateSpeed.Fast);
+        private readonly CacheField<Vector3> _position = new CacheField<Vector3>(UpdateSpeed.RealTime);
         private readonly CacheField<float> _distance = new CacheField<float>(UpdateSpeed.Fast);
         private readonly CacheField<SNOAnim> _currentAnimation = new CacheField<SNOAnim>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isInLineOfSight = new CacheField<bool>(UpdateSpeed.Fast);
@@ -129,7 +129,13 @@ namespace Trinity.LazyCache
             get
             {
                 if (_position.IsCacheValid) return _position.CachedValue;
-                return _position.CachedValue = GetPosition(this);
+                
+                var newPos = GetPosition(this);
+
+                if ((int) newPos.X != (int) _position.CachedValue.X || (int) newPos.Y != (int) _position.CachedValue.Y)
+                    OnPropertyChanged();
+
+                return _position.CachedValue = newPos;
             }
             set { _position.SetValueOverride(value); }
         }

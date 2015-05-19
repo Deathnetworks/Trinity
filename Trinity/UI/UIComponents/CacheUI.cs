@@ -59,6 +59,11 @@ namespace Trinity.UI.UIComponents
 
                 DataModel.PropertyChanged += DataModelOnPropertyChanged;
 
+                DataModel.LaunchRadarUICommand = new RelayCommand(param =>
+                {
+                    CreateRadarWindow().Show();                    
+                });
+
                 _isWindowOpen = true;
                 _updateCount = 0;
                 _window.Closed += Window_Closed;
@@ -76,6 +81,40 @@ namespace Trinity.UI.UIComponents
             }
 
             return _window;
+        }
+
+        private static Window CreateRadarWindow()
+        {
+            try
+            {
+                Logger.Log("Creating Radar Window");
+
+                if (DataModel == null)
+                    DataModel = new CacheUIDataModel();
+
+                _radarWindow = new Window
+                {
+                    Height = 450,
+                    Width = 450,
+                    MinHeight = MinimumHeight,
+                    MinWidth = MininumWidth,
+                    Title = "Trinity Radar",
+                    Content = UILoader.LoadAndTransformXamlFile<UserControl>(Path.Combine(FileManager.PluginPath, "UI", "RadarUI.xaml")),
+                    DataContext = DataModel
+                };
+
+                // Need lazycache ON for this to work.
+                DataModel.IsLazyCacheVisible = true;
+
+                _isRadarWindowOpen = true;
+                _radarWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogNormal("Unable to open Trinity RadarUI: {0}", ex);
+            }
+
+            return _radarWindow;
         }
 
         private static void DataModelOnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
@@ -140,7 +179,7 @@ namespace Trinity.UI.UIComponents
 
                     return false;
 
-                }, 250); //250ms Ticks
+                }, 100); //250ms Ticks
                
             }
         }
@@ -241,6 +280,8 @@ namespace Trinity.UI.UIComponents
         {
             Logger.Log("Copy to Clipboard Command Fired {0}", param);
         });
+        private static bool _isRadarWindowOpen;
+        private static Window _radarWindow;
 
         private static void Window_Closed(object sender, EventArgs e)
         {

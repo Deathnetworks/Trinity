@@ -96,6 +96,8 @@ namespace Trinity.UIComponents
             public double Value { set; get; }
         }
 
+        public ICommand LaunchRadarUICommand { set; get; }
+
         public ICommand CopyCommand
         {
             get

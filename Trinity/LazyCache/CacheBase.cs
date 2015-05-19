@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -10,6 +11,7 @@ using System.Web.Security;
 using System.Web.UI.WebControls;
 using System.Windows;
 using System.Windows.Controls.Primitives;
+using JetBrains.Annotations;
 using Trinity.Technicals;
 using Zeta.Game;
 using Zeta.Common;
@@ -24,7 +26,7 @@ namespace Trinity.LazyCache
     /// <summary>
     /// Base for cache objects. 
     /// </summary>
-    public class CacheBase
+    public class CacheBase : INotifyPropertyChanged
     {
         public static SNOTable _getActorTable;
 
@@ -432,6 +434,19 @@ namespace Trinity.LazyCache
             other.DiaItem = DiaItem;
             other.DiaUnit = DiaUnit;
             return other;
+        }
+
+        #endregion
+
+        #region INotifyPropertyChanged
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            var handler = PropertyChanged;
+            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
 
         #endregion

@@ -37,7 +37,7 @@ namespace Trinity.Combat.Weighting
         {
             var op = string.Empty;
 
-            if (Method == WeightMethod.Add && Amount > 0)
+            if (Method == WeightMethod.Add)
                 op = "+";
             else if (Method == WeightMethod.Multiply)
                 op = "*";

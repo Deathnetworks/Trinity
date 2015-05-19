@@ -23,11 +23,14 @@
         <ut:BindingProxy x:Key="Proxy" Data="{Binding}" />
     </UserControl.Resources>
     <DockPanel>
-        <WrapPanel DockPanel.Dock="Top">
-            <CheckBox Margin="5" Foreground="Black" IsChecked="{Binding Path=Enabled}">On/Off</CheckBox>
-            <CheckBox Margin="5" Foreground="Black" IsChecked="{Binding Path=IsDefaultVisible}">Show Default Cache</CheckBox>
-            <CheckBox Margin="5" Foreground="Black" IsChecked="{Binding Path=IsLazyCacheVisible}">Show Lazy Cache</CheckBox>
-        </WrapPanel>
+        <Grid DockPanel.Dock="Top">
+            <WrapPanel>                    
+                <CheckBox Margin="5" IsChecked="{Binding Path=Enabled}">On/Off</CheckBox>
+                <CheckBox Margin="5" IsChecked="{Binding Path=IsDefaultVisible}">Show Default Cache</CheckBox>
+                <CheckBox Margin="5" IsChecked="{Binding Path=IsLazyCacheVisible}">Show Lazy Cache</CheckBox>            
+            </WrapPanel>
+            <Button DockPanel.Dock="Top" Content="RadarUI" Width="75" Command="{Binding LaunchRadarUICommand}" HorizontalAlignment="Right" Height="22"/>
+        </Grid>
         <Grid DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
                 <ut:ColumnDefinitionExtended Visible="{Binding IsDefaultVisible}" Width="*" />

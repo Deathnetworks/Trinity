@@ -304,6 +304,7 @@
     <Compile Include="UI\UIComponents\CacheUIDataModel.cs" />
     <Compile Include="UI\UIComponents\Controls\AutoSizedGridView.cs" />
     <Compile Include="UI\UIComponents\Controls\ColumnDefinitionExtended.cs" />
+    <Compile Include="UI\UIComponents\Controls\RadarCanvas.cs" />
     <Compile Include="UI\UIComponents\Converters\BoolInverterConverter.cs" />
     <Compile Include="UI\UIComponents\Converters\BoolToTypeConverters.cs" />
     <Compile Include="UI\UIComponents\Converters\DebugDataBindingConverter.cs" />
@@ -396,6 +397,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\ConfigTVars.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\RadarUI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
