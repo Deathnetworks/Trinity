@@ -244,9 +244,7 @@ namespace Trinity.UIComponents
                         else if(unit.IsHostile)
                             baseColor = Colors.DodgerBlue; 
                         else
-                            baseColor = Colors.LightSkyBlue;
-
-                        
+                            baseColor = Colors.LightSkyBlue;                        
                     }
                     else
                     {
@@ -259,28 +257,30 @@ namespace Trinity.UIComponents
                     break;
             }
 
-            var text = String.Format("{0}", actor.Item.Name);
-
-            var formattedText = new FormattedText(text, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 11, new SolidColorBrush(baseColor))
-            {
-                MaxTextWidth = 80,
-                Trimming = TextTrimming.WordEllipsis,
-                TextAlignment = TextAlignment.Center
-            };
-
-            var textOffsetPosition = new Point(actor.Point.X - (formattedText.WidthIncludingTrailingWhitespace / 2), actor.Point.Y - 10 - formattedText.Height);
-            dc.DrawText(formattedText, textOffsetPosition);
-
-            // Draw a dot in the center of the actor;
-            var innerFill = new SolidColorBrush(baseColor);
-            dc.DrawEllipse(innerFill, border, actor.Point, MarkerSize / 2, MarkerSize / 2);
-
             if (baseColor == Colors.Transparent)
             {
-                border = new Pen(new SolidColorBrush(baseColor), 0.1);
+                border = new Pen(new SolidColorBrush(Colors.LightGray), 1);
+                border.DashStyle = DashStyles.DashDotDot;
+                border.DashCap = PenLineCap.Flat;
+            }
+            else
+            {
 
-                // Create a custom dash pattern.
-                border.DashStyle = DashStyles.Dash;
+                var text = String.Format("{0}", actor.Item.Name);
+
+                var formattedText = new FormattedText(text, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 11, new SolidColorBrush(baseColor))
+                {
+                    MaxTextWidth = 80,
+                    Trimming = TextTrimming.WordEllipsis,
+                    TextAlignment = TextAlignment.Center
+                };
+
+                var textOffsetPosition = new Point(actor.Point.X - (formattedText.WidthIncludingTrailingWhitespace / 2), actor.Point.Y - 10 - formattedText.Height);
+                dc.DrawText(formattedText, textOffsetPosition);
+
+                // Draw a dot in the center of the actor;
+                var innerFill = new SolidColorBrush(baseColor);
+                dc.DrawEllipse(innerFill, border, actor.Point, MarkerSize / 2, MarkerSize / 2);
             }
                 
 
