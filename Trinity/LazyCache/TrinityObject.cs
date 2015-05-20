@@ -7,6 +7,7 @@ using System.Text;
 using Trinity.Combat;
 using Trinity.Combat.Weighting;
 using Trinity.DbProvider;
+using Trinity.Helpers;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Game;
@@ -34,7 +35,8 @@ namespace Trinity.LazyCache
         private readonly CacheField<int> _monsterSNO = new CacheField<int>();
         private readonly CacheField<Vector3> _position = new CacheField<Vector3>(UpdateSpeed.RealTime);
         private readonly CacheField<float> _distance = new CacheField<float>(UpdateSpeed.Fast);
-        private readonly CacheField<SNOAnim> _currentAnimation = new CacheField<SNOAnim>(UpdateSpeed.Fast);
+        private readonly CacheField<SNOAnim> _currentAnimation = new CacheField<SNOAnim>(UpdateSpeed.Ultra);
+        private readonly CacheField<AnimationState> _currentAnimationState = new CacheField<AnimationState>(UpdateSpeed.Ultra);
         private readonly CacheField<bool> _isInLineOfSight = new CacheField<bool>(UpdateSpeed.Fast);
         private readonly CacheField<bool> _isNavigationObstacle = new CacheField<bool>();
         private readonly CacheField<bool> _isOwnedByPlayer = new CacheField<bool>();
@@ -77,6 +79,7 @@ namespace Trinity.LazyCache
         private readonly CacheField<bool> _isMe = new CacheField<bool>();
         private readonly CacheField<bool> _isItem = new CacheField<bool>();
         private double _weightTime;
+        private readonly TrinityMovement _movement = new TrinityMovement();
 
         #endregion
 
@@ -167,6 +170,19 @@ namespace Trinity.LazyCache
         }
 
         /// <summary>
+        /// Current animation being used by actor
+        /// </summary>
+        public AnimationState CurrentAnimationState
+        {
+            get
+            {
+                if (_currentAnimationState.IsCacheValid) return _currentAnimationState.CachedValue;
+                return _currentAnimationState.CachedValue = Source.AnimationState;
+            }
+            set { _currentAnimationState.SetValueOverride(value); }
+        }
+
+        /// <summary>
         /// If player can see the actor (Navigator-Based Raycast)
         /// </summary>
         public bool IsInLineOfSight
@@ -177,6 +193,14 @@ namespace Trinity.LazyCache
                 return _isInLineOfSight.CachedValue = NavHelper.CanRayCast(Position);
             }
             set { _isInLineOfSight.SetValueOverride(value); }
+        }
+
+        /// <summary>
+        /// Source for movement related information
+        /// </summary>
+        public TrinityMovement Movement
+        {
+            get { return _movement; }
         }
 
         /// <summary>

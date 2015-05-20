@@ -13,6 +13,7 @@ using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
+using Zeta.Game.Internals.SNO;
 using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.Helpers
@@ -34,16 +35,23 @@ namespace Trinity.Helpers
 
         public bool HasntMoved { get; set; }
 
+        private float _startHeadingRadians;
+
         /// <summary>
         /// This is separated from GetMovementSpeed() to prevent parrallel tasks failing on changed collection.
         /// </summary>
         /// <param name="o"></param>
         public void RecordMovement(TrinityObject o)
         {
+            if (o.ActorType != ActorType.Monster && o.ActorType != ActorType.Projectile && o.ActorType != ActorType.Player)
+                return;
+
             if (DateTime.UtcNow.Subtract(_lastRecordedPositionTime).TotalMilliseconds >= 250)
             {
                 if (!_speedSensors.Any())
                 {
+                    _startHeadingRadians = o.DiaUnit.Movement.Rotation;
+
                     _speedSensors.Add(new SpeedSensor
                     {
                         Location = o.Position,
@@ -103,8 +111,8 @@ namespace Trinity.Helpers
                 var headingDegrees = MathUtil.FindDirectionDegree(startPosition, endPosition);                
                 _lastHeadingDegrees = headingDegrees;
                 return headingDegrees;
-            }            
-            return 0f;
+            }
+            return (float)MathUtil.RadianToDegree(_startHeadingRadians);
         }
 
         public float GetHeadingRadians()
@@ -120,21 +128,13 @@ namespace Trinity.Helpers
                 _lastHeadingRadians = headingRadians;
                 return headingRadians;
             }
-            return 0f;
+
+            return _startHeadingRadians;
         }
 
         public string GetHeading()
         {
-            if (_speedSensors.Any())
-            {
-                if (_lastMovementSpeed == 0)
-                    return _lastHeading;
-
-                var heading = MathUtil.GetHeading(GetHeadingDegrees());
-                _lastHeading = heading;
-                return heading;
-            }
-            return string.Empty;
+            return MathUtil.GetHeading(GetHeadingDegrees());
         }
 
         public static void LogComparison(TrinityUnit u)

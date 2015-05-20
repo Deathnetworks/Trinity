@@ -56,13 +56,23 @@ namespace Trinity.UI.UIComponents
                 };
 
                 DataModel.CacheUpdateTime.Clear();
+                DataModel.WeightUpdateTime.Clear();
 
                 DataModel.PropertyChanged += DataModelOnPropertyChanged;
 
                 DataModel.LaunchRadarUICommand = new RelayCommand(param =>
                 {
-                    CreateRadarWindow().Show();                    
+                    DataModel.IsLazyCacheVisible = false;
+                    DataModel.LazyCache.Clear();
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        CreateRadarWindow().Show();
+                    });
+
+                    DataModel.IsLazyCacheVisible = true;
                 });
+                
 
                 _isWindowOpen = true;
                 _updateCount = 0;
@@ -103,11 +113,9 @@ namespace Trinity.UI.UIComponents
                     DataContext = DataModel
                 };
 
-                // Need lazycache ON for this to work.
-                DataModel.IsLazyCacheVisible = true;
-
                 _isRadarWindowOpen = true;
                 _radarWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                _window.Closed += Window_Closed;
             }
             catch (Exception ex)
             {
@@ -123,7 +131,6 @@ namespace Trinity.UI.UIComponents
             if (dataModel == null)
                 return;
 
-            // If user clicks the On/Off checkbox in UI, cant hit memory based properties for Copy to clipboard right click command.
             if (propertyChangedEventArgs.PropertyName == "Enabled")
             {
                 FreezeLazyCache();
@@ -165,22 +172,31 @@ namespace Trinity.UI.UIComponents
 
                     using (new MemoryHelper())
                     {
-                        if (!BotMain.IsPausedForStateExecution && DataModel.IsLazyCacheVisible)
+                        try
                         {
-                            if (ZetaDia.IsInGame && ZetaDia.Me != null)
+                            if (!BotMain.IsPausedForStateExecution && DataModel.IsLazyCacheVisible)
                             {
-                                if (!CacheManager.IsRunning)
-                                    CacheManager.Start();
+                                if (ZetaDia.IsInGame && ZetaDia.Me != null)
+                                {
+                                    if (!CacheManager.IsRunning)
+                                        CacheManager.Start();
 
-                                CacheManager.Update();
-                                CacheUI.Update();                                    
+                                    CacheManager.Update();
+                                    CacheUI.Update();
+                                }
                             }
                         }
+                        catch (Exception ex)
+                        {
+                            Logger.Log("Exception in LazyCacheUpdate thread. {0} {1}", ex.Message, ex.InnerException);
+                            throw;
+                        }
+
                     }
 
                     return false;
 
-                }, 100); //100ms Ticks
+                }, 100);
                
             }
         }
@@ -207,7 +223,7 @@ namespace Trinity.UI.UIComponents
                     _lastUpdatedDefault = DateTime.UtcNow;
                 }
 
-                if (DataModel.IsLazyCacheVisible && DateTime.UtcNow.Subtract(_lastUpdatedLazy).TotalMilliseconds > 25)
+                if (DataModel.IsLazyCacheVisible && DateTime.UtcNow.Subtract(_lastUpdatedLazy).TotalMilliseconds > 100)
                 {
                     _isUpdating = true;
                     _updateCount++;
@@ -226,9 +242,11 @@ namespace Trinity.UI.UIComponents
 
                         if (DataModel.WeightUpdateTime.Count > 100)
                             DataModel.WeightUpdateTime.RemoveAt(0);
-                    });                       
 
-                    DataModel.LazyCache = new ObservableCollection<TrinityObject>(GetLazyCacheActorList());
+                        DataModel.LazyCache = new ObservableCollection<TrinityObject>(GetLazyCacheActorList());
+
+                    });
+
                     _lastUpdatedLazy = DateTime.UtcNow;
                 }
 

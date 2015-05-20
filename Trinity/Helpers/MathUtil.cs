@@ -43,6 +43,11 @@ namespace Trinity
                 return false;
         }
 
+        private double DegreeToRadian(double angle)
+        {
+            return Math.PI * angle / 180.0;
+        }
+
         internal static Vector2 GetDirectionVectorFromRotation(double rotation)
         {
             return new Vector2((float)Math.Cos(rotation), (float)Math.Sin(rotation));

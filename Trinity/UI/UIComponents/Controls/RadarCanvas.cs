@@ -6,15 +6,21 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows;
 using System.Windows.Forms;
 using Trinity.LazyCache;
+using Zeta.Bot.Dungeons;
 using Zeta.Common;
+using Zeta.Game;
+using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
+using Zeta.Game.Internals.SNO;
 using Brushes = System.Windows.Media.Brushes;
 using Color = System.Windows.Media.Color;
 using FlowDirection = System.Windows.FlowDirection;
@@ -27,54 +33,42 @@ using Size = System.Windows.Size;
 
 namespace Trinity.UIComponents
 {
-    /// <summary>
-    /// Canvas information to be passable by reference
-    /// </summary>
-    public class CanvasData
-    {
-        public Point Center;
-        public Size Size;
-        public RotateTransform RotationTransform;
-        public ScaleTransform FlipTransform;
-        public TransformGroup Transforms;
-        public Size Grid = Size.Empty;
-
-        public void Update(Size desiredSize)
-        {
-            Center = new Point(desiredSize.Width / 2, desiredSize.Height / 2);
-
-            // Raw Vectors need to translated 45 degrees clockwise
-            RotationTransform = new RotateTransform(45, Center.X, Center.Y);
-
-            // Raw Vectors need to be flipped horizontally
-            FlipTransform = new ScaleTransform(-1, 1, Center.X, Center.Y);
-            
-            Transforms = new TransformGroup();            
-            Transforms.Children.Add(RotationTransform);
-            Transforms.Children.Add(FlipTransform);
-
-            Size = desiredSize;
-        }
-    }
 
     public class RadarCanvas : Canvas
     {
-        /// <summary>
-        /// The drawing space size for 1yd
-        /// </summary>
-        public const int GridSize = 10;
-
-        public TrinityItemPoint CenterActor { get; set; }
-
-        public double MarkerSize = 5;
-
-        public List<TrinityItemPoint> Objects = new List<TrinityItemPoint>();
-
-        public CanvasData CanvasData = new CanvasData();
-
         public RadarCanvas()
         {
         }
+
+        /// <summary>
+        /// The canvas size of grid squares (in pixels) for 1yd of game distance
+        /// </summary>
+        public const int GridSize = 5;
+
+        /// <summary>
+        /// The number of grid squares/yards to draw horizontal/vertical lines on
+        /// </summary>
+        public const int GridLineFrequency = 10;
+
+        /// <summary>
+        /// The size (in pixels) to draw actor markers
+        /// </summary>
+        public double MarkerSize = 5;
+
+        /// <summary>
+        /// The actor who should be at the center of the radar
+        /// </summary>
+        public TrinityItemPoint CenterActor { get; set; }
+
+        /// <summary>
+        /// Collection of game objects
+        /// </summary>
+        public List<TrinityItemPoint> Objects = new List<TrinityItemPoint>();
+
+        /// <summary>
+        /// Information about the WPF canvas we'll be drawing on
+        /// </summary>
+        public CanvasData CanvasData = new CanvasData();
 
         #region ItemSource Property
 
@@ -97,101 +91,182 @@ namespace Trinity.UIComponents
 
         #endregion
 
+        #region ItemSource Changed Event Handling
+
         void OnItemsSourceChanged(DependencyPropertyChangedEventArgs args)
         {
-            UpdateInternalCollections();
+            UpdateData();
 
             if (args.OldValue is INotifyCollectionChanged)
-            {
                 (args.OldValue as INotifyCollectionChanged).CollectionChanged -= OnItemsSourceCollectionChanged;
-            }
 
             if (args.NewValue is INotifyCollectionChanged)
-            {
                 (args.NewValue as INotifyCollectionChanged).CollectionChanged += OnItemsSourceCollectionChanged;
-            }
         }
 
+        /// <summary>
+        /// When objects are added/removed from ItemSource collection
+        /// </summary>
         void OnItemsSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
-            UpdateInternalCollections();
+            UpdateData();
 
-            if (args.OldItems != null)
-            {
-                foreach (object item in args.OldItems)
-                    if (item is INotifyPropertyChanged)
-                        (item as INotifyPropertyChanged).PropertyChanged -= OnItemPropertyChanged;
+            //if (args.OldItems != null)
+            //{
+            //    foreach (object item in args.OldItems)
+            //        if (item is INotifyPropertyChanged)
+            //            (item as INotifyPropertyChanged).PropertyChanged -= OnItemPropertyChanged;
 
-            }
-            if (args.NewItems != null)
-            {
-                foreach (object item in args.NewItems)
-                    if (item is INotifyPropertyChanged)
-                        (item as INotifyPropertyChanged).PropertyChanged += OnItemPropertyChanged;
-            }
+            //}
+            //if (args.NewItems != null)
+            //{
+            //    foreach (object item in args.NewItems)
+            //        if (item is INotifyPropertyChanged)
+            //            (item as INotifyPropertyChanged).PropertyChanged += OnItemPropertyChanged;
+            //}
         }
 
-        void UpdateInternalCollections()
-        {
-            Objects.Clear();
-
-            CanvasData.Update(DesiredSize);
-
-            foreach (var trinityObject in ItemsSource.OfType<TrinityObject>())
-            {
-                var itemPoint = new TrinityItemPoint(trinityObject, CanvasData);
-
-                Objects.Add(itemPoint);
-
-                if (trinityObject.IsMe)
-                {
-                    CenterActor = itemPoint;
-                }                    
-            }
-
-            foreach (var actor in Objects)
-            {
-                actor.UpdateRawPointFromWorldSpace(CenterActor.Item.Position);
-            }
-
-            // Triggers Rendering
-            InvalidateVisual();
-        }
-
+        /// <summary>
+        /// When objects within the ItemSource collection change
+        /// </summary>
         void OnItemPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-
+            
         }
+
+        #endregion
+
+        #region Canvas Changed Event Handling
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
             base.OnRenderSizeChanged(sizeInfo);
-            CanvasData.Update(DesiredSize);            
+            CanvasData.Update(DesiredSize, GridSize);
         }
-        
+
         protected override Size MeasureOverride(Size availableSize)
         {
+            // Not entirely sure what this does
             return availableSize;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Go through the ItemSource collection and calculate their canvas positions
+        /// </summary>
+        void UpdateData()
+        {
+            try
+            {
+                Objects.Clear();
+
+                CanvasData.Update(DesiredSize, GridSize);
+
+                // Find the actor who should be in the center of the radar
+                // and whos position all other points should be plotted against.
+
+                var center = ItemsSource.OfType<TrinityUnit>().FirstOrDefault(u => u.IsMe);
+                if (center == null)
+                    return;
+
+                CenterActor = new TrinityItemPoint(center, CanvasData);
+                CanvasData.CenterVector = CenterActor.Item.Position;
+
+                // Calculate locations for all actors positions
+                // on TrinityItemPoint ctor; or with .Update();
+
+                foreach (var trinityObject in ItemsSource.OfType<TrinityObject>())
+                {
+                    var itemPoint = new TrinityItemPoint(trinityObject, CanvasData);
+                    Objects.Add(itemPoint);
+                }
+
+                // Trigger Canvas to Render
+                InvalidateVisual();            
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Exception in RadarUI.UpdateData(). {0} {1}", ex.Message, ex.InnerException);
+            }
         }
 
         protected override void OnRender(DrawingContext dc)
         {
-            DrawGrid(dc, out CanvasData.Grid);
-
-            // display the grid size
-            var title = string.Format("{0}x{1}", CanvasData.Grid.Height, CanvasData.Grid.Width);
-            dc.DrawText(new FormattedText(title, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White), new Point(0, 0));
-
-            DrawRangeGuide(dc);
-
-            foreach (var actor in Objects)
+            if (!dc.CheckAccess())
             {
-                if(!actor.IsBeyondCanvas)
-                    DrawActor(dc, actor);
+                Logger.Log("CurrentThread '{0} ({1})' does not have access to DrawingContext", Thread.CurrentThread.Name, Thread.CurrentThread.ManagedThreadId);
+                return;
+            }
+
+            if (CanvasData.CanvasSize.Width == 0 && CanvasData.CanvasSize.Height == 0 || CanvasData.CenterVector == Vector3.Zero)
+                return;
+
+            try
+            {                
+                DrawGrid(dc, CanvasData, GridLineFrequency);
+
+                // display the grid size text at the top
+                var title = string.Format("{0}x{1}", CanvasData.Grid.Height, CanvasData.Grid.Width);
+                dc.DrawText(new FormattedText(title, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White), new Point(0, 0));
+
+                DrawRangeGuide(dc, CanvasData);
+
+                foreach (var actor in Objects)
+                {
+                    if (!actor.Morph.IsBeyondCanvas)
+                        DrawActor(dc, CanvasData, actor);
+                }
+
+                DrawScenes(dc, CanvasData);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Exception in RadarUI.OnRender(). {0} {1}", ex.Message, ex.InnerException);
             }
         }
 
-        private void DrawRangeGuide(DrawingContext dc)
+        private void DrawScenes(DrawingContext dc, CanvasData canvas)
+        {
+            var pen = new Pen(Brushes.Yellow, 0.1);
+            var brush = new SolidColorBrush(Colors.Transparent);
+
+            try
+            {
+                //var currentScene = ZetaDia.Me.CurrentScene.Mesh.Zone.NavZoneDef.
+                //var scenes = ZetaDia.Scenes.Where(s => s.Mesh.Zone != null).ToList();
+                ////scenes.ForEach(s =>
+                ////{
+                //    //GridSegmentation.Update();
+
+                //    //var nodes = GridSegmentation.Nodes.Where(n => n.Flags.HasFlag(NavCellFlags.AllowWalk));
+              
+                //    //var squares = s.Mesh.Zone.GridSquares.Where(sq => sq.Flags.HasFlag(NavCellFlags.AllowWalk))
+                //    scenes.ForEach(n =>
+                //    {
+                //        //var point = new PointMorph(n.Center.ToVector3(), canvas).GridPoint;
+                //        dc.DrawEllipse(brush, pen, new PointMorph(n.Mesh.Zone.ZoneMin.ToVector3(), canvas).Point, 5, 5);
+                //        //Logger.Log("Node GridPoint={0}x{1}", point.X, point.Y);
+                //    });
+                    
+                    //var min = new PointMorph(s.Mesh.Zone.ZoneMin.ToVector3(), canvas);
+                    //var max = new PointMorph(, canvas);
+                    //Logger.Log("Rect GridPoints Min={0}x{1} Max={2}{3}", min.GridPoint.X, min.GridPoint.Y, max.GridPoint, max.GridPoint.Y);
+                    //dc.DrawRectangle(brush, pen, new Rect(min.Point,max.Point));                    
+                //});
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Exception in RadarUI.DrawScenes(). {0} {1}", ex.Message, ex.InnerException);
+            }
+            
+        }
+
+        /// <summary>
+        /// Range guide drawsd a circle every 20yard from player
+        /// </summary>
+        private void DrawRangeGuide(DrawingContext dc, CanvasData canvas)
         {
             var pen = new Pen(Brushes.LightYellow, 0.1);
             var brush = new SolidColorBrush(Colors.Transparent);
@@ -199,121 +274,146 @@ namespace Trinity.UIComponents
             for (var i = 20; i < 100; i+=20)
             {
                 var radius = GridSize*i;
-                dc.DrawEllipse(brush, pen, CanvasData.Center, radius, radius);
+                dc.DrawEllipse(brush, pen, canvas.Center, radius, radius);
 
                 dc.DrawText(new FormattedText(i.ToString(), CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 12, Brushes.LightYellow),
-                    new Point(CanvasData.Center.X - (radius + 20), CanvasData.Center.Y));
+                    new Point(canvas.Center.X - (radius + 20), canvas.Center.Y));
             }            
         }
 
-        private void DrawActor(DrawingContext dc, TrinityItemPoint actor)
+        private void DrawActor(DrawingContext dc, CanvasData canvas, TrinityItemPoint actor)
         {
-            var border = new Pen(Brushes.Black, 0.1);
-
-            Color baseColor;
-            switch (actor.Item.TrinityType)
+            try
             {
-                case TrinityObjectType.Avoidance:
-                    baseColor = Colors.OrangeRed;
-                    break;
+                var border = new Pen(Brushes.Black, 0.1);
+                var baseColor = GetActorColor(actor);            
+                var actorName = actor.Item.Name;
+                var trinityType = actor.Item.TrinityType;
+                var actorRadius = actor.Item.Radius;
 
-                case TrinityObjectType.Container:
-                case TrinityObjectType.CursedChest:
-                case TrinityObjectType.CursedShrine:
-                case TrinityObjectType.Shrine:
-                case TrinityObjectType.HealthWell:
-                case TrinityObjectType.Interactable:
-                    baseColor = Colors.Yellow;
-                    break;
-
-                case TrinityObjectType.Gold:
-                case TrinityObjectType.Item:
-                    baseColor = Colors.DarkSeaGreen;
-                    break;
-
-                case TrinityObjectType.Player:
-                    baseColor = Colors.White;
-                    break;
-
-                case TrinityObjectType.Unit:
-
-                    var unit = actor.Item as TrinityUnit;
-                    if (unit != null)
-                    {
-                        if (unit.IsBossOrEliteRareUnique)
-                            baseColor = Colors.Blue;
-                        else if(unit.IsHostile)
-                            baseColor = Colors.DodgerBlue; 
-                        else
-                            baseColor = Colors.LightSkyBlue;                        
-                    }
-                    else
-                    {
-                        baseColor = Colors.SlateGray;
-                    }
-                    break;
-
-                default:
-                    baseColor = Colors.Transparent;
-                    break;
-            }
-
-            if (baseColor == Colors.Transparent)
-            {
-                border = new Pen(new SolidColorBrush(Colors.LightGray), 1);
-                border.DashStyle = DashStyles.DashDotDot;
-                border.DashCap = PenLineCap.Flat;
-            }
-            else
-            {
-
-                var text = String.Format("{0}", actor.Item.Name);
-
-                var formattedText = new FormattedText(text, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 11, new SolidColorBrush(baseColor))
+                if (baseColor == Colors.Transparent)
+                {                
+                    border = new Pen(new SolidColorBrush(Colors.LightGray), 1);
+                    border.DashStyle = DashStyles.DashDotDot;
+                    border.DashCap = PenLineCap.Flat;
+                }
+                else
                 {
-                    MaxTextWidth = 80,
-                    Trimming = TextTrimming.WordEllipsis,
-                    TextAlignment = TextAlignment.Center
-                };
+                    var formattedText = new FormattedText(string.Format("{0}", actorName), CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 11, new SolidColorBrush(baseColor))
+                    {
+                        MaxTextWidth = 80,
+                        Trimming = TextTrimming.WordEllipsis,
+                        TextAlignment = TextAlignment.Center
+                    };
 
-                var textOffsetPosition = new Point(actor.Point.X - (formattedText.WidthIncludingTrailingWhitespace / 2), actor.Point.Y - 10 - formattedText.Height);
-                dc.DrawText(formattedText, textOffsetPosition);
+                    var textOffsetPosition = new Point(actor.Point.X - (formattedText.WidthIncludingTrailingWhitespace / 2), actor.Point.Y - 10 - formattedText.Height);
+                    dc.DrawText(formattedText, textOffsetPosition);
 
-                // Draw a dot in the center of the actor;
-                var innerFill = new SolidColorBrush(baseColor);
-                dc.DrawEllipse(innerFill, border, actor.Point, MarkerSize / 2, MarkerSize / 2);
-            }
-                
+                    // Draw a dot in the center of the actor;
+                    var innerFill = new SolidColorBrush(baseColor);
+                    dc.DrawEllipse(innerFill, border, actor.Point, MarkerSize / 2, MarkerSize / 2);
+                }
+                                
+                if (actor.Item.ActorType == ActorType.Projectile)
+                {
+                    // Draw a line representing the projectile
+                    dc.DrawLine(new Pen(new SolidColorBrush(Colors.Red), 3), actor.Point, actor.HeadingPointAtRadius); 
+                }
+                else
+                {
+                    // Draw a circle representing the size of the actor
+                    var outerFill = new SolidColorBrush(baseColor);
+                    var gridRadius = actorRadius * GridSize;
+                    outerFill.Opacity = 0.25;
+                    dc.DrawEllipse(outerFill, border, actor.Point, gridRadius, gridRadius);
+                }
 
-            // Draw a circle representing the size of the actor
-            var outerFill = new SolidColorBrush(baseColor);
-            var gridRadius = actor.Item.Radius*GridSize;
-            outerFill.Opacity = 0.25;
-            dc.DrawEllipse(outerFill, border, actor.Point, gridRadius, gridRadius);
-
-            // show which way units are facing
-            if (actor.Item.TrinityType == TrinityObjectType.Unit && actor.Item is TrinityUnit)
-            {
-                // We currently dont have a direction reading for things that havent moved via TrinityMovement;
-                var unit = (TrinityUnit) actor.Item;
-                if (!unit.Movement.HasntMoved)
-                {                    
-                    //var headingVector = MathEx.GetPointAt(new Vector3((float)actor.Point.X, (float)actor.Point.Y, 0), gridRadius, unit.Movement.GetHeadingRadians());
-                    //var targetPoint = new Point(headingVector.X, headingVector.Y);
-                    //var flippedX = (CenterActor.Point.X - targetPoint.X) + CenterActor.Point.X;
-                    //var flippedPoint = new Point(flippedX, targetPoint.Y);
-                    //var drawingPen = new Pen(Brushes.Black, 1);
-                    //var headingRadians = unit.Movement.GetHeadingRadians();                    
-                    //new Point(distance * Math.Cos(angle), distance * Math.Sin(angle));
-
-                    //dc.DrawLine(drawingPen, actor.Point, targetPoint);                    
+                var unit = actor.Item as TrinityUnit;
+                if (unit != null)
+                {      
+                    // Draw a line to indicate which way the unit is facing
+                    var lighterBaseColor = ControlPaint.Light(baseColor.ToDrawingColor(), 50);
+                    var drawingPen = new Pen(new SolidColorBrush(lighterBaseColor.ToMediaColor()), 1);
+                    dc.DrawLine(drawingPen, actor.Point, actor.HeadingPointAtRadius);                          
                 }
 
             }
-           
+            catch (Exception ex)
+            {
+                Logger.Log("Exception in RadarUI.DrawActor(). {0} {1}", ex.Message, ex.InnerException);
+            }           
         }
 
-        private void DrawGrid(DrawingContext dc, out Size outGridSize)
+        /// <summary>
+        /// Returns a base color for actor based on type and stuff
+        /// </summary>
+        private static Color GetActorColor(TrinityItemPoint actor)
+        {
+            Color baseColor = Colors.White;
+            try
+            {
+                switch (actor.Item.TrinityType)
+                {
+                    case TrinityObjectType.Avoidance:
+                        baseColor = Colors.OrangeRed;
+                        break;
+
+                    case TrinityObjectType.Portal:
+                    case TrinityObjectType.Container:
+                    case TrinityObjectType.CursedChest:
+                    case TrinityObjectType.CursedShrine:
+                    case TrinityObjectType.Shrine:
+                    case TrinityObjectType.HealthWell:
+                    case TrinityObjectType.Interactable:
+                        baseColor = Colors.Yellow;
+                        break;
+
+                    case TrinityObjectType.ProgressionGlobe:
+                    case TrinityObjectType.PowerGlobe:
+                    case TrinityObjectType.HealthGlobe:
+                    case TrinityObjectType.Gold:
+                    case TrinityObjectType.Item:
+                        baseColor = Colors.DarkSeaGreen;
+                        break;
+
+                    case TrinityObjectType.Player:
+                        baseColor = Colors.White;
+                        break;
+
+                    case TrinityObjectType.Unit:
+
+                        var unit = actor.Item as TrinityUnit;
+                        if (unit != null)
+                        {
+                            if (unit.IsBossOrEliteRareUnique)
+                                baseColor = Colors.Blue;
+                            else if (unit.IsHostile)
+                                baseColor = Colors.DodgerBlue;
+                            else
+                                baseColor = Colors.LightSkyBlue;
+  
+                        }
+                        else
+                        {
+                            baseColor = Colors.SlateGray;
+                        }
+                        break;
+
+                    default:
+                        baseColor = Colors.Transparent;
+                        break;
+                }
+                    
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Exception in RadarUI.GetActorColor(). {0} {1}", ex.Message, ex.InnerException);
+            }   
+            return baseColor;
+        }
+
+        private void DrawGrid(DrawingContext dc, CanvasData canvas, int gridLineFrequency)
         {                
             Pen pen = new Pen(Brushes.Black, 0.1);
 
@@ -322,9 +422,14 @@ namespace Trinity.UIComponents
             var height = 0;
             do
             {
-                dc.DrawLine(pen, new Point(pos, 0), new Point(pos, (int) DesiredSize.Height));
-                pos += GridSize;
+                if (gridLineFrequency != 0 && (pos / gridLineFrequency) != 1)
+                {
+                    dc.DrawLine(pen, new Point(pos, 0), new Point(pos, (int) DesiredSize.Height));
+                }
+
+                pos += (int)canvas.GridSquareSize.Height;
                 height++;
+
             } while (pos < DesiredSize.Width);
 
             // horizontal lines
@@ -332,81 +437,59 @@ namespace Trinity.UIComponents
             var width = 0;
             do
             {
-                dc.DrawLine(pen, new Point(0, pos), new Point((int) DesiredSize.Width, pos));
-                pos += GridSize;
+                if (gridLineFrequency != 0 && (pos/gridLineFrequency) != 1)
+                {
+                    dc.DrawLine(pen, new Point(0, pos), new Point((int) DesiredSize.Width, pos));
+                }
+                pos += (int)canvas.GridSquareSize.Width;
                 width++;
             } while (pos < DesiredSize.Height);
 
-            outGridSize = new Size(width, height);
         }
 
         /// <summary>
-        /// TrinityItemPoint wraps a TrinityObject and provides some drawing related extensions.
+        /// TrinityItemPoint wraps a TrinityObject to add a canvas plot location.
         /// </summary>
         public class TrinityItemPoint : INotifyPropertyChanged
         {
             private TrinityObject _item;
-            private Point _point;
+
+            public PointMorph Morph = new PointMorph();
+
+            public Vector3 HeadingVectorAtRadius { get; set; }
+
+            public Point HeadingPointAtRadius { get; set; }
+
+            public Point Point
+            {
+                get { return Morph.Point; }
+            }
 
             public TrinityItemPoint(TrinityObject item, CanvasData canvasData)
             {
                 Item = item;
                 item.PropertyChanged += ItemOnPropertyChanged;
-                CanvasData = canvasData;
+                Morph.CanvasData = canvasData;
+                Update();
             }
 
             /// <summary>
-            /// Information about the canvas
+            /// Updates the plot location on canvas based on Item's current position.
             /// </summary>
-            public CanvasData CanvasData { get; private set; }
+            public void Update()
+            {
+                try
+                {
+                    Morph.Update(Item.Position);
 
-            /// <summary>
-            /// Point in GridSquare (Yards) Space before translations
-            /// </summary>
-            public Point RawGridPoint { get; private set; }
-
-            /// <summary>
-            /// Point before any translations
-            /// </summary>
-            public Point RawPoint { get; private set; }
-
-            /// <summary>
-            /// Point rotated around canvas center by global rotation amount.
-            /// </summary>
-            public Point RotatedPoint  { get; private set; }
-
-            /// <summary>
-            /// Point flipped on Y-Axis
-            /// </summary>
-            public Point FlippedPoint { get; private set; }
-
-            /// <summary>
-            /// Flipped and Rotated point
-            /// </summary>
-            public Point Point { get; private set; }
-
-            /// <summary>
-            /// Point coods based on Grid Scale
-            /// </summary>
-            public Point GridPoint { get; private set; }
-
-            /// <summary>
-            /// Point restricted to the boundary of the canvas
-            /// </summary>
-            public Point BoundPoint { get; private set; }
-
-            /// <summary>
-            /// If the point is located outside of the canvas bounds
-            /// </summary>
-            public bool IsBeyondCanvas { get; private set; }
-
-
-            public float RawWorldDistanceX { get; private set; }
-            public float RawWorldDistanceY { get; private set; }
-            public float RawDrawDistanceX { get; private set; }
-            public float RawDrawDistanceY { get; private set; }
-            public double RawDrawPositionX { get; private set; }
-            public double RawDrawPositionY { get; private set; }
+                    HeadingVectorAtRadius = MathEx.GetPointAt(new Vector3(Item.Position.X, Item.Position.Y, 0), Item.Radius, Item.Movement.GetHeadingRadians());
+                    HeadingPointAtRadius = new PointMorph(HeadingVectorAtRadius, Morph.CanvasData).Point;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log("Exception in RadarUI.TrinityItemPoint.Update(). {0} {1}", ex.Message, ex.InnerException);
+                }                
+            }
 
             public TrinityObject Item
             {
@@ -421,48 +504,12 @@ namespace Trinity.UIComponents
                 get { return _item; }
             }
 
-            public void UpdateRawPointFromWorldSpace(Vector3 position)
-            {
-                var pos = _item.Position;
-
-                // Distance from Actor to Player
-                RawWorldDistanceX = pos.X - position.X;
-                RawWorldDistanceY = pos.Y - position.Y;
-                
-                // We want 1 yard of game distance to = Gridsize
-                RawDrawDistanceX = RawWorldDistanceX * GridSize;
-                RawDrawDistanceY = RawWorldDistanceY * GridSize;
-
-                // Distance on canvas from center to actor
-                RawDrawPositionX = (CanvasData.Center.X + RawDrawDistanceX);
-                RawDrawPositionY = (CanvasData.Center.Y + RawDrawDistanceY);
-
-                // Points in Canvas and Grid Scale
-                RawPoint = new Point(RawDrawPositionX, RawDrawPositionY);                
-                RawGridPoint = new Point(RawDrawPositionX / GridSize, RawDrawPositionX / GridSize);
-
-                TranslatePoints();
-            }
-
-            /// <summary>
-            /// Moves and Rotates raw point to final position.
-            /// </summary>
-            public void TranslatePoints()
-            {
-                Point = CanvasData.Transforms.Transform(RawPoint);                
-                RotatedPoint = CanvasData.RotationTransform.Transform(RawPoint);
-                FlippedPoint =  CanvasData.FlipTransform.Transform(RawPoint);
-                BoundPoint = new Point(Clamp(Point.X, 0, CanvasData.Size.Width), Clamp(Point.Y, 0, CanvasData.Size.Height));
-                GridPoint = new Point((int)(Point.X / GridSize), (int)(Point.Y / GridSize));
-                IsBeyondCanvas = Point.X < 0 || Point.X > CanvasData.Size.Width || Point.Y < 0 || Point.Y > CanvasData.Size.Height;
-            }
-
             #region PropertyChanged Handling
 
             public event PropertyChangedEventHandler PropertyChanged;
 
             /// <summary>
-            /// When the internal Item has changed, bubble it.
+            /// When the internal Item has changed, bubble it.                        
             /// </summary>
             private void ItemOnPropertyChanged(object sender, PropertyChangedEventArgs args)
             {
@@ -483,39 +530,205 @@ namespace Trinity.UIComponents
             }
 
         }
+    }
 
-        private void DrawTriangle(DrawingContext dc, Point from, Point to)
+    /// <summary>
+    /// Houses canvas information, so a bunch of structs can be accessed by reference.
+    /// </summary>
+    public static class DrawingUtilities
+    {
+        public static System.Drawing.Color ToDrawingColor(this System.Windows.Media.Color color)
         {
-            //var triangle = new DrawingVisual();
-            //using (DrawingContext dc = triangle.RenderOpen())
-            //{
-                var start = new Point(0, 50);
-
-                var segments = new[]
-                { 
-                    new LineSegment(new Point(50,0), true), 
-                    new LineSegment(new Point(50, 100), true)
-                };
-
-                var figure = new PathFigure(start, segments, true);
-                var geo = new PathGeometry(new[] { figure });
-                dc.DrawGeometry(Brushes.Red, null, geo);
-
-                var drawingPen = new Pen(Brushes.Black, 3);
-                dc.DrawLine(drawingPen, new Point(0, 50), new Point(50, 0));
-                dc.DrawLine(drawingPen, new Point(50, 0), new Point(50, 100));
-                dc.DrawLine(drawingPen, new Point(50, 100), new Point(0, 50));
-            //}
-
-           // return triangle;
+            return System.Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
         }
 
-        public static T Clamp<T>(T val, T min, T max) where T : IComparable<T>
+        public static System.Windows.Media.Color ToMediaColor(this System.Drawing.Color color)
         {
-            if (val.CompareTo(min) < 0) return min;
-            if (val.CompareTo(max) > 0) return max;
-            return val;
+            return System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);
         }
+
+        
+    }
+
+    /// <summary>
+    /// Houses canvas information, so a bunch of structs can be accessed by reference.
+    /// </summary>
+    public class CanvasData
+    {
+        /// <summary>
+        /// Center of the canvas (in pixels)
+        /// </summary>
+        public Point Center;
+
+        /// <summary>
+        /// Size of the canvas (in pixels)
+        /// </summary>
+        public Size CanvasSize;
+
+        /// <summary>
+        /// Size of the canvas (in grid squares)
+        /// </summary>
+        public Size Grid;
+
+        /// <summary>
+        /// A transform for 45 degrees clockwise around canvas center
+        /// </summary>
+        public RotateTransform RotationTransform;
+
+        /// <summary>
+        /// A transform for flipping point vertically on canvas center
+        /// </summary>
+        public ScaleTransform FlipTransform;
+
+        /// <summary>
+        /// A transform for both FlipTransform and RotationTransform
+        /// </summary>
+        public TransformGroup Transforms;
+
+        /// <summary>
+        /// Size of a single grid square
+        /// </summary>
+        public Size GridSquareSize;
+
+        /// <summary>
+        /// The world space vector3 for the center for the canvas
+        /// </summary>
+        public Vector3 CenterVector { get; set; }
+
+        public bool Initialized { get; set; }
+
+        /// <summary>
+        /// Updates the canvas information (for if canvas size changes)
+        /// </summary>
+        public void Update(Size canvasSize, int gridSize)
+        {            
+            Center = new Point(canvasSize.Width / 2, canvasSize.Height / 2);
+            RotationTransform = new RotateTransform(45, Center.X, Center.Y);
+            FlipTransform = new ScaleTransform(1, -1, Center.X, Center.Y);
+            Transforms = new TransformGroup();
+            Transforms.Children.Add(RotationTransform);
+            Transforms.Children.Add(FlipTransform);
+            CanvasSize = canvasSize;
+            Grid = new Size((int)(canvasSize.Width / gridSize), (int)(canvasSize.Height / gridSize));
+            GridSquareSize = new Size(gridSize, gridSize);
+            Initialized = true;
+        }
+    }
+
+    /// <summary>
+    /// PointMorph handles the translation of a Vector3 world space position into Canvas space.
+    /// </summary>
+    public class PointMorph
+    {
+        public PointMorph() { }
+
+        public PointMorph(CanvasData canvasData)
+        {
+            CanvasData = canvasData;
+        }
+
+        public PointMorph(Vector3 vectorPosition, CanvasData canvasData)
+        {
+            CanvasData = canvasData;
+            Update(vectorPosition);
+        }
+
+        /// <summary>
+        /// Information about the canvas
+        /// </summary>
+        public CanvasData CanvasData { get; set; }
+
+        /// <summary>
+        /// Point in GridSquare (Yards) Space before translations
+        /// </summary>
+        public Point RawGridPoint { get; set; }
+
+        /// <summary>
+        /// Point before any translations
+        /// </summary>
+        public Point RawPoint { get; set; }
+
+        /// <summary>
+        /// Flipped and Rotated point
+        /// </summary>
+        public Point Point { get; set; }
+
+        /// <summary>
+        /// Point coods based on Grid Scale
+        /// </summary>
+        public Point GridPoint { get; set; }
+
+        /// <summary>
+        /// If the point is located outside of the canvas bounds
+        /// </summary>
+        public bool IsBeyondCanvas { get; set; }
+
+        /// <summary>
+        /// Game world distance from this point to the center actor on X-Axis
+        /// </summary>
+        public float RawWorldDistanceX { get; set; }
+
+        /// <summary>
+        /// Game world distance from this point to the center actor on Y-Axis
+        /// </summary>
+        public float RawWorldDistanceY { get; set; }
+
+        /// <summary>
+        /// Canvas (pixels) distance from this point to the center actor on Y-Axis
+        /// </summary>
+        public float RawDrawDistanceX { get; set; }
+
+        /// <summary>
+        /// Canvas (pixels) distance from this point to the center actor on Y-Axis
+        /// </summary>
+        public float RawDrawDistanceY { get; set; }
+
+        /// <summary>
+        /// Absolute canvas X-Axis coodinate for this actor (in pixels)
+        /// </summary>
+        public double RawDrawPositionX { get; set; }
+
+        /// <summary>
+        /// Absolute canvas Y-Axis coodinate for this actor (in pixels)
+        /// </summary>
+        public double RawDrawPositionY { get; set; }
+
+        public void Update(Vector3 position)
+        {
+            try
+            {
+                var centerActorPosition = CanvasData.CenterVector;
+
+                // Distance from Actor to Player
+                RawWorldDistanceX = centerActorPosition.X - position.X;
+                RawWorldDistanceY = centerActorPosition.Y - position.Y;
+
+                if (Math.Abs(RawWorldDistanceX) > 200 || Math.Abs(RawWorldDistanceY) > 200)
+                    return;
+
+                // We want 1 yard of game distance to = Gridsize
+                RawDrawDistanceX = RawWorldDistanceX * (float)CanvasData.GridSquareSize.Width;
+                RawDrawDistanceY = RawWorldDistanceY * (float)CanvasData.GridSquareSize.Height;
+
+                // Distance on canvas from center to actor
+                RawDrawPositionX = (CanvasData.Center.X + RawDrawDistanceX);
+                RawDrawPositionY = (CanvasData.Center.Y + RawDrawDistanceY);
+
+                // Points in Canvas and Grid Scale
+                RawPoint = new Point(RawDrawPositionX, RawDrawPositionY);
+                RawGridPoint = new Point(RawDrawPositionX / CanvasData.GridSquareSize.Width, RawDrawPositionY / CanvasData.GridSquareSize.Height);
+
+                Point = CanvasData.Transforms.Transform(RawPoint);
+                GridPoint = new Point((int)(Point.X / CanvasData.GridSquareSize.Width), (int)(Point.Y / CanvasData.GridSquareSize.Height));
+                IsBeyondCanvas = Point.X < 0 || Point.X > CanvasData.CanvasSize.Width || Point.Y < 0 || Point.Y > CanvasData.CanvasSize.Height;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Exception in RadarUI.PointMorph.Update(). {0} {1}", ex.Message, ex.InnerException);
+            }
+        }
+
     }
 
 }
