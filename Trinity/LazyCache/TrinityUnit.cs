@@ -295,10 +295,10 @@ namespace Trinity.LazyCache
         {
             get
             {
-                if (_isFacingPlayer.IsCacheValid) return _isFacingPlayer.CachedValue;
-                return _isFacingPlayer.CachedValue = CurrentAnimationState == AnimationState.Attacking || CurrentAnimationState == AnimationState.Casting;
+                if (_isAttacking.IsCacheValid) return _isAttacking.CachedValue;
+                return _isAttacking.CachedValue = CurrentAnimationState == AnimationState.Attacking || CurrentAnimationState == AnimationState.Casting;
             }
-            set { _isFacingPlayer.SetValueOverride(value); }
+            set { _isAttacking.SetValueOverride(value); }
         }
 
         /// <summary>
