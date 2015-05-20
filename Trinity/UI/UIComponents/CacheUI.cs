@@ -123,6 +123,7 @@ namespace Trinity.UI.UIComponents
             if (dataModel == null)
                 return;
 
+            // If user clicks the On/Off checkbox in UI, cant hit memory based properties for Copy to clipboard right click command.
             if (propertyChangedEventArgs.PropertyName == "Enabled")
             {
                 FreezeLazyCache();
@@ -130,7 +131,7 @@ namespace Trinity.UI.UIComponents
         }
 
         /// <summary>
-        /// Freeze records to return cached data only; useful when bot is or records are being stored
+        /// Freeze records to return cached data only; useful when bot is not running or records are being stored
         /// for longer than pulse/framelock, and the object no longer has valid references to memory.
         /// </summary>
         private static void FreezeLazyCache()
@@ -179,42 +180,38 @@ namespace Trinity.UI.UIComponents
 
                     return false;
 
-                }, 100); //250ms Ticks
+                }, 100); //100ms Ticks
                
             }
         }
 
         private static bool _isUpdating;
         private static int _updateCount;
-        private static readonly Stopwatch LastUpdatedStopwatch = new Stopwatch();
+
+        private static DateTime _lastUpdatedDefault = DateTime.MinValue;
+        private static DateTime _lastUpdatedLazy = DateTime.MinValue;
+
         private static void Update()
         {
             try
             {
-                if (!_isWindowOpen)
+                if (!_isWindowOpen || !DataModel.Enabled || _isUpdating)
                     return;
 
-                if (!DataModel.Enabled)
-                    return;
-
-                if (!LastUpdatedStopwatch.IsRunning)
-                    LastUpdatedStopwatch.Start();
-                else if (LastUpdatedStopwatch.ElapsedMilliseconds < 250)
-                    return;
-                else
-                    LastUpdatedStopwatch.Restart();
-
-                if (_isUpdating)
-                    return;
-                _isUpdating = true;
-
-                _updateCount++;
-
-                if(DataModel.IsDefaultVisible)
-                    DataModel.Cache = new ObservableCollection<CacheUIObject>(GetCacheActorList());
-
-                if (DataModel.IsLazyCacheVisible)
+                if (DataModel.IsDefaultVisible && DateTime.UtcNow.Subtract(_lastUpdatedDefault).TotalMilliseconds > 250)
                 {
+                    _isUpdating = true;
+                    _updateCount++;
+
+                    DataModel.Cache = new ObservableCollection<CacheUIObject>(GetCacheActorList());
+                    _lastUpdatedDefault = DateTime.UtcNow;
+                }
+
+                if (DataModel.IsLazyCacheVisible && DateTime.UtcNow.Subtract(_lastUpdatedLazy).TotalMilliseconds > 25)
+                {
+                    _isUpdating = true;
+                    _updateCount++;
+
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         // The initial update is always huge and messes up the charts.
@@ -232,6 +229,7 @@ namespace Trinity.UI.UIComponents
                     });                       
 
                     DataModel.LazyCache = new ObservableCollection<TrinityObject>(GetLazyCacheActorList());
+                    _lastUpdatedLazy = DateTime.UtcNow;
                 }
 
                 _isUpdating = false;

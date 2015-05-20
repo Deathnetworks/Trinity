@@ -14,9 +14,11 @@ using System.Windows;
 using System.Windows.Forms;
 using Trinity.LazyCache;
 using Zeta.Common;
+using Zeta.Game.Internals.Actors;
 using Brushes = System.Windows.Media.Brushes;
 using Color = System.Windows.Media.Color;
 using FlowDirection = System.Windows.FlowDirection;
+using LineSegment = System.Windows.Media.LineSegment;
 using Pen = System.Windows.Media.Pen;
 using Logger = Trinity.Technicals.Logger;
 using Point = System.Windows.Point;
@@ -201,7 +203,6 @@ namespace Trinity.UIComponents
 
                 dc.DrawText(new FormattedText(i.ToString(), CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 12, Brushes.LightYellow),
                     new Point(CanvasData.Center.X - (radius + 20), CanvasData.Center.Y));
-
             }            
         }
 
@@ -286,8 +287,30 @@ namespace Trinity.UIComponents
 
             // Draw a circle representing the size of the actor
             var outerFill = new SolidColorBrush(baseColor);
+            var gridRadius = actor.Item.Radius*GridSize;
             outerFill.Opacity = 0.25;
-            dc.DrawEllipse(outerFill, border, actor.Point, actor.Item.Radius * GridSize, actor.Item.Radius * GridSize);
+            dc.DrawEllipse(outerFill, border, actor.Point, gridRadius, gridRadius);
+
+            // show which way units are facing
+            if (actor.Item.TrinityType == TrinityObjectType.Unit && actor.Item is TrinityUnit)
+            {
+                // We currently dont have a direction reading for things that havent moved via TrinityMovement;
+                var unit = (TrinityUnit) actor.Item;
+                if (!unit.Movement.HasntMoved)
+                {                    
+                    //var headingVector = MathEx.GetPointAt(new Vector3((float)actor.Point.X, (float)actor.Point.Y, 0), gridRadius, unit.Movement.GetHeadingRadians());
+                    //var targetPoint = new Point(headingVector.X, headingVector.Y);
+                    //var flippedX = (CenterActor.Point.X - targetPoint.X) + CenterActor.Point.X;
+                    //var flippedPoint = new Point(flippedX, targetPoint.Y);
+                    //var drawingPen = new Pen(Brushes.Black, 1);
+                    //var headingRadians = unit.Movement.GetHeadingRadians();                    
+                    //new Point(distance * Math.Cos(angle), distance * Math.Sin(angle));
+
+                    //dc.DrawLine(drawingPen, actor.Point, targetPoint);                    
+                }
+
+            }
+           
         }
 
         private void DrawGrid(DrawingContext dc, out Size outGridSize)
@@ -459,6 +482,32 @@ namespace Trinity.UIComponents
                 return Item.GetHashCode();
             }
 
+        }
+
+        private void DrawTriangle(DrawingContext dc, Point from, Point to)
+        {
+            //var triangle = new DrawingVisual();
+            //using (DrawingContext dc = triangle.RenderOpen())
+            //{
+                var start = new Point(0, 50);
+
+                var segments = new[]
+                { 
+                    new LineSegment(new Point(50,0), true), 
+                    new LineSegment(new Point(50, 100), true)
+                };
+
+                var figure = new PathFigure(start, segments, true);
+                var geo = new PathGeometry(new[] { figure });
+                dc.DrawGeometry(Brushes.Red, null, geo);
+
+                var drawingPen = new Pen(Brushes.Black, 3);
+                dc.DrawLine(drawingPen, new Point(0, 50), new Point(50, 0));
+                dc.DrawLine(drawingPen, new Point(50, 0), new Point(50, 100));
+                dc.DrawLine(drawingPen, new Point(50, 100), new Point(0, 50));
+            //}
+
+           // return triangle;
         }
 
         public static T Clamp<T>(T val, T min, T max) where T : IComparable<T>

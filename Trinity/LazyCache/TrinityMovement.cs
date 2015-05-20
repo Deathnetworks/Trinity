@@ -32,6 +32,8 @@ namespace Trinity.Helpers
         private string _lastHeading = string.Empty;
         private double _lastMovementSpeed;
 
+        public bool HasntMoved { get; set; }
+
         /// <summary>
         /// This is separated from GetMovementSpeed() to prevent parrallel tasks failing on changed collection.
         /// </summary>
@@ -66,6 +68,7 @@ namespace Trinity.Helpers
                         });
 
                         _lastRecordedPositionTime = DateTime.UtcNow;
+                        HasntMoved = false;
                     }
                 }
             }
