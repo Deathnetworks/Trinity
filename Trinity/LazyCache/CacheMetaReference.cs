@@ -3019,6 +3019,18 @@ namespace Trinity.LazyCache
 { 242695, new ActorMeta ( 242695,-1,"x1_westm_waterwheel",4,11.55,-1,-1,-1,-1,false,false,false,-1,326679,326680,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
 
 
+{ 181651, new ActorMeta ( 181651,-1,"Brickhouse_SmashDoor",4,2.32,-1,-1,-1,-1,false,false,false,-1,14813,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 6312, new ActorMeta ( 6312,-1,"trOUT_ZombiePileAndWagon",4,32.00,-1,-1,-1,-1,false,false,false,174558,17356,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 213414, new ActorMeta ( 213414,-1,"Mystic_Crafting_Backbone_Tristram",4,25.00,-1,-1,-1,-1,false,false,false,-1,209379,213409,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 176779, new ActorMeta ( 176779,-1,"trOut_NewTristram_triage_C",4,8.07,-1,-1,-1,-1,false,false,false,210589,176778,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 176760, new ActorMeta ( 176760,-1,"trOut_NewTristram_bloody_bucket",4,4.16,-1,-1,-1,-1,false,false,false,-1,176759,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 213413, new ActorMeta ( 213413,-1,"Jeweler_Crafting_Backbone_Tristram",4,25.00,-1,-1,-1,-1,false,false,false,-1,209367,213408,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 176763, new ActorMeta ( 176763,-1,"trOut_NewTristram_broken_furniture_pile",4,9.18,-1,-1,-1,-1,false,false,false,-1,176762,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 176755, new ActorMeta ( 176755,-1,"trOut_NewTristram_bandage_pile_A",4,6.39,-1,-1,-1,-1,false,false,false,-1,176754,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 176764, new ActorMeta ( 176764,-1,"trOut_NewTristram_triage_B",4,8.19,-1,-1,-1,-1,false,false,false,210588,176756,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 176777, new ActorMeta ( 176777,-1,"trOut_NewTristram_triage_A",4,8.57,-1,-1,-1,-1,false,false,false,210587,176776,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 176772, new ActorMeta ( 176772,-1,"trOut_NewTristram_hanging_cloth_B",4,4.29,-1,-1,-1,-1,false,false,false,-1,176771,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
+{ 176769, new ActorMeta ( 176769,-1,"trOut_NewTristram_hanging_cloth_A",4,5.17,-1,-1,-1,-1,false,false,false,-1,176768,-1,false,false,false,false,false,false,-1,-1,-1,-1,false,false,-1,false,false,0,false,false,false,false,false,false ) },
 
         };
 

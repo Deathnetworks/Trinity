@@ -423,31 +423,21 @@ namespace Trinity.UIComponents
 
             // vertical lines
             int pos = 0;
-            var height = 0;
             do
             {
-                if (gridLineFrequency != 0 && (pos / gridLineFrequency) == 1)
-                {
-                    dc.DrawLine(pen, new Point(pos, 0), new Point(pos, (int) DesiredSize.Height));
-                }
+                dc.DrawLine(pen, new Point(pos, 0), new Point(pos, (int)canvas.CanvasSize.Height));
+                pos += (int)canvas.GridSquareSize.Height * gridLineFrequency;
 
-                pos += (int)canvas.GridSquareSize.Height;
-                height++;
-
-            } while (pos < DesiredSize.Width);
+            } while (pos < canvas.CanvasSize.Width);
 
             // horizontal lines
             pos = 0;
-            var width = 0;
             do
             {
-                if (gridLineFrequency != 0 && (pos/gridLineFrequency) == 1)
-                {
-                    dc.DrawLine(pen, new Point(0, pos), new Point((int) DesiredSize.Width, pos));
-                }
-                pos += (int)canvas.GridSquareSize.Width;
-                width++;
-            } while (pos < DesiredSize.Height);
+                dc.DrawLine(pen, new Point(0, pos), new Point((int)canvas.CanvasSize.Width, pos));
+                pos += (int)canvas.GridSquareSize.Width * gridLineFrequency;
+
+            } while (pos < canvas.CanvasSize.Height);
 
         }
 

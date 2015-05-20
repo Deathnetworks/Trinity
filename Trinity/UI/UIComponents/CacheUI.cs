@@ -196,7 +196,7 @@ namespace Trinity.UI.UIComponents
 
                     return false;
 
-                }, 100);
+                }, 50);
                
             }
         }
@@ -223,7 +223,7 @@ namespace Trinity.UI.UIComponents
                     _lastUpdatedDefault = DateTime.UtcNow;
                 }
 
-                if (DataModel.IsLazyCacheVisible && DateTime.UtcNow.Subtract(_lastUpdatedLazy).TotalMilliseconds > 100)
+                if (DataModel.IsLazyCacheVisible && DateTime.UtcNow.Subtract(_lastUpdatedLazy).TotalMilliseconds > 50)
                 {
                     _isUpdating = true;
                     _updateCount++;
