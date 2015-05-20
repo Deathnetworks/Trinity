@@ -1807,16 +1807,23 @@ namespace Trinity
             388435,
             //x1_MonsterAffix_Avenger_corpseBomber_slime
             389483,    
-
 	        //x1_Bog_bloodSpring_medium
             332922,
 	        //x1_Bog_bloodSpring_large
             332923,
 	        //x1_Bog_bloodSpring_small
             332924,
-
             //p4_RatKing_RatBallMonster
-            427170
+            427170,
+            //x1_LR_Boss_MalletDemon_FallingRocks
+            368453,
+            //X1_LR_Boss_FireNova_projectile
+            373937,
+            //X1_LR_Boss_AsteroidRain
+            378237,
+            //x1_LR_boss_terrorDemon_A_projectile
+            434843,
+
         };
 
         public static HashSet<int> PlayerBannerSNO = new HashSet<int>

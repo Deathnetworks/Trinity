@@ -367,9 +367,12 @@ namespace Trinity.LazyCache
 
             using (new PerformanceLogger("lazyCache.Update.Movement"))
             {
-                foreach (var u in Units)
+                foreach (var o in Objects)
                 {
-                    u.Movement.RecordMovement(u);
+                    if (o.IsUnit || o.IsProjectile || o.AvoidanceType == AvoidanceType.Arcane)
+                    {
+                        o.Movement.RecordMovement(o);
+                    }
                 }
             }
 

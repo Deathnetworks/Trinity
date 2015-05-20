@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows;
@@ -58,12 +59,12 @@ namespace Trinity.UIComponents
         /// <summary>
         /// The actor who should be at the center of the radar
         /// </summary>
-        public TrinityItemPoint CenterActor { get; set; }
+        public TrinityNode CenterActor { get; set; }
 
         /// <summary>
         /// Collection of game objects
         /// </summary>
-        public List<TrinityItemPoint> Objects = new List<TrinityItemPoint>();
+        public List<TrinityNode> Objects = new List<TrinityNode>();
 
         /// <summary>
         /// Information about the WPF canvas we'll be drawing on
@@ -170,15 +171,15 @@ namespace Trinity.UIComponents
                 if (center == null)
                     return;
 
-                CenterActor = new TrinityItemPoint(center, CanvasData);
-                CanvasData.CenterVector = CenterActor.Item.Position;
+                CenterActor = new TrinityNode(center, CanvasData);
+                CanvasData.CenterVector = CenterActor.Actor.Position;
 
                 // Calculate locations for all actors positions
                 // on TrinityItemPoint ctor; or with .Update();
 
                 foreach (var trinityObject in ItemsSource.OfType<TrinityObject>())
                 {
-                    var itemPoint = new TrinityItemPoint(trinityObject, CanvasData);
+                    var itemPoint = new TrinityNode(trinityObject, CanvasData);
                     Objects.Add(itemPoint);
                 }
 
@@ -281,15 +282,27 @@ namespace Trinity.UIComponents
             }            
         }
 
-        private void DrawActor(DrawingContext dc, CanvasData canvas, TrinityItemPoint actor)
+        private void DrawActor(DrawingContext dc, CanvasData canvas, TrinityNode actor)
         {
             try
             {
                 var border = new Pen(Brushes.Black, 0.1);
                 var baseColor = GetActorColor(actor);            
-                var actorName = actor.Item.Name;
-                var trinityType = actor.Item.TrinityType;
-                var actorRadius = actor.Item.Radius;
+                var actorName = actor.Actor.Name;
+                var trinityType = actor.Actor.TrinityType;
+                var actorRadius = actor.Actor.Radius;
+
+                var unit = actor.Actor as TrinityUnit;
+                if (unit != null)
+                {
+                    if (unit.IsDead)
+                        return;
+
+                    // Draw a line to indicate which way the unit is facing
+                    var lighterBaseColor = ControlPaint.Light(baseColor.ToDrawingColor(), 50);
+                    var drawingPen = new Pen(new SolidColorBrush(lighterBaseColor.ToMediaColor()), 1);
+                    dc.DrawLine(drawingPen, actor.Point, actor.HeadingPointAtRadius);
+                }
 
                 if (baseColor == Colors.Transparent)
                 {                
@@ -314,7 +327,7 @@ namespace Trinity.UIComponents
                     dc.DrawEllipse(innerFill, border, actor.Point, MarkerSize / 2, MarkerSize / 2);
                 }
                                 
-                if (actor.Item.ActorType == ActorType.Projectile)
+                if (actor.Actor.ActorType == ActorType.Projectile)
                 {
                     // Draw a line representing the projectile
                     dc.DrawLine(new Pen(new SolidColorBrush(Colors.Red), 3), actor.Point, actor.HeadingPointAtRadius); 
@@ -328,15 +341,6 @@ namespace Trinity.UIComponents
                     dc.DrawEllipse(outerFill, border, actor.Point, gridRadius, gridRadius);
                 }
 
-                var unit = actor.Item as TrinityUnit;
-                if (unit != null)
-                {      
-                    // Draw a line to indicate which way the unit is facing
-                    var lighterBaseColor = ControlPaint.Light(baseColor.ToDrawingColor(), 50);
-                    var drawingPen = new Pen(new SolidColorBrush(lighterBaseColor.ToMediaColor()), 1);
-                    dc.DrawLine(drawingPen, actor.Point, actor.HeadingPointAtRadius);                          
-                }
-
             }
             catch (Exception ex)
             {
@@ -347,12 +351,12 @@ namespace Trinity.UIComponents
         /// <summary>
         /// Returns a base color for actor based on type and stuff
         /// </summary>
-        private static Color GetActorColor(TrinityItemPoint actor)
+        private static Color GetActorColor(TrinityNode actor)
         {
             Color baseColor = Colors.White;
             try
             {
-                switch (actor.Item.TrinityType)
+                switch (actor.Actor.TrinityType)
                 {
                     case TrinityObjectType.Avoidance:
                         baseColor = Colors.OrangeRed;
@@ -382,7 +386,7 @@ namespace Trinity.UIComponents
 
                     case TrinityObjectType.Unit:
 
-                        var unit = actor.Item as TrinityUnit;
+                        var unit = actor.Actor as TrinityUnit;
                         if (unit != null)
                         {
                             if (unit.IsBossOrEliteRareUnique)
@@ -422,7 +426,7 @@ namespace Trinity.UIComponents
             var height = 0;
             do
             {
-                if (gridLineFrequency != 0 && (pos / gridLineFrequency) != 1)
+                if (gridLineFrequency != 0 && (pos / gridLineFrequency) == 1)
                 {
                     dc.DrawLine(pen, new Point(pos, 0), new Point(pos, (int) DesiredSize.Height));
                 }
@@ -437,7 +441,7 @@ namespace Trinity.UIComponents
             var width = 0;
             do
             {
-                if (gridLineFrequency != 0 && (pos/gridLineFrequency) != 1)
+                if (gridLineFrequency != 0 && (pos/gridLineFrequency) == 1)
                 {
                     dc.DrawLine(pen, new Point(0, pos), new Point((int) DesiredSize.Width, pos));
                 }
@@ -448,27 +452,44 @@ namespace Trinity.UIComponents
         }
 
         /// <summary>
-        /// TrinityItemPoint wraps a TrinityObject to add a canvas plot location.
+        /// TrinityNode wraps a TrinityObject to add a canvas plot location.
         /// </summary>
-        public class TrinityItemPoint : INotifyPropertyChanged
+        public class TrinityNode : INotifyPropertyChanged
         {
-            private TrinityObject _item;
+            private TrinityObject _actor;
 
+            /// <summary>
+            /// Contains the actors position and other useful information.
+            /// </summary>
             public PointMorph Morph = new PointMorph();
 
+            /// <summary>
+            /// Position in game world space for a point at radius distance 
+            /// from actor's center and in the direction the actor is facing.
+            /// </summary>
             public Vector3 HeadingVectorAtRadius { get; set; }
 
+            /// <summary>
+            /// Position on canvas (in pixels) for a point at radius distance 
+            /// from actor's center and in the direction the actor is facing.
+            /// </summary>
             public Point HeadingPointAtRadius { get; set; }
 
+            /// <summary>
+            /// Actors current position on canvas (in pixels).
+            /// </summary>
             public Point Point
             {
                 get { return Morph.Point; }
             }
 
-            public TrinityItemPoint(TrinityObject item, CanvasData canvasData)
+            /// <summary>
+            /// TrinityNode wraps a TrinityObject to add a canvas plot location.
+            /// </summary>
+            public TrinityNode(TrinityObject obj, CanvasData canvasData)
             {
-                Item = item;
-                item.PropertyChanged += ItemOnPropertyChanged;
+                Actor = obj;
+                obj.PropertyChanged += ItemOnPropertyChanged;
                 Morph.CanvasData = canvasData;
                 Update();
             }
@@ -480,10 +501,13 @@ namespace Trinity.UIComponents
             {
                 try
                 {
-                    Morph.Update(Item.Position);
+                    Morph.Update(Actor.Position);
 
-                    HeadingVectorAtRadius = MathEx.GetPointAt(new Vector3(Item.Position.X, Item.Position.Y, 0), Item.Radius, Item.Movement.GetHeadingRadians());
-                    HeadingPointAtRadius = new PointMorph(HeadingVectorAtRadius, Morph.CanvasData).Point;
+                    if (Actor.IsUnit || Actor.IsProjectile || Actor.AvoidanceType == AvoidanceType.Arcane)
+                    {
+                        HeadingVectorAtRadius = MathEx.GetPointAt(new Vector3(Actor.Position.X, Actor.Position.Y, 0), Actor.Radius, Actor.Movement.GetHeadingRadians());
+                        HeadingPointAtRadius = new PointMorph(HeadingVectorAtRadius, Morph.CanvasData).Point;                        
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -491,17 +515,20 @@ namespace Trinity.UIComponents
                 }                
             }
 
-            public TrinityObject Item
+            /// <summary>
+            /// The game object
+            /// </summary>
+            public TrinityObject Actor
             {
                 set
                 {
-                    if (!Equals(value, _item))
+                    if (!Equals(value, _actor))
                     {
-                        _item = value;
-                        OnPropertyChanged(new PropertyChangedEventArgs("Item"));
+                        _actor = value;
+                        OnPropertyChanged(new PropertyChangedEventArgs("Actor"));
                     }
                 }
-                get { return _item; }
+                get { return _actor; }
             }
 
             #region PropertyChanged Handling
@@ -526,28 +553,32 @@ namespace Trinity.UIComponents
 
             public override int GetHashCode()
             {
-                return Item.GetHashCode();
+                return Actor.GetHashCode();
             }
 
         }
     }
 
     /// <summary>
-    /// Houses canvas information, so a bunch of structs can be accessed by reference.
+    /// Useful tools for drawing stuff
     /// </summary>
     public static class DrawingUtilities
     {
+        /// <summary>
+        /// Convert to a Drawing System.Drawing.Color
+        /// </summary>
         public static System.Drawing.Color ToDrawingColor(this System.Windows.Media.Color color)
         {
             return System.Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
         }
 
+        /// <summary>
+        /// Convert to a System.Windows.Media.Color
+        /// </summary>
         public static System.Windows.Media.Color ToMediaColor(this System.Drawing.Color color)
         {
             return System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);
-        }
-
-        
+        }        
     }
 
     /// <summary>
@@ -595,8 +626,6 @@ namespace Trinity.UIComponents
         /// </summary>
         public Vector3 CenterVector { get; set; }
 
-        public bool Initialized { get; set; }
-
         /// <summary>
         /// Updates the canvas information (for if canvas size changes)
         /// </summary>
@@ -611,7 +640,6 @@ namespace Trinity.UIComponents
             CanvasSize = canvasSize;
             Grid = new Size((int)(canvasSize.Width / gridSize), (int)(canvasSize.Height / gridSize));
             GridSquareSize = new Size(gridSize, gridSize);
-            Initialized = true;
         }
     }
 
@@ -627,6 +655,9 @@ namespace Trinity.UIComponents
             CanvasData = canvasData;
         }
 
+        /// <summary>
+        /// PointMorph handles the translation of a Vector3 world space position into Canvas space.
+        /// </summary>
         public PointMorph(Vector3 vectorPosition, CanvasData canvasData)
         {
             CanvasData = canvasData;
@@ -693,6 +724,9 @@ namespace Trinity.UIComponents
         /// </summary>
         public double RawDrawPositionY { get; set; }
 
+        /// <summary>
+        /// Calculates Canvas position with a given game world position
+        /// </summary>
         public void Update(Vector3 position)
         {
             try

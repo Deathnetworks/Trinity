@@ -104,8 +104,8 @@ namespace Trinity.UI.UIComponents
 
                 _radarWindow = new Window
                 {
-                    Height = 450,
-                    Width = 450,
+                    Height = 700,
+                    Width = 700,
                     MinHeight = MinimumHeight,
                     MinWidth = MininumWidth,
                     Title = "Trinity Radar",

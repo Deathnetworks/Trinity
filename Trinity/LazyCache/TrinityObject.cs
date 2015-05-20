@@ -63,6 +63,8 @@ namespace Trinity.LazyCache
         private readonly CacheField<bool> _isShrine = new CacheField<bool>();
         private readonly CacheField<bool> _isMinimapActive = new CacheField<bool>(UpdateSpeed.VerySlow);
         private readonly CacheField<bool> _isUnit = new CacheField<bool>();
+        private readonly CacheField<bool> _isAvoidance = new CacheField<bool>();
+        private readonly CacheField<bool> _isProjectile = new CacheField<bool>();
         private readonly CacheField<bool> _isGizmo = new CacheField<bool>();
         private readonly CacheField<bool> _isGlobe = new CacheField<bool>();
         private readonly CacheField<string> _objectHash = new CacheField<string>();
@@ -522,6 +524,32 @@ namespace Trinity.LazyCache
                 return _isUnit.CachedValue = ActorMeta.IsUnit;
             }
             set { _isUnit.SetValueOverride(value); }
+        }
+
+        /// <summary>
+        /// Is the actor an avoidance
+        /// </summary>
+        public bool IsAvoidance
+        {
+            get
+            {
+                if (_isAvoidance.IsCacheValid) return _isAvoidance.CachedValue;
+                return _isAvoidance.CachedValue = AvoidanceType != AvoidanceType.None;
+            }
+            set { _isAvoidance.SetValueOverride(value); }
+        }
+
+        /// <summary>
+        /// Is the actor an avoidance
+        /// </summary>
+        public bool IsProjectile
+        {
+            get
+            {
+                if (_isProjectile.IsCacheValid) return _isProjectile.CachedValue;
+                return _isProjectile.CachedValue = ActorType == ActorType.Projectile;
+            }
+            set { _isProjectile.SetValueOverride(value); }
         }
 
         /// <summary>

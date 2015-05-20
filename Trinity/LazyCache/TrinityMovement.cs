@@ -18,10 +18,6 @@ using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.Helpers
 {
-    /// <summary>
-    /// DiaUnit.Movement object is throwing all sorts of weird exceptions on Player.
-    /// So adapting our own version so we don't have to call it.
-    /// </summary>
     public class TrinityMovement
     {
         private readonly List<SpeedSensor> _speedSensors = new List<SpeedSensor>();
@@ -29,11 +25,9 @@ namespace Trinity.Helpers
         private DateTime _lastRecordedPositionTime = DateTime.MinValue;
         
         private float _lastHeadingRadians;
-        private float _lastHeadingDegrees;
-        private string _lastHeading = string.Empty;
         private double _lastMovementSpeed;
 
-        public bool HasntMoved { get; set; }
+        public bool HasMoved { get; set; }
 
         private float _startHeadingRadians;
 
@@ -44,14 +38,21 @@ namespace Trinity.Helpers
         public void RecordMovement(TrinityObject o)
         {
             if (o.ActorType != ActorType.Monster && o.ActorType != ActorType.Projectile && o.ActorType != ActorType.Player)
-                return;
+            {
+                if (o.AvoidanceType != AvoidanceType.Arcane)
+                    return;
+            }
 
-            if (DateTime.UtcNow.Subtract(_lastRecordedPositionTime).TotalMilliseconds >= 250)
+            if (!_speedSensors.Any() || o.AvoidanceType == AvoidanceType.Arcane)
+            {
+                // For things that don't move, like units standing in town we can't calculate which way they're facing.
+                _startHeadingRadians = o.Object.Movement.Rotation;                
+            }
+
+            if (DateTime.UtcNow.Subtract(_lastRecordedPositionTime).TotalMilliseconds >= (int)UpdateSpeed.Ultra)
             {
                 if (!_speedSensors.Any())
-                {
-                    _startHeadingRadians = o.DiaUnit.Movement.Rotation;
-
+                {                    
                     _speedSensors.Add(new SpeedSensor
                     {
                         Location = o.Position,
@@ -76,7 +77,7 @@ namespace Trinity.Helpers
                         });
 
                         _lastRecordedPositionTime = DateTime.UtcNow;
-                        HasntMoved = false;
+                        HasMoved = true;
                     }
                 }
             }
@@ -99,27 +100,11 @@ namespace Trinity.Helpers
             return Vector2.Zero;
         }
 
-        public float GetHeadingDegrees()
-        {
-            if (_speedSensors.Count >= 2)
-            {
-                if (_lastMovementSpeed == 0)
-                    return _lastHeadingDegrees;
-
-                var startPosition = _speedSensors.ElementAt(_speedSensors.Count - 2).Location;
-                var endPosition = _speedSensors.ElementAt(_speedSensors.Count - 1).Location;
-                var headingDegrees = MathUtil.FindDirectionDegree(startPosition, endPosition);                
-                _lastHeadingDegrees = headingDegrees;
-                return headingDegrees;
-            }
-            return (float)MathUtil.RadianToDegree(_startHeadingRadians);
-        }
-
         public float GetHeadingRadians()
         {
             if (_speedSensors.Count >= 2)
             {
-                if (_lastMovementSpeed == 0)
+                if (_lastMovementSpeed == 0 && !HasMoved)
                     return _lastHeadingRadians;
 
                 var startPosition = _speedSensors.ElementAt(_speedSensors.Count - 2).Location;
@@ -130,6 +115,11 @@ namespace Trinity.Helpers
             }
 
             return _startHeadingRadians;
+        }
+
+        public float GetHeadingDegrees()
+        {
+            return (float)MathUtil.RadianToDegree(GetHeadingRadians());
         }
 
         public string GetHeading()
