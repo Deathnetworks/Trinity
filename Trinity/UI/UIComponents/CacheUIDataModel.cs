@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Windows.Data;
 using System.Windows.Input;
 using Trinity.Cache;
@@ -58,14 +59,20 @@ namespace Trinity.UIComponents
         private ObservableCollection<ChartDatum> _cacheUpdateTime = new ObservableCollection<ChartDatum>();
         public ObservableCollection<ChartDatum> CacheUpdateTime
         {
-            get { return _cacheUpdateTime; }
+            get
+            {
+                return Application.Current.Dispatcher.Invoke(() => _cacheUpdateTime);
+            }
             set { SetField(ref _cacheUpdateTime, value); }
         }
 
         private ObservableCollection<ChartDatum> _weightUpdateTime = new ObservableCollection<ChartDatum>();
         public ObservableCollection<ChartDatum> WeightUpdateTime
         {
-            get { return _weightUpdateTime; }
+            get
+            {
+                return Application.Current.Dispatcher.Invoke(() => _weightUpdateTime);
+            }
             set { SetField(ref _weightUpdateTime, value); }
         }
 
@@ -111,7 +118,12 @@ namespace Trinity.UIComponents
             }
         }
 
-
+        private bool _isRadarWindowVisible;
+        public bool IsRadarWindowVisible
+        {
+            get { return _isRadarWindowVisible; }
+            set { SetField(ref _isRadarWindowVisible, value); }
+        }
     }
 
 }

@@ -62,6 +62,7 @@ namespace Trinity.LazyCache
         private readonly CacheField<int> _maxBloodShards = new CacheField<int>();
         private readonly CacheField<int> _jewelUpgradesMax = new CacheField<int>();
         private readonly CacheField<int> _jewelUpgradesUsed = new CacheField<int>();
+        private readonly CacheField<int> _currentSceneGuid = new CacheField<int>(UpdateSpeed.Normal);
         private readonly CacheField<double> _loopingAnimationEndTime = new CacheField<double>();
         private readonly CacheField<double> _loopingAnimationStartTime = new CacheField<double>();
         private readonly CacheField<int> _backpackSlots = new CacheField<int>();
@@ -420,6 +421,15 @@ namespace Trinity.LazyCache
         {
             get { return _jewelUpgradesUsed.IsCacheValid ? _jewelUpgradesUsed.CachedValue : (_jewelUpgradesUsed.CachedValue = ZetaDia.Me.JewelUpgradesUsed); }
             set { _jewelUpgradesUsed.SetValueOverride(value); }
+        }
+
+        /// <summary>
+        /// Jewel upgrades already used
+        /// </summary>
+        public int CurrentSceneGuid
+        {
+            get { return _currentSceneGuid.IsCacheValid ? _currentSceneGuid.CachedValue : (_currentSceneGuid.CachedValue = ZetaDia.Me.CurrentScene.SceneGuid); }
+            set { _currentSceneGuid.SetValueOverride(value); }
         }
 
         /// <summary>

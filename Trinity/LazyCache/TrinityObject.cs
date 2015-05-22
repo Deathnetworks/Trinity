@@ -33,7 +33,7 @@ namespace Trinity.LazyCache
         #region Fields
 
         private readonly CacheField<int> _monsterSNO = new CacheField<int>();
-        private readonly CacheField<Vector3> _position = new CacheField<Vector3>(UpdateSpeed.RealTime);
+        private readonly CacheField<Vector3> _position = new CacheField<Vector3>(UpdateSpeed.Ultra);
         private readonly CacheField<float> _distance = new CacheField<float>(UpdateSpeed.Fast);
         private readonly CacheField<SNOAnim> _currentAnimation = new CacheField<SNOAnim>(UpdateSpeed.Ultra);
         private readonly CacheField<AnimationState> _currentAnimationState = new CacheField<AnimationState>(UpdateSpeed.Ultra);
@@ -46,10 +46,10 @@ namespace Trinity.LazyCache
         private readonly CacheField<Sphere> _collisionSphere = new CacheField<Sphere>();
         private readonly CacheField<MonsterType> _monsterType = new CacheField<MonsterType>();
         private readonly CacheField<int> _affixId = new CacheField<int>();
-        private readonly CacheField<int> _dynamicId = new CacheField<int>();
+        private readonly CacheField<int> _dynamicId = new CacheField<int>(UpdateSpeed.Normal);
         private readonly CacheField<int> _balanceId = new CacheField<int>();
         private readonly CacheField<int> _minimapVisibilityFlags = new CacheField<int>();
-        private readonly CacheField<int> _worldDynamicId = new CacheField<int>();
+        private readonly CacheField<int> _worldDynamicId = new CacheField<int>(UpdateSpeed.Normal);
         private readonly CacheField<ACDAnimationInfo> _animationInfo = new CacheField<ACDAnimationInfo>();
         private readonly CacheField<AnimationState> _animationState = new CacheField<AnimationState>(UpdateSpeed.Fast);
         private readonly CacheField<GameBalanceType> _gameBalanceType = new CacheField<GameBalanceType>();

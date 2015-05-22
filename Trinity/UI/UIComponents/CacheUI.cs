@@ -5,11 +5,14 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
+using Demonbuddy;
 using Trinity.Cache;
 using Trinity.Helpers;
 using Trinity.LazyCache;
@@ -35,19 +38,19 @@ namespace Trinity.UI.UIComponents
         private const int MininumWidth = 25;
         private const int MinimumHeight = 25;
 
-        private const int UpdateDelay = 1000;
-
         public static Window CreateWindow()
         {
             try
             {
+                Logger.Log("Creating CacheUI Window");
+
                 if (DataModel == null)
                     DataModel = new CacheUIDataModel();
 
                 _window = new Window
                 {
-                    Height = 450,
-                    Width = 1900,
+                    Height = 750,
+                    Width = 1200,
                     MinHeight = MinimumHeight,
                     MinWidth = MininumWidth,
                     Title = "Trinity Cache",
@@ -60,20 +63,6 @@ namespace Trinity.UI.UIComponents
 
                 DataModel.PropertyChanged += DataModelOnPropertyChanged;
 
-                DataModel.LaunchRadarUICommand = new RelayCommand(param =>
-                {
-                    DataModel.IsLazyCacheVisible = false;
-                    DataModel.LazyCache.Clear();
-
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        CreateRadarWindow().Show();
-                    });
-
-                    DataModel.IsLazyCacheVisible = true;
-                });
-                
-
                 _isWindowOpen = true;
                 _updateCount = 0;
                 _window.Closed += Window_Closed;
@@ -84,6 +73,10 @@ namespace Trinity.UI.UIComponents
 
                 _window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
 
+                _window.Show();
+
+                CreateRadarWindow();   
+
             }
             catch (Exception ex)
             {
@@ -93,36 +86,87 @@ namespace Trinity.UI.UIComponents
             return _window;
         }
 
-        private static Window CreateRadarWindow()
+        private static Thread _radarThread;
+
+        private static void CreateRadarWindow()
         {
             try
             {
-                Logger.Log("Creating Radar Window");
+                Logger.LogDebug("Creating Radar UI Thread");
 
-                if (DataModel == null)
-                    DataModel = new CacheUIDataModel();
-
-                _radarWindow = new Window
+                _radarThread = new Thread(() =>
                 {
-                    Height = 700,
-                    Width = 700,
-                    MinHeight = MinimumHeight,
-                    MinWidth = MininumWidth,
-                    Title = "Trinity Radar",
-                    Content = UILoader.LoadAndTransformXamlFile<UserControl>(Path.Combine(FileManager.PluginPath, "UI", "RadarUI.xaml")),
-                    DataContext = DataModel
-                };
+                    Logger.LogDebug("Creating Radar Window");
 
-                _isRadarWindowOpen = true;
-                _radarWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-                _window.Closed += Window_Closed;
+                    if (DataModel == null)
+                        DataModel = new CacheUIDataModel();
+
+                    _radarWindow = new Window
+                    {
+                        Height = 700,
+                        Width = 700,
+                        MinHeight = MinimumHeight,
+                        MinWidth = MininumWidth,
+                        Title = "Trinity Radar",
+                        Content = UILoader.LoadAndTransformXamlFile<UserControl>(Path.Combine(FileManager.PluginPath, "UI", "RadarUI.xaml")),
+                        DataContext = DataModel, WindowStartupLocation = WindowStartupLocation.CenterScreen
+                    };
+
+                    // Hide window instead of closing it.
+                    // This avoids thread ownership issues.
+                    _radarWindow.Closing += (sender, args) =>
+                    {
+                        Logger.LogDebug("Hiding Radar Window instead of Close");
+                        DataModel.IsRadarWindowVisible = false;
+                        _radarWindow.Hide();
+                        args.Cancel = true;
+                    };
+
+                    DataModel.PropertyChanged += (sender, args) =>
+                    {
+                        if (args.PropertyName == "IsRadarWindowVisible")
+                        {
+                            var radarDispatcher = Dispatcher.FromThread(_radarThread);
+                            if (radarDispatcher == null)
+                                return;
+
+                            if (DataModel.IsRadarWindowVisible)
+                            {
+                                radarDispatcher.Invoke(() =>
+                                {
+                                    Logger.LogDebug("Showing RadarWindow");
+                                    _radarWindow.Show();
+                                });                
+                            }
+                            else
+                            {
+                                radarDispatcher.Invoke(() =>
+                                {
+                                    Logger.LogDebug("Hiding RadarWindow");
+                                    _radarWindow.Hide();
+                                });                               
+                            }                                        
+                        }                                           
+                    };
+
+                    _window.Closed += (s, e) =>
+                    {
+                        Logger.Log("Proper Closing Radar Window & Thread");
+                        _radarWindow.Dispatcher.InvokeShutdown();
+                        _radarWindow.Close();
+                        _radarWindow = null;
+                    };
+
+                    Dispatcher.Run();
+                });
+
+                _radarThread.SetApartmentState(ApartmentState.STA);
+                _radarThread.Start();
             }
             catch (Exception ex)
             {
                 Logger.LogNormal("Unable to open Trinity RadarUI: {0}", ex);
             }
-
-            return _radarWindow;
         }
 
         private static void DataModelOnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
@@ -196,7 +240,7 @@ namespace Trinity.UI.UIComponents
 
                     return false;
 
-                }, 50);
+                }, 15);
                
             }
         }
@@ -223,7 +267,7 @@ namespace Trinity.UI.UIComponents
                     _lastUpdatedDefault = DateTime.UtcNow;
                 }
 
-                if (DataModel.IsLazyCacheVisible && DateTime.UtcNow.Subtract(_lastUpdatedLazy).TotalMilliseconds > 50)
+                if (DataModel.IsLazyCacheVisible && DateTime.UtcNow.Subtract(_lastUpdatedLazy).TotalMilliseconds > 15)
                 {
                     _isUpdating = true;
                     _updateCount++;
@@ -315,4 +359,14 @@ namespace Trinity.UI.UIComponents
             }
         }
     }
+
+        //public static class EventExtensions
+        //{
+        //    public static void Raise<T>(this EventHandler<EventArgs<T>> theEvent,
+        //                                object sender, T args)
+        //    {
+        //        if (theEvent != null)
+        //            theEvent(sender, new EventArgs<T>(args));
+        //    }
+        //}
 }

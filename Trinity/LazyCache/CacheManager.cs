@@ -4,14 +4,17 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using Trinity.Combat.Weighting;
 using Trinity.Helpers;
 using Trinity.Technicals;
+using Trinity.UIComponents;
 using Zeta.Bot;
 using Zeta.Common;
 using Zeta.Game;
+using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 using Logger = Trinity.Technicals.Logger;
@@ -80,6 +83,9 @@ namespace Trinity.LazyCache
         private static readonly CacheField<List<TrinityUnit>> _summoners = new CacheField<List<TrinityUnit>>(UpdateSpeed.Ultra, new List<TrinityUnit>());
 
         public static readonly ConcurrentDictionary<int, TrinityObject> CachedObjects = new ConcurrentDictionary<int, TrinityObject>();
+
+        public static readonly ConcurrentDictionary<int, TrinityScene> CachedScenes = new ConcurrentDictionary<int, TrinityScene>();
+
         internal static int ForceRefreshLevel;
         public static DateTime LastUpdated = DateTime.MinValue;
         public static int ActivePlayerGuid = -1;
@@ -308,9 +314,6 @@ namespace Trinity.LazyCache
                     Me = new TrinityPlayer(ZetaDia.Me);
                 else
                     Me.UpdateSource(ZetaDia.Me);
-
-                ActivePlayerGuid = Me.ACDGuid;
-                WorldDynamicId = Me.WorldDynamicId;
             }
 
             using (new PerformanceLogger("lazyCache.Update.Refresh"))
@@ -357,6 +360,9 @@ namespace Trinity.LazyCache
 
             IsUpdatePending = false;
 
+            ActivePlayerGuid = Me.ACDGuid;
+            WorldDynamicId = Me.WorldDynamicId;
+
             using (new PerformanceLogger("lazyCache.Update.Purge"))
             {               
                 foreach (var o in CachedObjects.Where(o => !o.Value.IsValid)) 
@@ -373,6 +379,18 @@ namespace Trinity.LazyCache
                     {
                         o.Movement.RecordMovement(o);
                     }
+                }
+            }
+
+            using (new PerformanceLogger("lazyCache.Update.Scenes"))
+            {
+                foreach (var scene in ZetaDia.Scenes)
+                {
+                    var sceneGuid = scene.SceneGuid;
+                    if (sceneGuid <= 0)
+                        continue;
+
+                    CachedScenes.AddOrUpdate(scene.SceneGuid, i => new TrinityScene(scene, sceneGuid), (i, trinityScene) => trinityScene.Update(scene));
                 }
             }
 
@@ -398,6 +416,45 @@ namespace Trinity.LazyCache
             LastUpdateTimeTaken = refreshTimer.Elapsed.TotalMilliseconds;
             LastWeightingTimeTaken = weightTimer.Elapsed.TotalMilliseconds;
         }
+
+        
+
+        //private static void CacheScene(Scene scene)
+        //{
+        //    var zone = scene.Mesh.Zone;                       
+
+        //    WalkableNavCells = new List<AABB>();
+        //    Zones = new List<AABB>();
+
+        //    if (zone != null)
+        //    {
+        //        var sceneMax = zone.ZoneMax;
+        //        var sceneMin = zone.ZoneMin;
+        //        var absBounds = new AABB
+        //        {
+        //            Max = sceneMax.ToVector3(),
+        //            Min = sceneMin.ToVector3()
+        //        };
+
+        //        Zones.Add(absBounds);
+
+        //        var navZoneDef = zone.NavZoneDef;               
+
+        //        foreach (var navCell in navZoneDef.NavCells)
+        //        {
+        //            if (!navCell.Flags.HasFlag(NavCellFlags.AllowWalk))
+        //                continue;
+
+        //            var absCellBounds = new AABB
+        //            {
+        //                Max = new Vector3(sceneMin.X + navCell.Max.X, sceneMin.Y + navCell.Max.Y, 0),
+        //                Min = new Vector3(sceneMin.X + navCell.Min.X, sceneMin.Y + navCell.Min.Y, 0)
+        //            };
+
+        //            WalkableNavCells.Add(absCellBounds);
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// Get actors of a particular TrinityObjectType
@@ -461,6 +518,10 @@ namespace Trinity.LazyCache
 
         public static double LastUpdateTimeTaken { get; set; }
         public static double LastWeightingTimeTaken { get; set; }
-        
+
+
+        public static List<AABB> WalkableNavCells { get; set; }
+
+        public static List<AABB> Zones { get; set; }
     }
 }

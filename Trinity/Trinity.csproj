@@ -155,6 +155,7 @@
     <Compile Include="LazyCache\CacheUtilities.cs" />
     <Compile Include="LazyCache\CacheMetaReference.cs" />
     <Compile Include="LazyCache\TrinityAvoidance.cs" />
+    <Compile Include="LazyCache\TrinityScene.cs" />
     <Compile Include="LazyCache\TrinityUnit.cs" />
     <Compile Include="LazyCache\TrinityPlayer.cs" />
     <Compile Include="LazyCache\TrinityGizmo.cs" />

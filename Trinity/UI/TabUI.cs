@@ -278,7 +278,7 @@ namespace Trinity.UI
         {
             try
             {
-                CacheUI.CreateWindow().Show();
+                CacheUI.CreateWindow();
             }
             catch (Exception ex)
             {
