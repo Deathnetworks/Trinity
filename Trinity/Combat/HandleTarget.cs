@@ -221,7 +221,7 @@ namespace Trinity
                         {
                             CurrentTargetIsInLoS = NavHelper.CanRayCast(Player.Position, CurrentDestination);
                         }
-                        else if (TargetCurrentDistance <= 20f)
+                        else if (TargetCurrentDistance <= 2f)
                         {
                             CurrentTargetIsInLoS = true;
                         }

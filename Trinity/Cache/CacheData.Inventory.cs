@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
-using Org.BouncyCastle.Asn1.Esf;
-using Trinity.Helpers;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Game;
@@ -19,7 +16,13 @@ namespace Trinity
         {
             static InventoryCache()
             {
-                Pulsator.OnPulse += (sender, args) => Instance.UpdateInventoryCache();
+                //Pulsator.OnPulse += (sender, args) => Instance.UpdateInventoryCache();
+                GameEvents.OnItemLooted += (sender, args) => Instance.UpdateInventoryCache();
+                GameEvents.OnItemSalvaged += (sender, args) => Instance.UpdateInventoryCache();
+                GameEvents.OnItemSold += (sender, args) => Instance.UpdateInventoryCache();
+                GameEvents.OnItemStashed += (sender, args) => Instance.UpdateInventoryCache();
+                GameEvents.OnGameJoined += (sender, args) => Instance.UpdateInventoryCache();
+                GameEvents.OnWorldChanged += (sender, args) => Instance.UpdateInventoryCache();
             }
 
             public InventoryCache()
@@ -30,7 +33,7 @@ namespace Trinity
                 UpdateInventoryCache();
             }
 
-            private static InventoryCache _instance = null;
+            private static InventoryCache _instance;
             public static InventoryCache Instance
             {
                 get { return _instance ?? (_instance = new InventoryCache()); }
