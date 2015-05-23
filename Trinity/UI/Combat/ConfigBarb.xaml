@@ -4,7 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ut="clr-namespace:Trinity.UIComponents"
              mc:Ignorable="d"  Foreground="{DynamicResource TextBrush}"
-             d:DesignHeight="350" d:DesignWidth="390">
+             d:DesignHeight="600" d:DesignWidth="500">
     <UserControl.Resources>
         <ResourceDictionary>
             <!-- Don't format this line otherwise Db can't open config window -->
@@ -49,21 +49,21 @@
                     HorizontalAlignment="Stretch" Margin="2,0"/>
             </Grid>
             <Grid Grid.Row="1" Margin="2">
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-              </Grid.ColumnDefinitions>
-              <TextBlock Text="Globe Health %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
-              <Slider Grid.Column="1" Template="{DynamicResource Slider}"
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Globe Health %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+                <Slider Grid.Column="1" Template="{DynamicResource Slider}"
                       Interval="500" Maximum="100" Minimum="0"
                       SmallChange="1" LargeChange="5"
                       TickPlacement="None"
                       Value="{Binding Path=Barb.HealthGlobeLevel, Converter={StaticResource percentConverter}}"
                       HorizontalAlignment="Stretch" Margin="2"/>
-              <TextBlock Grid.Column="2" Text="Globe Resource %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
-              <Slider Grid.Column="3" Template="{DynamicResource Slider}"
+                <TextBlock Grid.Column="2" Text="Globe Resource %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+                <Slider Grid.Column="3" Template="{DynamicResource Slider}"
                       Interval="500" Maximum="100" Minimum="0"
                       SmallChange="1" LargeChange="5"
                       TickPlacement="None"
@@ -71,20 +71,41 @@
                       HorizontalAlignment="Stretch" Margin="2"
                       ToolTip="Only applies when Reaper's Wraps are equipped"/>
             </Grid>
-            <Grid Grid.Row="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="3*" />
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Hota/WW Threshold" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center" Width="Auto" Margin="10,0" 
+            <StackPanel Grid.Row="2">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="2*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Hota/WW Threshold" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center" Width="Auto" Margin="10,0" 
                            ToolTip="Minimum Health to use Hammer of the Ancients, only applies when Whirlwind is available" />
-                <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                    <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                     Interval="500" Maximum="99" Minimum="0" SmallChange="1" LargeChange="5"
                     TickPlacement="BottomRight" TickFrequency="5" IsSnapToTickEnabled="True"
                     Value="{Binding Path=Barb.MinHotaHealth, Converter={StaticResource percentConverter}}"
                     HorizontalAlignment="Stretch" Margin="2,0" MinWidth="245" 
                     ToolTip="Minimum Health to use Hammer of the Ancients, only applies when Whirlwind is available" />
-            </Grid>
+                </Grid>
+                <GroupBox Header="Ignore Pain">
+                    <StackPanel>
+                        <CheckBox Margin="2" IsChecked="{Binding Path=Barb.IgnorePainOffCooldown}" ToolTip="Use Ignore Pain as soon as it's available">Use Ignore Pain Off Cooldown</CheckBox>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="3*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Ignore Pain Min Health %" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center" Width="Auto" Margin="10,0" 
+                           ToolTip="Minimum Health to use Hammer of the Ancients, only applies when Whirlwind is available" />
+                            <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                                    Interval="500" Maximum="99" Minimum="0" SmallChange="1" LargeChange="5"
+                                    TickPlacement="BottomRight" TickFrequency="5" IsSnapToTickEnabled="True"
+                                    Value="{Binding Path=Barb.IgnorePainMinHealthPct, Converter={StaticResource percentConverter}}"
+                                    HorizontalAlignment="Stretch" Margin="2,0" MinWidth="245" 
+                                    ToolTip="Minimum Health to use Ignore Pain" />
+                        </Grid>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
             <Grid Grid.Row="3">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -156,7 +177,6 @@
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.ThreatShoutOOC}" ToolTip="Use Threating Shout Out of Combat to generate Fury">Use Threating Shout OOC</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.UseLeapOOC}" ToolTip="Leap Out Of Combat">Leap OOC</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.UseChargeOOC}" ToolTip="Furious Charge Out Of Combat">Furious Charge OOC</CheckBox>
-                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.IgnorePainOffCooldown}" ToolTip="Use Ignore Pain as soon as it's available">Spam Ignore Pain</CheckBox>
             </UniformGrid>
             <GroupBox Grid.Row="2">
                 <GroupBox.Header>Sprint</GroupBox.Header>

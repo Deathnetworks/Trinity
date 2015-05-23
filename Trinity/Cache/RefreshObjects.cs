@@ -658,7 +658,7 @@ namespace Trinity
                             gizmoType = "GizmoType: " + giz.CommonData.ActorInfo.GizmoType.ToString();
                         }
                         Logger.Log(ll, lc, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0} {4} {5}",
-                                currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance, gizmoType, ex.Message);
+                                currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance, gizmoType, ex);
 
                     }
                 }

@@ -126,9 +126,8 @@ namespace Trinity.Combat.Abilities
             }
 
             // Meteor: Arcane Dynamo
-            bool arcaneDynamoPassiveReady =
-             (Passives.Wizard.ArcaneDynamo.IsActive && GetBuffStacks(SNOPower.Wizard_Passive_ArcaneDynamo) == 5);
-            if (!Player.IsIncapacitated && !arcaneDynamoPassiveReady && CanCast(SNOPower.Wizard_Meteor, CanCastFlags.NoTimer) && !ShouldWaitForConventionElement(Skills.Wizard.Meteor) &&
+            bool arcaneDynamoPassiveReady = (Passives.Wizard.ArcaneDynamo.IsActive && GetBuffStacks(SNOPower.Wizard_Passive_ArcaneDynamo) == 5);
+            if (!Player.IsIncapacitated && arcaneDynamoPassiveReady && CanCast(SNOPower.Wizard_Meteor, CanCastFlags.NoTimer) && !ShouldWaitForConventionElement(Skills.Wizard.Meteor) &&
                 (TargetUtil.EliteOrTrashInRange(65) || TargetUtil.ClusterExists(15f, 65, 2)))
             {
                 var bestMeteorClusterUnit = TargetUtil.GetBestClusterUnit();

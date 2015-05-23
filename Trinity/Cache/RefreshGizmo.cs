@@ -150,20 +150,27 @@ namespace Trinity
                         addToCache = true;
 
                         var gizmoDoor = c_diaObject as GizmoDoor;
-                        if (gizmoDoor != null && gizmoDoor.IsLocked)
+                        try
                         {
-                            MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
-                            CacheData.NavigationObstacles.Add(new CacheObstacleObject
+                            if (gizmoDoor != null && gizmoDoor.IsLocked)
                             {
-                                ActorSNO = CurrentCacheObject.ActorSNO,
-                                Radius = CurrentCacheObject.Radius,
-                                Position = CurrentCacheObject.Position,
-                                RActorGUID = CurrentCacheObject.RActorGuid,
-                                ObjectType = CurrentCacheObject.Type,
-                            });
+                                MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
+                                CacheData.NavigationObstacles.Add(new CacheObstacleObject
+                                {
+                                    ActorSNO = CurrentCacheObject.ActorSNO,
+                                    Radius = CurrentCacheObject.Radius,
+                                    Position = CurrentCacheObject.Position,
+                                    RActorGUID = CurrentCacheObject.RActorGuid,
+                                    ObjectType = CurrentCacheObject.Type,
+                                });
 
-                            c_IgnoreSubStep = "IsLocked";
-                            return false;
+                                c_IgnoreSubStep = "IsLocked";
+                                return false;
+                            }
+                        }
+                        catch
+                        {
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting gizmoDoor.IsLocked attribute for object {0} [{1}]", CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
                         }
 
                         if (c_diaObject is DiaGizmo && ((DiaGizmo)c_diaObject).HasBeenOperated)
@@ -183,7 +190,11 @@ namespace Trinity
                             if (currentAnimation.Contains("irongate") && currentAnimation.Contains("idle"))
                                 gizmoUsed = true;
                         }
-                        catch { }
+                        catch
+                        {
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting gizmoDoor.CurrentAnimation attribute for object {0} [{1}]", CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
+                        }
+
                         if (gizmoUsed)
                         {
                             Blacklist3Seconds.Add(CurrentCacheObject.RActorGuid);
@@ -254,7 +265,10 @@ namespace Trinity
                                 }
                             }
 
-                            catch { }
+                            catch
+                            {
+                                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting gizmoDoor.IsGizmoDisabledByScript attribute for object {0} [{1}]", CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
+                            }
                         }
                     }
                     break;
@@ -314,8 +328,6 @@ namespace Trinity
                         catch
                         {
                             Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
-                            addToCache = true;
-                            //return bWantThis;
                         }
                         try
                         {
@@ -619,10 +631,17 @@ namespace Trinity
                         addToCache = true;
 
                         var gizmoDestructible = c_diaObject as GizmoDestructible;
-                        if (gizmoDestructible != null && gizmoDestructible.HitpointsCurrentPct <= 0)
+                        try
                         {
-                            c_IgnoreSubStep = "HitPoints0";
-                            return false;
+                            if (gizmoDestructible != null && gizmoDestructible.HitpointsCurrentPct <= 0)
+                            {
+                                c_IgnoreSubStep = "HitPoints0";
+                                return false;
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting gizmoDestructible.HitpointsCurrentPct attribute for object {0} [{1}]", CurrentCacheObject.InternalName, CurrentCacheObject.ActorSNO);
                         }
 
                         if (noDamage)

@@ -53,13 +53,20 @@ namespace Trinity.Items
             try
             {
                 ActorSNO = item.ActorSNO;
-                Name = item.Name;
                 GameBalanceId = item.GameBalanceId;
                 DynamicId = item.DynamicId;
                 ACDGuid = item.ACDGuid;
                 InventorySlot = item.InventorySlot;
                 ValidInventorySlots = item.ValidInventorySlots;
                 RequiredLevel = item.RequiredLevel;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error wrapping non-attribute properties on item {0}: " + ex);
+            }
+            try
+            {
+                Name = item.Name;
                 IsUnidentified = item.IsUnidentified;
                 IsTwoHand = item.IsTwoHand;
                 IsOneHand = item.IsOneHand;

@@ -31,6 +31,8 @@ namespace Trinity.Config.Combat
         private bool _UseChargeOOC;
         private bool _WOTBEmergencyHealth;
         private int _rendWaitDelay;
+        private float _ignorePainMinHealthPct;
+
         private float _AvoidArcaneHealth;
         private float _AvoidAzmoBodiesHealth;
         private float _AvoidAzmoFireBallHealth;
@@ -82,7 +84,7 @@ namespace Trinity.Config.Combat
         }
         #endregion Constructors
 
-        #region Properties
+        #region Common
         [DataMember(IsRequired = false)]
         [DefaultValue(0.35f)]
         public float PotionLevel
@@ -731,7 +733,9 @@ namespace Trinity.Config.Combat
                 }
             }
         }
+#endregion
 
+        #region Properties
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool WaitWOTB
@@ -964,6 +968,24 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
+        [DefaultValue(0.40f)]
+        public float IgnorePainMinHealthPct
+        {
+            get
+            {
+                return _ignorePainMinHealthPct;
+            }
+            set
+            {
+                if (_ignorePainMinHealthPct != value)
+                {
+                    _ignorePainMinHealthPct = value;
+                    OnPropertyChanged("IgnorePainMinHealthPct");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
         [DefaultValue(BarbarianWOTBMode.Normal)]
         public BarbarianWOTBMode WOTBMode
         {
@@ -1110,10 +1132,10 @@ namespace Trinity.Config.Combat
         [OnDeserialized()]
         internal void OnDeserializedMethod(StreamingContext context)
         {
-            if (this._WOTBHardOnly)
+            if (WOTBHardOnly)
             {
-                this.WOTBMode = BarbarianWOTBMode.HardElitesOnly;
-                this.WOTBHardOnly = false;
+                WOTBMode = BarbarianWOTBMode.HardElitesOnly;
+                WOTBHardOnly = false;
             }
         }
         #endregion Methods

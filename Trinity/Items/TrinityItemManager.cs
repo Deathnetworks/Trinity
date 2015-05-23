@@ -757,6 +757,8 @@ namespace Trinity.Items
         private static int _lastProtectedSlotsCount;
         private static Vector2 _lastBackPackLocation = new Vector2(-2, -2);
 
+        public static readonly Vector2 NoFreeSlot = new Vector2(-1, -1);
+
         internal static void ResetBackPackCheck()
         {
             _lastBackPackCount = -1;
@@ -864,7 +866,7 @@ namespace Trinity.Items
                         Logger.LogDebug("Free Bag Slots is less than required. FreeSlots={0}, FreeBagSlots={1} FreeBagSlotsInTown={2} IsInTown={3} Protected={4} BackpackCount={5}",
                             freeBagSlots, Trinity.Settings.Loot.TownRun.FreeBagSlots, Trinity.Settings.Loot.TownRun.FreeBagSlotsInTown, Trinity.Player.IsInTown,
                             _lastProtectedSlotsCount, _lastBackPackCount);
-                        _lastBackPackLocation = new Vector2(-1, -1);
+                        _lastBackPackLocation = NoFreeSlot;
                         return _lastBackPackLocation;
                     }
                     // 10 columns
@@ -899,14 +901,14 @@ namespace Trinity.Items
 
                     // no free slot
                     Logger.LogDebug("No Free slots!");
-                    _lastBackPackLocation = new Vector2(-1, -1);
+                    _lastBackPackLocation = NoFreeSlot;
                     return _lastBackPackLocation;
                 }
                 catch (Exception ex)
                 {
                     Logger.Log(LogCategory.UserInformation, "Error in finding backpack slot");
                     Logger.Log(LogCategory.UserInformation, "{0}", ex.ToString());
-                    return new Vector2(1, 1);
+                    return NoFreeSlot;
                 }
             }
         }

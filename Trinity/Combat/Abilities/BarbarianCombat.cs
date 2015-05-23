@@ -167,13 +167,16 @@ namespace Trinity.Combat.Abilities
                 if (UseOOCBuff)
                     return false;
 
-                if (Settings.Combat.Barbarian.IgnorePainOffCooldown && CanCast(SNOPower.Barbarian_IgnorePain))
+                if (!CanCast(SNOPower.Barbarian_IgnorePain))
+                    return false;
+
+                if (Settings.Combat.Barbarian.IgnorePainOffCooldown)
                     return true;
 
-                if (CanCast(SNOPower.Barbarian_IgnorePain) && Player.CurrentHealthPct <= V.F("Barbarian.IgnorePain.MinHealth"))
+                if (Player.CurrentHealthPct <= V.F("Barbarian.IgnorePain.MinHealth"))
                     return true;
 
-                return Sets.TheLegacyOfRaekor.IsFullyEquipped && ShouldFuryDump && CanCast(SNOPower.Barbarian_IgnorePain);
+                return Sets.TheLegacyOfRaekor.IsFullyEquipped && ShouldFuryDump;
             }
         }
         public static bool CanUseCallOfTheAncients

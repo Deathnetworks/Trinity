@@ -67,10 +67,10 @@ namespace Trinity.UI
                     Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Put MainControl to Window");
                     ConfigWindow.Content = _windowContent;
                     Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Configure Window");
-                    ConfigWindow.Height = 620;
-                    ConfigWindow.Width = 480;
-                    ConfigWindow.MinHeight = 580;
-                    ConfigWindow.MinWidth = 480;
+                    ConfigWindow.Height = 650;
+                    ConfigWindow.Width = 550;
+                    ConfigWindow.MinHeight = 650;
+                    ConfigWindow.MinWidth = 550;
                     ConfigWindow.Title = "Trinity";
 
                     // Event handling for the config window loading up/closing
