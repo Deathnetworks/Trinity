@@ -1,41 +1,18 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Web.UI.WebControls;
-using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows;
-using System.Windows.Documents;
+using System.Windows.Controls;
 using System.Windows.Forms;
-using Trinity.Helpers;
+using System.Windows.Media;
 using Trinity.LazyCache;
-using Zeta.Bot.Dungeons;
 using Zeta.Common;
-using Zeta.Game;
-using Zeta.Game.Internals;
-using Zeta.Game.Internals.Actors;
-using Zeta.Game.Internals.SNO;
-using Brush = System.Windows.Media.Brush;
-using Brushes = System.Windows.Media.Brushes;
-using Color = System.Windows.Media.Color;
 using FlowDirection = System.Windows.FlowDirection;
 using LineSegment = System.Windows.Media.LineSegment;
-using Pen = System.Windows.Media.Pen;
 using Logger = Trinity.Technicals.Logger;
-using Point = System.Windows.Point;
-using Rectangle = System.Drawing.Rectangle;
-using Size = System.Windows.Size;
 
 namespace Trinity.UIComponents
 {
@@ -48,6 +25,8 @@ namespace Trinity.UIComponents
             
             CanvasData.OnCanvasSizeChanged += (before, after) =>
             {
+                // Scene drawings are specific to a canvas size.
+                // Changing canvas size means we have to redraw them all.
                 Drawings.Relative.Clear();
                 Drawings.Static.Clear();
                 Clip = CanvasData.ClipRegion;
@@ -178,12 +157,12 @@ namespace Trinity.UIComponents
                 CanvasData.CenterVector = CenterActor.Actor.Position;
 
                 // Calculate locations for all actors positions
-                // on TrinityItemPoint ctor; or with .Update();
+                // on RadarObject ctor; or with .Update();
 
                 foreach (var trinityObject in ItemsSource.OfType<TrinityObject>())
                 {
-                    var itemPoint = new RadarObject(trinityObject, CanvasData);
-                    Objects.Add(itemPoint);
+                    var radarObject = new RadarObject(trinityObject, CanvasData);
+                    Objects.Add(radarObject);
                 }
 
                 UpdateSceneData();
@@ -197,10 +176,10 @@ namespace Trinity.UIComponents
             }
         }
 
-
-
-
-
+        /// <summary>
+        /// Maintain our collection of walkable areas of scene drawings, removing old or invalid ones.
+        /// Calculates new position for each scene drawing based on its origin point.
+        /// </summary>
         private void UpdateSceneData()
         {
             var sceneKeysToRemove = new List<string>();
@@ -229,7 +208,10 @@ namespace Trinity.UIComponents
             }
         }
 
-
+        /// <summary>
+        /// OnRender is a core part of Canvas, replace it with our render code.
+        /// Can be manually triggered by InvalidateVisual();
+        /// </summary>
         protected override void OnRender(DrawingContext dc)
         {
 
@@ -259,10 +241,7 @@ namespace Trinity.UIComponents
             {
                 Logger.Log("Exception in RadarUI.OnRender(). {0} {1}", ex.Message, ex.InnerException);
             }
-
         }
-
-
 
         /// <summary>
         /// Mind = Blown
@@ -310,7 +289,7 @@ namespace Trinity.UIComponents
                             groupdc.DrawGeometry(RadarBrushes.WalkableTerrain, null, geo);                            
                         }
    
-                        // Have to use Guid as key because scenes can appear multiple times with the same name
+                        // Have to use SceneHash as key because scenes can appear multiple times with the same name
                         Drawings.Relative.TryAdd(scene.SceneHash, new RelativeDrawing
                         {
                             Drawing = drawing,
