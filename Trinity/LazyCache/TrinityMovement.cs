@@ -25,11 +25,14 @@ namespace Trinity.Helpers
         private DateTime _lastRecordedPositionTime = DateTime.MinValue;
         
         private float _lastHeadingRadians;
-        private double _lastMovementSpeed;
+        private double _movementSpeed;
 
         public bool HasMoved { get; set; }
 
         private float _startHeadingRadians;
+        private double _averageMovementSpeed;
+        private double _averageRecordingTimeHours;
+        private float _averageDistance;
 
         /// <summary>
         /// This is separated from GetMovementSpeed() to prevent parrallel tasks failing on changed collection.
@@ -104,7 +107,7 @@ namespace Trinity.Helpers
         {
             if (_speedSensors.Count >= 2)
             {
-                if (_lastMovementSpeed == 0 && !HasMoved)
+                if (_movementSpeed == 0 && !HasMoved)
                     return _lastHeadingRadians;
 
                 var startPosition = _speedSensors.ElementAt(_speedSensors.Count - 2).Location;
@@ -139,36 +142,51 @@ namespace Trinity.Helpers
 
         public double GetMovementSpeed(TrinityObject o)
         {
-            double movementSpeed;
-
             if (_speedSensors.Any(s => s != null && s.WorldID != CacheManager.WorldDynamicId))
             {
                 _speedSensors.Clear();
-                movementSpeed = 1d;
+                _movementSpeed = 1d;
             }
 
             else if (o.IsMe && DateTime.UtcNow.Subtract(SpellHistory.GetSpellLastused()).TotalMilliseconds <= 1000)
             {
-                movementSpeed = 1d;                
+                _movementSpeed = 1d;                
             }
 
             // Minimum of 2 records to calculate speed
             else if (!_speedSensors.Any() || _speedSensors.Count <= 1)
-                movementSpeed = 0d;                
+                _movementSpeed = 0d;                
 
             // If we haven't "moved" in over a second, then we're standing still
             else if (DateTime.UtcNow.Subtract(_lastRecordedPositionTime).TotalMilliseconds > 1000)
-                movementSpeed = 0d;
+                _movementSpeed = 0d;
 
             else
             {
-                double averageRecordingTime = _speedSensors.Average(s => s.TimeSinceLastMove.TotalHours);        
-                double averageMovementSpeed = _speedSensors.Average(s => Vector3.Distance(s.Location, o.Position) * 1000000);
-                movementSpeed =  averageMovementSpeed / averageRecordingTime;
+                _averageRecordingTimeHours = _speedSensors.Average(s => s.TimeSinceLastMove.TotalHours);
+                _averageDistance = _speedSensors.Average(s => Vector3.Distance(s.Location, o.Position));
+                _averageMovementSpeed =  _averageDistance * 1000000;
+                _movementSpeed =  _averageMovementSpeed / _averageRecordingTimeHours;
             }
 
-            _lastMovementSpeed = movementSpeed;
-            return movementSpeed;
+            return _movementSpeed;
+        }
+
+        public bool TryPredictPosition(DateTime time, out Vector3 position)
+        {
+            var last = _speedSensors.LastOrDefault();
+            if (last != null)
+            {
+                position = MathUtil.GetEstimatedPosition(
+                                    last.Location,
+                                    GetHeadingRadians(),
+                                    _averageRecordingTimeHours,
+                                    _movementSpeed);  
+
+                return true;                             
+            }
+            position = Vector3.Zero;
+            return false;
         }
     }
 }

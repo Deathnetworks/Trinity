@@ -78,12 +78,12 @@ namespace Trinity.UIComponents
         /// <summary>
         /// The actor who should be at the center of the radar
         /// </summary>
-        public TrinityNode CenterActor { get; set; }
+        public RadarObject CenterActor { get; set; }
 
         /// <summary>
         /// Collection of game objects
         /// </summary>
-        public List<TrinityNode> Objects = new List<TrinityNode>();
+        public List<RadarObject> Objects = new List<RadarObject>();
 
         /// <summary>
         /// Information about the WPF canvas we'll be drawing on
@@ -174,7 +174,7 @@ namespace Trinity.UIComponents
                 if (center == null)
                     return;
 
-                CenterActor = new TrinityNode(center, CanvasData);
+                CenterActor = new RadarObject(center, CanvasData);
                 CanvasData.CenterVector = CenterActor.Actor.Position;
 
                 // Calculate locations for all actors positions
@@ -182,7 +182,7 @@ namespace Trinity.UIComponents
 
                 foreach (var trinityObject in ItemsSource.OfType<TrinityObject>())
                 {
-                    var itemPoint = new TrinityNode(trinityObject, CanvasData);
+                    var itemPoint = new RadarObject(trinityObject, CanvasData);
                     Objects.Add(itemPoint);
                 }
 
@@ -197,23 +197,9 @@ namespace Trinity.UIComponents
             }
         }
 
-        internal static class Drawings
-        {
-            public static ConcurrentDictionary<string, RelativeDrawing> Relative = new ConcurrentDictionary<string, RelativeDrawing>();
-            public static ConcurrentDictionary<string, StaticDrawing> Static = new ConcurrentDictionary<string, StaticDrawing>();
-        }
 
-        internal class StaticDrawing
-        {
-            public DrawingGroup Drawing { get; set; }
-            public int WorldId { get; set; }
-        }
 
-        internal class RelativeDrawing : StaticDrawing
-        {
-            public PointMorph Origin { get; set; }
-            public Vector3 Center { get; set; }
-        }
+
 
         private void UpdateSceneData()
         {
@@ -276,45 +262,7 @@ namespace Trinity.UIComponents
 
         }
 
-        private static class RadarBrushes
-        {
-            static RadarBrushes()
-            {
-                WalkableTerrain = new SolidColorBrush(Colors.LightSlateGray)
-                {
-                    Opacity = 0.2
-                };
 
-                YellowPen = new Pen(Brushes.Yellow, 0.1);
-                BluePen = new Pen(Brushes.CornflowerBlue, 0.2);
-                LightYellowPen = new Pen(Brushes.LightYellow, 0.1);
-                TransparentBrush = new SolidColorBrush(Colors.Transparent);
-                BorderPen = new Pen(Brushes.Black, 0.1);
-                GridPen = new Pen(Brushes.Black, 0.1);
-
-                WhiteDashPen = new Pen(new SolidColorBrush(Colors.WhiteSmoke), 1)
-                {
-                    DashStyle = DashStyles.DashDotDot, 
-                    DashCap = PenLineCap.Flat
-                };
-            }
-
-            public static Brush WalkableTerrain { get; set; }
-
-            public static Pen YellowPen { get; set; }
-
-            public static Pen BluePen { get; set; }
-
-            public static SolidColorBrush TransparentBrush { get; set; }
-
-            public static Pen LightYellowPen { get; set; }
-
-            public static Pen BorderPen { get; set; }
-
-            public static Pen GridPen { get; set; }
-
-            public static Pen WhiteDashPen { get; set; }
-        }
 
         /// <summary>
         /// Mind = Blown
@@ -331,6 +279,7 @@ namespace Trinity.UIComponents
                     var scene = pair.Value;
 
                     // Combine navcells into one drawing and store it; because they don't change relative to each other
+                    // And because translating geometry for every navcell on every frame is waaaaay too slow.
                     if (!Drawings.Relative.ContainsKey(scene.SceneHash) && scene.WalkableNavCellBounds.Any() && scene.IsCurrentWorld)
                     {
                         var drawing = new DrawingGroup();
@@ -391,7 +340,7 @@ namespace Trinity.UIComponents
         }
 
         /// <summary>
-        /// Range guide drawsd a circle every 20yard from player
+        /// Range guide draws a circle every 20yard from player
         /// </summary>
         private void DrawRangeGuide(DrawingContext dc, CanvasData canvas)
         {
@@ -405,7 +354,7 @@ namespace Trinity.UIComponents
             }            
         }
 
-        private void DrawActor(DrawingContext dc, CanvasData canvas, TrinityNode actor)
+        private void DrawActor(DrawingContext dc, CanvasData canvas, RadarObject actor)
         {
             try
             {
@@ -461,7 +410,7 @@ namespace Trinity.UIComponents
         /// <summary>
         /// Returns a base color for actor based on type and stuff
         /// </summary>
-        private static Color GetActorColor(TrinityNode actor)
+        private static Color GetActorColor(RadarObject actor)
         {
             Color baseColor = Colors.White;
             try
@@ -570,412 +519,13 @@ namespace Trinity.UIComponents
             }
         }
 
-        /// <summary>
-        /// TrinityNode wraps a TrinityObject to add a canvas plot location.
-        /// </summary>
-        public class TrinityNode : INotifyPropertyChanged
-        {
-            private TrinityObject _actor;
-
-            /// <summary>
-            /// Contains the actors position and other useful information.
-            /// </summary>
-            public PointMorph Morph = new PointMorph();
-
-            /// <summary>
-            /// Position in game world space for a point at radius distance 
-            /// from actor's center and in the direction the actor is facing.
-            /// </summary>
-            public Vector3 HeadingVectorAtRadius { get; set; }
-
-            /// <summary>
-            /// Position on canvas (in pixels) for a point at radius distance 
-            /// from actor's center and in the direction the actor is facing.
-            /// </summary>
-            public Point HeadingPointAtRadius { get; set; }
-
-            /// <summary>
-            /// Actors current position on canvas (in pixels).
-            /// </summary>
-            public Point Point
-            {
-                get { return Morph.Point; }
-            }
-
-            /// <summary>
-            /// TrinityNode wraps a TrinityObject to add a canvas plot location.
-            /// </summary>
-            public TrinityNode(TrinityObject obj, CanvasData canvasData)
-            {
-                Actor = obj;
-                obj.PropertyChanged += ItemOnPropertyChanged;
-                Morph.CanvasData = canvasData;
-                Update();
-            }
-
-            /// <summary>
-            /// Updates the plot location on canvas based on Item's current position.
-            /// </summary>
-            public void Update()
-            {
-                try
-                {
-                    Morph.Update(Actor.Position);
-
-                    if (Actor.IsUnit || Actor.IsProjectile || Actor.AvoidanceType == AvoidanceType.Arcane)
-                    {
-                        HeadingVectorAtRadius = MathEx.GetPointAt(new Vector3(Actor.Position.X, Actor.Position.Y, 0), Actor.Radius, Actor.Movement.GetHeadingRadians());
-                        HeadingPointAtRadius = new PointMorph(HeadingVectorAtRadius, Morph.CanvasData).Point;                        
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log("Exception in RadarUI.TrinityItemPoint.Update(). {0} {1}", ex.Message, ex.InnerException);
-                }                
-            }
-
-            /// <summary>
-            /// The game object
-            /// </summary>
-            public TrinityObject Actor
-            {
-                set
-                {
-                    if (!Equals(value, _actor))
-                    {
-                        _actor = value;
-                        OnPropertyChanged(new PropertyChangedEventArgs("Actor"));
-                    }
-                }
-                get { return _actor; }
-            }
-
-            #region PropertyChanged Handling
-
-            public event PropertyChangedEventHandler PropertyChanged;
-
-            private void ItemOnPropertyChanged(object sender, PropertyChangedEventArgs args)
-            {
-                OnPropertyChanged(args);
-            }
-
-            protected virtual void OnPropertyChanged(PropertyChangedEventArgs args)
-            {                
-                if (PropertyChanged != null)
-                    PropertyChanged(this, args);
-            }
-
-            #endregion
-
-            public override int GetHashCode()
-            {
-                return Actor.GetHashCode();
-            }
-
-        }
-    }
-
-    /// <summary>
-    /// Useful tools for drawing stuff
-    /// </summary>
-    public static class DrawingUtilities
-    {
-        /// <summary>
-        /// Convert to a Drawing System.Drawing.Color
-        /// </summary>
-        public static System.Drawing.Color ToDrawingColor(this System.Windows.Media.Color color)
-        {
-            return System.Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
-        }
-
-        /// <summary>
-        /// Convert to a System.Windows.Media.Color
-        /// </summary>
-        public static System.Windows.Media.Color ToMediaColor(this System.Drawing.Color color)
-        {
-            return System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);
-        }
-
-        public static Point ToCanvasPoint(this Vector3 positionVector, CanvasData canvasData = null)
-        {
-            return new PointMorph(positionVector, canvasData ?? CanvasData.LastCanvas).Point;                    
-        }
-
-        public static void RelativeMove(DrawingGroup group, Vector3 origin, CanvasData canvasData = null)
-        {
-            var originPoint = new PointMorph(origin, CanvasData.LastCanvas);
-            var transform = new TranslateTransform(originPoint.Point.X - CanvasData.LastCanvas.Center.X, originPoint.Point.Y - CanvasData.LastCanvas.Center.Y);
-            group.Transform = transform;      
-        }
-
-        public static System.Drawing.Point ToDrawingPoint(this System.Windows.Point point)
-        {
-            return new System.Drawing.Point((int)point.X, (int)point.Y);
-        }
-
-        public static Point ToPoint(this Vector3 worldVector)
-        {
-            return new Point(worldVector.X, worldVector.Y);
-        }
-
-        public static System.Windows.Rect ToCanvasRect(this AABB bounds)
-        {
-            var max = bounds.Max;
-            var min = bounds.Min;
-            var center = new Vector3((int)(max.X - (max.X - min.X)/2), (int)(max.Y - (max.Y - min.Y)/2),0);
-            var width = Math.Abs(max.X - min.X);
-            var height = Math.Abs(max.Y - min.Y);
-            return new Rect(center.ToCanvasPoint(), new Size((int)width, (int)height));
-        }
-
-        public static Point Center(this Rectangle rect)
-        {
-            return new Point(rect.Left + rect.Width / 2,
-                             rect.Top + rect.Height / 2);
-        }
 
     }
 
-    /// <summary>
-    /// Houses canvas information, so a bunch of structs can be accessed by reference.
-    /// </summary>
-    public class CanvasData
-    {
-        /// <summary>
-        /// Center of the canvas (in pixels)
-        /// </summary>
-        public Point Center;
-
-        /// <summary>
-        /// Size of the canvas (in pixels)
-        /// </summary>
-        public Size CanvasSize;
-
-        /// <summary>
-        /// Size of the canvas (in grid squares)
-        /// </summary>
-        public Size Grid;
-
-        /// <summary>
-        /// A transform for 45 degrees clockwise around canvas center
-        /// </summary>
-        public RotateTransform RotationTransform;
-
-        /// <summary>
-        /// A transform for flipping point vertically on canvas center
-        /// </summary>
-        public ScaleTransform FlipTransform;
-
-        /// <summary>
-        /// A transform for both FlipTransform and RotationTransform
-        /// </summary>
-        public TransformGroup Transforms;
-
-        /// <summary>
-        /// A transform for -45 degrees clockwise around canvas center
-        /// </summary>
-        public RotateTransform RotationTransformReverse;
-
-        /// <summary>
-        /// A reverse transform for both FlipTransform and RotationTransform
-        /// </summary>
-        public TransformGroup TransformsReverse;
-
-        /// <summary>
-        /// Size of a single grid square
-        /// </summary>
-        public Size GridSquareSize;
-
-        /// <summary>
-        /// The world space vector3 for the center for the canvas
-        /// </summary>
-        public Vector3 CenterVector { get; set; }
-
-        /// <summary>
-        /// Updates the canvas information (for if canvas size changes)
-        /// </summary>
-        public void Update(Size canvasSize, int gridSize)
-        {
-            var previousSize = CanvasSize;
-
-            Center = new Point(canvasSize.Width / 2, canvasSize.Height / 2);
-
-            RotationTransform = new RotateTransform(45, Center.X, Center.Y);
-            FlipTransform = new ScaleTransform(1, -1, Center.X, Center.Y);
-            Transforms = new TransformGroup();
-            Transforms.Children.Add(RotationTransform);
-            Transforms.Children.Add(FlipTransform);
-
-            RotationTransformReverse = new RotateTransform(-45, Center.X, Center.Y);
-            TransformsReverse = new TransformGroup();
-            TransformsReverse.Children.Add(FlipTransform);
-            TransformsReverse.Children.Add(RotationTransform);
-
-            CanvasSize = canvasSize;
-            Grid = new Size((int)(canvasSize.Width / gridSize), (int)(canvasSize.Height / gridSize));
-            GridSquareSize = new Size(gridSize, gridSize);
-            LastCanvas = this;
-
-            ClipRegion = new RectangleGeometry(new Rect(new Point(20,20), new Size(canvasSize.Width - 40, canvasSize.Height - 40)));
-
-            if (OnCanvasSizeChanged != null && !previousSize.Equals(CanvasSize))
-                OnCanvasSizeChanged(previousSize, CanvasSize);
-        }
-
-        public static CanvasData LastCanvas { get; set; }
-
-        public delegate void CanvasSizeChanged(Size sizeBefore, Size sizeAfter);
-
-        public event CanvasSizeChanged OnCanvasSizeChanged;
-
-        public RectangleGeometry ClipRegion { get; set; }
-    }
-
-    /// <summary>
-    /// PointMorph handles the translation of a Vector3 world space position into Canvas space.
-    /// </summary>
-    public class PointMorph
-    {
-        public PointMorph() { }
-
-        public PointMorph(CanvasData canvasData)
-        {
-            CanvasData = canvasData;
-        }
-
-        /// <summary>
-        /// PointMorph handles the translation of a Vector3 world space position into Canvas space.
-        /// </summary>
-        public PointMorph(Vector3 vectorPosition, CanvasData canvasData)
-        {
-            CanvasData = canvasData;
-            Update(vectorPosition);
-        }
-
-        /// <summary>
-        /// Information about the canvas
-        /// </summary>
-        public CanvasData CanvasData { get; set; }
-
-        /// <summary>
-        /// Point in GridSquare (Yards) Space before translations
-        /// </summary>
-        public Point RawGridPoint { get; set; }
-
-        /// <summary>
-        /// Point before any translations
-        /// </summary>
-        public Point RawPoint { get; set; }
-
-        /// <summary>
-        /// Flipped and Rotated point
-        /// </summary>
-        public Point Point { get; set; }
-
-        /// <summary>
-        /// Point coods based on Grid Scale
-        /// </summary>
-        public Point GridPoint { get; set; }
-
-        /// <summary>
-        /// If the point is located outside of the canvas bounds
-        /// </summary>
-        public bool IsBeyondCanvas { get; set; }
-
-        /// <summary>
-        /// If the point is Zero
-        /// </summary>
-        public bool IsZero
-        {
-            get { return Point.X == 0 || Point.Y == 0;  }
-        }
-
-        /// <summary>
-        /// Game world distance from this point to the center actor on X-Axis
-        /// </summary>
-        public float RawWorldDistanceX { get; set; }
-
-        /// <summary>
-        /// Game world distance from this point to the center actor on Y-Axis
-        /// </summary>
-        public float RawWorldDistanceY { get; set; }
-
-        /// <summary>
-        /// Canvas (pixels) distance from this point to the center actor on Y-Axis
-        /// </summary>
-        public float RawDrawDistanceX { get; set; }
-
-        /// <summary>
-        /// Canvas (pixels) distance from this point to the center actor on Y-Axis
-        /// </summary>
-        public float RawDrawDistanceY { get; set; }
-
-        /// <summary>
-        /// Absolute canvas X-Axis coodinate for this actor (in pixels)
-        /// </summary>
-        public double RawDrawPositionX { get; set; }
-
-        /// <summary>
-        /// Absolute canvas Y-Axis coodinate for this actor (in pixels)
-        /// </summary>
-        public double RawDrawPositionY { get; set; }
-
-        /// <summary>
-        /// Absolute game world vector
-        /// </summary>
-        public Vector3 WorldVector { get; set; }
-
-        /// <summary>
-        /// Calculates Canvas position with a given game world position
-        /// </summary>
-        public void Update(Vector3 position)
-        {
-            try
-            {
-                WorldVector = position;
-
-                var centerActorPosition = CanvasData.CenterVector;
-
-                // Distance from Actor to Player
-                RawWorldDistanceX = centerActorPosition.X - position.X;
-                RawWorldDistanceY = centerActorPosition.Y - position.Y;
-
-                //if (Math.Abs(RawWorldDistanceX) > 1000 || Math.Abs(RawWorldDistanceY) > 1000)
-                //    return;
-
-                // We want 1 yard of game distance to = Gridsize
-                RawDrawDistanceX = RawWorldDistanceX * (float)CanvasData.GridSquareSize.Width;
-                RawDrawDistanceY = RawWorldDistanceY * (float)CanvasData.GridSquareSize.Height;
-
-                // Distance on canvas from center to actor
-                RawDrawPositionX = (CanvasData.Center.X + RawDrawDistanceX);
-                RawDrawPositionY = (CanvasData.Center.Y + RawDrawDistanceY);
-
-                // Points in Canvas and Grid Scale
-                RawPoint = new Point(RawDrawPositionX, RawDrawPositionY);
-                RawGridPoint = new Point(RawDrawPositionX / CanvasData.GridSquareSize.Width, RawDrawPositionY / CanvasData.GridSquareSize.Height);
-
-                Point point;
-                if (CanvasData.Transforms.TryTransform(RawPoint, out point))
-                {
-                    Point = point;
-                }
-                else
-                {
-                    Logger.Log("Point Transform Failed on {0}x{1}", RawPoint.X, RawPoint.Y);
-                }
-
-                GridPoint = new Point((int)(Point.X / CanvasData.GridSquareSize.Width), (int)(Point.Y / CanvasData.GridSquareSize.Height));
-                IsBeyondCanvas = Point.X < 0 || Point.X > CanvasData.CanvasSize.Width || Point.Y < 0 || Point.Y > CanvasData.CanvasSize.Height;
-
-            }
-            catch (Exception ex)
-            {
-                Logger.Log("Exception in RadarUI.PointMorph.Update(). {0} {1}", ex.Message, ex.InnerException);
-            }
-        }
 
 
-    }
+
+
+
 
 }

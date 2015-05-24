@@ -371,6 +371,11 @@ namespace Trinity.LazyCache
                 }
             }
 
+            using (new PerformanceLogger("lazyCache.Update.Buffs"))
+            {
+                CacheBuffs.Update();
+            }
+
             using (new PerformanceLogger("lazyCache.Update.Movement"))
             {
                 foreach (var o in Objects)

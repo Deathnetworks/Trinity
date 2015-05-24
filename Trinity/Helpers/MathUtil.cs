@@ -43,7 +43,7 @@ namespace Trinity
                 return false;
         }
 
-        private double DegreeToRadian(double angle)
+        public static double DegreeToRadian(double angle)
         {
             return Math.PI * angle / 180.0;
         }
@@ -197,6 +197,7 @@ namespace Trinity
             }
             return (float)(radian % (Math.PI * 2d));
         }
+
         public static double RadianToDegree(double angle)
         {
             return angle * (180.0 / Math.PI);
@@ -277,5 +278,191 @@ namespace Trinity
 
             return new Vector3(x, y, z);
         }
+
+        
+        public static Vector3 GetEstimatedPosition(Vector3 startPosition, double headingRadians, double time, double targetVelocity)
+        {
+            double x = startPosition.X + targetVelocity * time * Math.Sin(headingRadians);
+            double y = startPosition.Y + targetVelocity * time * Math.Cos(headingRadians);
+            return new Vector3((float)x, (float)y, 0);
+        }
+
+        /// <summary>
+        /// Utility for Predictive Firing 
+        /// </summary>
+        public class Intercept
+        {
+
+            /*
+                Intercept intercept = new Intercept();
+
+                intercept.calculate (
+                        ourRobotPositionX,
+                        ourRobotPositionY,
+                        currentTargetPositionX,
+                        currentTargetPositionY,
+                        curentTargetHeading_deg,
+                        currentTargetVelocity,
+                        bulletPower,
+                        0 // Angular velocity
+                );
+
+                // Helper function that converts any angle into  
+                // an angle between +180 and -180 degrees.
+                    double turnAngle = normalRelativeAngle(intercept.bulletHeading_deg - robot.getGunHeading());
+
+                // Move gun to target angle
+                    robot.setTurnGunRight (turnAngle);
+
+                    if (Math.abs (turnAngle) 
+                        <= intercept.angleThreshold) {
+                  // Ensure that the gun is pointing at the correct angle
+                  if ((intercept.impactPoint.x > 0)
+                                && (intercept.impactPoint.x < getBattleFieldWidth())
+                                && (intercept.impactPoint.y > 0)
+                                && (intercept.impactPoint.y < getBattleFieldHeight())) {
+                    // Ensure that the predicted impact point is within 
+                            // the battlefield
+                            fire(bulletPower);
+                        }
+                    }
+                }                          
+             */
+
+            public Vector2 impactPoint = new Vector2(0, 0);
+            public double bulletHeading_deg;
+
+            protected Vector2 bulletStartingPoint = new Vector2();
+            protected Vector2 targetStartingPoint = new Vector2();
+            public double targetHeading;
+            public double targetVelocity;
+            public double bulletPower;
+            public double angleThreshold;
+            public double distance;
+
+            protected double impactTime;
+            protected double angularVelocity_rad_per_sec;
+
+            public void Calculate(
+                // Initial bullet position x coordinate 
+                    double xb,
+                // Initial bullet position y coordinate
+                    double yb,
+                // Initial target position x coordinate
+                    double xt,
+                // Initial target position y coordinate
+                    double yt,
+                // Target heading
+                    double tHeading,
+                // Target velocity
+                    double vt,
+                // Power of the bullet that we will be firing
+                    double bPower,
+                // Angular velocity of the target
+                    double angularVelocityDegPerSec,
+                // target object's radius
+                    double targetsRadius
+            )
+            {
+                angularVelocity_rad_per_sec = DegreeToRadian(angularVelocityDegPerSec);
+
+                bulletStartingPoint = new Vector2((float) xb, (float) yb);
+                targetStartingPoint = new Vector2((float) xt, (float) yt);
+
+                targetHeading = tHeading;
+                targetVelocity = vt;
+                bulletPower = bPower;
+                double vb = 20 - 3 * bulletPower;
+
+                // Start with initial guesses at 10 and 20 ticks
+                impactTime = GetImpactTime(10, 20, 0.01);
+                impactPoint = GetEstimatedPosition(impactTime);
+
+                double dX = (impactPoint.X - bulletStartingPoint.X);
+                double dY = (impactPoint.Y - bulletStartingPoint.Y);
+
+                distance = Math.Sqrt(dX * dX + dY * dY);
+
+                bulletHeading_deg = RadianToDegree(Math.Atan2(dX, dY));
+                angleThreshold = RadianToDegree(Math.Atan(targetsRadius / distance));
+            }
+
+            protected Vector2 GetEstimatedPosition(double time)
+            {
+                double x = targetStartingPoint.X + targetVelocity * time * Math.Sin(DegreeToRadian(targetHeading));
+                double y = targetStartingPoint.Y + targetVelocity * time * Math.Cos(DegreeToRadian(targetHeading));
+                return new Vector2((float) x, (float) y);
+            }
+
+            private double F(double time)
+            {
+
+                double vb = 20 - 3 * bulletPower;
+
+                Vector2 targetPosition = GetEstimatedPosition(time);
+                double dX = (targetPosition.X - bulletStartingPoint.X);
+                double dY = (targetPosition.Y - bulletStartingPoint.Y);
+
+                return Math.Sqrt(dX * dX + dY * dY) - vb * time;
+            }
+
+            private double GetImpactTime(double t0,
+                    double t1, double accuracy)
+            {
+
+                double X = t1;
+                double lastX = t0;
+                int iterationCount = 0;
+                double lastfX = F(lastX);
+
+                while ((Math.Abs(X - lastX) >= accuracy)
+                        && (iterationCount < 15))
+                {
+
+                    iterationCount++;
+                    double fX = F(X);
+
+                    if ((fX - lastfX) == 0.0)
+                    {
+                        break;
+                    }
+
+                    double nextX = X - fX * (X - lastX) / (fX - lastfX);
+                    lastX = X;
+                    X = nextX;
+                    lastfX = fX;
+                }
+
+                return X;
+            }
+
+        }
+
+        public class CircularIntercept : Intercept {
+
+            protected new Vector2 GetEstimatedPosition(double time) {
+                if (Math.Abs(angularVelocity_rad_per_sec)
+                        <= DegreeToRadian(0.1))
+                {
+                    return base.GetEstimatedPosition(time);
+                }
+
+                double initialTargetHeading = DegreeToRadian(targetHeading);
+                double finalTargetHeading = initialTargetHeading
+                        + angularVelocity_rad_per_sec * time;
+                double x = targetStartingPoint.X - targetVelocity
+                        / angularVelocity_rad_per_sec * (Math.Cos(finalTargetHeading)
+                        - Math.Cos(initialTargetHeading));
+                double y = targetStartingPoint.Y - targetVelocity
+                        / angularVelocity_rad_per_sec
+                        * (Math.Sin(initialTargetHeading)
+                        - Math.Sin(finalTargetHeading));
+
+                return new Vector2((float) x, (float) y);
+            }
+
+        }
+
+
     }
 }

@@ -4,17 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Trinity.Helpers;
-using Trinity.LazyCache;
 using Zeta.Game.Internals.Actors;
-using Trinity.Technicals;
 
-namespace Trinity.Objects
+namespace Trinity.LazyCache
 {
-    public class CachedBuff
+    public class TrinityBuff
     {
-        public CachedBuff() { }
+        public TrinityBuff() { }
 
-        public CachedBuff(Buff buff)
+        public TrinityBuff(Buff buff)
         {
             _buff = buff;
             InternalName = buff.InternalName;
@@ -51,11 +49,5 @@ namespace Trinity.Objects
         {
             return ReferenceEquals(this, obj);
         }
-
-        public static implicit operator TrinityBuff(CachedBuff x)
-        {
-            return new TrinityBuff(x._buff);
-        }
-
     }
 }

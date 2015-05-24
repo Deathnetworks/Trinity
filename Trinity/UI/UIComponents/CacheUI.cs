@@ -240,7 +240,7 @@ namespace Trinity.UI.UIComponents
 
                     return false;
 
-                }, 15);
+                }, 50);
                
             }
         }
@@ -267,7 +267,7 @@ namespace Trinity.UI.UIComponents
                     _lastUpdatedDefault = DateTime.UtcNow;
                 }
 
-                if (DataModel.IsLazyCacheVisible && DateTime.UtcNow.Subtract(_lastUpdatedLazy).TotalMilliseconds > 15)
+                if (DataModel.IsLazyCacheVisible && DateTime.UtcNow.Subtract(_lastUpdatedLazy).TotalMilliseconds > 50)
                 {
                     _isUpdating = true;
                     _updateCount++;
@@ -360,13 +360,4 @@ namespace Trinity.UI.UIComponents
         }
     }
 
-        //public static class EventExtensions
-        //{
-        //    public static void Raise<T>(this EventHandler<EventArgs<T>> theEvent,
-        //                                object sender, T args)
-        //    {
-        //        if (theEvent != null)
-        //            theEvent(sender, new EventArgs<T>(args));
-        //    }
-        //}
 }

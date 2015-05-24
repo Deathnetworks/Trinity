@@ -133,6 +133,7 @@
     <Compile Include="Combat\Weighting\WeightingBase.cs" />
     <Compile Include="Combat\Weighting\WeightUtilities.cs" />
     <Compile Include="Combat\Weighting\WeightManager.cs" />
+    <Compile Include="Configuration\DataDictionary.Spawners.cs" />
     <Compile Include="Configuration\DataDictionary.ItemIds.cs" />
     <Compile Include="Configuration\Events.cs" />
     <Compile Include="Configuration\TVar.cs" />
@@ -146,6 +147,8 @@
     <Compile Include="Helpers\EnumValue.cs" />
     <Compile Include="Helpers\ExportHelper.cs" />
     <Compile Include="Helpers\GetAttributeExtensions.cs" />
+    <Compile Include="LazyCache\CacheBuffs.cs" />
+    <Compile Include="LazyCache\TrinityBuff.cs" />
     <Compile Include="LazyCache\TrinityMovement.cs" />
     <Compile Include="LazyCache\CacheBase.cs" />
     <Compile Include="LazyCache\CacheFactory.cs" />
@@ -305,7 +308,12 @@
     <Compile Include="UI\UIComponents\CacheUIDataModel.cs" />
     <Compile Include="UI\UIComponents\Controls\AutoSizedGridView.cs" />
     <Compile Include="UI\UIComponents\Controls\ColumnDefinitionExtended.cs" />
-    <Compile Include="UI\UIComponents\Controls\RadarCanvas.cs" />
+    <Compile Include="UI\UIComponents\RadarCanvas\CanvasData.cs" />
+    <Compile Include="UI\UIComponents\RadarCanvas\Drawings.cs" />
+    <Compile Include="UI\UIComponents\RadarCanvas\DrawingUtilities.cs" />
+    <Compile Include="UI\UIComponents\RadarCanvas\PointMorph.cs" />
+    <Compile Include="UI\UIComponents\RadarCanvas\RadarBrushes.cs" />
+    <Compile Include="UI\UIComponents\RadarCanvas\RadarCanvas.cs" />
     <Compile Include="UI\UIComponents\Converters\BoolInverterConverter.cs" />
     <Compile Include="UI\UIComponents\Converters\BoolToTypeConverters.cs" />
     <Compile Include="UI\UIComponents\Converters\DebugDataBindingConverter.cs" />
@@ -340,6 +348,9 @@
     <Compile Include="UI\UIComponents\LineChartLib\ItemPoint.cs" />
     <Compile Include="UI\UIComponents\LineChartLib\ItemPointCollection.cs" />
     <Compile Include="UI\UIComponents\LineChartLib\LineChartGenerator.cs" />
+    <Compile Include="UI\UIComponents\RadarCanvas\RadarObject.cs" />
+    <Compile Include="UI\UIComponents\RadarCanvas\RelativeDrawing.cs" />
+    <Compile Include="UI\UIComponents\RadarCanvas\StaticDrawing.cs" />
     <Compile Include="UI\UIComponents\RelayCommand.cs" />
     <Compile Include="UI\UIComponents\ItemList\LItem.cs" />
     <Compile Include="UI\UIComponents\TVarsViewModel.cs" />
