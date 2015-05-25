@@ -135,13 +135,14 @@ namespace Trinity
     public enum Element
     {
         Unknown = 0,
-        Arcane,
-        Cold,
-        Fire,
-        Holy,
-        Lightning,
-        Physical,
-        Poison
+        Arcane = 1 << 0,
+        Cold = 1 << 1,
+        Fire = 1 << 2,
+        Holy = 1 << 3,
+        Lightning = 1 << 4,
+        Physical = 1 << 5,
+        Poison = 1 << 6,   
+        Any = Arcane | Cold | Fire | Holy | Lightning | Physical | Poison
     }
 
     public enum SpellCategory

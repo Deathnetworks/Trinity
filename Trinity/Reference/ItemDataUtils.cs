@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Trinity.Helpers;
 using Trinity.Items;
 using Trinity.Objects;
@@ -65,6 +66,37 @@ namespace Trinity.Reference
                     return item.Stats.HolySkillDamagePercentBonus;
                 case Element.Physical:
                     return item.Stats.PhysicalSkillDamagePercentBonus;
+                case Element.Any:
+
+                    var fire = GetElementalDamage(item, Element.Fire);
+                    if (fire > 0)
+                        return fire;
+
+                    var cold = GetElementalDamage(item, Element.Cold);
+                    if (cold > 0)
+                        return cold;
+
+                    var lightning = GetElementalDamage(item, Element.Lightning);
+                    if (lightning > 0)
+                        return lightning;
+
+                    var arcane = GetElementalDamage(item, Element.Arcane);
+                    if (arcane > 0)
+                        return arcane;
+
+                    var poison = GetElementalDamage(item, Element.Poison);
+                    if (poison > 0)
+                        return poison;
+
+                    var holy = GetElementalDamage(item, Element.Holy);
+                    if (holy > 0)
+                        return holy;
+
+                    var physical = GetElementalDamage(item, Element.Physical);
+                    if (physical > 0)
+                        return physical;
+
+                    break;
             }
             return 0;
         }
@@ -234,7 +266,8 @@ namespace Trinity.Reference
                         Element.Arcane.ToEnumValue(),
                         Element.Fire.ToEnumValue(),
                         Element.Physical.ToEnumValue(),
-                        Element.Lightning.ToEnumValue(),                       
+                        Element.Lightning.ToEnumValue(), 
+                        Element.Any.ToEnumValue()
                     };
                     break;
             }
