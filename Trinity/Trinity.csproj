@@ -353,6 +353,7 @@
     <Compile Include="UI\UIComponents\RadarCanvas\StaticDrawing.cs" />
     <Compile Include="UI\UIComponents\RelayCommand.cs" />
     <Compile Include="UI\UIComponents\ItemList\LItem.cs" />
+    <Compile Include="UI\UIComponents\ThreadedWindow.cs" />
     <Compile Include="UI\UIComponents\TVarsViewModel.cs" />
     <Compile Include="UI\UIComponents\TVarValidationRule.cs" />
     <Compile Include="UI\UILoader.cs" />

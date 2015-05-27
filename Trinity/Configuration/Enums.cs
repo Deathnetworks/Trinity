@@ -132,16 +132,17 @@ namespace Trinity
         Waypoint,
     }
 
+    [Flags]
     public enum Element
     {
         Unknown = 0,
-        Arcane = 1 << 0,
-        Cold = 1 << 1,
-        Fire = 1 << 2,
-        Holy = 1 << 3,
-        Lightning = 1 << 4,
-        Physical = 1 << 5,
-        Poison = 1 << 6,   
+        Arcane = 1 << 1,
+        Cold = 1 << 2,
+        Fire = 1 << 3,
+        Holy = 1 << 4,
+        Lightning = 1 << 5,
+        Physical = 1 << 6,
+        Poison = 1 << 7,   
         Any = Arcane | Cold | Fire | Holy | Lightning | Physical | Poison
     }
 

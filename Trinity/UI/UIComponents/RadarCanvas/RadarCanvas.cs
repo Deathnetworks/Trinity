@@ -8,7 +8,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media;
+using System.Windows.Threading;
 using Trinity.LazyCache;
+using Trinity.Technicals;
 using Zeta.Common;
 using FlowDirection = System.Windows.FlowDirection;
 using LineSegment = System.Windows.Media.LineSegment;
@@ -32,7 +34,17 @@ namespace Trinity.UIComponents
                 Clip = CanvasData.ClipRegion;
             };
 
+            //Logger.Log("RadarCanvas Constructor");
+            //dispatcherTimer = new DispatcherTimer();
+            //dispatcherTimer.Tick += dispatcherTimer_Tick;
+            //dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 25);            
         }
+
+        //private void dispatcherTimer_Tick(object sender, EventArgs e)
+        //{
+        //    //Logger.Log("Dispatcher Tick");
+        //    InterpolateData();
+        //}
 
         /// <summary>
         /// The canvas size of grid squares (in pixels) for 1yd of game distance
@@ -77,6 +89,8 @@ namespace Trinity.UIComponents
                 typeof(RadarCanvas),
                 new PropertyMetadata(null, OnItemsSourceChanged));
         
+        //private System.Windows.Threading.DispatcherTimer dispatcherTimer;
+        
         public IList ItemsSource
         {
             set { SetValue(ItemsSourceProperty, value); }
@@ -85,7 +99,9 @@ namespace Trinity.UIComponents
 
         static void OnItemsSourceChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
-            (obj as RadarCanvas).OnItemsSourceChanged(args);
+            var radarCanvas = obj as RadarCanvas;
+            if (radarCanvas != null) 
+                radarCanvas.OnItemsSourceChanged(args);
         }
 
         #endregion
@@ -99,11 +115,13 @@ namespace Trinity.UIComponents
         {
             UpdateData();
 
-            if (args.OldValue is INotifyCollectionChanged)
-                (args.OldValue as INotifyCollectionChanged).CollectionChanged -= OnItemsSourceCollectionChanged;
+            var oldValue = args.OldValue as INotifyCollectionChanged;
+            if (oldValue != null)
+                oldValue.CollectionChanged -= OnItemsSourceCollectionChanged;
 
-            if (args.NewValue is INotifyCollectionChanged)
-                (args.NewValue as INotifyCollectionChanged).CollectionChanged += OnItemsSourceCollectionChanged;
+            var newValue = args.NewValue as INotifyCollectionChanged;
+            if (newValue != null)
+                newValue.CollectionChanged += OnItemsSourceCollectionChanged;
         }
 
         /// <summary>
@@ -139,42 +157,98 @@ namespace Trinity.UIComponents
         {
             try
             {
-                if (DesiredSize.Height <= 0 || DesiredSize.Width <= 0)
-                    return;
-
-                Objects.Clear();
-
-                CanvasData.Update(DesiredSize, GridSize);
-
-                // Find the actor who should be in the center of the radar
-                // and whos position all other points should be plotted against.
-
-                var center = ItemsSource.OfType<TrinityUnit>().FirstOrDefault(u => u.IsMe);
-                if (center == null)
-                    return;
-
-                CenterActor = new RadarObject(center, CanvasData);
-                CanvasData.CenterVector = CenterActor.Actor.Position;
-
-                // Calculate locations for all actors positions
-                // on RadarObject ctor; or with .Update();
-
-                foreach (var trinityObject in ItemsSource.OfType<TrinityObject>())
+                using (new PerformanceLogger("RadarUI UpdateData"))
                 {
-                    var radarObject = new RadarObject(trinityObject, CanvasData);
-                    Objects.Add(radarObject);
+                    
+                    if (DesiredSize.Height <= 0 || DesiredSize.Width <= 0)
+                        return;
+
+                    if (!IsVisible)
+                        return;
+
+                    Objects.Clear();
+
+                    CanvasData.Update(DesiredSize, GridSize);
+
+                    // Find the actor who should be in the center of the radar
+                    // and whos position all other points should be plotted against.
+
+                    var center = ItemsSource.OfType<TrinityUnit>().FirstOrDefault(u => u.IsMe);
+                    if (center == null)
+                        return;
+
+                    CenterActor = new RadarObject(center, CanvasData);
+                    CanvasData.CenterVector = CenterActor.Actor.Position;
+
+                    // Calculate locations for all actors positions
+                    // on RadarObject ctor; or with .Update();
+
+                    foreach (var trinityObject in ItemsSource.OfType<TrinityObject>())
+                    {
+                        var radarObject = new RadarObject(trinityObject, CanvasData);
+                        Objects.Add(radarObject);
+                    }
+
+                    UpdateSceneData();
+
+                    //// Reset interpolation timer
+                    ////dispatcherTimer.Start();
+
+                    //var futureTime = DateTime.UtcNow.AddMilliseconds(50);
+                    //foreach (var radarObject in Objects)
+                    //{
+                    //    Vector3 estimatedPosition;
+                    //    if (radarObject.Actor.Movement.HasMoved && radarObject.Actor.Movement.TryPredictPosition(futureTime, out estimatedPosition))
+                    //    {
+                    //        //radarObject.Morph.Update();
+                    //        _predictions.Add(estimatedPosition);
+                    //        //changeCount++;
+                    //    }
+                    //}
+
+                    //while (_predictions.Count >= 10)
+                    //{
+                    //    _predictions.RemoveAt(0);
+                    //}
+
                 }
 
-                UpdateSceneData();
-
                 // Trigger Canvas to Render
-                InvalidateVisual();    
+                InvalidateVisual();  
+                
+
+
+
             }
             catch (Exception ex)
             {
                 Logger.Log("Exception in RadarUI.UpdateData(). {0} {1}", ex.Message, ex.InnerException);
             }
         }
+
+        private void InterpolateData()
+        {
+            //var futureTime = DateTime.UtcNow.AddMilliseconds(25);
+            //var changeCount = 0;
+            //_predictions.Clear();
+
+            //foreach (var radarObject in Objects)
+            //{
+            //    Vector3 estimatedPosition;
+            //    if (radarObject.Actor.Movement.HasMoved && radarObject.Actor.Movement.TryPredictPosition(futureTime, out estimatedPosition))
+            //    {
+            //        //radarObject.Morph.Update();
+            //        _predictions.Add(estimatedPosition);
+            //        //changeCount++;
+            //    }
+            //}
+
+            ////Logger.Log("Estimated {0} actor positions", changeCount);
+
+            //InvalidateVisual();
+        }
+
+        private List<Vector3> _predictions = new List<Vector3>();
 
         /// <summary>
         /// Maintain our collection of walkable areas of scene drawings, removing old or invalid ones.
@@ -214,33 +288,46 @@ namespace Trinity.UIComponents
         /// </summary>
         protected override void OnRender(DrawingContext dc)
         {
-
-            if (CanvasData.CanvasSize.Width == 0 && CanvasData.CanvasSize.Height == 0 || CanvasData.CenterVector == Vector3.Zero)
-                return;
-
-            if (CenterActor.Point.X == 0 && CenterActor.Point.Y == 0)
-                return;
-
-            try
-            {                
-                DrawGrid(dc, CanvasData, GridLineFrequency);
-
-                //DrawRangeGuide(dc, CanvasData);
-
-                foreach (var actor in Objects)
-                {
-                    if (!actor.Morph.IsBeyondCanvas)
-                        DrawActor(dc, CanvasData, actor);
-                }
-
-                dc.DrawRectangle(null, new Pen(Brushes.WhiteSmoke, 1), CanvasData.ClipRegion.Rect);
-
-                DrawScenes(dc, CanvasData);                               
-            }
-            catch (Exception ex)
+            using (new PerformanceLogger("RadarUI Render"))
             {
-                Logger.Log("Exception in RadarUI.OnRender(). {0} {1}", ex.Message, ex.InnerException);
+
+                if (CanvasData.CanvasSize.Width == 0 && CanvasData.CanvasSize.Height == 0 || CanvasData.CenterVector == Vector3.Zero)
+                    return;
+
+                if (CenterActor.Point.X == 0 && CenterActor.Point.Y == 0)
+                    return;
+
+                try
+                {
+                    DrawGrid(dc, CanvasData, GridLineFrequency);
+
+                    //DrawRangeGuide(dc, CanvasData);
+
+                    foreach (var actor in Objects)
+                    {
+                        if (!actor.Morph.IsBeyondCanvas)
+                            DrawActor(dc, CanvasData, actor);
+                    }
+
+                    dc.DrawRectangle(null, new Pen(Brushes.WhiteSmoke, 1), CanvasData.ClipRegion.Rect);
+
+                    DrawScenes(dc, CanvasData);
+
+                    DrawPredictions(dc, CanvasData);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log("Exception in RadarUI.OnRender(). {0} {1}", ex.Message, ex.InnerException);
+                }
             }
+        }
+
+        private void DrawPredictions(DrawingContext dc, CanvasData canvasData)
+        {
+            _predictions.ForEach(p =>
+            {
+                dc.DrawEllipse(Brushes.Yellow, RadarBrushes.YellowPen, p.ToCanvasPoint(), 5, 5);                
+            });
         }
 
         /// <summary>
@@ -346,7 +433,7 @@ namespace Trinity.UIComponents
                 var unit = actor.Actor as TrinityUnit;
                 if (unit != null)
                 {
-                    if (unit.Source.IsDisposed || unit.IsDead)
+                    if (unit.Source.IsDisposed)
                         return;
 
                     // Draw a line to indicate which way the unit is facing
@@ -361,7 +448,7 @@ namespace Trinity.UIComponents
                     var outerFill = new SolidColorBrush(baseColor);
                     var gridRadius = actorRadius*GridSize;
                     outerFill.Opacity = 0.25;
-                    dc.DrawEllipse(outerFill, RadarBrushes.BorderPen, actor.Point, gridRadius, gridRadius);
+                    dc.DrawEllipse(outerFill, null, actor.Point, gridRadius, gridRadius);
 
                     var formattedText = new FormattedText(string.Format("{0}", actorName), CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 11, new SolidColorBrush(baseColor))
                     {
@@ -375,7 +462,7 @@ namespace Trinity.UIComponents
 
                     // Draw a dot in the center of the actor;
                     var innerFill = new SolidColorBrush(baseColor);
-                    dc.DrawEllipse(innerFill, RadarBrushes.BorderPen, actor.Point, MarkerSize / 2, MarkerSize / 2);
+                    dc.DrawEllipse(innerFill, null, actor.Point, MarkerSize / 2, MarkerSize / 2);
                 }
                
 

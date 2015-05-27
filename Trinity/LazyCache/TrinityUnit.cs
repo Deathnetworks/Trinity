@@ -50,7 +50,7 @@ namespace Trinity.LazyCache
         private readonly CacheField<bool> _isEnraged = new CacheField<bool>();
         private readonly CacheField<bool> _isQuestMonster = new CacheField<bool>(UpdateSpeed.Normal);
         private readonly CacheField<bool> _isStealthed = new CacheField<bool>(UpdateSpeed.Normal);
-        private readonly CacheField<bool> _isAttacking = new CacheField<bool>(UpdateSpeed.RealTime);
+        private readonly CacheField<bool> _isAttacking = new CacheField<bool>(UpdateSpeed.Ultra);
         private readonly CacheField<bool> _isMonster = new CacheField<bool>();
         private readonly CacheField<bool> _isUninterruptible = new CacheField<bool>();
         private readonly CacheField<MonsterRace> _monsterRace = new CacheField<MonsterRace>();
@@ -580,7 +580,7 @@ namespace Trinity.LazyCache
             set { _isHidden.SetValueOverride(value); }
         }
 
-        /// <summary>
+        /// <summary> 
         /// If unit is Rooted
         /// </summary>
         public bool IsRooted

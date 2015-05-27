@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using Trinity.Combat.Weighting;
 using Trinity.Helpers;
 using Trinity.Technicals;
@@ -410,7 +411,7 @@ namespace Trinity.LazyCache
             {
                 try
                 {
-                    Parallel.ForEach(CachedObjects, cacheObject => cacheObject.Value.TryCalculateWeight());
+                    CachedObjects.ForEach(cacheObject => cacheObject.Value.TryCalculateWeight());
                 }
                 catch (Exception)
                 {
@@ -421,45 +422,7 @@ namespace Trinity.LazyCache
             LastUpdateTimeTaken = refreshTimer.Elapsed.TotalMilliseconds;
             LastWeightingTimeTaken = weightTimer.Elapsed.TotalMilliseconds;
         }
-
-        
-
-        //private static void CacheScene(Scene scene)
-        //{
-        //    var zone = scene.Mesh.Zone;                       
-
-        //    WalkableNavCells = new List<AABB>();
-        //    Zones = new List<AABB>();
-
-        //    if (zone != null)
-        //    {
-        //        var sceneMax = zone.ZoneMax;
-        //        var sceneMin = zone.ZoneMin;
-        //        var absBounds = new AABB
-        //        {
-        //            Max = sceneMax.ToVector3(),
-        //            Min = sceneMin.ToVector3()
-        //        };
-
-        //        Zones.Add(absBounds);
-
-        //        var navZoneDef = zone.NavZoneDef;               
-
-        //        foreach (var navCell in navZoneDef.NavCells)
-        //        {
-        //            if (!navCell.Flags.HasFlag(NavCellFlags.AllowWalk))
-        //                continue;
-
-        //            var absCellBounds = new AABB
-        //            {
-        //                Max = new Vector3(sceneMin.X + navCell.Max.X, sceneMin.Y + navCell.Max.Y, 0),
-        //                Min = new Vector3(sceneMin.X + navCell.Min.X, sceneMin.Y + navCell.Min.Y, 0)
-        //            };
-
-        //            WalkableNavCells.Add(absCellBounds);
-        //        }
-        //    }
-        //}
+       
 
         /// <summary>
         /// Get actors of a particular TrinityObjectType

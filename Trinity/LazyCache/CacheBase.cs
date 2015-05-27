@@ -131,6 +131,7 @@ namespace Trinity.LazyCache
             try
             {
                 return selector != null && DiaUnit != null && DiaUnit.IsValid && Source.IsProbablyValid() ? selector(DiaUnit) : CacheUtilities.Default<T>();
+                //return selector(DiaUnit);
             }
             catch (Exception ex)
             {

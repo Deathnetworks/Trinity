@@ -9,6 +9,7 @@ using Trinity.LazyCache;
 using Zeta.Bot;
 using Zeta.Bot.Dungeons;
 using Zeta.Bot.Navigation;
+using Zeta.Bot.Pathfinding;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals;
@@ -175,13 +176,45 @@ namespace Trinity.Helpers
         public bool TryPredictPosition(DateTime time, out Vector3 position)
         {
             var last = _speedSensors.LastOrDefault();
+
+            //var averageRecordingTimeMs = _speedSensors.Average(s => s.TimeSinceLastMove.TotalMilliseconds);
+            //var distanceTravelled = _speedSensors.Average(s => Vector3.Distance(s.Location, CacheManager.Me.Position));
+            //var distancePerMs = distanceTravelled/averageRecordingTimeMs;
+            //var timeDifferenceMs = DateTime.UtcNow.Subtract(time).TotalMilliseconds;
+
+            if (last == null)
+            {
+                position = Vector3.Zero;
+                return false;
+            }
+                
+
+            var averageRecordingTimeMs = DateTime.UtcNow.Subtract(last.Timestamp).TotalMilliseconds;
+            var distanceTravelled = last.Location.Distance(CacheManager.Me.Position);
+            var distancePerMs = distanceTravelled/averageRecordingTimeMs;
+            var timeDifferenceMs = time.Subtract(DateTime.UtcNow).TotalMilliseconds;
+            var distanceToTravel = timeDifferenceMs * distancePerMs;
+
+            Logger.Log("averageRecordingTimeMs={0} distanceTravelled={1} distancePerMs={2} timeDifferenceMs={3} distToTravel={4}",
+                averageRecordingTimeMs,
+                distanceTravelled,
+                distancePerMs,
+                timeDifferenceMs,
+                distanceToTravel);
+
+
+
             if (last != null)
             {
-                position = MathUtil.GetEstimatedPosition(
-                                    last.Location,
-                                    GetHeadingRadians(),
-                                    _averageRecordingTimeHours,
-                                    _movementSpeed);  
+                
+
+
+                position = MathEx.GetPointAt(last.Location, (float)distanceToTravel, GetHeadingRadians());
+                //position = MathUtil.GetEstimatedPosition(
+                //                    last.Location,
+                //                    GetHeadingRadians(),
+                //                    timeDifferenceMs,
+                //                    distancePerMs);  
 
                 return true;                             
             }

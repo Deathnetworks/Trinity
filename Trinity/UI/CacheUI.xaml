@@ -24,7 +24,7 @@
     </UserControl.Resources>
     <DockPanel>
         <Grid DockPanel.Dock="Top">
-            <WrapPanel>                    
+            <WrapPanel>
                 <CheckBox Margin="5" IsChecked="{Binding Path=Enabled}">On/Off</CheckBox>
                 <CheckBox Margin="5" IsChecked="{Binding Path=IsDefaultVisible}">Show Default Cache</CheckBox>
                 <CheckBox Margin="5" IsChecked="{Binding Path=IsLazyCacheVisible}">Show Lazy Cache</CheckBox>
@@ -39,9 +39,10 @@
                 <ut:ColumnDefinitionExtended Visible="{Binding IsLazyCacheVisible}" Width="*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
+                <!--<RowDefinition Height="Auto" />-->
                 <RowDefinition Height="3*" />
-                <RowDefinition Height="5" />
-                <RowDefinition Height="175" />
+                <RowDefinition Height="0" />
+                <RowDefinition Height="0" />
             </Grid.RowDefinitions>
             <ListView Grid.Column="0" Grid.RowSpan="3" ItemsSource="{Binding Cache}" SelectionMode="Single">
                 <ListView.View>
@@ -64,7 +65,7 @@
                         <GridViewColumn Header="MinimapTexture" DisplayMemberBinding="{Binding MinimapTexture, Mode=OneWay}" CellTemplate="{StaticResource ListViewTextCellTemplate}" />
                         <!--<GridViewColumn Width="Auto" Header="RActorGUID" DisplayMemberBinding="{Binding RActorGUID, Mode=OneWay}" CellTemplate="{StaticResource listViewTextCellTemplate}" />-->
                         <!--<GridViewColumn Width="Auto" Header="ActorSNO" DisplayMemberBinding="{Binding ActorSNO, Mode=OneWay}" CellTemplate="{StaticResource listViewTextCellTemplate}" />-->
-                    </ut:AutoSizedGridView>              
+                    </ut:AutoSizedGridView>
                 </ListView.View>
             </ListView>
 
@@ -92,134 +93,73 @@
                     <ContextMenu>
                         <MenuItem Header="Copy" 
                               Command="{Binding Data.CopyCommand, Source={StaticResource Proxy}}"  
-                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />           
-                    </ContextMenu>               
+                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                    </ContextMenu>
                 </ListView.ContextMenu>
             </ListView>
 
-            <GridSplitter ResizeDirection="Rows" Background="Teal" Grid.Column="2" Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />
-
+            <GridSplitter ResizeDirection="Rows" Background="Teal" Grid.Column="2" Grid.Row="1" Height="0" HorizontalAlignment="Stretch" />
+            <!--
             <Border Padding="10,20" Grid.Column="2" Grid.Row="2" Background="#333333">
-                
-            <UserControl>
-
-                <UserControl.Resources>
-                    
-                    <charts:LineChartGenerator x:Key="UpdateLineGenerator" ItemsSource="{Binding CacheUpdateTime}" 
+                <UserControl>
+                    <UserControl.Resources>
+                        <charts:LineChartGenerator x:Key="UpdateLineGenerator" ItemsSource="{Binding CacheUpdateTime}" 
                                                Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=ActualWidth}" 
                                                Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=ActualHeight}">
-
-                        <charts:LineChartGenerator.HorizontalAxis>
-                            <charts:AutoAxis PropertyName="DateTime" />
-                        </charts:LineChartGenerator.HorizontalAxis>
-
-                        <charts:LineChartGenerator.VerticalAxis>
-                            <charts:AdaptableIncrementAxis PropertyName="Value" MaximumItems="5" IncludeZero="True" IsSymmetricAroundZero="False" Increments="1,2,5" IsFlipped="True" />
-                        </charts:LineChartGenerator.VerticalAxis>   
-
-                        </charts:LineChartGenerator>
-
-                        <charts:LineChartGenerator x:Key="WeightLineGenerator" ItemsSource="{Binding WeightUpdateTime}" 
-                                               Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=ActualWidth}" 
-                                               Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=ActualHeight}">
-
                             <charts:LineChartGenerator.HorizontalAxis>
                                 <charts:AutoAxis PropertyName="DateTime" />
                             </charts:LineChartGenerator.HorizontalAxis>
-
                             <charts:LineChartGenerator.VerticalAxis>
                                 <charts:AdaptableIncrementAxis PropertyName="Value" MaximumItems="5" IncludeZero="True" IsSymmetricAroundZero="False" Increments="1,2,5" IsFlipped="True" />
                             </charts:LineChartGenerator.VerticalAxis>
-
                         </charts:LineChartGenerator>
-
+                        <charts:LineChartGenerator x:Key="WeightLineGenerator" ItemsSource="{Binding WeightUpdateTime}" 
+                                               Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=ActualWidth}" 
+                                               Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=ActualHeight}">
+                            <charts:LineChartGenerator.HorizontalAxis>
+                                <charts:AutoAxis PropertyName="DateTime" />
+                            </charts:LineChartGenerator.HorizontalAxis>
+                            <charts:LineChartGenerator.VerticalAxis>
+                                <charts:AdaptableIncrementAxis PropertyName="Value" MaximumItems="5" IncludeZero="True" IsSymmetricAroundZero="False" Increments="1,2,5" IsFlipped="True" />
+                            </charts:LineChartGenerator.VerticalAxis>
+                        </charts:LineChartGenerator>
                     </UserControl.Resources>
-
-                <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-
-                        <Grid Grid.Row="1" Grid.Column="1" Background="#333333" Style="{x:Null}" Width="{Binding Source={StaticResource UpdateLineGenerator}, Path=Width}" Height="{Binding Source={StaticResource UpdateLineGenerator}, Path=Height}">
-
-                        <!-- Horizontal grid lines 
-                        <ItemsControl Background="Transparent" Style="{x:Null}" ItemsSource="{Binding Source={StaticResource UpdateLineGenerator}, 
-                                                Path=VerticalAxis.AxisItems}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                    <Grid Background="Transparent" Style="{x:Null}" IsItemsHost="True" />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                    <Line Stroke="#444444"
-                              X1="0"
-                              X2="{Binding Source={StaticResource UpdateLineGenerator}, Path=Width}"
-                              Y1="{Binding Offset}"
-                              Y2="{Binding Offset}" />
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>-->
-
-                        <!-- Vertical grid lines 
-                        <ItemsControl Background="Transparent" Style="{x:Null}" ItemsSource="{Binding Source={StaticResource Generator}, Path=HorizontalAxis.AxisItems}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <Grid Background="Transparent" Style="{x:Null}" IsItemsHost="True" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Line Stroke="DarkGray" X1="{Binding Offset}" X2="{Binding Offset}" Y1="0" Y2="{Binding Source={StaticResource Generator}, Path=Height}" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>-->
-
-                        <!-- Connect the points -->
-                        <Polyline StrokeLineJoin="Round" StrokeMiterLimit="0.5" StrokeThickness="2" Points="{Binding Source={StaticResource UpdateLineGenerator}, Path=Points}" Stroke="DarkOrange" />
-
-                        <!-- The chart itself -->
-                        <ItemsControl Background="Transparent" Style="{x:Null}" ItemsSource="{Binding Source={StaticResource UpdateLineGenerator}, Path=ItemPoints}">
-
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <Grid Background="Transparent" Style="{x:Null}" IsItemsHost="True" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Path Fill="Orange">
-                                        <Path.Data>
-                                            <EllipseGeometry Center="{Binding Point}" RadiusX="2" RadiusY="2" />
-                                        </Path.Data>
-                                    </Path>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                            <!-- Connect the points -->
-                            <Polyline StrokeLineJoin="Round" StrokeMiterLimit="0.5" StrokeThickness="2" Points="{Binding Source={StaticResource WeightLineGenerator}, Path=Points}" Stroke="DodgerBlue" />
-
-                            <!-- The chart itself -->
-                            <ItemsControl Background="Transparent" Style="{x:Null}" ItemsSource="{Binding Source={StaticResource WeightLineGenerator}, Path=ItemPoints}">
-
+                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="1" Grid.Column="1" Background="#333333" Style="{x:Null}" Width="{Binding Source={StaticResource UpdateLineGenerator}, Path=Width}" Height="{Binding Source={StaticResource UpdateLineGenerator}, Path=Height}">                 
+                            <Polyline StrokeLineJoin="Round" StrokeMiterLimit="0.5" StrokeThickness="2" Points="{Binding Source={StaticResource UpdateLineGenerator}, Path=Points}" Stroke="DarkOrange" />
+                            <ItemsControl Background="Transparent" Style="{x:Null}" ItemsSource="{Binding Source={StaticResource UpdateLineGenerator}, Path=ItemPoints}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <Grid Background="Transparent" Style="{x:Null}" IsItemsHost="True" />
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
-
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Path Fill="Orange">
+                                            <Path.Data>
+                                                <EllipseGeometry Center="{Binding Point}" RadiusX="2" RadiusY="2" />
+                                            </Path.Data>
+                                        </Path>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>             
+                            <Polyline StrokeLineJoin="Round" StrokeMiterLimit="0.5" StrokeThickness="2" Points="{Binding Source={StaticResource WeightLineGenerator}, Path=Points}" Stroke="DodgerBlue" />                
+                            <ItemsControl Background="Transparent" Style="{x:Null}" ItemsSource="{Binding Source={StaticResource WeightLineGenerator}, Path=ItemPoints}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Grid Background="Transparent" Style="{x:Null}" IsItemsHost="True" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Path Fill="DeepSkyBlue">
@@ -230,331 +170,49 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-
                         </Grid>
-
-                        
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="Cache Update (ms)" HorizontalAlignment="Left" TextAlignment="Center" Foreground="Orange" FontSize="12" Margin="10,-9,4,4" />
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="Weighting (ms)" TextAlignment="Right" Foreground="DodgerBlue" FontSize="12" Margin="4,-9,10,4" />
-                   
-
-
-                    <!-- Scale at left of chart -->
-                    <ItemsControl Grid.Row="1" Grid.Column="0" Background="Transparent" Style="{x:Null}" ItemsSource="{Binding Source={StaticResource UpdateLineGenerator}, Path=VerticalAxis.AxisItems}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <Grid Background="#333333" Style="{x:Null}" IsItemsHost="True" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                    <StackPanel Background="Transparent" Style="{x:Null}" Orientation="Horizontal" HorizontalAlignment="Right">
-                                        <TextBlock Background="Transparent" Style="{x:Null}" Padding="0,0,8,0" Foreground="DarkOrange" Text="{Binding Item, StringFormat=' {0:N1}'}" RenderTransform="1 0 0 1 0 -8" />
-                                    <!--<Line X2="10" Stroke="LightGray" />-->
-
-                                    <StackPanel.RenderTransform>
-                                        <TranslateTransform Y="{Binding Offset}" />
-                                    </StackPanel.RenderTransform>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-
-                    <!-- Scale at right of chart (Weighting) -->
-                    <ItemsControl Grid.Row="1" Grid.Column="2" Background="Transparent" Style="{x:Null}" ItemsSource="{Binding Source={StaticResource WeightLineGenerator}, Path=VerticalAxis.AxisItems}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="Cache Update (ms)" HorizontalAlignment="Left" TextAlignment="Center" Foreground="Orange" FontSize="12" Margin="10,-9,4,4" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="Weighting (ms)" TextAlignment="Right" Foreground="DodgerBlue" FontSize="12" Margin="4,-9,10,4" /> 
+                        <ItemsControl Grid.Row="1" Grid.Column="0" Background="Transparent" Style="{x:Null}" ItemsSource="{Binding Source={StaticResource UpdateLineGenerator}, Path=VerticalAxis.AxisItems}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
                                     <Grid Background="#333333" Style="{x:Null}" IsItemsHost="True" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Background="Transparent" Style="{x:Null}" Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <TextBlock Background="Transparent" Style="{x:Null}" Padding="0,0,8,0" Foreground="DarkOrange" Text="{Binding Item, StringFormat=' {0:N1}'}" RenderTransform="1 0 0 1 0 -8" />                                 
 
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
+                                        <StackPanel.RenderTransform>
+                                            <TranslateTransform Y="{Binding Offset}" />
+                                        </StackPanel.RenderTransform>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>              
+                        <ItemsControl Grid.Row="1" Grid.Column="2" Background="Transparent" Style="{x:Null}" ItemsSource="{Binding Source={StaticResource WeightLineGenerator}, Path=VerticalAxis.AxisItems}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Grid Background="#333333" Style="{x:Null}" IsItemsHost="True" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
                                     <StackPanel Background="Transparent" Style="{x:Null}" Orientation="Horizontal" HorizontalAlignment="Left">
                                         <TextBlock Background="Transparent" Style="{x:Null}" Foreground="DodgerBlue" Text="{Binding Item, StringFormat=' {0:N1}'}" RenderTransform="1 0 0 1 0 -8" Padding="8,0,0,0" />
-                                    <!--<Line X2="10" Stroke="LightGray" />-->
-
-                                    <StackPanel.RenderTransform>
+                                         <StackPanel.RenderTransform>
                                             <TranslateTransform Y="{Binding Offset}" />
-                                    </StackPanel.RenderTransform>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-
-                        <!-- Scale at bottom of chart 
-                    <ItemsControl Grid.Row="2" Grid.Column="1" Background="Transparent" Style="{x:Null}" ItemsSource="{Binding Source={StaticResource Generator}, 
-                                            Path=HorizontalAxis.AxisItems}">
-
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <Grid IsItemsHost="True" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel HorizontalAlignment="Left">
-                                    <Line Y2="10" Stroke="Gray" />
-
-                                    <TextBlock Name="txtblk" RenderTransform="1 0 0 1 -4 -4">
-                                        <TextBlock.LayoutTransform>
-                                            <RotateTransform Angle="45" />
-                                        </TextBlock.LayoutTransform>
-                                    </TextBlock>
-
-                                    <StackPanel.RenderTransform>
-                                        <TranslateTransform X="{Binding Offset}" />
-                                    </StackPanel.RenderTransform>
-                                </StackPanel>
-
-                                <DataTemplate.Triggers>
-                                    <DataTrigger Binding="{Binding Source={StaticResource Generator}, Path=HorizontalAxis.DateTimeInterval}" Value="Second">
-                                        <Setter TargetName="txtblk" Property="Text" Value="{Binding Item, StringFormat=ss}" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Source={StaticResource Generator}, Path=HorizontalAxis.DateTimeInterval}" Value="Minute">
-                                        <Setter TargetName="txtblk" Property="Text" Value="{Binding Item, StringFormat=mm:ss}" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Source={StaticResource Generator}, Path=HorizontalAxis.DateTimeInterval}" Value="Hour">
-                                        <Setter TargetName="txtblk" Property="Text" Value="{Binding Item, StringFormat='h tt, d MMM yy'}" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Source={StaticResource Generator}, Path=HorizontalAxis.DateTimeInterval}" Value="Day">
-                                        <Setter TargetName="txtblk" Property="Text" Value="{Binding Item, StringFormat=d}" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Source={StaticResource Generator}, Path=HorizontalAxis.DateTimeInterval}" Value="Month">
-                                        <Setter TargetName="txtblk" Property="Text" Value="{Binding Item, StringFormat=MMM yy}" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Source={StaticResource Generator}, Path=HorizontalAxis.DateTimeInterval}" Value="Year">
-                                        <Setter TargetName="txtblk" Property="Text" Value="{Binding Item, StringFormat=MMMM}" />
-                                    </DataTrigger>
-                                </DataTemplate.Triggers>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>-->
-                </Grid>
-
-            </UserControl>
-
-            </Border>
-            <!--<Grid Grid.Column="2" Grid.Row="2" Margin="15">
-
-                <Grid.Resources>
-                    <charts:LineChartGenerator x:Key="generator" 
-                                            Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type Grid}}, Path=ActualWidth}"  
-                                               Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type Grid}}, Path=ActualHeight}"
-                                               ItemsSource="{Binding CacheUpdateTime}">
-
-                        <charts:LineChartGenerator.HorizontalAxis>
-                            <charts:AdaptableDateTimeAxis PropertyName="DateTime" MaximumItems="50" />
-                        </charts:LineChartGenerator.HorizontalAxis>
-                        <charts:LineChartGenerator.VerticalAxis>
-                            <charts:AdaptableIncrementAxis PropertyName="Value" Margin="5" IsFlipped="True" IncludeZero="True" />
-                        </charts:LineChartGenerator.VerticalAxis>
-                    </charts:LineChartGenerator>
-                </Grid.Resources>
-
-                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    
-                    <Grid Grid.Row="0"
-              Grid.Column="1"
-              Background="Cyan"
-              Width="{Binding Source={StaticResource generator}, Path=Width}"
-              Height="{Binding Source={StaticResource generator}, Path=Height}">
-
-
-                        <ItemsControl ItemsSource="{Binding Source={StaticResource generator}, 
-                                                Path=VerticalAxis.AxisItems}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <Grid IsItemsHost="True" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Line Stroke="White"
-                              X1="0"
-                              X2="{Binding Source={StaticResource generator}, Path=Width}"
-                              Y1="{Binding Offset}"
-                              Y2="{Binding Offset}" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-
-                        <ItemsControl ItemsSource="{Binding Source={StaticResource generator}, 
-                                                Path=HorizontalAxis.AxisItems}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <Grid IsItemsHost="True" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Line Stroke="White"
-                                      X1="{Binding Offset}"
-                                      X2="{Binding Offset}"
-                                      Y1="0"
-                                      Y2="{Binding Source={StaticResource generator}, Path=Height}" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-              
-                        <Polyline Stroke="Blue" StrokeThickness="4" Points="{Binding Source={StaticResource generator}, Path=ItemPoints}" />
-
-
-                        <Canvas Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-
-
-                            <Polyline Canvas.Left="-20" Canvas.Top="-20"
-    Stroke="Yellow"
-                                 Points="{Binding Points, Source={StaticResource generator}}"
-    StrokeThickness="4" />
-
-                            <Polyline
-    Points="10,110 110,110 110,10"
-    Stroke="Black"
-    StrokeThickness="4"
-    Canvas.Left="-10" />
-
-
-                        </Canvas>
-
-  
-                        <ItemsControl ItemsSource="{Binding Source={StaticResource generator}, Path=ItemPoints}">
-
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <Grid IsItemsHost="True" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Path Fill="Red">
-                                        <Path.Data>
-                                            <EllipseGeometry Center="{Binding Point}"
-                                                 RadiusX="2"
-                                                 RadiusY="2" />
-                                        </Path.Data>
-                                    </Path>
+                                        </StackPanel.RenderTransform>
+                                    </StackPanel>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </Grid>
-                    
-    
-                        <ItemsControl Grid.Row="0"
-                      Grid.Column="0"
-                      ItemsSource="{Binding Source={StaticResource generator}, Path=VerticalAxis.AxisItems}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <Grid IsItemsHost="True" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
+                </UserControl>
 
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal"
-                           HorizontalAlignment="Right">
-                                        <TextBlock Text="{Binding Item, StringFormat=' {0:N1}'}" RenderTransform="1 0 0 1 0 -8" />
-                                        <Line X2="10" Stroke="Black" />
-
-                                        <StackPanel.RenderTransform>
-                                            <TranslateTransform Y="{Binding Offset}" />
-                                        </StackPanel.RenderTransform>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                
-                        <ItemsControl Grid.Row="1"
-                      Grid.Column="1"
-                      ItemsSource="{Binding Source={StaticResource generator}, 
-                                            Path=HorizontalAxis.AxisItems}">
-
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <Grid IsItemsHost="True" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel HorizontalAlignment="Left">
-                                        <Line Y2="10" Stroke="Black" />
-
-                                        <TextBlock Name="txtblk"
-                                   RenderTransform="1 0 0 1 -4 -4">
-                                            <TextBlock.LayoutTransform>
-                                                <RotateTransform Angle="45" />
-                                            </TextBlock.LayoutTransform>
-                                        </TextBlock>
-
-                                        <StackPanel.RenderTransform>
-                                            <TranslateTransform X="{Binding Offset}" />
-                                        </StackPanel.RenderTransform>
-                                    </StackPanel>
-
-                                    <DataTemplate.Triggers>
-                                        <DataTrigger Binding="{Binding Source={StaticResource generator}, 
-                                                       Path=HorizontalAxis.DateTimeInterval}" 
-                                     Value="Second">
-                                            <Setter TargetName="txtblk" Property="Text" 
-                                    Value="{Binding Item, StringFormat=h:mm:ss d MMM yy}" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Source={StaticResource generator}, 
-                                                       Path=HorizontalAxis.DateTimeInterval}" 
-                                     Value="Minute">
-                                            <Setter TargetName="txtblk" Property="Text" 
-                                    Value="{Binding Item, StringFormat=h:mm d MMM yy}" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Source={StaticResource generator}, 
-                                                       Path=HorizontalAxis.DateTimeInterval}" 
-                                     Value="Hour">
-                                            <Setter TargetName="txtblk" Property="Text" 
-                                    Value="{Binding Item, StringFormat='h tt, d MMM yy'}" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Source={StaticResource generator}, 
-                                                       Path=HorizontalAxis.DateTimeInterval}" 
-                                     Value="Day">
-                                            <Setter TargetName="txtblk" Property="Text" 
-                                    Value="{Binding Item, StringFormat=d}" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Source={StaticResource generator}, 
-                                                       Path=HorizontalAxis.DateTimeInterval}" 
-                                     Value="Month">
-                                            <Setter TargetName="txtblk" Property="Text" 
-                                    Value="{Binding Item, StringFormat=MMM yy}" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Source={StaticResource generator}, 
-                                                       Path=HorizontalAxis.DateTimeInterval}" 
-                                     Value="Year">
-                                            <Setter TargetName="txtblk" Property="Text" 
-                                    Value="{Binding Item, StringFormat=MMMM}" />
-                                        </DataTrigger>
-                                    </DataTemplate.Triggers>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                  
-                </Grid>
-            </Grid>-->
-
+            </Border>
+-->
         </Grid>
     </DockPanel>
 </UserControl>

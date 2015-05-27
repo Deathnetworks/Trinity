@@ -14,11 +14,14 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using Demonbuddy;
 using Trinity.Cache;
+using Trinity.Combat.Abilities;
 using Trinity.Helpers;
 using Trinity.LazyCache;
 using Trinity.Technicals;
 using Trinity.UIComponents;
 using Zeta.Bot;
+using Zeta.Bot.Dungeons;
+using Zeta.Bot.Profile.Common;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals;
@@ -32,140 +35,111 @@ namespace Trinity.UI.UIComponents
 {
     public class CacheUI
     {
-        private static Window _window;
-        internal static CacheUIDataModel DataModel = new CacheUIDataModel();
+        private static bool _isUpdating;
+        private static CacheUIDataModel _dataModel;
+        private static DateTime _lastUpdatedDefault = DateTime.MinValue;
+        private static DateTime _lastUpdatedLazy = DateTime.MinValue;
+        private static DispatcherTimer _internalTimer;
+        private static ThreadedWindow _cacheWindow;
+        private static ThreadedWindow _radarWindow;
 
-        private const int MininumWidth = 25;
-        private const int MinimumHeight = 25;
-
-        public static Window CreateWindow()
+        public static void CreateWindow()
         {
-            try
+            if (_dataModel == null)
             {
-                Logger.Log("Creating CacheUI Window");
-
-                if (DataModel == null)
-                    DataModel = new CacheUIDataModel();
-
-                _window = new Window
-                {
-                    Height = 750,
-                    Width = 1200,
-                    MinHeight = MinimumHeight,
-                    MinWidth = MininumWidth,
-                    Title = "Trinity Cache",
-                    Content = UILoader.LoadAndTransformXamlFile<UserControl>(Path.Combine(FileManager.PluginPath, "UI", "CacheUI.xaml")),
-                    DataContext = DataModel
-                };
-
-                DataModel.CacheUpdateTime.Clear();
-                DataModel.WeightUpdateTime.Clear();
-
-                DataModel.PropertyChanged += DataModelOnPropertyChanged;
-
-                _isWindowOpen = true;
-                _updateCount = 0;
-                _window.Closed += Window_Closed;
-
+                _dataModel = new CacheUIDataModel();
+                _dataModel.PropertyChanged += DataModelOnPropertyChanged;
                 Configuration.Events.OnCacheUpdated += Update;
-                
-                RegisterNotRunningLazyCacheUpdate();
-
-                _window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-
-                _window.Show();
-
-                CreateRadarWindow();   
-
             }
-            catch (Exception ex)
+
+            if (_cacheWindow == null)
             {
-                Logger.LogNormal("Unable to open Trinity CacheUI: {0}", ex);
+                Logger.Log("Loading CacheUI");
+                var cacheXamlPath = Path.Combine(FileManager.PluginPath, "UI", "CacheUI.xaml");
+                _cacheWindow = new ThreadedWindow(cacheXamlPath, _dataModel, "CacheUI", 750, 1200);
             }
 
-            return _window;
+            _cacheWindow.Show();
+
+            CreateRadarWindow();
+
+            _internalTimer = new DispatcherTimer();
+            _internalTimer.Tick += InternalTimerTick;
+            _internalTimer.Interval = new TimeSpan(0, 0, 0, 0, 50);
+            _internalTimer.Start();
         }
 
-        private static Thread _radarThread;
+        private static void InternalTimerTick(object sender, EventArgs e)
+        {
+            if (!_cacheWindow.IsWindowOpen || !_dataModel.Enabled || (!_dataModel.IsLazyCacheVisible && !_dataModel.IsDefaultVisible))
+                return;
+
+            if (BotMain.IsRunning)
+            {
+                Update();
+            }
+            else
+            {                
+                using (ZetaDia.Memory.AcquireFrame(true))
+                //using (new MemoryHelper())
+                {
+                    //var dbMainDispatcher = Dispatcher.FromThread(BotMain.BotThread);
+                    //if (dbMainDispatcher != null)
+                    //{
+                    //    dbMainDispatcher.Invoke(() =>
+                    //    {
+
+                    Dispatcher.CurrentDispatcher.Invoke(() =>
+                    {
+
+
+
+                        ZetaDia.Actors.Update();
+
+                        if (_dataModel.IsDefaultVisible)
+                            Trinity.RefreshDiaObjectCache();
+
+                        if (_dataModel.IsLazyCacheVisible)
+                            CacheManager.Update();
+
+                        Update();
+
+                    });
+
+                    //});                        
+                    //}
+
+                }
+            }
+        }
 
         private static void CreateRadarWindow()
         {
-            try
+            if (_radarWindow == null)
             {
-                Logger.LogDebug("Creating Radar UI Thread");
+                Logger.Log("Loading RadarUI");
+                var radarXamlPath = Path.Combine(FileManager.PluginPath, "UI", "RadarUI.xaml");
+                _radarWindow = new ThreadedWindow(radarXamlPath, _dataModel, "RadarUI", 600, 600);
 
-                _radarThread = new Thread(() =>
+                _dataModel.PropertyChanged += (sender, args) =>
                 {
-                    Logger.LogDebug("Creating Radar Window");
-
-                    if (DataModel == null)
-                        DataModel = new CacheUIDataModel();
-
-                    _radarWindow = new Window
+                    if (args.PropertyName == "IsRadarWindowVisible")
                     {
-                        Height = 700,
-                        Width = 700,
-                        MinHeight = MinimumHeight,
-                        MinWidth = MininumWidth,
-                        Title = "Trinity Radar",
-                        Content = UILoader.LoadAndTransformXamlFile<UserControl>(Path.Combine(FileManager.PluginPath, "UI", "RadarUI.xaml")),
-                        DataContext = DataModel, WindowStartupLocation = WindowStartupLocation.CenterScreen
-                    };
-
-                    // Hide window instead of closing it.
-                    // This avoids thread ownership issues.
-                    _radarWindow.Closing += (sender, args) =>
-                    {
-                        Logger.LogDebug("Hiding Radar Window instead of Close");
-                        DataModel.IsRadarWindowVisible = false;
-                        _radarWindow.Hide();
-                        args.Cancel = true;
-                    };
-
-                    DataModel.PropertyChanged += (sender, args) =>
-                    {
-                        if (args.PropertyName == "IsRadarWindowVisible")
+                        if (_dataModel.IsRadarWindowVisible)
                         {
-                            var radarDispatcher = Dispatcher.FromThread(_radarThread);
-                            if (radarDispatcher == null)
-                                return;
+                            _radarWindow.Show();
+                        }
+                        else
+                        {
+                            _radarWindow.Hide();
+                        }
+                    }
+                };
 
-                            if (DataModel.IsRadarWindowVisible)
-                            {
-                                radarDispatcher.Invoke(() =>
-                                {
-                                    Logger.LogDebug("Showing RadarWindow");
-                                    _radarWindow.Show();
-                                });                
-                            }
-                            else
-                            {
-                                radarDispatcher.Invoke(() =>
-                                {
-                                    Logger.LogDebug("Hiding RadarWindow");
-                                    _radarWindow.Hide();
-                                });                               
-                            }                                        
-                        }                                           
-                    };
-
-                    _window.Closed += (s, e) =>
-                    {
-                        Logger.Log("Proper Closing Radar Window & Thread");
-                        _radarWindow.Dispatcher.InvokeShutdown();
-                        _radarWindow.Close();
-                        _radarWindow = null;
-                    };
-
-                    Dispatcher.Run();
-                });
-
-                _radarThread.SetApartmentState(ApartmentState.STA);
-                _radarThread.Start();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogNormal("Unable to open Trinity RadarUI: {0}", ex);
+                _radarWindow.OnHidden += () =>
+                {
+                    _dataModel.IsRadarWindowVisible = false;
+                };
             }
         }
 
@@ -177,124 +151,38 @@ namespace Trinity.UI.UIComponents
 
             if (propertyChangedEventArgs.PropertyName == "Enabled")
             {
-                FreezeLazyCache();
+                if (_dataModel.Enabled)
+                    _dataModel.LazyCache.ForEach(CacheUtilities.UnFreeze);
+                else
+                    _dataModel.LazyCache.ForEach(CacheUtilities.Freeze);
             }
         }
-
-        /// <summary>
-        /// Freeze records to return cached data only; useful when bot is not running or records are being stored
-        /// for longer than pulse/framelock, and the object no longer has valid references to memory.
-        /// </summary>
-        private static void FreezeLazyCache()
-        {
-            if (DataModel.Enabled)
-                DataModel.LazyCache.ForEach(CacheUtilities.UnFreeze);
-            else
-                DataModel.LazyCache.ForEach(CacheUtilities.Freeze);
-        }
-
-        /// <summary>
-        /// Allows the UICache LazyCache Panel to be updated while bot is not started.
-        /// </summary>
-        private static void RegisterNotRunningLazyCacheUpdate()
-        {
-            if (!BotMain.IsRunning && !BotMain.IsPausedForStateExecution)
-            {
-                Logger.Log("Starting CacheUI update thread");
-                Worker.Start(() =>
-                {
-                    if (BotMain.IsRunning || !_isWindowOpen)
-                    {
-                        Logger.Log("Shutting down CacheUI update thread");
-
-                        if (!_isWindowOpen)
-                        {
-                            CacheManager.Stop();
-                        }
-                        return true;
-                    }
-
-                    using (new MemoryHelper())
-                    {
-                        try
-                        {
-                            if (!BotMain.IsPausedForStateExecution && DataModel.IsLazyCacheVisible)
-                            {
-                                if (ZetaDia.IsInGame && ZetaDia.Me != null)
-                                {
-                                    if (!CacheManager.IsRunning)
-                                        CacheManager.Start();
-
-                                    CacheManager.Update();
-                                    CacheUI.Update();
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Log("Exception in LazyCacheUpdate thread. {0} {1}", ex.Message, ex.InnerException);
-                            throw;
-                        }
-
-                    }
-
-                    return false;
-
-                }, 50);
-               
-            }
-        }
-
-        private static bool _isUpdating;
-        private static int _updateCount;
-
-        private static DateTime _lastUpdatedDefault = DateTime.MinValue;
-        private static DateTime _lastUpdatedLazy = DateTime.MinValue;
 
         private static void Update()
         {
             try
             {
-                if (!_isWindowOpen || !DataModel.Enabled || _isUpdating)
-                    return;
-
-                if (DataModel.IsDefaultVisible && DateTime.UtcNow.Subtract(_lastUpdatedDefault).TotalMilliseconds > 250)
+                using (new PerformanceLogger("CacheUI Update"))
                 {
-                    _isUpdating = true;
-                    _updateCount++;
+                    if (_isUpdating)
+                        return;
 
-                    DataModel.Cache = new ObservableCollection<CacheUIObject>(GetCacheActorList());
-                    _lastUpdatedDefault = DateTime.UtcNow;
-                }
-
-                if (DataModel.IsLazyCacheVisible && DateTime.UtcNow.Subtract(_lastUpdatedLazy).TotalMilliseconds > 50)
-                {
-                    _isUpdating = true;
-                    _updateCount++;
-
-                    Application.Current.Dispatcher.Invoke(() =>
+                    if (_dataModel.IsDefaultVisible && DateTime.UtcNow.Subtract(_lastUpdatedDefault).TotalMilliseconds > 250)
                     {
-                        // The initial update is always huge and messes up the charts.
-                        if (_updateCount > 1 || CacheManager.LastUpdated == DateTime.MinValue)
-                        {
-                            DataModel.CacheUpdateTime.Add(new CacheUIDataModel.ChartDatum(CacheManager.LastUpdated, CacheManager.LastUpdateTimeTaken));
-                            DataModel.WeightUpdateTime.Add(new CacheUIDataModel.ChartDatum(CacheManager.LastUpdated, CacheManager.LastWeightingTimeTaken));
-                        }
+                        _isUpdating = true;
+                        _dataModel.Cache = new ObservableCollection<CacheUIObject>(GetCacheActorList());
+                        _lastUpdatedDefault = DateTime.UtcNow;
+                    }
 
-                        if (DataModel.CacheUpdateTime.Count > 100)
-                            DataModel.CacheUpdateTime.RemoveAt(0);
+                    if (_dataModel.IsLazyCacheVisible && DateTime.UtcNow.Subtract(_lastUpdatedLazy).TotalMilliseconds > 50)
+                    {
+                        _isUpdating = true;                        
+                        _dataModel.LazyCache = new ObservableCollection<TrinityObject>(GetLazyCacheActorList());
+                        _lastUpdatedLazy = DateTime.UtcNow;
+                    }
 
-                        if (DataModel.WeightUpdateTime.Count > 100)
-                            DataModel.WeightUpdateTime.RemoveAt(0);
-
-                        DataModel.LazyCache = new ObservableCollection<TrinityObject>(GetLazyCacheActorList());
-
-                    });
-
-                    _lastUpdatedLazy = DateTime.UtcNow;
+                    _isUpdating = false;
                 }
-
-                _isUpdating = false;
             }
             catch (Exception ex)
             {
@@ -310,14 +198,13 @@ namespace Trinity.UI.UIComponents
                 return CacheManager.GetActorsOfType<TrinityObject>()
                     .OrderByDescending(o => o.Weight)
                     .ThenBy(o => o.Distance)
-                    .ToList();     
+                    .ToList();
             }
             catch (Exception ex)
             {
                 Logger.Log("Exception in GetLazyCacheActorList > GetActorsOfType. {0}", ex.Message, ex.InnerException);
                 throw;
             }
-          
         }
 
         public static List<CacheUIObject> GetCacheActorList()
@@ -334,30 +221,6 @@ namespace Trinity.UI.UIComponents
             }
         }
 
-        private static bool _isWindowOpen;
-
-        private static ICommand CopyToClipboardCommand = new RelayCommand(param =>
-        {
-            Logger.Log("Copy to Clipboard Command Fired {0}", param);
-        });
-        private static bool _isRadarWindowOpen;
-        private static Window _radarWindow;
-
-        private static void Window_Closed(object sender, EventArgs e)
-        {
-            try
-            {
-                _isWindowOpen = false;
-                Configuration.Events.OnCacheUpdated -= Update;
-                DataModel.PropertyChanged -= DataModelOnPropertyChanged;
-                _window = null;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogNormal("Exception in Window_Closed: {0}", ex.ToString());
-
-            }
-        }
     }
 
 }

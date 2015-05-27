@@ -10,6 +10,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using Trinity.Cache;
 using Trinity.LazyCache;
+using Trinity.UI.UIComponents;
 using Trinity.UIComponents;
 using Logger = Trinity.Technicals.Logger;
 
@@ -124,6 +125,8 @@ namespace Trinity.UIComponents
             get { return _isRadarWindowVisible; }
             set { SetField(ref _isRadarWindowVisible, value); }
         }
+
+
     }
 
 }
