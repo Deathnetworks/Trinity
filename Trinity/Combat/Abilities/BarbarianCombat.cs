@@ -2,6 +2,7 @@
 using Trinity.Config.Combat;
 using Trinity.Reference;
 using Zeta.Common;
+using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 
 namespace Trinity.Combat.Abilities
@@ -521,6 +522,10 @@ namespace Trinity.Combat.Abilities
             {
                 if (UseOOCBuff || IsCurrentlyAvoiding || !CanCast(SNOPower.Barbarian_Whirlwind) || Player.IsIncapacitated || Player.IsRooted || Player.PrimaryResource < 10)
                     return false;
+                if (!NavHelper.CanRayCast(CurrentTarget.Position))
+                {
+                    return false;
+                }
 
                 return (CurrentTarget.RadiusDistance <= 25f || TargetUtil.AnyMobsInRange(V.F("Barbarian.Whirlwind.TrashRange"), V.I("Barbarian.Whirlwind.TrashCount"))) &&
                     // Check for energy reservation amounts

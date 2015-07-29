@@ -354,9 +354,9 @@ namespace Trinity
 
                         if (Player.ActorClass == ActorClass.Barbarian)
                         {
-                            bool wwToItem = (CurrentTarget.Type != TrinityObjectType.Item || (CurrentTarget.Type == TrinityObjectType.Item && CurrentTarget.Distance > 10f && NavHelper.CanRayCast(CurrentTarget.Position)));
+                            bool wwToItem = (CurrentTarget.Type != TrinityObjectType.Item || (CurrentTarget.Type == TrinityObjectType.Item && CurrentTarget.Distance > 10f));
                             // Whirlwind against everything within range
-                            if (Player.PrimaryResource >= 10 && CombatBase.CanCast(SNOPower.Barbarian_Whirlwind) && wwToItem &&
+                            if (Player.PrimaryResource >= 10 && CombatBase.CanCast(SNOPower.Barbarian_Whirlwind) && wwToItem && NavHelper.CanRayCast(CurrentTarget.Position) &&
                                 (TargetUtil.AnyMobsInRange(20, false) || Sets.BulKathossOath.IsFullyEquipped) && !IsWaitingForSpecial)
                             {
                                 Skills.Barbarian.Whirlwind.Cast(CurrentDestination);
@@ -872,7 +872,7 @@ namespace Trinity
 
                 // Whirlwind for a barb
                 if (attackableSpecialMovement && !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker
-                    && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource >= 10)
+                    && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource >= 10 && NavHelper.CanRayCast(CurrentTarget.Position))
                 {
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, CurrentDestination, CurrentWorldDynamicId);
                     // Store the current destination for comparison incase of changes next loop

@@ -60,12 +60,11 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Demonbuddy, Version=1.1.2299.519, Culture=neutral, PublicKeyToken=eff32ccf253d66d4, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Demonbuddy.exe</HintPath>
+    <Reference Include="Demonbuddy">
+      <HintPath>..\..\..\DB-PTR\Demonbuddy.exe</HintPath>
     </Reference>
     <Reference Include="GreyMagic">
-      <HintPath>..\..\..\GreyMagic.dll</HintPath>
+      <HintPath>..\..\..\DB-PTR\GreyMagic.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
@@ -517,30 +516,29 @@
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>rd /S /Q "C:\db\svn\$(ProjectName)\trunk\Sources\"
-rd /S /Q "C:\db\Plugins\$(ProjectName)\"
-del /S "$(ProjectDir)*.bak"
+    <PostBuildEvent>SET TARGETDIR=C:\DB\DB-Current\Plugins\$(ProjectName)\
 
-xcopy /E /Y "$(ProjectDir)*.cs" "C:\db\Plugins\$(ProjectName)\"
-xcopy /E /Y "$(ProjectDir)*.dis" "C:\db\Plugins\$(ProjectName)\"
-xcopy /E /Y "$(ProjectDir)*.xaml" "C:\db\Plugins\$(ProjectName)\"
-xcopy /E /Y "$(ProjectDir)*.xml" "C:\db\Plugins\$(ProjectName)\"
-xcopy /E /Y "$(ProjectDir)*.xsd" "C:\db\Plugins\$(ProjectName)\"
-xcopy /E /Y "$(ProjectDir)*.txt" "C:\db\Plugins\$(ProjectName)\"
+rd "%25TARGETDIR%25" /S /Q
+xcopy "$(ProjectDir)*" "%25TARGETDIR%25" /Q /E /C /I /R /Y
+rd "%25TARGETDIR%25\bin\" /S /Q
+rd "%25TARGETDIR%25obj\" /S /Q
+del "%25TARGETDIR%25$(ProjectName).csproj"
+del "%25TARGETDIR%25*.suo"
+del "%25TARGETDIR%25*.user"
+del "%25TARGETDIR%25*.DotSettings"
+del "%25TARGETDIR%25packages.config"
 
-rd /S /Q "C:\db\Plugins\$(ProjectName)\obj\
-rd /S /Q "C:\db\Plugins\$(ProjectName)\bin\
+SET TARGETDIR=C:\DB\DB-PTR\Plugins\$(ProjectName)\
 
-xcopy /E /Y "$(ProjectDir)*.cs" "C:\db\svn\$(ProjectName)\trunk\Sources\"
-xcopy /E /Y "$(ProjectDir)*.dis" "C:\db\svn\$(ProjectName)\trunk\Sources\"
-xcopy /E /Y "$(ProjectDir)*.xaml" "C:\db\svn\$(ProjectName)\trunk\Sources\"
-xcopy /E /Y "$(ProjectDir)*.xml" "C:\db\svn\$(ProjectName)\trunk\Sources\"
-xcopy /E /Y "$(ProjectDir)*.xsd" "C:\db\svn\$(ProjectName)\trunk\Sources\"
-xcopy /E /Y "$(ProjectDir)*.txt" "C:\db\svn\$(ProjectName)\trunk\Sources\"
-
-rd /S /Q "C:\db\svn\$(ProjectName)\trunk\Sources\bin\"
-rd /S /Q "C:\db\svn\$(ProjectName)\trunk\Sources\obj\"
-
+rd "%25TARGETDIR%25" /S /Q
+xcopy "$(ProjectDir)*" "%25TARGETDIR%25" /Q /E /C /I /R /Y
+rd "%25TARGETDIR%25bin\" /S /Q
+rd "%25TARGETDIR%25obj\" /S /Q
+del "%25TARGETDIR%25$(ProjectName).csproj"
+del "%25TARGETDIR%25*.suo"
+del "%25TARGETDIR%25*.user"
+del "%25TARGETDIR%25*.DotSettings"
+del "%25TARGETDIR%25packages.config"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>
