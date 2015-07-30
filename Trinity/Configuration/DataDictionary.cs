@@ -46,14 +46,14 @@ namespace Trinity
         public static List<int> RiftWorldIds { get { return DataDictionary.riftWorldIds; } }
         private static readonly List<int> riftWorldIds = new List<int>()
         {
-            288454,
-            288685,
-            288687,
-            288798,
-            288800,
-            288802,
-            288804,
-            288806,
+			288454,
+			288685,
+			288687,
+			288798,
+			288800,
+			288802,
+			288804,
+			288806,
         };
 
         /// <summary>
@@ -61,17 +61,17 @@ namespace Trinity
         /// </summary>
         public static List<int> RiftPortalHashes { get { return DataDictionary.riftPortalHashes; } }
         private static readonly List<int> riftPortalHashes = new List<int>()
-        {
-            1938876094,
-            1938876095,
-            1938876096,
-            1938876097,
-            1938876098,
-            1938876099,
-            1938876100,
-            1938876101,
-            1938876102,
-        };
+		{
+			1938876094,
+			1938876095,
+			1938876096,
+			1938876097,
+			1938876098,
+			1938876099,
+			1938876100,
+			1938876101,
+			1938876102,
+		};
 
         public static HashSet<int> BountyTurnInQuests { get { return DataDictionary.bountyTurnInQuests; } }
         private static readonly HashSet<int> bountyTurnInQuests = new HashSet<int>()
@@ -221,8 +221,8 @@ namespace Trinity
         /// </summary>
         public static HashSet<int> BossLevelAreaIDs { get { return bossLevelAreaIDs; } }
         private static readonly HashSet<int> bossLevelAreaIDs = new HashSet<int>
-        {
-            109457, 185228, 60194, 130163, 60714, 19789, 62726, 90881, 195268, 58494, 81178, 60757, 111232, 112580,
+        { 
+            109457, 185228, 60194, 130163, 60714, 19789, 62726, 90881, 195268, 58494, 81178, 60757, 111232, 112580, 
             119656, 111516, 143648, 215396, 119882, 109563, 153669, 215235, 55313, 60193, 19789, 330576,
         };
 
@@ -281,14 +281,14 @@ namespace Trinity
             // Stitch_Suicide_Bomb State=Transform By: Corpulent_C (3849)
             new DoubleInt((int)SNOActor.Corpulent_A, (int)SNOAnim.Stitch_Suicide_Bomb),
             new DoubleInt((int)SNOActor.Corpulent_A_Unique_01, (int)SNOAnim.Stitch_Suicide_Bomb),
-            new DoubleInt((int)SNOActor.Corpulent_A_Unique_02, (int)SNOAnim.Stitch_Suicide_Bomb),
-            new DoubleInt((int)SNOActor.Corpulent_A_Unique_03, (int)SNOAnim.Stitch_Suicide_Bomb),
-            new DoubleInt((int)SNOActor.Corpulent_B, (int)SNOAnim.Stitch_Suicide_Bomb),
-            new DoubleInt((int)SNOActor.Corpulent_B_Unique_01, (int)SNOAnim.Stitch_Suicide_Bomb),
-            new DoubleInt((int)SNOActor.Corpulent_C, (int)SNOAnim.Stitch_Suicide_Bomb),
-            new DoubleInt((int)SNOActor.Corpulent_D_CultistSurvivor_Unique, (int)SNOAnim.Stitch_Suicide_Bomb),
-            new DoubleInt((int)SNOActor.Corpulent_C_OasisAmbush_Unique, (int)SNOAnim.Stitch_Suicide_Bomb),
-            new DoubleInt((int)SNOActor.Corpulent_D_Unique_Spec_01, (int)SNOAnim.Stitch_Suicide_Bomb),
+            new DoubleInt((int)SNOActor.Corpulent_A_Unique_02, (int)SNOAnim.Stitch_Suicide_Bomb), 
+            new DoubleInt((int)SNOActor.Corpulent_A_Unique_03, (int)SNOAnim.Stitch_Suicide_Bomb), 
+            new DoubleInt((int)SNOActor.Corpulent_B, (int)SNOAnim.Stitch_Suicide_Bomb), 
+            new DoubleInt((int)SNOActor.Corpulent_B_Unique_01, (int)SNOAnim.Stitch_Suicide_Bomb), 
+            new DoubleInt((int)SNOActor.Corpulent_C, (int)SNOAnim.Stitch_Suicide_Bomb), 
+            new DoubleInt((int)SNOActor.Corpulent_D_CultistSurvivor_Unique, (int)SNOAnim.Stitch_Suicide_Bomb),             
+            new DoubleInt((int)SNOActor.Corpulent_C_OasisAmbush_Unique, (int)SNOAnim.Stitch_Suicide_Bomb),  
+            new DoubleInt((int)SNOActor.Corpulent_D_Unique_Spec_01, (int)SNOAnim.Stitch_Suicide_Bomb), 
 
             new DoubleInt(330824, (int)SNOAnim.x1_Urzael_attack_06), // Urzael flame 
             new DoubleInt(330824, 348109), // Urzael Cannonball Aim
@@ -302,8 +302,8 @@ namespace Trinity
             
             // Big guys with blades on their arms who jump accross the screen and stun you
             // x1_westmarchBrute_attack_02_out State=Attacking By: x1_westmarchBrute_A (258678)
-            new DoubleInt((int)SNOActor.x1_westmarchBrute_A, (int)SNOAnim.x1_westmarchBrute_attack_02_in),
-            new DoubleInt((int)SNOActor.x1_westmarchBrute_A, (int)SNOAnim.x1_westmarchBrute_attack_02_mid),
+            new DoubleInt((int)SNOActor.x1_westmarchBrute_A, (int)SNOAnim.x1_westmarchBrute_attack_02_in), 
+            new DoubleInt((int)SNOActor.x1_westmarchBrute_A, (int)SNOAnim.x1_westmarchBrute_attack_02_mid), 
             new DoubleInt((int)SNOActor.x1_westmarchBrute_A, (int)SNOAnim.x1_westmarchBrute_attack_02_out),   
            
             // snakeMan_melee_generic_cast_01 State=Transform By: X1_LR_Boss_Snakeman_Melee_Belial (360281)
@@ -341,8 +341,8 @@ namespace Trinity
            
             // Angels with those big clubs with a dashing attack
             // Angel_Corrupt_attack_dash_in State=Transform By: Angel_Corrupt_A (106711)
-            new DoubleInt((int)SNOActor.Angel_Corrupt_A, (int)SNOAnim.Angel_Corrupt_attack_dash_in),
-            new DoubleInt((int)SNOActor.Angel_Corrupt_A, (int)SNOAnim.Angel_Corrupt_attack_dash_middle),
+            new DoubleInt((int)SNOActor.Angel_Corrupt_A, (int)SNOAnim.Angel_Corrupt_attack_dash_in), 
+            new DoubleInt((int)SNOActor.Angel_Corrupt_A, (int)SNOAnim.Angel_Corrupt_attack_dash_middle), 
             new DoubleInt((int)SNOActor.Angel_Corrupt_A, (int)SNOAnim.Angel_Corrupt_attack_dash_out), 
            
 
@@ -464,7 +464,7 @@ namespace Trinity
             377090, // X1_Unique_Monster_Generic_Projectile_Lightning
             377091, // X1_Unique_Monster_Generic_Projectile_Physical
             377092, // X1_Unique_Monster_Generic_Projectile_Poison
-            (int)SNOActor.x1_LR_boss_terrorDemon_A_projectile,
+            (int)SNOActor.x1_LR_boss_terrorDemon_A_projectile, 
 
         };
 
@@ -512,7 +512,7 @@ namespace Trinity
 
             // 4394, //g_ChargedBolt_Projectile-200915 (4394) Type=Projectile
             // 368392, // x1_Cesspool_Slime_Posion_Attack_Projectile-222254 (368392) Type=Projectile
-            (int)SNOActor.x1_LR_boss_terrorDemon_A_projectile,
+            (int)SNOActor.x1_LR_boss_terrorDemon_A_projectile, 
         };
 
         /// <summary>
@@ -590,7 +590,7 @@ namespace Trinity
             {377090, 10f}, // X1_Unique_Monster_Generic_Projectile_Lightning
             {377091, 10f}, // X1_Unique_Monster_Generic_Projectile_Physical
             {377092, 10f}, // X1_Unique_Monster_Generic_Projectile_Poison
-            {(int)SNOActor.x1_LR_boss_terrorDemon_A_projectile, 10f},
+            {(int)SNOActor.x1_LR_boss_terrorDemon_A_projectile, 10f}, 
 
         };
 
@@ -720,7 +720,7 @@ namespace Trinity
             // Siegebreaker (96192), Azmodan (89690), Cydea (95250), Heart-thing (193077), 
             96192,                   89690,           95250,         193077, 
             //Kulle (80509), Small Belial (220160), Big Belial (3349), Diablo 1 (114917), terror Diablo (133562)
-            80509,           220160,                3349,              114917,            133562,
+            80509,           220160,                3349,              114917,            133562, 
             62975, // Belial TrueForm
             //Maghda, Kamyr (MiniBoss before Belial)
             6031, 51298,
@@ -773,29 +773,29 @@ namespace Trinity
 
         public static HashSet<int> MysticAllyIds { get { return mysticAllyIds; } }
         private static readonly HashSet<int> mysticAllyIds = new HashSet<int>
-        {
-            169123, 123885, 169890, 168878, 169891, 169077, 169904, 169907, 169906, 169908, 169905, 169909
+        { 
+            169123, 123885, 169890, 168878, 169891, 169077, 169904, 169907, 169906, 169908, 169905, 169909 
         };
 
         public static HashSet<int> GargantuanIds { get { return gargantuanIds; } }
         private static readonly HashSet<int> gargantuanIds = new HashSet<int>
-        {
+        { 
             179780, 179778, 179772, 179779, 179776, 122305 };
 
         public static HashSet<int> ZombieDogIds { get { return zombieDogIds; } }
         private static readonly HashSet<int> zombieDogIds = new HashSet<int>
-        {
-            110959, 103235, 103215, 105763, 103217, 51353,
+        { 
+            110959, 103235, 103215, 105763, 103217, 51353, 
         };
 
         public static HashSet<int> DemonHunterPetIds { get { return demonHunterPetIds; } }
         private static readonly HashSet<int> demonHunterPetIds = new HashSet<int>
-        {
-            178664,
-            173827,
-            133741,
-            159144,
-            181748,
+        { 
+            178664, 
+            173827, 
+            133741, 
+            159144, 
+            181748, 
             159098,
             159102,
             159144,
@@ -805,7 +805,7 @@ namespace Trinity
 
         public static HashSet<int> DemonHunterSentryIds { get { return demonHunterSentryIds; } }
         private static readonly HashSet<int> demonHunterSentryIds = new HashSet<int>
-        {
+        { 
            141402, 150025, 150024, 168815, 150026, 150027,
         };
 
@@ -880,11 +880,11 @@ namespace Trinity
         public static Dictionary<int, float> CustomObjectRadius { get { return customObjectRadius; } }
         private static readonly Dictionary<int, float> customObjectRadius = new Dictionary<int, float>
         {
-            {56686, 4},
-            {52685, 4},
-            {54882, 40},
+            {56686, 4}, 
+            {52685, 4}, 
+            {54882, 40}, 
             {3349, 25}, // Belial
-            {225270, 35},
+            {225270, 35}, 
             {180575, 10},  // Diablo Arena Health Well
             {375111, 45f}, // A5 x1_Death_Orb_Master_Monster
             {301177, 15f}, // x1_PandExt_Time_Activator
@@ -902,7 +902,7 @@ namespace Trinity
         private static readonly HashSet<int> navigationObstacleIds = new HashSet<int>
         {
             174900, 185391, // demonic forge
-            194682, 81699, 3340, 123325,
+            194682, 81699, 3340, 123325, 
 
             158681, // A1 Blacksmith_Lore
             104596, // A1 trOut_FesteringWoods_Neph_Column_B
@@ -920,14 +920,8 @@ namespace Trinity
             (int)SNOActor.px_Bounty_Camp_Pinger, // A4 bounties
 
             // DyingHymn A4 Bounties
-            433402,
+            433402, 
             434971, 
-
-            // Adventurer
-            433383, // A3 - Bounty - Catapult Command - Catapults
-            433384, // A3 - Bounty - Catapult Command - Catapults
-            210433 //A3 -  Catapult_a3dunKeep_WarMachines_Snow_Firing
-
         };
 
         /// <summary>
@@ -947,7 +941,7 @@ namespace Trinity
             // DyingHymn A4 Bounties
             {433402, 8},
             {434971, 10},
-
+            
          };
 
         public static HashSet<int> ForceDestructibles { get { return forceDestructibles; } }
@@ -995,7 +989,7 @@ namespace Trinity
             62873, 95011, 81424, 108230, 111808, 111809, 211861, 62866, 109264, 62866, 62860, 96993,
             // Magi
 			112182,
-            363725, 357331, // chests after Cursed Chest
+			363725, 357331, // chests after Cursed Chest
 
              301177, // A5 Timeless Prison Switch
         };
@@ -1073,7 +1067,7 @@ namespace Trinity
         public static HashSet<int> BlackListIds { get { return blacklistIds; } }
         private static HashSet<int> blacklistIds = new HashSet<int>
         {
-
+            
             362323, // x1_WestmHub_GuardNoHelmUnarmed
             // World Objects
             163449, 2909, 58283, 58321, 87809, 90150, 91600, 97023, 97350, 97381, 72689, 121327, 54515, 3340, 122076, 123640,
@@ -1108,13 +1102,13 @@ namespace Trinity
             213907, 92519, 61544, 105681, 113983, 114527, 114642, 139933, 144405, 156890, 164057, 164195, 180254, 180802, 180809, 181173, 181174, 181177, 181181,
             181182, 181185, 181290, 181292, 181306, 181309, 181313, 181326, 181563, 181857, 181858, 187265, 191433, 191462, 191641, 192880, 192881, 196413, 196435,
             197280, 199191, 199264, 199274, 199597, 199664, 200979, 200982, 201236, 201580, 201581, 201583, 204183, 205746, 205756, 210087, 213907, 218228, 219223,
-            220114, 3011, 3205, 3539, 3582, 3584, 3595, 3600, 4580, 52693, 5466, 55005, 5509, 62522,
+            220114, 3011, 3205, 3539, 3582, 3584, 3595, 3600, 4580, 52693, 5466, 55005, 5509, 62522, 
             205756, 5509, 200371, 167185, 181195, 217346, 178161, 60108, 
             // rrrix act 3
             182443, 211456,
             // uber fire chains in Realm of Turmoil and Iron Gate in Realm of Chaos
-            263014,
-            5724, 5727,
+            263014, 
+            5724, 5727, 
             5869, // trDun_Gargoyle_01
             5738, // trDun_Cath_Breakable_pillar
 
@@ -1175,26 +1169,7 @@ namespace Trinity
             //x1_Westm_HeroWorship01_VO = 321451,
             //x1_Westm_HeroWorship02_VO = 321454,
             //x1_Westm_HeroWorship03_VO = 321479,
-            321451, 321454, 321479,
-
-            // Adventurer
-            430733, //A1 Templar Inquisition
-            432259, //A1 The Triune Reborn
-            434366, //A1 : Wortham Survivors 
-            432770, //A1: Queen's Desert
-            433051, //A2: Prisoners of the Cult
-            432331, //A2: Blood and Iron
-            432885, //A2: The Ancient Devices
-            433184, //A3: The Lost Patrol
-            433295, //A3: The Demon Gates
-            433385, //A3: Catapult Command (It's a switch instead of chest, so might be pre 2.2 bounty)
-            433402, //A4: Hell Portals
-            433124, //A4: Tormented Angels
-            433246, //A5: Death's Embrace
-            433316, //A5: Rathma's Gift
-			
-			435630, // Pinger 1
-			434971, // Pinger 2
+            321451, 321454, 321479
 
         };
 
@@ -1293,7 +1268,7 @@ namespace Trinity
 
         public static HashSet<int> TownLevelAreaIds = new HashSet<int>()
         {
-            332339,168314,92945,270011
+            332339,168314,92945,270011        
         };
 
         public static Dictionary<int, Vector3> ButcherPanelPositions = new Dictionary<int, Vector3>
@@ -1334,11 +1309,11 @@ namespace Trinity
             TrinityObjectType.Item,
             TrinityObjectType.Door,
             TrinityObjectType.Container,
-            TrinityObjectType.HealthWell,
+            TrinityObjectType.HealthWell,  
             TrinityObjectType.CursedChest,
             TrinityObjectType.Interactable,
             TrinityObjectType.Shrine,
-            TrinityObjectType.CursedShrine
+            TrinityObjectType.CursedShrine               
         };
 
         public readonly static HashSet<TrinityObjectType> DestroyableTypes = new HashSet<TrinityObjectType>
@@ -1346,7 +1321,7 @@ namespace Trinity
             TrinityObjectType.Barricade,
             TrinityObjectType.Destructible,
             TrinityObjectType.HealthGlobe,
-            TrinityObjectType.ProgressionGlobe
+            TrinityObjectType.ProgressionGlobe                        
         };
 
         public readonly static HashSet<TrinityObjectType> NoPickupClickTypes = new HashSet<TrinityObjectType>
@@ -1354,7 +1329,7 @@ namespace Trinity
             TrinityObjectType.Gold,
             TrinityObjectType.PowerGlobe,
             TrinityObjectType.HealthGlobe,
-            TrinityObjectType.ProgressionGlobe
+            TrinityObjectType.ProgressionGlobe                     
         };
 
         public readonly static HashSet<SNOActor> Shrines = new HashSet<SNOActor>
@@ -1362,39 +1337,39 @@ namespace Trinity
             SNOActor.Shrine_Global_Fortune,
             SNOActor.Shrine_Global_Blessed,
             SNOActor.Shrine_Global_Frenzied,
-            SNOActor.Shrine_Global_Reloaded,
-            SNOActor.Shrine_Global_Enlightened,
-            SNOActor.Shrine_Global_Hoarder,
-            SNOActor.x1_LR_Shrine_Infinite_Casting,
-            SNOActor.x1_LR_Shrine_Electrified,
-            SNOActor.x1_LR_Shrine_Invulnerable,
-            SNOActor.x1_LR_Shrine_Run_Speed,
-            SNOActor.x1_LR_Shrine_Damage
+            SNOActor.Shrine_Global_Reloaded,                     
+            SNOActor.Shrine_Global_Enlightened,    
+            SNOActor.Shrine_Global_Hoarder,    
+            SNOActor.x1_LR_Shrine_Infinite_Casting,    
+            SNOActor.x1_LR_Shrine_Electrified,    
+            SNOActor.x1_LR_Shrine_Invulnerable,    
+            SNOActor.x1_LR_Shrine_Run_Speed,    
+            SNOActor.x1_LR_Shrine_Damage 
         };
 
         internal static HashSet<string> ActorIgnoreNames = new HashSet<string>
         {
-            "MarkerLocation",
-            "Generic_Proxy",
-            "Hireling",
-            "Start_Location",
-            "SphereTrigger",
-            "Checkpoint",
-            "ConductorProxyMaster",
-            "BoxTrigger",
-            "SavePoint",
-            "TriggerSphere",
-            "minimapicon",
+            "MarkerLocation", 
+            "Generic_Proxy", 
+            "Hireling", 
+            "Start_Location", 
+            "SphereTrigger", 
+            "Checkpoint", 
+            "ConductorProxyMaster", 
+            "BoxTrigger", 
+            "SavePoint", 
+            "TriggerSphere", 
+            "minimapicon", 
         };
 
         internal static HashSet<string> ActorIgnoreNameParts = new HashSet<string>
         {
-            "markerlocation",
-            "start_location",
-            "checkpoint",
-            "savepoint",
-            "triggersphere",
-            "minimapicon",
+            "markerlocation", 
+            "start_location", 
+            "checkpoint", 
+            "savepoint", 
+            "triggersphere", 
+            "minimapicon", 
             "proxy",
             "invisbox",
             "trigger",
@@ -1403,14 +1378,14 @@ namespace Trinity
 
         internal static HashSet<SNOAnim> ActorChargeAnimations = new HashSet<SNOAnim>
         {
-            SNOAnim.Beast_start_charge_02,
-            SNOAnim.Beast_charge_02,
-            SNOAnim.Beast_charge_04,
-            SNOAnim.Butcher_Attack_Charge_01_in,
+            SNOAnim.Beast_start_charge_02, 
+            SNOAnim.Beast_charge_02, 
+            SNOAnim.Beast_charge_04, 
+            SNOAnim.Butcher_Attack_Charge_01_in, 
             SNOAnim.Butcher_Attack_Chain_01_out,
-            SNOAnim.Butcher_Attack_05_telegraph,
-            SNOAnim.Butcher_Attack_Chain_01_in,
-            SNOAnim.Butcher_BreakFree_run_01,
+            SNOAnim.Butcher_Attack_05_telegraph, 
+            SNOAnim.Butcher_Attack_Chain_01_in, 
+            SNOAnim.Butcher_BreakFree_run_01,  
         };
 
         /// <summary>
@@ -1434,7 +1409,7 @@ namespace Trinity
         /// </summary>
         public static HashSet<int> ExcludedActorIds = new HashSet<int>
         {
-            -1,
+            -1, 
             4176, // Generic Proxy
             5502, // Start Location
             375658, // Banter Trigger
@@ -1598,7 +1573,7 @@ namespace Trinity
             //HealthGlobe_steak_02
             375125,
             //x1_healthGlobe_steak_model
-            375132,
+            375132,	
         };
 
         public static HashSet<int> HealthWellSNO = new HashSet<int>
