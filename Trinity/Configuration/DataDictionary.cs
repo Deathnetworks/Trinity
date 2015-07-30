@@ -921,7 +921,12 @@ namespace Trinity
 
             // DyingHymn A4 Bounties
             433402, 
-            434971, 
+            434971,
+
+            // Bulba
+            433383, // A3 - Bounty - Catapult Command - Catapults
+            433384, // A3 - Bounty - Catapult Command - Catapults
+            210433 //A3 -  Catapult_a3dunKeep_WarMachines_Snow_Firing
         };
 
         /// <summary>
@@ -1169,7 +1174,27 @@ namespace Trinity
             //x1_Westm_HeroWorship01_VO = 321451,
             //x1_Westm_HeroWorship02_VO = 321454,
             //x1_Westm_HeroWorship03_VO = 321479,
-            321451, 321454, 321479
+            321451, 321454, 321479,
+
+
+            // Bulba
+            430733, //A1 Templar Inquisition
+            432259, //A1 The Triune Reborn
+            434366, //A1 : Wortham Survivors 
+            432770, //A1: Queen's Desert
+            433051, //A2: Prisoners of the Cult
+            432331, //A2: Blood and Iron
+            432885, //A2: The Ancient Devices
+            433184, //A3: The Lost Patrol
+            433295, //A3: The Demon Gates
+            433385, //A3: Catapult Command (It's a switch instead of chest, so might be pre 2.2 bounty)
+            433402, //A4: Hell Portals
+            433124, //A4: Tormented Angels
+            433246, //A5: Death's Embrace
+            433316, //A5: Rathma's Gift
+			
+			435630, // Pinger 1
+			434971, // Pinger 2
 
         };
 

@@ -678,11 +678,11 @@ namespace Trinity.LazyCache
         /// <summary>
         /// Level of the key awarded for finishing the current rift
         /// </summary>
-        public int RiftRewardKey
-        {
-            get { return _riftRewardKey.IsCacheValid ? _riftRewardKey.CachedValue : (_riftRewardKey.CachedValue = Source.GetAttributeOrDefault<int>(ActorAttributeType.TieredLootRunRewardKeyValue)); }
-            set { _riftRewardKey.SetValueOverride(value); }
-        }
+        //public int RiftRewardKey
+        //{
+        //    get { return _riftRewardKey.IsCacheValid ? _riftRewardKey.CachedValue : (_riftRewardKey.CachedValue = Source.GetAttributeOrDefault<int>(ActorAttributeType.TieredLootRunRewardKeyValue)); }
+        //    set { _riftRewardKey.SetValueOverride(value); }
+        //}
 
         /// <summary>
         /// Time until allowed to ressurect (current rift)
@@ -852,9 +852,9 @@ namespace Trinity.LazyCache
             ZetaDia.Me.HasDebuff(power);
         }
 
-        public void OpenRift(ACDItem keystone)
+        public void OpenRift(int level)
         {
-            ZetaDia.Me.OpenRift(keystone);
+            ZetaDia.Me.OpenRift(level);
         }
 
         public void SetActiveSkill(SNOPower power, int runeId, HotbarSlot slot)
