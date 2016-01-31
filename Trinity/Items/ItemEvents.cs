@@ -1,9 +1,8 @@
 ﻿using Trinity.DbProvider;
-using Trinity.Items;
 using Zeta.Bot;
 using Zeta.Game.Internals.Actors;
 
-namespace Trinity
+namespace Trinity.Items
 {
     public class ItemEvents
     {
@@ -11,7 +10,7 @@ namespace Trinity
         {
             ACDItem i = e.Item;
 
-            if (!i.IsValid)
+            if (i == null || !i.IsValid)
                 return;
 
             var cachedItem = CachedACDItem.GetCachedItem(i);
@@ -27,14 +26,6 @@ namespace Trinity
                     TownRun.LogGoodItems(cachedItem, cachedItem.TrinityItemBaseType, cachedItem.TrinityItemType, ItemValuation.ValueThisItem(cachedItem, cachedItem.TrinityItemType));
                     break;
             }
-
-
-            //Log additional items - Ramalandni's Gift - Infernal Keys - Horadric Cache
-            if (shouldLogItemCustom(cachedItem))
-            {
-                TownRun.LogGoodItems(cachedItem, cachedItem.TrinityItemBaseType, cachedItem.TrinityItemType);
-            }
-            
         }
 
         internal static void TrinityOnItemSalvaged(object sender, ItemEventArgs e)
@@ -76,6 +67,9 @@ namespace Trinity
 
         internal static void TrinityOnOnItemIdentificationRequest(object sender, ItemIdentifyRequestEventArgs e)
         {
+            if (Trinity.Settings.Loot.TownRun.DropLegendaryInTown)
+                e.Item.Drop();
+
             e.IgnoreIdentification = !TrinityItemManager.ItemRulesIdentifyValidation(e.Item);
         }
 
@@ -87,17 +81,9 @@ namespace Trinity
             Trinity.WantToTownRun = false;
         }
 
-        private static bool shouldLogItemCustom(CachedACDItem i)
+        internal static void TrinityOnItemDropped(object sender, ItemEventArgs e)
         {
-            switch (i.TrinityItemType)
-            {
-                case GItemType.ConsumableAddSockets:
-                case GItemType.InfernalKey:
-                case GItemType.HoradricCache:                
-                    return true;
-            }
-
-            return false;
+            //Logger.Log("Dropped {0} ({1})", e.Item.Name, e.Item.ActorSNO);          
         }
     }
 }

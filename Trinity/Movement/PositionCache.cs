@@ -18,7 +18,7 @@ namespace Trinity
             {
                 Position = Trinity.Player.Position;
                 RecordedAt = DateTime.UtcNow;
-                WorldId = ZetaDia.CurrentWorldId;
+                WorldId = Trinity.Player.WorldID;
             }
         }
 

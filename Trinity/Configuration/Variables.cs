@@ -86,16 +86,6 @@ namespace Trinity
         private static string _statusText = "";
 
         /// <summary>
-        /// A flag to indicate if we just entered or just left archon form (and so to force-update the hotbar)
-        /// </summary>
-        internal static bool HasHadArchonbuff = false;
-
-        /// <summary>
-        /// A flag to see if we need to refresh hot bar abilities
-        /// </summary>
-        internal static bool ShouldRefreshHotbarAbilities = false;
-
-        /// <summary>
         /// Timestamp of when our position was last measured as changed
         /// </summary>
         private static DateTime _lastMovedDuringCombat = DateTime.MinValue;
@@ -113,7 +103,13 @@ namespace Trinity
         /// <summary>
         /// Holds all of the player's current info handily cached, updated once per loop with a minimum timer on updates to save D3 memory hits
         /// </summary>
-        public static PlayerInfoCache Player = new PlayerInfoCache(DateTime.MinValue, false, false, false, 0d, 0d, 0d, 0d, 0d, Vector3.Zero, false, 0, 1, ActorClass.Invalid, String.Empty);
+        public static CacheData.PlayerCache Player
+        {
+            get
+            {
+                return CacheData.Player;
+            }
+        }
 
         // Also storing a list of all profiles, for experimental reasons/incase I want to use them down the line
         public static List<string> ProfileHistory = new List<string>();
@@ -136,7 +132,7 @@ namespace Trinity
         internal static int PlayerOwnedZombieDogCount = 0;
         internal static int PlayerOwnedDHPetsCount = 0;
         internal static int PlayerOwnedDHSentryCount = 0;
-        internal static int PlayerOwnedHydraCount = 0;
+        internal static int PlayerOwnedHydraCount = 0;        
 
         // These are a bunch of safety counters for how many times in a row we register having *NO* ability to select when we need one (eg all off cooldown)
 
@@ -268,8 +264,6 @@ namespace Trinity
             set { Trinity.lastPowerUsed = value; }
         }
 
-        // Two variables to stop DB from attempting any navigator movement mid-combat/mid-backtrack
-        public static bool DontMoveMeIAmDoingShit = false;
         public static bool DisableOutofCombatSprint = false;
         public static bool OnlyTarget = false;
 
@@ -295,7 +289,6 @@ namespace Trinity
         private static int TotalNumberGoblins = 0;
         private static DateTime lastGoblinTime = DateTime.MinValue;
 
-        internal static DateTime SweepWindSpam = DateTime.MinValue;
 
         private static bool IsAlreadyMoving = false;
         private static Vector3 LastMoveToTarget;
@@ -309,7 +302,6 @@ namespace Trinity
         internal static List<SNOPower> hashCachedPowerHotbarAbilities = new List<SNOPower>();
 
         // A list and a dictionary for quick buff checking and buff references
-        internal static List<Buff> listCachedBuffs = new List<Buff>();
         internal static Dictionary<int, int> PlayerBuffs = new Dictionary<int, int>();
 
         // For "position-shifting" to navigate around obstacle SNO's
@@ -352,7 +344,6 @@ namespace Trinity
         /// </summary>
         internal static List<TrinityCacheObject> ObjectCache;
 
-
         // From main RefreshDiaobjects
         /// <summary>
         /// The position of the last CurrentTarget (Primary Target)
@@ -362,8 +353,9 @@ namespace Trinity
         /// <summary>
         /// The RActorGUID of the last CurrentTarget (PrimaryTarget)
         /// </summary>
-        private static int LastTargetRactorGUID;
-        private static int LastTargetACDGuid;
+        public static int LastTargetRactorGUID;
+
+        internal static int LastTargetACDGuid;
         /// <summary>
         /// The number of monsters within melee range distance of the player
         /// </summary>
@@ -374,7 +366,7 @@ namespace Trinity
         /// <summary>
         /// Used for trimming off numbers from object names in RefreshDiaObject
         /// </summary>
-        private static Regex nameNumberTrimRegex = new Regex(@"-\d+$", RegexOptions.Compiled);
+        internal static Regex NameNumberTrimRegex = new Regex(@"-\d+$", RegexOptions.Compiled);
 
         // The following 2 variables are used to clear the dictionaries out - clearing one dictionary out per maximum every 2 seconds, working through in sequential order
         private static DateTime lastClearedCacheDictionary = DateTime.MinValue;

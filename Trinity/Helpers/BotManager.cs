@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using Trinity.Config;
 using Trinity.DbProvider;
@@ -8,6 +10,7 @@ using Trinity.Items;
 using Trinity.Settings.Loot;
 using Trinity.Technicals;
 using Zeta.Bot;
+using Zeta.Bot.Coroutines;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Game;
@@ -54,7 +57,48 @@ namespace Trinity.Helpers
             if (!TreeHooks.Instance.Hooks.ContainsKey("Combat"))
                 return;
             // This is the do-all-be-all god-head all encompasing piece of trinity
-            StoreAndReplaceHook("Combat", new Decorator(Trinity.TargetCheck, new Action(ret => Trinity.HandleTarget())));
+            StoreAndReplaceHook("Combat", new ActionRunCoroutine(ret => MainCombatTask()));
+        }
+
+        private static async Task<bool> MainCombatTask()
+        {
+            // If we aren't in the game or a world is loading, don't do anything yet
+            if (!ZetaDia.IsInGame || ZetaDia.IsLoadingWorld || !ZetaDia.Me.IsValid)
+            {
+                Logger.LogDebug(LogCategory.GlobalHandler, "Not in game, IsLoadingWorld, or Me is Invalid");
+                return true;
+            }
+
+            var equippedItems = ZetaDia.Me.Inventory.Equipped.Where(i => i.IsValid);
+            bool needEmergencyRepair = false;
+            //ZetaDia.Me.Inventory.Equipped.Where(i => i.ACDGuid != 0 && i.IsValid).Average(i => i.DurabilityPercent) < 0.05
+            foreach (var item in equippedItems)
+            {
+                if (item.ACDGuid == 0) continue;
+                float durabilitySum = 0f;
+                int itemCount = 0;
+                try
+                {
+                    durabilitySum += item.DurabilityPercent;
+                    itemCount++;
+                }
+                catch { 
+                    // Ring them bells for the chosen few who will judge the many when the game is through
+                }
+                if (itemCount > 0 && durabilitySum / itemCount < 0.05)
+                    needEmergencyRepair = true;
+            }
+
+            // We keep dying because we're spawning in AoE and next to 50 elites and we need to just leave the game
+            if (DateTime.UtcNow.Subtract(Trinity.LastDeathTime).TotalSeconds < 30 && !ZetaDia.IsInTown && needEmergencyRepair)
+            {
+                Logger.Log("Durability is zero, emergency leave game");
+                ZetaDia.Service.Party.LeaveGame(true);
+                await CommonCoroutines.LeaveGame("Durability is zero");
+                Logger.LogDebug(LogCategory.GlobalHandler, "Recently died, durability zero");
+                return true;
+            }
+            return await new Decorator(Trinity.TargetCheck, new Action(ret => Trinity.HandleTarget())).ExecuteCoroutine();
         }
 
         private static void ReplaceVendorRunHook()

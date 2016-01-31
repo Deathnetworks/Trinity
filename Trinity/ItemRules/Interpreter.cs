@@ -426,6 +426,14 @@ namespace Trinity.ItemRules
                         + SEP + e.ToString()
                         , InterpreterAction.NULL, LogType.ERROR);
                 }
+                if (parseErrors != null && parseErrors.Count > 0)
+                {
+                    if (parseErrors.Count > 0)
+                        logOut("Have errors in rule! "
+                            + SEP + "last use rule: " + str
+                            + SEP + getParseErrors(parseErrors)
+                            + SEP + getFullItem(), InterpreterAction.NULL, LogType.ERROR);
+                }
             }
 
             logOut(evaluationType, validRule, action);
@@ -927,6 +935,8 @@ namespace Trinity.ItemRules
             itemDic.Add("[MAXMANA]", item.Stats.MaxMana);
             itemDic.Add("[MANAREG]", item.Stats.ManaRegen);
 
+            itemDic.Add("[ANCIENT]", (float)item.AncientRank);
+
             // - ROS & MORE STATS ADDED -------------------------------------------//
             // This include Splash Damage, Cooldown Reduction, Resource Cost
             // Reduction, +% damage to Physical damage skills, and specific Class
@@ -962,7 +972,7 @@ namespace Trinity.ItemRules
                                                     item.Stats.HolySkillDamagePercentBonus,
                                                     item.Stats.PhysicalSkillDamagePercentBonus }.Max());
 
-            itemDic.Add("[SKILLDMG%]", SkillBySlot.GetSkillDamagePercent(item));
+            itemDic.Add("[SKILLDMG%]", ItemDataUtils.GetSkillDamagePercent(item));
 
             float damage, healing, toughness;
             item.GetStatChanges(out damage, out healing, out toughness);

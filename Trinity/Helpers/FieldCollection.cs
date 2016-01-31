@@ -13,15 +13,22 @@ namespace Trinity.Helpers
     public class FieldCollection<TBase, TItem>
     {
         private static List<TItem> _list;
-        public static List<TItem> ToList()
+        public static List<TItem> ToList(bool clone = false)
         {
-            return _list ?? (_list = ToEnumerable().ToList());
+            return _list ?? (_list = ToEnumerable(clone).ToList());
         }
 
         private static IEnumerable<TItem> _enumerable;
-        public static IEnumerable<TItem> ToEnumerable()
+        public static IEnumerable<TItem> ToEnumerable(bool clone = false)
         {
-            return _enumerable ?? (_enumerable = typeof(TBase).GetFields(BindingFlags.Public | BindingFlags.Static).Select(f => f.GetValue(null)).OfType<TItem>());
+            var source = _enumerable ?? (_enumerable = typeof(TBase).GetFields(BindingFlags.Public | BindingFlags.Static).Select(f => f.GetValue(null)).OfType<TItem>());
+            
+            if (clone && IsCloneableType(typeof (TItem)))
+            {
+                return source.Select(o => (TItem)((ICloneable)o).Clone());
+            }
+
+            return source;
         }
 
         public static IEnumerable<TItem> Where(Func<TItem, bool> predicate)
@@ -32,6 +39,14 @@ namespace Trinity.Helpers
         public static bool Any(Func<TItem, bool> predicate)
         {
             return ToList().Any(predicate);
+        }
+
+        public static bool IsCloneableType(Type type)
+        {
+            if (typeof(ICloneable).IsAssignableFrom(type))
+                return true;
+
+            return type.IsValueType;
         }
     }
     

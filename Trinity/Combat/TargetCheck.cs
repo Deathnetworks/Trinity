@@ -1,25 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading;
 using Trinity.Combat.Abilities;
 using Trinity.DbProvider;
 using Trinity.Helpers;
 using Trinity.Technicals;
 using Zeta.Bot;
-using Zeta.Common.Plugins;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 
 namespace Trinity
 {
-    public partial class Trinity : IPlugin
+    public partial class Trinity
     {
-        internal static int lastSceneId = -1;
+        internal static int LastSceneId = -1;
 
         internal static Stopwatch HotbarRefreshTimer = new Stopwatch();
-
 
         private static bool TargetCheckResult(bool result, string source)
         {
@@ -28,7 +24,7 @@ namespace Trinity
         }
 
         /// <summary>
-        /// Find fresh targets, start main BehaviorTree if needed, cast any buffs needed etc.
+        /// Find fresh targets, start main BehaviorTree if needed, cast any buffs needed etc.        
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
@@ -36,86 +32,11 @@ namespace Trinity
         {
             using (new PerformanceLogger("TargetCheck"))
             {
-                // If we aren't in the game or a world is loading, don't do anything yet
-                if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
-                {
-                    return TargetCheckResult(false, "Not in Game, Invalid, Or Loading World");
-                }
-
-                // We keep dying because we're spawning in AoE and next to 50 elites and we need to just leave the game
-                if (DateTime.UtcNow.Subtract(LastDeathTime).TotalSeconds < 30 &&
-                    ZetaDia.Me.Inventory.Equipped.Any() &&
-                    ZetaDia.Me.Inventory.Equipped.Where(i => i.IsValid).Average(i => i.DurabilityPercent) < 0.05 && !ZetaDia.IsInTown)
-                {
-                    Logger.Log("Durability is zero, emergency leave game");
-                    ZetaDia.Service.Party.LeaveGame(true);
-                    Thread.Sleep(11000);
-                    return TargetCheckResult(false, "Recently Died, zero durability");
-                }
-
-                if (ZetaDia.Me.IsDead)
+                if (Player.IsDead)
                 {
                     return TargetCheckResult(false, "Is Dead");
                 }
 
-                if (!HotbarRefreshTimer.IsRunning)
-                    HotbarRefreshTimer.Start();
-
-                if (HotbarRefreshTimer.ElapsedMilliseconds > 1000 || ShouldRefreshHotbarAbilities)
-                {
-                    PlayerInfoCache.RefreshHotbar();
-                    // Pick an appropriate health set etc. based on class
-                    switch (Player.ActorClass)
-                    {
-                        case ActorClass.Barbarian:
-                            PlayerEmergencyHealthPotionLimit = Settings.Combat.Barbarian.PotionLevel;
-                            _playerEmergencyHealthGlobeLimit = Settings.Combat.Barbarian.HealthGlobeLevel;
-                            _playerHealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
-                            CombatBase.PlayerKiteDistance = Settings.Combat.Barbarian.KiteLimit;
-                            CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Never;
-                            break;
-                        case ActorClass.Crusader:
-                            PlayerEmergencyHealthPotionLimit = Settings.Combat.Crusader.PotionLevel;
-                            _playerEmergencyHealthGlobeLimit = Settings.Combat.Crusader.HealthGlobeLevel;
-                            _playerHealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
-                            CombatBase.PlayerKiteDistance = 0;
-                            CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Never;
-                            break;
-                        case ActorClass.Monk:
-                            PlayerEmergencyHealthPotionLimit = Settings.Combat.Monk.PotionLevel;
-                            _playerEmergencyHealthGlobeLimit = Settings.Combat.Monk.HealthGlobeLevel;
-                            _playerHealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
-                            // Monks never kite :)
-                            CombatBase.PlayerKiteDistance = 0;
-                            CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Never;
-                            break;
-                        case ActorClass.Wizard:
-                            PlayerEmergencyHealthPotionLimit = Settings.Combat.Wizard.PotionLevel;
-                            _playerEmergencyHealthGlobeLimit = Settings.Combat.Wizard.HealthGlobeLevel;
-                            _playerHealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
-                            CombatBase.PlayerKiteDistance = Settings.Combat.Wizard.KiteLimit;
-                            CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Always;
-                            break;
-                        case ActorClass.Witchdoctor:
-                            PlayerEmergencyHealthPotionLimit = Settings.Combat.WitchDoctor.PotionLevel;
-                            _playerEmergencyHealthGlobeLimit = Settings.Combat.WitchDoctor.HealthGlobeLevel;
-                            _playerHealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
-                            CombatBase.PlayerKiteDistance = Settings.Combat.WitchDoctor.KiteLimit;
-                            CombatBase.PlayerKiteMode = Config.Combat.KiteMode.Always;
-                            break;
-                        case ActorClass.DemonHunter:
-                            PlayerEmergencyHealthPotionLimit = Settings.Combat.DemonHunter.PotionLevel;
-                            _playerEmergencyHealthGlobeLimit = Settings.Combat.DemonHunter.HealthGlobeLevel;
-                            _playerHealthGlobeResource = Settings.Combat.Barbarian.HealthGlobeLevelResource;
-                            CombatBase.PlayerKiteDistance = Settings.Combat.DemonHunter.KiteLimit;
-                            CombatBase.PlayerKiteMode = Settings.Combat.DemonHunter.KiteMode;
-                            break;
-                    }
-                }
-                // Clear target current and reset key variables used during the target-handling function
-
-                //CurrentTarget = null;
-                DontMoveMeIAmDoingShit = false;
                 _timesBlockedMoving = 0;
                 IsAlreadyMoving = false;
                 lastMovementCommand = DateTime.MinValue;
@@ -135,10 +56,11 @@ namespace Trinity
                 // We have a target, start the target handler!
                 if (CurrentTarget != null)
                 {
-                    DontMoveMeIAmDoingShit = true;
                     _shouldPickNewAbilities = true;
                     return TargetCheckResult(true, "Current Target is not null");
                 }
+
+                MonkCombat.RunOngoingPowers();
 
                 // if we just opened a horadric cache, wait around to open it
                 if (DateTime.UtcNow.Subtract(Composites.LastFoundHoradricCache).TotalSeconds < 5)
@@ -147,9 +69,9 @@ namespace Trinity
                 using (new PerformanceLogger("TargetCheck.OOCPotion"))
                 {
                     // Pop a potion when necessary
-                    if (Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit)
+                    if (Player.CurrentHealthPct <= CombatBase.EmergencyHealthPotionLimit)
                     {
-                        Trinity.UsePotionIfNeededTask();
+                        UsePotionIfNeededTask();
                     }
                 }
                 _statusText = "[Trinity] No more targets - DemonBuddy/profile management is now in control";
@@ -162,11 +84,11 @@ namespace Trinity
 
                 // Nothing to do... do we have some maintenance we can do instead, like out of combat buffing?
 
-                if (DateTime.UtcNow.Subtract(lastMaintenanceCheck).TotalMilliseconds > 150)
+                if (DateTime.UtcNow.Subtract(_lastMaintenanceCheck).TotalMilliseconds > 150)
                 {
                     using (new PerformanceLogger("TargetCheck.OOCBuff"))
                     {
-                        lastMaintenanceCheck = DateTime.UtcNow;
+                        _lastMaintenanceCheck = DateTime.UtcNow;
 
                         bool isLoopingAnimation = ZetaDia.Me.LoopingAnimationEndTime > 0;
 
@@ -175,19 +97,23 @@ namespace Trinity
                             BarbarianCombat.AllowSprintOOC = true;
                             DisableOutofCombatSprint = false;
 
-                            powerBuff = AbilitySelector(false, true, false);
+                            powerBuff = AbilitySelector(UseOOCBuff: true);
 
                             if (powerBuff.SNOPower != SNOPower.None)
                             {
 
                                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Using OOC Buff: {0}", powerBuff.SNOPower.ToString());
-                                if (powerBuff.WaitTicksBeforeUse > 0)
-                                    BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitBeforeUseDelay));
                                 ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetACDGUID);
                                 LastPowerUsed = powerBuff.SNOPower;
                                 CacheData.AbilityLastUsed[powerBuff.SNOPower] = DateTime.UtcNow;
-                                if (powerBuff.WaitTicksAfterUse > 0)
-                                    BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitAfterUseDelay));
+
+                                // Monk Stuffs get special attention
+                                {
+                                    if (powerBuff.SNOPower == SNOPower.Monk_TempestRush)
+                                        MonkCombat.LastTempestRushLocation = CombatBase.CurrentPower.TargetPosition;
+                                    if (powerBuff.SNOPower == SNOPower.Monk_SweepingWind)
+                                        MonkCombat.LastSweepingWindRefresh = DateTime.UtcNow;
+                                }
 
                             }
                         }
@@ -200,7 +126,7 @@ namespace Trinity
                 }
                 CurrentTarget = null;
 
-                if ((Trinity.ForceVendorRunASAP || Trinity.WantToTownRun) && TownRun.TownRunTimerRunning())
+                if ((ForceVendorRunASAP || WantToTownRun) && TownRun.TownRunTimerRunning())
                 {
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Waiting for town run timer (Target Check)", true);
                     return TargetCheckResult(true, "Waiting for TownRunTimer");
@@ -209,7 +135,7 @@ namespace Trinity
                 return TargetCheckResult(false, "End of TargetCheck");
             }
         }
-        private static DateTime lastMaintenanceCheck = DateTime.UtcNow;
+        private static DateTime _lastMaintenanceCheck = DateTime.UtcNow;
 
         private static void ClearBlacklists()
         {

@@ -13,7 +13,7 @@ namespace Trinity.Items
     {
         public int ActorSNO { get; set; }
         public int GameBalanceId { get; set; }
-        public int DynamicID { get; set; }
+        public int DynamicId { get; set; }
         public int ACDGuid { get; set; }
         public int RequiredLevel { get; set; }
         public InventorySlot InventorySlot { get; set; }
@@ -29,7 +29,7 @@ namespace Trinity.Items
         public bool IsShield { get; set; }
         public bool IsOffHand { get; set; }
         public bool IsWeapon { get; set; }
-        public bool IsJewlery { get; set; }
+        public bool IsJewelry { get; set; }
         public bool IsArmor { get; set; }
         public bool IsEquipment { get; set; }
         public bool IsMisc { get; set; }
@@ -39,7 +39,7 @@ namespace Trinity.Items
         public ItemQuality ItemQualityLevel { get; set; }
         public GemQuality GemQuality { get; set; }
         public int TieredLootRunKeyLevel { get; set; }
-        public int ItemStackQuantity { get; set; }
+        public long ItemStackQuantity { get; set; }
         public bool IsSetItem { get; set; }
         public string ItemSetName { get; set; }
 
@@ -50,17 +50,23 @@ namespace Trinity.Items
 
         public ItemWrapper(ACDItem item)
         {
-
-            ActorSNO = item.ActorSNO;
-            Name = item.Name;
             try
             {
+                ActorSNO = item.ActorSNO;
                 GameBalanceId = item.GameBalanceId;
-                DynamicID = item.DynamicId;
+                DynamicId = item.DynamicId;
                 ACDGuid = item.ACDGuid;
                 InventorySlot = item.InventorySlot;
                 ValidInventorySlots = item.ValidInventorySlots;
                 RequiredLevel = item.RequiredLevel;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error wrapping non-attribute properties on item {0}: " + ex);
+            }
+            try
+            {
+                Name = item.Name;
                 IsUnidentified = item.IsUnidentified;
                 IsTwoHand = item.IsTwoHand;
                 IsOneHand = item.IsOneHand;
@@ -70,7 +76,7 @@ namespace Trinity.Items
                 IsShield = ShieldTypes.Contains(ItemType);
                 IsOffHand = OffHandTypes.Contains(ItemType);
                 IsArmor = ArmorTypes.Contains(ItemType);
-                IsJewlery = JewleryTypes.Contains(ItemType);
+                IsJewelry = JewleryTypes.Contains(ItemType);
                 IsWeapon = WeaponTypes.Contains(ItemType);
                 IsEquipment = item.ItemBaseType == ItemBaseType.Armor || item.ItemBaseType == ItemBaseType.Jewelry || item.ItemBaseType == ItemBaseType.Weapon;
                 IsMisc = MiscTypes.Contains(ItemType);
@@ -93,7 +99,7 @@ namespace Trinity.Items
             }
             catch (Exception ex)
             {
-                Logger.LogError("Error wrapping item {0}/{1}: " + ex, Name, ActorSNO);
+                Logger.LogError("Error wrapping item {0}: " + ex);
             }
         }
 
@@ -190,7 +196,10 @@ namespace Trinity.Items
 
         public bool Equals(ItemWrapper other)
         {
-            if (DynamicID == other.DynamicID)
+            if (other == null)
+                return false;
+
+            if (DynamicId == other.DynamicId)
                 return true;
 
             return ItemType == other.ItemType &&
@@ -204,9 +213,23 @@ namespace Trinity.Items
             return Item.GetHashCode();
         }
 
-        public static bool operator ==(ItemWrapper item, ItemWrapper other)
+        public static bool operator ==(ItemWrapper a, ItemWrapper b)
         {
-            return item.Equals(other);
+            if (ReferenceEquals(a, b))
+            {
+                return true;
+            }
+            // If one is null, but not both, return false.
+            if (((object)a == null) || ((object)b == null))
+            {
+                return false;
+            }
+
+            // Return true if the fields match:
+            return a.ItemType == b.ItemType &&
+                a.ItemBaseType == b.ItemBaseType &&
+                a.Item.ItemQualityLevel == b.Item.ItemQualityLevel &&
+                a.Item.Name == b.Name;
         }
 
         public static bool operator !=(ItemWrapper item, ItemWrapper other)

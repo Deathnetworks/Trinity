@@ -53,7 +53,6 @@ namespace Trinity
             {
             }
 
-            ShouldRefreshHotbarAbilities = false;
             if (!ItemDropStats.MaintainStatTracking)
             {
                 ItemDropStats.ItemStatsWhenStartedBot = DateTime.UtcNow;
@@ -123,7 +122,7 @@ namespace Trinity
 
         static void GameEvents_OnWorldChanged(object sender, EventArgs e)
         {
-            CacheData.FullClear();
+            CacheData.WorldChangedClear();
             TrinityItemManager.ResetBackPackCheck();
         }
 
@@ -188,7 +187,6 @@ namespace Trinity
             // Out of thread Async stuff
             BeginInvoke(() =>
             {
-
                 Logger.Log("New Game - resetting everything");
 
                 TrinityItemManager.ResetBackPackCheck();
@@ -212,7 +210,7 @@ namespace Trinity
                 Blacklist60Seconds = new HashSet<int>();
                 Blacklist90Seconds = new HashSet<int>();
                 Blacklist15Seconds = new HashSet<int>();
-                ShouldRefreshHotbarAbilities = true;
+           
                 PlayerMover.TotalAntiStuckAttempts = 1;
                 PlayerMover.vSafeMovementLocation = Vector3.Zero;
                 PlayerMover.LastPosition = Vector3.Zero;

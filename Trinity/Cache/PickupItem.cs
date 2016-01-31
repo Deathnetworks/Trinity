@@ -12,8 +12,8 @@ namespace Trinity.Cache
         public int BalanceID { get; set; }
         public ItemBaseType DBBaseType { get; set; }
         public ItemType DBItemType { get; set; }
-        public GItemBaseType TBaseType { get; set; }
-        public GItemType TType { get; set; }
+        public TrinityItemBaseType TBaseType { get; set; }
+        public TrinityItemType TType { get; set; }
         public bool IsOneHand { get; set; }
         public bool IsTwoHand { get; set; }
         public FollowerType ItemFollowerType { get; set; }
@@ -22,32 +22,69 @@ namespace Trinity.Cache
         public int ActorSNO { get; set; }
         public int ACDGuid { get; set; }
         public int RActorGUID { get; set; }
-        public ACDItem ACDItem { get { return Zeta.Game.ZetaDia.Actors.GetACDItemByGuid(this.ACDGuid); } }
+        public ACDItem ACDItem { get { return Zeta.Game.ZetaDia.Actors.GetACDItemByGuid(ACDGuid); } }
         public bool IsUpgrade { get; set; }
         public float UpgradeDamage { get; set; }
         public float UpgradeToughness { get; set; }
         public float UpgradeHealing { get; set; }
+        public int WorldId { get; set; }
 
         public PickupItem() { }
 
-        public PickupItem(string Name, string internalName, int level, ItemQuality quality, int balanceId, ItemBaseType dbItemBaseType, 
-            ItemType dbItemType, bool isOneHand, bool isTwoHand, FollowerType followerType, int acdGuid, int dynamicID = 0)
+        public PickupItem(ACDItem item, TrinityItemBaseType trinityItemBaseType, TrinityItemType trinityItemType)
         {
-            this.Name = Name;
-            this.InternalName = internalName;
-            this.Level = level;
-            this.Quality = quality;
-            this.BalanceID = balanceId;
-            this.DBBaseType = dbItemBaseType;
-            this.DBItemType = dbItemType;
-            this.IsOneHand = IsOneHand;
-            this.IsTwoHand = IsTwoHand;
-            this.ItemFollowerType = followerType;
-            this.ACDGuid = acdGuid;
-            this.DynamicID = dynamicID;
+            Name = item.Name;
+            InternalName = Trinity.NameNumberTrimRegex.Replace(item.InternalName, ""); ;
+            Level = item.Level;
+            Quality = item.ItemQualityLevel;
+            BalanceID = item.GameBalanceId;
+            DBBaseType = item.ItemBaseType;
+            DBItemType = item.ItemType;
+            TBaseType = trinityItemBaseType;
+            TType = trinityItemType;
+            IsOneHand = item.IsOneHand;
+            IsTwoHand = item.IsTwoHand;
+            ItemFollowerType = item.FollowerSpecialType;
+            DynamicID = item.DynamicId;
+            ActorSNO = item.ActorSNO;
+            ACDGuid = item.ACDGuid;
+            WorldId = Trinity.Player.WorldID;
         }
 
+        public PickupItem(string name, string internalName, int level, ItemQuality quality, int balanceId, ItemBaseType dbItemBaseType, 
+            ItemType dbItemType, bool isOneHand, bool isTwoHand, FollowerType followerType, int acdGuid, int dynamicID = 0)
+        {
+            Name = name;
+            InternalName = Trinity.NameNumberTrimRegex.Replace(internalName, "");
+            Level = level;
+            Quality = quality;
+            BalanceID = balanceId;
+            DBBaseType = dbItemBaseType;
+            DBItemType = dbItemType;
+            IsOneHand = isOneHand;
+            IsTwoHand = isTwoHand;
+            ItemFollowerType = followerType;
+            ACDGuid = acdGuid;
+            DynamicID = dynamicID;
+            WorldId = Trinity.Player.WorldID;
+        }
 
+        public virtual bool Equals(PickupItem other)
+        {
+            return DynamicID == other.DynamicID || GetHashCode() == other.GetHashCode();
+        }
 
+        public override int GetHashCode()
+        {            
+            return
+                Position.GetHashCode() ^
+                ActorSNO.GetHashCode() ^
+                InternalName.GetHashCode() ^
+                WorldId.GetHashCode() ^
+                Quality.GetHashCode() ^
+                Level.GetHashCode();
+
+        
+        }
     }
 }

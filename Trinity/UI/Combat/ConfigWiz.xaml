@@ -84,8 +84,22 @@
                     Value="{Binding Path=Wiz.KiteLimit}" 
                     HorizontalAlignment="Stretch" Margin="2"/>
         </Grid>
+        <!--BlackHoleAoECount-->
+        <Grid Grid.Row="4" Margin="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Black Hole AoE Count" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+            <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                                Interval="1" Maximum="10" Minimum="1"
+                                SmallChange="1" LargeChange="10"
+                                TickPlacement="BottomRight"  IsSnapToTickEnabled="True"
+                                Value="{Binding Path=Wiz.BlackHoleAoECount}" 
+                                HorizontalAlignment="Stretch" Margin="2,0"/>
+        </Grid>
 
-        <Grid Grid.Row="4" HorizontalAlignment="Center">
+        <Grid Grid.Row="5" HorizontalAlignment="Center">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />

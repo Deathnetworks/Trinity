@@ -26,7 +26,6 @@ namespace Trinity.UI.UIComponents
         private readonly TrinitySetting _Model;
         private readonly TrinitySetting _OriginalModel;
 
-
         /// <summary>
         ///     Initializes a new instance of the <see cref="ConfigViewModel" /> class.
         /// </summary>
@@ -39,6 +38,7 @@ namespace Trinity.UI.UIComponents
                 _Model = new TrinitySetting();
                 _OriginalModel.CopyTo(_Model);
                 InitializeResetCommand();
+
                 SaveCommand = new RelayCommand(
                     parameter =>
                     {
@@ -129,19 +129,39 @@ namespace Trinity.UI.UIComponents
                         try
                         {
                             UILoader.CloseWindow();
-                            BotMain.Stop(false, "Dumping Debug Information");
-                            ZetaDia.Actors.Update();
-                            using (ZetaDia.Memory.SaveCacheState())
-                            {
-                                ZetaDia.Memory.TemporaryCacheState(false);
-                                DebugUtil.LogBuildAndItems(TrinityLogLevel.Info);
-                            }
+                            DebugUtil.LogBuildAndItems(TrinityLogLevel.Info);                          
                         }
                         catch (Exception ex)
                         {
                             Logger.Log(LogCategory.UserInformation, "Exception Dumping Skill/Rune/Passive Items: {0}", ex);
                         }
                     });
+                DumpInvalidItemsCommand = new RelayCommand(
+                    parameter =>
+                    {
+                        try
+                        {
+                            UILoader.CloseWindow();
+                            DebugUtil.LogInvalidItems(TrinityLogLevel.Info);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log(LogCategory.UserInformation, "Exception Dumping Invalid Items: {0}", ex);
+                        }
+                    });
+                DumpItemSNOReference = new RelayCommand(
+                    parameter =>
+                    {
+                        try
+                        {
+                            UILoader.CloseWindow();
+                            DebugUtil.DumpItemSNOReference();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log(LogCategory.UserInformation, "Exception in DumpItemSNOReference: {0}", ex);
+                        }
+                    });                
                 DumpMerchantItemsCommand = new RelayCommand(
                     parameter =>
                     {
@@ -278,8 +298,7 @@ namespace Trinity.UI.UIComponents
                 DumpSkillsCommand = new RelayCommand(
                     parameter =>
                     {
-                        PlayerInfoCache.DumpPlayerSkills();
-
+                        CacheData.Hotbar.Dump();
                         UILoader.CloseWindow();
                     });
             }
@@ -367,6 +386,18 @@ namespace Trinity.UI.UIComponents
         /// <value>The save command.</value>
         public ICommand DumpSkillsAndItemsCommand { get; private set; }
 
+        /// <summary>
+        ///     Gets the test score command.
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand DumpInvalidItemsCommand { get; private set; }
+        
+        /// <summary>
+        ///     Gets the test score command.
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand DumpItemSNOReference { get; private set; }
+        
         /// <summary>
         ///     Gets the test score command.
         /// </summary>
@@ -615,6 +646,11 @@ namespace Trinity.UI.UIComponents
             get { return _Model.Loot.ItemRank; }
         }
 
+        public ItemListSettings ItemList
+        {
+            get { return _Model.Loot.ItemList; }
+        }
+
         /// <summary>
         ///     Gets the Pickup Configuration Model.
         /// </summary>
@@ -727,7 +763,7 @@ namespace Trinity.UI.UIComponents
                     parameter => _Model.Notification.Reset());
 
                 ResetAllCommand = new RelayCommand(
-                    parameter => _Model.Reset());
+                    parameter => _Model.UserRequestedReset());
             }
             catch (Exception ex)
             {

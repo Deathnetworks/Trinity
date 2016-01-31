@@ -21,7 +21,8 @@ namespace Trinity.Helpers
         /// </summary>
         internal void ResetCheckXp()
         {
-            Logger.LogDebug(LogCategory.GlobalHandler, "Resetting Experience Timer, Last Experience changed from {0} to {1}", _lastXpAmount, Trinity.Player.Coinage);
+            if (Trinity.Settings.Advanced.XpInactivityEnabled)
+                Logger.LogDebug(LogCategory.GlobalHandler, "Resetting Experience Timer, Last Experience changed from {0} to {1}", _lastXpAmount, Trinity.Player.Coinage);
 
             _lastCheckBag = DateTime.UtcNow;
             _lastFoundXp = DateTime.UtcNow;
@@ -42,7 +43,6 @@ namespace Trinity.Helpers
             if (!Trinity.Settings.Advanced.XpInactivityEnabled)
             {
                 // timer isn't enabled so move along!
-                ResetCheckXp();
                 return false;
             }
             try

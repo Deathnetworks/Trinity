@@ -3,11 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using Trinity.Objects;
 using Zeta.Game;
+using Zeta.Game.Internals.Actors;
+using Trinity.Technicals;
 
 namespace Trinity.Reference
 {
     class PassiveUtils
     {
+
+        /// <summary>
+        /// Fast lookup for a Skill by SNOPower
+        /// </summary>
+        public static Passive ById(SNOPower power)
+        {
+            if (!_allPassiveBySnoPower.Any())
+                _allPassiveBySnoPower = All.ToDictionary(s => s.SNOPower, s => s);
+
+            Passive passive;
+            var result = _allPassiveBySnoPower.TryGetValue(power, out passive);
+            if (!result)
+            {
+                Logger.LogDebug("Unable to find passive for power {0}", power);
+            }
+            return result ? passive : new Passive();
+        }
+        private static Dictionary<SNOPower, Passive> _allPassiveBySnoPower = new Dictionary<SNOPower, Passive>();
+
         /// <summary>
         /// All passives that are currently active
         /// </summary>

@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Trinity.Combat;
 using Trinity.Technicals;
 using Zeta.Game.Internals.Actors;
 
-namespace Trinity
+namespace Trinity.Combat
 {
     /// <summary>
     /// Provides facilities to track DoT and duration/expiration spells on monsters
     /// </summary>
     public class SpellTracker : IEquatable<SpellTracker>
     {
+        private const int AnyRune = -999;
+
         public int ACDGuid { get; set; }
         public SNOPower Power { get; set; }
         public DateTime Expiration { get; set; }
@@ -28,21 +29,28 @@ namespace Trinity
             }
         }
 
-        internal static void TrackSpellOnUnit(int acdGuid, SNOPower power, float duration = 0f)
+        internal static void TrackSpellOnUnit(int acdGuid, SNOPower power)
         {
             try
             {
-                if (CachedTrackedSpells.ContainsKey(power))
+                float duration = -1;
+                if (CacheData.Hotbar.ActivePowers.Contains(power))
                 {
-                    HotbarSkills skill = HotbarSkills.AssignedSkills.FirstOrDefault(p => p.Power == power);
-                    TrackedSpell spell = TrackedSpells.FirstOrDefault(s => s.Equals(new TrackedSpell(power, skill.RuneIndex)));
+                    // Can't track a spell that isn't equipped
+                    var skill = CacheData.Hotbar.GetSkill(power);
+                    var spell = TrackedSpells.FirstOrDefault(s => s.Equals(new TrackedSpell(power, skill.RuneIndex)) || s.Equals(new TrackedSpell(power, AnyRune)));
                     if (spell != null)
                         duration = spell.Duration;
                 }
 
+                var anyRune = TrackedSpells.FirstOrDefault(s => s.Power == power  && s.RuneIndex == AnyRune);
+
+                if (duration == -1 && anyRune != null)
+                    duration = anyRune.Duration;
+
                 if (duration > 0)
                 {
-                    //Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Tracking unit {0} with power {1} for duration {2:0.00}", acdGuid, power, duration);
+                    //Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Tracking unit {0} with power {1} for duration {2:0.00}", acdGuid, power, duration);
                     TrackSpellOnUnit(new SpellTracker()
                        {
                            ACDGuid = acdGuid,
@@ -71,12 +79,15 @@ namespace Trinity
         /// <summary>
         /// Checks if a unit is currently being tracked with a given SNOPower. When the spell is properly configured, this can be used to set a "timer" on a DoT re-cast, for example.
         /// </summary>
-        /// <param name="acdGuid"></param>
+        /// <param name="unit"></param>
         /// <param name="power"></param>
         /// <returns></returns>
         public static bool IsUnitTracked(TrinityCacheObject unit, SNOPower power)
         {
-            if (unit.Type != GObjectType.Unit)
+            if (unit == null)
+                return false;
+
+            if (unit.Type != TrinityObjectType.Unit)
                 return false;
             bool result = TrackedUnits.Any(t => t.ACDGuid == unit.ACDGuid && t.Power == power);
             //if (result)
@@ -140,23 +151,6 @@ namespace Trinity
         }
         #endregion
 
-        private static Dictionary<SNOPower, int> CachedTrackedSpells = new Dictionary<SNOPower, int>();
-
-        /// <summary>
-        /// Updates the cached tracked spells. Call only after updating HotbarSkills.
-        /// </summary>
-        internal static void RefreshCachedSpells()
-        {
-            CachedTrackedSpells.Clear();
-            foreach (HotbarSkills skill in HotbarSkills.AssignedSkills)
-            {
-                if (TrackedSpells.Any(s => s.Power == skill.Power && (s.RuneIndex == skill.RuneIndex || s.RuneIndex == -999)))
-                {
-                    CachedTrackedSpells.Add(skill.Power, skill.RuneIndex);
-                }
-            }
-        }
-
         private static HashSet<TrackedSpell> TrackedSpells = new HashSet<TrackedSpell>();
 
         /// <summary>
@@ -165,7 +159,7 @@ namespace Trinity
         private static void PopulateTrackedSpells()
         {
             // new TrackedSpell(SNOPower, RuneIndex, MillsecondsDuration)
-            // Use RuneIndex = -999 for "default" or any rune index
+            // Use RuneIndex = AnyRune for "default" or any rune index
 
             TrackedSpells.Clear();
 
@@ -173,7 +167,7 @@ namespace Trinity
             // TBD, maybe Rend is a good candidate?
 
             // Monk
-            TrackedSpells.Add(new TrackedSpell(SNOPower.Monk_ExplodingPalm, -999, 7000f));
+            TrackedSpells.Add(new TrackedSpell(SNOPower.Monk_ExplodingPalm, AnyRune, 9000f));
 
             // Wizard
             // TBD
@@ -185,12 +179,12 @@ namespace Trinity
             TrackedSpells.Add(new TrackedSpell(SNOPower.Witchdoctor_Haunt, 3, 6000f));
             TrackedSpells.Add(new TrackedSpell(SNOPower.Witchdoctor_Haunt, 4, 2000f)); // WD, Resentful Spirit
 
-            TrackedSpells.Add(new TrackedSpell(SNOPower.Witchdoctor_Locust_Swarm, -999, 8000f));
+            TrackedSpells.Add(new TrackedSpell(SNOPower.Witchdoctor_Locust_Swarm, AnyRune, 8000f));
 
-            TrackedSpells.Add(new TrackedSpell(SNOPower.DemonHunter_MarkedForDeath, -999, 10f));
+            TrackedSpells.Add(new TrackedSpell(SNOPower.DemonHunter_MarkedForDeath, AnyRune, 10f));
 
             // Demon Hunter
-            TrackedSpells.Add(new TrackedSpell(SNOPower.DemonHunter_MarkedForDeath, -99, 30000f));
+            TrackedSpells.Add(new TrackedSpell(SNOPower.DemonHunter_MarkedForDeath, AnyRune, 30000f));
             // TBD
         }
 
@@ -212,20 +206,20 @@ namespace Trinity
 
             public TrackedSpell(SNOPower power, int runeIndex, float duration)
             {
-                this.Power = power;
-                this.RuneIndex = runeIndex;
-                this.Duration = duration;
+                Power = power;
+                RuneIndex = runeIndex;
+                Duration = duration;
             }
 
             public TrackedSpell(SNOPower power, int runeIndex)
             {
-                this.Power = power;
-                this.RuneIndex = runeIndex;
+                Power = power;
+                RuneIndex = runeIndex;
             }
 
             public bool Equals(TrackedSpell other)
             {
-                return this.Power == other.Power && (this.RuneIndex == other.RuneIndex || this.RuneIndex == -999 || other.RuneIndex == -999);
+                return Power == other.Power && (RuneIndex == other.RuneIndex || RuneIndex == AnyRune || other.RuneIndex == AnyRune);
             }
         }
     }

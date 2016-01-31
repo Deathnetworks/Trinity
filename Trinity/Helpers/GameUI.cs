@@ -31,6 +31,31 @@ namespace Trinity
         private const ulong reviveAtCheckpointHash = 0xBFAAF48BA9316742;
         private const ulong reviveInTownHash = 0x7A2AF9C0F3045ADA;
 
+        //[1F03C1A0] Mouseover: 0x6DA3168427892076, Name: Root.NormalLayer.GreaterRifts_VictoryScreen.LayoutRoot.Middle_Frame.button_exit
+        private const ulong riftCompleteOkButton = 0x6DA3168427892076;
+
+        //[1DB5A7F0] Mouseover: 0x16C4B9DB83655800, Name: Root.NormalLayer.BattleNetWhatsNewPatches_main.LayoutRoot.OverlayContainer.Ok
+        private const ulong patchOKButton = 0x16C4B9DB83655800;
+
+        // [1DD61C20] Mouseover: 0x981391BBDF64B009, Name: Root.TopLayer.credits_dialog_main_X1.creditsClose_button
+
+        public static UIElement ChinaStoreCloseButton
+        {
+            get { return UIElement.FromHash(0xCDD29D7F6A61DAD8); }
+        }
+
+        public static UIElement CloseCreditsButton
+        {
+            get { return UIElement.FromHash(0x981391BBDF64B009); }
+        }
+
+        public static UIElement PatchOKButton { get { return UIElement.FromHash(patchOKButton); } }
+
+        public static UIElement RiftCompleteOkButton
+        {
+            get { return UIElement.FromHash(riftCompleteOkButton); }
+        }
+
         public static UIElement StashDialogMainPage
         {
             get { return UIElement.FromHash(0xB83F0423F7247928); }
@@ -203,7 +228,7 @@ namespace Trinity
         /// <returns></returns>
         public static bool SafeClickElement(UIElement element, string name = "", bool fireWorldTransfer = false)
         {
-            if (!ZetaDia.Me.IsValid)
+            if (!Trinity.Player.IsValid)
                 return false;
             if (!IsElementVisible(element))
                 return false;
@@ -218,24 +243,30 @@ namespace Trinity
         private static DateTime _lastCheckedUiButtons = DateTime.MinValue;
         public static void SafeClickUIButtons()
         {
-            if (ZetaDia.IsLoadingWorld)
+            if (Trinity.Player.IsLoadingWorld)
                 return;
 
             // These buttons should be clicked with no delay
 
-            if (ZetaDia.IsInGame && SafeClickElement(BountyRewardDialog, "Bounty Reward Dialog"))
+            if (SafeClickElement(CloseCreditsButton, "Close Credits Button"))
                 return;
-            if (ZetaDia.IsInGame && SafeClickElement(ConversationSkipButton, "Conversation Button"))
+            if (SafeClickElement(PatchOKButton, "Patch Update OK Button"))
                 return;
-            if (ZetaDia.IsInGame && SafeClickElement(PartyLeaderBossAccept, "Party Leader Boss Accept", true))
+            if (Trinity.Player.IsInGame && SafeClickElement(ChinaStoreCloseButton, "Closing China Store Window"))
                 return;
-            if (ZetaDia.IsInGame && SafeClickElement(PartyFollowerBossAccept, "Party Follower Boss Accept", true))
+            if (Trinity.Player.IsInGame && SafeClickElement(BountyRewardDialog, "Bounty Reward Dialog"))
                 return;
-            if (ZetaDia.IsInGame && SafeClickElement(TalktoInteractButton1, "Conversation Button"))
+            if (Trinity.Player.IsInGame && SafeClickElement(ConversationSkipButton, "Conversation Button"))
+                return;
+            if (Trinity.Player.IsInGame && SafeClickElement(PartyLeaderBossAccept, "Party Leader Boss Accept", true))
+                return;
+            if (Trinity.Player.IsInGame && SafeClickElement(PartyFollowerBossAccept, "Party Follower Boss Accept", true))
+                return;
+            if (Trinity.Player.IsInGame && SafeClickElement(TalktoInteractButton1, "Conversation Button"))
                 return;
             if (DateTime.UtcNow.Subtract(_lastCheckedUiButtons).TotalMilliseconds <= 500)
                 return;
-            if (ZetaDia.IsInGame && SafeClickElement(JoinRiftButton, "Join Rift Accept Button", true))
+            if (Trinity.Player.IsInGame && SafeClickElement(JoinRiftButton, "Join Rift Accept Button", true))
                 return;
 
             _lastCheckedUiButtons = DateTime.UtcNow;
@@ -250,6 +281,8 @@ namespace Trinity
             if (loopingAnimationEndTime > 0)
                 return;
             if (ZetaDia.IsInGame && SafeClickElement(MercenaryOKButton, "Mercenary OK Button"))
+                return;
+            if (SafeClickElement(RiftCompleteOkButton, "Rift Complete OK Button"))
                 return;
             if (SafeClickElement(GenericOK, "GenericOK"))
                 return;

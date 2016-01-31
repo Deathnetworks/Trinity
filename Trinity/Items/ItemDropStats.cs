@@ -57,8 +57,8 @@ namespace Trinity
         public static long LastXP = 0;
         public static long NextLevelXP = 0;
         // Gold counter
-        public static int TotalGold = 0;
-        public static int LastGold = 0;
+        public static long TotalGold = 0;
+        public static long LastGold = 0;
         // Level and ParagonLevel
         public static int Level = 0;
         public static int ParagonLevel = 0;
@@ -146,7 +146,14 @@ namespace Trinity
             TotalInfernalKeys = totalKeys;
         }
 
-        private static PlayerInfoCache Player { get { return Trinity.Player; } }
+        private static CacheData.PlayerCache Player
+        {
+            get
+            {
+                return CacheData.Player;
+            }
+        }
+
         /// <summary>
         ///     Full Output Of Item Stats
         /// </summary>
@@ -180,7 +187,7 @@ namespace Trinity
                 try
                 {
                     Level = Trinity.Player.Level;
-                    Player.ParagonLevel = Player.ParagonLevel;
+
                     if (Player.Level < 60)
                     {
                         if (!(TotalXP == 0 && LastXP == 0 && NextLevelXP == 0))

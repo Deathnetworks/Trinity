@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Trinity.Cache;
 using Trinity.Helpers;
 using Trinity.Items;
@@ -48,10 +49,10 @@ namespace Trinity
                 c_IsTwoHandedItem = diaItem.CommonData.IsTwoHand;
                 c_item_tFollowerType = diaItem.CommonData.FollowerSpecialType;
                 // Calculate item type
-                c_item_GItemType = TrinityItemManager.DetermineItemType(CurrentCacheObject.InternalName, c_DBItemType, c_item_tFollowerType);
+                _cItemTinityItemType = TrinityItemManager.DetermineItemType(CurrentCacheObject.InternalName, c_DBItemType, c_item_tFollowerType);
 
                 // And temporarily store the base type
-                GItemBaseType itemBaseType = TrinityItemManager.DetermineBaseType(c_item_GItemType);
+                TrinityItemBaseType itemBaseType = TrinityItemManager.DetermineBaseType(_cItemTinityItemType);
 
                 // Compute item quality from item link 
                 if (!CacheData.ItemLinkQuality.TryGetValue(CurrentCacheObject.ACDGuid, out c_ItemQuality))
@@ -60,7 +61,7 @@ namespace Trinity
                     CacheData.ItemLinkQuality.Add(CurrentCacheObject.ACDGuid, c_ItemQuality);
                 }
 
-                if (itemBaseType == GItemBaseType.Gem)
+                if (itemBaseType == TrinityItemBaseType.Gem)
                     c_ItemLevel = (int)diaItem.CommonData.GemQuality;
 
                 CurrentCacheObject.ObjectHash = HashGenerator.GenerateItemHash(
@@ -70,6 +71,12 @@ namespace Trinity
                     Player.WorldID,
                     c_ItemQuality,
                     c_ItemLevel);
+
+                try
+                {
+                    c_IsAncient = c_ItemQuality == ItemQuality.Legendary && diaItem.CommonData.GetAttribute<int>(ActorAttributeType.AncientRank) > 0;
+                }
+                catch {}
 
                 float range = 0f;
 
@@ -90,14 +97,6 @@ namespace Trinity
                     }
                 }
 
-                //float damage, toughness, healing = 0;
-                //bool isUpgrade = false;
-
-                //diaItem.CommonData.GetStatChanges(out damage, out healing, out toughness);
-
-                //if (damage > 0 && toughness > 0)
-                //    isUpgrade = true;
-
                 var pickupItem = new PickupItem
                 {
                     Name = c_ItemDisplayName,
@@ -108,7 +107,7 @@ namespace Trinity
                     DBBaseType = c_DBItemBaseType,
                     DBItemType = c_DBItemType,
                     TBaseType = itemBaseType,
-                    TType = c_item_GItemType,
+                    TType = _cItemTinityItemType,
                     IsOneHand = c_IsOneHandedItem,
                     IsTwoHand = c_IsTwoHandedItem,
                     ItemFollowerType = c_item_tFollowerType,
@@ -117,30 +116,32 @@ namespace Trinity
                     ActorSNO = CurrentCacheObject.ActorSNO,
                     ACDGuid = CurrentCacheObject.ACDGuid,
                     RActorGUID = CurrentCacheObject.RActorGuid,
-                    //IsUpgrade = isUpgrade,
-                    //UpgradeDamage = damage,
-                    //UpgradeToughness = toughness,
-                    //UpgradeHealing = healing
                 };
 
-                // Treat all globes as a yes
-                if (c_item_GItemType == GItemType.HealthGlobe)
+                // Blood Shards == HoradricRelic
+                if (_cItemTinityItemType == TrinityItemType.HoradricRelic && ZetaDia.CPlayer.BloodshardCount >= Trinity.Player.MaxBloodShards)
                 {
-                    CurrentCacheObject.Type = GObjectType.HealthGlobe;
+                    return false;
+                }
+
+                // Treat all globes as a yes
+                if (_cItemTinityItemType == TrinityItemType.HealthGlobe)
+                {
+                    CurrentCacheObject.Type = TrinityObjectType.HealthGlobe;
                     return true;
                 }
 
                 // Treat all globes as a yes
-                if (c_item_GItemType == GItemType.PowerGlobe)
+                if (_cItemTinityItemType == TrinityItemType.PowerGlobe)
                 {
-                    CurrentCacheObject.Type = GObjectType.PowerGlobe;
+                    CurrentCacheObject.Type = TrinityObjectType.PowerGlobe;
                     return true;
                 }
 
                 // Treat all globes as a yes
-                if (c_item_GItemType == GItemType.ProgressionGlobe)
+                if (_cItemTinityItemType == TrinityItemType.ProgressionGlobe)
                 {
-                    CurrentCacheObject.Type = GObjectType.ProgressionGlobe;
+                    CurrentCacheObject.Type = TrinityObjectType.ProgressionGlobe;
                     return true;
                 }
 
@@ -173,6 +174,22 @@ namespace Trinity
                         AddToCache = TrinityItemManager.PickupItemValidation(pickupItem);
                     }
 
+                    // Ignore if item has existed before in this location
+                    if (Settings.Loot.TownRun.DropLegendaryInTown)
+                    {
+                        if (!CacheData.DroppedItems.Any(i => i.Equals(pickupItem)))
+                        {
+                            CacheData.DroppedItems.Add(pickupItem);
+                            AddToCache = true;
+                        }
+                        else
+                        {
+                            Logger.LogDebug("Ignoring Dropped Item = ItemPosition={0} Hashcode={1} DynId={2}", pickupItem.Position, pickupItem.GetHashCode(), pickupItem.DynamicID);
+                            AddToCache = false;
+                        }
+                            
+                    }
+
                     CacheData.PickupItem.Add(CurrentCacheObject.RActorGuid, AddToCache);
                 }
 
@@ -183,7 +200,7 @@ namespace Trinity
                 if (!AddToCache && c_IgnoreSubStep == String.Empty)
                     c_IgnoreSubStep = "NoMatchingRule";
 
-                if (Settings.Advanced.LogDroppedItems && logNewItem && c_item_GItemType != GItemType.HealthGlobe && c_item_GItemType != GItemType.HealthPotion && c_item_GItemType != GItemType.PowerGlobe && c_item_GItemType != GItemType.ProgressionGlobe)
+                if (Settings.Advanced.LogDroppedItems && logNewItem && _cItemTinityItemType != TrinityItemType.HealthGlobe && _cItemTinityItemType != TrinityItemType.HealthPotion && _cItemTinityItemType != TrinityItemType.PowerGlobe && _cItemTinityItemType != TrinityItemType.ProgressionGlobe)
                     //LogDroppedItem();
                     ItemDroppedAppender.Instance.AppendDroppedItem(pickupItem);
 
@@ -230,7 +247,7 @@ namespace Trinity
 
             return true;
         }
-        private static bool RefreshItemStats(GItemBaseType baseType)
+        private static bool RefreshItemStats(TrinityItemBaseType baseType)
         {
             bool isNewLogItem = false;
 
@@ -243,9 +260,9 @@ namespace Trinity
                 try
                 {
                     isNewLogItem = true;
-                    if (baseType == GItemBaseType.Armor || baseType == GItemBaseType.WeaponOneHand || baseType == GItemBaseType.WeaponTwoHand ||
-                        baseType == GItemBaseType.WeaponRange || baseType == GItemBaseType.Jewelry || baseType == GItemBaseType.FollowerItem ||
-                        baseType == GItemBaseType.Offhand)
+                    if (baseType == TrinityItemBaseType.Armor || baseType == TrinityItemBaseType.WeaponOneHand || baseType == TrinityItemBaseType.WeaponTwoHand ||
+                        baseType == TrinityItemBaseType.WeaponRange || baseType == TrinityItemBaseType.Jewelry || baseType == TrinityItemBaseType.FollowerItem ||
+                        baseType == TrinityItemBaseType.Offhand)
                     {
                         try
                         {
@@ -268,21 +285,21 @@ namespace Trinity
                             Logger.LogError("Error Refreshing Item Stats for Equippable Item: " + ex.ToString());
                         }
                     }
-                    else if (baseType == GItemBaseType.Gem)
+                    else if (baseType == TrinityItemBaseType.Gem)
                     {
                         try
                         {
                             int iThisGemType = 0;
                             ItemDropStats.ItemsDroppedStats.TotalGems++;
-                            if (c_item_GItemType == GItemType.Topaz)
+                            if (_cItemTinityItemType == TrinityItemType.Topaz)
                                 iThisGemType = ItemDropStats.GEMTOPAZ;
-                            if (c_item_GItemType == GItemType.Ruby)
+                            if (_cItemTinityItemType == TrinityItemType.Ruby)
                                 iThisGemType = ItemDropStats.GEMRUBY;
-                            if (c_item_GItemType == GItemType.Emerald)
+                            if (_cItemTinityItemType == TrinityItemType.Emerald)
                                 iThisGemType = ItemDropStats.GEMEMERALD;
-                            if (c_item_GItemType == GItemType.Amethyst)
+                            if (_cItemTinityItemType == TrinityItemType.Amethyst)
                                 iThisGemType = ItemDropStats.GEMAMETHYST;
-                            if (c_item_GItemType == GItemType.Diamond)
+                            if (_cItemTinityItemType == TrinityItemType.Diamond)
                                 iThisGemType = ItemDropStats.GEMDIAMOND;
                             ItemDropStats.ItemsDroppedStats.GemsPerType[iThisGemType]++;
                             ItemDropStats.ItemsDroppedStats.GemsPerLevel[c_ItemLevel]++;
@@ -293,7 +310,7 @@ namespace Trinity
                             Logger.LogError("Error refreshing item stats for Gem: " + ex.ToString());
                         }
                     }
-                    else if (c_item_GItemType == GItemType.InfernalKey)
+                    else if (_cItemTinityItemType == TrinityItemType.InfernalKey)
                     {
                         try
                         {

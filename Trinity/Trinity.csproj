@@ -61,14 +61,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Demonbuddy">
-      <HintPath>..\Demonbuddy.exe</HintPath>
+      <HintPath>..\..\..\DB-PTR\Demonbuddy.exe</HintPath>
     </Reference>
     <Reference Include="GreyMagic">
-      <HintPath>..\GreyMagic.dll</HintPath>
+      <HintPath>..\..\..\DB-PTR\GreyMagic.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="PresentationFramework.Aero" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -77,6 +78,7 @@
     <Reference Include="System.Management" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
@@ -84,12 +86,17 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cache\EquippedItemCache.cs" />
+    <Compile Include="Cache\CacheData.Buffs.cs" />
+    <Compile Include="Cache\CacheData.Hotbar.cs" />
+    <Compile Include="Cache\CacheData.Inventory.cs" />
+    <Compile Include="Cache\CacheData.Player.cs" />
+    <Compile Include="Cache\CacheUIObject.cs" />
     <Compile Include="Cache\ItemStashSellAppender.cs" />
     <Compile Include="Cache\ItemDroppedAppender.cs" />
     <Compile Include="Cache\TrinityBountyInfo.cs" />
     <Compile Include="Cache\CacheData.cs" />
     <Compile Include="Cache\GroupHotSpot.cs" />
+    <Compile Include="Cache\TrinityCacheObjectUtils.cs" />
     <Compile Include="Cache\TrinityQuestInfo.cs" />
     <Compile Include="Cache\RefreshAvoidance.cs" />
     <Compile Include="Cache\RefreshGizmo.cs" />
@@ -105,22 +112,78 @@
     <Compile Include="Combat\Abilities\WizardCombat.cs" />
     <Compile Include="Combat\AvoidanceManager.cs" />
     <Compile Include="Combat\AvoidanceType.cs" />
+    <Compile Include="Combat\CombatContext.cs" />
     <Compile Include="Combat\Enemies.cs" />
+    <Compile Include="Combat\Routine\TrinityRoutine.cs" />
     <Compile Include="Combat\SpellTracker.cs" />
+    <Compile Include="Combat\Targetting\TargetHandler.cs" />
+    <Compile Include="Combat\Targetting\TargetSelector.cs" />
+    <Compile Include="Combat\Weighting\ContainerWeighting.cs" />
+    <Compile Include="Combat\Weighting\DoorWeighting.cs" />
+    <Compile Include="Combat\Weighting\GlobeWeighting.cs" />
+    <Compile Include="Combat\Weighting\HealthWellWeighting.cs" />
+    <Compile Include="Combat\Weighting\HotSpotWeighting.cs" />
+    <Compile Include="Combat\Weighting\InteractableWeighting.cs" />
+    <Compile Include="Combat\Weighting\ItemWeighting.cs" />
+    <Compile Include="Combat\Weighting\ObstacleWeighting.cs" />
+    <Compile Include="Combat\Weighting\ShrineWeighting.cs" />
+    <Compile Include="Combat\Weighting\UnitWeighting.cs" />
+    <Compile Include="Combat\Weighting\Weight.cs" />
+    <Compile Include="Combat\Weighting\WeightingBase.cs" />
+    <Compile Include="Combat\Weighting\WeightUtilities.cs" />
+    <Compile Include="Combat\Weighting\WeightManager.cs" />
+    <Compile Include="Configuration\DataDictionary.Spawners.cs" />
+    <Compile Include="Configuration\DataDictionary.ItemIds.cs" />
     <Compile Include="Configuration\Events.cs" />
     <Compile Include="Configuration\TVar.cs" />
     <Compile Include="Configuration\TVars.cs" />
     <Compile Include="Coroutines\DeathBehavior.cs" />
     <Compile Include="Coroutines\TrinityCoroutines.cs" />
     <Compile Include="DbProvider\DeathHandler.cs" />
+    <Compile Include="DbProvider\RecipeBot.cs" />
     <Compile Include="DbProvider\SearchAreaProvider.cs" />
     <Compile Include="Helpers\Attributes\NoCopy.cs" />
+    <Compile Include="Helpers\EnumValue.cs" />
+    <Compile Include="Helpers\ExportHelper.cs" />
+    <Compile Include="Helpers\GetAttributeExtensions.cs" />
+    <Compile Include="LazyCache\CacheBuffs.cs" />
+    <Compile Include="LazyCache\TrinityBuff.cs" />
+    <Compile Include="LazyCache\TrinityMovement.cs" />
+    <Compile Include="LazyCache\CacheBase.cs" />
+    <Compile Include="LazyCache\CacheFactory.cs" />
+    <Compile Include="LazyCache\CacheField.cs" />
+    <Compile Include="LazyCache\CacheManager.cs" />
+    <Compile Include="LazyCache\CacheMeta.cs" />
+    <Compile Include="LazyCache\CacheUtilities.cs" />
+    <Compile Include="LazyCache\CacheMetaReference.cs" />
+    <Compile Include="LazyCache\TrinityAvoidance.cs" />
+    <Compile Include="LazyCache\TrinityScene.cs" />
+    <Compile Include="LazyCache\TrinityUnit.cs" />
+    <Compile Include="LazyCache\TrinityPlayer.cs" />
+    <Compile Include="LazyCache\TrinityGizmo.cs" />
+    <Compile Include="LazyCache\TrinityItem.cs" />
+    <Compile Include="LazyCache\TrinityObject.cs" />
+    <Compile Include="LazyCache\UpdateSpeed.cs" />
+    <Compile Include="Objects\CachedBuff.cs" />
+    <Compile Include="Objects\IUnique.cs" />
+    <Compile Include="Objects\ItemStatRange.cs" />
+    <Compile Include="Objects\SkillMeta.cs" />
+    <Compile Include="Reference\SkillsDefaultMeta.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Resources\Battle.Net API\BNetDataObjects.cs" />
     <Compile Include="Helpers\Bounties\BountyType.cs" />
     <Compile Include="Helpers\Bounties\Extensions.cs" />
     <Compile Include="Helpers\CloneExtension.cs" />
     <Compile Include="Helpers\Composites.cs" />
+    <Compile Include="Resources\Battle.Net API\BNetDataProvider.cs" />
+    <Compile Include="Helpers\FullyObservableCollection.cs" />
     <Compile Include="Helpers\LookupList.cs" />
+    <Compile Include="Helpers\MemoryHelper.cs" />
     <Compile Include="Helpers\SystemInformation.cs" />
+    <Compile Include="Helpers\TaskDispatcher.cs" />
+    <Compile Include="Helpers\ToStringReflector.cs" />
+    <Compile Include="Helpers\Worker.cs" />
     <Compile Include="Helpers\XpInactivity.cs" />
     <Compile Include="Helpers\DebugUtil.cs" />
     <Compile Include="Helpers\DoubleInt.cs" />
@@ -132,6 +195,7 @@
     <Compile Include="Helpers\ObservableDictionary.cs" />
     <Compile Include="Helpers\PluginCheck.cs" />
     <Compile Include="Helpers\ZetaCacheHelper.cs" />
+    <Compile Include="Items\CleanStash.cs" />
     <Compile Include="Items\ItemEvents.cs" />
     <Compile Include="Cache\CacheUtils.cs" />
     <Compile Include="Cache\GenericBlacklist.cs" />
@@ -146,13 +210,13 @@
     <Compile Include="Cache\GameBalanceDataCache.cs" />
     <Compile Include="Items\ItemDropStats.cs" />
     <Compile Include="Items\ItemIds.cs" />
+    <Compile Include="Items\ItemList.cs" />
     <Compile Include="Items\ItemSort.cs" />
     <Compile Include="Items\ItemStatsData.cs" />
     <Compile Include="Items\ItemStatsDataFactory.cs" />
     <Compile Include="Items\ItemWrapper.cs" />
     <Compile Include="Helpers\GoldInactivity.cs" />
     <Compile Include="Cache\HashGenerator.cs" />
-    <Compile Include="Combat\HotbarSkills.cs" />
     <Compile Include="Helpers\MathUtil.cs" />
     <Compile Include="Movement\Kite.cs" />
     <Compile Include="Movement\NavHelper.cs" />
@@ -169,8 +233,9 @@
     <Compile Include="Objects\Rune.cs" />
     <Compile Include="Objects\Set.cs" />
     <Compile Include="Objects\Skill.cs" />
+    <Compile Include="Reference\ItemRankData.cs" />
     <Compile Include="Reference\ItemRanks.cs" />
-    <Compile Include="Reference\SkillBySlot.cs" />
+    <Compile Include="Reference\ItemDataUtils.cs" />
     <Compile Include="Reference\Legendary.cs" />
     <Compile Include="Reference\Passives.cs" />
     <Compile Include="Reference\PassiveUtils.cs" />
@@ -181,7 +246,10 @@
     <Compile Include="Combat\CombatMovement.cs" />
     <Compile Include="Reference\SkillUtils.cs" />
     <Compile Include="Settings\Combat\CrusaderSetting.cs" />
+    <Compile Include="Settings\Loot\ItemListSettings.cs" />
     <Compile Include="Settings\Loot\ItemRankSettings.cs" />
+    <Compile Include="Settings\Mock\ItemListMockData.cs" />
+    <Compile Include="Settings\Mock\MockData.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Combat\HandleTarget.cs" />
     <Compile Include="Combat\AbilitySelector.cs" />
@@ -231,24 +299,68 @@
     <Compile Include="Settings\TrinitySetting.cs" />
     <Compile Include="Settings\WorldObjectSetting.cs" />
     <Compile Include="Helpers\PerformanceLogger.cs" />
+    <Compile Include="UI\UIComponents\BindingProxy.cs" />
+    <Compile Include="UI\UIComponents\CacheUI.cs" />
     <Compile Include="UI\TabUI.cs" />
-    <Compile Include="UI\UIComponents\BoolInverterConverter.cs" />
+    <Compile Include="UI\UIComponents\Behaviors\ComboAlwaysFireSelection.cs" />
+    <Compile Include="UI\UIComponents\Behaviors\InputBindingBehavior.cs" />
+    <Compile Include="UI\UIComponents\CacheUIDataModel.cs" />
+    <Compile Include="UI\UIComponents\Controls\AutoSizedGridView.cs" />
+    <Compile Include="UI\UIComponents\Controls\ColumnDefinitionExtended.cs" />
+    <Compile Include="UI\UIComponents\RadarCanvas\CanvasData.cs" />
+    <Compile Include="UI\UIComponents\RadarCanvas\Drawings.cs" />
+    <Compile Include="UI\UIComponents\RadarCanvas\DrawingUtilities.cs" />
+    <Compile Include="UI\UIComponents\RadarCanvas\PointMorph.cs" />
+    <Compile Include="UI\UIComponents\RadarCanvas\RadarBrushes.cs" />
+    <Compile Include="UI\UIComponents\RadarCanvas\RadarCanvas.cs" />
+    <Compile Include="UI\UIComponents\Converters\BoolInverterConverter.cs" />
+    <Compile Include="UI\UIComponents\Converters\BoolToTypeConverters.cs" />
+    <Compile Include="UI\UIComponents\Converters\DebugDataBindingConverter.cs" />
+    <Compile Include="UI\UIComponents\Converters\UrlToCachedImageConverter.cs" />
+    <Compile Include="UI\UIComponents\Converters\UrlToImageConverter.cs" />
+    <Compile Include="UI\UIComponents\IntegerStringBinding.cs" />
+    <Compile Include="UI\UIComponents\ItemList\ItemProperty.cs" />
+    <Compile Include="UI\UIComponents\ItemList\LRule.cs" />
+    <Compile Include="UI\UIComponents\Behaviors\CancelMouseBubbling.cs" />
+    <Compile Include="UI\UIComponents\Controls\ModalContentCommands.cs" />
+    <Compile Include="UI\UIComponents\Controls\ModalContentPresenter.cs" />
+    <Compile Include="UI\UIComponents\Behaviors\SelectTextOnFocus.cs" />
+    <Compile Include="UI\UIComponents\Behaviors\SelectionChangedBehaviour.cs" />
     <Compile Include="UI\UIComponents\ConfigViewModel.cs" />
-    <Compile Include="UI\UIComponents\EnumVisibilityConverter.cs" />
-    <Compile Include="UI\UIComponents\IntToStringConverter.cs" />
-    <Compile Include="UI\UIComponents\FlagEnumValueConverter.cs" />
-    <Compile Include="UI\UIComponents\PercentConverter.cs" />
-    <Compile Include="UI\UIComponents\EnumBooleanConverter.cs" />
+    <Compile Include="UI\UIComponents\DeferredAction.cs" />
+    <Compile Include="UI\UIComponents\Converters\EmptyStringToVisibilityConverter.cs" />
+    <Compile Include="UI\UIComponents\Converters\EnumVisibilityConverter.cs" />
+    <Compile Include="UI\UIComponents\Converters\IntToStringConverter.cs" />
+    <Compile Include="UI\UIComponents\Converters\FlagEnumValueConverter.cs" />
+    <Compile Include="UI\UIComponents\Converters\PercentConverter.cs" />
+    <Compile Include="UI\UIComponents\Converters\EnumBooleanConverter.cs" />
+    <Compile Include="UI\UIComponents\ItemList\RuleType.cs" />
+    <Compile Include="UI\UIComponents\LineChartLib\AdaptableDateTimeAxis.cs" />
+    <Compile Include="UI\UIComponents\LineChartLib\AdaptableIncrementAxis.cs" />
+    <Compile Include="UI\UIComponents\LineChartLib\AutoAxis.cs" />
+    <Compile Include="UI\UIComponents\LineChartLib\AxisItem.cs" />
+    <Compile Include="UI\UIComponents\LineChartLib\AxisItemCollection.cs" />
+    <Compile Include="UI\UIComponents\LineChartLib\AxisStrategy.cs" />
+    <Compile Include="UI\UIComponents\LineChartLib\CanonicalSpline.cs" />
+    <Compile Include="UI\UIComponents\LineChartLib\DateTimeInterval.cs" />
+    <Compile Include="UI\UIComponents\LineChartLib\IncrementAxis.cs" />
+    <Compile Include="UI\UIComponents\LineChartLib\ItemPoint.cs" />
+    <Compile Include="UI\UIComponents\LineChartLib\ItemPointCollection.cs" />
+    <Compile Include="UI\UIComponents\LineChartLib\LineChartGenerator.cs" />
+    <Compile Include="UI\UIComponents\RadarCanvas\RadarObject.cs" />
+    <Compile Include="UI\UIComponents\RadarCanvas\RelativeDrawing.cs" />
+    <Compile Include="UI\UIComponents\RadarCanvas\StaticDrawing.cs" />
     <Compile Include="UI\UIComponents\RelayCommand.cs" />
+    <Compile Include="UI\UIComponents\ItemList\LItem.cs" />
+    <Compile Include="UI\UIComponents\ThreadedWindow.cs" />
     <Compile Include="UI\UIComponents\TVarsViewModel.cs" />
     <Compile Include="UI\UIComponents\TVarValidationRule.cs" />
     <Compile Include="UI\UILoader.cs" />
-    <Compile Include="Combat\Weighting.cs" />
+    <Compile Include="Cache\Weighting.cs" />
     <Compile Include="Combat\TargetCheck.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Configuration\Variables.cs" />
     <Compile Include="Configuration\Enums.cs" />
-    <Compile Include="Cache\PlayerInfoCache.cs" />
     <Compile Include="Configuration\DataDictionary.cs" />
     <Compile Include="Movement\StuckHandler.cs" />
     <Compile Include="Movement\PlayerMover.cs" />
@@ -256,6 +368,10 @@
     <Compile Include="Cache\RefreshObjects.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="UI\CacheUI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\Combat\ConfigMisc.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -296,7 +412,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UI\RadarUI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\DebugTab.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Items\ConfigItemList.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -349,13 +473,25 @@
     <Folder Include="ItemRules\Rules\custom\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Configuration\Dictionaries.xml" />
     <Content Include="ItemRules\ItemRules2.txt" />
+    <Content Include="Resources\JS Class Generator\create_class_passives.htm" />
+    <Content Include="Resources\JS Class Generator\create_class_runes.htm" />
+    <Content Include="Resources\JS Class Generator\create_class_skills.htm" />
+    <Content Include="Resources\JS Class Generator\create_itemrank.htm" />
+    <Content Include="Resources\JS Class Generator\create_items.htm" />
+    <Content Include="Resources\JS Class Generator\create_items_BountyCacheItems.htm" />
+    <Content Include="Resources\JS Class Generator\create_items_SpecificPage.htm" />
+    <Content Include="Resources\JS Class Generator\handlebars.js" />
+    <Content Include="Resources\JS Class Generator\handlebars_helper.js" />
+    <Content Include="Resources\JS Class Generator\item-parse.js" />
+    <Content Include="Resources\JS Class Generator\item-SpecificPage.js" />
+    <Content Include="Resources\JS Class Generator\itemrank-parse.js" />
+    <Content Include="Resources\JS Class Generator\ItemReference.js" />
+    <Content Include="Resources\JS Class Generator\jquery.xdomainajax.js" />
+    <Content Include="Resources\JS Class Generator\olditemsreference.txt" />
+    <Content Include="Resources\JS Class Generator\skills.js" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Configuration\Dictionaries.xsd">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="ItemRules\Rules\hard\common.dis" />
     <None Include="ItemRules\Rules\hard\legendary.dis" />
     <None Include="ItemRules\Rules\hard\magic.dis" />
@@ -380,30 +516,29 @@
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>rd /S /Q "C:\db\svn\$(ProjectName)\trunk\Sources\"
-rd /S /Q "C:\db\Plugins\$(ProjectName)\"
-del /S "$(ProjectDir)*.bak"
+    <PostBuildEvent>SET TARGETDIR=C:\DB\DB-Current\Plugins\$(ProjectName)\
 
-xcopy /E /Y "$(ProjectDir)*.cs" "C:\db\Plugins\$(ProjectName)\"
-xcopy /E /Y "$(ProjectDir)*.dis" "C:\db\Plugins\$(ProjectName)\"
-xcopy /E /Y "$(ProjectDir)*.xaml" "C:\db\Plugins\$(ProjectName)\"
-xcopy /E /Y "$(ProjectDir)*.xml" "C:\db\Plugins\$(ProjectName)\"
-xcopy /E /Y "$(ProjectDir)*.xsd" "C:\db\Plugins\$(ProjectName)\"
-xcopy /E /Y "$(ProjectDir)*.txt" "C:\db\Plugins\$(ProjectName)\"
+rd "%25TARGETDIR%25" /S /Q
+xcopy "$(ProjectDir)*" "%25TARGETDIR%25" /Q /E /C /I /R /Y
+rd "%25TARGETDIR%25\bin\" /S /Q
+rd "%25TARGETDIR%25obj\" /S /Q
+del "%25TARGETDIR%25$(ProjectName).csproj"
+del "%25TARGETDIR%25*.suo"
+del "%25TARGETDIR%25*.user"
+del "%25TARGETDIR%25*.DotSettings"
+del "%25TARGETDIR%25packages.config"
 
-rd /S /Q "C:\db\Plugins\$(ProjectName)\obj\
-rd /S /Q "C:\db\Plugins\$(ProjectName)\bin\
+SET TARGETDIR=C:\DB\DB-PTR\Plugins\$(ProjectName)\
 
-xcopy /E /Y "$(ProjectDir)*.cs" "C:\db\svn\$(ProjectName)\trunk\Sources\"
-xcopy /E /Y "$(ProjectDir)*.dis" "C:\db\svn\$(ProjectName)\trunk\Sources\"
-xcopy /E /Y "$(ProjectDir)*.xaml" "C:\db\svn\$(ProjectName)\trunk\Sources\"
-xcopy /E /Y "$(ProjectDir)*.xml" "C:\db\svn\$(ProjectName)\trunk\Sources\"
-xcopy /E /Y "$(ProjectDir)*.xsd" "C:\db\svn\$(ProjectName)\trunk\Sources\"
-xcopy /E /Y "$(ProjectDir)*.txt" "C:\db\svn\$(ProjectName)\trunk\Sources\"
-
-rd /S /Q "C:\db\svn\$(ProjectName)\trunk\Sources\bin\"
-rd /S /Q "C:\db\svn\$(ProjectName)\trunk\Sources\obj\"
-
+rd "%25TARGETDIR%25" /S /Q
+xcopy "$(ProjectDir)*" "%25TARGETDIR%25" /Q /E /C /I /R /Y
+rd "%25TARGETDIR%25bin\" /S /Q
+rd "%25TARGETDIR%25obj\" /S /Q
+del "%25TARGETDIR%25$(ProjectName).csproj"
+del "%25TARGETDIR%25*.suo"
+del "%25TARGETDIR%25*.user"
+del "%25TARGETDIR%25*.DotSettings"
+del "%25TARGETDIR%25packages.config"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>

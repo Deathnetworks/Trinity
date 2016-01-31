@@ -23,7 +23,7 @@ namespace Trinity
         public List<SNOAnim> AvoidanceAnimations { get; set; }
         public float DirectionalAvoidanceDegrees { get; set; }
         public bool AvoidAtPlayerPosition { get; set; }
-        public GObjectType ObjectType { get; set; }
+        public TrinityObjectType ObjectType { get; set; }
 
         public AvoidanceType AvoidanceType
         {

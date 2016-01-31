@@ -1,5 +1,4 @@
-﻿
-using System.Linq;
+﻿using System.Linq;
 using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Game;
@@ -29,6 +28,9 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.X1_Crusader_SteedCharge);
                 }
             }
+            // Destructibles
+            if (UseDestructiblePower)
+                return DestroyObjectPower;
 
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CurrentTarget != null)
             {
@@ -58,6 +60,13 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.X1_Crusader_LawsOfValor2);
                 }
 
+                if (ShouldRefreshBastiansGeneratorBuff)
+                {
+                    power = GetPrimaryPower();
+                    if (power != null)
+                        return power;
+                }
+
                 // Judgement
                 if (CanCastJudgement())
                 {
@@ -85,7 +94,7 @@ namespace Trinity.Combat.Abilities
                 }
 
                 // Consecration
-                bool hasSGround = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_Crusader_Consecration && s.RuneIndex == 3);
+                bool hasSGround = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.X1_Crusader_Consecration && s.RuneIndex == 3);
                 if ((!hasSGround && CanCastConsecration()) ||
                    (hasSGround && CanCastConsecration() && (TargetUtil.AnyMobsInRange(15f, 5) || TargetUtil.IsEliteTargetInRange(15f))))
                 {
@@ -118,17 +127,13 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.X1_Crusader_FallingSword, 16f, TargetUtil.GetBestClusterPoint(15f, 65f, false));
                 }
 
-                if (Legendary.FateOfTheFell.IsEquipped && Player.PrimaryResourcePct > 0.5)
-                {
-                    return new TrinityPower(SNOPower.X1_Crusader_HeavensFury3, 65f, TargetUtil.GetBestPierceTarget(65f,45).Position);
-                }
-
                 // HeavensFury
                 bool hasAkkhan = (Sets.ArmorOfAkkhan.IsThirdBonusActive);
                 if (CanCastHeavensFury() && !hasAkkhan)
                 {
                     return new TrinityPower(SNOPower.X1_Crusader_HeavensFury3, 65f, TargetUtil.GetBestClusterPoint());
                 }
+
                 if (CanCastHeavensFuryHolyShotgun() && hasAkkhan)
                 {
                     return new TrinityPower(SNOPower.X1_Crusader_HeavensFury3, 15f, CurrentTarget.Position);
@@ -143,15 +148,19 @@ namespace Trinity.Combat.Abilities
                 // Phalanx
                 if (CanCastPhalanx())
                 {
-                    return new TrinityPower(SNOPower.x1_Crusader_Phalanx3, 45f, TargetUtil.GetBestClusterPoint(15f, 45f));
+                    var bestPierceTarget = TargetUtil.GetBestPierceTarget(45f);
+                    if (bestPierceTarget != null)
+                        return new TrinityPower(SNOPower.x1_Crusader_Phalanx3, 45f, bestPierceTarget.ACDGuid);
                 }
-                if (CanCastPhalanxStampede(hasAkkhan))
+                if (CanCastPhalanxStampede())
                 {
-                    return new TrinityPower(SNOPower.x1_Crusader_Phalanx3, 7f, CurrentTarget.ACDGuid);
+                    var bestPierceTarget = TargetUtil.GetBestPierceTarget(45f);
+                    if (bestPierceTarget != null)
+                        return new TrinityPower(SNOPower.x1_Crusader_Phalanx3, 45f, bestPierceTarget.ACDGuid);
                 }
 
                 // Blessed Shield : Piercing Shield
-                bool hasPiercingShield = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_Crusader_BlessedShield && s.RuneIndex == 5);
+                bool hasPiercingShield = CacheData.Hotbar.ActiveSkills.Any(s => s.Power == SNOPower.X1_Crusader_BlessedShield && s.RuneIndex == 5);
                 if (CanCastBlessedShieldPiercingShield(hasPiercingShield))
                 {
                     var bestPierceTarget = TargetUtil.GetBestPierceTarget(45f);
@@ -219,29 +228,10 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.X1_Crusader_BlessedShield, 14f, CurrentTarget.ACDGuid);
                 }
 
-                // Justice
-                if (CanCast(SNOPower.X1_Crusader_Justice))
-                {
-                    return new TrinityPower(SNOPower.X1_Crusader_Justice, 7f, CurrentTarget.ACDGuid);
-                }
-
-                // Smite
-                if (CanCast(SNOPower.X1_Crusader_Smite))
-                {
-                    return new TrinityPower(SNOPower.X1_Crusader_Smite, 15f, TargetUtil.GetBestClusterUnit(15f, 15f).ACDGuid);
-                }
-
-                // Slash
-                if (CanCast(SNOPower.X1_Crusader_Slash))
-                {
-                    return new TrinityPower(SNOPower.X1_Crusader_Slash, 15f, TargetUtil.GetBestClusterUnit(5f, 8f).ACDGuid);
-                }
-
-                // Punish
-                if (CanCast(SNOPower.X1_Crusader_Punish))
-                {
-                    return new TrinityPower(SNOPower.X1_Crusader_Punish, 7f, CurrentTarget.ACDGuid);
-                }
+                // Primary generators
+                power = GetPrimaryPower();
+                if (power != null)
+                    return power;
             }
 
             // Buffs
@@ -278,6 +268,34 @@ namespace Trinity.Combat.Abilities
             return power;
         }
 
+        public static TrinityPower GetPrimaryPower()
+        {
+            // Justice
+            if (CanCast(SNOPower.X1_Crusader_Justice))
+            {
+                return new TrinityPower(SNOPower.X1_Crusader_Justice, 7f, CurrentTarget.ACDGuid);
+            }
+
+            // Smite
+            if (CanCast(SNOPower.X1_Crusader_Smite))
+            {
+                return new TrinityPower(SNOPower.X1_Crusader_Smite, 15f, TargetUtil.GetBestClusterUnit(15f, 15f).ACDGuid);
+            }
+
+            // Slash
+            if (CanCast(SNOPower.X1_Crusader_Slash))
+            {
+                return new TrinityPower(SNOPower.X1_Crusader_Slash, 15f, TargetUtil.GetBestClusterUnit(5f, 8f).ACDGuid);
+            }
+
+            // Punish
+            if (CanCast(SNOPower.X1_Crusader_Punish))
+            {
+                return new TrinityPower(SNOPower.X1_Crusader_Punish, 7f, CurrentTarget.ACDGuid);
+            }
+            return null;
+        }
+
         private static bool CanCastSweepAttack()
         {
             return CanCast(SNOPower.X1_Crusader_SweepAttack) &&
@@ -307,12 +325,12 @@ namespace Trinity.Combat.Abilities
 
         private static bool CanCastPhalanx()
         {
-            return CanCast(SNOPower.x1_Crusader_Phalanx3) && (TargetUtil.ClusterExists(15f, 3) || TargetUtil.EliteOrTrashInRange(15f));
+            return CanCast(SNOPower.x1_Crusader_Phalanx3) && (TargetUtil.ClusterExists(45f, 3) || TargetUtil.EliteOrTrashInRange(45f));
         }
 
-        private static bool CanCastPhalanxStampede(bool hasAkkhan)
+        private static bool CanCastPhalanxStampede()
         {
-            return (hasAkkhan && CanCast(SNOPower.x1_Crusader_Phalanx3) && TargetUtil.AnyMobsInRange(15f, 1) && Runes.Crusader.Stampede.IsActive);
+            return (Legendary.UnrelentingPhalanx.IsEquipped && CanCast(SNOPower.x1_Crusader_Phalanx3) && TargetUtil.AnyMobsInRange(45f, 1) && Runes.Crusader.Stampede.IsActive);
         }
 
         private static bool CanCastSteedChargeOutOfCombat()

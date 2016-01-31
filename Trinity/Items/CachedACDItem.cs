@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Web.Caching;
 using Trinity.Helpers;
 using Trinity.Items;
 using Trinity.Technicals;
 using Zeta.Game;
 using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
+using Zeta.Game.Internals.SNO;
 
 namespace Trinity
 {
@@ -20,17 +22,18 @@ namespace Trinity
         public int GoldAmount { get; set; }
         public int BalanceID { get; set; }
         public int DynamicID { get; set; }
+        public int ActorSNO { get; set; }
         public float WeaponDPS { get; set; }
         public bool OneHanded { get; set; }
         public bool TwoHanded { get; set; }
         public DyeType DyeType { get; set; }
         public ItemType DBItemType { get; set; }
         public ItemBaseType DBBaseType { get; set; }
-        public GItemBaseType TrinityItemBaseType { get; set; }
-        public GItemType TrinityItemType { get; set; }
+        public TrinityItemBaseType TrinityItemBaseType { get; set; }
+        public TrinityItemType TrinityItemType { get; set; }
         public FollowerType FollowerType { get; set; }
         public bool IsUnidentified { get; set; }
-        public int ItemStackQuantity { get; set; }
+        public long ItemStackQuantity { get; set; }
         public float Dexterity { get; set; }
         public float Intelligence { get; set; }
         public float Strength { get; set; }
@@ -89,9 +92,9 @@ namespace Trinity
         public int Row { get; set; }
         public int Column { get; set; }
         public string ItemLink { get; set; }
-        public float UpgradeDamage { get; set; }
-        public float UpgradeToughness { get; set; }
-        public float UpgradeHealing { get; set; }
+        public bool IsAncient { get; set; }
+        public bool IsEquipment { get; set; }
+        public bool IsSalvageable { get; set; }
 
         public CachedACDItem(ItemStats stats)
         {
@@ -157,106 +160,6 @@ namespace Trinity
 
         }
 
-        public CachedACDItem(
-            ACDItem acdItem,
-            string internalName,
-            string realName,
-            int level,
-            ItemQuality quality,
-            int goldAmount,
-            int balanceId,
-            int dynamicId,
-            float dps,
-            bool oneHanded,
-            bool twoHanded,
-            DyeType dyeType,
-            ItemType itemType,
-            ItemBaseType itembasetype,
-            FollowerType followerType,
-            bool unidentified,
-            int stackQuantity,
-            ItemStats itemStats)
-        {
-            AcdItem = acdItem;
-            InternalName = internalName;
-            RealName = realName;
-            Level = level;
-            Quality = quality;
-            GoldAmount = goldAmount;
-            BalanceID = balanceId;
-            DynamicID = dynamicId;
-            WeaponDPS = dps;
-            OneHanded = oneHanded;
-            TwoHanded = twoHanded;
-            DyeType = dyeType;
-            DBItemType = itemType;
-            DBBaseType = itembasetype;
-            FollowerType = followerType;
-            IsUnidentified = unidentified;
-            ItemStackQuantity = stackQuantity;
-
-            Dexterity = itemStats.Dexterity;
-            Intelligence = itemStats.Intelligence;
-            Strength = itemStats.Strength;
-            Vitality = itemStats.Vitality;
-            LifePercent = itemStats.LifePercent;
-            LifeOnHit = itemStats.LifeOnHit;
-            LifeSteal = itemStats.LifeSteal;
-            HealthPerSecond = itemStats.HealthPerSecond;
-            MagicFind = itemStats.MagicFind;
-            GoldFind = itemStats.GoldFind;
-            MovementSpeed = itemStats.MovementSpeed;
-            PickUpRadius = itemStats.PickUpRadius;
-            Sockets = itemStats.Sockets;
-            CritPercent = itemStats.CritPercent;
-            CritDamagePercent = itemStats.CritDamagePercent;
-            AttackSpeedPercent = itemStats.AttackSpeedPercent;
-            MinDamage = itemStats.MinDamage;
-            MaxDamage = itemStats.MaxDamage;
-            BlockChance = itemStats.BlockChance;
-            Thorns = itemStats.Thorns;
-            ResistAll = itemStats.ResistAll;
-            ResistArcane = itemStats.ResistArcane;
-            ResistCold = itemStats.ResistCold;
-            ResistFire = itemStats.ResistFire;
-            ResistHoly = itemStats.ResistHoly;
-            ResistLightning = itemStats.ResistLightning;
-            ResistPhysical = itemStats.ResistPhysical;
-            ResistPoison = itemStats.ResistPoison;
-            WeaponDamagePerSecond = itemStats.WeaponDamagePerSecond;
-            ArmorBonus = itemStats.ArmorBonus;
-            MaxDiscipline = itemStats.MaxDiscipline;
-            MaxMana = itemStats.MaxMana;
-            ArcaneOnCrit = itemStats.ArcaneOnCrit;
-            ManaRegen = itemStats.ManaRegen;
-            GlobeBonus = itemStats.HealthGlobeBonus;
-            HatredRegen = itemStats.HatredRegen;
-            MaxFury = itemStats.MaxFury;
-            SpiritRegen = itemStats.SpiritRegen;
-            MaxSpirit = itemStats.MaxSpirit;
-            HealthPerSpiritSpent = itemStats.HealthPerSpiritSpent;
-            MaxArcanePower = itemStats.MaxArcanePower;
-            DamageReductionPhysicalPercent = itemStats.DamageReductionPhysicalPercent;
-            ArmorTotal = itemStats.ArmorTotal;
-            Armor = itemStats.Armor;
-            //FireDamagePercent = itemStats.FireDamagePercent;
-            //LightningDamagePercent = itemStats.LightningDamagePercent;
-            //ColdDamagePercent = itemStats.ColdDamagePercent;
-            //PoisonDamagePercent = itemStats.PoisonDamagePercent;
-            //ArcaneDamagePercent = itemStats.ArcaneDamagePercent;
-            //HolyDamagePercent = itemStats.HolyDamagePercent;
-            HealthGlobeBonus = itemStats.HealthGlobeBonus;
-            WeaponAttacksPerSecond = itemStats.WeaponAttacksPerSecond;
-            WeaponMaxDamage = itemStats.WeaponMaxDamage;
-            WeaponMinDamage = itemStats.WeaponMinDamage;
-
-            TrinityItemType = TrinityItemManager.DetermineItemType(internalName, itemType, followerType);
-            TrinityItemBaseType = TrinityItemManager.DetermineBaseType(TrinityItemType);
-
-            ComputeUpgrade();
-        }
-
-
         public int CompareTo(object obj)
         {
             CachedACDItem item = (CachedACDItem)obj;
@@ -287,6 +190,7 @@ namespace Trinity
                     GoldAmount = item.Gold,
                     BalanceID = item.GameBalanceId,
                     DynamicID = item.DynamicId,
+                    ActorSNO = item.ActorSNO,
                     OneHanded = item.IsOneHand,
                     TwoHanded = item.IsTwoHand,
                     DyeType = item.DyeType,
@@ -299,10 +203,14 @@ namespace Trinity
                     Column = item.InventoryColumn,
                     ItemLink = item.ItemLink,
                     TrinityItemType = TrinityItemManager.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType),
-                    TrinityItemBaseType = TrinityItemManager.DetermineBaseType(TrinityItemManager.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType))
-                };
+                    IsAncient = item.GetAttribute<int>(ActorAttributeType.AncientRank) > 0,
 
-                cItem.ComputeUpgrade();
+                };
+                TrinityItemBaseType trinityItemBaseType = TrinityItemManager.DetermineBaseType(TrinityItemManager.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType));
+                cItem.TrinityItemBaseType = trinityItemBaseType;
+                cItem.IsEquipment = GetIsEquipment(trinityItemBaseType);
+                cItem.IsSalvageable = GetIsSalvageable(cItem);
+
                 return cItem;
             }
             catch (Exception ex)
@@ -313,38 +221,32 @@ namespace Trinity
 
         }
 
-        public void ComputeUpgrade()
+        public static bool GetIsSalvageable(CachedACDItem cItem)
         {
-            float damage = 0, healing = 0, toughness = 0;
+            if (!cItem.IsEquipment)
+                return false;
 
-            float altDamage = 0;
-            float altToughness = 0;
+            if (cItem.AcdItem.IsVendorBought)
+                return false;
 
-            foreach (var slot in AcdItem.ValidInventorySlots)
+            return true;
+        }
+
+        public static bool GetIsEquipment(TrinityItemBaseType baseType)
+        {
+            switch (baseType)
             {
-                float altHealing = 0;
-                if (slot == InventorySlot.RightFinger)
-                {
-                    AcdItem.GetStatChanges(out altDamage, out altHealing, out altToughness, true);
-                }
-                else if (slot == InventorySlot.RightHand)
-                {
-                    AcdItem.GetStatChanges(out altDamage, out altHealing, out altToughness, true);
-                }
-                else
-                {
-                    AcdItem.GetStatChanges(out damage, out healing, out toughness);
-                }
+                case TrinityItemBaseType.Armor:
+                case global::Trinity.TrinityItemBaseType.Jewelry:
+                case global::Trinity.TrinityItemBaseType.Offhand:
+                case global::Trinity.TrinityItemBaseType.WeaponOneHand:
+                case global::Trinity.TrinityItemBaseType.WeaponRange:
+                case global::Trinity.TrinityItemBaseType.WeaponTwoHand:
+                case global::Trinity.TrinityItemBaseType.FollowerItem:
+                    return true;
+                default:
+                    return false;
             }
-            if ((altDamage + altToughness) > (damage + toughness))
-            {
-                damage = altDamage;
-                toughness = altToughness;
-            }
-
-            UpgradeDamage = damage;
-            UpgradeToughness = toughness;
-            UpgradeHealing = healing;
         }
     }
 }

@@ -1,4 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using Trinity.Config.Combat;
 using Trinity.Reference;
@@ -8,8 +14,110 @@ using Zeta.Game.Internals.SNO;
 
 namespace Trinity.Helpers
 {
+    /// <summary>
+    /// Class Extensions.
+    /// </summary>
     public static class Extensions
     {
+
+        /// <summary>
+        /// Allows a nullable backed property and use _field.GetValueOrDefaultAttribute() for [DefaultValue(1)] attribute
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj">The object.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="type">The type.</param>
+        /// <returns>T.</returns>
+        public static T GetValueOrDefaultAttribute<T>(this T? obj, [CallerMemberName] string name = "", Type type = null) where T : struct, IComparable
+        {
+            if (obj.HasValue)
+                return obj.Value;
+
+            if (type == null)
+            {
+                var frame = new StackFrame(1);
+                var method = frame.GetMethod();
+                if (method.DeclaringType != null)
+                {
+                    type = method.DeclaringType;
+                }
+                else
+                {
+                    return default(T);
+                }
+            }
+
+            var properties = TypeDescriptor.GetProperties(type)[name];
+            if (properties != null)
+            {
+                var myAttribute = properties.Attributes.OfType<DefaultValueAttribute>().FirstOrDefault();
+                if (myAttribute != null)
+                {
+                    return (T)Convert.ChangeType(myAttribute.Value, typeof(T));
+                }
+            }
+            return default(T);
+        }
+
+        /// <summary>
+        /// Gets a dictionary value or the default
+        /// </summary>
+        /// <typeparam name="TKey">The type of the t key.</typeparam>
+        /// <typeparam name="TValue">The type of the t value.</typeparam>
+        /// <param name="dictionary">The dictionary.</param>
+        /// <param name="key">The key.</param>
+        /// <returns>TValue.</returns>
+        public static TValue GetValueOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key)
+        {
+            TValue value;
+            return dictionary.TryGetValue(key, out value) ? value : default(TValue);
+        }
+
+        /// <summary>
+        /// Get an attribute, exceptions get swallowed and default returned
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="actor">The actor.</param>
+        /// <param name="type">The type.</param>
+        /// <returns>T.</returns>
+        public static T GetAttributeOrDefault<T>(this TrinityCacheObject actor, ActorAttributeType type) where T : struct
+        {
+            try
+            {
+                actor.CommonData.GetAttribute<T>(type);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug(LogCategory.CacheManagement, "Exception on {0} accessing {1} attribute: {2}", actor.InternalName, type, ex);
+            }
+            return default(T);
+        }
+
+        /// <summary>
+        /// Get an attribute, exceptions get swallowed and default returned
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="actorACD">The actor acd.</param>
+        /// <param name="type">The type.</param>
+        /// <returns>T.</returns>
+        public static T GetAttributeOrDefault<T>(this ACD actorACD, ActorAttributeType type) where T : struct
+        {
+            try
+            {
+                actorACD.GetAttribute<T>(type);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug(LogCategory.CacheManagement, "Exception on {0} accessing {1} attribute: {2}", actorACD.Name, type, ex);
+            }
+            return default(T);
+        }
+
+        /// <summary>
+        /// Gets the trinity item quality.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <returns>TrinityItemQuality.</returns>
         public static TrinityItemQuality GetTrinityItemQuality(this ACDItem item)
         {
             if (item == null)
@@ -43,8 +151,32 @@ namespace Trinity.Helpers
             }
         }
 
-        private static Regex ItemQualityRegex = new Regex("{c:[a-zA-Z0-9]{8}}", RegexOptions.Compiled);
+        /// <summary>
+        /// To the enum value.
+        /// </summary>
+        /// <typeparam name="TEnum">The type of the t enum.</typeparam>
+        /// <param name="e">The e.</param>
+        /// <returns>EnumValue&lt;TEnum&gt;.</returns>
+        /// <exception cref="System.ArgumentException">T must be an enumerated type</exception>
+        public static EnumValue<TEnum> ToEnumValue<TEnum>(this TEnum e) where TEnum : struct, IConvertible
+        {
+            if (!typeof(TEnum).IsEnum)
+            {
+                throw new ArgumentException("T must be an enumerated type");
+            }
+            return new EnumValue<TEnum>(e);
+        }
 
+        /// <summary>
+        /// The _item quality regex
+        /// </summary>
+        private static Regex _itemQualityRegex = new Regex("{c:[a-zA-Z0-9]{8}}", RegexOptions.Compiled);
+
+        /// <summary>
+        /// Items the link color quality.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <returns>ItemQuality.</returns>
         public static ItemQuality ItemLinkColorQuality(this ACDItem item)
         {
             if (item == null)
@@ -61,10 +193,9 @@ namespace Trinity.Helpers
 
             string itemLink = item.ItemLink;
 
-            string linkColor = ItemQualityRegex.Match(itemLink).Value;
+            string linkColor = _itemQualityRegex.Match(itemLink).Value;
 
             ItemQuality qualityResult;
-            string itemLinkLog = itemLink.Replace("{", "{{").Replace("}", "}}");
 
             switch (linkColor)
             {
@@ -105,6 +236,11 @@ namespace Trinity.Helpers
             return qualityResult;
         }
 
+        /// <summary>
+        /// Determines whether [is set item] [the specified item].
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <returns><c>true</c> if [is set item] [the specified item]; otherwise, <c>false</c>.</returns>
         public static bool IsSetItem(this ACDItem item)
         {
             if (item == null)
@@ -114,7 +250,7 @@ namespace Trinity.Helpers
 
             string itemLink = item.ItemLink;
 
-            string linkColor = ItemQualityRegex.Match(itemLink).Value;
+            string linkColor = _itemQualityRegex.Match(itemLink).Value;
 
             if (linkColor == "{c:ff00ff00}")
                 return true;
@@ -122,6 +258,11 @@ namespace Trinity.Helpers
             return false;
         }
 
+        /// <summary>
+        /// Items the name of the set.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <returns>System.String.</returns>
         public static string ItemSetName(this ACDItem item)
         {
             if (!item.IsSetItem())
@@ -134,6 +275,11 @@ namespace Trinity.Helpers
             return null;
         }
 
+        /// <summary>
+        /// Gets the gem quality level.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <returns>System.Int32.</returns>
         public static int GetGemQualityLevel(this ACDItem item)
         {
             if (item == null)
@@ -147,6 +293,11 @@ namespace Trinity.Helpers
 
             return item.Level;
         }
+        /// <summary>
+        /// Gets the size of the nav cell.
+        /// </summary>
+        /// <param name="cell">The cell.</param>
+        /// <returns>System.Double.</returns>
         public static double GetNavCellSize(this NavCell cell)
         {
             var diff = cell.Max.ToVector2() - cell.Min.ToVector2();
@@ -156,11 +307,60 @@ namespace Trinity.Helpers
         /// <summary>
         /// Returns if a DiaObject is not null, is valid, and it's ACD is not null, and is valid
         /// </summary>
-        /// <param name="diaObject"></param>
-        /// <returns></returns>
+        /// <param name="diaObject">The dia object.</param>
+        /// <returns><c>true</c> if [is fully valid] [the specified dia object]; otherwise, <c>false</c>.</returns>
         public static bool IsFullyValid(this DiaObject diaObject)
         {
             return diaObject != null && diaObject.IsValid && diaObject.CommonData != null && diaObject.CommonData.IsValid;
+        }
+
+        /// <summary>
+        /// Removed duplicates from a list based on specified property .DistinctBy(o =&gt; o.property)
+        /// </summary>
+        /// <typeparam name="TSource">The type of the t source.</typeparam>
+        /// <typeparam name="TKey">The type of the t key.</typeparam>
+        /// <param name="source">The source.</param>
+        /// <param name="keySelector">The key selector.</param>
+        /// <returns>IEnumerable&lt;TSource&gt;.</returns>
+        public static IEnumerable<TSource> DistinctBy<TSource, TKey>
+            (this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+        {
+            var seenKeys = new HashSet<TKey>();
+            return source.Where(element => seenKeys.Add(keySelector(element)));
+        }
+
+        /// <summary>
+        /// Splits a StringLikeThisWithCapitalLetters into words with spaces between.
+        /// </summary>
+        /// <param name="text">The text.</param>
+        /// <param name="preserveAcronyms">if set to <c>true</c> [preserve acronyms].</param>
+        /// <returns>System.String.</returns>
+        public static string AddSpacesToSentence(this string text, bool preserveAcronyms = false)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return string.Empty;
+            StringBuilder newText = new StringBuilder(text.Length * 2);
+            newText.Append(text[0]);
+            for (int i = 1; i < text.Length; i++)
+            {
+                if (char.IsUpper(text[i]))
+                    if ((text[i - 1] != ' ' && !char.IsUpper(text[i - 1])) ||
+                        (preserveAcronyms && char.IsUpper(text[i - 1]) &&
+                         i < text.Length - 1 && !char.IsUpper(text[i + 1])))
+                        newText.Append(' ');
+                newText.Append(text[i]);
+            }
+            return newText.ToString();
+        }
+
+        /// <summary>
+        /// Gets the item stack quantity.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <returns>System.Int32.</returns>
+        public static int GetItemStackQuantity(this ACDItem item)
+        {
+            return (item.GetAttribute<int>(ActorAttributeType.ItemStackQuantityHi) << 32) | item.GetAttribute<int>(ActorAttributeType.ItemStackQuantityLo);
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.Serialization;
+using Trinity.Helpers;
+using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
@@ -22,41 +24,65 @@ namespace Trinity
         {
             get
             {
-                if (_object == null || (_object != null && !_object.IsValid))
+                if (_object == null)
                 {
                     _object = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, true).FirstOrDefault(o => o.RActorGuid == RActorGuid);
                 }
                 return _object;
             }
+            set { _object = value; }
         }
+
+        [NoCopy]
+        private DiaUnit _unit;
         [NoCopy]
         public DiaUnit Unit
         {
             get
             {
-                if (Object != null && Object.IsValid && Object is DiaUnit)
-                    return Object as DiaUnit;
+                if (_unit != null && _unit.IsFullyValid())
+                    return _unit;
+                if (Object != null && Object.IsFullyValid() && Object is DiaUnit)
+                {
+                    _unit = Object as DiaUnit;
+                    return _unit;
+                }
                 return default(DiaUnit);
             }
         }
+
+        [NoCopy]
+        private DiaGizmo _gizmo;
         [NoCopy]
         public DiaGizmo Gizmo
         {
             get
             {
-                if (Object != null && Object.IsValid && Object is DiaGizmo)
-                    return Object as DiaGizmo;
+                if (_gizmo != null && _unit.IsFullyValid())
+                    return _gizmo;
+                if (Object != null && Object.IsFullyValid() && Object is DiaGizmo)
+                {
+                    _gizmo = Object as DiaGizmo;
+                    return _gizmo;
+                }
                 return default(DiaGizmo);
             }
         }
 
         [NoCopy]
+        private DiaItem _item;
+        [NoCopy]
         public DiaItem Item
         {
             get
             {
-                if (Object != null && Object.IsValid && Object is DiaItem)
-                    return Object as DiaItem;
+                if (_item != null && _unit.IsFullyValid())
+                    return _item;
+                if (Object != null && Object.IsFullyValid() && Object is DiaItem)
+                {
+                    _item = Object as DiaItem;
+                    return _item;
+                }
                 return default(DiaItem);
             }
         }
@@ -71,13 +97,15 @@ namespace Trinity
 
                 return Object.CommonData;
             }
+            set { throw new NotImplementedException(); }
         }
 
+        [NoCopy]
         public bool CommonDataIsValid
         {
             get
             {
-                return CommonData != null && CommonData.IsValid;
+                return IsFullyValid();
             }
         }
 
@@ -90,10 +118,8 @@ namespace Trinity
         [DataMember]
         public int ActorSNO { get; set; }
 
-        // Generic stuff applicable to all objects
-
         [DataMember]
-        public GObjectType Type { get; set; }
+        public TrinityObjectType Type { get; set; }
 
         [DataMember]
         public ActorType ActorType { get; set; }
@@ -141,7 +167,7 @@ namespace Trinity
 
         [DataMember]
         public bool OneHanded { get; set; }
-        
+
         [DataMember]
         public bool TwoHanded { get; set; }
 
@@ -158,13 +184,16 @@ namespace Trinity
         public FollowerType FollowerType { get; set; }
 
         [DataMember]
-        public GItemType TrinityItemType { get; set; }
+        public TrinityItemType TrinityItemType { get; set; }
 
         [DataMember]
         public DateTime LastSeenTime { get; set; }
 
         [DataMember]
         public bool IsElite { get; set; }
+
+        [DataMember]
+        public bool IsInvulnerable { get; set; }
 
         [DataMember]
         public bool IsRare { get; set; }
@@ -186,6 +215,9 @@ namespace Trinity
 
         [DataMember]
         public bool IsBoss { get; set; }
+
+        [DataMember]
+        public bool IsAncient { get; set; }
 
         [DataMember]
         public bool HasAffixShielded { get; set; }
@@ -220,7 +252,7 @@ namespace Trinity
         /// <summary>
         /// If Player is facing unit
         /// </summary>
-        [DataMember] 
+        [DataMember]
         public bool ForceLeapAgainst { get; set; }
 
         [DataMember]
@@ -249,7 +281,7 @@ namespace Trinity
         [DataMember]
         public bool HasBeenInLoS { get; set; }
 
-        [NoCopy]        
+        [NoCopy]
         public bool IsBossOrEliteRareUnique { get { return (this.IsUnit && (IsEliteRareUnique || IsBoss)); } }
 
         [NoCopy]
@@ -268,7 +300,7 @@ namespace Trinity
         public int SummonedByACDId { get; set; }
 
         [NoCopy]
-        public bool IsUnit { get { return this.Type == GObjectType.Unit; } }
+        public bool IsUnit { get { return this.Type == TrinityObjectType.Unit; } }
 
         [DataMember]
         public bool IsNPC { get; set; }
@@ -288,14 +320,47 @@ namespace Trinity
         [DataMember]
         public bool IsQuestGiver { get; set; }
 
-        [NoCopy]
-        public bool IsCursedChest { get { return Type == GObjectType.CursedChest; } }
+        [DataMember]
+        public string IgnoreReason { get; set; }
+
+        [DataMember]
+        public string ExtraInfo { get; set; }
 
         [NoCopy]
-        public bool IsCursedShrine { get { return Type == GObjectType.CursedShrine; } }
+        public bool IsCursedChest { get { return Type == TrinityObjectType.CursedChest; } }
+
+        [NoCopy]
+        public bool IsCursedShrine { get { return Type == TrinityObjectType.CursedShrine; } }
 
         [NoCopy]
         public bool IsEventObject { get { return IsCursedChest || IsCursedShrine; } }
+
+        [NoCopy]
+        public bool IsDestroyable
+        {
+            get
+            {
+                return Type == TrinityObjectType.Barricade || Type == TrinityObjectType.Destructible;
+            }
+        }
+
+        [NoCopy]
+        public bool IsInteractable
+        {
+            get
+            {
+                return Type == TrinityObjectType.Item || Type == TrinityObjectType.Container || Type == TrinityObjectType.CursedChest || Type == TrinityObjectType.CursedChest || Type == TrinityObjectType.CursedShrine ||
+                    Type == TrinityObjectType.Door || Type == TrinityObjectType.HealthWell || Type == TrinityObjectType.Interactable || Type == TrinityObjectType.Shrine;
+            }
+        }
+
+        public bool IsPickupNoClick
+        {
+            get
+            {
+                return Type == TrinityObjectType.Gold || Type == TrinityObjectType.PowerGlobe || Type == TrinityObjectType.HealthGlobe || Type == TrinityObjectType.ProgressionGlobe;
+            }
+        }
 
         [NoCopy]
         public bool IsFacing(Vector3 targetPosition, float arcDegrees = 70f)
@@ -346,7 +411,7 @@ namespace Trinity
         {
             using (new Technicals.PerformanceLogger("CacheObject.UnitsNear"))
             {
-                if (this.Type != GObjectType.Unit)
+                if (this.Type != TrinityObjectType.Unit)
                     return 0;
 
                 return Trinity.ObjectCache
@@ -368,9 +433,9 @@ namespace Trinity
         {
             return
                 (from u in Trinity.ObjectCache
-                 where u.RActorGuid != this.RActorGuid &&
+                 where u.RActorGuid != RActorGuid &&
                  u.IsUnit &&
-                 MathUtil.IntersectsPath(u.Position, u.Radius, Trinity.Player.Position, this.Position)
+                 MathUtil.IntersectsPath(u.Position, u.Radius, Trinity.Player.Position, Position)
                  select u).Count();
         }
 
@@ -399,6 +464,22 @@ namespace Trinity
         public override string ToString()
         {
             return string.Format("{0}, Type={1} Dist={2} IsBossOrEliteRareUnique={3} IsAttackable={4}", InternalName, Type, RadiusDistance, IsBossOrEliteRareUnique, IsAttackable);
+        }
+
+        public bool IsMarker { get; set; }
+
+        /// <summary>
+        /// Determines whether [is in line of sight].
+        /// </summary>
+        /// <returns><c>true</c> if [is in line of sight]; otherwise, <c>false</c>.</returns>
+        public bool IsInLineOfSight()
+        {
+            return !Navigator.Raycast(Trinity.Player.Position, Position);
+        }
+
+        public bool IsFullyValid()
+        {
+            return _object != null && _object.CommonData != null && _object.IsValid && _object.CommonData.IsValid;
         }
     }
 }

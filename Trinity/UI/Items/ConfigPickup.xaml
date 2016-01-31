@@ -4,7 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ut="clr-namespace:Trinity.UIComponents"
              mc:Ignorable="d" Foreground="{DynamicResource TextBrush}" 
-             d:DesignHeight="700" d:DesignWidth="390">
+             d:DesignHeight="1200" d:DesignWidth="390">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -20,12 +20,15 @@
         <StackPanel>
             <GroupBox Header="Item Rules Mode">
                 <StackPanel>
-                    <ComboBox FontSize="14" HorizontalAlignment="Stretch" SelectedValuePath="Tag" SelectedValue="{Binding Path=Loot.ItemFilterMode}" Margin="10" >
-                        <ComboBoxItem Content="Trinity Scoring Only" Tag="TrinityOnly" IsSelected="True" ToolTip="Uses Trinity Scoring Only (see Trinity Town-Runs Tab)" />
-                        <ComboBoxItem Content="File Based Script Rules" Tag="TrinityWithItemRules" ToolTip="Utilizes Item Rulesets (see ItemRules directory)" />
-                        <ComboBoxItem Content="Demonbuddy Loot Rules" Tag="DemonBuddy" ToolTip="Use the Built-in Demonbuddy loot rule logic (see Demonbuddy Settings tab)" />
-                        <ComboBoxItem Content="Item Ranking" Tag="ItemRanks" ToolTip="Use Top 1000 Greater Rift popular items" />
-                    </ComboBox>
+                    <Border BorderBrush="White" BorderThickness="1" Margin="5">
+                        <ComboBox FontSize="14" HorizontalAlignment="Stretch" SelectedValuePath="Tag" SelectedValue="{Binding Path=Loot.ItemFilterMode}">
+                            <ComboBoxItem Content="Trinity Scoring Only" Tag="TrinityOnly" IsSelected="True" ToolTip="Uses Trinity Scoring Only (see Trinity Town-Runs Tab)" />
+                            <ComboBoxItem Content="File Based Script Rules" Tag="TrinityWithItemRules" ToolTip="Utilizes Item Rulesets (see ItemRules directory)" />
+                            <ComboBoxItem Content="Demonbuddy Loot Rules" Tag="DemonBuddy" ToolTip="Use the Built-in Demonbuddy loot rule logic (see Demonbuddy Settings tab)" />
+                            <ComboBoxItem Content="Item Ranking" Tag="ItemRanks" ToolTip="Use Top 1000 Greater Rift popular items" />
+                            <ComboBoxItem Content="Item List" Tag="ItemList" ToolTip="Use custom list of items" />
+                        </ComboBox>
+                    </Border>
                     <Button HorizontalAlignment="Center"
                         Style="{DynamicResource LinkButton}"
                         Command="{Binding Path=HelpLinkCommand}" 
@@ -46,6 +49,7 @@
                     <CheckBox IsChecked="{Binding Path=Pickup.PickupLegendaries}" VerticalAlignment="Center" HorizontalAlignment="Center">
                         <TextBlock FontSize="14" Text="Pickup Legendaries" ToolTip="Applies to ALL ITEMS - including Crafting Plans" FontWeight="Bold" Foreground="#FFA73B1E" />
                     </CheckBox>
+                    <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" Content="Legendary Follower Items" IsChecked="{Binding Path=Pickup.PickupLegendaryFollowerItems}" />
                     <UniformGrid HorizontalAlignment="Center">
                         <CheckBox Content="Magic Follower Items" IsChecked="{Binding Path=Pickup.PickupBlueFollowerItems}" VerticalAlignment="Center" />
                         <CheckBox Content="Rare Follower Items" IsChecked="{Binding Path=Pickup.PickupYellowFollowerItems}" VerticalAlignment="Center" />
@@ -86,79 +90,86 @@
                 </StackPanel>
             </GroupBox>
             <GroupBox Header="Misc Pickup Options">
-                <StackPanel>
-                    <UniformGrid Columns="3">
-                        <CheckBox Content="Designs" IsChecked="{Binding Path=Pickup.Designs}" Margin="5"/>
-                        <CheckBox Content="Plans" IsChecked="{Binding Path=Pickup.Plans}" Margin="5"/>
-                        <CheckBox Content="Legendary Plans" IsChecked="{Binding Path=Pickup.LegendaryPlans}" Margin="5"/>
-                        <CheckBox Content="Craft Materials" IsChecked="{Binding Path=Pickup.CraftMaterials}" Margin="5"/>
-                        <CheckBox Content="Infernal Keys" IsChecked="{Binding Path=Pickup.InfernalKeys}" Margin="5"/>
-                        <CheckBox Content="Low Level Items" IsChecked="{Binding Path=Pickup.PickupLowLevel}" Margin="5" ToolTip="Pickup Grey and White Items to level 6/11 (for questing)"/>
-                        <CheckBox Content="Blood Shards" IsChecked="{Binding Path=Pickup.BloodShards}" Margin="5" ToolTip="Pickup Blood Shards"/>
-                        <CheckBox Content="Rift Keys" IsChecked="{Binding Path=Pickup.LootRunKey}" Margin="5" ToolTip="Pickup Rift Key Fragments"/>
-                        <CheckBox Content="Trial Keys" IsChecked="{Binding Path=Pickup.TrialKeys}" Margin="5" ToolTip="Pickup Rift Key Fragments"/>
-                        <CheckBox Content="Ramadalini's" IsChecked="{Binding Path=Pickup.RamadalinisGift}" Margin="5" ToolTip="Pickup Rift Key Fragments"/>
-                        <CheckBox Content="Legendary Potions" IsChecked="{Binding Path=Pickup.LegendaryPotions}" Margin="5" ToolTip="Pickup Rift Key Fragments"/>
-                    </UniformGrid>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Label VerticalAlignment="Center">Gems:</Label>
-                        <ComboBox Grid.Column="1" SelectedValuePath="Tag" SelectedValue="{Binding Path=Pickup.GemLevel, Converter={StaticResource intToStringConverter}}" >
+                <UniformGrid Columns="3">
+                    <CheckBox Content="Designs" IsChecked="{Binding Path=Pickup.Designs}" Margin="5"/>
+                    <CheckBox Content="Plans" IsChecked="{Binding Path=Pickup.Plans}" Margin="5"/>
+                    <CheckBox Content="Legendary Plans" IsChecked="{Binding Path=Pickup.LegendaryPlans}" Margin="5"/>
+                    <CheckBox Content="Craft Materials" IsChecked="{Binding Path=Pickup.CraftMaterials}" Margin="5"/>
+                    <CheckBox Content="Infernal Keys" IsChecked="{Binding Path=Pickup.InfernalKeys}" Margin="5"/>
+                    <CheckBox Content="Low Level Items" IsChecked="{Binding Path=Pickup.PickupLowLevel}" Margin="5" ToolTip="Pickup Grey and White Items to level 6/11 (for questing)"/>
+                    <CheckBox Content="Blood Shards" IsChecked="{Binding Path=Pickup.BloodShards}" Margin="5" ToolTip="Pickup Blood Shards"/>
+                    <CheckBox Content="Rift Keys" IsChecked="{Binding Path=Pickup.LootRunKey}" Margin="5" ToolTip="Pickup Rift Key Fragments"/>
+                    <CheckBox Content="Trial Keys" IsChecked="{Binding Path=Pickup.TrialKeys}" Margin="5" ToolTip="Pickup Rift Key Fragments"/>
+                    <CheckBox Content="Ramadalini's" IsChecked="{Binding Path=Pickup.RamadalinisGift}" Margin="5" ToolTip="Pickup Rift Key Fragments"/>
+                    <CheckBox Content="Legendary Potions" IsChecked="{Binding Path=Pickup.LegendaryPotions}" Margin="5" ToolTip="Pickup Rift Key Fragments"/>
+                </UniformGrid>
+            </GroupBox>
+            <GroupBox Header="Gems">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="1" BorderBrush="White" BorderThickness="1">
+                        <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding Path=Pickup.GemLevel, Converter={StaticResource intToStringConverter}}" Padding="5" >
                             <ComboBoxItem Content="Chipped+" Tag="0" />
                             <ComboBoxItem Content="Flawless Square+" IsSelected="True" Tag="14" />
                             <ComboBoxItem Content="Marquise+" IsSelected="True" Tag="15" />
                             <ComboBoxItem Content="Imperial+" IsSelected="True" Tag="16" />
                         </ComboBox>
-                        <CheckBox Grid.Row="0" Grid.Column="2" Content="Emerald" 
+                    </Border>
+                    <CheckBox Grid.Row="0" Grid.Column="2" Content="Emerald" 
                               IsChecked="{Binding Path=Pickup.GemType,Converter={StaticResource flagsEnumValueConverter}, ConverterParameter='Emerald'}" 
                               Margin="0" VerticalAlignment="Center"/>
-                        <CheckBox Grid.Row="0" Grid.Column="3" Content="Topaz" 
+                    <CheckBox Grid.Row="0" Grid.Column="3" Content="Topaz" 
                               IsChecked="{Binding Path=Pickup.GemType,Converter={StaticResource flagsEnumValueConverter}, ConverterParameter='Topaz'}" 
                               Margin="0" VerticalAlignment="Center"/>
-                        <CheckBox Grid.Row="0" Grid.Column="4" Content="Amethyst" 
+                    <CheckBox Grid.Row="0" Grid.Column="4" Content="Amethyst" 
                               IsChecked="{Binding Path=Pickup.GemType,Converter={StaticResource flagsEnumValueConverter}, ConverterParameter='Amethyst'}" 
                               Margin="0" VerticalAlignment="Center"/>
-                        <CheckBox Grid.Row="0" Grid.Column="5" Content="Ruby" 
+                    <CheckBox Grid.Row="0" Grid.Column="5" Content="Ruby" 
                               IsChecked="{Binding Path=Pickup.GemType,Converter={StaticResource flagsEnumValueConverter}, ConverterParameter='Ruby'}" 
                               Margin="0" VerticalAlignment="Center"/>
-                        <CheckBox Grid.Row="0" Grid.Column="6" Content="Diamond" 
+                    <CheckBox Grid.Row="0" Grid.Column="6" Content="Diamond" 
                               IsChecked="{Binding Path=Pickup.GemType,Converter={StaticResource flagsEnumValueConverter}, ConverterParameter='Diamond'}" 
                               Margin="0" VerticalAlignment="Center"/>
-                    </Grid>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" DockPanel.Dock="Left" Text="Misc Item Level:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" />
-                        <ComboBox Grid.Column="1" SelectedValuePath="Tag" SelectedValue="{Binding Path=Pickup.MiscItemQuality}">
-                            <ComboBoxItem Content="None" IsSelected="True" Tag="None" />
-                            <ComboBoxItem Content="Common+" IsSelected="True" Tag="Common" />
-                            <ComboBoxItem Content="Magic+" IsSelected="True" Tag="Magic" />
-                            <ComboBoxItem Content="Rare+" IsSelected="True" Tag="Rare" />
-                            <ComboBoxItem Content="Legendary" IsSelected="True" Tag="Legendary" />
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="Crafting Materials: Grey / White / Blue / Yellow ">
+                <Grid Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <!--<ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />-->
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" DockPanel.Dock="Left" Text="Crafting Mats Min Quality:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                    <Border Grid.Column="1" BorderBrush="White" BorderThickness="1">
+                        <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding Path=Pickup.MiscItemQuality}" Padding="5">
+                            <ComboBoxItem Content="None" Tag="None" />
+                            <ComboBoxItem Content="Common+" Tag="Common" />
+                            <ComboBoxItem Content="Magic+" Tag="Magic" />
+                            <ComboBoxItem Content="Rare+" Tag="Rare" />
+                            <ComboBoxItem Content="Legendary" Tag="Legendary" />
                         </ComboBox>
-                        <TextBlock Grid.Column="2" DockPanel.Dock="Left" FontWeight="Bold"  Text="Potion Cap:" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                        <ComboBox Grid.Column="3" SelectedValuePath="Tag" SelectedValue="{Binding Path=Pickup.PotionCount}" VerticalAlignment="Center">
-                            <ComboBoxItem Content="0" Tag="0" />
-                            <ComboBoxItem Content="25" Tag="25" />
-                            <ComboBoxItem Content="50" Tag="50" />
-                            <ComboBoxItem Content="98" IsSelected="True" Tag="98" />
-                            <ComboBoxItem Content="198" Tag="198" />
-                            <ComboBoxItem Content="Pickup All" Tag="6000" />
-                        </ComboBox>
-                    </Grid>
-                </StackPanel>
+                    </Border>
+                    <!--
+                    <TextBlock Grid.Column="2" DockPanel.Dock="Left" FontWeight="Bold"  Text="Potion Cap:" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                    <ComboBox Grid.Column="3" SelectedValuePath="Tag" SelectedValue="{Binding Path=Pickup.PotionCount}" VerticalAlignment="Center">
+                        <ComboBoxItem Content="0" Tag="0" />
+                        <ComboBoxItem Content="25" Tag="25" />
+                        <ComboBoxItem Content="50" Tag="50" />
+                        <ComboBoxItem Content="98" IsSelected="True" Tag="98" />
+                        <ComboBoxItem Content="198" Tag="198" />
+                        <ComboBoxItem Content="Pickup All" Tag="6000" />
+                    </ComboBox>
+                    -->
+                </Grid>
             </GroupBox>
             <GroupBox Header="Gold Pickup Settings">
                 <DockPanel LastChildFill="True">

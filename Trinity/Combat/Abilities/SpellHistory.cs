@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Trinity.Objects;
+using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
 
@@ -10,6 +12,18 @@ namespace Trinity.Combat.Abilities
     {
         private const int SpellHistorySize = 1000;
         private static List<SpellHistoryItem> _historyQueue = new List<SpellHistoryItem>(SpellHistorySize * 2);
+
+        private static DateTime _lastSpenderCast = DateTime.MinValue;
+        public static double TimeSinceSpenderCast 
+        {
+            get { return DateTime.UtcNow.Subtract(_lastSpenderCast).TotalMilliseconds; }
+        }
+
+        private static DateTime _lastGeneratorCast = DateTime.MinValue;
+        public static double TimeSinceGeneratorCast
+        {
+            get { return DateTime.UtcNow.Subtract(_lastGeneratorCast).TotalMilliseconds; }
+        }
 
         internal static List<SpellHistoryItem> HistoryQueue
         {
@@ -21,6 +35,15 @@ namespace Trinity.Combat.Abilities
         {
             if (_historyQueue.Count >= SpellHistorySize)
                 _historyQueue.RemoveAt(_historyQueue.Count() - 1);
+
+            var skill = SkillUtils.ById(power.SNOPower);
+            
+            if(skill.IsAttackSpender)
+                _lastSpenderCast = DateTime.UtcNow;
+
+            if (skill.IsGeneratorOrPrimary)
+                _lastGeneratorCast = DateTime.UtcNow;
+
             _historyQueue.Add(new SpellHistoryItem
             {
                 Power = power,
@@ -53,10 +76,18 @@ namespace Trinity.Combat.Abilities
             return SNOPower.None;
         }
 
-        public static DateTime GetSpellLastused(SNOPower power)
+        public static DateTime GetSpellLastused(SNOPower power = SNOPower.None)
         {
-            DateTime lastUsed = DateTime.MinValue;
-            CacheData.AbilityLastUsed.TryGetValue(power, out lastUsed);
+            DateTime lastUsed;
+            if (power == SNOPower.None && CacheData.AbilityLastUsed.Any())
+            {
+                var pair = CacheData.AbilityLastUsed.LastOrDefault();
+                lastUsed = pair.Value;
+            }
+            else
+            {
+                CacheData.AbilityLastUsed.TryGetValue(power, out lastUsed);
+            }
             return lastUsed;
         }
 

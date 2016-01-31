@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Trinity.Cache;
 using Zeta.Common;
+using Zeta.Game;
+using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 
 namespace Trinity
 {
-    public class CacheData
+    public partial class CacheData
     {
         /* 
          * This set of dictionaries are used for performance increases throughout, and a minimization of DB mis-read/null exception errors
@@ -98,6 +102,11 @@ namespace Trinity
         internal static Dictionary<int, bool> HasBeenInLoS = new Dictionary<int, bool>();
 
         /// <summary>
+        /// Record of items that have been on the ground
+        /// </summary>
+        internal static HashSet<PickupItem> DroppedItems = new HashSet<PickupItem>();
+
+        /// <summary>
         /// Stores the computed ItemQuality from an ACDItem.ItemLink (ACDGuid based)
         /// </summary>
         internal static Dictionary<int, ItemQuality> ItemLinkQuality = new Dictionary<int, ItemQuality>();
@@ -138,6 +147,53 @@ namespace Trinity
         internal static HashSet<int> BlacklistedEvents = new HashSet<int>();
 
         /// <summary>
+        /// Contains the ignore rules/reasons why an object was not added to the cache
+        /// </summary>
+        internal static Dictionary<int, string> IgnoreReasons = new Dictionary<int, string>(); 
+
+        /// <summary>
+        /// Cache for low weight/priority objects, so we dont have to refresh them every tick.
+        /// </summary>
+        internal static Dictionary<int, TrinityCacheObject> LowPriorityObjectCache = new Dictionary<int, TrinityCacheObject>();
+
+        public static InventoryCache Inventory
+        {
+            get { return InventoryCache.Instance; }            
+        }
+
+        public static PlayerCache Player
+        {
+            get { return PlayerCache.Instance; }
+        }
+
+        public static HotbarCache Hotbar
+        {
+            get { return HotbarCache.Instance; }
+        }
+
+        public static BuffsCache Buffs
+        {
+            get { return BuffsCache.Instance; }
+        }
+
+        public static CachedValue<List<MinimapMarker>> _cachedMarkers;
+        public static List<MinimapMarker> CachedMarkers
+        {
+            get
+            {
+                if (_cachedMarkers == null)
+                    _cachedMarkers = new CachedValue<List<MinimapMarker>>(GetMarkerList, TimeSpan.FromSeconds(1));
+                return _cachedMarkers.Value;
+            }
+        }
+
+        public static List<MinimapMarker> GetMarkerList()
+        {
+
+            return ZetaDia.Minimap.Markers.AllMarkers.ToList();
+        }
+
+        /// <summary>
         /// Called every cache-refresh
         /// </summary>
         internal static void Clear()
@@ -154,6 +210,7 @@ namespace Trinity
             UnitMonsterAffix.Clear();
             TimeBoundAvoidance.RemoveWhere(aoe => aoe.Expires < DateTime.UtcNow);
             NavigationObstacles.RemoveWhere(o => o.Position.Distance2DSqr(Trinity.Player.Position) > 90f * 90f);
+            IgnoreReasons.Clear();
         }
 
         /// <summary>
@@ -162,7 +219,12 @@ namespace Trinity
         internal static void FullClear()
         {
             Clear();
+            WorldChangedClear();
+            DroppedItems.Clear();
+        }
 
+        internal static void WorldChangedClear()
+        {
             AbilityLastUsed = new Dictionary<SNOPower, DateTime>(DataDictionary.LastUseAbilityTimeDefaults);
             AvoidanceObstacles.Clear();
             GoldStack.Clear();
@@ -177,7 +239,8 @@ namespace Trinity
             PrimaryTargetCount.Clear();
             TimeBoundAvoidance.Clear();
             BlacklistedEvents.Clear();
+            LowPriorityObjectCache.Clear();
+            Player.ForceUpdates();
         }
-
     }
 }

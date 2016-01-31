@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Buddy.Coroutines;
 using Trinity.Coroutines;
@@ -21,8 +22,10 @@ namespace Trinity.Items
 {
     public static class ItemSort
     {
-        private const int ItemMovementDelay = 50;
+        private const int ItemMovementDelay = 100;
         const string HookName = "VendorRun";
+
+        public static bool IsSorting { get; private set; }
 
         /// <summary>
         /// Compares items for sorting. Returns -1 if item1 comes before item2. Returns 0 if items are of equal sort. Returns 1 if item1 should come after item2.
@@ -33,7 +36,7 @@ namespace Trinity.Items
         public static int Compare(this ItemWrapper thisItem, ItemWrapper thatItem)
         {
             Logger.LogDebug("Comparing item {0} ({1}) to {2} ({3})", thisItem.Name, thisItem.InternalName, thatItem.Name, thatItem.InternalName);
-            if (thisItem.DynamicID == thatItem.DynamicID)
+            if (thisItem.DynamicId == thatItem.DynamicId)
                 return 0;
 
             string thisInternalName = thisItem.InternalName.ToLower().Replace("x1_", "").Replace("p1_", "");
@@ -135,17 +138,18 @@ namespace Trinity.Items
                  *  Equipment (Weapons, Armor, Jewlery)
                  */
 
+                // Two slots before one slots
+                if (!thisItem.IsTwoSquareItem && thatItem.IsTwoSquareItem)
+                    return -1;
+                if (thisItem.IsTwoSquareItem && !thatItem.IsTwoSquareItem)
+                    return 1;
+
                 // Sort Sets
-                if (thisItem.IsSetItem && thatItem.IsSetItem)
+                if (thisItem.IsSetItem && thatItem.IsSetItem && thisItem.IsTwoSquareItem)
                 {
                     bool isSameSet = thisItem.ItemSetName == thatItem.ItemSetName;
                     if (isSameSet)
                     {
-                        if (!thisItem.IsTwoSquareItem && thatItem.IsTwoSquareItem)
-                            return 1;
-                        if (thisItem.IsTwoSquareItem && !thatItem.IsTwoSquareItem)
-                            return -1;
-
                         return String.Compare(thisSortName, thatSortName, StringComparison.InvariantCulture);
                     }
 
@@ -238,7 +242,7 @@ namespace Trinity.Items
         {
             if (!BotMain.IsRunning)
             {
-                Logger.LogError("Unable to sort backpack while bot is not running");
+                TaskDispatcher.Start(ret => SortTask(InventorySlot.BackpackItems), ret => !IsSorting);
                 return;
             }
 
@@ -267,7 +271,7 @@ namespace Trinity.Items
         {
             if (!BotMain.IsRunning)
             {
-                Logger.LogError("Unable to sort stash while bot is not running");
+                TaskDispatcher.Start(ret => SortTask(InventorySlot.SharedStash), ret => !IsSorting);
                 return;
             }
 
@@ -294,6 +298,8 @@ namespace Trinity.Items
 
         private static void RemoveBehavior()
         {
+            IsSorting = false;
+
             if (_sortBehavior != null)
             {
                 try
@@ -320,8 +326,11 @@ namespace Trinity.Items
             return new ActionRunCoroutine(ret => SortTask(inventorySlot));
         }
 
-        private static async Task<bool> SortTask(InventorySlot inventorySlot)
+        internal static async Task<bool> SortTask(InventorySlot inventorySlot)
         {
+
+            IsSorting = true;
+
             if (!ZetaDia.IsInGame)
                 return false;
             if (ZetaDia.IsLoadingWorld)
@@ -329,9 +338,17 @@ namespace Trinity.Items
             if (!ZetaDia.Me.IsFullyValid())
                 return false;
 
-            if (!await ReturnToStashTask(inventorySlot))
-                return true;
+            if (ZetaDia.Me.IsParticipatingInTieredLootRun)
+            {
+                Logger.LogNormal("Cannot sort while in trial/greater rift");
+                RemoveBehavior();
+                return false;
+            }
 
+            if (inventorySlot == InventorySlot.SharedStash && !await TrinityCoroutines.ReturnToStashTask())
+            {
+                return true;
+            }
             Logger.Log("Starting sort task for {0}", inventorySlot);
 
             List<ItemWrapper> wrappedItems;
@@ -417,7 +434,7 @@ namespace Trinity.Items
                 BotMain.StatusText = "Waiting 5 seconds...";
                 await Coroutine.Sleep(5000);
 
-                if (_startedOutOfTown && ZetaDia.IsInTown)
+                if (TrinityCoroutines.StartedOutOfTown && ZetaDia.IsInTown)
                     await CommonBehaviors.TakeTownPortalBack().ExecuteCoroutine();
             }
             else if (inventorySlot == InventorySlot.BackpackItems)
@@ -428,57 +445,7 @@ namespace Trinity.Items
 
             RemoveBehavior();
             return true;
-        }
 
-        private static bool _startedOutOfTown;
-        private static async Task<bool> ReturnToStashTask(InventorySlot inventorySlot)
-        {
-            if (inventorySlot == InventorySlot.SharedStash)
-            {
-                if (ZetaDia.Me.IsInCombat)
-                    return false;
-
-                if (!ZetaDia.IsInTown && ZetaDia.Me.IsFullyValid() && !ZetaDia.Me.IsInCombat && UIElements.BackgroundScreenPCButtonRecall.IsEnabled)
-                {
-                    _startedOutOfTown = true;
-                    await CommonCoroutines.UseTownPortal("Returning to stash");
-                    return false;
-                }
-
-                if (!GameUI.IsElementVisible(GameUI.StashDialogMainPage) && ZetaDia.IsInTown)
-                {
-                    // Move to Stash
-                    if (TownRun.StashLocation.Distance2D(ZetaDia.Me.Position) > 10f)
-                    {
-                        await TrinityCoroutines.MoveTo(TownRun.StashLocation, "Shared Stash");
-                        return false;
-                    }
-                    if (TownRun.StashLocation.Distance2D(ZetaDia.Me.Position) <= 10f && TownRun.SharedStash == null)
-                    {
-                        Logger.LogError("Shared Stash actor is null!");
-                        RemoveBehavior();
-                        return false;
-                    }
-
-                    // Open Stash
-                    if (TownRun.StashLocation.Distance2D(ZetaDia.Me.Position) <= 10f && TownRun.SharedStash != null && !GameUI.IsElementVisible(GameUI.StashDialogMainPage))
-                    {
-                        while (ZetaDia.Me.Movement.IsMoving)
-                        {
-                            Navigator.PlayerMover.MoveStop();
-                            await Coroutine.Yield();
-                        }
-                        Logger.Log("Opening Stash");
-                        TownRun.SharedStash.Interact();
-                        await Coroutine.Sleep(ItemMovementDelay);
-                        await Coroutine.Yield();
-                        if (GameUI.IsElementVisible(GameUI.StashDialogMainPage))
-                            return true;
-                        return false;
-                    }
-                }
-            }
-            return true;
         }
 
         public static async Task<bool> SortItems(InventorySlot inventorySlot)
@@ -548,7 +515,7 @@ namespace Trinity.Items
                     string msg = String.Format("Moving item {0} from {1},{2} to {3},{4}", i.Name, i.Item.InventoryColumn, i.Item.InventoryRow, currentCol, currentRow);
                     BotMain.StatusText = msg;
                     Logger.LogDebug(msg);
-                    ZetaDia.Me.Inventory.MoveItem(i.DynamicID, myDynamicId, inventorySlot, currentCol, currentRow);
+                    ZetaDia.Me.Inventory.MoveItem(i.DynamicId, myDynamicId, inventorySlot, currentCol, currentRow);
 
                     MarkCellAsUsed(currentRow, currentCol, i);
                     currentCol++;
@@ -625,7 +592,7 @@ namespace Trinity.Items
 
                     int desiredStashPage = await SetStashpage(currentRow);
 
-                    if (i.Item.MaxStackCount > 1 && ZetaDia.Me.Inventory.CanStackItemInStashPage(i.Item, desiredStashPage))
+                    if (i.Item.MaxStackCount > 1 && ZetaDia.Me.Inventory.CanStackItemInStashPage(i.Item, desiredStashPage) && GetNumberOfStacks(i.Item, inventorySlot) > 1)
                     {
                         ZetaDia.Me.Inventory.QuickWithdraw(i.Item);
                         await Coroutine.Sleep(50);
@@ -645,7 +612,7 @@ namespace Trinity.Items
                     string msg = String.Format("Moving item {0} from {1},{2} to {3},{4}", i.Name, i.Item.InventoryColumn, i.Item.InventoryRow, currentCol, currentRow);
                     BotMain.StatusText = msg;
                     Logger.LogDebug(msg);
-                    ZetaDia.Me.Inventory.MoveItem(i.DynamicID, myDynamicId, inventorySlot, currentCol, currentRow);
+                    ZetaDia.Me.Inventory.MoveItem(i.DynamicId, myDynamicId, inventorySlot, currentCol, currentRow);
 
                     MarkCellAsUsed(currentRow, currentCol, i);
                     currentCol--;
@@ -661,6 +628,23 @@ namespace Trinity.Items
                 RemoveBehavior();
             }
             return false;
+        }
+
+        private static int GetNumberOfStacks(ACDItem item, InventorySlot inventorySlot)
+        {
+            List<ACDItem> items;
+            switch (inventorySlot)
+            {
+                case InventorySlot.BackpackItems:
+                    items = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsValid && i.ActorSNO == item.ActorSNO && i.ItemType == item.ItemType).ToList();
+                    break;
+                case InventorySlot.SharedStash:
+                    items = ZetaDia.Me.Inventory.StashItems.Where(i => i.IsValid && i.ActorSNO == item.ActorSNO && i.ItemType == item.ItemType).ToList();
+                    break;
+                default: 
+                    return 0;
+            }
+            return items.Count();
         }
 
         private static async Task<int> SetStashpage(int currentRow)

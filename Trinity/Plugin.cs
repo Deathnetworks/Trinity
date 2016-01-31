@@ -1,4 +1,5 @@
 ﻿//!CompilerOption:AddRef:System.Management.dll
+//!CompilerOption:AddRef:System.Web.Extensions.dll
 
 using System;
 using System.IO;
@@ -29,7 +30,8 @@ namespace Trinity
         {
             get
             {
-                return new Version(2, 2, 0);
+				//test
+                return new Version(2, 10, 0);
             }
         }
 
@@ -37,7 +39,7 @@ namespace Trinity
         {
             get
             {
-                return "rrrix, xzjv, many community devs";
+                return "rrrix, xzjv, jubisman, and many more";
             }
         }
 
@@ -65,6 +67,8 @@ namespace Trinity
                 {
                     if (ZetaDia.Me == null)
                         return;
+
+                    
 
                     if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
                         return;
@@ -95,7 +99,7 @@ namespace Trinity
 
                     DebugUtil.LogOnPulse();
 
-                    MonkCombat.Monk_MaintainTempestRush();
+                    MonkCombat.RunOngoingPowers();
                 }
                 catch (AccessViolationException)
                 {
@@ -146,6 +150,7 @@ namespace Trinity
                     GameEvents.OnGameLeft += TrinityOnLeaveGame;
                     GameEvents.OnItemSold += ItemEvents.TrinityOnItemSold;
                     GameEvents.OnItemSalvaged += ItemEvents.TrinityOnItemSalvaged;
+                    GameEvents.OnItemDropped += ItemEvents.TrinityOnItemDropped;
                     GameEvents.OnItemStashed += ItemEvents.TrinityOnItemStashed;
                     GameEvents.OnItemIdentificationRequest += ItemEvents.TrinityOnOnItemIdentificationRequest;
                     GameEvents.OnGameChanged += GameEvents_OnGameChanged;
@@ -355,6 +360,11 @@ namespace Trinity
         internal static void BeginInvoke(Action action)
         {
             Application.Current.Dispatcher.BeginInvoke(action);
+        }
+
+        internal static void Invoke(Action action)
+        {
+            Application.Current.Dispatcher.Invoke(action);
         }
 
     }

@@ -3,22 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using Trinity.Combat;
 using Trinity.Combat.Abilities;
+using Trinity.LazyCache;
 using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
+using Zeta.Game.Internals.SNO;
 
 namespace Trinity.Objects
 {
     /// <summary>
     /// Contains information about a Skill
     /// </summary>
-    public class Skill
+    public class Skill : IUnique
     {
         private int _cost;
         private TimeSpan _duration;
         private TimeSpan _cooldown;
         private Element _element;
+        private bool _isDamaging;
+        private float _areaEffectRadius;
 
         public Skill()
         {
@@ -37,6 +41,8 @@ namespace Trinity.Objects
         public string Name { get; set; }
         public string Description { get; set; }
         public string Slug { get; set; }
+        public string IconSlug { get; set; }
+        public ResourceEffectType ResourceEffect { get; set; }
 
         /// <summary>
         /// The runes that may be selected for this skill
@@ -81,7 +87,7 @@ namespace Trinity.Objects
         public Resource Resource { get; set; }
 
         /// <summary>
-        /// If this skill is a special primary skill (free to cast or generators)
+        /// Blizzards game guide classifies some skills with a primary flag
         /// </summary>
         public bool IsPrimary { get; set; }
 
@@ -90,8 +96,18 @@ namespace Trinity.Objects
         /// </summary>
         public int Cost
         {
-            get { return CurrentRune.ModifiedCost.HasValue ? CurrentRune.ModifiedCost.Value : _cost; }
+            get { return CurrentRune.ModifiedCost ?? _cost; }
             set { _cost = value; }
+        }
+
+        /// <summary>
+        /// How much this spell costs to cast; uses rune value when applicable.
+        /// Corrisponds to: Beam=Width, Cone=ArcDegrees
+        /// </summary>
+        public float AreaEffectRadius
+        {
+            get { return CurrentRune.ModifiedAreaEffectRadius ?? _areaEffectRadius; }
+            set { _areaEffectRadius = value; }
         }
 
         /// <summary>
@@ -99,8 +115,17 @@ namespace Trinity.Objects
         /// </summary>
         public TimeSpan Duration
         {
-            get { return CurrentRune.ModifiedDuration.HasValue ? CurrentRune.ModifiedDuration.Value : _duration; }
+            get { return CurrentRune.ModifiedDuration ?? _duration; }
             set { _duration = value; }
+        }
+
+        /// <summary>
+        /// If the spell causes direct damage to enemies
+        /// </summary>
+        public bool IsDamaging
+        {
+            get { return CurrentRune.ModifiedIsDamaging ?? _isDamaging; }
+            set { _isDamaging = value; }
         }
 
         /// <summary>
@@ -115,7 +140,7 @@ namespace Trinity.Objects
                 var finalCooldown = Trinity.Player.CooldownReductionPct > 0 ? TimeSpan.FromMilliseconds(newCooldownMilliseconds) : baseCooldown;
                 return finalCooldown;
             }
-            set { _cooldown = value;  }
+            set { _cooldown = value; }
         }
 
         /// <summary>
@@ -127,9 +152,9 @@ namespace Trinity.Objects
             {
                 if (TimeSinceUse > 9999999) return 0;
                 var castTime = DateTime.UtcNow.Subtract(TimeSpan.FromMilliseconds(TimeSinceUse));
-                var endTime = castTime.Add(Cooldown);                
+                var endTime = castTime.Add(Cooldown);
                 var remainingMilliseconds = DateTime.UtcNow.Subtract(endTime).TotalMilliseconds;
-                return remainingMilliseconds < 0 ? (int)remainingMilliseconds * -1 : 0;;
+                return remainingMilliseconds < 0 ? (int)remainingMilliseconds * -1 : 0;
             }
         }
 
@@ -149,6 +174,43 @@ namespace Trinity.Objects
         public bool IsActive
         {
             get { return SkillUtils.ActiveIds.Contains(SNOPower); }
+        }
+
+        /// <summary>
+        /// Check if skill spend primary ressource
+        /// </summary>
+        public bool IsAttackSpender
+        {
+            get
+            {
+                if (SNOPower == 0 || Resource == Resource.Discipline || Resource == Resource.Unknown)
+                    return false;
+
+                if (this == Skills.DemonHunter.Chakram && Legendary.SpinesOfSeethingHatred.IsEquipped)
+                    return false;
+
+                if (this == Skills.DemonHunter.ElementalArrow && Legendary.Kridershot.IsEquipped)
+                    return false;
+
+                return Cost > 0 && IsDamaging;
+            }
+        }
+
+        /// <summary>
+        /// Check if skill generates resource and can hit
+        /// </summary>
+        public bool IsGeneratorOrPrimary
+        {
+            get
+            {
+                if (this == Skills.DemonHunter.Chakram && Legendary.SpinesOfSeethingHatred.IsEquipped)
+                    return true;
+
+                if (this == Skills.DemonHunter.ElementalArrow && Legendary.Kridershot.IsEquipped)
+                    return true;
+
+                return Category == SpellCategory.Primary;
+            }
         }
 
         /// <summary>
@@ -174,7 +236,7 @@ namespace Trinity.Objects
         {
             get
             {
-                var rune =  Runes.FirstOrDefault(r => r.IsActive);
+                var rune = Runes.FirstOrDefault(r => r.IsActive);
                 return rune ?? new Rune();
             }
         }
@@ -199,16 +261,24 @@ namespace Trinity.Objects
             get
             {
                 if (ZetaDia.IsInGame && ZetaDia.Me.IsValid && IsActive)
-                    return ZetaDia.CPlayer.GetActiveSkillBySlot(HotbarSkills.BySNOPower(SNOPower).Slot).HasRuneEquipped;
+                    return CacheData.Hotbar.GetSkill(SNOPower).Rune != null;
 
                 return false;
             }
-        }        
+        }
+
+        /// <summary>
+        /// Check if skill can and should be cast
+        /// </summary>
+        public bool CanCast()
+        {
+            return CombatBase.CanCast(this);
+        }
 
         /// <summary>
         /// Performs basic checks to see if we have and can cast a power (hotbar, power manager). Checks use timer for Wiz, DH, Monk
         /// </summary>
-        public bool CanCast (CombatBase.CanCastFlags flags = CombatBase.CanCastFlags.All)
+        public bool CanCast(CombatBase.CanCastFlags flags = CombatBase.CanCastFlags.All)
         {
             return CombatBase.CanCast(SNOPower, flags);
         }
@@ -226,7 +296,7 @@ namespace Trinity.Objects
         /// </summary>
         public double TimeSinceUse
         {
-            get {  return DateTime.UtcNow.Subtract(LastUsed).TotalMilliseconds; }
+            get { return DateTime.UtcNow.Subtract(LastUsed).TotalMilliseconds; }
         }
 
         /// <summary>
@@ -242,11 +312,68 @@ namespace Trinity.Objects
         }
 
         /// <summary>
+        /// Gets the current skill charge count
+        /// </summary>
+        public int Charges
+        {
+            get { return CombatBase.GetSkillCharges(SNOPower); }
+        }
+
+        /// <summary>
         /// This skill as TrinityPower
         /// </summary>
-        public TrinityPower ToPower
+        public TrinityPower ToPower(float minimumRange, int acdGuid)
         {
-            get { return new TrinityPower(SNOPower); }
+            return new TrinityPower(SNOPower, minimumRange, acdGuid);
+        }
+
+
+        /// <summary>
+        /// This skill as TrinityPower
+        /// </summary>
+        public TrinityPower ToPower(float minimumRange, Vector3 targetPosition)
+        {
+            return new TrinityPower(SNOPower, minimumRange, targetPosition);
+        }
+
+        /// <summary>
+        /// This skill as TrinityPower
+        /// </summary>
+        public TrinityPower ToPower(float minimumRange, Vector3 targetPosition, int waitTicksBeforeUse, int waitTicksAfterUse)
+        {
+            return new TrinityPower(SNOPower, minimumRange, targetPosition, waitTicksBeforeUse, waitTicksAfterUse);
+        }
+
+        /// <summary>
+        /// This skill as TrinityPower
+        /// </summary>
+        public TrinityPower ToPower(float minimumRange, Vector3 targetPosition, int acdGuid, int waitTicksBeforeUse, int waitTicksAfterUse)
+        {
+            return new TrinityPower(SNOPower, minimumRange, targetPosition, Trinity.Player.WorldDynamicID, acdGuid, waitTicksBeforeUse, waitTicksAfterUse);
+        }
+
+        /// <summary>
+        /// This skill as TrinityPower
+        /// </summary>
+        public TrinityPower ToPower(int waitTicksBeforeUse, int waitTicksAfterUse)
+        {
+            return new TrinityPower(SNOPower, waitTicksBeforeUse, waitTicksAfterUse);
+        }
+
+        /// <summary>
+        /// This skill as TrinityPower
+        /// </summary>
+        public TrinityPower ToPower(float minimumRange)
+        {
+            return new TrinityPower(SNOPower, minimumRange);
+        }
+
+        /// <summary>
+        /// This skill as TrinityPower
+        /// </summary>
+        public TrinityPower ToPower()
+        {
+            return new TrinityPower(SNOPower);
         }
 
         /// <summary>
@@ -268,7 +395,7 @@ namespace Trinity.Objects
         /// <summary>
         /// Cast this skill at the specified target
         /// </summary>
-        public void Cast (TrinityCacheObject target)
+        public void Cast(TrinityCacheObject target)
         {
             Cast(target.Position, target.ACDGuid);
         }
@@ -292,12 +419,16 @@ namespace Trinity.Objects
                 {
                     Trinity.LastPowerUsed = SNOPower;
                     CacheData.AbilityLastUsed[SNOPower] = DateTime.UtcNow;
-                    SpellTracker.TrackSpellOnUnit(CombatBase.CurrentTarget.ACDGuid, SNOPower);
+                    if (CombatBase.CurrentTarget != null)
+                        SpellTracker.TrackSpellOnUnit(CombatBase.CurrentTarget.ACDGuid, SNOPower);
                     SpellHistory.RecordSpell(SNOPower);
                 }
             }
         }
 
+        /// <summary>
+        /// Game client is not doing anything weird.
+        /// </summary>
         private bool GameIsReady
         {
             get { return ZetaDia.IsInGame && ZetaDia.Me.IsValid && !ZetaDia.IsLoadingWorld && !ZetaDia.IsInTown && !ZetaDia.IsPlayingCutscene; }
@@ -309,6 +440,28 @@ namespace Trinity.Objects
         public override int GetHashCode()
         {
             return Index.GetHashCode() ^ Name.GetHashCode();
+        }
+
+        /// <summary>
+        /// A unique identifier for IUnique
+        /// </summary>
+        public int Id
+        {
+            get { return (int)SNOPower; }
+        }
+
+        /// <summary>
+        /// Skill metadata
+        /// </summary>
+        public SkillMeta Meta
+        {
+            get { return SkillUtils.GetSkillMeta(this); }
+            set { SkillUtils.SetSkillMeta(value); }
+        }
+
+        public static explicit operator Skill(ActiveSkillEntry x)
+        {
+            return SkillUtils.ById((SNOPower)x.SNOPower);
         }
 
     }

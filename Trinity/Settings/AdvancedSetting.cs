@@ -14,6 +14,8 @@ namespace Trinity.Config
         private bool _TPSEnabled;
         private int _TPSLimit;
         private int _CacheRefreshRate;
+        private int? _cacheLowPriorityRefreshRate;
+        private int? _cacheWeightThresholdPct;
         private bool _LogStuckLocation;
         private bool _DebugInStatusBar;
         private LogCategory _LogCategories;
@@ -27,6 +29,8 @@ namespace Trinity.Config
         private bool _ShowHeroName;
         private bool _ShowHeroClass;
         private bool _DisableAllMovement;
+        private bool _AllowDuplicateMessages;
+        private bool _exportNewActorMeta;
         #endregion Fields
 
         #region Events
@@ -228,6 +232,45 @@ namespace Trinity.Config
         }
 
         [DataMember(IsRequired = false)]
+        [DefaultValue(500)]
+        public int CacheLowPriorityRefreshRate
+        {
+            get
+            {
+                if (!_cacheLowPriorityRefreshRate.HasValue)
+                    _cacheLowPriorityRefreshRate = 500;
+
+                return _cacheLowPriorityRefreshRate.Value;
+            }
+            set
+            {
+                if (_cacheLowPriorityRefreshRate.HasValue && _cacheLowPriorityRefreshRate.Value != value)
+                    OnPropertyChanged("CacheLowPriorityRefreshRate");
+
+                _cacheLowPriorityRefreshRate = value;          
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        public int CacheWeightThresholdPct
+        {
+            get
+            {
+                if (!_cacheWeightThresholdPct.HasValue)
+                    _cacheWeightThresholdPct = 50;
+                
+                return _cacheWeightThresholdPct.Value;
+            }
+            set
+            {
+                if (_cacheWeightThresholdPct.HasValue && _cacheWeightThresholdPct.Value != value)
+                    OnPropertyChanged("CacheWeightThresholdPct");
+
+                _cacheWeightThresholdPct = value;
+            }
+        }
+
+        [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool DebugInStatusBar
         {
@@ -335,7 +378,7 @@ namespace Trinity.Config
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
+        [DefaultValue(true)]
         public bool ShowHeroName
         {
             get
@@ -353,7 +396,7 @@ namespace Trinity.Config
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
+        [DefaultValue(true)]
         public bool ShowHeroClass
         {
             get
@@ -384,6 +427,42 @@ namespace Trinity.Config
                 {
                     _DisableAllMovement = value;
                     OnPropertyChanged("DisableAllMovement");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool AllowDuplicateMessages
+        {
+            get
+            {
+                return _AllowDuplicateMessages;
+            }
+            set
+            {
+                if (_AllowDuplicateMessages != value)
+                {
+                    _AllowDuplicateMessages = value;
+                    OnPropertyChanged("AllowDuplicateMessages");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool ExportNewActorMeta
+        {
+            get
+            {
+                return _exportNewActorMeta;
+            }
+            set
+            {
+                if (_exportNewActorMeta != value)
+                {
+                    _exportNewActorMeta = value;
+                    OnPropertyChanged("ExportNewCacheMeta");
                 }
             }
         }

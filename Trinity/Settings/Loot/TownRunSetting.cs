@@ -1,4 +1,7 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
 using Trinity.Settings.Loot;
 
@@ -23,9 +26,20 @@ namespace Trinity.Config.Loot
         private bool _ForceSalvageRares;
         private bool _KeepLegendaryUnid;
         private bool _SellExtraPotions;
+        private bool _StashLegendaryPotions;
         private bool _KeepTrialLootRunKeysInBackpack;
         private bool _KeepTieredLootRunKeysInBackpack;
         private bool _KeepRiftKeysInBackPack;
+        private bool _DropLegendaryInTown;
+        private bool _ApplyPickupValidationToStashing;
+        private bool _StashVanityItems;
+        private bool _stashLegendaryFollowerItems;
+        private int _maxStackVeiledCrystal;
+        private int _maxStackArcaneDust;
+        private int _maxStackReusableParts;
+        private int _maxStackDeathsBreath;
+        private int _maxStackForgottonSoul;
+        private bool _alwaysStashAncients;
         #endregion Fields
 
         #region Events
@@ -46,6 +60,115 @@ namespace Trinity.Config.Loot
         #endregion Constructors
 
         #region Properties
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool AlwaysStashAncients
+        {
+            get
+            {
+                return _alwaysStashAncients;
+            }
+            set
+            {
+                if (_alwaysStashAncients != value)
+                {
+                    _alwaysStashAncients = value;
+                    OnPropertyChanged("AlwaysStashAncients");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(500000)]
+        public int MaxStackForgottonSoul
+        {
+            get
+            {
+                return _maxStackForgottonSoul;
+            }
+            set
+            {
+                if (_maxStackForgottonSoul != value)
+                {
+                    _maxStackForgottonSoul = value;
+                    OnPropertyChanged("MaxStackForgottonSoul");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(500000)]
+        public int MaxStackDeathsBreath
+        {
+            get
+            {
+                return _maxStackDeathsBreath;
+            }
+            set
+            {
+                if (_maxStackDeathsBreath != value)
+                {
+                    _maxStackDeathsBreath = value;
+                    OnPropertyChanged("MaxStackDeathsBreath");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(500000)]
+        public int MaxStackReusableParts
+        {
+            get
+            {
+                return _maxStackReusableParts;
+            }
+            set
+            {
+                if (_maxStackReusableParts != value)
+                {
+                    _maxStackReusableParts = value;
+                    OnPropertyChanged("MaxStackReusableParts");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(500000)]
+        public int MaxStackArcaneDust
+        {
+            get
+            {
+                return _maxStackArcaneDust;
+            }
+            set
+            {
+                if (_maxStackArcaneDust != value)
+                {
+                    _maxStackArcaneDust = value;
+                    OnPropertyChanged("MaxStackArcaneDust");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(500000)]
+        public int MaxStackVeiledCrystal
+        {
+            get
+            {
+                return _maxStackVeiledCrystal;
+            }
+            set
+            {
+                if (_maxStackVeiledCrystal != value)
+                {
+                    _maxStackVeiledCrystal = value;
+                    OnPropertyChanged("MaxStackVeiledCrystal");
+                }
+            }
+        }
+
         [DataMember(IsRequired = false)]
         [DefaultValue(70000)]
         public int WeaponScore
@@ -297,23 +420,25 @@ namespace Trinity.Config.Loot
                 }
             }
         }
+
         [DataMember(IsRequired = false)]
-        [DefaultValue(true)]
-        public bool SellExtraPotions
+        [DefaultValue(false)]
+        public bool StashLegendaryPotions
         {
             get
             {
-                return _SellExtraPotions;
+                return _StashLegendaryPotions;
             }
             set
             {
-                if (_SellExtraPotions != value)
+                if (_StashLegendaryPotions != value)
                 {
-                    _SellExtraPotions = value;
-                    OnPropertyChanged("SellExtraPotions");
+                    _StashLegendaryPotions = value;
+                    OnPropertyChanged("StashLegendaryPotions");
                 }
             }
         }
+
         [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool KeepTrialLootRunKeysInBackpack
@@ -365,6 +490,59 @@ namespace Trinity.Config.Loot
                 }
             }
         }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool DropLegendaryInTown
+        {
+            get
+            {
+                return _DropLegendaryInTown;
+            }
+            set
+            {
+                if (_DropLegendaryInTown != value)
+                {
+                    _DropLegendaryInTown = value;
+                    OnPropertyChanged("DropLegendaryInTown");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool ApplyPickupValidationToStashing
+        {
+            get
+            {
+                return _ApplyPickupValidationToStashing;
+            }
+            set
+            {
+                if (_ApplyPickupValidationToStashing != value)
+                {
+                    _ApplyPickupValidationToStashing = value;
+                    OnPropertyChanged("ApplyPickupValidationToStashing");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool StashVanityItems
+        {
+            get
+            {
+                return _StashVanityItems;
+            }
+            set
+            {
+                if (_StashVanityItems != value)
+                {
+                    _StashVanityItems = value;
+                    OnPropertyChanged("StashVanityItems");
+                }
+            }
+        }
         #endregion Properties
 
         #region Methods
@@ -402,14 +580,13 @@ namespace Trinity.Config.Loot
         [OnDeserializing]
         internal void OnDeserializingMethod(StreamingContext context)
         {
-            FreeBagSlots = 1;
-            FreeBagSlotsInTown = 6;
-            OpenHoradricCaches = true;
-            SellExtraPotions = true;
-            SalvageWhiteItemOption = SalvageOption.Salvage;
-            SalvageBlueItemOption = SalvageOption.Salvage;
-            SalvageYellowItemOption = SalvageOption.Salvage;
-            SalvageLegendaryItemOption = SalvageOption.Salvage;
+            foreach (PropertyInfo p in GetType().GetProperties())
+            {
+                foreach (DefaultValueAttribute dv in p.GetCustomAttributes(true).OfType<DefaultValueAttribute>())
+                {
+                    p.SetValue(this, dv.Value);
+                }
+            }
         }
 
         /// <summary>

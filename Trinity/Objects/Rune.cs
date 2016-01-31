@@ -65,7 +65,7 @@ namespace Trinity.Objects
             {
                 if (ZetaDia.IsInGame && ZetaDia.Me.IsValid && Class == ZetaDia.Me.ActorClass && Skill != null && RuneIndex >= 0)
                 {
-                    return HotbarSkills.BySNOPower(Skill.SNOPower).RuneIndex == RuneIndex || Skill.IsAllRuneBonusActive;
+                    return CacheData.Hotbar.GetSkill(Skill.SNOPower).RuneIndex == RuneIndex || Skill.IsAllRuneBonusActive;
                 }
                 return false;
             }
@@ -102,6 +102,10 @@ namespace Trinity.Objects
         /// If set, this value will be used by the associated skill.
         /// </summary>
         public Element? ModifiedElement { get; set; }
+
+        public bool? ModifiedIsDamaging { get; set; }
+
+        public float? ModifiedAreaEffectRadius { get; set; }
 
         /// <summary>
         /// Unique Identifier so that dictionarys can compare this object properly.

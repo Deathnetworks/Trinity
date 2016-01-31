@@ -1,19 +1,25 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.Serialization;
 using Trinity.Cache;
 using Trinity.Combat.Abilities;
+using Trinity.Items;
 using Trinity.Reference;
+using Trinity.UIComponents;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 
 namespace Trinity.Objects
 {
-    public class Item : IEquatable<Item>
+    [DataContract(Namespace = "")]
+    public class Item : IUnique, IEquatable<Item>
     {
+        [DataMember]
         public int Id { get; set; }
         public string Name { get; set; }
 
         public ItemType ItemType { get; set; }
+
         public ItemQuality Quality { get; set; }
         public ItemBaseType BaseType { get; set; }
 
@@ -50,7 +56,7 @@ namespace Trinity.Objects
         /// </summary>
         public bool IsEquipped
         {
-            get { return EquippedItemCache.Instance.ItemIds.Contains(Id); }
+            get { return CacheData.Inventory.EquippedIds.Contains(Id); }
         }
 
         /// <summary>
@@ -96,6 +102,49 @@ namespace Trinity.Objects
             }
         }
 
+        public ActorClass ClassRestriction
+        {
+            get { return GetClassRestriction(TrinityItemType); }
+        }
+
+        public static ActorClass GetClassRestriction(TrinityItemType type)
+        {
+            switch (type)
+            {
+                case TrinityItemType.Flail:
+                case TrinityItemType.CrusaderShield:
+                case TrinityItemType.TwoHandFlail:
+                    return ActorClass.Crusader;
+
+                case TrinityItemType.FistWeapon:
+                case TrinityItemType.SpiritStone:
+                case TrinityItemType.TwoHandDaibo:
+                    return ActorClass.Monk;
+
+                case TrinityItemType.VoodooMask:
+                case TrinityItemType.Mojo:
+                case TrinityItemType.CeremonialKnife:
+                    return ActorClass.Witchdoctor;
+
+                case TrinityItemType.MightyBelt:
+                case TrinityItemType.MightyWeapon:
+                    return ActorClass.Barbarian;
+
+                case TrinityItemType.WizardHat:
+                case TrinityItemType.Orb:
+                    return ActorClass.Wizard;
+
+                case TrinityItemType.HandCrossbow:
+                case TrinityItemType.Cloak:
+                case TrinityItemType.Quiver:
+                case TrinityItemType.TwoHandBow:
+                case TrinityItemType.TwoHandCrossbow:
+                    return ActorClass.DemonHunter;   
+            }
+            
+            return ActorClass.Invalid;            
+        }
+
         public bool Equals(Item other)
         {
             return GetHashCode().Equals(other.GetHashCode());
@@ -109,5 +158,10 @@ namespace Trinity.Objects
             return Id.GetHashCode() ^ Name.GetHashCode();
         }
 
+        public bool IsTwoHanded { get; set; }
+
+        public TrinityItemType TrinityItemType { get; set; }
+
+        public string IconUrl { get; set; }
     }
 }

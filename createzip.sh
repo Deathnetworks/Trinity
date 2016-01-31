@@ -10,6 +10,8 @@ D=".zip"
 
 ZIPFILE=$A$B$D
 
+echo creating Zip as $ZIPFILE
+
 ./CreateZip.cmd
 
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Trinity.Combat;
 using Trinity.Combat.Abilities;
 using Trinity.DbProvider;
 using Trinity.Technicals;
@@ -24,11 +25,11 @@ namespace Trinity
                 return Trinity.ObjectCache;
             }
         }
-        private static PlayerInfoCache Player
+        private static CacheData.PlayerCache Player
         {
             get
             {
-                return Trinity.Player;
+                return CacheData.Player;
             }
         }
         private static bool AnyTreasureGoblinsPresent
@@ -48,11 +49,11 @@ namespace Trinity
                 return Trinity.CurrentTarget;
             }
         }
-        private static List<SNOPower> Hotbar
+        private static HashSet<SNOPower> Hotbar
         {
             get
             {
-                return Trinity.Hotbar;
+                return CacheData.Hotbar.ActivePowers;
             }
         }
         #endregion
@@ -106,7 +107,7 @@ namespace Trinity
             {
                 return
                     (from u in ObjectCache
-                     where u.IsUnit && u.CommonDataIsValid &&
+                     where u.IsUnit && u.IsFullyValid() &&
                      u.Weight > 0 &&
                      u.IsBossOrEliteRareUnique &&
                      u.RadiusDistance <= range
@@ -145,7 +146,7 @@ namespace Trinity
 
             var clusterCheck =
                 (from u in ObjectCache
-                 where u.IsUnit && u.CommonDataIsValid &&
+                 where u.IsUnit && u.IsFullyValid() &&
                  u.RadiusDistance <= maxRange &&
                  u.NearbyUnitsWithinDistance(radius) >= minCount
                  select u).Any();
@@ -170,7 +171,7 @@ namespace Trinity
 
             var clusterUnit =
                 (from u in ObjectCache
-                 where u.IsUnit && u.CommonDataIsValid &&
+                 where u.IsUnit && u.IsFullyValid() &&
                  u.RadiusDistance <= 200 &&
                  u.NearbyUnitsWithinDistance(clusterRadius) >= minCount
                  orderby u.NearbyUnitsWithinDistance(clusterRadius)
@@ -182,7 +183,7 @@ namespace Trinity
             return clusterUnit.Position;
         }
 
-        internal static TrinityCacheObject GetBestPierceTarget(float maxRange, int arcDegrees = 0, bool ignoreUnitsInAoE = false)
+        internal static TrinityCacheObject GetBestPierceTarget(float maxRange, bool ignoreUnitsInAoE = false)
         {
             var result =
                 (from u in ObjectCache
@@ -250,7 +251,7 @@ namespace Trinity
                      (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                      u.RadiusDistance <= maxRange &&
                      u.NearbyUnitsWithinDistance(aoe_radius) >= count
-                     orderby u.Type != GObjectType.HealthGlobe && u.Type != GObjectType.PowerGlobe,
+                     orderby u.Type != TrinityObjectType.HealthGlobe && u.Type != TrinityObjectType.PowerGlobe,
                      u.NearbyUnitsWithinDistance(aoe_radius),
                      u.Distance descending
                      select u).ToList();
@@ -284,7 +285,7 @@ namespace Trinity
             Vector3 bestClusterPoint;
             var clusterUnits =
                 (from u in ObjectCache
-                 where u.Type == GObjectType.HealthGlobe &&
+                 where u.Type == TrinityObjectType.HealthGlobe &&
                  (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                  u.RadiusDistance <= maxRange
                  orderby u.NearbyUnitsWithinDistance(radius),
@@ -318,7 +319,7 @@ namespace Trinity
             Vector3 bestClusterPoint;
             var clusterUnits =
                 (from u in ObjectCache
-                 where u.Type == GObjectType.PowerGlobe &&
+                 where u.Type == TrinityObjectType.PowerGlobe &&
                  (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                  u.RadiusDistance <= maxRange
                  orderby u.NearbyUnitsWithinDistance(radius),
@@ -341,7 +342,7 @@ namespace Trinity
         {
             var clusterCheck =
                 (from u in ObjectCache
-                 where u.Type == GObjectType.HealthGlobe && !UnitOrPathInAoE(u) &&
+                 where u.Type == TrinityObjectType.HealthGlobe && !UnitOrPathInAoE(u) &&
                  u.RadiusDistance <= radius
                  select u).Any();
 
@@ -357,7 +358,7 @@ namespace Trinity
         {
             var clusterCheck =
                 (from u in ObjectCache
-                 where u.Type == GObjectType.PowerGlobe && !UnitOrPathInAoE(u) &&
+                 where u.Type == TrinityObjectType.PowerGlobe && !UnitOrPathInAoE(u) &&
                  u.RadiusDistance <= radius
                  select u).Any();
 
@@ -367,11 +368,11 @@ namespace Trinity
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="radius"></param>
-        /// <param name="maxRange"></param>
-        /// <param name="count"></param>
-        /// <param name="useWeights"></param>
-        /// <param name="includeUnitsInAoe"></param>
+        /// <param name="radius">Cluster Radius</param>
+        /// <param name="maxRange">Unit Max Distance</param>
+        /// <param name="count">Minimum number of mobs</param>
+        /// <param name="useWeights">Include Mobs with Weight or not</param>
+        /// <param name="includeUnitsInAoe">Include mobs in AoE or not</param>
         /// <returns></returns>
         internal static TrinityCacheObject GetBestClusterUnit(float radius = 15f, float maxRange = 65f, int count = 1, bool useWeights = true, bool includeUnitsInAoe = true)
         {
@@ -425,18 +426,18 @@ namespace Trinity
                 case ActorClass.Barbarian:
                     includeHealthGlobes = CombatBase.Hotbar.Contains(SNOPower.Barbarian_Whirlwind) &&
                                           Trinity.Settings.Combat.Misc.CollectHealthGlobe &&
-                                          ObjectCache.Any(g => g.Type == GObjectType.HealthGlobe && g.Weight > 0);
+                                          ObjectCache.Any(g => g.Type == TrinityObjectType.HealthGlobe && g.Weight > 0);
                     break;
             }
 
             Vector3 bestClusterPoint;
             var clusterUnits =
                 (from u in ObjectCache
-                 where (u.IsUnit || (includeHealthGlobes && u.Type == GObjectType.HealthGlobe)) &&
+                 where (u.IsUnit || (includeHealthGlobes && u.Type == TrinityObjectType.HealthGlobe)) &&
                  ((useWeights && u.Weight > 0) || !useWeights) &&
                  (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                  u.RadiusDistance <= maxRange
-                 orderby u.Type != GObjectType.HealthGlobe, // if it's a globe this will be false and sorted at the top
+                 orderby u.Type != TrinityObjectType.HealthGlobe, // if it's a globe this will be false and sorted at the top
                  u.IsTrashMob,
                  u.NearbyUnitsWithinDistance(radius) descending,
                  u.Distance,
@@ -493,7 +494,7 @@ namespace Trinity
         internal static bool AnyMobsInRangeOfPosition(Vector3 position, float range = 15f, int unitsRequired = 1)
         {
             var inRangeCount = (from u in ObjectCache
-                                where u.IsUnit && u.CommonDataIsValid &&
+                                where u.IsUnit && u.IsFullyValid() &&
                                         u.Weight > 0 &&
                                         u.Position.Distance2D(position) <= range
                                 select u).Count();
@@ -506,7 +507,7 @@ namespace Trinity
         internal static int NumMobsInRangeOfPosition(Vector3 position, float range = 15f)
         {
             return (from u in ObjectCache
-                    where u.IsUnit && u.CommonDataIsValid &&
+                    where u.IsUnit && u.IsFullyValid() &&
                             u.Weight > 0 &&
                             u.Position.Distance2D(position) <= range
                     select u).Count();
@@ -517,7 +518,7 @@ namespace Trinity
         internal static int NumBossInRangeOfPosition(Vector3 position, float range = 15f)
         {
             return (from u in ObjectCache
-                    where u.IsUnit && u.CommonDataIsValid &&
+                    where u.IsUnit && u.IsFullyValid() &&
                             u.Weight > 0 &&
                             u.IsBoss &&
                             u.Position.Distance2D(position) <= range
@@ -529,7 +530,7 @@ namespace Trinity
         internal static List<TrinityCacheObject> ListUnitsInRangeOfPosition(Vector3 position, float range = 15f)
         {
             return (from u in ObjectCache
-                    where u.IsUnit && u.CommonDataIsValid &&
+                    where u.IsUnit && u.IsFullyValid() &&
                         u.Weight > 0 &&
                         u.Position.Distance2D(position) <= range
                     select u).ToList();
@@ -591,7 +592,7 @@ namespace Trinity
         internal static bool AnyElitesInRangeOfPosition(Vector3 position, float range = 15f, int unitsRequired = 1)
         {
             var inRangeCount = (from u in ObjectCache
-                                where u.IsUnit && u.CommonDataIsValid &&
+                                where u.IsUnit && u.IsFullyValid() &&
                                         u.Weight > 0 &&
                                         u.IsBossOrEliteRareUnique &&
                                         u.Position.Distance2D(position) <= range
@@ -605,7 +606,7 @@ namespace Trinity
         internal static int NumElitesInRangeOfPosition(Vector3 position, float range = 15f)
         {
             return (from u in ObjectCache
-                    where u.IsUnit && u.CommonDataIsValid &&
+                    where u.IsUnit && u.IsFullyValid() &&
                             u.Weight > 0 &&
                             u.IsBossOrEliteRareUnique &&
                             u.Position.Distance2D(position) <= range
@@ -658,14 +659,13 @@ namespace Trinity
         /// <returns></returns>
         internal static Vector3 GetZigZagTarget(Vector3 origin, float ringDistance, bool randomizeDistance = false)
         {
-            var minDistance = 20f;
+            const float minDistance = 5f;
             Vector3 myPos = Player.Position;
-            float distanceToTarget = origin.Distance2D(myPos);
 
-            Vector3 zigZagPoint = origin;
+            Vector3 zigZagPoint;
 
             bool useTargetBasedZigZag = false;
-            float maxDistance = 25f;
+            float maxDistance = 35f;
             int minTargets = 2;
 
             if (Trinity.Player.ActorClass == ActorClass.Monk)
@@ -679,13 +679,10 @@ namespace Trinity
                 useTargetBasedZigZag = Trinity.Settings.Combat.Barbarian.TargetBasedZigZag;
             }
 
-            int eliteCount = ObjectCache.Count(u => u.IsUnit && u.IsBossOrEliteRareUnique);
-            bool shouldZigZagElites = ((Trinity.CurrentTarget.IsBossOrEliteRareUnique && eliteCount > 1) || eliteCount == 0);
-
-            if (useTargetBasedZigZag && shouldZigZagElites && !AnyTreasureGoblinsPresent && ObjectCache.Count(o => o.IsUnit) >= minTargets)
+            if (useTargetBasedZigZag && ObjectCache.Count(o => o.IsUnit) >= minTargets)
             {
                 bool attackInAoe = Trinity.Settings.Combat.Misc.KillMonstersInAoE;
-                var clusterPoint = TargetUtil.GetBestClusterPoint(ringDistance, ringDistance, false, attackInAoe);
+                var clusterPoint = GetBestClusterPoint(ringDistance, ringDistance, false, attackInAoe);
                 if (clusterPoint.Distance2D(Player.Position) >= minDistance)
                 {
                     Logger.Log(LogCategory.Movement, "Returning ZigZag: BestClusterPoint {0} r-dist={1} t-dist={2}", clusterPoint, ringDistance, clusterPoint.Distance2D(Player.Position));
@@ -693,7 +690,7 @@ namespace Trinity
                 }
 
 
-                var zigZagTargetList = new List<TrinityCacheObject>();
+                List<TrinityCacheObject> zigZagTargetList;
                 if (attackInAoe)
                 {
                     zigZagTargetList =
@@ -720,23 +717,19 @@ namespace Trinity
                 }
             }
 
-            Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
             float highestWeightFound = float.NegativeInfinity;
             Vector3 bestLocation = origin;
 
             // the unit circle always starts at 0 :)
-            double min = 0;
+            const double min = 0;
             // the maximum size of a unit circle
-            double max = 2 * Math.PI;
+            const double max = 2 * Math.PI;
             // the number of times we will iterate around the circle to find points
-            double piSlices = 16;
+            const double piSlices = 16;
 
             // We will do several "passes" to make sure we can get a point that we can least zig-zag to
             // The total number of points tested will be piSlices * distancePasses.Count
-            List<float> distancePasses = new List<float>();
-            distancePasses.Add(ringDistance * 1 / 2); // Do one loop at 1/2 distance
-            distancePasses.Add(ringDistance * 3 / 4); // Do one loop at 3/4 distance
-            distancePasses.Add(ringDistance);         // Do one loop at exact distance
+            List<float> distancePasses = new List<float> { ringDistance * 1 / 2, ringDistance * 3 / 4, ringDistance };
 
             foreach (float distance in distancePasses)
             {
@@ -759,11 +752,11 @@ namespace Trinity
                         targetCircle = 10f;
 
                     bool intersectsPath = MathUtil.IntersectsPath(CurrentTarget.Position, targetCircle, myPos, zigZagPoint);
-                    if (CombatBase.PlayerKiteDistance <= 0 && !intersectsPath)
+                    if (CombatBase.KiteDistance <= 0 && !intersectsPath)
                         continue;
 
                     // if we're kiting, lets not actualy run through monsters
-                    if (CombatBase.PlayerKiteDistance > 0 && CacheData.MonsterObstacles.Any(m => m.Position.Distance(zigZagPoint) <= CombatBase.PlayerKiteDistance))
+                    if (CombatBase.KiteDistance > 0 && CacheData.MonsterObstacles.Any(m => m.Position.Distance(zigZagPoint) <= CombatBase.KiteDistance))
                         continue;
 
                     // Ignore point if any AoE in this point position
@@ -776,7 +769,6 @@ namespace Trinity
                         continue;
 
                     float distanceToPoint = zigZagPoint.Distance2D(myPos);
-                    float distanceFromTargetToPoint = zigZagPoint.Distance2D(origin);
 
                     // Lots of weight for points further away from us (e.g. behind our CurrentTarget)
                     pointWeight *= distanceToPoint;
@@ -846,18 +838,18 @@ namespace Trinity
         internal static bool IsUnitWithDebuffInRangeOfPosition(float range, Vector3 position, SNOPower power, int unitsRequiredWithDebuff = 1)
         {
             var unitsWithDebuff = (from u in ObjectCache
-                                   where u.IsUnit && u.CommonDataIsValid &&
+                                   where u.IsUnit && u.IsFullyValid() &&
                                           u.Weight > 0 &&
                                           u.Position.Distance2D(position) <= range &&
                                           SpellTracker.IsUnitTracked(u.ACDGuid, power)
                                    select u).ToList();
 
             // Make sure units exist
-            unitsWithDebuff.RemoveAll(u =>
-            {
-                var acd = ZetaDia.Actors.GetACDByGuid(u.ACDGuid);
-                return acd == null || !acd.IsValid;
-            });
+            //unitsWithDebuff.RemoveAll(u =>
+            //{
+            //    var acd = ZetaDia.Actors.GetACDByGuid(u.ACDGuid);
+            //    return acd == null || !acd.IsValid;
+            //});
 
             return unitsWithDebuff.Count >= unitsRequiredWithDebuff;
         }
@@ -900,7 +892,7 @@ namespace Trinity
         {
             TrinityCacheObject harvestTarget =
             (from u in ObjectCache
-             where u.IsUnit && u.CommonDataIsValid &&
+             where u.IsUnit && u.IsFullyValid() &&
              u.RadiusDistance <= maxRange &&
              u.IsBossOrEliteRareUnique &&
              u.CommonData.GetAttribute<int>(ActorAttributeType.BuffVisualEffect) != 0
@@ -920,7 +912,7 @@ namespace Trinity
         internal static bool PercentOfMobsDebuffed(float maxRange = 30f, float minPercent = 0.5f)
         {
             int debuffed = (from u in ObjectCache
-                            where u.IsUnit && u.CommonDataIsValid &&
+                            where u.IsUnit && u.IsFullyValid() &&
                             u.RadiusDistance <= maxRange &&
                             u.CommonData.GetAttribute<int>(ActorAttributeType.BuffVisualEffect) != 0
                             select u).Count();
@@ -939,7 +931,7 @@ namespace Trinity
         internal static int MobsWithDebuff(SNOPower power, float maxRange = 30f)
         {
             return (from u in ObjectCache
-                    where u.IsUnit && u.CommonDataIsValid &&
+                    where u.IsUnit && u.IsFullyValid() &&
                     u.RadiusDistance <= maxRange &&
                     u.HasDebuff(power)
                     select u).Count();
@@ -948,7 +940,7 @@ namespace Trinity
         internal static int MobsWithDebuff(IEnumerable<SNOPower> powers, float maxRange = 30f)
         {
             return (from u in ObjectCache
-                    where u.IsUnit && u.CommonDataIsValid &&
+                    where u.IsUnit && u.IsFullyValid() &&
                     u.RadiusDistance <= maxRange &&
                     powers.Any(u.HasDebuff)
                     select u).Count();
@@ -957,7 +949,7 @@ namespace Trinity
         internal static int MobsWithDebuff(IEnumerable<SNOPower> powers, IEnumerable<TrinityCacheObject> units)
         {
             return (from u in units
-                    where u.IsUnit && u.CommonDataIsValid &&
+                    where u.IsUnit && u.IsFullyValid() &&
                     powers.Any(u.HasDebuff)
                     select u).Count();
         }
@@ -965,7 +957,7 @@ namespace Trinity
         internal static int DebuffCount(IEnumerable<SNOPower> powers, float maxRange = 30f)
         {
             return (from u in ObjectCache
-                    where u.IsUnit && u.CommonDataIsValid &&
+                    where u.IsUnit && u.IsFullyValid() &&
                     u.RadiusDistance <= maxRange &&
                     powers.Any(u.HasDebuff)
                     select powers.Count(u.HasDebuff)
@@ -975,7 +967,7 @@ namespace Trinity
         internal static int DebuffCount(IEnumerable<SNOPower> powers, IEnumerable<TrinityCacheObject> units)
         {
             return (from u in units
-                    where u.IsUnit && u.CommonDataIsValid &&
+                    where u.IsUnit && u.IsFullyValid() &&
                     powers.Any(u.HasDebuff)
                     select powers.Count(u.HasDebuff)
                     ).Sum();
@@ -989,10 +981,37 @@ namespace Trinity
 
             TrinityCacheObject lowestHealthTarget;
             var unitsByHealth = (from u in ObjectCache
-                                 where u.IsUnit && u.CommonDataIsValid &&
+                                 where u.IsUnit && u.IsFullyValid() &&
                                         u.Weight > 0 &&
                                         u.Position.Distance2D(position) <= range &&
-                                        (debuff == SNOPower.None || !SpellTracker.IsUnitTracked(u.ACDGuid, debuff))
+                                        (debuff == SNOPower.None || !SpellTracker.IsUnitTracked(u.ACDGuid, debuff)) &&
+                                        !CacheData.MonsterObstacles.Any(m => MathUtil.IntersectsPath(m.Position, m.Radius, u.Position, Player.Position))
+                                 orderby u.HitPoints ascending
+                                 select u).ToList();
+
+            if (unitsByHealth.Any())
+                lowestHealthTarget = unitsByHealth.FirstOrDefault();
+            else if (Trinity.CurrentTarget != null)
+                lowestHealthTarget = Trinity.CurrentTarget;
+            else
+                lowestHealthTarget = default(TrinityCacheObject);
+
+            return lowestHealthTarget;
+        }
+
+        internal static TrinityCacheObject BestExploadingPalmTarget(float range, Vector3 position = new Vector3())
+        {
+            if (position == new Vector3())
+                position = Player.Position;
+
+            TrinityCacheObject lowestHealthTarget;
+            var unitsByHealth = (from u in ObjectCache
+                                 where u.IsUnit && u.IsFullyValid() &&
+                                        u.Weight > 0 &&
+                                        u.Position.Distance2D(position) <= range &&
+                                        !SpellTracker.IsUnitTracked(u.ACDGuid, SNOPower.Monk_ExplodingPalm) &&
+                                        !CacheData.MonsterObstacles.Any(m => MathUtil.IntersectsPath(m.Position, m.Radius, u.Position, Player.Position)) &&
+                                        u.IsInLineOfSight()
                                  orderby u.HitPoints ascending
                                  select u).ToList();
 
@@ -1013,7 +1032,7 @@ namespace Trinity
 
             TrinityCacheObject target;
             var unitsByWeight = (from u in ObjectCache
-                                 where u.IsUnit && u.CommonDataIsValid &&
+                                 where u.IsUnit && u.IsFullyValid() &&
                                         u.Weight > 0 &&
                                         u.Position.Distance2D(position) <= range &&
                                         !debuffs.All(u.HasDebuff)
@@ -1035,7 +1054,7 @@ namespace Trinity
         {
             var result =
                 (from u in ObjectCache
-                 where u.IsUnit && u.Distance >= procDistance && u.CommonDataIsValid &&
+                 where u.IsUnit && u.Distance >= procDistance && u.IsFullyValid() &&
                  u.RadiusDistance <= maxRange
                  orderby u.RadiusDistance descending
                  select u).FirstOrDefault();
@@ -1055,18 +1074,18 @@ namespace Trinity
                 case ActorClass.Barbarian:
                     includeHealthGlobes = CombatBase.Hotbar.Contains(SNOPower.Barbarian_Whirlwind) &&
                                           Trinity.Settings.Combat.Misc.CollectHealthGlobe &&
-                                          ObjectCache.Any(g => g.Type == GObjectType.HealthGlobe && g.Weight > 0);
+                                          ObjectCache.Any(g => g.Type == TrinityObjectType.HealthGlobe && g.Weight > 0);
                     break;
             }
 
             Vector3 bestClusterPoint;
             var clusterUnits =
                 (from u in ObjectCache
-                 where (u.IsUnit || (includeHealthGlobes && u.Type == GObjectType.HealthGlobe)) &&
+                 where (u.IsUnit || (includeHealthGlobes && u.Type == TrinityObjectType.HealthGlobe)) &&
                  ((useWeights && u.Weight > 0) || !useWeights) &&
                  (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                  u.RadiusDistance <= maxRange && u.Distance >= procDistance
-                 orderby u.Type != GObjectType.HealthGlobe, // if it's a globe this will be false and sorted at the top
+                 orderby u.Type != TrinityObjectType.HealthGlobe, // if it's a globe this will be false and sorted at the top
                   !u.IsBossOrEliteRareUnique,
                   u.NearbyUnitsWithinDistance(radius) descending,
                   u.Distance,

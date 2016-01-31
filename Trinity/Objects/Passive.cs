@@ -1,14 +1,16 @@
 ﻿using Trinity.Combat;
 using Trinity.Combat.Abilities;
+using Trinity.Reference;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
+using Zeta.Game.Internals.SNO;
 
 namespace Trinity.Objects
 {
     /// <summary>
     /// Contains information about a Passive
     /// </summary>
-    public class Passive
+    public class Passive : IUnique
     {
         public Passive()
         {
@@ -61,7 +63,7 @@ namespace Trinity.Objects
             {
                 if (ZetaDia.IsInGame && ZetaDia.Me.IsValid && Class == ZetaDia.Me.ActorClass)
                 {
-                    return HotbarSkills.PassiveSkills.Contains(SNOPower);
+                    return CacheData.Hotbar.PassiveSkills.Contains(SNOPower);
                 }
                 return false;
             }
@@ -91,5 +93,16 @@ namespace Trinity.Objects
             return Index.GetHashCode() ^ Name.GetHashCode();
         }
 
+        public int Id
+        {
+            get { return (int)SNOPower; }
+        }
+
+        public string IconSlug { get; set; }
+
+        public static explicit operator Passive(TraitEntry x)
+        {
+            return PassiveUtils.ById((SNOPower)x.SNOPower);
+        }
     }
 }

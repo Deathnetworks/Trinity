@@ -31,14 +31,14 @@ namespace Trinity
         private static int c_GoldStackSize = 0;
         private static bool c_IsOneHandedItem = false;
         private static bool c_IsTwoHandedItem = false;
+        private static bool c_IsAncient = false;
         private static ItemQuality c_ItemQuality = ItemQuality.Invalid;
         private static ItemType c_DBItemType = ItemType.Unknown;
         private static ItemBaseType c_DBItemBaseType = ItemBaseType.None;
         private static FollowerType c_item_tFollowerType = FollowerType.None;
-        private static GItemType c_item_GItemType = GItemType.Unknown;
+        private static TrinityItemType _cItemTinityItemType = TrinityItemType.Unknown;
         private static MonsterSize c_unit_MonsterSize = MonsterSize.Unknown;
         private static DiaObject c_diaObject = null;
-        private static DiaUnit c_diaUnit = null;
         private static DiaGizmo c_diaGizmo = null;
         private static SNOAnim c_CurrentAnimation = SNOAnim.Invalid;
         private static bool c_unit_IsElite = false;
@@ -57,8 +57,6 @@ namespace Trinity
         private static bool c_HasDotDPS = false;
         private static MonsterAffixes c_MonsterAffixes = MonsterAffixes.None;
         private static bool c_IsFacingPlayer;
-        private static float c_Rotation;
-        private static Vector2 c_DirectionVector = Vector2.Zero;
 
         private static bool CacheDiaObject(DiaObject freshObject)
         {
@@ -87,17 +85,17 @@ namespace Trinity
             /*
              *  Get primary reference objects and keys
              */
-            c_diaObject = freshObject;
+            CurrentCacheObject.Object = c_diaObject = freshObject;
 
             try
             {
-                // Ractor GUID
+                // RActor GUID
                 CurrentCacheObject.RActorGuid = freshObject.RActorGuid;
                 // Check to see if we've already looked at this GUID
                 CurrentCacheObject.ACDGuid = freshObject.ACDGuid;
 
                 // Get Name
-                CurrentCacheObject.InternalName = nameNumberTrimRegex.Replace(freshObject.Name, "");
+                CurrentCacheObject.InternalName = NameNumberTrimRegex.Replace(freshObject.Name, "");
 
                 CurrentCacheObject.ActorSNO = freshObject.ActorSNO;
                 CurrentCacheObject.ActorType = freshObject.ActorType;
@@ -157,7 +155,7 @@ namespace Trinity
                     ObjectType = CurrentCacheObject.Type,
                 });
 
-                ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
+                MainGridProvider.AddCellWeightingObstacle(CurrentCacheObject.ActorSNO, CurrentCacheObject.Radius);
 
                 c_IgnoreReason = "NavigationObstacle";
                 AddToCache = false;
@@ -179,7 +177,7 @@ namespace Trinity
             if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return false; }
 
             CurrentCacheObject.Type = CurrentCacheObject.Type;
-            if (CurrentCacheObject.Type != GObjectType.Item)
+            if (CurrentCacheObject.Type != TrinityObjectType.Item)
             {
                 CurrentCacheObject.ObjectHash = HashGenerator.GenerateWorldObjectHash(CurrentCacheObject.ActorSNO, CurrentCacheObject.Position, CurrentCacheObject.Type.ToString(), Trinity.CurrentWorldDynamicId);
             }
@@ -188,7 +186,7 @@ namespace Trinity
             AddToCache = RefreshStepCheckBlacklists(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CheckBlacklists"; return AddToCache; }
 
-            if (CurrentCacheObject.Type == GObjectType.Item)
+            if (CurrentCacheObject.Type == TrinityObjectType.Item)
             {
                 if (GenericBlacklist.ContainsKey(CurrentCacheObject.ObjectHash))
                 {
@@ -227,9 +225,36 @@ namespace Trinity
                 // Ignore all LoS
                 AddToCache = RefreshStepIgnoreLoS(AddToCache);
                 if (!AddToCache) { c_IgnoreReason = "IgnoreLoS"; return AddToCache; }
-
-                AddLoSUnit();
             }
+            string extraData = "";
+
+            switch (CurrentCacheObject.Type)
+            {
+                case TrinityObjectType.Unit:
+                    {
+                        if (c_IsEliteRareUnique)
+                            extraData += " IsElite " + c_MonsterAffixes;
+
+                        if (c_unit_HasShieldAffix)
+                            extraData += " HasAffixShielded";
+
+                        if (c_HasDotDPS)
+                            extraData += " HasDotDPS";
+
+                        if (c_HasBeenInLoS)
+                            extraData += " HasBeenInLoS";
+
+                        if (CurrentCacheObject.IsUnit)
+                            extraData += " HP=" + c_HitPoints.ToString("0") + " (" + c_HitPointsPct.ToString("0.00") + ")";
+                    } break;
+                case TrinityObjectType.Avoidance:
+                    {
+                        extraData += _standingInAvoidance ? "InAoE " : "";
+                        break;
+                    }
+            }
+
+            CurrentCacheObject.ExtraInfo = extraData;
 
             // If it's a unit, add it to the monster cache
             AddUnitToMonsterObstacleCache();
@@ -241,7 +266,6 @@ namespace Trinity
             CurrentCacheObject.Animation = c_CurrentAnimation;
             CurrentCacheObject.DBItemBaseType = c_DBItemBaseType;
             CurrentCacheObject.DBItemType = c_DBItemType;
-            CurrentCacheObject.DirectionVector = c_DirectionVector;
             CurrentCacheObject.Distance = CurrentCacheObject.Distance;
             CurrentCacheObject.DynamicID = CurrentCacheObject.DynamicID;
             CurrentCacheObject.FollowerType = c_item_tFollowerType;
@@ -258,7 +282,6 @@ namespace Trinity
             CurrentCacheObject.IsAttackable = c_unit_IsAttackable;
             CurrentCacheObject.IsElite = c_unit_IsElite;
             CurrentCacheObject.IsEliteRareUnique = c_IsEliteRareUnique;
-            CurrentCacheObject.IsFacingPlayer = c_IsFacingPlayer;
             CurrentCacheObject.IsMinion = c_unit_IsMinion;
             CurrentCacheObject.IsRare = c_unit_IsRare;
             CurrentCacheObject.IsTreasureGoblin = c_unit_IsTreasureGoblin;
@@ -271,11 +294,10 @@ namespace Trinity
             CurrentCacheObject.OneHanded = c_IsOneHandedItem;
             CurrentCacheObject.RActorGuid = CurrentCacheObject.RActorGuid;
             CurrentCacheObject.Radius = CurrentCacheObject.Radius;
-            CurrentCacheObject.Rotation = c_Rotation;
-            CurrentCacheObject.TrinityItemType = c_item_GItemType;
+            CurrentCacheObject.TrinityItemType = _cItemTinityItemType;
             CurrentCacheObject.TwoHanded = c_IsTwoHandedItem;
             CurrentCacheObject.Type = CurrentCacheObject.Type;
-            ObjectCache.Add(CurrentCacheObject);
+            CurrentCacheObject.IsAncient = c_IsAncient;
             return true;
         }
 
@@ -283,13 +305,13 @@ namespace Trinity
         {
             switch (CurrentCacheObject.Type)
             {
-                case GObjectType.Barricade:
-                case GObjectType.Container:
-                case GObjectType.Destructible:
-                case GObjectType.Door:
-                case GObjectType.HealthWell:
-                case GObjectType.Interactable:
-                case GObjectType.Shrine:
+                case TrinityObjectType.Barricade:
+                case TrinityObjectType.Container:
+                case TrinityObjectType.Destructible:
+                case TrinityObjectType.Door:
+                case TrinityObjectType.HealthWell:
+                case TrinityObjectType.Interactable:
+                case TrinityObjectType.Shrine:
                     CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                     {
                         ActorSNO = CurrentCacheObject.ActorSNO,
@@ -306,7 +328,7 @@ namespace Trinity
         /// </summary>
         private static void AddUnitToMonsterObstacleCache()
         {
-            if (CurrentCacheObject.Type == GObjectType.Unit)
+            if (CurrentCacheObject.Type == TrinityObjectType.Unit)
             {
                 // Add to the collision-list
                 CacheData.MonsterObstacles.Add(new CacheObstacleObject()
@@ -326,8 +348,8 @@ namespace Trinity
         {
             CurrentCacheObject = new TrinityCacheObject();
             // Start this object as off as unknown type
-            CurrentCacheObject.Type = GObjectType.Unknown;
-
+            CurrentCacheObject.Type = TrinityObjectType.Unknown;
+            CurrentCacheObject.GizmoType = GizmoType.None;
             CurrentCacheObject.Distance = 0f;
             CurrentCacheObject.Radius = 0f;
             c_ZDiff = 0f;
@@ -364,23 +386,19 @@ namespace Trinity
             c_DBItemBaseType = ItemBaseType.None;
             c_DBItemType = ItemType.Unknown;
             c_item_tFollowerType = FollowerType.None;
-            c_item_GItemType = GItemType.Unknown;
+            _cItemTinityItemType = TrinityItemType.Unknown;
             c_unit_MonsterSize = MonsterSize.Unknown;
             c_diaObject = null;
-            c_diaUnit = null;
             c_diaGizmo = null;
             c_CurrentAnimation = SNOAnim.Invalid;
             c_HasDotDPS = false;
             c_MonsterAffixes = MonsterAffixes.None;
-            c_IsFacingPlayer = false;
-            c_Rotation = 0f;
-            c_DirectionVector = Vector2.Zero;
         }
 
         private static bool RefreshStepIgnoreNullCommonData(bool AddToCache)
         {
             // Null Common Data makes a DiaUseless!
-            if (CurrentCacheObject.Type == GObjectType.Unit || CurrentCacheObject.Type == GObjectType.Item || CurrentCacheObject.Type == GObjectType.Gold)
+            if (CurrentCacheObject.Type == TrinityObjectType.Unit || CurrentCacheObject.Type == TrinityObjectType.Item || CurrentCacheObject.Type == TrinityObjectType.Gold)
             {
                 if (c_diaObject.CommonData == null)
                 {
@@ -398,13 +416,17 @@ namespace Trinity
         {
             // Set the object type
             // begin with default... 
-            CurrentCacheObject.Type = GObjectType.Unknown;
+            CurrentCacheObject.Type = TrinityObjectType.Unknown;
 
-            if (ignoreNames.Any(n => CurrentCacheObject.InternalName.ToLower().Contains(n.ToLower())))
+            var currentInternalName = CurrentCacheObject.InternalName.ToLower();
+            foreach (var ignoreName in DataDictionary.ActorIgnoreNames)
             {
-                AddToCache = false;
-                c_IgnoreSubStep = "IgnoreNames";
-                return AddToCache;
+                if (currentInternalName.StartsWith(ignoreName.ToLower(), StringComparison.InvariantCultureIgnoreCase))
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep = "IgnoreNames";
+                    return AddToCache;
+                }
             }
 
             // Either get the cached object type, or calculate it fresh
@@ -414,20 +436,32 @@ namespace Trinity
                 bool isAvoidanceSNO = DataDictionary.Avoidances.Contains(CurrentCacheObject.ActorSNO) ||
                     DataDictionary.ButcherFloorPanels.Contains(CurrentCacheObject.ActorSNO) ||
                     DataDictionary.AvoidanceProjectiles.Contains(CurrentCacheObject.ActorSNO);
-                try
+
+                // Check if it's a unit with an animation we should avoid. We need to recheck this every time.
+                if (c_diaObject is DiaUnit && Settings.Combat.Misc.AvoidAOE &&
+                    DataDictionary.AvoidanceAnimations.Contains(new DoubleInt(CurrentCacheObject.ActorSNO, (int)c_diaObject.CommonData.CurrentAnimation)))
                 {
+                    // The ActorSNO and Animation match a known pair, avoid this!
+                    // Example: "Grotesque" death animation
+                    AddToCache = true;
+                    CurrentCacheObject.Type = TrinityObjectType.Avoidance;
+                    isAvoidanceSNO = true;
+                }
+
+                if (CurrentCacheObject.Unit != null && CurrentCacheObject.Unit.Movement.IsValid)
+                {
+                    CurrentCacheObject.Rotation = CurrentCacheObject.Unit.Movement.Rotation;
+                    CurrentCacheObject.DirectionVector = CurrentCacheObject.Unit.Movement.DirectionVector;
                     // Check if it's a unit with an animation we should avoid. We need to recheck this every time.
-                    if (c_diaObject is DiaUnit &&
-                        Settings.Combat.Misc.AvoidAOE && DataDictionary.AvoidanceAnimations.Contains(new DoubleInt(CurrentCacheObject.ActorSNO, (int)c_diaObject.CommonData.CurrentAnimation)))
+                    if (c_diaObject is DiaUnit && Settings.Combat.Misc.AvoidAOE && CurrentCacheObject.IsFacing(Player.Position) &&
+                        DataDictionary.DirectionalAvoidanceAnimations.Contains(new DoubleInt(CurrentCacheObject.ActorSNO, (int)c_diaObject.CommonData.CurrentAnimation)))
                     {
                         // The ActorSNO and Animation match a known pair, avoid this!
-                        // Example: "Grotesque" death animation
                         AddToCache = true;
-                        CurrentCacheObject.Type = GObjectType.Avoidance;
+                        CurrentCacheObject.Type = TrinityObjectType.Avoidance;
                         isAvoidanceSNO = true;
                     }
                 }
-                catch { }
 
                 // We're avoiding AoE and this is an AoE
                 if (Settings.Combat.Misc.AvoidAOE && isAvoidanceSNO)
@@ -449,7 +483,7 @@ namespace Trinity
                             if (hasBuff)
                             {
                                 AddToCache = true;
-                                CurrentCacheObject.Type = GObjectType.Avoidance;
+                                CurrentCacheObject.Type = TrinityObjectType.Avoidance;
                             }
                             else
                             {
@@ -460,7 +494,7 @@ namespace Trinity
                         else
                         {
                             // Avoidance isn't disabled, so set this object type to avoidance
-                            CurrentCacheObject.Type = GObjectType.Avoidance;
+                            CurrentCacheObject.Type = TrinityObjectType.Avoidance;
                         }
                     }
                 }
@@ -490,20 +524,19 @@ namespace Trinity
                             }
                             else
                             {
-                                c_diaUnit = c_diaObject as DiaUnit;
-                                CurrentCacheObject.Type = GObjectType.Unit;
+                                CurrentCacheObject.Type = TrinityObjectType.Unit;
                             }
                         }
                     }
                     else if (c_diaObject.ActorType == ActorType.Player)
                     {
-                        CurrentCacheObject.Type = GObjectType.Player;
+                        CurrentCacheObject.Type = TrinityObjectType.Player;
                     }
                     else if (DataDictionary.ForceToItemOverrideIds.Contains(CurrentCacheObject.ActorSNO) || (c_diaObject.ActorType == ActorType.Item))
                     {
                         using (new PerformanceLogger("RefreshCachedType.2"))
                         {
-                            CurrentCacheObject.Type = GObjectType.Item;
+                            CurrentCacheObject.Type = TrinityObjectType.Item;
 
                             if (c_diaObject.CommonData == null)
                             {
@@ -516,12 +549,12 @@ namespace Trinity
 
                             if (CurrentCacheObject.InternalName.ToLower().StartsWith("gold"))
                             {
-                                CurrentCacheObject.Type = GObjectType.Gold;
+                                CurrentCacheObject.Type = TrinityObjectType.Gold;
                             }
                         }
                     }
                     else if (DataDictionary.InteractWhiteListIds.Contains(CurrentCacheObject.ActorSNO))
-                        CurrentCacheObject.Type = GObjectType.Interactable;
+                        CurrentCacheObject.Type = TrinityObjectType.Interactable;
 
                     else if (c_diaObject is DiaGizmo && c_diaObject.ActorType == ActorType.Gizmo && CurrentCacheObject.Distance <= 90)
                     {
@@ -530,61 +563,61 @@ namespace Trinity
 
                         if (CurrentCacheObject.InternalName.Contains("CursedChest"))
                         {
-                            CurrentCacheObject.Type = GObjectType.CursedChest;
+                            CurrentCacheObject.Type = TrinityObjectType.CursedChest;
                             return true;
                         }
 
                         if (CurrentCacheObject.InternalName.Contains("CursedShrine"))
                         {
-                            CurrentCacheObject.Type = GObjectType.CursedShrine;
+                            CurrentCacheObject.Type = TrinityObjectType.CursedShrine;
                             return true;
                         }
 
                         if (c_diaGizmo.IsBarricade)
                         {
-                            CurrentCacheObject.Type = GObjectType.Barricade;
+                            CurrentCacheObject.Type = TrinityObjectType.Barricade;
                         }
                         else
                         {
                             switch (c_diaGizmo.ActorInfo.GizmoType)
                             {
                                 case GizmoType.HealingWell:
-                                    CurrentCacheObject.Type = GObjectType.HealthWell;
+                                    CurrentCacheObject.Type = TrinityObjectType.HealthWell;
                                     break;
                                 case GizmoType.Door:
-                                    CurrentCacheObject.Type = GObjectType.Door;
+                                    CurrentCacheObject.Type = TrinityObjectType.Door;
                                     break;
                                 case GizmoType.PoolOfReflection:
                                 case GizmoType.PowerUp:
-                                    CurrentCacheObject.Type = GObjectType.Shrine;
+                                    CurrentCacheObject.Type = TrinityObjectType.Shrine;
                                     break;
                                 case GizmoType.Chest:
-                                    CurrentCacheObject.Type = GObjectType.Container;
+                                    CurrentCacheObject.Type = TrinityObjectType.Container;
                                     break;
                                 case GizmoType.BreakableDoor:
-                                    CurrentCacheObject.Type = GObjectType.Barricade;
+                                    CurrentCacheObject.Type = TrinityObjectType.Barricade;
                                     break;
                                 case GizmoType.BreakableChest:
-                                    CurrentCacheObject.Type = GObjectType.Destructible;
+                                    CurrentCacheObject.Type = TrinityObjectType.Destructible;
                                     break;
                                 case GizmoType.DestroyableObject:
-                                    CurrentCacheObject.Type = GObjectType.Destructible;
+                                    CurrentCacheObject.Type = TrinityObjectType.Destructible;
                                     break;
                                 case GizmoType.PlacedLoot:
                                 case GizmoType.Switch:
                                 case GizmoType.Headstone:
-                                    CurrentCacheObject.Type = GObjectType.Interactable;
+                                    CurrentCacheObject.Type = TrinityObjectType.Interactable;
                                     break;
                                 default:
-                                    CurrentCacheObject.Type = GObjectType.Unknown;
+                                    CurrentCacheObject.Type = TrinityObjectType.Unknown;
                                     break;
                             }
                         }
                     }
                     else
-                        CurrentCacheObject.Type = GObjectType.Unknown;
+                        CurrentCacheObject.Type = TrinityObjectType.Unknown;
                 }
-                if (CurrentCacheObject.Type != GObjectType.Unknown)
+                if (CurrentCacheObject.Type != TrinityObjectType.Unknown)
                 {  // Now cache the object type if it's on the screen and we know what it is
                     //CacheData.ObjectType.Add(CurrentCacheObject.RActorGuid, CurrentCacheObject.Type);
                 }
@@ -597,13 +630,13 @@ namespace Trinity
             // Now do stuff specific to object types
             switch (CurrentCacheObject.Type)
             {
-                case GObjectType.Player:
+                case TrinityObjectType.Player:
                     {
                         AddToCache = RefreshUnit();
                         break;
                     }
                 // Handle Unit-type Objects
-                case GObjectType.Unit:
+                case TrinityObjectType.Unit:
                     {
                         // Not allowed to kill monsters due to profile settings
                         if (!Combat.Abilities.CombatBase.IsCombatAllowed)
@@ -617,7 +650,7 @@ namespace Trinity
                         break;
                     }
                 // Handle Item-type Objects
-                case GObjectType.Item:
+                case TrinityObjectType.Item:
                     {
                         // Not allowed to loot due to profile settings
                         // rrrix disabled this since noobs can't figure out their profile is broken... looting is always enabled now
@@ -639,7 +672,7 @@ namespace Trinity
 
                     }
                 // Handle Gold
-                case GObjectType.Gold:
+                case TrinityObjectType.Gold:
                     {
                         // Not allowed to loot due to profile settings
                         //if (!LootTargeting.Instance.AllowedToLoot || LootTargeting.Instance.DisableLooting)
@@ -651,35 +684,35 @@ namespace Trinity
                         AddToCache = RefreshGold();
                         break;
                     }
-                case GObjectType.PowerGlobe:
-                case GObjectType.HealthGlobe:
-                case GObjectType.ProgressionGlobe:
+                case TrinityObjectType.PowerGlobe:
+                case TrinityObjectType.HealthGlobe:
+                case TrinityObjectType.ProgressionGlobe:
                     {
                         AddToCache = true;
                         break;
                     }
                 // Handle Avoidance Objects
-                case GObjectType.Avoidance:
+                case TrinityObjectType.Avoidance:
                     {
                         AddToCache = RefreshAvoidance();
                         if (!AddToCache) { c_IgnoreSubStep = "RefreshAvoidance"; }
                         break;
                     }
                 // Handle Other-type Objects
-                case GObjectType.Destructible:
-                case GObjectType.Door:
-                case GObjectType.Barricade:
-                case GObjectType.Container:
-                case GObjectType.Shrine:
-                case GObjectType.Interactable:
-                case GObjectType.HealthWell:
-                case GObjectType.CursedChest:
-                case GObjectType.CursedShrine:
+                case TrinityObjectType.Destructible:
+                case TrinityObjectType.Door:
+                case TrinityObjectType.Barricade:
+                case TrinityObjectType.Container:
+                case TrinityObjectType.Shrine:
+                case TrinityObjectType.Interactable:
+                case TrinityObjectType.HealthWell:
+                case TrinityObjectType.CursedChest:
+                case TrinityObjectType.CursedShrine:
                     {
-                        AddToCache = RefreshGizmo(AddToCache);
+                        AddToCache = RefreshGizmo();
                         break;
                     }
-                // Object switch on type (to seperate shrines, destructibles, barricades etc.)
+                // Object switch on type (to separate shrines, destructibles, barricades etc.)
                 default:
                     {
                         DebugUtil.LogUnknown(c_diaObject);
@@ -701,7 +734,7 @@ namespace Trinity
         {
             try
             {
-                if (CurrentCacheObject.Type == GObjectType.Item || CurrentCacheObject.Type == GObjectType.Gold)
+                if (CurrentCacheObject.Type == TrinityObjectType.Item || CurrentCacheObject.Type == TrinityObjectType.Gold)
                     return true;
 
                 // No need for raycasting in certain level areas (rift trial for example)
@@ -717,27 +750,18 @@ namespace Trinity
                 {
                     // Bounty Objectives should always be on the weight list
                     if (CurrentCacheObject.IsBountyObjective)
-                    {
-                        c_HasBeenInLoS = true;
                         return true;
-                    }
 
                     // Quest Monsters should get LoS white-listed
                     if (CurrentCacheObject.IsQuestMonster)
-                    {
-                        c_HasBeenInLoS = true;
                         return true;
-                    }
 
                     // Always LoS Units during events
-                    if (CurrentCacheObject.Type == GObjectType.Unit && Player.InActiveEvent)
-                    {
-                        c_HasBeenInLoS = true;
+                    if (CurrentCacheObject.Type == TrinityObjectType.Unit && Player.InActiveEvent)
                         return true;
-                    }
                 }
                 // Everything except items and the current target
-                if (CurrentCacheObject.RActorGuid != LastTargetRactorGUID && CurrentCacheObject.Type != GObjectType.Unknown)
+                if (CurrentCacheObject.RActorGuid != LastTargetRactorGUID && CurrentCacheObject.Type != TrinityObjectType.Unknown)
                 {
                     if (CurrentCacheObject.Distance < 95)
                     {
@@ -804,6 +828,8 @@ namespace Trinity
                                 else
                                 {
                                     c_HasBeenInLoS = true;
+                                    if (!CacheData.HasBeenInLoS.ContainsKey(CurrentCacheObject.RActorGuid))
+                                        CacheData.HasBeenInLoS.Add(CurrentCacheObject.RActorGuid, c_HasBeenInLoS);
                                 }
 
                             }
@@ -856,7 +882,7 @@ namespace Trinity
         private static bool RefreshStepIgnoreUnknown(bool AddToCache)
         {
             // We couldn't get a valid object type, so ignore it
-            if (!c_IsObstacle && CurrentCacheObject.Type == GObjectType.Unknown)
+            if (!c_IsObstacle && CurrentCacheObject.Type == TrinityObjectType.Unknown)
             {
                 AddToCache = false;
             }
@@ -880,54 +906,54 @@ namespace Trinity
                 return AddToCache;
             }
             // Ignore stuff which has a Z-height-difference too great, it's probably on a different level etc. - though not avoidance!
-            if (CurrentCacheObject.Type != GObjectType.Avoidance)
+            if (CurrentCacheObject.Type != TrinityObjectType.Avoidance)
             {
                 // Calculate the z-height difference between our current position, and this object's position
                 switch (CurrentCacheObject.Type)
                 {
-                    case GObjectType.Door:
-                    case GObjectType.Unit:
-                    case GObjectType.Barricade:
+                    case TrinityObjectType.Door:
+                    case TrinityObjectType.Unit:
+                    case TrinityObjectType.Barricade:
                         // Ignore monsters (units) who's Z-height is 14 foot or more than our own z-height except bosses
                         if (c_ZDiff >= 14f && !CurrentCacheObject.IsBoss)
                         {
                             AddToCache = false;
                         }
                         break;
-                    case GObjectType.Item:
-                    case GObjectType.HealthWell:
+                    case TrinityObjectType.Item:
+                    case TrinityObjectType.HealthWell:
                         // Items at 26+ z-height difference (we don't want to risk missing items so much)
                         if (c_ZDiff >= 26f)
                         {
                             AddToCache = false;
                         }
                         break;
-                    case GObjectType.Gold:
-                    case GObjectType.HealthGlobe:
-                    case GObjectType.PowerGlobe:
+                    case TrinityObjectType.Gold:
+                    case TrinityObjectType.HealthGlobe:
+                    case TrinityObjectType.PowerGlobe:
                         // Gold/Globes at 11+ z-height difference
                         if (c_ZDiff >= 11f)
                         {
                             AddToCache = false;
                         }
                         break;
-                    case GObjectType.Destructible:
-                    case GObjectType.Shrine:
-                    case GObjectType.Container:
+                    case TrinityObjectType.Destructible:
+                    case TrinityObjectType.Shrine:
+                    case TrinityObjectType.Container:
                         // Destructibles, shrines and containers are the least important, so a z-height change of only 7 is enough to ignore (help avoid stucks at stairs etc.)
                         if (c_ZDiff >= 7f)
                         {
                             AddToCache = false;
                         }
                         break;
-                    case GObjectType.Interactable:
+                    case TrinityObjectType.Interactable:
                         // Special interactable objects
                         if (c_ZDiff >= 9f)
                         {
                             AddToCache = false;
                         }
                         break;
-                    case GObjectType.Unknown:
+                    case TrinityObjectType.Unknown:
                     default:
                         {
                             // Don't touch it!
@@ -1038,7 +1064,6 @@ namespace Trinity
             catch
             {
                 // Stuff it
-
             }
         }
         private static void CacheObjectIsBountyObjective()
@@ -1056,12 +1081,6 @@ namespace Trinity
         }
 
 
-
-        private static void AddLoSUnit()
-        {
-            if (CurrentCacheObject.IsUnit && !CacheData.HasBeenInLoS.ContainsKey(CurrentCacheObject.RActorGuid))
-                CacheData.HasBeenInLoS.Add(CurrentCacheObject.RActorGuid, c_HasBeenInLoS);
-        }
 
     }
 }

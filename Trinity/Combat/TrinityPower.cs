@@ -1,5 +1,7 @@
 ﻿using System;
 using Trinity.Combat.Abilities;
+using Trinity.Objects;
+using Trinity.Reference;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
 
@@ -231,6 +233,24 @@ namespace Trinity
         }
 
         /// <summary>
+        /// Create a TrinityPower for use at a specific location
+        /// </summary>
+        /// <param name="snoPower"></param>
+        /// <param name="minimumRange"></param>
+        /// <param name="position"></param>
+        public TrinityPower(SNOPower snoPower, float minimumRange, Vector3 position, float waitTicksBeforeUse, float waitTicksAfterUse)
+        {
+            SNOPower = snoPower;
+            MinimumRange = minimumRange;
+            TargetPosition = position;
+            TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
+            TargetACDGUID = -1;
+            WaitTicksBeforeUse = waitTicksBeforeUse;
+            WaitTicksAfterUse = waitTicksAfterUse;
+            PowerAssignmentTime = DateTime.UtcNow;
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TrinityPower" /> class.
         /// </summary>
         /// <param name="snoPower">The SNOPower to be used</param>
@@ -265,7 +285,7 @@ namespace Trinity
         public override string ToString()
         {
             return
-            String.Format("power={0} pos={1} acdGuid={2} preWait={3} postWait={4} timeSinceAssigned={5} timeSinceUse={6} range={7}",
+            String.Format("power={0} pos={1} acdGuid={2} preWait={3} postWait={4} timeSinceAssigned={5} timeSinceUse={6} range={7} charges={8}",
                     SNOPower,
                     NavHelper.PrettyPrintVector3(TargetPosition),
                     TargetACDGUID,
@@ -273,7 +293,8 @@ namespace Trinity
                     WaitTicksAfterUse,
                     TimeSinceAssigned,
                     TimeSinceUse,
-                    MinimumRange);
+                    MinimumRange,
+                    GetSkill().Charges);
         }
 
         public static int MillisecondsToTickDelay(int milliseconds)
@@ -281,6 +302,11 @@ namespace Trinity
             const int totalTps = 1000 / TickTimeMs;
 
             return totalTps / (1000 / milliseconds);
+        }
+
+        public Skill GetSkill()
+        {
+            return SkillUtils.ById(SNOPower);
         }
     }
 }

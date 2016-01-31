@@ -185,7 +185,7 @@ namespace Trinity.DbProvider
                     }
 
                     // Fix for A1 new game with bags full
-                    if (Trinity.Player.LevelAreaId == 19947 && ZetaDia.CurrentQuest.QuestSNO == 87700 && (ZetaDia.CurrentQuest.StepId == -1 || ZetaDia.CurrentQuest.StepId == 42))
+                    if (Trinity.Player.LevelAreaId == 19947 && ZetaDia.CurrentQuest.QuestSNO == 87700)
                     {
                         Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Can't townrun with the current quest!");
                         Trinity.WantToTownRun = false;
@@ -269,7 +269,7 @@ namespace Trinity.DbProvider
 
         internal static bool TownRunTimerFinished()
         {
-            return ZetaDia.IsInTown || (TownRunCheckTimer.IsRunning && TownRunCheckTimer.ElapsedMilliseconds > 2000);
+            return CacheData.Player.IsInTown || (TownRunCheckTimer.IsRunning && TownRunCheckTimer.ElapsedMilliseconds > 2000);
         }
 
         internal static bool TownRunTimerRunning()
@@ -356,7 +356,7 @@ namespace Trinity.DbProvider
 
         internal static SalvageOption GetSalvageOption(ItemQuality qualityLevel)
         {
-            if (qualityLevel > ItemQuality.Normal && qualityLevel <= ItemQuality.Superior)
+            if (qualityLevel >= ItemQuality.Inferior && qualityLevel <= ItemQuality.Superior)
             {
                 return Trinity.Settings.Loot.TownRun.SalvageWhiteItemOption;
             }
@@ -424,7 +424,7 @@ namespace Trinity.DbProvider
         /// <summary>
         ///     Log the nice items we found and stashed
         /// </summary>
-        internal static void LogGoodItems(CachedACDItem acdItem, GItemBaseType itemBaseType, GItemType itemType, double itemValue)
+        internal static void LogGoodItems(CachedACDItem acdItem, TrinityItemBaseType itemBaseType, TrinityItemType itemType, double itemValue)
         {
             FileStream logStream = null;
             try
@@ -494,7 +494,7 @@ namespace Trinity.DbProvider
         /// <summary>
         ///     Log the rubbish junk items we salvaged or sold
         /// </summary>
-        internal static void LogJunkItems(CachedACDItem acdItem, GItemBaseType itemBaseType, GItemType itemType, double itemValue)
+        internal static void LogJunkItems(CachedACDItem acdItem, TrinityItemBaseType itemBaseType, TrinityItemType itemType, double itemValue)
         {
             FileStream logStream = null;
             try
@@ -532,7 +532,7 @@ namespace Trinity.DbProvider
         {
             get
             {
-                switch (ZetaDia.CurrentLevelAreaId)
+                switch (Trinity.Player.LevelAreaId)
                 {
                     case 19947: // Campaign A1 Hub
                         return new Vector3(2968.16f, 2789.63f, 23.94531f);
@@ -545,7 +545,7 @@ namespace Trinity.DbProvider
                     case 270011: // A5 Hub
                         return new Vector3(502.8296f, 739.7472f, 2.598635f);
                     default:
-                        throw new ValueUnavailableException("Unknown LevelArea Id " + ZetaDia.CurrentLevelAreaId);
+                        throw new ValueUnavailableException("Unknown LevelArea Id " + Trinity.Player.LevelAreaId);
                 }
             }
         }

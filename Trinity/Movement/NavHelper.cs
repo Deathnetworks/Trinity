@@ -31,11 +31,11 @@ namespace Trinity
                 return Trinity.ObjectCache;
             }
         }
-        private static PlayerInfoCache PlayerStatus
+        private static CacheData.PlayerCache Player
         {
             get
             {
-                return Trinity.Player;
+                return CacheData.Player;
             }
         }
         private static bool AnyTreasureGoblinsPresent
@@ -55,11 +55,11 @@ namespace Trinity
                 return Trinity.CurrentTarget;
             }
         }
-        private static List<SNOPower> Hotbar
+        private static HashSet<SNOPower> Hotbar
         {
             get
             {
-                return Trinity.Hotbar;
+                return CacheData.Hotbar.ActivePowers;
             }
         }
         private static Zeta.Bot.Navigation.MainGridProvider MainGridProvider
@@ -79,7 +79,7 @@ namespace Trinity
 
         internal static bool CanRayCast(Vector3 destination)
         {
-            return CanRayCast(PlayerStatus.Position, destination);
+            return CanRayCast(Player.Position, destination);
         }
 
         /// <summary>
@@ -156,28 +156,28 @@ namespace Trinity
                 {
                     return lastSafeZonePosition;
                 }
-                hasEmergencyTeleportUp = (!PlayerStatus.IsIncapacitated && (
+                hasEmergencyTeleportUp = (!Player.IsIncapacitated && (
                     // Leap is available
                     (CombatBase.CanCast(SNOPower.Barbarian_Leap)) ||
                     // Whirlwind is available
                     (CombatBase.CanCast(SNOPower.Barbarian_Whirlwind) &&
-                        ((PlayerStatus.PrimaryResource >= 10 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= Trinity.MinEnergyReserve)) ||
+                        ((Player.PrimaryResource >= 10 && !CombatBase.IsWaitingForSpecial) || Player.PrimaryResource >= Trinity.MinEnergyReserve)) ||
                     // Tempest rush is available
                     (CombatBase.CanCast(SNOPower.Monk_TempestRush) &&
-                        ((PlayerStatus.PrimaryResource >= 20 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= Trinity.MinEnergyReserve)) ||
+                        ((Player.PrimaryResource >= 20 && !CombatBase.IsWaitingForSpecial) || Player.PrimaryResource >= Trinity.MinEnergyReserve)) ||
                     // Teleport is available
-                    (CombatBase.CanCast(SNOPower.Wizard_Teleport) && PlayerStatus.PrimaryResource >= 15) ||
+                    (CombatBase.CanCast(SNOPower.Wizard_Teleport) && Player.PrimaryResource >= 15) ||
                     // Archon Teleport is available
                     (CombatBase.CanCast(SNOPower.Wizard_Archon_Teleport))
                     ));
                 // Wizards can look for bee stings in range and try a wave of force to dispel them
-                if (!shouldKite && PlayerStatus.ActorClass == ActorClass.Wizard && CombatBase.CanCast(SNOPower.Wizard_WaveOfForce) &&
-                    !PlayerStatus.IsIncapacitated && CacheData.TimeBoundAvoidance.Count(u => u.ActorSNO == 5212 && u.Position.Distance(PlayerStatus.Position) <= 15f) >= 2 &&
+                if (!shouldKite && Player.ActorClass == ActorClass.Wizard && CombatBase.CanCast(SNOPower.Wizard_WaveOfForce) &&
+                    !Player.IsIncapacitated && CacheData.TimeBoundAvoidance.Count(u => u.ActorSNO == 5212 && u.Position.Distance(Player.Position) <= 15f) >= 2 &&
                     (
                     //HotbarSkills.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) || 
                     PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))
                 {
-                    ZetaDia.Me.UsePower(SNOPower.Wizard_WaveOfForce, Vector3.Zero, PlayerStatus.WorldDynamicID, -1);
+                    ZetaDia.Me.UsePower(SNOPower.Wizard_WaveOfForce, Vector3.Zero, Player.WorldDynamicID, -1);
                 }
             }
 
@@ -308,7 +308,7 @@ namespace Trinity
                             timers[3].Start();
                             double checkRadius = gridSquareRadius;
 
-                            if (CombatBase.PlayerKiteDistance > 0)
+                            if (CombatBase.KiteDistance > 0)
                             {
                                 checkRadius = gridSquareSize + 10f;
                             }
@@ -340,7 +340,7 @@ namespace Trinity
                             gridPoint.Weight = ((maxDistance - gridPoint.Distance) / maxDistance) * maxWeight;
 
                             // Low weight for close range grid points
-                            if (shouldKite && gridPoint.Distance < CombatBase.PlayerKiteDistance)
+                            if (shouldKite && gridPoint.Distance < CombatBase.KiteDistance)
                             {
                                 gridPoint.Weight = (int)gridPoint.Distance;
                             }
@@ -371,7 +371,7 @@ namespace Trinity
                                 float distFromPointToOrigin = gridPoint.Position.Distance2D(origin);
 
                                 // No Kite Distance Setting
-                                if (CombatBase.PlayerKiteDistance <= 0)
+                                if (CombatBase.KiteDistance <= 0)
                                 {
                                     // higher weight closer to monster
                                     if (distFromPointToMonster < distFromPointToOrigin)

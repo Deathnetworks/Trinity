@@ -1,27 +1,109 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Trinity.Combat;
 using Trinity.Objects;
+using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.Reference
 {
     public class SkillUtils
-    {       /// <summary>
+    {
+        #region SkillMeta
+
+        /// <summary>
+        /// Dictionary mapping Skills to SkillMeta
+        /// </summary>
+        private static Dictionary<Skill, SkillMeta> _skillMetas = new Dictionary<Skill, SkillMeta>();
+
+        /// <summary>
+        /// Set skill to use an SkillMeta object
+        /// </summary>
+        public static void SetSkillMeta(SkillMeta newMeta)
+        {
+            if (newMeta.Skill == null)
+            {
+                Logger.Log("SkillInfo set attempt without a reference to a skill");
+                return;
+            }
+
+            SkillMeta oldMeta;
+            if (_skillMetas.TryGetValue(newMeta.Skill, out oldMeta))
+            {
+                oldMeta.Apply(newMeta);
+            }
+            else
+            {
+                _skillMetas.Add(newMeta.Skill, newMeta);
+            }
+        }
+
+        /// <summary>
+        /// Set skills to use SkillMeta objects
+        /// </summary>
+        public static void SetSkillMeta(IEnumerable<SkillMeta> metas)
+        {
+            metas.ForEach(SetSkillMeta);
+        }
+
+        /// <summary>
+        /// Get a SkillMeta object
+        /// </summary>
+        /// <param name="skill"></param>
+        /// <returns></returns>
+        public static SkillMeta GetSkillMeta(Skill skill)
+        {
+            SkillMeta s;
+            if (_skillMetas.TryGetValue(skill, out s))
+                return s;
+
+            Logger.LogVerbose("GetSkillInfo found no SkillMeta for {0}", skill.Name);
+            
+            var newMeta = new SkillMeta(skill);
+            SetSkillMeta(newMeta);
+
+            return newMeta;
+        }
+
+        #endregion
+
+        /// <summary>
         /// Fast lookup for a Skill by SNOPower
         /// </summary>
         public static Skill ById(SNOPower power)
         {
             if (!_allSkillBySnoPower.Any())
-                _allSkillBySnoPower = _all.ToDictionary(s => s.SNOPower, s => s);
+                _allSkillBySnoPower = All.ToDictionary(s => s.SNOPower, s => s);
+
             Skill skill;
             var result = _allSkillBySnoPower.TryGetValue(power, out skill);
+            if (!result)
+            {
+                Logger.LogDebug("Unable to find skill for power {0}", power);
+            }
             return result ? skill : new Skill();
         }
-
         private static Dictionary<SNOPower, Skill> _allSkillBySnoPower = new Dictionary<SNOPower, Skill>();
+
+        /// <summary>
+        /// Fast lookup for a Skill by SNOPower
+        /// </summary>
+        public static Skill ByName(string name)
+        {
+            if (!_allSkillByName.Any())
+                _allSkillByName = All.ToDictionary(s => s.Name.ToLowerInvariant(), s => s);
+
+            Skill skill;
+            var result = _allSkillByName.TryGetValue(name.ToLowerInvariant(), out skill);
+            if (!result)
+            {
+                Logger.LogDebug("Unable to find skill for power {0}", name);
+            }
+            return result ? skill : new Skill();
+        }
+        private static Dictionary<string, Skill> _allSkillByName = new Dictionary<string, Skill>();
 
         /// <summary>
         /// All SNOPowers
@@ -71,8 +153,8 @@ namespace Trinity.Reference
         private static void UpdateActiveSkills()
         {
             _lastUpdatedActiveSkills = DateTime.UtcNow;
-            _active = CurrentClass.Where(s => HotbarSkills.AssignedSNOPowers.Contains(s.SNOPower)).ToList();
-            _activeIds = HotbarSkills.AssignedSNOPowers;
+            _active = CurrentClass.Where(s => CacheData.Hotbar.ActivePowers.Contains(s.SNOPower)).ToList();
+            _activeIds = CacheData.Hotbar.ActivePowers;
         }
 
         private static DateTime _lastUpdatedActiveSkills = DateTime.MinValue;

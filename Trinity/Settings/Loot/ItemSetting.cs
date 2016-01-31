@@ -14,6 +14,7 @@ namespace Trinity.Settings.Loot
         private TownRunSetting _townRun;
         private ItemRuleSetting _itemRules;
         private ItemRankSettings _itemRank;
+        private ItemListSettings _itemList;
         #endregion Fields
 
         #region Events
@@ -31,6 +32,7 @@ namespace Trinity.Settings.Loot
             TownRun = new TownRunSetting();
             ItemRules = new ItemRuleSetting();
             ItemRank = new ItemRankSettings();
+            ItemList = new ItemListSettings();
         }
         #endregion Constructors
 
@@ -118,8 +120,23 @@ namespace Trinity.Settings.Loot
                 }
             }
         }
-        #endregion Properties
-
+        [DataMember(IsRequired = false)]
+        public ItemListSettings ItemList
+        {
+            get
+            {
+                return _itemList;
+            }
+            set
+            {
+                if (_itemList!= value)
+                {
+                    _itemList = value;
+                    OnPropertyChanged("ItemList");
+                }
+            }
+        }
+        #endregion
         #region Methods
         public void Reset()
         {

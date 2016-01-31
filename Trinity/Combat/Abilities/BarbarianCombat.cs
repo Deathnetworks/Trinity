@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Trinity.Config.Combat;
 using Trinity.Reference;
 using Zeta.Common;
@@ -10,6 +9,12 @@ namespace Trinity.Combat.Abilities
     class BarbarianCombat : CombatBase
     {
         private static bool _allowSprintOoc = true;
+        private const float MaxFuriousChargeDistance = 300f;
+
+        static BarbarianCombat()
+        {
+            SkillUtils.SetSkillMeta(SkillsDefaultMeta.Barbarian.ToList());
+        }
 
         public static TrinityPower GetPower()
         {
@@ -27,47 +32,29 @@ namespace Trinity.Combat.Abilities
                 // Sprint OOC
                 if (IsNull(power) && CanUseSprintOOC)
                     power = PowerSprint;
-                // Threatening Shout OOC
             }
+
 
             if (!UseOOCBuff)
             {
                 // Refresh Frenzy
                 if (IsNull(power) && CanCast(SNOPower.Barbarian_Frenzy) && TimeSincePowerUse(SNOPower.Barbarian_Frenzy) > 3000 && TimeSincePowerUse(SNOPower.Barbarian_Frenzy) < 4000)
                     power = PowerFrenzy;
+
+                // Refresh Bash - Punish
+                if (IsNull(power) && CanCast(SNOPower.Barbarian_Bash) && TimeSincePowerUse(SNOPower.Barbarian_Bash) > 4000 && TimeSincePowerUse(SNOPower.Barbarian_Bash) < 5000)
+                    power = PowerBash;
             }
             // Ignore Pain when low on health
             if (IsNull(power) && CanCastIgnorePain)
                 power = PowerIgnorePain;
-
-            IsWaitingForSpecial = false;
-
-            // Check if we should conserve Fury for specials
-            if (IsNull(power) && Player.PrimaryResource < MinEnergyReserve)
-            {
-                if (ShouldWaitForCallOfTheAncients)
-                {
-                    //Logger.LogNormal("Waiting for Barbarian_CallOfTheAncients!");
-                    IsWaitingForSpecial = true;
-                }
-                if (ShouldWaitForWrathOfTheBerserker)
-                {
-                    //Logger.LogNormal("Waiting for Barbarian_WrathOfTheBerserker 1!");
-                    IsWaitingForSpecial = true;
-                }
-                if (ShouldWaitForEarthquake)
-                {
-                    //Logger.LogNormal("Waiting for Barbarian_Earthquake!");
-                    IsWaitingForSpecial = true;
-                }
-            }
 
             // WOTB
             if (IsNull(power) && CanUseWrathOfTheBerserker)
                 power = PowerWrathOfTheBerserker;
 
             // Call of the Ancients
-            if (IsNull(power) && !UseOOCBuff && CanUseCallOfTheAncients)
+            if (IsNull(power) && CanUseCallOfTheAncients)
                 power = PowerCallOfTheAncients;
 
             // Leap with Earth Set.
@@ -138,10 +125,6 @@ namespace Trinity.Combat.Abilities
             if (IsNull(power) && CanUseFrenzyTo5)
                 power = PowerFrenzy;
 
-            // Weapon Throw: Dreadbomb
-            if (IsNull(power) && CanUseDreadbomb)
-                power = PowerWeaponThrow;
-
             // HOTA Elites
             if (IsNull(power) && CanUseHammerOfTheAncientsElitesOnly)
                 power = PowerHammerOfTheAncients;
@@ -175,73 +158,43 @@ namespace Trinity.Combat.Abilities
                 power = DefaultPower;
 
             return power;
-
         }
-
+        
         public static bool CanCastIgnorePain
         {
             get
             {
-                return
-                    !UseOOCBuff &&
-                    CanCast(SNOPower.Barbarian_IgnorePain) &&
-                    (Player.CurrentHealthPct <= V.F("Barbarian.IgnorePain.MinHealth") ||
-                    (Sets.TheLegacyOfRaekor.IsFullyEquipped && (Player.CurrentHealthPct <= V.F("Barbarian.FuryDumpRaekor.MinHealth")
-                    || CurrentTarget.IsBossOrEliteRareUnique ||
-                    Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin"))
-                    && (GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
-                    Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")));
-            }
-        }
-        public static bool ShouldWaitForCallOfTheAncients
-        {
-            get
-            {
-                return
-                    Hotbar.Contains(SNOPower.Barbarian_CallOfTheAncients) &&
-                    !UseOOCBuff &&
-                    !IsCurrentlyAvoiding &&
-                    !CanCast(SNOPower.Barbarian_CallOfTheAncients) &&
-                    TargetUtil.AnyMobsInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange"), 3) &&
-                    !GetHasBuff(SNOPower.Barbarian_CallOfTheAncients) &&
-                    Player.PrimaryResource <= V.F("Barbarian.CallOfTheAncients.MinFury");
+                if (UseOOCBuff)
+                    return false;
+
+                if (!CanCast(SNOPower.Barbarian_IgnorePain))
+                    return false;
+
+                if (Settings.Combat.Barbarian.IgnorePainOffCooldown)
+                    return true;
+
+                if (Player.CurrentHealthPct <= V.F("Barbarian.IgnorePain.MinHealth"))
+                    return true;
+
+                return Sets.TheLegacyOfRaekor.IsFullyEquipped && ShouldFuryDump;
             }
         }
         public static bool CanUseCallOfTheAncients
         {
             get
             {
-                return
+                return !UseOOCBuff &&
                     !IsCurrentlyAvoiding &&
                     CanCast(SNOPower.Barbarian_CallOfTheAncients) &&
                     !Player.IsIncapacitated &&
-                    !GetHasBuff(SNOPower.Barbarian_CallOfTheAncients) && (Sets.ImmortalKingsCall.IsFullyEquipped || 
+                    !GetHasBuff(SNOPower.Barbarian_CallOfTheAncients) && (Sets.ImmortalKingsCall.IsFullyEquipped ||
+                    CurrentTarget.IsEliteRareUnique ||
                     TargetUtil.EliteOrTrashInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange")) ||
-                    TargetUtil.AnyMobsInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange"), 3) || TargetUtil.AnyElitesInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange")));
+                    TargetUtil.AnyMobsInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange"), 3) ||
+                    TargetUtil.AnyElitesInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange")));
             }
         }
 
-        public static bool ShouldWaitForWrathOfTheBerserker
-        {
-            get
-            {
-                if (UseOOCBuff || IsCurrentlyAvoiding)
-                    return false;
-
-                // WOTB with elites
-                bool wotbElites =
-                    (WOTBGoblins || WOTBElitesPresent);
-
-                return
-                    Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) &&
-                    !UseOOCBuff &&
-                    !IsCurrentlyAvoiding &&
-                    Player.PrimaryResource <= 50 &&
-                    !CanCast(SNOPower.Barbarian_WrathOfTheBerserker) &&
-                    !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) &&
-                    (WOTBIgnoreElites || wotbElites || (Settings.Combat.Barbarian.WOTBMode == BarbarianWOTBMode.WhenReady));
-            }
-        }
         public static bool CanUseWrathOfTheBerserker
         {
             get
@@ -257,17 +210,14 @@ namespace Trinity.Combat.Abilities
                 bool anyTime = (Settings.Combat.Barbarian.WOTBMode == BarbarianWOTBMode.WhenReady && !Player.IsInTown);
                 bool hasBuff = GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
                 bool hasInfiniteCasting = GetHasBuff(SNOPower.Pages_Buff_Infinite_Casting);
-                bool canCast = CanCast(SNOPower.Barbarian_WrathOfTheBerserker, CanCastFlags.NoTimer);
 
                 bool emergencyHealth = Player.CurrentHealthPct <= V.F("Barbarian.WOTB.EmergencyHealth");
 
                 bool result =
-                    (!UseOOCBuff || anyTime) &&
                     //Player.PrimaryResource >= V.I("Barbarian.WOTB.MinFury") && // WOTB is "free" !
                     // Don't still have the buff
-                    !hasBuff &&
-                    canCast &&
-                    (WOTBGoblins || WOTBIgnoreElites || WOTBElitesPresent || anyTime || emergencyHealth || hasInfiniteCasting);
+                    !hasBuff && CanCast(SNOPower.Barbarian_WrathOfTheBerserker) &&
+                    (WOTBGoblins || WOTBIgnoreElites || WOTBElitesPresent || emergencyHealth || hasInfiniteCasting || anyTime);
 
                 return result;
             }
@@ -322,25 +272,12 @@ namespace Trinity.Combat.Abilities
             }
         }
 
-        public static bool ShouldWaitForEarthquake
-        {
-            get
-            {
-                return
-                    Hotbar.Contains(SNOPower.Barbarian_Earthquake) &&
-                    !UseOOCBuff &&
-                    !IsCurrentlyAvoiding &&
-                    !CanCast(SNOPower.Barbarian_Earthquake) &&
-                    TargetUtil.EliteOrTrashInRange(45) &&
-                    Player.PrimaryResource <= 50;
-            }
-        }
         public static bool CanUseEarthquake
         {
             get
             {
                 double minFury = 50f;
-                bool hasCaveIn = HotbarSkills.AssignedSkills.Any(p => p.Power == SNOPower.Barbarian_Earthquake && p.RuneIndex == 4);
+                bool hasCaveIn = CacheData.Hotbar.ActiveSkills.Any(p => p.Power == SNOPower.Barbarian_Earthquake && p.RuneIndex == 4);
                 float range = hasCaveIn ? 24f : 14f;
 
                 return
@@ -359,14 +296,11 @@ namespace Trinity.Combat.Abilities
             get
             {
                 return !UseOOCBuff && !Player.IsIncapacitated && CanCast(SNOPower.Barbarian_BattleRage, CanCastFlags.NoTimer) &&
-                    (
-                        !GetHasBuff(SNOPower.Barbarian_BattleRage) || (Player.CurrentHealthPct <= V.F("Barbarian.FuryDumpRaekor.MinHealth") &&
-                        ((Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin") && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
-                        Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")))
-                    ) &&
+                    (!GetHasBuff(SNOPower.Barbarian_BattleRage) || ShouldFuryDump) &&
                     Player.PrimaryResource >= V.F("Barbarian.BattleRage.MinFury");
             }
         }
+
         public static bool CanUseSprintOOC
         {
             get
@@ -449,7 +383,7 @@ namespace Trinity.Combat.Abilities
                 if (UseOOCBuff)
                     return false;
 
-                var bestTarget = TargetUtil.GetBestPierceTarget(35f);
+                var bestTarget = TargetUtil.GetBestPierceTarget(MaxFuriousChargeDistance);
                 int unitsInFrontOfBestTarget = 0;
 
                 if (bestTarget != null)
@@ -457,7 +391,7 @@ namespace Trinity.Combat.Abilities
 
                 bool currentEliteTargetInRange = CurrentTarget.RadiusDistance > 7f && CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 35f;
 
-                return CanCast(SNOPower.Barbarian_FuriousCharge, CanCastFlags.NoTimer) && !IsCurrentlyAvoiding && 
+                return CanCast(SNOPower.Barbarian_FuriousCharge, CanCastFlags.NoTimer) && !IsCurrentlyAvoiding &&
                     (currentEliteTargetInRange || unitsInFrontOfBestTarget >= 3 || Sets.TheLegacyOfRaekor.IsFullyEquipped);
 
             }
@@ -466,46 +400,39 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                bool leapresult = !UseOOCBuff &&
-                        !Player.IsIncapacitated &&
-                        CanCast(SNOPower.Barbarian_Leap);
-                if (Legendary.LutSocks.IsEquipped) // This will now cast whenever leap is available and an enemy is around. Disable Leap OOC option. The last line will prevent you from leaping on destructibles
+                bool leapresult = !UseOOCBuff && !Player.IsIncapacitated && CanCast(SNOPower.Barbarian_Leap);
+                // This will now cast whenever leap is available and an enemy is around. 
+                // Disable Leap OOC option. The last line will prevent you from leaping on destructibles
+                if (Legendary.LutSocks.IsEquipped)
                 {
                     return leapresult && TargetUtil.AnyMobsInRange(15f, 1);
                 }
-                else
-                {
-                    return leapresult && (TargetUtil.ClusterExists(15f, 35f, V.I("Barbarian.Leap.TrashCount")) || CurrentTarget.IsBossOrEliteRareUnique);
-                }
+                return leapresult && (TargetUtil.ClusterExists(15f, 35f, V.I("Barbarian.Leap.TrashCount")) || CurrentTarget.IsBossOrEliteRareUnique);
             }
         }
         public static bool CanUseRend
         {
-            //skillDict.Add("Rend", SNOPower.Barbarian_Rend);
-            //runeDict.Add("Ravage", 1);
-            //runeDict.Add("BloodLust", 3);
-            //runeDict.Add("Lacerate", 0);
-            //runeDict.Add("Mutilate", 2);
-            //runeDict.Add("Bloodbath", 4);
             get
             {
-                bool hasReserveEnergy = (!IsWaitingForSpecial && Player.PrimaryResource >= V.I("Barbarian.Rend.MinFury")) || (IsWaitingForSpecial && Player.PrimaryResource > MinEnergyReserve);
+                if (UseOOCBuff || IsCurrentlyAvoiding || Player.IsIncapacitated || !CanCast(SNOPower.Barbarian_Rend))
+                    return false;
 
-                return
-                    !UseOOCBuff &&
-                    !Player.IsIncapacitated &&
-                    hasReserveEnergy &&
-                    ((CanCast(SNOPower.Barbarian_Rend)) &&
-                        (Trinity.ObjectCache.Count(o => o.IsUnit &&
-                            !o.HasDotDPS && o.RadiusDistance <= V.F("Barbarian.Rend.MaxRange")) >= V.I("Barbarian.Rend.MinNonBleedMobCount"))
-                     ||
-                    // Spam with Bloodlust
-                    (CanCast(SNOPower.Barbarian_Rend) &&
-                     Player.CurrentHealthPct <= V.F("Barbarian.Rend.SpamBelowHealthPct") &&
-                     HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_Rend && s.RuneIndex == 3) &&
-                     TargetUtil.AnyMobsInRange(V.F("Barbarian.Rend.MaxRange"), false)
-                    ))
-                    ;
+                if (!CanCast(SNOPower.Barbarian_Rend))
+                    return false;
+
+                bool hasReserveEnergy = (!IsWaitingForSpecial && Player.PrimaryResource >= 20) || (IsWaitingForSpecial && Player.PrimaryResource > MinEnergyReserve);
+
+                bool mobCountThreshold = Trinity.ObjectCache.Count(o => o.IsUnit && (!o.HasDotDPS) && o.RadiusDistance <= 12) >= 3 ||
+                    CurrentTarget.IsEliteRareUnique;
+
+                if (!mobCountThreshold)
+                    return false;
+
+                // Spam with Bloodlust
+                if (Runes.Barbarian.BloodLust.IsActive && Player.CurrentHealthPct <= .25)
+                    return true;
+
+                return Skills.Barbarian.Rend.TimeSinceUse > Settings.Combat.Barbarian.RendWaitDelay && hasReserveEnergy;
             }
         }
         public static bool CanUseOverPower
@@ -554,8 +481,7 @@ namespace Trinity.Combat.Abilities
                     // last power used was whirlwind and we don't have sprint up
                         (LastPowerUsed == SNOPower.Barbarian_Whirlwind && !GetHasBuff(SNOPower.Barbarian_Sprint)) ||
                     // Fury Dump Options for sprint: use at max energy constantly
-                        (Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin") && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
-                        (Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")) ||
+                        ShouldFuryDump ||
                     // or on a timer
                         (
                          (SNOPowerUseTimer(SNOPower.Barbarian_Sprint) && !GetHasBuff(SNOPower.Barbarian_Sprint)) &&
@@ -585,74 +511,25 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                // minimum checks
-                if (UseOOCBuff)
-                    return false;
-                if (IsCurrentlyAvoiding)
-                    return false;
-                if (!Hotbar.Contains(SNOPower.Barbarian_Bash))
-                    return false;
-
-                //skillDict.Add("Bash", SNOPower.Barbarian_Bash);
-                //runeDict.Add("Clobber", 2);
-                //runeDict.Add("Onslaught", 0);
-                //runeDict.Add("Punish", 1);
-                //runeDict.Add("Instigation", 3);
-                //runeDict.Add("Pulverize", 4);
-
-                bool hasPunish = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_Bash && s.RuneIndex == 1);
-
-                // for combo use with Frenzy or Cleave
-                if (hasPunish)
-                {
-                    // haven't bashed, ever
-                    if (!SpellHistory.HasUsedSpell(SNOPower.Barbarian_Bash))
-                        return true;
-
-                    int timeSinceUse = SpellHistory.TimeSinceUse(SNOPower.Barbarian_Bash).Milliseconds;
-
-                    // been almost 5 seconds since our last bash (keep the Punish buff up)
-                    if (timeSinceUse >= 4600)
-                        return true;
-
-                    // if it's been less than 5 seconds, check if we have used 2 in 10 seconds
-                    if (SpellHistory.HistoryQueue.Count(i => i.TimeSinceUse.TotalMilliseconds < 9600) <= 2)
-                        return true;
-
-                    // if it's been less than 5 seconds, check if we have used 3 in 15 seconds (for full stack)
-                    if (SpellHistory.HistoryQueue.Count(i => i.TimeSinceUse.TotalSeconds < 14600) <= 3)
-                        return true;
-                }
-
-                return false;
+                return !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsRooted && Hotbar.Contains(SNOPower.Barbarian_Bash) &&
+                    Runes.Barbarian.Punish.IsActive && !TargetUtil.AnyMobsInRange(15f, 3) && GetBuffStacks(SNOPower.Barbarian_Bash) < 3;
             }
         }
         public static bool CanUseWhirlwind
         {
             get
             {
-                return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && !Player.IsIncapacitated && !Player.IsRooted && Player.PrimaryResource >= 10 &&
-                    (!IsWaitingForSpecial || (IsWaitingForSpecial && Player.PrimaryResource > MinEnergyReserve)) &&
-                    //(!IsWaitingForSpecial || (IsWaitingForSpecial && !(TargetUtil.AnyMobsInRange(3, 15) || ForceCloseRangeTarget))) && // make sure we're not surrounded if waiting for special
-                    // Only if within 25 yards of main target
-                    ((CurrentTarget.RadiusDistance <= 25f || TargetUtil.AnyMobsInRange(V.F("Barbarian.Whirlwind.TrashRange"), V.I("Barbarian.Whirlwind.TrashCount")))) &&
-                    (TargetUtil.AnyMobsInRange(50, 2) || CurrentTarget.HitPointsPct >= 0.30 || CurrentTarget.IsBossOrEliteRareUnique || Player.CurrentHealthPct <= 0.60) &&
+                if (UseOOCBuff || IsCurrentlyAvoiding || !CanCast(SNOPower.Barbarian_Whirlwind) || Player.IsIncapacitated || Player.IsRooted || Player.PrimaryResource < 10)
+                    return false;
+
+                return (CurrentTarget.RadiusDistance <= 25f || TargetUtil.AnyMobsInRange(V.F("Barbarian.Whirlwind.TrashRange"), V.I("Barbarian.Whirlwind.TrashCount"))) &&
                     // Check for energy reservation amounts
-                    //((playerStatus.dCurrentEnergy >= 20 && !playerStatus.bWaitingForReserveEnergy) || playerStatus.dCurrentEnergy >= iWaitingReservedAmount) &&
                     Player.PrimaryResource >= V.D("Barbarian.Whirlwind.MinFury") &&
                     // If they have battle-rage, make sure it's up
                     (!Hotbar.Contains(SNOPower.Barbarian_BattleRage) || (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage)));
             }
         }
-        // Dreadbomb build support
-        public static bool CanUseDreadbomb
-        {
-            get
-            {
-                return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.X1_Barbarian_WeaponThrow)
-                    && Player.PrimaryResourcePct >= 0.99 && (HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_Barbarian_WeaponThrow && s.RuneIndex == 3));
-            }
-        }
+
         public static bool CanUseHammerOfTheAncients
         {
             get
@@ -712,7 +589,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                bool hasBerserker = HotbarSkills.PassiveSkills.Any(p => p == SNOPower.Barbarian_Passive_BerserkerRage);
+                bool hasBerserker = CacheData.Hotbar.PassiveSkills.Any(p => p == SNOPower.Barbarian_Passive_BerserkerRage);
                 double minFury = hasBerserker ? Player.PrimaryResourceMax * 0.99 : 0f;
 
                 return !UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.X1_Barbarian_Avalanche_v2, CanCastFlags.NoTimer) &&
@@ -744,7 +621,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                var bestTarget = TargetUtil.GetBestPierceTarget(35f, 0, true);
+                var bestTarget = TargetUtil.GetBestPierceTarget(MaxFuriousChargeDistance);
 
                 if (bestTarget != null)
                     return new TrinityPower(SNOPower.Barbarian_FuriousCharge, V.F("Barbarian.FuriousCharge.UseRange"), bestTarget.Position);
@@ -756,7 +633,7 @@ namespace Trinity.Combat.Abilities
             get
             {
                 // For Call of Arreat rune. Will do all quakes on top of each other
-                bool hasCallOfArreat = HotbarSkills.AssignedSkills.Any(p => p.Power == SNOPower.Barbarian_Leap && p.RuneIndex == 0);
+                bool hasCallOfArreat = CacheData.Hotbar.ActiveSkills.Any(p => p.Power == SNOPower.Barbarian_Leap && p.RuneIndex == 0);
                 if (Legendary.LutSocks.IsEquipped && hasCallOfArreat)
                 {
                     Vector3 aoeTarget = TargetUtil.GetBestClusterPoint(7f, 9f, false);
@@ -788,37 +665,13 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                bool shouldGetNewZigZag =
-                    (DateTime.UtcNow.Subtract(LastChangedZigZag).TotalMilliseconds >= V.I("Barbarian.Whirlwind.ZigZagMaxTime") ||
-                    CurrentTarget.ACDGuid != LastZigZagUnitAcdGuid ||
-                    ZigZagPosition.Distance2D(Player.Position) <= 5f);
-                bool hasRLTW = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_Sprint && s.RuneIndex == 2);
-
-                if (shouldGetNewZigZag)
-                {
-                    if (hasRLTW)
-                    {
-                        var wwdist = V.F("Barbarian.Whirlwind.RLTWZigZag");
-                        ZigZagPosition = TargetUtil.GetZigZagTarget(CurrentTarget.Position, wwdist);
-                        return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), ZigZagPosition, Trinity.CurrentWorldDynamicId, -1, 0, 1);
-                    }
-                    if (!hasRLTW)
-                    {
-                        var wwdist = V.F("Barbarian.Whirlwind.ZigZagDistance");
-                        ZigZagPosition = TargetUtil.GetZigZagTarget(CurrentTarget.Position, wwdist);
-                        return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), ZigZagPosition, Trinity.CurrentWorldDynamicId, -1, 0, 1);
-                    }
-
-                    LastZigZagUnitAcdGuid = CurrentTarget.ACDGuid;
-                    LastChangedZigZag = DateTime.UtcNow;
-                }
-                return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), ZigZagPosition, Trinity.CurrentWorldDynamicId, -1, 0, 1);
+                return new TrinityPower(SNOPower.Barbarian_Whirlwind, 20f, TargetUtil.GetZigZagTarget(CurrentTarget.Position, 20), Trinity.CurrentWorldDynamicId, -1, 0, 1);
             }
         }
         public static TrinityPower PowerHammerOfTheAncients { get { return new TrinityPower(SNOPower.Barbarian_HammerOfTheAncients, V.F("Barbarian.HammerOfTheAncients.UseRange"), CurrentTarget.ACDGuid); } }
         public static TrinityPower PowerWeaponThrow { get { return new TrinityPower(SNOPower.X1_Barbarian_WeaponThrow, V.F("Barbarian.WeaponThrow.UseRange"), CurrentTarget.ACDGuid); } }
         public static TrinityPower PowerFrenzy { get { return new TrinityPower(SNOPower.Barbarian_Frenzy, V.F("Barbarian.Frenzy.UseRange"), CurrentTarget.ACDGuid); } }
-        public static TrinityPower PowerBash { get { return new TrinityPower(SNOPower.Barbarian_Bash, V.F("Barbarian.Bash.UseRange"), Vector3.Zero, -1, CurrentTarget.ACDGuid, 2, 2); } }
+        public static TrinityPower PowerBash { get { return new TrinityPower(SNOPower.Barbarian_Bash, V.F("Barbarian.Bash.UseRange"), CurrentTarget.ACDGuid); } }
         public static TrinityPower PowerCleave { get { return new TrinityPower(SNOPower.Barbarian_Cleave, V.F("Barbarian.Cleave.UseRange"), CurrentTarget.ACDGuid); } }
 
         private static TrinityPower DestroyObjectPower
@@ -841,7 +694,7 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.Barbarian_Overpower, 9);
 
                 if (CanCast(SNOPower.Barbarian_Whirlwind))
-                    return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), LastZigZagLocation);
+                    return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), CurrentTarget.Position);
 
                 if (CanCast(SNOPower.Barbarian_Rend) && Player.PrimaryResourcePct >= 0.65)
                     return new TrinityPower(SNOPower.Barbarian_Rend, V.F("Barbarian.Rend.UseRange"));
@@ -873,6 +726,19 @@ namespace Trinity.Combat.Abilities
                 return Hotbar.Count(i => i == SNOPower.Barbarian_Frenzy || i == SNOPower.Barbarian_Bash || i == SNOPower.Barbarian_Cleave) > 1;
             }
         }
+        private static bool ShouldFuryDump
+        {
+            get
+            {
+                bool berserkerRage = !Passives.Barbarian.BerserkerRage.IsActive;
+                bool ignoranceIsBliss = Runes.Barbarian.IgnoranceIsBliss.IsActive && GetHasBuff(SNOPower.Barbarian_IgnorePain) && Trinity.Player.CurrentHealthPct <= 1;
+
+                return ((berserkerRage || ignoranceIsBliss) && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) &&
+                        ((Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")) ||
+                         Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")));
+            }
+        }
+
 
     }
 }

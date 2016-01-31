@@ -19,8 +19,7 @@ namespace Trinity
         /// <returns></returns>
         public static bool GetHasBuff(SNOPower power)
         {
-            int id = (int)power;
-            return listCachedBuffs.Any(u => u.SNOId == id);
+            return GetBuffStacks(power) > 0;
         }
 
         /// <summary>
@@ -30,12 +29,7 @@ namespace Trinity
         /// <returns></returns>
         public static int GetBuffStacks(SNOPower power)
         {
-            int stacks;
-            if (PlayerBuffs.TryGetValue((int)power, out stacks))
-            {
-                return stacks;
-            }
-            return 0;
+            return CacheData.Buffs.GetBuffStacks(power);
         }
 
         /// <summary>
@@ -74,14 +68,14 @@ namespace Trinity
                 if (!UseOOCBuff && CurrentTarget == null)
                     return new TrinityPower();
 
-                // See if archon just appeared/disappeared, so update the hotbar
-                if (ShouldRefreshHotbarAbilities || HotbarRefreshTimer.ElapsedMilliseconds > 5000)
-                    PlayerInfoCache.RefreshHotbar();
-
                 // Switch based on the cached character class
-
                 TrinityPower power = CombatBase.CurrentPower;
 
+                if (Player.PrimaryResource >= MinEnergyReserve)
+                    IsWaitingForSpecial = false;
+
+                if (Player.PrimaryResource < 20)
+                    IsWaitingForSpecial = true;
 
                 using (new PerformanceLogger("AbilitySelector.ClassAbility"))
                 {
@@ -89,7 +83,6 @@ namespace Trinity
                     {
                         // Barbs
                         case ActorClass.Barbarian:
-                            //power = GetBarbarianPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
                             power = BarbarianCombat.GetPower();
                             break;
                         // Crusader
@@ -99,6 +92,8 @@ namespace Trinity
                         // Monks
                         case ActorClass.Monk:
                             power = MonkCombat.GetPower();
+                            if (power != null && GetHasBuff(SNOPower.X1_Monk_Epiphany) && power.MinimumRange > 0)
+                                power.MinimumRange = 75f;
                             break;
                         // Wizards
                         case ActorClass.Wizard:

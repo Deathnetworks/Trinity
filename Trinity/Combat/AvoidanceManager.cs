@@ -1,48 +1,28 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Trinity.Config.Combat;
+using Trinity.LazyCache;
+using Trinity.Reference;
 using Trinity.Technicals;
 using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 
 namespace Trinity
 {
     public static class AvoidanceManager
     {
-        /// <summary>
-        /// Initializes the <see cref="AvoidanceManager" /> class.
-        /// </summary>
-        static AvoidanceManager()
-        {
-            LoadAvoidanceDictionary();
-        }
-
-        private static void LoadAvoidanceDictionary(bool force = false)
-        {
-            if (SNOAvoidanceType == null || !SNOAvoidanceType.Any() || force)
-            {
-                SNOAvoidanceType = FileManager.Load<int, AvoidanceType>("AvoidanceType", "SNO", "Type");
-            }
-        }
-
-        private static IDictionary<int, AvoidanceType> SNOAvoidanceType
-        {
-            get;
-            set;
-        }
-
         public static AvoidanceType GetAvoidanceType(int actorSno)
         {
-            LoadAvoidanceDictionary(false);
-            if (SNOAvoidanceType.ContainsKey(actorSno))
-                return SNOAvoidanceType[actorSno];
-            else
-                return AvoidanceType.None;
+            AvoidanceType type;
+            if (DataDictionary.AvoidanceTypeSNO.TryGetValue(actorSno, out type)) 
+                return type;
+            
+            return default(AvoidanceType);
         }
 
         public static float GetAvoidanceRadius(AvoidanceType type, float defaultValue)
         {
-            LoadAvoidanceDictionary(false);
-            //TODO : Make mapping between Type and Config
             switch (type)
             {
                 case AvoidanceType.Arcane:
@@ -121,28 +101,95 @@ namespace Trinity
             }
         }
 
+        public static float GetAvoidanceRadius(TrinityObject trinityObject)
+        {
+            float customRadius;
+
+            if (!DataDictionary.DefaultAvoidanceCustomRadius.TryGetValue(trinityObject.ActorSNO, out customRadius))
+            {
+                DataDictionary.DefaultAvoidanceAnimationCustomRadius.TryGetValue((int) trinityObject.CurrentAnimation, out customRadius);
+            }
+
+            if (DataDictionary.AvoidanceTypeSNO.ContainsKey(trinityObject.ActorSNO))
+                return GetAvoidanceRadius(DataDictionary.AvoidanceTypeSNO[trinityObject.ActorSNO], customRadius);
+
+            return customRadius;
+        }
+
         public static float GetAvoidanceRadiusBySNO(int snoId, float defaultValue)
         {
             using (new PerformanceLogger("GetAvoidanceRadiusBySNO"))
             {
-                if (SNOAvoidanceType.ContainsKey(snoId))
+                if (DataDictionary.AvoidanceTypeSNO.ContainsKey(snoId))
                 {
-                    float radius = GetAvoidanceRadius(SNOAvoidanceType[snoId], defaultValue);
-                    //DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Found avoidance Radius of={0} for snoId={1} (default={2})", radius, snoId, defaultValue);
+                    float radius = GetAvoidanceRadius(DataDictionary.AvoidanceTypeSNO[snoId], defaultValue);
                     return radius;
-                }
-                else
-                {
-                    //Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Unkown Avoidance type for Radius! {0}", snoId);
                 }
                 return defaultValue;
             }
         }
 
+        public static TimeSpan GetAvoidanceSpawnerDuration(TrinityObject trinityObject)
+        {
+            TimeSpan aoeExpiration;
+            return DataDictionary.AvoidanceSpawnerDuration.TryGetValue(trinityObject.ActorSNO, out aoeExpiration) ? aoeExpiration : TimeSpan.Zero;
+        }
+
         public static float GetAvoidanceHealth(AvoidanceType type, float defaultValue)
         {
-            //TODO : Make mapping between Type and Config
-            LoadAvoidanceDictionary(false);
+
+            // Monks with Serenity up ignore all AOE's
+            if (Trinity.Player.ActorClass == ActorClass.Monk && Trinity.Hotbar.Contains(SNOPower.Monk_Serenity) && Trinity.GetHasBuff(SNOPower.Monk_Serenity))
+            {
+                // Monks with serenity are immune
+                defaultValue *= V.F("Monk.Avoidance.Serenity");
+                Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring avoidance as a Monk with Serenity");
+            }
+            // Witch doctors with spirit walk available and not currently Spirit Walking will subtly ignore ice balls, arcane, desecrator & plague cloud
+            if (Trinity.Player.ActorClass == ActorClass.Witchdoctor && Trinity.Hotbar.Contains(SNOPower.Witchdoctor_SpiritWalk) && Trinity.GetHasBuff(SNOPower.Witchdoctor_SpiritWalk))
+            {
+                if (type == AvoidanceType.IceBall || type == AvoidanceType.Arcane || type == AvoidanceType.Desecrator || type == AvoidanceType.PlagueCloud)
+                {
+                    // Ignore ICE/Arcane/Desc/PlagueCloud altogether with spirit walk up or available
+                    defaultValue *= V.F("WitchDoctor.Avoidance.SpiritWalk");
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring avoidance as a WitchDoctor with Spirit Walk");
+                }
+            }
+            // Remove ice balls if the barbarian has wrath of the berserker up, and reduce health from most other SNO avoidances
+            if (Trinity.Player.ActorClass == ActorClass.Barbarian &&
+                Trinity.Settings.Combat.Barbarian.IgnoreAvoidanceInWOTB &&
+                Trinity.Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) &&
+                Trinity.GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
+            {
+                switch (type)
+                {
+                    case AvoidanceType.IceBall:
+                        defaultValue *= V.F("Barbarian.Avoidance.WOTB.IceBall");
+                        break;
+                    case AvoidanceType.Arcane:
+                        defaultValue *= V.F("Barbarian.Avoidance.WOTB.Arcane");
+                        break;
+                    case AvoidanceType.Desecrator:
+                        defaultValue *= V.F("Barbarian.Avoidance.WOTB.Desecrator");
+                        break;
+                    case AvoidanceType.Belial:
+                        defaultValue = V.F("Barbarian.Avoidance.WOTB.Belial");
+                        break;
+                    case AvoidanceType.PoisonTree:
+                        defaultValue = V.F("Barbarian.Avoidance.WOTB.PoisonTree");
+                        break;
+                    case AvoidanceType.BeastCharge:
+                        defaultValue = V.F("Barbarian.Avoidance.WOTB.BeastCharge");
+                        break;
+                    case AvoidanceType.MoltenCore:
+                        defaultValue = V.F("Barbarian.Avoidance.WOTB.MoltenCore");
+                        break;
+                    default:
+                        defaultValue *= V.F("Barbarian.Avoidance.WOTB.Other");
+                        break;
+                }
+            }            
+
             IAvoidanceHealth avoidanceHealth = null;
             switch (Trinity.Player.ActorClass)
             {
@@ -165,6 +212,7 @@ namespace Trinity
                     avoidanceHealth = Trinity.Settings.Combat.DemonHunter;
                     break;
             }
+
             if (avoidanceHealth != null)
             {
                 switch (type)
@@ -247,20 +295,103 @@ namespace Trinity
             return defaultValue;
         }
 
+        public static bool IsPlayerImmune(AvoidanceType avoidanceType)
+        {
+            // Item based immunity
+            switch (avoidanceType)
+            {
+                case AvoidanceType.PoisonTree:
+                case AvoidanceType.PlagueCloud:
+                case AvoidanceType.PoisonEnchanted:
+                case AvoidanceType.PlagueHand:
+
+                    if (Legendary.MarasKaleidoscope.IsEquipped)
+                    {
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because MarasKaleidoscope is equipped", avoidanceType);
+                        return true;
+                    }
+                    break;
+
+                case AvoidanceType.AzmoFireball:
+                case AvoidanceType.DiabloRingOfFire:
+                case AvoidanceType.DiabloMeteor:
+                case AvoidanceType.ButcherFloorPanel:
+                case AvoidanceType.Mortar:
+                case AvoidanceType.MageFire:
+                case AvoidanceType.MoltenTrail:
+                case AvoidanceType.MoltenBall:
+                case AvoidanceType.ShamanFire:
+
+                    if (Legendary.TheStarOfAzkaranth.IsEquipped)
+                    {
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because TheStarofAzkaranth is equipped", avoidanceType);
+                        return true;
+                    }
+                    break;
+
+                case AvoidanceType.FrozenPulse:
+                case AvoidanceType.IceBall:
+                case AvoidanceType.IceTrail:
+
+                    // Ignore if both items are equipped
+                    if (Legendary.TalismanOfAranoch.IsEquipped)
+                    {
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because TalismanofAranoch is equipped", avoidanceType);
+                        return true;
+                    }
+                    break;
+
+                case AvoidanceType.Orbiter:
+                case AvoidanceType.Thunderstorm:
+
+                    if (Legendary.XephirianAmulet.IsEquipped)
+                    {
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because XephirianAmulet is equipped", avoidanceType);
+                        return true;
+                    }
+                    break;
+
+                case AvoidanceType.Arcane:
+                    if (Legendary.CountessJuliasCameo.IsEquipped)
+                    {
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because CountessJuliasCameo is equipped", avoidanceType);
+                        return true;
+                    }
+                    break;
+            }
+
+            // Set based immunity
+            if (Sets.BlackthornesBattlegear.IsMaxBonusActive)
+            {
+                var blackthornsImmunity = new HashSet<AvoidanceType>
+                {
+                    AvoidanceType.Desecrator,
+                    AvoidanceType.MoltenBall,
+                    AvoidanceType.MoltenCore,
+                    AvoidanceType.MoltenTrail,
+                    AvoidanceType.PlagueHand
+                };
+
+                if (blackthornsImmunity.Contains(avoidanceType))
+                {
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring Avoidance {0} because BlackthornesBattlegear is equipped", avoidanceType);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public static float GetAvoidanceHealthBySNO(int snoId, float defaultValue)
         {
             using (new PerformanceLogger("GetAvoidanceHealthbySNO"))
             {
-                if (SNOAvoidanceType.ContainsKey(snoId))
+                if (DataDictionary.AvoidanceTypeSNO.ContainsKey(snoId))
                 {
-                    float health = GetAvoidanceHealth(SNOAvoidanceType[snoId], defaultValue);
-                    //DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Found avoidance Health of={0} for snoId={1} (default={2})", health, snoId, defaultValue);
+                    float health = GetAvoidanceHealth(DataDictionary.AvoidanceTypeSNO[snoId], defaultValue);
                     return health;
                 }
-                else
-                {
-                    //Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Unkown Avoidance type for Health! {0}", snoId);
-                }
+
                 return defaultValue;
             }
         }

@@ -16,6 +16,7 @@ namespace Trinity.Config.Combat
 		private bool _DisableDisintegrationWave;
         private bool _ArchonElitesOnly;
         private int _ArchonMobCount;
+        private int _BlackHoleAoECount;
         private float _ArchonMobDistance;
         private float _ArchonEliteDistance;
         private WizardKiteOption _KiteOption;
@@ -140,6 +141,24 @@ namespace Trinity.Config.Combat
                 {
                     _ArchonMobCount = value;
                     OnPropertyChanged("ArchonMobCount");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(2)]
+        public int BlackHoleAoECount
+        {
+            get
+            {
+                return _BlackHoleAoECount;
+            }
+            set
+            {
+                if (_BlackHoleAoECount != value)
+                {
+                    _BlackHoleAoECount = value;
+                    OnPropertyChanged("BlackHoleAoECount");
                 }
             }
         }
@@ -946,6 +965,7 @@ namespace Trinity.Config.Combat
             AvoidWormholeHealth = 0.50f;
             ArchonElitesOnly = true;
             ArchonEliteDistance = 15f;
+            BlackHoleAoECount = 2;
         }
 
         [OnDeserialized]

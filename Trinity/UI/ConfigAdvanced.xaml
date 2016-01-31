@@ -36,11 +36,12 @@
                         <CheckBox IsChecked="{Binding Advanced.ShowHeroClass}" Content="Show Hero Class in Title bar"/>
                         <CheckBox IsChecked="{Binding Advanced.LazyRaiderClickToPause}" Content="Lazy Raider Click to Pause"/>
                         <CheckBox IsChecked="{Binding Advanced.DisableAllMovement}" Content="Disable All Movement"/>
+                        <CheckBox IsChecked="{Binding Advanced.AllowDuplicateMessages}" Content="Allow Duplicate Messages"/>
                     </UniformGrid>
                 </GroupBox>
                 <GroupBox Header="Unstucker">
                     <UniformGrid VerticalAlignment="Top">
-                        <CheckBox IsChecked="{Binding Advanced.UnstuckerEnabled}" Content="Enable Trinity unstucker"/>
+                        <CheckBox IsChecked="{Binding Advanced.UnstuckerEnabled}" Content="Enable Trinity Unstucker"/>
                         <CheckBox IsChecked="{Binding Advanced.AllowRestartGame}" Content="Allow game restarts"/>
                     </UniformGrid>
                 </GroupBox>
@@ -64,6 +65,8 @@
                         <CheckBox IsChecked="{Binding Path=Advanced.OutputReports}" ToolTip="Output Reports to TrinityLogs">Output Reports</CheckBox>
                         <CheckBox IsChecked="{Binding Path=Advanced.LogDroppedItems}" ToolTip="Create a CSV file for all dropped items">Log dropped Items</CheckBox>
                         <CheckBox IsChecked="{Binding Path=Advanced.LogStuckLocation}" ToolTip="Create a separated file for stuck locations">Log stuck locations</CheckBox>
+                        <CheckBox IsChecked="{Binding Path=Advanced.ExportNewActorMeta}" ToolTip="Enable logging utililty for building ReferenceActorMeta">Export New ActorMeta</CheckBox>
+                        
                     </UniformGrid>
                 </GroupBox>
                 <GroupBox Header="Trinity Support Specialized logs">
@@ -80,6 +83,7 @@
                         <CheckBox IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=Animation}">Log Monster Animations</CheckBox>
                         <CheckBox IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=UnknownObjects}">Log Unknown Objects</CheckBox>
                         <CheckBox IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=ActiveBuffs}">Log Active Buffs</CheckBox>
+                        <CheckBox IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=SkillSelection}">Log Skill Selection</CheckBox>
                     </UniformGrid>
                 </GroupBox>
                 <!--TPS-->
@@ -115,6 +119,22 @@
                     </StackPanel>
                 </GroupBox>
                 -->
+                <GroupBox Header="Low Priority Object Cache">
+                    <StackPanel Margin="10">
+                        <TextBlock Text="Refresh Rate (ms)" TextWrapping="Wrap" Margin="0" />
+                        <Slider Template="{DynamicResource Slider}" IsEnabled="True"
+                    Interval="50" Maximum="2000" Minimum="100" SmallChange="50" TickFrequency="50"  TickPlacement="BottomRight"
+                    Value="{Binding Path=Advanced.CacheLowPriorityRefreshRate}" IsSnapToTickEnabled="True"
+                    HorizontalAlignment="Stretch"
+                        ToolTip="Default 500."/>
+                        <TextBlock Text="Threshold (Percentage of current target's weight)" TextWrapping="Wrap" Width="341" HorizontalAlignment="Left" />
+                        <Slider Template="{DynamicResource Slider}" IsEnabled="True"
+                    Interval="5" Maximum="80" Minimum="20" SmallChange="5" TickFrequency="5"  TickPlacement="BottomRight"
+                    Value="{Binding Path=Advanced.CacheWeightThresholdPct}" IsSnapToTickEnabled="True"
+                    HorizontalAlignment="Stretch"
+                        ToolTip="Default 50."/>
+                    </StackPanel>
+                </GroupBox>                
             </StackPanel>
             <WrapPanel VerticalAlignment="Bottom" HorizontalAlignment="Center" DockPanel.Dock="Bottom">
                 <!--Reset Button-->

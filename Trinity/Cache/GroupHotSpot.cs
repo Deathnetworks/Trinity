@@ -94,14 +94,19 @@ namespace Trinity
             if (Trinity.Player.IsInTown)
                 return list;
 
-            foreach (var hotSpot in HotSpotList.Where(s => s.Location.Distance2D(Trinity.Player.Position) <= V.F("Cache.HotSpot.MaxDistance") && s.Location.Distance2D(Trinity.Player.Position) >= V.F("Cache.HotSpot.MinDistance") && s.WorldId == Trinity.Player.WorldID))
+            var hotSpotList = HotSpotList.Where(s => 
+                s.Location.Distance2D(Trinity.Player.Position) <= V.F("Cache.HotSpot.MaxDistance") && 
+                s.Location.Distance2D(Trinity.Player.Position) >= V.F("Cache.HotSpot.MinDistance") && 
+                s.WorldId == Trinity.Player.WorldID).ToList();
+
+            foreach (var hotSpot in hotSpotList)
             {
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Adding HotSpot to Cache: {0}", hotSpot);
                 var o = new TrinityCacheObject()
                 {
                     Position = hotSpot.Location,
                     InternalName = "HotSpot",
-                    Type = GObjectType.HotSpot,
+                    Type = TrinityObjectType.HotSpot,
                     Distance = Trinity.Player.Position.Distance2D(hotSpot.Location),
                     Radius = HotSpot.MaxPositionDistance,
                 };
@@ -120,6 +125,11 @@ namespace Trinity
         internal static bool CacheObjectIsInHotSpot(TrinityCacheObject cacheObject)
         {
             return LocationIsInHotSpot(cacheObject.Position, Trinity.Player.WorldID);
+        }
+
+        internal static bool CacheObjectIsInHotSpot(Vector3 position)
+        {
+            return LocationIsInHotSpot(position, Trinity.Player.WorldID);
         }
 
     }

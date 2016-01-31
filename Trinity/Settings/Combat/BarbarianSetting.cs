@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.Reflection;
 using System.Runtime.Serialization;
 
 namespace Trinity.Config.Combat
@@ -21,12 +23,16 @@ namespace Trinity.Config.Combat
         private int _MinThreatShoutMobCount;
         private bool _IgnoreAvoidanceInWOTB;
         private bool _IgnoreGoldInWOTB;
+        private bool _ignorePainOffCooldown;
         private float _MinHotaHealth;
         private BarbarianWOTBMode _WOTBMode;
         private BarbarianSprintMode _SprintMode;
         private bool _UseLeapOOC;
         private bool _UseChargeOOC;
         private bool _WOTBEmergencyHealth;
+        private int _rendWaitDelay;
+        private float _ignorePainMinHealthPct;
+
         private float _AvoidArcaneHealth;
         private float _AvoidAzmoBodiesHealth;
         private float _AvoidAzmoFireBallHealth;
@@ -78,7 +84,7 @@ namespace Trinity.Config.Combat
         }
         #endregion Constructors
 
-        #region Properties
+        #region Common
         [DataMember(IsRequired = false)]
         [DefaultValue(0.35f)]
         public float PotionLevel
@@ -727,7 +733,9 @@ namespace Trinity.Config.Combat
                 }
             }
         }
+#endregion
 
+        #region Properties
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool WaitWOTB
@@ -742,6 +750,24 @@ namespace Trinity.Config.Combat
                 {
                     _WaitWOTB = value;
                     OnPropertyChanged("WaitWOTB");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(3500)]
+        public int RendWaitDelay
+        {
+            get
+            {
+                return _rendWaitDelay;
+            }
+            set
+            {
+                if (_rendWaitDelay != value)
+                {
+                    _rendWaitDelay = value;
+                    OnPropertyChanged("RendWaitDelay");
                 }
             }
         }
@@ -942,6 +968,24 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
+        [DefaultValue(0.40f)]
+        public float IgnorePainMinHealthPct
+        {
+            get
+            {
+                return _ignorePainMinHealthPct;
+            }
+            set
+            {
+                if (_ignorePainMinHealthPct != value)
+                {
+                    _ignorePainMinHealthPct = value;
+                    OnPropertyChanged("IgnorePainMinHealthPct");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
         [DefaultValue(BarbarianWOTBMode.Normal)]
         public BarbarianWOTBMode WOTBMode
         {
@@ -1013,6 +1057,24 @@ namespace Trinity.Config.Combat
             }
         }
 
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool IgnorePainOffCooldown
+        {
+            get
+            {
+                return _ignorePainOffCooldown;
+            }
+            set
+            {
+                if (_ignorePainOffCooldown != value)
+                {
+                    _ignorePainOffCooldown = value;
+                    OnPropertyChanged("IgnorePainOffCooldown");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -1047,22 +1109,20 @@ namespace Trinity.Config.Combat
         /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
         /// </summary>
         /// <param name="context"></param>
-        [OnDeserializing()]
+        [OnDeserializing]
         internal void OnDeserializingMethod(StreamingContext context)
         {
-            this.TargetBasedZigZag = true;
-            this.MinThreatShoutMobCount = 1;
-            this.ThreatShoutOOC = true;
-            this.IgnoreAvoidanceInWOTB = true;
-            this.IgnoreGoldInWOTB = true;
-            this.MinHotaHealth = 0.40f;
-            this.WOTBMode = BarbarianWOTBMode.Normal;
-            this.UseLeapOOC = true;
-            this.UseChargeOOC = true;
-            this.AvoidGrotesqueHealth = 1;
-            this.AvoidOrbiterHealth = 1;
-            this.AvoidWormholeHealth = 0.50f;
-            this.SprintMode = BarbarianSprintMode.MovementOnly;
+            foreach (PropertyInfo p in GetType().GetProperties())
+            {
+                foreach (Attribute attr in p.GetCustomAttributes(true))
+                {
+                    if (attr is DefaultValueAttribute)
+                    {
+                        DefaultValueAttribute dv = (DefaultValueAttribute)attr;
+                        p.SetValue(this, dv.Value);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -1072,10 +1132,10 @@ namespace Trinity.Config.Combat
         [OnDeserialized()]
         internal void OnDeserializedMethod(StreamingContext context)
         {
-            if (this._WOTBHardOnly)
+            if (WOTBHardOnly)
             {
-                this.WOTBMode = BarbarianWOTBMode.HardElitesOnly;
-                this.WOTBHardOnly = false;
+                WOTBMode = BarbarianWOTBMode.HardElitesOnly;
+                WOTBHardOnly = false;
             }
         }
         #endregion Methods

@@ -35,7 +35,7 @@ namespace Trinity
 
                 if (CurrentTarget != null && CurrentTarget.IsUnit)
                 {
-                    switch (CombatBase.PlayerKiteMode)
+                    switch (CombatBase.KiteMode)
                     {
                         case KiteMode.Never:
                             break;
@@ -43,7 +43,7 @@ namespace Trinity
                             kiteMonsterList = (from m in ObjectCache
                                                where m.IsUnit &&
                                                m.RadiusDistance > 0 &&
-                                               m.RadiusDistance <= CombatBase.PlayerKiteDistance &&
+                                               m.RadiusDistance <= CombatBase.KiteDistance &&
                                                m.IsBossOrEliteRareUnique
                                                select m).ToList();
                             break;
@@ -51,7 +51,7 @@ namespace Trinity
                             kiteMonsterList = (from m in ObjectCache
                                                where m.IsUnit &&
                                                m.RadiusDistance > 0 &&
-                                               m.RadiusDistance <= CombatBase.PlayerKiteDistance &&
+                                               m.RadiusDistance <= CombatBase.KiteDistance &&
                                                m.IsBoss
                                                select m).ToList();
                             break;
@@ -60,7 +60,7 @@ namespace Trinity
                                                where m.IsUnit &&
                                                m.Weight > 0 &&
                                                m.RadiusDistance > 0 &&
-                                               m.RadiusDistance <= CombatBase.PlayerKiteDistance &&
+                                               m.RadiusDistance <= CombatBase.KiteDistance &&
                                                (m.IsBossOrEliteRareUnique ||
                                                 ((m.HitPointsPct >= .15 || m.MonsterSize != MonsterSize.Swarm) && !m.IsBossOrEliteRareUnique))
                                                select m).ToList();
@@ -73,7 +73,7 @@ namespace Trinity
                     vKitePointAvoid = Player.Position;
                 }
 
-                if (CombatBase.PlayerKiteDistance > 0 && kiteMonsterList.Count() > 0 && IsWizardShouldKite())
+                if (CombatBase.KiteDistance > 0 && kiteMonsterList.Count() > 0 && IsWizardShouldKite())
                 {
                     TryToKite = true;
                     vKitePointAvoid = Player.Position;
@@ -81,7 +81,7 @@ namespace Trinity
 
                 // Avoid Death
                 if (Settings.Combat.Misc.AvoidDeath &&
-                    Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit && // health is lower than potion limit
+                    Player.CurrentHealthPct <= CombatBase.EmergencyHealthPotionLimit && // health is lower than potion limit
                     !SNOPowerUseTimer(SNOPower.DrinkHealthPotion) && // we can't use a potion anymore
                     TargetUtil.AnyMobsInRange(90f, false))
                 {
@@ -141,13 +141,13 @@ namespace Trinity
                         {
                             Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}",
                                 vAnySafePoint, vAnySafePoint.Distance(Player.Position), MathUtil.GetHeading(MathUtil.FindDirectionDegree(Me.Position, vAnySafePoint)),
-                                Player.CurrentHealthPct, CombatBase.PlayerKiteDistance, kiteMonsterList.Count(),
+                                Player.CurrentHealthPct, CombatBase.KiteDistance, kiteMonsterList.Count(),
                                 NeedToKite, TryToKite);
                         }
                         CurrentTarget = new TrinityCacheObject()
                         {
                             Position = vAnySafePoint,
-                            Type = GObjectType.Avoidance,
+                            Type = TrinityObjectType.Avoidance,
                             Weight = 90000,
                             Distance = Vector3.Distance(Player.Position, vAnySafePoint),
                             Radius = 2f,
